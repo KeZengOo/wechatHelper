@@ -5,8 +5,11 @@ import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.async.DeferredResult;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -21,6 +24,7 @@ import java.time.LocalDate;
 import static springfox.documentation.schema.AlternateTypeRules.newRule;
 
 @SpringBootApplication
+//@EnableDiscoveryClient
 @EnableSwagger2
 public class VirtualRepApiApplication {
 
@@ -56,4 +60,12 @@ public class VirtualRepApiApplication {
 
 	@Autowired
 	private TypeResolver typeResolver;
+
+
+	@Bean
+	//@LoadBalanced
+	RestTemplate getRestTemplate(){
+
+		return new RestTemplate();
+	}
 }
