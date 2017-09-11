@@ -17,7 +17,6 @@ public class DrugUserService {
     private DrugUserRepository drugUserRepository;
 
     public DrugUser findByEmail(String email){
-
-        return null;
+        return drugUserRepository.findFirstByEmail(email);
     }
 }

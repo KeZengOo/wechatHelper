@@ -2,9 +2,7 @@ package com.nuoxin.virtual.rep.virtualrepapi.entity;
 
 import com.nuoxin.virtual.rep.virtualrepapi.common.entity.IdEntity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 /**
@@ -14,7 +12,8 @@ import java.util.Date;
 @Table(name = "virtual_doctor_call_info")
 public class DoctorCallInfo extends IdEntity {
 
-    @Column(name = "virtual_doctor_id")
+    //@Column(name = "virtual_doctor_id")
+    @Transient
     private Long doctorId;
     @Column(name = "virtual_drug_user_id")
     private Long drugUserId;
@@ -30,6 +29,10 @@ public class DoctorCallInfo extends IdEntity {
     private String remark;
     @Column(name = "create_time")
     private Date createTime;
+
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH},fetch = FetchType.LAZY)
+    @JoinColumn(name = "virtual_doctor_id")
+    private Doctor doctor;
 
     public Long getDoctorId() {
         return doctorId;
@@ -93,5 +96,13 @@ public class DoctorCallInfo extends IdEntity {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public Doctor getDoctor() {
+        return doctor;
+    }
+
+    public void setDoctor(Doctor doctor) {
+        this.doctor = doctor;
     }
 }
