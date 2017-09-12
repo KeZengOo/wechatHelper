@@ -27,6 +27,8 @@ public class DoctorCallInfo extends IdEntity {
     private Long questionnaireId;
     @Column(name = "remark")
     private String remark;
+    @Column(name = "status")
+    private String status;
     @Column(name = "create_time")
     private Date createTime;
 
@@ -104,5 +106,13 @@ public class DoctorCallInfo extends IdEntity {
 
     public void setDoctor(Doctor doctor) {
         this.doctor = doctor;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

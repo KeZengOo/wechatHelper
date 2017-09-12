@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Created by fenggang on 9/11/17.
  */
-@Api(value = "",description = "获取客户信息接口")
+@Api(value = "",description = "客户信息接口")
 @RestController
 @RequestMapping(value = "/doctor")
 public class DoctorController extends BaseController {
@@ -20,6 +20,30 @@ public class DoctorController extends BaseController {
     @GetMapping("/details/{id}")
     public void doctorDetails(@PathVariable Long id,
                               HttpServletRequest request, HttpServletResponse response){
+
+    }
+
+    @ApiOperation(value = "获取医生列表", notes = "获取医生列表")
+    @PostMapping("/page")
+    public void page(HttpServletRequest request, HttpServletResponse response){
+
+    }
+
+    @ApiOperation(value = "客户头部统计", notes = "客户头部统计")
+    @PostMapping("/stat")
+    public void stat(HttpServletRequest request, HttpServletResponse response){
+
+    }
+
+    @ApiOperation(value = "医生保存", notes = "医生保存")
+    @PostMapping("/save")
+    public void save(HttpServletRequest request, HttpServletResponse response){
+
+    }
+
+    @ApiOperation(value = "医生excle导入", notes = "医生excle导入")
+    @PostMapping("/excel")
+    public void excel(HttpServletRequest request, HttpServletResponse response){
 
     }
 }

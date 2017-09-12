@@ -36,5 +36,16 @@ public class DoctorCallController extends BaseController {
 
     }
 
+    @ApiOperation(value = "拨号保存电话记录", notes = "拨号保存电话记录")
+    @PostMapping("/save")
+    public void save(HttpServletRequest request, HttpServletResponse response){
+
+    }
+
+    @ApiOperation(value = "挂断保存电话记录", notes = "挂断保存电话记录")
+    @PostMapping("/stop/save")
+    public void stopSave(HttpServletRequest request, HttpServletResponse response){
+
+    }
 
 }
