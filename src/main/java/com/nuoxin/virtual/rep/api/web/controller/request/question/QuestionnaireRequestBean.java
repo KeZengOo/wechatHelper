@@ -10,10 +10,12 @@ import java.util.List;
  * Created by fenggang on 9/11/17.
  */
 @ApiModel
-public class QuestionnaireSaveRequestBean implements Serializable {
+public class QuestionnaireRequestBean implements Serializable {
 
     private static final long serialVersionUID = -955947577004247095L;
 
+    @ApiModelProperty(value = "id")
+    private Long id;
     @ApiModelProperty(value = "标题")
     private String title;
     @ApiModelProperty(value = "问题")
@@ -33,5 +35,13 @@ public class QuestionnaireSaveRequestBean implements Serializable {
 
     public void setQuestions(List<QuestionRequestBean> questions) {
         this.questions = questions;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

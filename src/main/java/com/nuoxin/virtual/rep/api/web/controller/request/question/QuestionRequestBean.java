@@ -14,6 +14,8 @@ public class QuestionRequestBean implements Serializable {
 
     private static final long serialVersionUID = -7014923363775468068L;
 
+    @ApiModelProperty(value = "id")
+    private Long id;
     @ApiModelProperty(value = "标题")
     private String title;
     @ApiModelProperty(value = "选项")
@@ -53,5 +55,13 @@ public class QuestionRequestBean implements Serializable {
 
     public void setType(Integer type) {
         this.type = type;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

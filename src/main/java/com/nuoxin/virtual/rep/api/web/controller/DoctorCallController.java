@@ -1,9 +1,18 @@
 package com.nuoxin.virtual.rep.api.web.controller;
 
+import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
+import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
+import com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.call.CallInfoRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.call.CallRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.call.CallHistoryResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.call.CallResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.call.CallStatResponseBean;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,32 +29,40 @@ public class DoctorCallController extends BaseController {
 
     @ApiOperation(value = "客户电话搜索列表", notes = "客户电话搜索列表")
     @PostMapping("/doctor/page")
-    public void doctorPage(HttpServletRequest request, HttpServletResponse response){
-
+    public DefaultResponseBean<PageResponseBean<CallResponseBean>> doctorPage(@RequestBody QueryRequestBean bean,
+                                                                              HttpServletRequest request, HttpServletResponse response){
+        DefaultResponseBean responseBean = new DefaultResponseBean();
+        return responseBean;
     }
 
     @ApiOperation(value = "客户电话历史记录", notes = "客户电话历史记录")
     @PostMapping("/doctor/history/page")
-    public void doctorHistoryPage(HttpServletRequest request, HttpServletResponse response){
-
+    public DefaultResponseBean<PageResponseBean<CallHistoryResponseBean>> doctorHistoryPage(HttpServletRequest request, HttpServletResponse response){
+        DefaultResponseBean responseBean = new DefaultResponseBean();
+        return responseBean;
     }
 
     @ApiOperation(value = "电话顶部统计", notes = "电话顶部统计")
     @PostMapping("/stat")
-    public void stat(HttpServletRequest request, HttpServletResponse response){
-
+    public DefaultResponseBean<CallStatResponseBean> stat(HttpServletRequest request, HttpServletResponse response){
+        DefaultResponseBean responseBean = new DefaultResponseBean();
+        return responseBean;
     }
 
     @ApiOperation(value = "拨号保存电话记录", notes = "拨号保存电话记录")
     @PostMapping("/save")
-    public void save(HttpServletRequest request, HttpServletResponse response){
-
+    public DefaultResponseBean<CallRequestBean> save(@RequestBody CallRequestBean bean,
+                                    HttpServletRequest request, HttpServletResponse response){
+        DefaultResponseBean responseBean = new DefaultResponseBean();
+        return responseBean;
     }
 
     @ApiOperation(value = "挂断保存电话记录", notes = "挂断保存电话记录")
     @PostMapping("/stop/save")
-    public void stopSave(HttpServletRequest request, HttpServletResponse response){
-
+    public DefaultResponseBean<Boolean> stopSave(@RequestBody CallInfoRequestBean bean,
+                                        HttpServletRequest request, HttpServletResponse response){
+        DefaultResponseBean responseBean = new DefaultResponseBean();
+        return responseBean;
     }
 
 }
