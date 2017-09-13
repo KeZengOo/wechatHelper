@@ -1,10 +1,13 @@
 package com.nuoxin.virtual.rep.api.utils;
 
+
 import com.nuoxin.virtual.rep.api.common.annotations.Excel;
-import com.nuoxin.virtual.rep.api.web.controller.response.vo.WechatMessage;
+import com.nuoxin.virtual.rep.api.entity.WechatMessage;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,6 +24,8 @@ import java.util.*;
  */
 public class ExcelUtils <E>{
 
+    private static Logger logger = LoggerFactory.getLogger(ExcelUtils.class);
+
     private E e;
     private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private int etimes = 0;
@@ -36,7 +41,7 @@ public class ExcelUtils <E>{
     }
 
     /**
-     * 从文件读取数据，最好是所有的单元格都是文本格式，日期格式要求yyyy-MM-dd HH:mm:ss,布尔类型0：真，1：假
+     * 从文件读取数据，重载方法可以从输入流中读取，最好是所有的单元格都是文本格式，日期格式要求yyyy-MM-dd HH:mm:ss,布尔类型0：真，1：假
      *
      * @param edf
      *            数据格式化，如果没有要格式化的，传null
@@ -105,6 +110,79 @@ public class ExcelUtils <E>{
         return list;
     }
 
+
+
+
+    /**
+     *
+     * 重载方法从文件输入流中读取数据，最好是所有的单元格都是文本格式，日期格式要求yyyy-MM-dd HH:mm:ss,布尔类型0：真，1：假
+     *
+     * @param edf
+     *            数据格式化，如果没有要格式化的，传null
+     *
+     * @param is
+     *            Excel文件输入流，支持xlsx 和 xls 后缀的文件
+     * @return
+     * @throws Exception
+     */
+    public List<E> readFromFile(ExcelDataFormatter edf, InputStream is) throws Exception {
+        Field[] fields = ReflectUtils.getClassFieldsAndSuperClassFields(e.getClass());
+
+        Map<String, String> textToKey = new HashMap<String, String>();
+
+        Excel excel = null;
+        for (Field field : fields) {
+            excel = field.getAnnotation(Excel.class);
+            if (excel == null || excel.skip() == true) {
+                continue;
+            }
+            textToKey.put(excel.name(), field.getName());
+        }
+
+        //InputStream is = new FileInputStream(file);
+
+        //Workbook wb = new XSSFWorkbook(is);
+        Workbook wb = WorkbookFactory.create(is);
+
+        Sheet sheet = wb.getSheetAt(0);
+        Row title = sheet.getRow(0);
+        // 标题数组，后面用到，根据索引去标题名称，通过标题名称去字段名称用到 textToKey
+        String[] titles = new String[title.getPhysicalNumberOfCells()];
+        for (int i = 0; i < title.getPhysicalNumberOfCells(); i++) {
+            titles[i] = title.getCell(i).getStringCellValue();
+        }
+
+        List<E> list = new ArrayList<E>();
+
+        E e = null;
+
+        int rowIndex = 0;
+        int columnCount = titles.length;
+        Cell cell = null;
+        Row row = null;
+
+        for (Iterator<Row> it = sheet.rowIterator(); it.hasNext();) {
+
+            row = it.next();
+            if (rowIndex++ == 0) {
+                continue;
+            }
+
+            if (row == null) {
+                break;
+            }
+
+            e = get();
+
+            for (int i = 0; i < columnCount; i++) {
+                cell = row.getCell(i);
+                etimes = 0;
+                readCellContent(textToKey.get(titles[i]), fields, cell, e, edf);
+            }
+            list.add(e);
+        }
+        return list;
+    }
 
 
 

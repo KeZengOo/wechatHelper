@@ -14,6 +14,8 @@ import java.util.Date;
 @Table(name = "virtual_wechat_message")
 public class WechatMessage extends IdEntity {
 
+    private static final long serialVersionUID = -7724291148759601691L;
+
     // 用户类型，1是销售代表，2是医生
     @Column(name = "user_type")
     private Integer userType;
@@ -123,4 +125,7 @@ public class WechatMessage extends IdEntity {
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
+
+
+
 }

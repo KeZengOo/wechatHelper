@@ -1,8 +1,12 @@
-package com.nuoxin.virtual.rep.api.web.controller.response.vo;
+package com.nuoxin.virtual.rep.api.web.controller.request.vo;
 
 import com.nuoxin.virtual.rep.api.common.annotations.Excel;
 
-public class WechatMessage {
+/**
+ * 微信消息excel映射实体类
+ * @author tiancun
+ */
+public class WechatMessageVo {
 
     @Excel(name = "ID", width = 50)
     private String id;
@@ -22,7 +26,7 @@ public class WechatMessage {
     @Excel(name = "类型", width = 20)
     private String messageType;
 
-    @Excel(name = "消息", width = 500)
+    @Excel(name = "消息", width = 1000)
     private String message;
 
 
@@ -83,16 +87,6 @@ public class WechatMessage {
     }
 
 
-    @Override
-    public String toString() {
-        return "WechatMessage{" +
-                "id='" + id + '\'' +
-                ", wechatTime='" + wechatTime + '\'' +
-                ", nickname='" + nickname + '\'' +
-                ", wechatNumber='" + wechatNumber + '\'' +
-                ", messageStatus='" + messageStatus + '\'' +
-                ", messageType='" + messageType + '\'' +
-                ", message='" + message + '\'' +
-                '}';
-    }
+
 }
+
