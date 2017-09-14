@@ -1,22 +1,28 @@
 package com.nuoxin.virtual.rep.api.service;
 
+import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.FileFormatException;
+import com.nuoxin.virtual.rep.api.common.service.BaseService;
 import com.nuoxin.virtual.rep.api.dao.WechatRepository;
 import com.nuoxin.virtual.rep.api.entity.WechatMessage;
 import com.nuoxin.virtual.rep.api.enums.UserTypeEnum;
 import com.nuoxin.virtual.rep.api.utils.ExcelUtils;
 import com.nuoxin.virtual.rep.api.utils.RegularUtils;
 import com.nuoxin.virtual.rep.api.web.controller.request.vo.WechatMessageVo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.nuoxin.virtual.rep.api.web.controller.request.wechat.WechatMessageRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.wechat.WechatMessageResponseBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.criteria.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,9 +34,7 @@ import java.util.List;
  * 微信相关接口
  */
 @Service
-public class WechatService {
-
-    private static Logger logger = LoggerFactory.getLogger(ExcelUtils.class);
+public class WechatService extends BaseService{
 
     private static final String EXTENSION_XLS = "xls";
 
@@ -47,6 +51,11 @@ public class WechatService {
     private WechatRepository wechatRepository;
 
 
+    /**
+     * 导入微信聊天消息
+     * @param file 消息的excel文件
+     * @return
+     */
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public boolean importExcel(MultipartFile file){
         boolean success = false;
@@ -159,5 +168,55 @@ public class WechatService {
         return success;
     }
 
+
+
+
+    public PageResponseBean<WechatMessageResponseBean> getWechatMessageList(WechatMessageRequestBean bean){
+        bean.setPage(bean.getPage()-1);
+        Pageable pageable = super.getPage(bean);
+
+        Specification<WechatMessage> specification = new Specification<WechatMessage>() {
+            @Override
+            public Predicate toPredicate(Root<WechatMessage> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+                //Path path = root.get("id");
+                //Predicate predicate = criteriaBuilder.equal(path, bean.getTelephone());
+                //Predicate predicate = criteriaBuilder.ge(path,2);
+
+//                Path<String> path = root.get("telephone");
+//                Predicate predicate = criteriaBuilder.equal(path, bean.getTelephone());
+//                criteriaBuilder.equal(path, bean.getTelephone());
+//                return predicate;
+
+                return null;
+            }
+        };
+
+
+        Page<WechatMessage> page = wechatRepository.findAll(specification, pageable);
+        PageResponseBean<WechatMessageResponseBean> wechatMessagePage = new PageResponseBean<>(page);
+        List<WechatMessageResponseBean> list = new ArrayList<>();
+        List<WechatMessage> content = page.getContent();
+        if (null != content && content.size() > 0){
+
+            for (WechatMessage wechatMessage:content){
+                WechatMessageResponseBean wechatMessageResponseBean = new WechatMessageResponseBean();
+                wechatMessageResponseBean.setId(wechatMessage.getId());
+                wechatMessageResponseBean.setMessage(wechatMessage.getMessage());
+                wechatMessageResponseBean.setMessageStatus(wechatMessage.getMessageStatus());
+                wechatMessageResponseBean.setMessageType(wechatMessage.getMessageType());
+                wechatMessageResponseBean.setNickname(wechatMessage.getNickname());
+                wechatMessageResponseBean.setTelephone(wechatMessage.getTelephone());
+                wechatMessageResponseBean.setWechatTime(wechatMessage.getWechatTime());
+                wechatMessageResponseBean.setWechatNumber(wechatMessage.getWechatNumber());
+                wechatMessageResponseBean.setUserType(wechatMessage.getUserType());
+                list.add(wechatMessageResponseBean);
+            }
+
+        }
+
+        wechatMessagePage.setContent(list);
+
+        return wechatMessagePage;
+    }
 
 }
