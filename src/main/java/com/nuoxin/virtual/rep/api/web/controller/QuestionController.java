@@ -3,10 +3,12 @@ package com.nuoxin.virtual.rep.api.web.controller;
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
+import com.nuoxin.virtual.rep.api.service.QuestionService;
 import com.nuoxin.virtual.rep.api.web.controller.request.question.QuestionQueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.question.QuestionnaireRequestBean;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,11 +22,16 @@ import javax.servlet.http.HttpServletResponse;
 @RequestMapping(value = "/question")
 public class QuestionController extends BaseController {
 
+    @Autowired
+    private QuestionService questionService;
+
     @ApiOperation(value = "添加问卷", notes = "添加问卷")
     @PostMapping("/save")
-    public DefaultResponseBean save(@RequestBody QuestionnaireRequestBean bean,
+    public DefaultResponseBean<Boolean> save(@RequestBody QuestionnaireRequestBean bean,
                      HttpServletRequest request, HttpServletResponse response){
         DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean();
+        bean.setDrugUserId(super.getLoginId(request));
+        responseBean.setData(questionService.save(bean));
         return responseBean;
     }
 
@@ -33,6 +40,8 @@ public class QuestionController extends BaseController {
     public DefaultResponseBean<Boolean> update(@RequestBody QuestionnaireRequestBean bean,
                        HttpServletRequest request, HttpServletResponse response){
         DefaultResponseBean responseBean = new DefaultResponseBean();
+        bean.setDrugUserId(super.getLoginId(request));
+        responseBean.setData(questionService.update(bean));
         return responseBean;
     }
 
@@ -41,6 +50,16 @@ public class QuestionController extends BaseController {
     public DefaultResponseBean<QuestionnaireRequestBean> get(@PathVariable Long id,
                     HttpServletRequest request, HttpServletResponse response){
         DefaultResponseBean responseBean = new DefaultResponseBean();
+        responseBean.setData(questionService.findById(id));
+        return responseBean;
+    }
+
+    @ApiOperation(value = "删除单个问卷", notes = "删除单个问卷")
+    @GetMapping("/delete/{id}")
+    public DefaultResponseBean<Boolean> delete(@PathVariable Long id,
+                                                             HttpServletRequest request, HttpServletResponse response){
+        DefaultResponseBean responseBean = new DefaultResponseBean();
+        responseBean.setData(questionService.delete(id));
         return responseBean;
     }
 
@@ -49,6 +68,7 @@ public class QuestionController extends BaseController {
     public DefaultResponseBean<PageResponseBean<QuestionnaireRequestBean>> page(@RequestBody QuestionQueryRequestBean bean,
                                                       HttpServletRequest request, HttpServletResponse response){
         DefaultResponseBean responseBean = new DefaultResponseBean();
+        responseBean.setData(questionService.page(bean));
         return responseBean;
     }
 

@@ -35,6 +35,8 @@ public class DoctorRequestBean implements Serializable {
     @ApiModelProperty(value = "教授")
     private String professor;
 
+    private Long drugUserId;
+
     public Long getId() {
         return id;
     }
@@ -121,5 +123,13 @@ public class DoctorRequestBean implements Serializable {
 
     public void setProfessor(String professor) {
         this.professor = professor;
+    }
+
+    public Long getDrugUserId() {
+        return drugUserId;
+    }
+
+    public void setDrugUserId(Long drugUserId) {
+        this.drugUserId = drugUserId;
     }
 }

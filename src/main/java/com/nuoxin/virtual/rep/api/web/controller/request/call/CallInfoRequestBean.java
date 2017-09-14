@@ -20,6 +20,8 @@ public class CallInfoRequestBean implements Serializable {
     @ApiModelProperty(value = "备注")
     private String remark;
 
+    private Long drugUserId;
+
     public Long getId() {
         return id;
     }
@@ -42,5 +44,13 @@ public class CallInfoRequestBean implements Serializable {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public Long getDrugUserId() {
+        return drugUserId;
+    }
+
+    public void setDrugUserId(Long drugUserId) {
+        this.drugUserId = drugUserId;
     }
 }

@@ -28,6 +28,8 @@ public class QueryRequestBean extends PageRequestBean {
     @ApiModelProperty(value = "医生级别")
     private String doctorLevle;
 
+    private Long drugUserId;
+
     public String getMobile() {
         return mobile;
     }
@@ -90,5 +92,13 @@ public class QueryRequestBean extends PageRequestBean {
 
     public void setDoctorLevle(String doctorLevle) {
         this.doctorLevle = doctorLevle;
+    }
+
+    public Long getDrugUserId() {
+        return drugUserId;
+    }
+
+    public void setDrugUserId(Long drugUserId) {
+        this.drugUserId = drugUserId;
     }
 }

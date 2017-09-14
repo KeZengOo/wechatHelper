@@ -20,6 +20,7 @@ public class QuestionnaireRequestBean implements Serializable {
     private String title;
     @ApiModelProperty(value = "问题")
     private List<QuestionRequestBean> questions;
+    private Long drugUserId;
 
     public String getTitle() {
         return title;
@@ -43,5 +44,13 @@ public class QuestionnaireRequestBean implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getDrugUserId() {
+        return drugUserId;
+    }
+
+    public void setDrugUserId(Long drugUserId) {
+        this.drugUserId = drugUserId;
     }
 }
