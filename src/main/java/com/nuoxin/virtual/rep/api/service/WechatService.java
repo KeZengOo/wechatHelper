@@ -130,7 +130,11 @@ public class WechatService {
                         throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
                     }
                     nickname = nicknameArray[0];
-                    telephone = nicknameArray[01];
+                    telephone = nicknameArray[1];
+                    boolean m = RegularUtils.isMatcher(MATCH_TELEPHONE, telephone);
+                    if (!m){
+                        throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
+                    }
                 }
 
                 WechatMessage wechatMessage = new WechatMessage();
