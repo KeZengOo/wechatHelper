@@ -3,6 +3,7 @@ package com.nuoxin.virtual.rep.api.common.controller;
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
+import com.nuoxin.virtual.rep.api.common.exception.FileFormatException;
 import com.nuoxin.virtual.rep.api.common.exception.NeedLoginException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,6 +117,26 @@ public class ControllerAssist {
 		ErrorEnum error = ErrorEnum.ERROR;
 		return ResponseEntity.ok(DefaultResponseBean.clone(error.getMessage(), error.getStatus(), exception.getMessage()));
 	}
+
+
+	/**
+	 * 处理文件格式异常
+	 * @param exception
+	 * @param request
+	 * @return
+	 */
+	@ExceptionHandler(FileFormatException.class)
+	@ResponseBody
+	public ResponseEntity<DefaultResponseBean<?>> handleFileFormatException(FileFormatException exception, HttpServletRequest request, Locale locale){
+
+		logger.error("文件格式错误。。。", exception.getMessage());
+		ErrorEnum error = ErrorEnum.FILE_FORMAT_ERROR;
+
+		return ResponseEntity.ok(DefaultResponseBean.clone(error.getMessage(), error.getStatus(), exception.getMessage()));
+
+
+	}
+
 
 	/**
 	 * 处理服务器端RuntimeException

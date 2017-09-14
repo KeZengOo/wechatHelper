@@ -14,7 +14,9 @@ public enum ErrorEnum {
 
     PERMISSION_ERROR(550,"权限不足"),
 
-    SYSTEM_REQUEST_PARAM_ERROR(600,"请求参数错误");
+    SYSTEM_REQUEST_PARAM_ERROR(600,"请求参数错误"),
+
+    FILE_FORMAT_ERROR(4100,"文件格式错误");
 
     private int status;
     private String message;
