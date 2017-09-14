@@ -3,7 +3,9 @@ package com.nuoxin.virtual.rep.api.web.controller;
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
+import com.nuoxin.virtual.rep.api.service.DoctorCallService;
 import com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.call.CallHistoryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.CallInfoRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.CallRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.call.CallHistoryResponseBean;
@@ -11,6 +13,7 @@ import com.nuoxin.virtual.rep.api.web.controller.response.call.CallResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.call.CallStatResponseBean;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,18 +30,26 @@ import javax.servlet.http.HttpServletResponse;
 @RequestMapping(value = "/call")
 public class DoctorCallController extends BaseController {
 
+    @Autowired
+    private DoctorCallService doctorCallService;
+
     @ApiOperation(value = "客户电话搜索列表", notes = "客户电话搜索列表")
     @PostMapping("/doctor/page")
     public DefaultResponseBean<PageResponseBean<CallResponseBean>> doctorPage(@RequestBody QueryRequestBean bean,
                                                                               HttpServletRequest request, HttpServletResponse response){
         DefaultResponseBean responseBean = new DefaultResponseBean();
+        bean.setDrugUserId(super.getLoginId(request));
+        responseBean.setData(doctorCallService.doctorPage(bean));
         return responseBean;
     }
 
     @ApiOperation(value = "客户电话历史记录", notes = "客户电话历史记录")
     @PostMapping("/doctor/history/page")
-    public DefaultResponseBean<PageResponseBean<CallHistoryResponseBean>> doctorHistoryPage(HttpServletRequest request, HttpServletResponse response){
+    public DefaultResponseBean<PageResponseBean<CallHistoryResponseBean>> doctorHistoryPage(@RequestBody CallHistoryRequestBean bean,
+                                                                                            HttpServletRequest request, HttpServletResponse response){
         DefaultResponseBean responseBean = new DefaultResponseBean();
+        bean.setDrugUserId(super.getLoginId(request));
+        responseBean.setData(doctorCallService.doctorHistoryPage(bean));
         return responseBean;
     }
 
@@ -46,6 +57,7 @@ public class DoctorCallController extends BaseController {
     @PostMapping("/stat")
     public DefaultResponseBean<CallStatResponseBean> stat(HttpServletRequest request, HttpServletResponse response){
         DefaultResponseBean responseBean = new DefaultResponseBean();
+        responseBean.setData(doctorCallService.stat(super.getLoginId(request)));
         return responseBean;
     }
 
@@ -54,6 +66,8 @@ public class DoctorCallController extends BaseController {
     public DefaultResponseBean<CallRequestBean> save(@RequestBody CallRequestBean bean,
                                     HttpServletRequest request, HttpServletResponse response){
         DefaultResponseBean responseBean = new DefaultResponseBean();
+        bean.setDrugUserId(super.getLoginId(request));
+        responseBean.setData(doctorCallService.save(bean));
         return responseBean;
     }
 
@@ -62,6 +76,8 @@ public class DoctorCallController extends BaseController {
     public DefaultResponseBean<Boolean> stopSave(@RequestBody CallInfoRequestBean bean,
                                         HttpServletRequest request, HttpServletResponse response){
         DefaultResponseBean responseBean = new DefaultResponseBean();
+        bean.setDrugUserId(super.getLoginId(request));
+        responseBean.setData(doctorCallService.stopSave(bean));
         return responseBean;
     }
 

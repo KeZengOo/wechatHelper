@@ -19,6 +19,8 @@ public class CallRequestBean implements Serializable {
     @ApiModelProperty(value = "唯一标识")
     private String sinToken;
 
+    private Long drugUserId;
+
     public String getMobile() {
         return mobile;
     }
@@ -41,5 +43,13 @@ public class CallRequestBean implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getDrugUserId() {
+        return drugUserId;
+    }
+
+    public void setDrugUserId(Long drugUserId) {
+        this.drugUserId = drugUserId;
     }
 }

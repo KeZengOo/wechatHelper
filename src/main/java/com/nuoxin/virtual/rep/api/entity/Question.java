@@ -23,7 +23,7 @@ public class Question extends IdEntity {
     @Column(name = "options")
     private String options;
     @Column(name = "virtual_questionnaire_id")
-    private Long optionsnaireId;
+    private Long questionnaireId;
     @Column(name = "answer")
     private String answer;
     @Column(name = "create_time")
@@ -53,12 +53,12 @@ public class Question extends IdEntity {
         this.options = options;
     }
 
-    public Long getOptionsnaireId() {
-        return optionsnaireId;
+    public Long getQuestionnaireId() {
+        return questionnaireId;
     }
 
-    public void setOptionsnaireId(Long optionsnaireId) {
-        this.optionsnaireId = optionsnaireId;
+    public void setQuestionnaireId(Long questionnaireId) {
+        this.questionnaireId = questionnaireId;
     }
 
     public String getAnswer() {
