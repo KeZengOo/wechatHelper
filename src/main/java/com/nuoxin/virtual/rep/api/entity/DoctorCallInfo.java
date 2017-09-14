@@ -31,6 +31,8 @@ public class DoctorCallInfo extends IdEntity {
     private String status;
     @Column(name = "create_time")
     private Date createTime;
+    @Column(name = "mobile")
+    private String mobile;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH},fetch = FetchType.LAZY)
     @JoinColumn(name = "virtual_doctor_id")
@@ -114,5 +116,13 @@ public class DoctorCallInfo extends IdEntity {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
     }
 }

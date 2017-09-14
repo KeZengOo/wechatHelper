@@ -25,6 +25,10 @@ public class CallHistoryResponseBean implements Serializable {
     private Long times;
     @ApiModelProperty(value = "通话时间（yyyy-MM-dd HH:mm）")
     private String timeStr;
+    @ApiModelProperty(value = "是否是当前记录")
+    private Boolean current = false;
+    @ApiModelProperty(value = "通话时间（时间戳）")
+    private Long timeLong;
     @ApiModelProperty(value = "问卷信息")
     private List<QuestionnaireRequestBean> questions;
 
@@ -74,5 +78,21 @@ public class CallHistoryResponseBean implements Serializable {
 
     public void setQuestions(List<QuestionnaireRequestBean> questions) {
         this.questions = questions;
+    }
+
+    public Long getTimeLong() {
+        return timeLong;
+    }
+
+    public void setTimeLong(Long timeLong) {
+        this.timeLong = timeLong;
+    }
+
+    public Boolean getCurrent() {
+        return current;
+    }
+
+    public void setCurrent(Boolean current) {
+        this.current = current;
     }
 }

@@ -43,6 +43,9 @@ public class Doctor extends IdEntity {
     @Column(name = "create_time")
     private Date createTime;
 
+    @Column(name = "drug_user_ids")
+    private String drugUserIds;
+
     public Long getEappId() {
         return eappId;
     }
@@ -145,5 +148,13 @@ public class Doctor extends IdEntity {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public String getDrugUserIds() {
+        return drugUserIds;
+    }
+
+    public void setDrugUserIds(String drugUserIds) {
+        this.drugUserIds = drugUserIds;
     }
 }

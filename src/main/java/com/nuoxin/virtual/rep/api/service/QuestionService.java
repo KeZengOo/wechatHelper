@@ -80,6 +80,7 @@ public class QuestionService extends BaseService {
             questionRepository.deleteByQuestionnaireId(questionnaire.getId());
             for (QuestionRequestBean questionBean:list) {
                 Question question = new Question();
+                question.setId(questionBean.getId());
                 question.setAnswer(questionBean.getAnswer());
                 question.setTitle(questionBean.getTitle());
                 question.setQuestionnaireId(questionnaire.getId());
@@ -151,6 +152,7 @@ public class QuestionService extends BaseService {
                 if(question.getOptions()!=null && !"".equals(question.getOptions())){
                     bean.setOptioons(JSON.parseArray(question.getOptions(), OptionsRequestBean.class));
                 }
+                requestBeans.add(bean);
             }
             return  requestBeans;
         }
