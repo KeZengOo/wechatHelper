@@ -5,6 +5,7 @@ import com.nuoxin.virtual.rep.api.common.annotations.Excel;
 import com.nuoxin.virtual.rep.api.entity.WechatMessage;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

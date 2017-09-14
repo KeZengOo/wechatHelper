@@ -130,6 +130,7 @@ public class QuestionService extends BaseService {
 
     private QuestionnaireRequestBean _getQuestionnaire(Questionnaire questionnaire){
         QuestionnaireRequestBean requestBean = new QuestionnaireRequestBean();
+        if(questionnaire==null){return requestBean;}
         requestBean.setDrugUserId(questionnaire.getCreateId());
         requestBean.setId(questionnaire.getId());
         requestBean.setTitle(questionnaire.getTitle());
