@@ -20,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -59,6 +58,7 @@ public class WechatService {
             logger.error("得到上传文件的输入流失败。。" + e);
             logger.error("得到上传文件的输入流失败。。" + e.getMessage());
             e.printStackTrace();
+            throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
         }
 
         String originalFilename = file.getOriginalFilename();
@@ -94,16 +94,17 @@ public class WechatService {
         } catch (Exception e) {
             logger.error("读取上传的excel文件失败。。" , e.getMessage());
             e.printStackTrace();
+            throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
         }
 
         if (null == wechatMessageVos || wechatMessageVos.size() <= 0){
             return false;
         }
 
-        for (WechatMessageVo wechatMessageVo:wechatMessageVos){
-            if (null != wechatMessageVo){
+        for (WechatMessageVo wechatMessageVo:wechatMessageVos) {
+            if (null != wechatMessageVo) {
                 String id = wechatMessageVo.getId();
-                if (StringUtils.isEmpty(id)){
+                if (StringUtils.isEmpty(id)) {
                     continue;
                 }
 
@@ -115,31 +116,17 @@ public class WechatService {
                 String messageType = wechatMessageVo.getMessageType();
                 String message = wechatMessageVo.getMessage();
 
-                try {
-                    wechatTime = new String(wechatTime.getBytes("gbk"), "utf-8");
-                    wechatNickName = new String(wechatNickName.getBytes("gbk"), "utf-8");
-                    wechatNumber = new String(wechatNumber.getBytes("gbk"), "utf-8");
-                    messageStatus = new String(messageStatus.getBytes("gbk"), "utf-8");
-                    messageType = new String(messageType.getBytes("gbk"), "utf-8");
-                    message = new String(message.getBytes("gbk"), "utf-8");
-                } catch (UnsupportedEncodingException e) {
-                    logger.error("编码转换异常。。", e.getMessage());
-                    e.printStackTrace();
-                    throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
-                }
-
-
                 int userType = 0;
                 String nickname = "";
                 String telephone = "";
-                if (wechatNickName != null && DRUG_USER_NICKNAME.equals(wechatNickName)){
+                if (wechatNickName != null && DRUG_USER_NICKNAME.equals(wechatNickName)) {
                     userType = UserTypeEnum.DRUG_USER.getUserType();
                     nickname = drugUserNickname;
                     telephone = drugUserTelephone;
-                }else if (wechatNickName !=null && !DRUG_USER_NICKNAME.equals(wechatNickName)){
+                } else if (wechatNickName != null && !DRUG_USER_NICKNAME.equals(wechatNickName)) {
                     userType = UserTypeEnum.DOCTOR.getUserType();
                     String[] nicknameArray = wechatNickName.split("-");
-                    if (null == nicknameArray || nicknameArray.length < 2){
+                    if (null == nicknameArray || nicknameArray.length < 2) {
                         throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
                     }
                     nickname = nicknameArray[0];
@@ -161,12 +148,12 @@ public class WechatService {
             }
         }
 
-
-
+        //批量保存微信聊天消息
         wechatRepository.save(list);
 
         success = true;
         return success;
     }
+
 
 }
