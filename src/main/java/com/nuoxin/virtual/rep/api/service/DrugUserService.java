@@ -2,6 +2,7 @@ package com.nuoxin.virtual.rep.api.service;
 
 import com.nuoxin.virtual.rep.api.dao.DrugUserRepository;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
+import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorStatResponseBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,5 +19,9 @@ public class DrugUserService {
 
     public DrugUser findByEmail(String email){
         return drugUserRepository.findFirstByEmail(email);
+    }
+
+    public DoctorStatResponseBean doctorStat(Long drugUserId){
+        return null;
     }
 }

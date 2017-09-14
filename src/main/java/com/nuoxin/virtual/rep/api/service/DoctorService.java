@@ -4,6 +4,7 @@ import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.service.BaseService;
 import com.nuoxin.virtual.rep.api.dao.DoctorRepository;
 import com.nuoxin.virtual.rep.api.entity.Doctor;
+import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.doctor.DoctorRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorResponseBean;
@@ -23,6 +24,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by fenggang on 9/11/17.
@@ -33,6 +35,8 @@ public class DoctorService extends BaseService {
 
     @Autowired
     private DoctorRepository doctorRepository;
+    @Autowired
+    private DrugUserService drugUserService;
 
     public Doctor findById(Long id){
         return doctorRepository.findOne(id);
@@ -44,6 +48,9 @@ public class DoctorService extends BaseService {
             @Override
             public Predicate toPredicate(Root<Doctor> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
                 List<Predicate> predicates = new ArrayList<>();
+                if(bean.getDrugUserId()!=null && bean.getDrugUserId()!=0){
+                    predicates.add(cb.like(root.get("drugUserIds").as(String.class),"%"+bean.getDrugUserId()+",%"));
+                }
                 query.where(cb.and(cb.and(predicates.toArray(new Predicate[0]))));
                 return query.getRestriction();
             }
@@ -63,22 +70,40 @@ public class DoctorService extends BaseService {
             }
             responseBean.setContent(list);
         }
-        return null;
+        return responseBean;
     }
 
     public DoctorStatResponseBean stat(Long drugUserId){
-
-        return null;
+        DoctorStatResponseBean responseBean = new DoctorStatResponseBean();
+        Map<String,Integer> map = doctorRepository.statDrugUserDoctorNum("%"+drugUserId+",%");
+        if(map!=null){
+            responseBean.setDoctorNum(map.get("doctorNum"));
+            responseBean.setHospitalNum(map.get("hospitalNum"));
+        }
+        return responseBean;
     }
 
     @Transactional(readOnly = false)
     public Boolean save(DoctorRequestBean bean){
-        Doctor doctor = new Doctor();
+        Doctor doctor = doctorRepository.findTopByMobile(bean.getMobile());
+        if(doctor==null){
+            doctor = new Doctor();
+            doctor.setDrugUserIds(bean.getDrugUserId()+",");
+        }else{
+            doctor.setDrugUserIds(doctor.getDrugUserIds()+bean.getDrugUserId()+',');
+        }
         BeanUtils.copyProperties(bean,doctor);
+        //TODO  获取主数据id
+
         doctor = doctorRepository.saveAndFlush(doctor);
         if(doctor.getId()!=null){
             return true;
         }
         return false;
+    }
+
+    @Transactional(readOnly = false)
+    public Boolean saves(List<Doctor> list){
+        return true;
     }
 }

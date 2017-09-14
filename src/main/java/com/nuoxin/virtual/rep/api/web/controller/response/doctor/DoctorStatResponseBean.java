@@ -14,9 +14,9 @@ public class DoctorStatResponseBean implements Serializable {
     private static final long serialVersionUID = 4054761929458613106L;
 
     @ApiModelProperty(value = "医生数量")
-    private Integer doctorNum;
+    private Integer doctorNum = 0;
     @ApiModelProperty(value = "医院数量")
-    private Integer hospitalNum;
+    private Integer hospitalNum = 0;
 
     public Integer getDoctorNum() {
         return doctorNum;
