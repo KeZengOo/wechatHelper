@@ -12,9 +12,12 @@ import java.util.Date;
 @Table(name = "virtual_doctor_call_info")
 public class DoctorCallInfo extends IdEntity {
 
+    private static final long serialVersionUID = 4671164567577414946L;
     //@Column(name = "virtual_doctor_id")
     @Transient
     private Long doctorId;
+    @Column(name = "type")
+    private Integer type;
     @Column(name = "virtual_drug_user_id")
     private Long drugUserId;
     @Column(name = "sin_token")
@@ -28,7 +31,9 @@ public class DoctorCallInfo extends IdEntity {
     @Column(name = "remark")
     private String remark;
     @Column(name = "status")
-    private String status;
+    private Integer status;
+    @Column(name = "status_name")
+    private String statusName;
     @Column(name = "create_time")
     private Date createTime;
     @Column(name = "mobile")
@@ -110,19 +115,35 @@ public class DoctorCallInfo extends IdEntity {
         this.doctor = doctor;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
     public String getMobile() {
         return mobile;
     }
 
     public void setMobile(String mobile) {
         this.mobile = mobile;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public String getStatusName() {
+        return statusName;
+    }
+
+    public void setStatusName(String statusName) {
+        this.statusName = statusName;
     }
 }

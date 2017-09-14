@@ -14,22 +14,22 @@ public class CallStatResponseBean implements Serializable {
     private static final long serialVersionUID = -2522214759420367289L;
 
     @ApiModelProperty(value = "呼出总数")
-    private Integer callOutAllNum;
+    private Integer callOutAllNum = 0;
     @ApiModelProperty(value = "呼出接通数")
-    private Integer callOutNum;
+    private Integer callOutNum = 0;
     @ApiModelProperty(value = "呼出总时长")
-    private Long callOutAllTimes;
+    private Long callOutAllTimes = 0l;
     @ApiModelProperty(value = "呼出平均时长")
-    private Long callOutAvgTimes;
+    private Long callOutAvgTimes = 0l;
 
     @ApiModelProperty(value = "呼入总数")
-    private Integer inCallAllNum;
+    private Integer inCallAllNum = 0;
     @ApiModelProperty(value = "呼入接通总数")
-    private Integer inCallNum;
+    private Integer inCallNum = 0;
     @ApiModelProperty(value = "呼入总时长")
-    private Integer inCallAllTimes;
+    private Long inCallAllTimes = 0l;
     @ApiModelProperty(value = "呼入平均时长")
-    private Integer inCallTimes;
+    private Long inCallTimes = 0l;
 
     public Integer getCallOutAllNum() {
         return callOutAllNum;
@@ -79,19 +79,19 @@ public class CallStatResponseBean implements Serializable {
         this.inCallNum = inCallNum;
     }
 
-    public Integer getInCallAllTimes() {
+    public Long getInCallAllTimes() {
         return inCallAllTimes;
     }
 
-    public void setInCallAllTimes(Integer inCallAllTimes) {
+    public void setInCallAllTimes(Long inCallAllTimes) {
         this.inCallAllTimes = inCallAllTimes;
     }
 
-    public Integer getInCallTimes() {
+    public Long getInCallTimes() {
         return inCallTimes;
     }
 
-    public void setInCallTimes(Integer inCallTimes) {
+    public void setInCallTimes(Long inCallTimes) {
         this.inCallTimes = inCallTimes;
     }
 }
