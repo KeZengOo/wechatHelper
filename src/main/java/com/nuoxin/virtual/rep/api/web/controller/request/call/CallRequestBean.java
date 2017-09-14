@@ -18,8 +18,12 @@ public class CallRequestBean implements Serializable {
     private String mobile;
     @ApiModelProperty(value = "唯一标识")
     private String sinToken;
-    @ApiModelProperty(value = "状态")
-    private String status;
+    @ApiModelProperty(value = "状态名称")
+    private String statusName;
+    @ApiModelProperty(value = "状态(1-成功接通，0-未成功)")
+    private Integer status;
+    @ApiModelProperty(value = "类型")
+    private Integer type;
 
     private Long drugUserId;
 
@@ -55,11 +59,27 @@ public class CallRequestBean implements Serializable {
         this.drugUserId = drugUserId;
     }
 
-    public String getStatus() {
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
+    }
+
+    public String getStatusName() {
+        return statusName;
+    }
+
+    public void setStatusName(String statusName) {
+        this.statusName = statusName;
+    }
+
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 }

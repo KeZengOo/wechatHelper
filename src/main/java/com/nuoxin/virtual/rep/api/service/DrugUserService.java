@@ -21,7 +21,4 @@ public class DrugUserService {
         return drugUserRepository.findFirstByEmail(email);
     }
 
-    public DoctorStatResponseBean doctorStat(Long drugUserId){
-        return null;
-    }
 }

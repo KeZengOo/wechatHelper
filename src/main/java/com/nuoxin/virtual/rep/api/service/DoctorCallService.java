@@ -6,6 +6,7 @@ import com.nuoxin.virtual.rep.api.dao.DoctorCallInfoRepository;
 import com.nuoxin.virtual.rep.api.dao.DoctorRepository;
 import com.nuoxin.virtual.rep.api.entity.Doctor;
 import com.nuoxin.virtual.rep.api.entity.DoctorCallInfo;
+import com.nuoxin.virtual.rep.api.enums.CallTypeEnum;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.utils.StringUtils;
 import com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean;
@@ -30,6 +31,7 @@ import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by fenggang on 9/13/17.
@@ -113,8 +115,38 @@ public class DoctorCallService extends BaseService {
     }
 
     public CallStatResponseBean stat(Long drugUserId){
+        CallStatResponseBean responseBean = new CallStatResponseBean();
+        Map<String,Long> map = doctorCallInfoRepository.statDrugUserIds("%"+drugUserId+",%", CallTypeEnum.CALL_TYPE_CALLOUT.getType());
+        Long callTimes = null;
+        Long num = null;
+        if(map!=null){
+            responseBean.setCallOutAllNum(map.get("allNum").intValue());
+            callTimes = map.get("callTimes");
+            num = map.get("num");
+            if(callTimes!=null){
+                responseBean.setCallOutAllTimes(callTimes);
+            }
+            if(num!=null){
+                responseBean.setCallOutNum(num.intValue());
+            }
 
-        return null;
+
+        }
+        map = doctorCallInfoRepository.statDrugUserIds("%"+drugUserId+",%", CallTypeEnum.CALL_TYPE_INCALL.getType());
+        if (map != null) {
+            responseBean.setInCallAllNum(map.get("allNum").intValue());
+            callTimes = map.get("callTimes");
+            num = map.get("num");
+            if(callTimes!=null){
+                responseBean.setInCallAllTimes(callTimes);
+            }
+            if(num!=null){
+                responseBean.setInCallNum(num.intValue());
+            }
+
+
+        }
+        return responseBean;
     }
 
     @Transactional(readOnly = false)
@@ -123,7 +155,9 @@ public class DoctorCallService extends BaseService {
         info.setDoctor(doctorRepository.findTopByMobile(bean.getMobile()));
         info.setSinToken(bean.getSinToken());
         info.setStatus(bean.getStatus());
+        info.setStatusName(bean.getStatusName());
         info.setMobile(bean.getMobile());
+        info.setType(bean.getType());
         info.setDrugUserId(bean.getDrugUserId());
         doctorCallInfoRepository.saveAndFlush(info);
         bean.setId(info.getId());
