@@ -9,6 +9,7 @@ import com.nuoxin.virtual.rep.api.dao.QuestionnaireRepository;
 import com.nuoxin.virtual.rep.api.entity.Doctor;
 import com.nuoxin.virtual.rep.api.entity.Question;
 import com.nuoxin.virtual.rep.api.entity.Questionnaire;
+import com.nuoxin.virtual.rep.api.utils.StringUtils;
 import com.nuoxin.virtual.rep.api.web.controller.request.question.OptionsRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.question.QuestionQueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.question.QuestionRequestBean;
@@ -55,7 +56,7 @@ public class QuestionService extends BaseService {
                 question.setAnswer(questionBean.getAnswer());
                 question.setTitle(questionBean.getTitle());
                 question.setQuestionnaireId(questionnaire.getId());
-                question.setOptions(JSONObject.toJSONString(questionBean.getOptioons()));
+                question.setOptions(JSONObject.toJSONString(questionBean.getOptions()));
                 question.setCreateTime(new Date());
                 question.setType(questionBean.getType());
                 questionRepository.saveAndFlush(question);
@@ -84,7 +85,7 @@ public class QuestionService extends BaseService {
                 question.setAnswer(questionBean.getAnswer());
                 question.setTitle(questionBean.getTitle());
                 question.setQuestionnaireId(questionnaire.getId());
-                question.setOptions(JSONObject.toJSONString(questionBean.getOptioons()));
+                question.setOptions(JSONObject.toJSONString(questionBean.getOptions()));
                 question.setCreateTime(new Date());
                 question.setType(questionBean.getType());
                 questionRepository.saveAndFlush(question);
@@ -112,6 +113,12 @@ public class QuestionService extends BaseService {
             @Override
             public Predicate toPredicate(Root<Questionnaire> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
                 List<Predicate> predicates = new ArrayList<>();
+                if(bean.getDrugUserId()!=null&&bean.getDrugUserId()!=0){
+                    predicates.add(cb.equal(root.get("createId").as(Long.class),bean.getDrugUserId()));
+                }
+                if(StringUtils.isNotEmtity(bean.getQuery())){
+                    predicates.add(cb.like(root.get("title").as(String.class),"%"+bean.getQuery()+"%"));
+                }
                 query.where(cb.and(cb.and(predicates.toArray(new Predicate[0]))));
                 return query.getRestriction();
             }
@@ -150,7 +157,7 @@ public class QuestionService extends BaseService {
                 bean.setTitle(question.getTitle());
                 bean.setType(question.getType());
                 if(question.getOptions()!=null && !"".equals(question.getOptions())){
-                    bean.setOptioons(JSON.parseArray(question.getOptions(), OptionsRequestBean.class));
+                    bean.setOptions(JSON.parseArray(question.getOptions(), OptionsRequestBean.class));
                 }
                 requestBeans.add(bean);
             }
