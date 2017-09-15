@@ -1,4 +1,4 @@
-package com.nuoxin.virtual.rep.api.web.controller.response.wechat;
+package com.nuoxin.virtual.rep.api.web.controller.response.message;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -8,12 +8,15 @@ import java.io.Serializable;
 /**
  * Create by tiancun on 2017/9/14
  */
-@ApiModel(value = "微信消息")
-public class WechatMessageResponseBean implements Serializable{
+@ApiModel(value = "微信消息或者短信消息")
+public class MessageResponseBean implements Serializable{
     private static final long serialVersionUID = -3477145970782301979L;
 
     @ApiModelProperty(value = "id")
     private Long id;
+
+    @ApiModelProperty(value = "销售代表或者医生id")
+    private Long userId;
 
     @ApiModelProperty(value = "用户类型，1是销售代表，2是医生")
     private Integer userType;
@@ -28,16 +31,19 @@ public class WechatMessageResponseBean implements Serializable{
     private String telephone;
 
     @ApiModelProperty(value = "微信消息的状态，发送或者接收")
-    private String messageStatus;
+    private String wechatMessageStatus;
 
     @ApiModelProperty(value = "微信消息的类型")
-    private String messageType;
+    private String wechatMessageType;
 
-    @ApiModelProperty(value = "微信聊天消息")
+    @ApiModelProperty(value = "微信聊天消息或者短信消息")
     private String message;
 
-    @ApiModelProperty(value = "微信聊天时间")
-    private String wechatTime;
+    @ApiModelProperty(value = "消息类型，1是微信，2是短信")
+    private Integer messageType;
+
+    @ApiModelProperty(value = "微信聊天时间或者短信发送时间")
+    private String messageTime;
 
 
     public Long getId() {
@@ -46,6 +52,14 @@ public class WechatMessageResponseBean implements Serializable{
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public Integer getUserType() {
@@ -80,20 +94,20 @@ public class WechatMessageResponseBean implements Serializable{
         this.telephone = telephone;
     }
 
-    public String getMessageStatus() {
-        return messageStatus;
+    public String getWechatMessageStatus() {
+        return wechatMessageStatus;
     }
 
-    public void setMessageStatus(String messageStatus) {
-        this.messageStatus = messageStatus;
+    public void setWechatMessageStatus(String wechatMessageStatus) {
+        this.wechatMessageStatus = wechatMessageStatus;
     }
 
-    public String getMessageType() {
-        return messageType;
+    public String getWechatMessageType() {
+        return wechatMessageType;
     }
 
-    public void setMessageType(String messageType) {
-        this.messageType = messageType;
+    public void setWechatMessageType(String wechatMessageType) {
+        this.wechatMessageType = wechatMessageType;
     }
 
     public String getMessage() {
@@ -104,11 +118,19 @@ public class WechatMessageResponseBean implements Serializable{
         this.message = message;
     }
 
-    public String getWechatTime() {
-        return wechatTime;
+    public Integer getMessageType() {
+        return messageType;
     }
 
-    public void setWechatTime(String wechatTime) {
-        this.wechatTime = wechatTime;
+    public void setMessageType(Integer messageType) {
+        this.messageType = messageType;
+    }
+
+    public String getMessageTime() {
+        return messageTime;
+    }
+
+    public void setMessageTime(String messageTime) {
+        this.messageTime = messageTime;
     }
 }

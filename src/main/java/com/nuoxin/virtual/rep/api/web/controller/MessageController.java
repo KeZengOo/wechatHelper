@@ -4,9 +4,9 @@ package com.nuoxin.virtual.rep.api.web.controller;
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
-import com.nuoxin.virtual.rep.api.service.WechatService;
-import com.nuoxin.virtual.rep.api.web.controller.request.wechat.WechatMessageRequestBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.wechat.WechatMessageResponseBean;
+import com.nuoxin.virtual.rep.api.service.MessageService;
+import com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.message.MessageResponseBean;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,21 +14,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-@Api(value = "微信相关接口")
-@RequestMapping(value = "/wechat")
+@Api(value = "微信消息或者短信消息相关接口")
+@RequestMapping(value = "/message")
 @RestController
-public class WechatController extends BaseController {
+public class MessageController extends BaseController {
 
     @Autowired
-    private WechatService wechatService;
+    private MessageService messageService;
 
 
     @ApiOperation(value = "微信消息导入接口", notes = "微信消息导入接口")
-    @PostMapping("/importExcel")
+    @PostMapping("/wechat/importExcel")
     @ResponseBody
     public ResponseEntity<DefaultResponseBean<Boolean>> importExcel(MultipartFile file){
 
-        boolean b = wechatService.importExcel(file);
+        boolean b = messageService.importExcel(file);
 
         DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
         responseBean.setData(b);
@@ -41,12 +41,12 @@ public class WechatController extends BaseController {
     @ApiOperation(value = "查询微信消息接口", notes = "查询微信消息接口")
     @PostMapping("/getList")
     @ResponseBody
-    public ResponseEntity<DefaultResponseBean<PageResponseBean<WechatMessageResponseBean>>> getList(@RequestBody WechatMessageRequestBean bean){
+    public ResponseEntity<DefaultResponseBean<PageResponseBean<MessageResponseBean>>> getList(@RequestBody MessageRequestBean bean){
 
-        PageResponseBean<WechatMessageResponseBean> wechatMessageList = wechatService.getWechatMessageList(bean);
+        PageResponseBean<MessageResponseBean> messageList = messageService.getMessageList(bean);
 
-        DefaultResponseBean<PageResponseBean<WechatMessageResponseBean>> responseBean = new DefaultResponseBean<>();
-        responseBean.setData(wechatMessageList);
+        DefaultResponseBean<PageResponseBean<MessageResponseBean>> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(messageList);
 
         return ResponseEntity.ok(responseBean);
 

@@ -2,7 +2,7 @@ package com.nuoxin.virtual.rep.api.utils;
 
 
 import com.nuoxin.virtual.rep.api.common.annotations.Excel;
-import com.nuoxin.virtual.rep.api.entity.WechatMessage;
+import com.nuoxin.virtual.rep.api.entity.Message;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.usermodel.DateUtil;
@@ -331,10 +331,10 @@ public class ExcelUtils <E>{
 
 
     public static void main(String[] args) throws Exception {
-        ExcelUtils<WechatMessage> excelUtils = new ExcelUtils<>(new WechatMessage());
-        List<WechatMessage> wechatMessages = excelUtils.readFromFile(null, new File("C:\\Users\\27168\\Desktop\\hh.xls"));
+        ExcelUtils<Message> excelUtils = new ExcelUtils<>(new Message());
+        List<Message> wechatMessages = excelUtils.readFromFile(null, new File("C:\\Users\\27168\\Desktop\\hh.xls"));
 
-        for (WechatMessage wechatMessage:wechatMessages){
+        for (Message wechatMessage:wechatMessages){
 
             System.out.println(wechatMessage);
         }

@@ -1,6 +1,7 @@
 package com.nuoxin.virtual.rep.api.dao;
 
-import com.nuoxin.virtual.rep.api.entity.WechatMessage;
+
+import com.nuoxin.virtual.rep.api.entity.Message;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
@@ -8,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  * 微信消息相关
  * @author tiancun
  */
-public interface WechatRepository extends JpaRepository<WechatMessage, Long>,JpaSpecificationExecutor<WechatMessage> {
+public interface MessageRepository extends JpaRepository<Message, Long>,JpaSpecificationExecutor<Message> {
 
 
 

@@ -21,15 +21,8 @@ public enum UserTypeEnum {
         return userType;
     }
 
-    public void setUserType(int userType) {
-        this.userType = userType;
-    }
-
     public String getUserTypeName() {
         return userTypeName;
     }
 
-    public void setUserTypeName(String userTypeName) {
-        this.userTypeName = userTypeName;
-    }
 }
