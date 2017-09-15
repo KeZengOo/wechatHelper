@@ -1,13 +1,8 @@
 package com.nuoxin.virtual.rep.api.dao;
 
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
-import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorStatResponseBean;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-
-import java.util.Map;
 
 /**
  * Created by fenggang on 9/11/17.
@@ -15,5 +10,7 @@ import java.util.Map;
 public interface DrugUserRepository extends JpaRepository<DrugUser,Long>,JpaSpecificationExecutor<DrugUser> {
 
     DrugUser findFirstByEmail(String email);
+
+    DrugUser findFirstByMobile(String mobile);
 
 }
