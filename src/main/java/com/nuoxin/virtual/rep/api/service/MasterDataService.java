@@ -42,7 +42,7 @@ public class MasterDataService {
      * @param hcpId 主数据医生id
      * @return 主数据医生
      */
-    @Cacheable(value = "dashboard_api_master_data", key="'getHcpById_'+#hcpId" )
+    @Cacheable(value = "virtual_rep_api_master_data", key="'getHcpById_'+#hcpId" )
     public Hcp getHcpById(Long hcpId){
         Hcp hcp = null;
 
@@ -78,7 +78,7 @@ public class MasterDataService {
      * @param name 主数据医生姓名
      * @return
      */
-    @Cacheable(value = "dashboard_api_master_data", key="'getHcpByHciIdAndHcpName'+#hciId+#name" )
+    @Cacheable(value = "virtual_rep_api_master_data", key="'getHcpByHciIdAndHcpName'+#hciId+#name" )
     public Hcp getHcpByHciIdAndHcpName(Long hciId, String name){
         Hcp hcp = null;
 
@@ -110,7 +110,7 @@ public class MasterDataService {
      * @param hciId 主数据医院id
      * @return 主数据医院
      */
-    @Cacheable(value = "dashboard_api_master_data", key="'getHciById'+#hciId" )
+    @Cacheable(value = "virtual_rep_api_master_data", key="'getHciById'+#hciId" )
     public Hci getHciById(Long hciId){
         Hci hci = null;
 
@@ -141,7 +141,7 @@ public class MasterDataService {
      * @param name 主数据医院名称或者医院别名
      * @return
      */
-    @Cacheable(value = "dashboard_api_master_data", key="'getHciByName'+#name" )
+    @Cacheable(value = "virtual_rep_api_master_data", key="'getHciByName'+#name" )
     public Hci getHciByName(String name){
         Hci hci = null;
 
@@ -175,7 +175,7 @@ public class MasterDataService {
      * @param hcpId 主数据医生id
      * @return 返回的主数据医生的社会信息map
      */
-    @Cacheable(value = "dashboard_api_master_data", key="'getHcpInfo_'+#hcpId" )
+    @Cacheable(value = "virtual_rep_api_master_data", key="'getHcpInfo_'+#hcpId" )
     public Map<String,String> getMapHcpInfo(Long hcpId){
         Map<String, String> map = new HashMap<>();
         WebResult result = restTemplate.getForObject( prefixUrl + "api/hcp/hcpInfo/{id}", WebResult.class, hcpId);
@@ -233,7 +233,7 @@ public class MasterDataService {
      * @param hcpId 主数据医生id
      * @return 主数据医生的学术类
      */
-    @Cacheable(value = "dashboard_api_master_data", key = "'getHcpResearchInfo_'+#hcpId" )
+    @Cacheable(value = "virtual_rep_api_master_data", key = "'getHcpResearchInfo_'+#hcpId" )
     public HcpResearchInfo getHcpResearchInfo(Long hcpId){
         HcpResearchInfo hcpResearchInfo = null;
         WebResult result = restTemplate.getForObject(prefixUrl + "api/hcp/research/{id}", WebResult.class,hcpId);
@@ -263,7 +263,7 @@ public class MasterDataService {
      * @param hcpId 主数据医生id
      * @return 论文关键词列表
      */
-    @Cacheable(value = "dashboard_api_master_data", key = "'getDocKeyWordPage'+#hcpId")
+    @Cacheable(value = "virtual_rep_api_master_data", key = "'getDocKeyWordPage'+#hcpId")
     public List<DocKeyWord> getDocKeyWordList(Long hcpId){
         List<DocKeyWord> list = new ArrayList<>();
         DocKeyWordPage docKeyWordPage = new DocKeyWordPage();
@@ -297,7 +297,7 @@ public class MasterDataService {
      * @param pageSize 每页的数量
      * @return
      */
-    @Cacheable(value = "dashboard_api_master_data", key = "'getDocKeyWordPage'+#hcpId+#page+#pageSize")
+    @Cacheable(value = "virtual_rep_api_master_data", key = "'getDocKeyWordPage'+#hcpId+#page+#pageSize")
     public DocKeyWordPage getDocKeyWordPage(Long hcpId, int page,int pageSize){
         DocKeyWordPage docKeyWordPage = null;
         WebResult result = restTemplate.getForObject(prefixUrl + "api/dockeyword/getPageListByHcpId?hcpId={id}&offset={offset}&size={size}", WebResult.class,hcpId,page,pageSize);
@@ -332,7 +332,7 @@ public class MasterDataService {
      * @param hcpIds 医生id以英文逗号隔开
      * @return map
      */
-    @Cacheable(value = "dashboard_api_master_data", key = "'getDocKeyWordList'+#hcpIds")
+    @Cacheable(value = "virtual_rep_api_master_data", key = "'getDocKeyWordList'+#hcpIds")
     public   Map<Long, List<DocKeyWord>> getDocKeyWordList(String hcpIds){
         Map<Long, List<DocKeyWord>> map  = null;
         WebResult result = restTemplate.getForObject(prefixUrl + "api/dockeyword/getListByHcpIds?hcpIds={hcpIds}", WebResult.class,hcpIds);
@@ -364,7 +364,7 @@ public class MasterDataService {
      * @param key 对话关键词，多个以英文逗号分隔
      * @return
      */
-    @Cacheable(value = "dashboard_api_master_data", key = "'getConsultDetailListByKey'+#hcpId")
+    @Cacheable(value = "virtual_rep_api_master_data", key = "'getConsultDetailListByKey'+#hcpId")
     public List<ConsultDetail> getConsultDetailListByKey(Long hcpId, String key){
         List<ConsultDetail> list = new ArrayList<>();
         if (key == null){
@@ -404,7 +404,7 @@ public class MasterDataService {
      * @param pageSize 每页显示的数量
      * @return
      */
-    @Cacheable(value = "dashboard_api_master_data", key = "'getConsultDetailListByKeyAndPage'+#hcpId+#key+#page+#pageSize")
+    @Cacheable(value = "virtual_rep_api_master_data", key = "'getConsultDetailListByKeyAndPage'+#hcpId+#key+#page+#pageSize")
     public ConsultDetailPage getConsultDetailListByKeyAndPage(Long hcpId, String key, int page, int pageSize){
         ConsultDetailPage consultDetailPage = null;
 
@@ -448,7 +448,7 @@ public class MasterDataService {
      * @param page 当前页
      * @return
      */
-    @Cacheable(value = "dashboard_api_master_data", key = "'getHcpDocListByKeys'+#hcpId+#keys+#page+#pageSize")
+    @Cacheable(value = "virtual_rep_api_master_data", key = "'getHcpDocListByKeys'+#hcpId+#keys+#page+#pageSize")
     public KeyWordDoc getHcpDocListByKeys(Long hcpId,String keys, int page,int pageSize){
         KeyWordDoc keyWordDoc = null;
         if (keys == null){
@@ -488,7 +488,7 @@ public class MasterDataService {
      * @param id 主数据杂志id
      * @return
      */
-    @Cacheable(value = "dashboard_api_master_data", key = "'getMagazine'+#id")
+    @Cacheable(value = "virtual_rep_api_master_data", key = "'getMagazine'+#id")
     public Magazine getMagazine(Long id){
         Magazine magazine = null;
         WebResult magazineResult = restTemplate.getForObject(prefixUrl + "api/magazine/getById/{id}", WebResult.class,id);
@@ -522,7 +522,7 @@ public class MasterDataService {
      * @param province 省份
      * @return
      */
-    @Cacheable(value = "dashboard_api_master_data", key = "'getIndexStatistics'+#province")
+    @Cacheable(value = "virtual_rep_api_master_data", key = "'getIndexStatistics'+#province")
     public IndexStatistics getIndexStatistics(String province){
         province = cityJsonConfig.checkProvince(province);
         IndexStatistics indexStatistics = null;
@@ -556,7 +556,7 @@ public class MasterDataService {
      * 首页地图上有数据省份
      * @return
      */
-    @Cacheable(value = "dashboard_api_master_data", key = "getMapProvinceStatisticsList")
+    @Cacheable(value = "virtual_rep_api_master_data", key = "getMapProvinceStatisticsList")
     public List<MapProvinceStatistics> getMapProvinceStatisticsList(){
         List<MapProvinceStatistics> list = new ArrayList<>();
 
@@ -592,7 +592,7 @@ public class MasterDataService {
      * @param size 分页数量
      * @return
      */
-    @Cacheable(value = "dashboard_api_master_data", key = "'getHciPage'+#name+#province+#city+#grade+#dept+#offset+#size")
+    @Cacheable(value = "virtual_rep_api_master_data", key = "'getHciPage'+#name+#province+#city+#grade+#dept+#offset+#size")
     public HciStatisticsPage getHciPage(String name, String province, String city, Integer grade, String dept, Integer offset, Integer size){
         HciStatisticsPage hciStatisticsPage = null;
         province = cityJsonConfig.checkProvince(province);
@@ -657,7 +657,7 @@ public class MasterDataService {
      * @param size
      * @return
      */
-    @Cacheable(value = "dashboard_api_master_data", key = "'getHcpTitlePage'+#name+#hciId+#levelName+#dept+#offset+#size")
+    @Cacheable(value = "virtual_rep_api_master_data", key = "'getHcpTitlePage'+#name+#hciId+#levelName+#dept+#offset+#size")
     public HcpTitlePage getHcpTitlePage(String name, Long hciId, String levelName, String dept, Integer offset, Integer size){
         HcpTitlePage hcpTitlePage = null;
 
@@ -712,7 +712,7 @@ public class MasterDataService {
      * @param city
      * @return
      */
-    @Cacheable(value = "dashboard_api_master_data", key = "'getCountByParam'+#province+#city")
+    @Cacheable(value = "virtual_rep_api_master_data", key = "'getCountByParam'+#province+#city")
     public Integer getCountByParam(String province, String city){
         province = cityJsonConfig.checkProvince(province);
         int count = 0;
@@ -753,7 +753,7 @@ public class MasterDataService {
      * @param name 医院名称
      * @return
      */
-    @Cacheable(value = "dashboard_api_master_data", key = "'getDeptListByName'+#name")
+    @Cacheable(value = "virtual_rep_api_master_data", key = "'getDeptListByName'+#name")
     public List<Dept> getDeptListByName(String name){
         List<Dept> list = new ArrayList<>();
 
@@ -786,7 +786,7 @@ public class MasterDataService {
      * @param hciId
      * @return
      */
-    @Cacheable(value = "dashboard_api_master_data", key = "'getHciAliasList'+#hciId")
+    @Cacheable(value = "virtual_rep_api_master_data", key = "'getHciAliasList'+#hciId")
     public List<HciAlias> getHciAliasList(Long hciId){
         List<HciAlias> list = null;
 
@@ -845,7 +845,7 @@ public class MasterDataService {
      * 得到所有的医生级别
      * @return
      */
-    @Cacheable(value = "dashboard_api_master_data", key = "_getAllHcpTitle_")
+    @Cacheable(value = "virtual_rep_api_master_data", key = "_getAllHcpTitle_")
     public List<HcpLevel> getAllHcpTitle(){
         List<HcpLevel> list = null;
         WebResult result = restTemplate.getForObject(prefixUrl + "api/hcp/getTitleList", WebResult.class);
