@@ -2,15 +2,13 @@ package com.nuoxin.virtual.rep.api.service;
 
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.service.BaseService;
+import com.nuoxin.virtual.rep.api.common.util.StringUtils;
 import com.nuoxin.virtual.rep.api.dao.DoctorRepository;
 import com.nuoxin.virtual.rep.api.entity.Doctor;
-import com.nuoxin.virtual.rep.api.entity.DrugUser;
-import com.nuoxin.virtual.rep.api.utils.StringUtils;
 import com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.doctor.DoctorRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorStatResponseBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.vo.Doc;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -41,6 +39,10 @@ public class DoctorService extends BaseService {
 
     public Doctor findById(Long id){
         return doctorRepository.findOne(id);
+    }
+
+    public Doctor findByMobile(String mobile){
+        return doctorRepository.findTopByMobile(mobile);
     }
 
     public PageResponseBean<DoctorResponseBean> page(QueryRequestBean bean){

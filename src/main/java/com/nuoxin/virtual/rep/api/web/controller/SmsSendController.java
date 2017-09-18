@@ -2,12 +2,10 @@ package com.nuoxin.virtual.rep.api.web.controller;
 
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
+import com.nuoxin.virtual.rep.api.web.controller.request.SmsSendRequestBean;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,15 +19,16 @@ import javax.servlet.http.HttpServletResponse;
 public class SmsSendController extends BaseController {
 
     @ApiOperation(value = "短信模板", notes = "短信模板")
-    @GetMapping("/update")
+    @GetMapping("/template/list")
     public DefaultResponseBean<Object> smsTemplate(HttpServletRequest request, HttpServletResponse response){
         DefaultResponseBean<Object> responseBean = new DefaultResponseBean<>();
         return responseBean;
     }
 
     @ApiOperation(value = "短信发送", notes = "短信发送")
-    @PostMapping("/update")
-    public DefaultResponseBean<Boolean> send(HttpServletRequest request, HttpServletResponse response){
+    @PostMapping("/send")
+    public DefaultResponseBean<Boolean> send(@RequestBody SmsSendRequestBean bean,
+                                             HttpServletRequest request, HttpServletResponse response){
         DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
         return responseBean;
     }

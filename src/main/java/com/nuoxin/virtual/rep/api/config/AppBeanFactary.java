@@ -1,5 +1,7 @@
 package com.nuoxin.virtual.rep.api.config;
 
+import com.aliyun.mns.client.CloudAccount;
+import com.aliyun.oss.OSSClient;
 import com.nuoxin.virtual.rep.api.web.intercept.CrossDomainFilter;
 import net.spy.memcached.AddrUtil;
 import net.spy.memcached.ConnectionFactoryBuilder;
@@ -10,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.boot.web.servlet.MultipartConfigFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -18,6 +21,7 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 import javax.annotation.Resource;
+import javax.servlet.MultipartConfigElement;
 import java.io.IOException;
 
 /**
@@ -29,6 +33,8 @@ public class AppBeanFactary {
 
     @Resource
     private MemcachedConfig memcachedConfig;
+    @Resource
+    private AliyunConfig aliyunConfig;
 
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
@@ -97,6 +103,30 @@ public class AppBeanFactary {
         }
 
         return memcachedClient;
+    }
+
+    @Bean
+    CloudAccount  cloudAccount(){
+        CloudAccount account = new CloudAccount(aliyunConfig.getAccessKeyId(), aliyunConfig.getAccessKeySecret(), aliyunConfig.getMnsEndpoint());
+        return account;
+    }
+
+    @Bean(name = "uploadOSSClient")
+    public OSSClient uploadOSSClient() {
+        return new OSSClient(aliyunConfig.getUploadEndpoint(), aliyunConfig.getAccessKeyId(), aliyunConfig.getAccessKeySecret());
+    }
+
+    /**
+     * 上传文件大小限制
+     *
+     * @return
+     */
+    @Bean
+    public MultipartConfigElement multipartConfigElement() {
+        MultipartConfigFactory configFactory = new MultipartConfigFactory();
+        configFactory.setMaxFileSize("100MB");
+        configFactory.setMaxRequestSize("100MB");
+        return configFactory.createMultipartConfig();
     }
 
     /**

@@ -188,6 +188,17 @@
 		</dependency>
 		<!-- 操作excel end -->
 
+		<dependency>
+			<groupId>com.aliyun.mns</groupId>
+			<artifactId>aliyun-sdk-mns</artifactId>
+			<version>1.1.8</version>
+			<classifier>jar-with-dependencies</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.aliyun.oss</groupId>
+			<artifactId>aliyun-sdk-oss</artifactId>
+			<version>2.0.2</version>
+		</dependency>
 
 	</dependencies>
 

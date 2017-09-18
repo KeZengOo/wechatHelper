@@ -21,4 +21,8 @@ public class DrugUserService {
         return drugUserRepository.findFirstByEmail(email);
     }
 
+    public DrugUser findById(Long drugUserId){
+        return drugUserRepository.getOne(drugUserId);
+    }
+
 }
