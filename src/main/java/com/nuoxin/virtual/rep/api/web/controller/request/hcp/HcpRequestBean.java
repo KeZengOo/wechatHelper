@@ -30,6 +30,9 @@ public class HcpRequestBean extends PageRequestBean implements Serializable {
     @ApiModelProperty(value = "主数据医生级别")
     private String levelName;
 
+    @ApiModelProperty(value = "销售id")
+    private Long drugUserId;
+
     public Long getHcpId() {
         return hcpId;
     }
@@ -70,9 +73,17 @@ public class HcpRequestBean extends PageRequestBean implements Serializable {
         this.levelName = levelName;
     }
 
+    public Long getDrugUserId() {
+        return drugUserId;
+    }
+
+    public void setDrugUserId(Long drugUserId) {
+        this.drugUserId = drugUserId;
+    }
+
     @Override
     public String toString() {
-        return "" + hcpId + hcpName + dept + levelName + hciId +
+        return "" + hcpId + hcpName + dept + levelName + hciId + drugUserId +
                  super.getPage() + super.getPageSize();
 
     }

@@ -1,6 +1,8 @@
 package com.nuoxin.virtual.rep.api.service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.service.BaseService;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
@@ -11,9 +13,11 @@ import com.nuoxin.virtual.rep.api.web.controller.request.hcp.HcpRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.hcp.*;
 import com.nuoxin.virtual.rep.api.web.controller.response.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
@@ -34,6 +38,11 @@ public class HcpService extends BaseService {
 //    private DoctorMapper doctorMapper;
 
 
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @Value("${data.center.prefix.url}")
+    private String prefixUrl;
 
 
 
@@ -202,20 +211,15 @@ public class HcpService extends BaseService {
     public PageResponseBean<HcpDialogResponseBean> getDialogList(HcpRequestBean bean){
 
         Long hcpId = bean.getHcpId();
-        Integer page = bean.getPage();
+        Integer page = bean.getPage() + 1;
         Integer pageSize = bean.getPageSize();
-        //DrugUser drugUser = bean.getUser();
-
-        /**
-         * 暂时写死
-         */
-        DrugUser drugUser = null;
 
 
+        Long drugUserId = bean.getDrugUserId();
 
         //得到的关键词
         String allkeyword = "";
-        Map<String, String> keys = getKeys(drugUser);
+        Map<String, String> keys = getKeys(drugUserId);
         if (null != keys && keys.size() > 0){
             allkeyword = keys.get("allkeyword");
         }
@@ -268,23 +272,10 @@ public class HcpService extends BaseService {
         KeywordListResponseBean keywordListResponseBean = new KeywordListResponseBean();
         Long hcpId = bean.getHcpId();
 
-
-        //DrugUser drugUser = bean.getUser();
-
-        /**
-         * 暂时写死
-         */
-        DrugUser drugUser = null;
-
-
-
-
-
-
-
+        Long drugUserId = bean.getDrugUserId();
 
         String allkeyword = "";
-        Map<String, String> keys = getKeys(drugUser);
+        Map<String, String> keys = getKeys(drugUserId);
         if (null != keys && keys.size() > 0){
             allkeyword = keys.get("allkeyword");
         }
@@ -294,7 +285,7 @@ public class HcpService extends BaseService {
             return keywordListResponseBean;
         }
 
-        Map<String, List<String>> map = getKeysList(drugUser);
+        Map<String, List<String>> map = getKeysList(drugUserId);
         List<String> ckeywordList = new ArrayList<>();
         List<String> pkeywordList = new ArrayList<>();
         if (null != map && map.size() > 0){
@@ -490,18 +481,11 @@ public class HcpService extends BaseService {
     @Cacheable(value = "dashboard_api_hcp_service", key="'getDocList'+#bean" )
     public PageResponseBean<HcpDocResponseBean> getDocList(HcpRequestBean bean){
         Long hcpId = bean.getHcpId();
-        Integer page = bean.getPage();
+        Integer page = bean.getPage() + 1;
         Integer pageSize = bean.getPageSize();
 
 
-
-        //DrugUser drugUser = bean.getUser();
-
-
-        /**
-         * 暂时写死
-         */
-        DrugUser drugUser = null;
+        Long drugUserId = bean.getDrugUserId();
 
 
 
@@ -522,7 +506,7 @@ public class HcpService extends BaseService {
         String allkeyword = "";
         String ckeyword = "";
         String pkeyword = "";
-        Map<String, String> keys = getKeys(drugUser);
+        Map<String, String> keys = getKeys(drugUserId);
         if (null != keys && keys.size() > 0){
             allkeyword = keys.get("allkeyword");
             ckeyword = keys.get("ckeyword");
@@ -664,53 +648,58 @@ public class HcpService extends BaseService {
      */
     /**
      * 暂时没有实现
-     * @param drugUser
+     * @param drugUserId
      * @return
      */
-    private Map<String,String> getKeys(DrugUser drugUser){
+    private Map<String,String> getKeys(Long drugUserId){
         Map<String,String> map = new HashMap<>();
-
-//
-//        List<ProductLine> productKeyWordList = drugUserService.findByProductKeyWord(drugUser);
-//        if(null != productKeyWordList && productKeyWordList.size() > 0){
-//            StringBuilder ckeyWordStr = new StringBuilder("");
-//            StringBuilder pkeyWordStr = new StringBuilder("");
-//            StringBuilder allkeyWordStr = new StringBuilder("");
-//            for (ProductLine productLine:productKeyWordList){
-//                //竞品关键词
-//                String ckeyWord = productLine.getCkeyWord();
-//                if (null != ckeyWord && !"".equals(ckeyWord.trim())){
-//                    String[] ckeyWordArrays = ckeyWord.split(",");
-//                    if (null != ckeyWordArrays && ckeyWordArrays.length > 0){
-//                        for (String ckeyWordArray:ckeyWordArrays){
-//                            ckeyWordStr.append(ckeyWordArray+ ",");
-//                            allkeyWordStr.append(ckeyWordArray+ ",");
-//                        }
-//                    }
-//                }
-//
-//                //产品关键词
-//                String pkeyword = productLine.getPkeyWord();
-//                if (null != pkeyword && !"".equals(pkeyword.trim())){
-//                    String[] pkeywordArrays = pkeyword.split(",");
-//                    if (null != pkeywordArrays && pkeywordArrays.length > 0){
-//                        for (String pkeywordArray:pkeywordArrays){
-//                            pkeyWordStr.append(pkeywordArray+ ",");
-//                            allkeyWordStr.append(pkeywordArray+ ",");
-//                        }
-//                    }
-//                }
-//
-//
-//            }
-//            map.put("ckeyword",ckeyWordStr.toString());
-//            map.put("pkeyword",pkeyWordStr.toString());
-//            map.put("allkeyword",allkeyWordStr.toString());
-
-//        }
+        String url = prefixUrl + "/hcp/getProductKeys/{id}";
+        DefaultResponseBean<HcpSocietyResponseBean> responseBean = restTemplate.getForObject(url, DefaultResponseBean.class, drugUserId);
+        JSONObject json = (JSONObject) JSONObject.toJSON(responseBean);
+        if (null != json){
+            int code = (int) json.get("code");
+            if (code == 200){
+                map = (Map<String, String>) json.get("data");
+            }
+        }
 
 
         return map;
+    }
+
+    private Map<String,List<String>> getKeysList(Long drugUserId){
+
+        Map<String,List<String>> map = new HashMap<>();
+
+        List<String> ckeywordList = new ArrayList<>();
+        List<String> pkeyworkList = new ArrayList<>();
+
+        Map<String, String> keys = getKeys(drugUserId);
+        String pkeyword = keys.get("pkeyword");
+        if (!StringUtils.isEmpty(pkeyword)){
+            String[] split = pkeyword.split(",");
+            if (null != split && split.length > 0){
+                for (String pkey:split){
+                    pkeyworkList.add(pkey);
+                }
+            }
+        }
+
+        String ckeyword = keys.get("ckeyword");
+        if (!StringUtils.isEmpty(ckeyword)){
+            String[] split = ckeyword.split(",");
+            if (null != split && split.length > 0){
+                for (String ckey:split){
+                    ckeywordList.add(ckey);
+                }
+            }
+        }
+
+        map.put("ckeywordList",ckeywordList);
+        map.put("pkeywordList",pkeyworkList);
+
+        return map;
+
     }
 
 
