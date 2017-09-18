@@ -211,7 +211,7 @@ public class HcpService extends BaseService {
     public PageResponseBean<HcpDialogResponseBean> getDialogList(HcpRequestBean bean){
 
         Long hcpId = bean.getHcpId();
-        Integer page = bean.getPage();
+        Integer page = bean.getPage() + 1;
         Integer pageSize = bean.getPageSize();
 
 
@@ -481,7 +481,7 @@ public class HcpService extends BaseService {
     @Cacheable(value = "dashboard_api_hcp_service", key="'getDocList'+#bean" )
     public PageResponseBean<HcpDocResponseBean> getDocList(HcpRequestBean bean){
         Long hcpId = bean.getHcpId();
-        Integer page = bean.getPage();
+        Integer page = bean.getPage() + 1;
         Integer pageSize = bean.getPageSize();
 
 

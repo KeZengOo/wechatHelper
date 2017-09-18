@@ -19,7 +19,7 @@ public class QuestionRequestBean implements Serializable {
     @ApiModelProperty(value = "标题")
     private String title;
     @ApiModelProperty(value = "选项")
-    private List<OptionsRequestBean> optioons;
+    private List<OptionsRequestBean> options;
     @ApiModelProperty(value = "答案")
     private String answer;
     @ApiModelProperty(value = "类型")
@@ -33,12 +33,12 @@ public class QuestionRequestBean implements Serializable {
         this.title = title;
     }
 
-    public List<OptionsRequestBean> getOptioons() {
-        return optioons;
+    public List<OptionsRequestBean> getOptions() {
+        return options;
     }
 
-    public void setOptioons(List<OptionsRequestBean> optioons) {
-        this.optioons = optioons;
+    public void setOptions(List<OptionsRequestBean> options) {
+        this.options = options;
     }
 
     public String getAnswer() {

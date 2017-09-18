@@ -52,7 +52,7 @@ public class DoctorCallService extends BaseService {
             public Predicate toPredicate(Root<DoctorCallInfo> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
                 List<Predicate> predicates = new ArrayList<>();
                 if(StringUtils.isNotEmtity(bean.getName())){
-                    predicates.add(cb.like(root.get("doctor").get("drugUserIds").as(String.class),"%"+bean.getName()+"%"));
+                    predicates.add(cb.like(root.get("doctor").get("name").as(String.class),"%"+bean.getName()+"%"));
                 }
                 if(StringUtils.isNotEmtity(bean.getMobile())){
                     predicates.add(cb.like(root.get("doctor").get("mobile").as(String.class),"%"+bean.getMobile()+"%"));

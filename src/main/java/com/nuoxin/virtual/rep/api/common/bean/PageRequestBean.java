@@ -29,7 +29,7 @@ public class PageRequestBean implements Serializable {
 	private Integer currentSize;
 
 	public int getPage() {
-		return page;
+		return (page-1)>0?(page-1):0;
 	}
 
 	public void setPage(int page) {

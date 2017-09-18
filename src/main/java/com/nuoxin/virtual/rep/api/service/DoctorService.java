@@ -5,6 +5,7 @@ import com.nuoxin.virtual.rep.api.common.service.BaseService;
 import com.nuoxin.virtual.rep.api.dao.DoctorRepository;
 import com.nuoxin.virtual.rep.api.entity.Doctor;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
+import com.nuoxin.virtual.rep.api.utils.StringUtils;
 import com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.doctor.DoctorRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorResponseBean;
@@ -50,6 +51,21 @@ public class DoctorService extends BaseService {
                 List<Predicate> predicates = new ArrayList<>();
                 if(bean.getDrugUserId()!=null && bean.getDrugUserId()!=0){
                     predicates.add(cb.like(root.get("drugUserIds").as(String.class),"%"+bean.getDrugUserId()+",%"));
+                }
+                if(StringUtils.isNotEmtity(bean.getName())){
+                    predicates.add(cb.like(root.get("name").as(String.class),"%"+bean.getName()+"%"));
+                }
+                if(StringUtils.isNotEmtity(bean.getMobile())){
+                    predicates.add(cb.like(root.get("mobile").as(String.class),"%"+bean.getMobile()+"%"));
+                }
+                if(StringUtils.isNotEmtity(bean.getDepartment())){
+                    predicates.add(cb.like(root.get("department").as(String.class),"%"+bean.getDepartment()+"%"));
+                }
+                if(StringUtils.isNotEmtity(bean.getDoctorLevle())){
+                    predicates.add(cb.like(root.get("doctorLevle").as(String.class),"%"+bean.getDoctorLevle()+"%"));
+                }
+                if(StringUtils.isNotEmtity(bean.getHospital())){
+                    predicates.add(cb.like(root.get("hospitalName").as(String.class),"%"+bean.getHospital()+"%"));
                 }
                 query.where(cb.and(cb.and(predicates.toArray(new Predicate[0]))));
                 return query.getRestriction();
