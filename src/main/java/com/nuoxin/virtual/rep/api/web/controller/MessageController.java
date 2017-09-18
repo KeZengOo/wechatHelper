@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Map;
+
 @Api(value = "微信消息或者短信消息相关接口")
 @RequestMapping(value = "/message")
 @RestController
@@ -47,6 +49,21 @@ public class MessageController extends BaseController {
 
         DefaultResponseBean<PageResponseBean<MessageResponseBean>> responseBean = new DefaultResponseBean<>();
         responseBean.setData(messageList);
+
+        return ResponseEntity.ok(responseBean);
+
+    }
+
+
+    @ApiOperation(value = "今日会话接口", notes = "今日会话接口")
+    @GetMapping("/getMessageCountList/{id}")
+    @ResponseBody
+    public ResponseEntity<DefaultResponseBean<Map<String,Integer>>> getList(@PathVariable(value = "id") Long drugUserId){
+
+        Map<String, Integer> messageCountList = messageService.getMessageCountList(drugUserId);
+
+        DefaultResponseBean<Map<String, Integer>> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(messageCountList);
 
         return ResponseEntity.ok(responseBean);
 
