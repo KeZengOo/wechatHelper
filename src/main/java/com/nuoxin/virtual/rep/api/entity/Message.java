@@ -28,6 +28,9 @@ public class Message extends IdEntity {
     @Column(name = "nickname")
     private String nickname;
 
+    @Column(name = "drug_user_id")
+    private Long drugUserId;
+
     //微信号
     @Column(name = "wechat_number")
     private String wechatNumber;
@@ -59,6 +62,7 @@ public class Message extends IdEntity {
     //消息录入时间
     @Column(name = "create_time")
     private Date createTime;
+
 
 
     public Long getUserId() {
@@ -148,5 +152,14 @@ public class Message extends IdEntity {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+
+    public Long getDrugUserId() {
+        return drugUserId;
+    }
+
+    public void setDrugUserId(Long drugUserId) {
+        this.drugUserId = drugUserId;
     }
 }

@@ -16,10 +16,13 @@ import com.nuoxin.virtual.rep.api.utils.ExcelUtils;
 import com.nuoxin.virtual.rep.api.utils.RegularUtils;
 import com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.vo.WechatMessageVo;
+import com.nuoxin.virtual.rep.api.web.controller.response.message.MessageLinkmanResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.message.MessageResponseBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -61,6 +64,9 @@ public class MessageService extends BaseService{
 
     @Autowired
     private DoctorRepository doctorRepository;
+
+    @Autowired
+    private DoctorService doctorService;
 
 
     /**
@@ -141,14 +147,17 @@ public class MessageService extends BaseService{
                 String nickname = "";
                 String telephone = "";
                 Long userId = 0L;
+                DrugUser drugUser = drugUserRepository.findFirstByMobile(drugUserTelephone);
+                if (drugUser == null){
+                    throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
+                }
+                Long drugUserId = drugUser.getId();
                 if (wechatNickName != null && DRUG_USER_NICKNAME.equals(wechatNickName)) {
                     userType = UserTypeEnum.DRUG_USER.getUserType();
                     nickname = drugUserNickname;
                     telephone = drugUserTelephone;
-                    DrugUser drugUser = drugUserRepository.findFirstByMobile(telephone);
-                    if (null != drugUser){
-                        userId = drugUser.getId();
-                    }
+                    userId = drugUserId;
+
 
                 } else if (wechatNickName != null && !DRUG_USER_NICKNAME.equals(wechatNickName)) {
                     userType = UserTypeEnum.DOCTOR.getUserType();
@@ -175,6 +184,7 @@ public class MessageService extends BaseService{
                 wechatMessage.setUserId(userId);
                 wechatMessage.setUserType(userType);
                 wechatMessage.setNickname(nickname);
+                wechatMessage.setDrugUserId(drugUserId);
                 wechatMessage.setWechatNumber(wechatNumber);
                 wechatMessage.setTelephone(telephone);
                 wechatMessage.setWechatMessageStatus(wechatMessageStatus);
@@ -199,25 +209,27 @@ public class MessageService extends BaseService{
 
 
     public PageResponseBean<MessageResponseBean> getMessageList(MessageRequestBean bean){
-        bean.setPage(bean.getPage()-1);
-        Pageable pageable = super.getPage(bean);
+
+        //Pageable pageable = super.getPage(bean);
 
         Specification<Message> specification = new Specification<Message>() {
             @Override
             public Predicate toPredicate(Root<Message> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
-                //Path path = root.get("id");
-                //Predicate predicate = criteriaBuilder.equal(path, bean.getTelephone());
-                //Predicate predicate = criteriaBuilder.ge(path,2);
 
-//                Path<String> path = root.get("telephone");
-//                Predicate predicate = criteriaBuilder.equal(path, bean.getTelephone());
-//                criteriaBuilder.equal(path, bean.getTelephone());
-//                return predicate;
+                List<Predicate> predicates = new ArrayList<>();
+                predicates.add(criteriaBuilder.equal(root.get("drugUserId").as(Long.class),bean.getDrugUserId()));
+                predicates.add(criteriaBuilder.equal(root.get("messageType").as(Integer.class),bean.getMessageType()));
 
-                return null;
+
+                criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.and(predicates.toArray(new Predicate[0]))));
+                return criteriaQuery.getRestriction();
+
             }
         };
 
+        Sort.Order order = new Sort.Order(Sort.Direction.DESC, "messageTime");
+        Sort sort = new Sort(order);
+        Pageable pageable = new PageRequest(bean.getPage(),bean.getPageSize(),sort);
 
         Page<Message> page = messageRepository.findAll(specification, pageable);
         PageResponseBean<MessageResponseBean> messagePage = new PageResponseBean<>(page);
@@ -265,6 +277,65 @@ public class MessageService extends BaseService{
         map.put("im", imCount);
 
         return map;
+    }
+
+
+    /**
+     * 微信消息联系人
+     * @return
+     */
+    public PageResponseBean<MessageLinkmanResponseBean> getMessageLinkmanList(MessageRequestBean bean){
+
+        String drugUserId = "%" + bean.getDrugUserId() + "%";
+        int page = bean.getPage();
+        int pageSize = bean.getPageSize();
+        Integer messageListCount = messageRepository.getMessageListCount(drugUserId);
+        List<Message> messageList = messageRepository.getMessageList(drugUserId, page  * pageSize, pageSize);
+        if (messageListCount == null){
+            messageListCount = 0;
+        }
+
+        List<MessageLinkmanResponseBean> list = new ArrayList<>();
+        if (messageList != null && messageList.size() > 0){
+
+            for (Message message:messageList){
+
+                MessageLinkmanResponseBean messageLinkmanResponseBean = new MessageLinkmanResponseBean();
+                messageLinkmanResponseBean.setDoctorId(message.getUserId());
+                messageLinkmanResponseBean.setMessageType(message.getMessageType());
+                messageLinkmanResponseBean.setLastMessage(message.getMessage());
+                messageLinkmanResponseBean.setNickname(message.getNickname());
+                String messageTime = message.getMessageTime();
+                messageTime = messageTime.substring(0, messageTime.length()-2);
+                messageLinkmanResponseBean.setLastTime(messageTime);
+
+                list.add(messageLinkmanResponseBean);
+            }
+
+        }
+
+        PageResponseBean<MessageLinkmanResponseBean> pageResponseBean = new PageResponseBean<>(bean, messageListCount,list);
+
+
+        return pageResponseBean;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+    public void test(){
+
+        List<Message> messageList = messageRepository.test();
+        System.out.println(messageList.size());
+        System.out.println(messageList);
     }
 
 }

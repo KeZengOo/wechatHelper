@@ -44,7 +44,7 @@ public class VirtualRepApiApplication {
 						DeferredResult.class,
 						typeResolver.resolve(
 								ResponseEntity.class,
-								WildcardType.class
+					 		WildcardType.class
 						)
 				), typeResolver.resolve(WildcardType.class)))
 				.useDefaultResponseMessages(false);

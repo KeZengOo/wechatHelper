@@ -6,6 +6,7 @@ import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
 import com.nuoxin.virtual.rep.api.service.MessageService;
 import com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.message.MessageLinkmanResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.message.MessageResponseBean;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -23,6 +24,15 @@ public class MessageController extends BaseController {
 
     @Autowired
     private MessageService messageService;
+
+
+    @ApiOperation(value = "测试", notes = "测试")
+    @GetMapping("/test")
+    @ResponseBody
+    public Object test(){
+        messageService.test();
+        return null;
+    }
 
 
     @ApiOperation(value = "微信消息导入接口", notes = "微信消息导入接口")
@@ -67,6 +77,20 @@ public class MessageController extends BaseController {
 
         return ResponseEntity.ok(responseBean);
 
+    }
+
+
+    @ApiOperation(value = "消息联系人接口", notes = "消息联系人接口")
+    @PostMapping("/getMessageLinkmanList")
+    @ResponseBody
+    public ResponseEntity<DefaultResponseBean<PageResponseBean<MessageLinkmanResponseBean>>> getMessageLinkmanList(@RequestBody MessageRequestBean bean){
+
+        PageResponseBean<MessageLinkmanResponseBean> messageLinkmanList = messageService.getMessageLinkmanList(bean);
+        DefaultResponseBean<PageResponseBean<MessageLinkmanResponseBean>> responseBean = new DefaultResponseBean<>();
+
+        responseBean.setData(messageLinkmanList);
+
+        return ResponseEntity.ok(responseBean);
     }
 
 
