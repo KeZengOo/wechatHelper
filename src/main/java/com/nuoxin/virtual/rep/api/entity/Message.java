@@ -2,7 +2,9 @@ package com.nuoxin.virtual.rep.api.entity;
 
 import com.nuoxin.virtual.rep.api.common.entity.IdEntity;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.util.Date;
 
 /**
@@ -25,6 +27,9 @@ public class Message extends IdEntity {
     //昵称或者备注
     @Column(name = "nickname")
     private String nickname;
+
+    @Column(name = "drug_user_id")
+    private Long drugUserId;
 
     //微信号
     @Column(name = "wechat_number")
@@ -58,9 +63,6 @@ public class Message extends IdEntity {
     @Column(name = "create_time")
     private Date createTime;
 
-//    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH},fetch = FetchType.LAZY)
-//    @JoinColumn(name = "user_id")
-//    private Doctor doctor;
 
 
     public Long getUserId() {
@@ -153,11 +155,11 @@ public class Message extends IdEntity {
     }
 
 
-//    public Doctor getDoctor() {
-//        return doctor;
-//    }
-//
-//    public void setDoctor(Doctor doctor) {
-//        this.doctor = doctor;
-//    }
+    public Long getDrugUserId() {
+        return drugUserId;
+    }
+
+    public void setDrugUserId(Long drugUserId) {
+        this.drugUserId = drugUserId;
+    }
 }

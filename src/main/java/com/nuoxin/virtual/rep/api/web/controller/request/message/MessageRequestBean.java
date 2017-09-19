@@ -29,6 +29,8 @@ public class MessageRequestBean extends PageRequestBean implements Serializable{
     @ApiModelProperty(value = "手机号")
     private String telephone;
 
+    @ApiModelProperty(value = "消息类型,1是微信,2是短信")
+    private Integer messageType;
 
     @ApiModelProperty(value = "微信聊天时间")
     private String wechatTime;
@@ -99,5 +101,14 @@ public class MessageRequestBean extends PageRequestBean implements Serializable{
 
     public void setDrugUserId(Long drugUserId) {
         this.drugUserId = drugUserId;
+    }
+
+
+    public Integer getMessageType() {
+        return messageType;
+    }
+
+    public void setMessageType(Integer messageType) {
+        this.messageType = messageType;
     }
 }

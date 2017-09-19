@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -146,14 +147,17 @@ public class MessageService extends BaseService{
                 String nickname = "";
                 String telephone = "";
                 Long userId = 0L;
+                DrugUser drugUser = drugUserRepository.findFirstByMobile(drugUserTelephone);
+                if (drugUser == null){
+                    throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
+                }
+                Long drugUserId = drugUser.getId();
                 if (wechatNickName != null && DRUG_USER_NICKNAME.equals(wechatNickName)) {
                     userType = UserTypeEnum.DRUG_USER.getUserType();
                     nickname = drugUserNickname;
                     telephone = drugUserTelephone;
-                    DrugUser drugUser = drugUserRepository.findFirstByMobile(telephone);
-                    if (null != drugUser){
-                        userId = drugUser.getId();
-                    }
+                    userId = drugUserId;
+
 
                 } else if (wechatNickName != null && !DRUG_USER_NICKNAME.equals(wechatNickName)) {
                     userType = UserTypeEnum.DOCTOR.getUserType();
@@ -180,6 +184,7 @@ public class MessageService extends BaseService{
                 wechatMessage.setUserId(userId);
                 wechatMessage.setUserType(userType);
                 wechatMessage.setNickname(nickname);
+                wechatMessage.setDrugUserId(drugUserId);
                 wechatMessage.setWechatNumber(wechatNumber);
                 wechatMessage.setTelephone(telephone);
                 wechatMessage.setWechatMessageStatus(wechatMessageStatus);
@@ -204,25 +209,27 @@ public class MessageService extends BaseService{
 
 
     public PageResponseBean<MessageResponseBean> getMessageList(MessageRequestBean bean){
-        bean.setPage(bean.getPage()-1);
-        Pageable pageable = super.getPage(bean);
+
+        //Pageable pageable = super.getPage(bean);
 
         Specification<Message> specification = new Specification<Message>() {
             @Override
             public Predicate toPredicate(Root<Message> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
-                //Path path = root.get("id");
-                //Predicate predicate = criteriaBuilder.equal(path, bean.getTelephone());
-                //Predicate predicate = criteriaBuilder.ge(path,2);
 
-//                Path<String> path = root.get("telephone");
-//                Predicate predicate = criteriaBuilder.equal(path, bean.getTelephone());
-//                criteriaBuilder.equal(path, bean.getTelephone());
-//                return predicate;
+                List<Predicate> predicates = new ArrayList<>();
+                predicates.add(criteriaBuilder.equal(root.get("drugUserId").as(Long.class),bean.getDrugUserId()));
+                predicates.add(criteriaBuilder.equal(root.get("messageType").as(Integer.class),bean.getMessageType()));
 
-                return null;
+
+                criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.and(predicates.toArray(new Predicate[0]))));
+                return criteriaQuery.getRestriction();
+
             }
         };
 
+        Sort.Order order = new Sort.Order(Sort.Direction.DESC, "messageTime");
+        Sort sort = new Sort(order);
+        Pageable pageable = new PageRequest(bean.getPage(),bean.getPageSize(),sort);
 
         Page<Message> page = messageRepository.findAll(specification, pageable);
         PageResponseBean<MessageResponseBean> messagePage = new PageResponseBean<>(page);
@@ -233,7 +240,7 @@ public class MessageService extends BaseService{
             for (Message message:content){
                 MessageResponseBean messageResponseBean = new MessageResponseBean();
                 messageResponseBean.setId(message.getId());
-//                messageResponseBean.setUserId(message.getUserId());
+                messageResponseBean.setUserId(message.getUserId());
                 messageResponseBean.setUserType(message.getUserType());
                 messageResponseBean.setNickname(message.getNickname());
                 messageResponseBean.setWechatNumber(message.getWechatNumber());
@@ -319,14 +326,7 @@ public class MessageService extends BaseService{
 
 
 
-    private Message getFirstOne(Long userId, Integer userType){
-        Pageable pageable = new PageRequest(0,1);
-        List<Message> messages = messageRepository.findByUserIdAndUserTypeOrderByMessageTimeDesc(pageable, userId, userType);
-        if (null == messages || messages.size() == 0){
-            return null;
-        }
-        return messages.get(0);
-    }
+
 
 
 
