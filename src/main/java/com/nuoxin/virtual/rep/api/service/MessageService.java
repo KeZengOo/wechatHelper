@@ -16,9 +16,11 @@ import com.nuoxin.virtual.rep.api.utils.ExcelUtils;
 import com.nuoxin.virtual.rep.api.utils.RegularUtils;
 import com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.vo.WechatMessageVo;
+import com.nuoxin.virtual.rep.api.web.controller.response.message.MessageLinkmanResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.message.MessageResponseBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -61,6 +63,9 @@ public class MessageService extends BaseService{
 
     @Autowired
     private DoctorRepository doctorRepository;
+
+    @Autowired
+    private DoctorService doctorService;
 
 
     /**
@@ -228,7 +233,7 @@ public class MessageService extends BaseService{
             for (Message message:content){
                 MessageResponseBean messageResponseBean = new MessageResponseBean();
                 messageResponseBean.setId(message.getId());
-                messageResponseBean.setUserId(message.getUserId());
+//                messageResponseBean.setUserId(message.getUserId());
                 messageResponseBean.setUserType(message.getUserType());
                 messageResponseBean.setNickname(message.getNickname());
                 messageResponseBean.setWechatNumber(message.getWechatNumber());
@@ -265,6 +270,72 @@ public class MessageService extends BaseService{
         map.put("im", imCount);
 
         return map;
+    }
+
+
+    /**
+     * 微信消息联系人
+     * @return
+     */
+    public PageResponseBean<MessageLinkmanResponseBean> getMessageLinkmanList(MessageRequestBean bean){
+
+        String drugUserId = "%" + bean.getDrugUserId() + "%";
+        int page = bean.getPage();
+        int pageSize = bean.getPageSize();
+        Integer messageListCount = messageRepository.getMessageListCount(drugUserId);
+        List<Message> messageList = messageRepository.getMessageList(drugUserId, page  * pageSize, pageSize);
+        if (messageListCount == null){
+            messageListCount = 0;
+        }
+
+        List<MessageLinkmanResponseBean> list = new ArrayList<>();
+        if (messageList != null && messageList.size() > 0){
+
+            for (Message message:messageList){
+
+                MessageLinkmanResponseBean messageLinkmanResponseBean = new MessageLinkmanResponseBean();
+                messageLinkmanResponseBean.setDoctorId(message.getUserId());
+                messageLinkmanResponseBean.setMessageType(message.getMessageType());
+                messageLinkmanResponseBean.setLastMessage(message.getMessage());
+                messageLinkmanResponseBean.setNickname(message.getNickname());
+                String messageTime = message.getMessageTime();
+                messageTime = messageTime.substring(0, messageTime.length()-2);
+                messageLinkmanResponseBean.setLastTime(messageTime);
+
+                list.add(messageLinkmanResponseBean);
+            }
+
+        }
+
+        PageResponseBean<MessageLinkmanResponseBean> pageResponseBean = new PageResponseBean<>(bean, messageListCount,list);
+
+
+        return pageResponseBean;
+    }
+
+
+
+
+
+
+
+    private Message getFirstOne(Long userId, Integer userType){
+        Pageable pageable = new PageRequest(0,1);
+        List<Message> messages = messageRepository.findByUserIdAndUserTypeOrderByMessageTimeDesc(pageable, userId, userType);
+        if (null == messages || messages.size() == 0){
+            return null;
+        }
+        return messages.get(0);
+    }
+
+
+
+
+    public void test(){
+
+        List<Message> messageList = messageRepository.test();
+        System.out.println(messageList.size());
+        System.out.println(messageList);
     }
 
 }
