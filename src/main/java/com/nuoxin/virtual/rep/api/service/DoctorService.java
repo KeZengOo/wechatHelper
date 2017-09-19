@@ -63,8 +63,8 @@ public class DoctorService extends BaseService {
                 if(StringUtils.isNotEmtity(bean.getDepartment())){
                     predicates.add(cb.like(root.get("department").as(String.class),"%"+bean.getDepartment()+"%"));
                 }
-                if(StringUtils.isNotEmtity(bean.getDoctorLevle())){
-                    predicates.add(cb.like(root.get("doctorLevle").as(String.class),"%"+bean.getDoctorLevle()+"%"));
+                if(StringUtils.isNotEmtity(bean.getDoctorLevel())){
+                    predicates.add(cb.like(root.get("doctorLevel").as(String.class),"%"+bean.getDoctorLevel()+"%"));
                 }
                 if(StringUtils.isNotEmtity(bean.getHospital())){
                     predicates.add(cb.like(root.get("hospitalName").as(String.class),"%"+bean.getHospital()+"%"));
@@ -110,7 +110,15 @@ public class DoctorService extends BaseService {
         }else{
             doctor.setDrugUserIds(doctor.getDrugUserIds()+bean.getDrugUserId()+',');
         }
-        BeanUtils.copyProperties(bean,doctor);
+//        BeanUtils.copyProperties(bean,doctor);
+        doctor.setCity(bean.getCity());
+        doctor.setClientLevel(bean.getClientLevel());
+        doctor.setDepartment(bean.getDepartment());
+        doctor.setDoctorLevel(bean.getDoctorLevel());
+        doctor.setHospitalLevel(bean.getHospitalLevel());
+        doctor.setHospitalName(bean.getHospitalName());
+        doctor.setMobile(bean.getMobile());
+        doctor.setName(bean.getName());
         //TODO  获取主数据id
 
         doctor = doctorRepository.saveAndFlush(doctor);

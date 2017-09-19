@@ -35,7 +35,7 @@ public class DoctorCallInfo extends IdEntity {
     @Column(name = "status_name")
     private String statusName;
     @Column(name = "create_time")
-    private Date createTime;
+    private Date createTime = new Date();
     @Column(name = "mobile")
     private String mobile;
 

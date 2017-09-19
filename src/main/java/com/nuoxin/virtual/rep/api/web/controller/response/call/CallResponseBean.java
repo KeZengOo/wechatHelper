@@ -21,7 +21,7 @@ public class CallResponseBean implements Serializable {
     @ApiModelProperty(value = "电话")
     private String doctorMobile;
     @ApiModelProperty(value = "客户等级")
-    private String clientLevle;
+    private String clientLevel;
     @ApiModelProperty(value = "通话时间（时间戳）")
     private Long timeLong;
     @ApiModelProperty(value = "通话时间（yyyy-MM-dd HH:mm）")
@@ -51,12 +51,12 @@ public class CallResponseBean implements Serializable {
         this.doctorMobile = doctorMobile;
     }
 
-    public String getClientLevle() {
-        return clientLevle;
+    public String getClientLevel() {
+        return clientLevel;
     }
 
-    public void setClientLevle(String clientLevle) {
-        this.clientLevle = clientLevle;
+    public void setClientLevel(String clientLevel) {
+        this.clientLevel = clientLevel;
     }
 
     public Long getTimeLong() {

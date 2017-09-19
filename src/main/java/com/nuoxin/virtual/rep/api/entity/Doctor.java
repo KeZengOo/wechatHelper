@@ -26,8 +26,8 @@ public class Doctor extends IdEntity {
     private Long hospitalId;
     @Column(name = "hospital_name")
     private String hospitalName;
-    @Column(name = "hospital_levle")
-    private String hospitalLevle;
+    @Column(name = "hospital_level")
+    private String hospitalLevel;
     @Column(name = "province")
     private String province;
     @Column(name = "city")
@@ -36,10 +36,10 @@ public class Doctor extends IdEntity {
     private String department;
     @Column(name = "mobile")
     private String mobile;
-    @Column(name = "doctor_levle")
-    private String doctorLevle;
-    @Column(name = "client_levle")
-    private String clientLevle;
+    @Column(name = "doctor_level")
+    private String doctorLevel;
+    @Column(name = "client_level")
+    private String clientLevel;
     @Column(name = "create_time")
     private Date createTime;
 
@@ -86,12 +86,12 @@ public class Doctor extends IdEntity {
         this.hospitalName = hospitalName;
     }
 
-    public String getHospitalLevle() {
-        return hospitalLevle;
+    public String getHospitalLevel() {
+        return hospitalLevel;
     }
 
-    public void setHospitalLevle(String hospitalLevle) {
-        this.hospitalLevle = hospitalLevle;
+    public void setHospitalLevel(String hospitalLevel) {
+        this.hospitalLevel = hospitalLevel;
     }
 
     public String getProvince() {
@@ -126,20 +126,20 @@ public class Doctor extends IdEntity {
         this.mobile = mobile;
     }
 
-    public String getDoctorLevle() {
-        return doctorLevle;
+    public String getDoctorLevel() {
+        return doctorLevel;
     }
 
-    public void setDoctorLevle(String doctorLevle) {
-        this.doctorLevle = doctorLevle;
+    public void setDoctorLevel(String doctorLevel) {
+        this.doctorLevel = doctorLevel;
     }
 
-    public String getClientLevle() {
-        return clientLevle;
+    public String getClientLevel() {
+        return clientLevel;
     }
 
-    public void setClientLevle(String clientLevle) {
-        this.clientLevle = clientLevle;
+    public void setClientLevel(String clientLevel) {
+        this.clientLevel = clientLevel;
     }
 
     public Date getCreateTime() {

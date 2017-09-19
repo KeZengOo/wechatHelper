@@ -26,7 +26,7 @@ public class QueryRequestBean extends PageRequestBean {
     @ApiModelProperty(value = "科室")
     private String department;
     @ApiModelProperty(value = "医生级别")
-    private String doctorLevle;
+    private String doctorLevel;
 
     private Long drugUserId;
 
@@ -86,12 +86,12 @@ public class QueryRequestBean extends PageRequestBean {
         this.department = department;
     }
 
-    public String getDoctorLevle() {
-        return doctorLevle;
+    public String getDoctorLevel() {
+        return doctorLevel;
     }
 
-    public void setDoctorLevle(String doctorLevle) {
-        this.doctorLevle = doctorLevle;
+    public void setDoctorLevel(String doctorLevel) {
+        this.doctorLevel = doctorLevel;
     }
 
     public Long getDrugUserId() {

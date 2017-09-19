@@ -19,6 +19,10 @@ public class CallInfoRequestBean implements Serializable {
     private List<QuestionnaireRequestBean> questions;
     @ApiModelProperty(value = "备注")
     private String remark;
+    @ApiModelProperty(value = "录音url")
+    private String url;
+    @ApiModelProperty(value = "通话时长")
+    private Long times;
 
     private Long drugUserId;
 
@@ -52,5 +56,21 @@ public class CallInfoRequestBean implements Serializable {
 
     public void setDrugUserId(Long drugUserId) {
         this.drugUserId = drugUserId;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public Long getTimes() {
+        return times;
+    }
+
+    public void setTimes(Long times) {
+        this.times = times;
     }
 }

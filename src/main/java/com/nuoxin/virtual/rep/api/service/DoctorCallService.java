@@ -4,14 +4,18 @@ import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.service.BaseService;
 import com.nuoxin.virtual.rep.api.common.util.StringUtils;
 import com.nuoxin.virtual.rep.api.dao.DoctorCallInfoRepository;
+import com.nuoxin.virtual.rep.api.dao.DoctorQuestionnaireRepository;
 import com.nuoxin.virtual.rep.api.dao.DoctorRepository;
 import com.nuoxin.virtual.rep.api.entity.DoctorCallInfo;
+import com.nuoxin.virtual.rep.api.entity.DoctorQuestionnaire;
 import com.nuoxin.virtual.rep.api.enums.CallTypeEnum;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.CallHistoryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.CallInfoRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.CallRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.question.QuestionRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.question.QuestionnaireRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.call.CallHistoryResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.call.CallResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.call.CallStatResponseBean;
@@ -39,6 +43,9 @@ import java.util.Map;
 public class DoctorCallService extends BaseService {
 
     @Autowired
+    private DoctorQuestionnaireService doctorQuestionnaireService;
+
+    @Autowired
     private DoctorCallInfoRepository doctorCallInfoRepository;
     @Autowired
     private DoctorRepository doctorRepository;
@@ -58,8 +65,8 @@ public class DoctorCallService extends BaseService {
                 if(StringUtils.isNotEmtity(bean.getDepartment())){
                     predicates.add(cb.like(root.get("doctor").get("department").as(String.class),"%"+bean.getDepartment()+"%"));
                 }
-                if(StringUtils.isNotEmtity(bean.getDoctorLevle())){
-                    predicates.add(cb.like(root.get("doctor").get("doctorLevle").as(String.class),"%"+bean.getDoctorLevle()+"%"));
+                if(StringUtils.isNotEmtity(bean.getDoctorLevel())){
+                    predicates.add(cb.like(root.get("doctor").get("doctorLevle").as(String.class),"%"+bean.getDoctorLevel()+"%"));
                 }
                 if(StringUtils.isNotEmtity(bean.getHospital())){
                     predicates.add(cb.like(root.get("doctor").get("hospitalName").as(String.class),"%"+bean.getHospital()+"%"));
@@ -165,6 +172,38 @@ public class DoctorCallService extends BaseService {
     @Transactional(readOnly = false)
     public Boolean stopSave(CallInfoRequestBean bean){
         DoctorCallInfo info = doctorCallInfoRepository.findOne(bean.getId());
+        if(info==null){
+
+        }
+        info.setCallTime(bean.getTimes());
+        info.setCallUrl(bean.getUrl());
+        info.setRemark(bean.getRemark());
+        //保存通话信息
+
+        //保存问卷信息
+        List<DoctorQuestionnaire> saveList = new ArrayList<>();
+        List<QuestionnaireRequestBean> list = bean.getQuestions();
+        if(list!=null && !list.isEmpty()){
+            for (QuestionnaireRequestBean arb:list) {
+                List<QuestionRequestBean> qs = arb.getQuestions();
+                if(qs!=null && !qs.isEmpty()){
+                    for (QuestionRequestBean qrb:qs) {
+                        DoctorQuestionnaire dq = new DoctorQuestionnaire();
+                        dq.setAnswer(qrb.getAnswer());
+                        dq.setCreateTime(new Date());
+                        dq.setDoctorId(info.getDoctor()==null?0l:info.getDoctor().getId());
+                        dq.setDrugUserId(bean.getDrugUserId());
+                        dq.setQuestionnaireId(arb.getId());
+                        dq.setQuestionId(qrb.getId());
+                        dq.setCallId(info.getId());
+                        saveList.add(dq);
+                    }
+                }
+            }
+        }
+        if(saveList!=null && !saveList.isEmpty()){
+            doctorQuestionnaireService.save(saveList);
+        }
         return null;
     }
 
@@ -180,13 +219,16 @@ public class DoctorCallService extends BaseService {
         if(timeLong!=null && timeLong.equals(callBean.getTimeLong())){
             callBean.setCurrent(true);
         }
+
+        //添加试题
+        callBean.setQuestions(doctorQuestionnaireService.findByCallId(info.getId()));
         return callBean;
     }
 
     private CallResponseBean _getCallResponseBean(DoctorCallInfo info){
         CallResponseBean responseBean = new CallResponseBean();
         if(info!=null){
-            responseBean.setClientLevle(info.getDoctor().getClientLevle());
+            responseBean.setClientLevel(info.getDoctor().getClientLevel());
             responseBean.setDoctorId(info.getDoctor().getId());
             responseBean.setDoctorMobile(info.getDoctor().getMobile());
             responseBean.setDoctorName(info.getDoctor().getName());

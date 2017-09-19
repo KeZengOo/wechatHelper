@@ -19,11 +19,11 @@ public class DoctorRequestBean implements Serializable {
     @ApiModelProperty(value = "电话")
     private String mobile;
     @ApiModelProperty(value = "客户等级")
-    private String clientLevle;
+    private String clientLevel;
     @ApiModelProperty(value = "医院名称")
     private String hospitalName;
     @ApiModelProperty(value = "医院级别")
-    private String hospitalLevle;
+    private String hospitalLevel;
     @ApiModelProperty(value = "科室")
     private String department;
     @ApiModelProperty(value = "省份")
@@ -31,7 +31,7 @@ public class DoctorRequestBean implements Serializable {
     @ApiModelProperty(value = "城市")
     private String city;
     @ApiModelProperty(value = "医生级别")
-    private String doctorLevle;
+    private String doctorLevel;
     @ApiModelProperty(value = "教授")
     private String professor;
 
@@ -61,12 +61,12 @@ public class DoctorRequestBean implements Serializable {
         this.mobile = mobile;
     }
 
-    public String getClientLevle() {
-        return clientLevle;
+    public String getClientLevel() {
+        return clientLevel;
     }
 
-    public void setClientLevle(String clientLevle) {
-        this.clientLevle = clientLevle;
+    public void setClientLevel(String clientLevel) {
+        this.clientLevel = clientLevel;
     }
 
     public String getHospitalName() {
@@ -77,12 +77,12 @@ public class DoctorRequestBean implements Serializable {
         this.hospitalName = hospitalName;
     }
 
-    public String getHospitalLevle() {
-        return hospitalLevle;
+    public String getHospitalLevel() {
+        return hospitalLevel;
     }
 
-    public void setHospitalLevle(String hospitalLevle) {
-        this.hospitalLevle = hospitalLevle;
+    public void setHospitalLevel(String hospitalLevel) {
+        this.hospitalLevel = hospitalLevel;
     }
 
     public String getDepartment() {
@@ -109,12 +109,12 @@ public class DoctorRequestBean implements Serializable {
         this.city = city;
     }
 
-    public String getDoctorLevle() {
-        return doctorLevle;
+    public String getDoctorLevel() {
+        return doctorLevel;
     }
 
-    public void setDoctorLevle(String doctorLevle) {
-        this.doctorLevle = doctorLevle;
+    public void setDoctorLevel(String doctorLevel) {
+        this.doctorLevel = doctorLevel;
     }
 
     public String getProfessor() {
