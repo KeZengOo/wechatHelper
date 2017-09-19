@@ -17,6 +17,6 @@ public interface DoctorRepository extends JpaRepository<Doctor,Long>,JpaSpecific
     Doctor findTopByMobile(String mobile);
 
     @Query("select count(distinct d.id) as doctorNum,count(distinct d.hospitalName) as hospitalNum from Doctor d where d.drugUserIds like :drugUserId ")
-    Map<String,Integer> statDrugUserDoctorNum(@Param("drugUserId") String drugUserId);
+    Map<String,Long> statDrugUserDoctorNum(@Param("drugUserId") String drugUserId);
 
 }

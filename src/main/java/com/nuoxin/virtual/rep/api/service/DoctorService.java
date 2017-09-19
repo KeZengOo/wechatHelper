@@ -93,10 +93,10 @@ public class DoctorService extends BaseService {
 
     public DoctorStatResponseBean stat(Long drugUserId){
         DoctorStatResponseBean responseBean = new DoctorStatResponseBean();
-        Map<String,Integer> map = doctorRepository.statDrugUserDoctorNum("%"+drugUserId+",%");
+        Map<String,Long> map = doctorRepository.statDrugUserDoctorNum("%"+drugUserId+",%");
         if(map!=null){
-            responseBean.setDoctorNum(map.get("doctorNum"));
-            responseBean.setHospitalNum(map.get("hospitalNum"));
+            responseBean.setDoctorNum(map.get("doctorNum")!=null?Integer.valueOf(map.get("doctorNum")+""):0);
+            responseBean.setHospitalNum(map.get("hospitalNum")!=null?Integer.valueOf(map.get("hospitalNum")+""):0);
         }
         return responseBean;
     }
