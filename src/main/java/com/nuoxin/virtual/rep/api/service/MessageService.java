@@ -34,9 +34,7 @@ import javax.persistence.criteria.Root;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * 微信相关接口
@@ -249,6 +247,24 @@ public class MessageService extends BaseService{
         messagePage.setContent(list);
 
         return messagePage;
+    }
+
+
+    /**
+     * 今日会话统计
+     * @param drugUserId
+     * @return
+     */
+    public Map<String,Integer> getMessageCountList(Long drugUserId){
+        Map<String,Integer> map = new HashMap<>();
+        Integer wechatCount = messageRepository.messageCount(drugUserId, MessageTypeEnum.WECHAT.getMessageType(), UserTypeEnum.DOCTOR.getUserType());
+
+        Integer imCount = messageRepository.messageCount(drugUserId, MessageTypeEnum.IM.getMessageType(), UserTypeEnum.DOCTOR.getUserType());
+
+        map.put("wechat", wechatCount);
+        map.put("im", imCount);
+
+        return map;
     }
 
 }
