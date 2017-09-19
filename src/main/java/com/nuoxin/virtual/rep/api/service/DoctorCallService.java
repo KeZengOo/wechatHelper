@@ -173,12 +173,13 @@ public class DoctorCallService extends BaseService {
     public Boolean stopSave(CallInfoRequestBean bean){
         DoctorCallInfo info = doctorCallInfoRepository.findOne(bean.getId());
         if(info==null){
-
+            return false;
         }
         info.setCallTime(bean.getTimes());
         info.setCallUrl(bean.getUrl());
         info.setRemark(bean.getRemark());
         //保存通话信息
+        doctorCallInfoRepository.saveAndFlush(info);
 
         //保存问卷信息
         List<DoctorQuestionnaire> saveList = new ArrayList<>();
@@ -204,7 +205,7 @@ public class DoctorCallService extends BaseService {
         if(saveList!=null && !saveList.isEmpty()){
             doctorQuestionnaireService.save(saveList);
         }
-        return null;
+        return true;
     }
 
     private CallHistoryResponseBean _getCallHistoryResponseBean(DoctorCallInfo info,Long timeLong){

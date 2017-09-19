@@ -17,7 +17,7 @@ public class LoginService {
     @Autowired
     private DrugUserService drugUserService;
 
-    public void login(LoginRequestBean bean){
+    public DrugUser login(LoginRequestBean bean){
         DrugUser drugUser = drugUserService.findByEmail(bean.getUserName());
         if(drugUser==null){
             throw new BusinessException(ErrorEnum.LOGIN_ERROR.getStatus(),"用户名不存在");
@@ -25,6 +25,6 @@ public class LoginService {
         if (!PasswordEncoder.checkPassword(bean.getPassword(), drugUser.getPassword())) {
             throw new BusinessException(ErrorEnum.LOGIN_ERROR.getStatus(),"用户名密码不匹配");
         }
-
+        return drugUser;
     }
 }

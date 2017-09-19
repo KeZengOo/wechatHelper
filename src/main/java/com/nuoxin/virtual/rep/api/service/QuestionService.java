@@ -16,14 +16,12 @@ import com.nuoxin.virtual.rep.api.web.controller.request.question.QuestionnaireR
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -107,7 +105,8 @@ public class QuestionService extends BaseService {
     }
 
     public PageResponseBean<QuestionnaireRequestBean> page(QuestionQueryRequestBean bean){
-        PageRequest pageable = super.getPage(bean);
+        Sort sort = new Sort(Sort.Direction.DESC, "createTime");
+        PageRequest pageable = super.getPage(bean,sort);
         Specification<Questionnaire> spec = new Specification<Questionnaire>() {
             @Override
             public Predicate toPredicate(Root<Questionnaire> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
@@ -160,7 +159,7 @@ public class QuestionService extends BaseService {
                 }
                 requestBeans.add(bean);
             }
-            return  requestBeans;
+            return requestBeans;
         }
         return null;
     }
