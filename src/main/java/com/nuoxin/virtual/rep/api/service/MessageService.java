@@ -13,7 +13,6 @@ import com.nuoxin.virtual.rep.api.entity.Message;
 import com.nuoxin.virtual.rep.api.enums.MessageTypeEnum;
 import com.nuoxin.virtual.rep.api.enums.UserTypeEnum;
 import com.nuoxin.virtual.rep.api.utils.ExcelUtils;
-import com.nuoxin.virtual.rep.api.utils.RegularUtils;
 import com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.vo.WechatMessageVo;
 import com.nuoxin.virtual.rep.api.web.controller.response.message.MessageLinkmanResponseBean;
@@ -91,23 +90,31 @@ public class MessageService extends BaseService{
         String originalFilename = file.getOriginalFilename();
         File excelFile = new File(originalFilename);
 
-        String name = excelFile.getName();
-        System.out.println(name);
+
+//        String name = excelFile.getName();
+//        System.out.println(name);
+
+
         if (!originalFilename.endsWith(EXTENSION_XLS) && !originalFilename.endsWith(EXTENSION_XLSX)){
             throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
         }
-        String[] split = originalFilename.split("-");
-        if (null == split || split.length < 2){
-            throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
-        }
 
-        String drugUserNickname = split[0];
-        String drugUserTelephone = split[1];
-        drugUserTelephone = drugUserTelephone.substring(0, drugUserTelephone.indexOf("."));
-        boolean matcher = RegularUtils.isMatcher(MATCH_TELEPHONE, drugUserTelephone);
-        if (!matcher){
-            throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
-        }
+
+//        String[] split = originalFilename.split("-");
+//        if (null == split || split.length < 2){
+//            throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
+//        }
+//
+//        String drugUserNickname = split[0];
+//        String drugUserTelephone = split[1];
+//        drugUserTelephone = drugUserTelephone.substring(0, drugUserTelephone.indexOf("."));
+//        boolean matcher = RegularUtils.isMatcher(MATCH_TELEPHONE, drugUserTelephone);
+//        if (!matcher){
+//            throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
+//        }
+
+
+
 
 
 
@@ -142,6 +149,8 @@ public class MessageService extends BaseService{
                 String wechatMessageStatus = wechatMessageVo.getMessageStatus();
                 String wechatMessageType = wechatMessageVo.getMessageType();
                 String message = wechatMessageVo.getMessage();
+                String drugUserTelephone = wechatMessageVo.getDrugUserTelephone();
+                String doctorTelephone = wechatMessageVo.getDoctorTelephone();
 
                 int userType = 0;
                 String nickname = "";
@@ -151,31 +160,47 @@ public class MessageService extends BaseService{
                 if (drugUser == null){
                     throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
                 }
+
+                Doctor doctor = doctorRepository.findTopByMobile(doctorTelephone);
+                if (doctor == null){
+                    throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
+                }
+
+
+
                 Long drugUserId = drugUser.getId();
+                Long doctorId = doctor.getId();
                 if (wechatNickName != null && DRUG_USER_NICKNAME.equals(wechatNickName)) {
                     userType = UserTypeEnum.DRUG_USER.getUserType();
-                    nickname = drugUserNickname;
-                    telephone = drugUserTelephone;
+                    nickname = drugUser.getName();
+                    telephone = drugUser.getMobile();
                     userId = drugUserId;
 
 
                 } else if (wechatNickName != null && !DRUG_USER_NICKNAME.equals(wechatNickName)) {
-                    userType = UserTypeEnum.DOCTOR.getUserType();
-                    String[] nicknameArray = wechatNickName.split("-");
-                    if (null == nicknameArray || nicknameArray.length < 2) {
-                        throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
-                    }
-                    nickname = nicknameArray[0];
-                    telephone = nicknameArray[1];
-                    boolean m = RegularUtils.isMatcher(MATCH_TELEPHONE, telephone);
-                    if (!m){
-                        throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
-                    }
+//                    userType = UserTypeEnum.DOCTOR.getUserType();
+//                    String[] nicknameArray = wechatNickName.split("-");
+//                    if (null == nicknameArray || nicknameArray.length < 2) {
+//                        throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
+//                    }
+//                    nickname = nicknameArray[0];
+//                    telephone = nicknameArray[1];
+//                    boolean m = RegularUtils.isMatcher(MATCH_TELEPHONE, telephone);
+//                    if (!m){
+//                        throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
+//                    }
+//
+//                    Doctor doctor = doctorRepository.findTopByMobile(telephone);
+//                    if (null != doctor){
+//                        userId = doctor.getId();
+//                    }
 
-                    Doctor doctor = doctorRepository.findTopByMobile(telephone);
-                    if (null != doctor){
-                        userId = doctor.getId();
-                    }
+
+                    userType = UserTypeEnum.DOCTOR.getUserType();
+                    nickname = doctor.getName();
+                    telephone = doctor.getMobile();
+                    userId = doctorId;
+
 
                 }
 
@@ -185,6 +210,7 @@ public class MessageService extends BaseService{
                 wechatMessage.setUserType(userType);
                 wechatMessage.setNickname(nickname);
                 wechatMessage.setDrugUserId(drugUserId);
+                wechatMessage.setDoctorId(doctorId);
                 wechatMessage.setWechatNumber(wechatNumber);
                 wechatMessage.setTelephone(telephone);
                 wechatMessage.setWechatMessageStatus(wechatMessageStatus);
@@ -218,9 +244,8 @@ public class MessageService extends BaseService{
 
                 List<Predicate> predicates = new ArrayList<>();
                 predicates.add(criteriaBuilder.equal(root.get("drugUserId").as(Long.class),bean.getDrugUserId()));
+                predicates.add(criteriaBuilder.equal(root.get("doctorId").as(Long.class),bean.getDoctorId()));
                 predicates.add(criteriaBuilder.equal(root.get("messageType").as(Integer.class),bean.getMessageType()));
-
-
                 criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.and(predicates.toArray(new Predicate[0]))));
                 return criteriaQuery.getRestriction();
 

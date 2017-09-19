@@ -28,8 +28,13 @@ public class Message extends IdEntity {
     @Column(name = "nickname")
     private String nickname;
 
+    //与聊天有关的销售id
     @Column(name = "drug_user_id")
     private Long drugUserId;
+
+    //与聊天有关的医生id
+    @Column(name = "doctor_id")
+    private Long doctorId;
 
     //微信号
     @Column(name = "wechat_number")
@@ -161,5 +166,14 @@ public class Message extends IdEntity {
 
     public void setDrugUserId(Long drugUserId) {
         this.drugUserId = drugUserId;
+    }
+
+
+    public Long getDoctorId() {
+        return doctorId;
+    }
+
+    public void setDoctorId(Long doctorId) {
+        this.doctorId = doctorId;
     }
 }

@@ -13,8 +13,8 @@ public class MessageRequestBean extends PageRequestBean implements Serializable{
     @ApiModelProperty(value = "微信消息id")
     private Long id;
 
-    @ApiModelProperty(value = "销售代表或者医生id")
-    private Long userId;
+    @ApiModelProperty(value = "医生id")
+    private Long doctorId;
 
     @ApiModelProperty(value = "用户类型,1是销售代表，2是医生")
     private Integer userType;
@@ -47,12 +47,12 @@ public class MessageRequestBean extends PageRequestBean implements Serializable{
         this.id = id;
     }
 
-    public Long getUserId() {
-        return userId;
+    public Long getDoctorId() {
+        return doctorId;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setDoctorId(Long doctorId) {
+        this.doctorId = doctorId;
     }
 
     public Integer getUserType() {
