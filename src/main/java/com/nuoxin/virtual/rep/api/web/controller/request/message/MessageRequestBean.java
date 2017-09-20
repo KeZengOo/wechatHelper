@@ -38,6 +38,13 @@ public class MessageRequestBean extends PageRequestBean implements Serializable{
     @ApiModelProperty(value = "销售代表id")
     private Long drugUserId;
 
+    @ApiModelProperty(value = "聊天开始时间")
+    private String startTime;
+
+
+    @ApiModelProperty(value = "聊天结束时间")
+    private String endTime;
+
 
     public Long getId() {
         return id;
@@ -110,5 +117,21 @@ public class MessageRequestBean extends PageRequestBean implements Serializable{
 
     public void setMessageType(Integer messageType) {
         this.messageType = messageType;
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
     }
 }

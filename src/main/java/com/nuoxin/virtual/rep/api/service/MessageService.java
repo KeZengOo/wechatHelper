@@ -246,6 +246,14 @@ public class MessageService extends BaseService{
                 predicates.add(criteriaBuilder.equal(root.get("drugUserId").as(Long.class),bean.getDrugUserId()));
                 predicates.add(criteriaBuilder.equal(root.get("doctorId").as(Long.class),bean.getDoctorId()));
                 predicates.add(criteriaBuilder.equal(root.get("messageType").as(Integer.class),bean.getMessageType()));
+
+                String startTime = bean.getStartTime();
+                String endTime = bean.getEndTime();
+
+                if (!StringUtils.isEmpty(startTime) && !StringUtils.isEmpty(endTime)){
+                    predicates.add(criteriaBuilder.between(root.get("messageTime").as(String.class),startTime,endTime));
+                }
+
                 criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.and(predicates.toArray(new Predicate[0]))));
                 return criteriaQuery.getRestriction();
 
