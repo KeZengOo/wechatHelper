@@ -17,7 +17,7 @@ public class SmsTemplate extends IdEntity {
     private String template;
     private String message;
     private String topic;
-    private String sinName;
+    private String sigName;
     private Long drugId;
     private Date createTime;
 
@@ -45,12 +45,12 @@ public class SmsTemplate extends IdEntity {
         this.topic = topic;
     }
 
-    public String getSinName() {
-        return sinName;
+    public String getSigName() {
+        return sigName;
     }
 
-    public void setSinName(String sinName) {
-        this.sinName = sinName;
+    public void setSigName(String sinName) {
+        this.sigName = sinName;
     }
 
     public Long getDrugId() {

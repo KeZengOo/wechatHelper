@@ -15,10 +15,16 @@ import com.nuoxin.virtual.rep.api.entity.Doctor;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.SmsTemplate;
 import com.nuoxin.virtual.rep.api.web.controller.request.SmsSendRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.vo.Doc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by fenggang on 9/18/17.
@@ -105,18 +111,49 @@ public class SmsSendService {
 
     }
 
-    public Boolean send(SmsSendRequestBean bean) {
-        SmsMassageBean smsBean = new SmsMassageBean();
-        Doctor doctor = doctorService.findByMobile(bean.getMobile());
+    public List<String> send(SmsSendRequestBean bean) {
+        List<String> result = new ArrayList<>();
         DrugUser drugUser = drugUserService.findById(bean.getDrugUserId());
         SmsTemplate smsTemplate = smsTemplateService.fingById(bean.getTemplateId());
-        try {
-            this.sendSms(smsBean);
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
+        List<SmsMassageBean> sendList =  new ArrayList<>();
+        List<String> list = new ArrayList<>();
+        if(bean.getMobile()!=null){
+            String[] mobiles = bean.getMobile().split(",");
+            for (String m:mobiles) {
+                if(m!=null && !"".equals(m) && !"".equals(m.trim())){}
+                list.add(m);
+            }
         }
-        return false;
+        List<Doctor> doctors = doctorService.findByMobileIn(list);
+        if(doctors!=null && !doctors.isEmpty()){
+            for (Doctor doctor:doctors) {
+                SmsMassageBean smsBean = new SmsMassageBean();
+                Map<String,Object> map = new HashMap<>();
+                map.put("customer",doctor.getName());
+                smsBean.setMap(map);
+                List<String> mobiles = new ArrayList<>();
+                mobiles.add(doctor.getMobile());
+                smsBean.setMobiles(mobiles);
+                smsBean.setTemplateCode(smsTemplate.getTemplate());
+                smsBean.setMessage(smsTemplate.getMessage());
+                smsBean.setTopic(smsTemplate.getTopic());
+                smsBean.setSignName(smsTemplate.getSigName());
+                sendList.add(smsBean);
+            }
+        }
+
+        if(sendList!=null && !sendList.isEmpty()){
+            for (SmsMassageBean sms:sendList) {
+                try {
+                    this.sendSms(sms);
+                } catch (Exception e) {
+                    result.add("手机号【"+sms.getMobiles().get(0)+"】短信发送失败：");
+                    logger.debug("手机号【{}】短信发送失败：",sms.getMobiles().get(0),e);
+                    e.printStackTrace();
+                }
+            }
+        }
+        return result;
     }
 
 }

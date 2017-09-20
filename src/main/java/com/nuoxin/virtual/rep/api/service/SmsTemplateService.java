@@ -17,6 +17,6 @@ public class SmsTemplateService {
     private SmsTemplateRepository smsTemplateRepository;
 
     public SmsTemplate fingById(Long id){
-        return smsTemplateRepository.getOne(id);
+        return smsTemplateRepository.findOne(id);
     }
 }

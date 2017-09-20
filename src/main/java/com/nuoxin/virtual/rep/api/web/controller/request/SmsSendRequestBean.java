@@ -12,7 +12,7 @@ import java.io.Serializable;
 public class SmsSendRequestBean implements Serializable {
 
     private static final long serialVersionUID = 2326614631256049253L;
-    @ApiModelProperty(value = "手机号")
+    @ApiModelProperty(value = "手机号(多个手机号中间用英文逗号分隔)")
     private String mobile;
     @ApiModelProperty(value = "模板")
     private Long templateId;

@@ -22,6 +22,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -43,6 +44,14 @@ public class DoctorService extends BaseService {
 
     public Doctor findByMobile(String mobile){
         return doctorRepository.findTopByMobile(mobile);
+    }
+
+    public List<Doctor> findByIdIn(Collection<Long> ids){
+        return doctorRepository.findByIdIn(ids);
+    }
+
+    public List<Doctor> findByMobileIn(Collection<String> mobiles){
+        return doctorRepository.findByMobileIn(mobiles);
     }
 
     public PageResponseBean<DoctorResponseBean> page(QueryRequestBean bean){
