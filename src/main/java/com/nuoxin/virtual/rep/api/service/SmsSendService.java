@@ -10,21 +10,26 @@ import com.aliyun.mns.model.MessageAttributes;
 import com.aliyun.mns.model.RawTopicMessage;
 import com.aliyun.mns.model.TopicMessage;
 import com.nuoxin.virtual.rep.api.common.bean.SmsMassageBean;
+import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.config.AliyunConfig;
+import com.nuoxin.virtual.rep.api.dao.DoctorRepository;
+import com.nuoxin.virtual.rep.api.dao.MessageRepository;
 import com.nuoxin.virtual.rep.api.entity.Doctor;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
+import com.nuoxin.virtual.rep.api.entity.Message;
 import com.nuoxin.virtual.rep.api.entity.SmsTemplate;
+import com.nuoxin.virtual.rep.api.enums.MessageTypeEnum;
+import com.nuoxin.virtual.rep.api.enums.UserTypeEnum;
+import com.nuoxin.virtual.rep.api.utils.DateUtil;
+import com.nuoxin.virtual.rep.api.utils.RegularUtils;
 import com.nuoxin.virtual.rep.api.web.controller.request.SmsSendRequestBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.vo.Doc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Matcher;
 
 /**
  * Created by fenggang on 9/18/17.
@@ -43,6 +48,14 @@ public class SmsSendService {
     private DoctorService doctorService;
     @Autowired
     private SmsTemplateService smsTemplateService;
+
+    @Autowired
+    private DoctorRepository doctorRepository;
+
+    @Autowired
+    private MessageRepository messageRepository;
+
+    private static final String regex = "(\\${.*})";
 
     /**
      * 发送短信
@@ -114,6 +127,9 @@ public class SmsSendService {
     public List<String> send(SmsSendRequestBean bean) {
         List<String> result = new ArrayList<>();
         DrugUser drugUser = drugUserService.findById(bean.getDrugUserId());
+        if (drugUser == null){
+            throw new BusinessException();
+        }
         SmsTemplate smsTemplate = smsTemplateService.fingById(bean.getTemplateId());
         List<SmsMassageBean> sendList =  new ArrayList<>();
         List<String> list = new ArrayList<>();
@@ -146,6 +162,10 @@ public class SmsSendService {
             for (SmsMassageBean sms:sendList) {
                 try {
                     this.sendSms(sms);
+
+                    //将信息保存到数据库
+                    saveSms(drugUser,sms);
+
                 } catch (Exception e) {
                     result.add("手机号【"+sms.getMobiles().get(0)+"】短信发送失败：");
                     logger.debug("手机号【{}】短信发送失败：",sms.getMobiles().get(0),e);
@@ -154,6 +174,67 @@ public class SmsSendService {
             }
         }
         return result;
+    }
+
+
+    /**
+     * 保存发送短信记录
+     * @param sms
+     */
+    public void saveSms(DrugUser drugUser, SmsMassageBean sms){
+        if (drugUser == null){
+            return;
+        }
+
+        if (sms == null){
+            return;
+        }
+
+
+
+        List<String> mobiles =  sms.getMobiles();
+        if (null != mobiles && mobiles.size() > 0){
+            for (String mobile:mobiles){
+                Doctor doctor = doctorRepository.findTopByMobile(mobile);
+                if(doctor != null){
+                    Message message = new Message();
+                    message.setUserId(doctor.getId());
+                    message.setUserType(UserTypeEnum.DOCTOR.getUserType());
+                    message.setNickname(doctor.getName());
+                    message.setDrugUserId(drugUser.getId());
+                    message.setDoctorId(doctor.getId());
+                    message.setTelephone(doctor.getMobile());
+                    //模板消息，需要自己组装
+                    String imessage = sms.getMessage();
+                    Map<String, Object> map = sms.getMap();
+                    if (map != null && map.size() > 0){
+                        for (Map.Entry<String, Object> entry:map.entrySet()){
+                            String key = entry.getKey();
+                            key = "${" + key + "}";
+                            imessage = imessage.replace(key, entry.getValue().toString());
+                        }
+                    }
+                    message.setMessage(imessage);
+                    message.setMessageType(MessageTypeEnum.IM.getMessageType());
+                    message.setMessageTime(DateUtil.getDateString(new Date()));
+                    message.setCreateTime(new Date());
+                    messageRepository.save(message);
+                }
+
+            }
+
+        }
+
+    }
+
+    public static void main(String[] args) {
+        String imessage = "内容尊敬的{customer}，欢123迎您使用阿里大鱼短信服务${hh}，阿里大鱼将为{aa}您提供便捷的通信服务！";
+        Matcher matcher = RegularUtils.getMatcher("(\\{.*})", imessage);
+        //Matcher matcher = RegularUtils.getMatcher("\\d", imessage);
+
+        while(matcher.find()){
+
+        }
     }
 
 }
