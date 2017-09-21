@@ -19,6 +19,15 @@ public class HcpBaseInfoResponseBean implements Serializable{
     @ApiModelProperty(value = "医院名称")
     private String hospitalName;
 
+    @ApiModelProperty(value = "医生性别")
+    private String doctorSex;
+
+    @ApiModelProperty(value = "地区")
+    private String district;
+
+    @ApiModelProperty(value = "教授级别")
+    private String professorLevel;
+
     //第一个圈
     @ApiModelProperty(value = "医生科室")
     private String depart;
@@ -139,5 +148,30 @@ public class HcpBaseInfoResponseBean implements Serializable{
 
     public void setKeywordList(List<DocKeywordResponseBean> keywordList) {
         this.keywordList = keywordList;
+    }
+
+
+    public String getDoctorSex() {
+        return doctorSex;
+    }
+
+    public void setDoctorSex(String doctorSex) {
+        this.doctorSex = doctorSex;
+    }
+
+    public String getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(String district) {
+        this.district = district;
+    }
+
+    public String getProfessorLevel() {
+        return professorLevel;
+    }
+
+    public void setProfessorLevel(String professorLevel) {
+        this.professorLevel = professorLevel;
     }
 }
