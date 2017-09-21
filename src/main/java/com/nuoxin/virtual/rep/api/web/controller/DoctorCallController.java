@@ -83,7 +83,7 @@ public class DoctorCallController extends BaseController {
             return responseBean;
         }
         bean.setDrugUserId(super.getLoginId(request));
-        bean = doctorCallService.save(bean);
+        bean = doctorCallService.update(bean);
         if(bean.getId()==null){
             responseBean.setCode(300);
             responseBean.setMessage("状态更新失败");

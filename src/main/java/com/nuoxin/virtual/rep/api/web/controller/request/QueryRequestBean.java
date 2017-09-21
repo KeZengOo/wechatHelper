@@ -14,11 +14,11 @@ public class QueryRequestBean extends PageRequestBean {
     @ApiModelProperty(value = "电话")
     private String mobile;
     @ApiModelProperty(value = "年")
-    private Integer year;
+    private Integer year = 0;
     @ApiModelProperty(value = "月")
-    private Integer month;
+    private Integer month = 0;
     @ApiModelProperty(value = "日")
-    private Integer day;
+    private Integer day = 0;
     @ApiModelProperty(value = "姓名")
     private String name;
     @ApiModelProperty(value = "医院")

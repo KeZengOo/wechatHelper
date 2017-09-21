@@ -32,10 +32,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by fenggang on 9/13/17.
@@ -73,6 +70,36 @@ public class DoctorCallService extends BaseService {
                 }
                 if(StringUtils.isNotEmtity(bean.getHospital())){
                     predicates.add(cb.like(root.get("doctor").get("hospitalName").as(String.class),"%"+bean.getHospital()+"%"));
+                }
+                if(bean.getYear()!=0 && bean.getMonth()!=0 && bean.getDay()!=0){
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.set(bean.getYear(), bean.getMonth(), bean.getDay(), 0, 0, 0);
+                    Date start = calendar.getTime();
+                    predicates.add(cb.greaterThanOrEqualTo(root.get("createTime").as(Date.class),start));
+                    calendar.add(Calendar.DAY_OF_YEAR,+1);
+                    Date end =calendar.getTime();
+                    predicates.add(cb.lessThanOrEqualTo(root.get("createTime").as(Date.class),end));
+                }
+                if(bean.getYear()!=0 && bean.getMonth()!=0 && bean.getDay()==0){
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.set(bean.getYear(), bean.getMonth(), bean.getDay(), 0, 0, 0);
+                    Date start = calendar.getTime();
+                    predicates.add(cb.greaterThanOrEqualTo(root.get("createTime").as(Date.class),start));
+                    calendar.add(Calendar.DAY_OF_MONTH,+1);
+                    Date end =calendar.getTime();
+                    predicates.add(cb.lessThanOrEqualTo(root.get("createTime").as(Date.class),end));
+
+                }
+                if(bean.getYear()!=0 && bean.getMonth()==0 && bean.getDay()==0){
+                    String date = bean.getYear()+"-01-01 00:00:00";
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.set(bean.getYear(), bean.getMonth(), bean.getDay(), 0, 0, 0);
+                    Date start =calendar.getTime();
+                    predicates.add(cb.greaterThanOrEqualTo(root.get("createTime").as(Date.class),start));
+                    calendar.add(Calendar.YEAR,+1);
+                    Date end =calendar.getTime();
+                    predicates.add(cb.lessThanOrEqualTo(root.get("createTime").as(Date.class),end));
+
                 }
                 predicates.add(cb.like(root.get("doctor").get("drugUserIds").as(String.class),"%"+bean.getDrugUserId()+",%"));
                 query.where(cb.and(cb.and(predicates.toArray(new Predicate[0]))));
@@ -172,6 +199,7 @@ public class DoctorCallService extends BaseService {
         return bean;
     }
 
+    @Transactional(readOnly = false)
     public CallRequestBean update(CallRequestBean bean){
         DoctorCallInfo info = doctorCallInfoRepository.findOne(bean.getId());
         if(info==null){
