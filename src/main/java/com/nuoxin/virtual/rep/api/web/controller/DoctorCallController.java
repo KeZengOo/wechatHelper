@@ -77,6 +77,11 @@ public class DoctorCallController extends BaseController {
                                                      HttpServletRequest request, HttpServletResponse response){
         DefaultResponseBean responseBean = new DefaultResponseBean();
         Long id = bean.getId();
+        if(id==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("请求参数id不能为空");
+            return responseBean;
+        }
         bean.setDrugUserId(super.getLoginId(request));
         bean = doctorCallService.save(bean);
         if(bean.getId()==null){
@@ -93,6 +98,11 @@ public class DoctorCallController extends BaseController {
     public DefaultResponseBean<Boolean> stopSave(@RequestBody CallInfoRequestBean bean,
                                         HttpServletRequest request, HttpServletResponse response){
         DefaultResponseBean responseBean = new DefaultResponseBean();
+        if(bean.getId()==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("请求参数id不能为空");
+            return responseBean;
+        }
         bean.setDrugUserId(super.getLoginId(request));
         responseBean.setData(doctorCallService.stopUpdate(bean));
         return responseBean;

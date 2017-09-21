@@ -1,6 +1,7 @@
 package com.nuoxin.virtual.rep.api.web.controller;
 
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
+import com.nuoxin.virtual.rep.api.common.bean.DoctorExcel;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
 import com.nuoxin.virtual.rep.api.service.DoctorService;
@@ -11,6 +12,7 @@ import com.nuoxin.virtual.rep.api.web.controller.request.doctor.DoctorRequestBea
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorDetailsResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorStatResponseBean;
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by fenggang on 9/11/17.
@@ -73,7 +78,21 @@ public class DoctorController extends BaseController {
     public DefaultResponseBean<Boolean> excel(MultipartFile file,
                                               HttpServletRequest request, HttpServletResponse response){
         DefaultResponseBean responseBean = new DefaultResponseBean();
-
+        ExcelUtils<DoctorExcel> excelUtils = new ExcelUtils<>(new DoctorExcel());
+        List<DoctorExcel> list = new ArrayList<>();
+        try{
+            list = excelUtils.readFromFile(null,file.getInputStream());
+        }catch (Exception e){
+            responseBean.setCode(300);
+            responseBean.setMessage("excel解析失败");
+            responseBean.setDescription(e.getMessage());
+            return responseBean;
+        }
+        if(list==null || list.isEmpty()){
+            responseBean.setCode(300);
+            responseBean.setMessage("导入数据为空");
+            return responseBean;
+        }
         return responseBean;
     }
 }
