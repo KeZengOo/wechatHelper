@@ -31,6 +31,8 @@ public class ExcelUtils <E>{
     private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private int etimes = 0;
 
+
+
     public ExcelUtils(E e) {
         this.e = e;
     }
@@ -39,6 +41,7 @@ public class ExcelUtils <E>{
     @SuppressWarnings("unchecked")
     public E get() throws InstantiationException, IllegalAccessException {
         return (E) e.getClass().newInstance();
+
     }
 
     /**
@@ -173,10 +176,18 @@ public class ExcelUtils <E>{
                 break;
             }
 
+            if (row.getCell(0) == null){
+                continue;
+            }
+
+
             e = get();
 
             for (int i = 0; i < columnCount; i++) {
                 cell = row.getCell(i);
+                if (cell == null){
+                    continue;
+                }
                 etimes = 0;
                 readCellContent(textToKey.get(titles[i]), fields, cell, e, edf);
             }
