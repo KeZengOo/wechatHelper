@@ -3,10 +3,12 @@ package com.nuoxin.virtual.rep.api.service;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.service.BaseService;
 import com.nuoxin.virtual.rep.api.common.util.StringUtils;
+import com.nuoxin.virtual.rep.api.dao.DoctorCallInfoDetailsRepository;
 import com.nuoxin.virtual.rep.api.dao.DoctorCallInfoRepository;
 import com.nuoxin.virtual.rep.api.dao.DoctorQuestionnaireRepository;
 import com.nuoxin.virtual.rep.api.dao.DoctorRepository;
 import com.nuoxin.virtual.rep.api.entity.DoctorCallInfo;
+import com.nuoxin.virtual.rep.api.entity.DoctorCallInfoDetails;
 import com.nuoxin.virtual.rep.api.entity.DoctorQuestionnaire;
 import com.nuoxin.virtual.rep.api.enums.CallTypeEnum;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
@@ -44,7 +46,8 @@ public class DoctorCallService extends BaseService {
 
     @Autowired
     private DoctorQuestionnaireService doctorQuestionnaireService;
-
+    @Autowired
+    private DoctorCallInfoDetailsRepository doctorCallInfoDetailsRepository;
     @Autowired
     private DoctorCallInfoRepository doctorCallInfoRepository;
     @Autowired
@@ -169,8 +172,29 @@ public class DoctorCallService extends BaseService {
         return bean;
     }
 
+    public CallRequestBean update(CallRequestBean bean){
+        DoctorCallInfo info = doctorCallInfoRepository.findOne(bean.getId());
+        if(info==null){
+            bean.setId(null);
+            return bean;
+        }
+        info.setSinToken(bean.getSinToken());
+        info.setStatus(bean.getStatus());
+        info.setStatusName(bean.getStatusName());
+        info.setMobile(bean.getMobile());
+        info.setType(bean.getType());
+        doctorCallInfoRepository.saveAndFlush(info);
+        DoctorCallInfoDetails infoDetails = new DoctorCallInfoDetails();
+        infoDetails.setCallId(info.getId());
+        infoDetails.setStatus(info.getStatus());
+        infoDetails.setStatusName(info.getStatusName());
+        infoDetails.setCreateTime(new Date());
+        doctorCallInfoDetailsRepository.save(infoDetails);
+        return bean;
+    }
+
     @Transactional(readOnly = false)
-    public Boolean stopSave(CallInfoRequestBean bean){
+    public Boolean stopUpdate(CallInfoRequestBean bean){
         DoctorCallInfo info = doctorCallInfoRepository.findOne(bean.getId());
         if(info==null){
             return false;

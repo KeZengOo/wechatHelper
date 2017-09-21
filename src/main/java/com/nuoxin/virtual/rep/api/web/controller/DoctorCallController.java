@@ -71,13 +71,30 @@ public class DoctorCallController extends BaseController {
         return responseBean;
     }
 
+    @ApiOperation(value = "拨号电话记录修改", notes = "拨号电话记录修改")
+    @PostMapping("/update")
+    public DefaultResponseBean<CallRequestBean> update(@RequestBody CallRequestBean bean,
+                                                     HttpServletRequest request, HttpServletResponse response){
+        DefaultResponseBean responseBean = new DefaultResponseBean();
+        Long id = bean.getId();
+        bean.setDrugUserId(super.getLoginId(request));
+        bean = doctorCallService.save(bean);
+        if(bean.getId()==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("状态更新失败");
+        }
+        responseBean.setData(bean);
+
+        return responseBean;
+    }
+
     @ApiOperation(value = "挂断保存电话记录", notes = "挂断保存电话记录")
-    @PostMapping("/stop/save")
+    @PostMapping("/stop/update")
     public DefaultResponseBean<Boolean> stopSave(@RequestBody CallInfoRequestBean bean,
                                         HttpServletRequest request, HttpServletResponse response){
         DefaultResponseBean responseBean = new DefaultResponseBean();
         bean.setDrugUserId(super.getLoginId(request));
-        responseBean.setData(doctorCallService.stopSave(bean));
+        responseBean.setData(doctorCallService.stopUpdate(bean));
         return responseBean;
     }
 

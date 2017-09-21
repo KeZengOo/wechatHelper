@@ -19,11 +19,11 @@ public class DoctorResponseBean implements Serializable {
     @ApiModelProperty(value = "电话")
     private String doctorMobile;
     @ApiModelProperty(value = "客户等级")
-    private String clientLevle;
+    private String clientLevel;
     @ApiModelProperty(value = "医院名称")
     private String hospitalName;
     @ApiModelProperty(value = "医院等级")
-    private String hospitalLevle;
+    private String hospitalLevel;
     @ApiModelProperty(value = "省份")
     private String province;
     @ApiModelProperty(value = "城市")
@@ -55,14 +55,6 @@ public class DoctorResponseBean implements Serializable {
         this.doctorMobile = doctorMobile;
     }
 
-    public String getClientLevle() {
-        return clientLevle;
-    }
-
-    public void setClientLevle(String clientLevle) {
-        this.clientLevle = clientLevle;
-    }
-
     public String getHospitalName() {
         return hospitalName;
     }
@@ -70,15 +62,6 @@ public class DoctorResponseBean implements Serializable {
     public void setHospitalName(String hospitalName) {
         this.hospitalName = hospitalName;
     }
-
-    public String getHospitalLevle() {
-        return hospitalLevle;
-    }
-
-    public void setHospitalLevle(String hospitalLevle) {
-        this.hospitalLevle = hospitalLevle;
-    }
-
     public String getProvince() {
         return province;
     }
@@ -101,5 +84,21 @@ public class DoctorResponseBean implements Serializable {
 
     public void setDepartment(String department) {
         this.department = department;
+    }
+
+    public String getClientLevel() {
+        return clientLevel;
+    }
+
+    public void setClientLevel(String clientLevel) {
+        this.clientLevel = clientLevel;
+    }
+
+    public String getHospitalLevel() {
+        return hospitalLevel;
+    }
+
+    public void setHospitalLevel(String hospitalLevel) {
+        this.hospitalLevel = hospitalLevel;
     }
 }

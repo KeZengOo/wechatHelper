@@ -1,5 +1,6 @@
 package com.nuoxin.virtual.rep.api.service;
 
+import com.nuoxin.virtual.rep.api.common.bean.DoctorVo;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.service.BaseService;
 import com.nuoxin.virtual.rep.api.common.util.StringUtils;
@@ -37,6 +38,8 @@ public class DoctorService extends BaseService {
     private DoctorRepository doctorRepository;
     @Autowired
     private DrugUserService drugUserService;
+    @Autowired
+    private CenterDataService centerDataService;
 
     public Doctor findById(Long id){
         return doctorRepository.findOne(id);
@@ -131,6 +134,11 @@ public class DoctorService extends BaseService {
         //TODO  获取主数据id
 
         doctor = doctorRepository.saveAndFlush(doctor);
+//        DoctorVo vo = centerDataService.checkout(doctor);
+//        if(vo!=null){
+//            doctor.setEappId(vo.getId());
+//            doctorRepository.saveAndFlush(doctor);
+//        }
         if(doctor.getId()!=null){
             return true;
         }

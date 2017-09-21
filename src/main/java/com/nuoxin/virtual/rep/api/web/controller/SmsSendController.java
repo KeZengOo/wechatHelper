@@ -42,6 +42,7 @@ public class SmsSendController extends BaseController {
     public DefaultResponseBean<List<String>> send(@RequestBody SmsSendRequestBean bean,
                                           HttpServletRequest request, HttpServletResponse response){
         DefaultResponseBean<List<String>> responseBean = new DefaultResponseBean<>();
+        bean.setDrugUserId(this.getLoginId(request));
         List<String> list = smsSendService.send(bean);
         responseBean.setData(list);
         return responseBean;
