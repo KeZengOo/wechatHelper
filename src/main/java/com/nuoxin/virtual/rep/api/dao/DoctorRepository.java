@@ -1,9 +1,6 @@
 package com.nuoxin.virtual.rep.api.dao;
 
 import com.nuoxin.virtual.rep.api.entity.Doctor;
-import com.nuoxin.virtual.rep.api.entity.DoctorQuestionnaire;
-import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorStatResponseBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.vo.Doc;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -20,9 +17,13 @@ public interface DoctorRepository extends JpaRepository<Doctor,Long>,JpaSpecific
 
     Doctor findTopByMobile(String mobile);
 
+    Doctor findFirstById(Long id);
+
     List<Doctor> findByIdIn(Collection<Long> ids);
 
     List<Doctor> findByMobileIn(Collection<String> mobiles);
+
+
 
     @Query("select count(distinct d.id) as doctorNum,count(distinct d.hospitalName) as hospitalNum from Doctor d where d.drugUserIds like :drugUserId ")
     Map<String,Long> statDrugUserDoctorNum(@Param("drugUserId") String drugUserId);

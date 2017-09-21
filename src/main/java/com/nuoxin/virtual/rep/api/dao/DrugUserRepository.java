@@ -13,4 +13,6 @@ public interface DrugUserRepository extends JpaRepository<DrugUser,Long>,JpaSpec
 
     DrugUser findFirstByMobile(String mobile);
 
+    DrugUser findFirstById(Long id);
+
 }

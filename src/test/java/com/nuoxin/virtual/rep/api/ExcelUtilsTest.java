@@ -1,13 +1,12 @@
 package com.nuoxin.virtual.rep.api;
 
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 //@RunWith(SpringRunner.class)
 //@SpringBootTest
@@ -18,6 +17,8 @@ public class ExcelUtilsTest {
         File file = new File("C:\\Users\\27168\\Desktop\\hh.xls");
         String name = file.getName();
         System.out.println(name);
+
+        byte b = 'a';
 
     }
 
@@ -94,4 +95,6 @@ public class ExcelUtilsTest {
 
         return result;
     }
+
+
 }

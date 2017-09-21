@@ -5,7 +5,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.service.BaseService;
+import com.nuoxin.virtual.rep.api.dao.DoctorRepository;
+import com.nuoxin.virtual.rep.api.dao.DrugUserRepository;
+import com.nuoxin.virtual.rep.api.entity.Doctor;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
+import com.nuoxin.virtual.rep.api.enums.HospitalLevelEnum;
 import com.nuoxin.virtual.rep.api.enums.MagazineTypeEnum;
 import com.nuoxin.virtual.rep.api.utils.CollectionUtil;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
@@ -37,6 +41,12 @@ public class HcpService extends BaseService {
 //    @Autowired
 //    private DoctorMapper doctorMapper;
 
+    @Autowired
+    private DrugUserRepository drugUserRepository;
+
+    @Autowired
+    private DoctorRepository doctorRepository;
+
 
     @Autowired
     private RestTemplate restTemplate;
@@ -55,6 +65,13 @@ public class HcpService extends BaseService {
     @Cacheable(value = "virtual_rep_api_hcp_service", key="'getHcpBaseInfo'+#hcpId" )
     public HcpBaseInfoResponseBean getHcpBaseInfo(Long hcpId){
         HcpBaseInfoResponseBean hcpBaseInfoResponseBean = new HcpBaseInfoResponseBean();
+        Doctor doctor = doctorRepository.findFirstById(hcpId);
+        if (null != doctor){
+            hcpId = doctor.getMasterDateId();
+        }else{
+            hcpId = 0L;
+        }
+
 
         //第一个圈内容基本信息
         long hciId = 0;
@@ -69,7 +86,8 @@ public class HcpService extends BaseService {
             String hospitalName = hci.getName();
             int hospitalLevel = hci.getMedicalGrade();
             hcpBaseInfoResponseBean.setHospitalName(hospitalName);
-            hcpBaseInfoResponseBean.setHospitalLevel("" + hospitalLevel);
+            String name = HospitalLevelEnum.getName(hospitalLevel);
+            hcpBaseInfoResponseBean.setHospitalLevel(name);
         }
 
 
@@ -132,6 +150,14 @@ public class HcpService extends BaseService {
     @Cacheable(value = "virtual_rep_api_hcp_service", key="'getHcpSociety'+#hcpId" )
     public HcpSocietyResponseBean getHcpSociety(Long hcpId){
         HcpSocietyResponseBean hcpSocietyResponseBean = new HcpSocietyResponseBean();
+
+        Doctor doctor = doctorRepository.findFirstById(hcpId);
+        if (null != doctor){
+            hcpId = doctor.getMasterDateId();
+        }else{
+            hcpId = 0L;
+        }
+
 
         Map<String, String> map = masterDataService.getMapHcpInfo(hcpId);
         if (map != null && map.size() > 0){
@@ -211,15 +237,29 @@ public class HcpService extends BaseService {
     public PageResponseBean<HcpDialogResponseBean> getDialogList(HcpRequestBean bean){
 
         Long hcpId = bean.getHcpId();
+
+        Doctor doctor = doctorRepository.findFirstById(hcpId);
+        if (null != doctor){
+            hcpId = doctor.getMasterDateId();
+        }else{
+            hcpId = 0L;
+        }
+
+
         Integer page = bean.getPage() + 1;
         Integer pageSize = bean.getPageSize();
 
 
         Long drugUserId = bean.getDrugUserId();
+        DrugUser firstById = drugUserRepository.findFirstById(drugUserId);
+        Long eappId = 0L;
+        if (firstById != null){
+            eappId = firstById.getEappId();
+        }
 
         //得到的关键词
         String allkeyword = "";
-        Map<String, String> keys = getKeys(drugUserId);
+        Map<String, String> keys = getKeys(eappId);
         if (null != keys && keys.size() > 0){
             allkeyword = keys.get("allkeyword");
         }
@@ -272,10 +312,23 @@ public class HcpService extends BaseService {
         KeywordListResponseBean keywordListResponseBean = new KeywordListResponseBean();
         Long hcpId = bean.getHcpId();
 
+        Doctor doctor = doctorRepository.findFirstById(hcpId);
+        if (null != doctor){
+            hcpId = doctor.getMasterDateId();
+        }else{
+            hcpId = 0L;
+        }
+
         Long drugUserId = bean.getDrugUserId();
 
+        DrugUser firstById = drugUserRepository.findFirstById(drugUserId);
+        Long eappId = 0L;
+        if (firstById != null){
+            eappId = firstById.getEappId();
+        }
+
         String allkeyword = "";
-        Map<String, String> keys = getKeys(drugUserId);
+        Map<String, String> keys = getKeys(eappId);
         if (null != keys && keys.size() > 0){
             allkeyword = keys.get("allkeyword");
         }
@@ -285,7 +338,7 @@ public class HcpService extends BaseService {
             return keywordListResponseBean;
         }
 
-        Map<String, List<String>> map = getKeysList(drugUserId);
+        Map<String, List<String>> map = getKeysList(eappId);
         List<String> ckeywordList = new ArrayList<>();
         List<String> pkeywordList = new ArrayList<>();
         if (null != map && map.size() > 0){
@@ -357,6 +410,13 @@ public class HcpService extends BaseService {
     public HcpPentagonResponseBean getHcpPentagon(Long hcpId){
         HcpPentagonResponseBean hcpPentagonResponseBean = new HcpPentagonResponseBean();
 
+        Doctor doctor = doctorRepository.findFirstById(hcpId);
+        if (null != doctor){
+            hcpId = doctor.getMasterDateId();
+        }else{
+            hcpId = 0L;
+        }
+
         HcpResearchInfo hcpResearchInfo = masterDataService.getHcpResearchInfo(hcpId);
         if (hcpResearchInfo != null){
 
@@ -406,6 +466,13 @@ public class HcpService extends BaseService {
     @Cacheable(value = "virtual_rep_api_hcp_service", key="'getHcpResearchInfo'+#hcpId" )
     public HcpResearchInfoResponseBean getHcpResearchInfo(Long hcpId){
         HcpResearchInfoResponseBean hcpResearchInfoResponseBean = new HcpResearchInfoResponseBean();
+
+        Doctor doctor = doctorRepository.findFirstById(hcpId);
+        if (null != doctor){
+            hcpId = doctor.getMasterDateId();
+        }else{
+            hcpId = 0L;
+        }
 
         //论文关键词
 //        List<DocKeywordResponseBean> docKeywordList = new ArrayList<>();
@@ -481,13 +548,23 @@ public class HcpService extends BaseService {
     @Cacheable(value = "dashboard_api_hcp_service", key="'getDocList'+#bean" )
     public PageResponseBean<HcpDocResponseBean> getDocList(HcpRequestBean bean){
         Long hcpId = bean.getHcpId();
+
+        Doctor doctor = doctorRepository.findFirstById(hcpId);
+        if (null != doctor){
+            hcpId = doctor.getMasterDateId();
+        }else{
+            hcpId = 0L;
+        }
         Integer page = bean.getPage() + 1;
         Integer pageSize = bean.getPageSize();
 
 
         Long drugUserId = bean.getDrugUserId();
-
-
+        DrugUser firstById = drugUserRepository.findFirstById(drugUserId);
+        Long eappId = 0L;
+        if (firstById != null){
+            eappId = firstById.getEappId();
+        }
 
         HcpResearchInfo hcpResearchInfo = masterDataService.getHcpResearchInfo(hcpId);
         List<Doc> docList = new ArrayList<>();
@@ -506,7 +583,7 @@ public class HcpService extends BaseService {
         String allkeyword = "";
         String ckeyword = "";
         String pkeyword = "";
-        Map<String, String> keys = getKeys(drugUserId);
+        Map<String, String> keys = getKeys(eappId);
         if (null != keys && keys.size() > 0){
             allkeyword = keys.get("allkeyword");
             ckeyword = keys.get("ckeyword");
@@ -576,6 +653,13 @@ public class HcpService extends BaseService {
     @Cacheable(value = "dashboard_api_hcp_service", key="'getHcpDocTrend'+#hcpId" )
     public TreeMap<Integer, Integer> getHcpDocTrend(Long hcpId){
 
+        Doctor doctor = doctorRepository.findFirstById(hcpId);
+        if (null != doctor){
+            hcpId = doctor.getMasterDateId();
+        }else{
+            hcpId = 0L;
+        }
+
         HcpResearchInfo hcpResearchInfo = masterDataService.getHcpResearchInfo(hcpId);
         //截取时间后的论文
         List<Doc> newHcpDocList = new ArrayList<>();
@@ -625,6 +709,14 @@ public class HcpService extends BaseService {
      */
     @Cacheable(value = "dashboard_api_hcp_service", key="'getDocKeywordList'+#hcpId" )
     public List<DocKeywordResponseBean> getDocKeywordList(Long hcpId){
+
+        Doctor doctor = doctorRepository.findFirstById(hcpId);
+        if (null != doctor){
+            hcpId = doctor.getMasterDateId();
+        }else{
+            hcpId = 0L;
+        }
+
         List<DocKeywordResponseBean> docKeywordList = new ArrayList<>();
         List<DocKeyWord> docKeyWordList = masterDataService.getDocKeyWordList(hcpId);
         if (docKeyWordList != null && docKeyWordList.size() > 0){
