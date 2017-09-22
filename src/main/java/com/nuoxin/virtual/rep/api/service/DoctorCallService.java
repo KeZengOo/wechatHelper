@@ -66,7 +66,7 @@ public class DoctorCallService extends BaseService {
                     predicates.add(cb.like(root.get("doctor").get("department").as(String.class),"%"+bean.getDepartment()+"%"));
                 }
                 if(StringUtils.isNotEmtity(bean.getDoctorLevel())){
-                    predicates.add(cb.like(root.get("doctor").get("doctorLevle").as(String.class),"%"+bean.getDoctorLevel()+"%"));
+                    predicates.add(cb.like(root.get("doctor").get("doctorLevel").as(String.class),"%"+bean.getDoctorLevel()+"%"));
                 }
                 if(StringUtils.isNotEmtity(bean.getHospital())){
                     predicates.add(cb.like(root.get("doctor").get("hospitalName").as(String.class),"%"+bean.getHospital()+"%"));

@@ -39,7 +39,7 @@ public class QueryRequestBean extends PageRequestBean {
     }
 
     public Integer getYear() {
-        return year;
+        return year==null?0:year;
     }
 
     public void setYear(Integer year) {
@@ -47,7 +47,7 @@ public class QueryRequestBean extends PageRequestBean {
     }
 
     public Integer getMonth() {
-        return month;
+        return month==null?0:month;
     }
 
     public void setMonth(Integer month) {
@@ -55,7 +55,7 @@ public class QueryRequestBean extends PageRequestBean {
     }
 
     public Integer getDay() {
-        return day;
+        return day==null?0:day;
     }
 
     public void setDay(Integer day) {
