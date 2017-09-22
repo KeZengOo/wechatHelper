@@ -28,28 +28,35 @@ public class DoctorDynamicFieldService {
     private DoctorDynamicFieldRepository doctorDynamicFieldRepository;
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public Long add(DoctorDynamicFieldRequestBean bean){
-        Long id = 0L;
-        String alias = bean.getAlias();
-        String name = bean.getName();
-        Integer type = bean.getType();
-        String value = bean.getValue();
-
-        DoctorDynamicField doctorDynamicField = new DoctorDynamicField();
-        doctorDynamicField.setAlias(alias);
-        doctorDynamicField.setName(name);
-        doctorDynamicField.setType(type);
-        doctorDynamicField.setValue(value);
-        doctorDynamicField.setCreateTime(new Date());
-        doctorDynamicField.setUpdateTime(new Date());
-
-        DoctorDynamicField saveDoctorDynamicField = doctorDynamicFieldRepository.save(doctorDynamicField);
-
-        if (null != saveDoctorDynamicField){
-            id = saveDoctorDynamicField.getId();
+    public Boolean add(List<DoctorDynamicFieldRequestBean> list){
+        if (list == null || list.isEmpty()){
+            return false;
         }
 
-        return id;
+        Boolean flag = false;
+
+        List<DoctorDynamicField> doctorDynamicFieldList = new ArrayList<>();
+        for (DoctorDynamicFieldRequestBean bean:list){
+            String name = bean.getName();
+            Integer type = bean.getType();
+            String value = bean.getValue();
+
+            DoctorDynamicField doctorDynamicField = new DoctorDynamicField();
+
+            doctorDynamicField.setName(name);
+            doctorDynamicField.setType(type);
+            doctorDynamicField.setValue(value);
+            doctorDynamicField.setCreateTime(new Date());
+            doctorDynamicField.setUpdateTime(new Date());
+
+            doctorDynamicFieldList.add(doctorDynamicField);
+
+        }
+
+       doctorDynamicFieldRepository.save(doctorDynamicFieldList);
+
+        flag = true;
+        return flag;
 
     }
 

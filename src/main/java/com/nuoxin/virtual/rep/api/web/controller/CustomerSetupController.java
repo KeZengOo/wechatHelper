@@ -46,11 +46,11 @@ public class CustomerSetupController {
 
     @ApiOperation(value = "添加动态新增的字段")
     @PostMapping("/addField")
-    public ResponseEntity<DefaultResponseBean<Long>> addField(@RequestBody DoctorDynamicFieldRequestBean bean) {
+    public ResponseEntity<DefaultResponseBean<Boolean>> addField(@RequestBody List<DoctorDynamicFieldRequestBean> list) {
 
-        Long id = doctorDynamicFieldService.add(bean);
-        DefaultResponseBean<Long> responseBean = new DefaultResponseBean<>();
-        responseBean.setData(id);
+        Boolean flag = doctorDynamicFieldService.add(list);
+        DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(flag);
         return ResponseEntity.ok(responseBean);
     }
 
