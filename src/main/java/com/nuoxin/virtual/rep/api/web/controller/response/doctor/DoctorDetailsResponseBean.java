@@ -25,7 +25,7 @@ public class DoctorDetailsResponseBean implements Serializable {
     @ApiModelProperty(value = "医院名称")
     private String hospitalName;
     @ApiModelProperty(value = "医院等级")
-    private String hospitalLevle;
+    private String hospitalLevel;
     @ApiModelProperty(value = "省份")
     private String province;
     @ApiModelProperty(value = "城市")
@@ -35,9 +35,9 @@ public class DoctorDetailsResponseBean implements Serializable {
     @ApiModelProperty(value = "电话")
     private String mobile;
     @ApiModelProperty(value = "医生等级")
-    private String doctorLevle;
+    private String doctorLevel;
     @ApiModelProperty(value = "客户等级")
-    private String clientLevle;
+    private String clientLevel;
 
     public Long getEappId() {
         return eappId;
@@ -87,14 +87,6 @@ public class DoctorDetailsResponseBean implements Serializable {
         this.hospitalName = hospitalName;
     }
 
-    public String getHospitalLevle() {
-        return hospitalLevle;
-    }
-
-    public void setHospitalLevle(String hospitalLevle) {
-        this.hospitalLevle = hospitalLevle;
-    }
-
     public String getProvince() {
         return province;
     }
@@ -127,19 +119,27 @@ public class DoctorDetailsResponseBean implements Serializable {
         this.mobile = mobile;
     }
 
-    public String getDoctorLevle() {
-        return doctorLevle;
+    public String getHospitalLevel() {
+        return hospitalLevel;
     }
 
-    public void setDoctorLevle(String doctorLevle) {
-        this.doctorLevle = doctorLevle;
+    public void setHospitalLevel(String hospitalLevel) {
+        this.hospitalLevel = hospitalLevel;
     }
 
-    public String getClientLevle() {
-        return clientLevle;
+    public String getDoctorLevel() {
+        return doctorLevel;
     }
 
-    public void setClientLevle(String clientLevle) {
-        this.clientLevle = clientLevle;
+    public void setDoctorLevel(String doctorLevel) {
+        this.doctorLevel = doctorLevel;
+    }
+
+    public String getClientLevel() {
+        return clientLevel;
+    }
+
+    public void setClientLevel(String clientLevel) {
+        this.clientLevel = clientLevel;
     }
 }
