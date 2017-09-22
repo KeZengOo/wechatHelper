@@ -14,8 +14,11 @@ import java.util.Map;
  */
 public interface DoctorCallInfoRepository extends JpaRepository<DoctorCallInfo,Long>,JpaSpecificationExecutor<DoctorCallInfo> {
 
-    @Query("select count(distinct d.id) from DoctorCallInfo d where createTime>=:date")
+    @Query("select count(distinct d.id) from DoctorCallInfo d where d.createTime>=:date")
     Integer findByCreateTimeCount(@Param("date") Date date);
+
+    @Query("select count(distinct d.id) from DoctorCallInfo d where d.createTime>=:date and d.doctor.id=:doctorId")
+    Integer findByCreateTimeCount(@Param("date") Date date,@Param("doctorId") Long doctorId);
 
     @Query("select count(distinct d.id) as allNum,sum(d.callTime) as callTimes,sum(d.status) as num from DoctorCallInfo d where d.doctor.drugUserIds like :drugUserIds and d.type=:type")
     Map<String,Long> statDrugUserIds(@Param("drugUserIds") String drugUserIds,@Param("type") Integer type);

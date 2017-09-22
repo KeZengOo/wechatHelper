@@ -42,6 +42,15 @@ public class DoctorController extends BaseController {
         return responseBean;
     }
 
+    @ApiOperation(value = "获取医生信息", notes = "获取医生信息")
+    @GetMapping("/mobile/{mobile}")
+    public DefaultResponseBean<DoctorDetailsResponseBean> doctorDetails(@PathVariable String mobile,
+                                                                        HttpServletRequest request, HttpServletResponse response){
+        DefaultResponseBean responseBean = new DefaultResponseBean();
+        responseBean.setData(doctorService.findByMobile(mobile));
+        return responseBean;
+    }
+
     @ApiOperation(value = "获取医生列表", notes = "获取医生列表")
     @PostMapping("/page")
     public DefaultResponseBean<PageResponseBean<DoctorResponseBean>> page(@RequestBody QueryRequestBean bean,
