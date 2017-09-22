@@ -14,6 +14,8 @@ public class CallHistoryRequestBean extends PageRequestBean {
 
     @ApiModelProperty(value = "时间戳")
     private Long timeLong;
+    @ApiModelProperty(value = "医生id")
+    private Long doctorId;
 
     private Long drugUserId;
 
@@ -31,5 +33,13 @@ public class CallHistoryRequestBean extends PageRequestBean {
 
     public void setTimeLong(Long timeLong) {
         this.timeLong = timeLong;
+    }
+
+    public Long getDoctorId() {
+        return doctorId;
+    }
+
+    public void setDoctorId(Long doctorId) {
+        this.doctorId = doctorId;
     }
 }

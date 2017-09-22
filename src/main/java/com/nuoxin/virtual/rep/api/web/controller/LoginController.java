@@ -3,6 +3,8 @@ package com.nuoxin.virtual.rep.api.web.controller;
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
+import com.nuoxin.virtual.rep.api.service.DrugUserService;
+import com.nuoxin.virtual.rep.api.service.EmailService;
 import com.nuoxin.virtual.rep.api.service.LoginService;
 import com.nuoxin.virtual.rep.api.service.SercurityService;
 import com.nuoxin.virtual.rep.api.web.controller.request.LoginRequestBean;
@@ -11,6 +13,7 @@ import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -25,6 +28,10 @@ public class LoginController extends BaseController {
     private LoginService loginService;
     @Autowired
     private SercurityService sercurityService;
+    @Autowired
+    private DrugUserService drugUserService;
+    @Autowired
+    private EmailService emailService;
 
     @PostMapping("/login")
     @ResponseBody
@@ -48,5 +55,19 @@ public class LoginController extends BaseController {
         DefaultResponseBean<Object> responseBean = new DefaultResponseBean<>();
         return responseBean;
     }
+
+    @GetMapping("/retrieve/pwd/send")
+    @ResponseBody
+    public DefaultResponseBean<Object> emailCodeSend(@RequestParam("email") String email,
+                                                     HttpServletRequest request, HttpServletResponse response) throws MessagingException {
+        DrugUser drugUser = drugUserService.findByEmail(email);
+        DefaultResponseBean<Object> responseBean = new DefaultResponseBean<>();
+        if(drugUser==null){
+
+        }
+        emailService.sendEmailCode(drugUser);
+        return responseBean;
+    }
+
 
 }

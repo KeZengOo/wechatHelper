@@ -13,6 +13,7 @@ import com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.doctor.DoctorRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorStatResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.vo.Hcp;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -40,62 +41,64 @@ public class DoctorService extends BaseService {
     private DrugUserService drugUserService;
     @Autowired
     private CenterDataService centerDataService;
+    @Autowired
+    private MasterDataService masterDataService;
 
-
+    @Autowired
     private DoctorDynamicFieldValueService DoctorDynamicFieldValueService;
 
-    public Doctor findById(Long id){
+    public Doctor findById(Long id) {
         return doctorRepository.findOne(id);
     }
 
-    public Doctor findByMobile(String mobile){
+    public Doctor findByMobile(String mobile) {
         return doctorRepository.findTopByMobile(mobile);
     }
 
-    public List<Doctor> findByIdIn(Collection<Long> ids){
+    public List<Doctor> findByIdIn(Collection<Long> ids) {
         return doctorRepository.findByIdIn(ids);
     }
 
-    public List<Doctor> findByMobileIn(Collection<String> mobiles){
+    public List<Doctor> findByMobileIn(Collection<String> mobiles) {
         return doctorRepository.findByMobileIn(mobiles);
     }
 
-    public PageResponseBean<DoctorResponseBean> page(QueryRequestBean bean){
+    public PageResponseBean<DoctorResponseBean> page(QueryRequestBean bean) {
         PageRequest pageable = super.getPage(bean);
         Specification<Doctor> spec = new Specification<Doctor>() {
             @Override
             public Predicate toPredicate(Root<Doctor> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
                 List<Predicate> predicates = new ArrayList<>();
-                if(bean.getDrugUserId()!=null && bean.getDrugUserId()!=0){
-                    predicates.add(cb.like(root.get("drugUserIds").as(String.class),"%"+bean.getDrugUserId()+",%"));
+                if (bean.getDrugUserId() != null && bean.getDrugUserId() != 0) {
+                    predicates.add(cb.like(root.get("drugUserIds").as(String.class), "%" + bean.getDrugUserId() + ",%"));
                 }
-                if(StringUtils.isNotEmtity(bean.getName())){
-                    predicates.add(cb.like(root.get("name").as(String.class),"%"+bean.getName()+"%"));
+                if (StringUtils.isNotEmtity(bean.getName())) {
+                    predicates.add(cb.like(root.get("name").as(String.class), "%" + bean.getName() + "%"));
                 }
-                if(StringUtils.isNotEmtity(bean.getMobile())){
-                    predicates.add(cb.like(root.get("mobile").as(String.class),"%"+bean.getMobile()+"%"));
+                if (StringUtils.isNotEmtity(bean.getMobile())) {
+                    predicates.add(cb.like(root.get("mobile").as(String.class), "%" + bean.getMobile() + "%"));
                 }
-                if(StringUtils.isNotEmtity(bean.getDepartment())){
-                    predicates.add(cb.like(root.get("department").as(String.class),"%"+bean.getDepartment()+"%"));
+                if (StringUtils.isNotEmtity(bean.getDepartment())) {
+                    predicates.add(cb.like(root.get("department").as(String.class), "%" + bean.getDepartment() + "%"));
                 }
-                if(StringUtils.isNotEmtity(bean.getDoctorLevel())){
-                    predicates.add(cb.like(root.get("doctorLevel").as(String.class),"%"+bean.getDoctorLevel()+"%"));
+                if (StringUtils.isNotEmtity(bean.getDoctorLevel())) {
+                    predicates.add(cb.like(root.get("doctorLevel").as(String.class), "%" + bean.getDoctorLevel() + "%"));
                 }
-                if(StringUtils.isNotEmtity(bean.getHospital())){
-                    predicates.add(cb.like(root.get("hospitalName").as(String.class),"%"+bean.getHospital()+"%"));
+                if (StringUtils.isNotEmtity(bean.getHospital())) {
+                    predicates.add(cb.like(root.get("hospitalName").as(String.class), "%" + bean.getHospital() + "%"));
                 }
                 query.where(cb.and(cb.and(predicates.toArray(new Predicate[0]))));
                 return query.getRestriction();
             }
         };
-        Page<Doctor> page = doctorRepository.findAll(spec,pageable);
+        Page<Doctor> page = doctorRepository.findAll(spec, pageable);
         PageResponseBean<DoctorResponseBean> responseBean = new PageResponseBean<>(page);
         List<Doctor> pageList = page.getContent();
-        if(pageList!=null && !pageList.isEmpty()){
+        if (pageList != null && !pageList.isEmpty()) {
             List<DoctorResponseBean> list = new ArrayList<>();
-            for (Doctor doctor:pageList) {
+            for (Doctor doctor : pageList) {
                 DoctorResponseBean listBean = new DoctorResponseBean();
-                BeanUtils.copyProperties(doctor,listBean);
+                BeanUtils.copyProperties(doctor, listBean);
                 listBean.setDoctorId(doctor.getId());
                 listBean.setDoctorMobile(doctor.getMobile());
                 listBean.setDoctorName(doctor.getName());
@@ -106,24 +109,24 @@ public class DoctorService extends BaseService {
         return responseBean;
     }
 
-    public DoctorStatResponseBean stat(Long drugUserId){
+    public DoctorStatResponseBean stat(Long drugUserId) {
         DoctorStatResponseBean responseBean = new DoctorStatResponseBean();
-        Map<String,Long> map = doctorRepository.statDrugUserDoctorNum("%"+drugUserId+",%");
-        if(map!=null){
-            responseBean.setDoctorNum(map.get("doctorNum")!=null?Integer.valueOf(map.get("doctorNum")+""):0);
-            responseBean.setHospitalNum(map.get("hospitalNum")!=null?Integer.valueOf(map.get("hospitalNum")+""):0);
+        Map<String, Long> map = doctorRepository.statDrugUserDoctorNum("%" + drugUserId + ",%");
+        if (map != null) {
+            responseBean.setDoctorNum(map.get("doctorNum") != null ? Integer.valueOf(map.get("doctorNum") + "") : 0);
+            responseBean.setHospitalNum(map.get("hospitalNum") != null ? Integer.valueOf(map.get("hospitalNum") + "") : 0);
         }
         return responseBean;
     }
 
     @Transactional(readOnly = false)
-    public Boolean save(DoctorRequestBean bean){
+    public Boolean save(DoctorRequestBean bean) {
         Doctor doctor = doctorRepository.findTopByMobile(bean.getMobile());
-        if(doctor==null){
+        if (doctor == null) {
             doctor = new Doctor();
-            doctor.setDrugUserIds(bean.getDrugUserId()+",");
-        }else{
-            doctor.setDrugUserIds(doctor.getDrugUserIds()+bean.getDrugUserId()+',');
+            doctor.setDrugUserIds(bean.getDrugUserId() + ",");
+        } else {
+            doctor.setDrugUserIds(doctor.getDrugUserIds() + bean.getDrugUserId() + ',');
         }
 //        BeanUtils.copyProperties(bean,doctor);
         doctor.setCity(bean.getCity());
@@ -135,14 +138,22 @@ public class DoctorService extends BaseService {
         doctor.setMobile(bean.getMobile());
         doctor.setName(bean.getName());
         //TODO  获取主数据id
+        if (StringUtils.isNotEmtity(bean.getHospitalName())) {
+            Hcp hcp = masterDataService.getHcpByHciIdAndHcpName(bean.getHospitalName(), bean.getName());
+            if (hcp != null) {
+                doctor.setMasterDateId(hcp.getId());
+                doctor.setHospitalId(hcp.getHciId());
+            }
+        }
 
-        doctor = doctorRepository.saveAndFlush(doctor);
+        //TODO 营销数据
 //        DoctorVo vo = centerDataService.checkout(doctor);
 //        if(vo!=null){
 //            doctor.setEappId(vo.getId());
-//            doctorRepository.saveAndFlush(doctor);
 //        }
-        if(doctor.getId()!=null){
+
+        doctor = doctorRepository.saveAndFlush(doctor);
+        if (doctor.getId() != null) {
             return true;
         }
 
@@ -154,27 +165,27 @@ public class DoctorService extends BaseService {
     }
 
     @Transactional(readOnly = false)
-    public Boolean saves(List<DoctorExcel> list){
+    public Boolean saves(List<DoctorExcel> list) {
         List<String> mobiles = new ArrayList<>();
-        for (int i = 0,leng=list.size(); i < leng; i++) {
+        for (int i = 0, leng = list.size(); i < leng; i++) {
             DoctorExcel excel = list.get(i);
-            if(StringUtils.isNotEmtity(excel.getMobile())){
+            if (StringUtils.isNotEmtity(excel.getMobile())) {
                 mobiles.add(excel.getMobile());
             }
         }
         List<Doctor> doctors = new ArrayList<>();
-        if(!mobiles.isEmpty()){
+        if (!mobiles.isEmpty()) {
             doctors = this.findByMobileIn(mobiles);
         }
 
-        Map<String,Long> map = new HashMap<>();
+        Map<String, Long> map = new HashMap<>();
         List<Doctor> savelist = new ArrayList<>();
-        for (int i = 0,leng=list.size(); i < leng; i++) {
+        for (int i = 0, leng = list.size(); i < leng; i++) {
             DoctorExcel excel = list.get(i);
             Doctor doctor = new Doctor();
-            if(doctors!=null && !doctors.isEmpty() && StringUtils.isNotEmtity(excel.getMobile())){
-                for (Doctor d:doctors) {
-                    if(d.getMobile().equals(excel.getMobile())){
+            if (doctors != null && !doctors.isEmpty() && StringUtils.isNotEmtity(excel.getMobile())) {
+                for (Doctor d : doctors) {
+                    if (d.getMobile().equals(excel.getMobile())) {
                         doctor = d;
                     }
                 }
@@ -187,28 +198,40 @@ public class DoctorService extends BaseService {
             doctor.setDoctorLevel(excel.getPosition());
             doctor.setMobile(excel.getMobile());
             //TODO 主数据id
-
-            //TODO 营销id
+            if (StringUtils.isNotEmtity(excel.getHospitalName())) {
+                Hcp hcp = masterDataService.getHcpByHciIdAndHcpName(excel.getHospitalName(), excel.getDoctorName());
+                if (hcp != null) {
+                    doctor.setMasterDateId(hcp.getId());
+                    doctor.setHospitalId(hcp.getHciId());
+                    doctor.setHospitalLevel("");
+                }
+            }
 
             //TODO 销售代表
-            if(StringUtils.isNotEmtity(excel.getDrugUserEmail())){
-                if(map.get(excel.getDrugUserEmail())==null){
+            if (StringUtils.isNotEmtity(excel.getDrugUserEmail())) {
+                if (map.get(excel.getDrugUserEmail()) == null) {
                     DrugUser drugUser = drugUserService.findByEmail(excel.getDrugUserEmail());
-                    if(drugUser!=null){
-                        if(StringUtils.isNotEmtity(doctor.getDrugUserIds())){
-                            doctor.setDrugUserIds(doctor.getDrugUserIds()+drugUser.getId()+",");
-                        }else{
-                            doctor.setDrugUserIds(drugUser.getId()+",");
+                    if (drugUser != null) {
+                        if (StringUtils.isNotEmtity(doctor.getDrugUserIds())) {
+                            doctor.setDrugUserIds(doctor.getDrugUserIds() + drugUser.getId() + ",");
+                        } else {
+                            doctor.setDrugUserIds(drugUser.getId() + ",");
                         }
-                        map.put(excel.getDrugUserEmail(),drugUser.getId());
+                        map.put(excel.getDrugUserEmail(), drugUser.getId());
                     }
-                }else{
-                    if(StringUtils.isNotEmtity(doctor.getDrugUserIds())){
-                        doctor.setDrugUserIds(doctor.getDrugUserIds()+map.get(excel.getDrugUserEmail())+",");
-                    }else{
-                        doctor.setDrugUserIds(map.get(excel.getDrugUserEmail())+",");
+                } else {
+                    if (StringUtils.isNotEmtity(doctor.getDrugUserIds())) {
+                        doctor.setDrugUserIds(doctor.getDrugUserIds() + map.get(excel.getDrugUserEmail()) + ",");
+                    } else {
+                        doctor.setDrugUserIds(map.get(excel.getDrugUserEmail()) + ",");
                     }
                 }
+
+                //TODO 营销id
+//                DoctorVo vo = centerDataService.checkout(doctor);
+//                if (vo != null) {
+//                    doctor.setEappId(vo.getId());
+//                }
             }
             savelist.add(doctor);
         }

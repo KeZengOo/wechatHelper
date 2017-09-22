@@ -120,9 +120,16 @@ public class DoctorCallService extends BaseService {
 
     public PageResponseBean<CallHistoryResponseBean> doctorHistoryPage(CallHistoryRequestBean bean){
         if(bean.getTimeLong()!=null && bean.getTimeLong()!=0){
-            Integer count = doctorCallInfoRepository.findByCreateTimeCount(new Date(bean.getTimeLong()));
-            if(count!=0){
-                bean.setPage((int)Math.ceil(count.doubleValue()/bean.getPageSize()));
+            if(bean.getDoctorId()!=null && bean.getDoctorId()>0){
+                Integer count = doctorCallInfoRepository.findByCreateTimeCount(new Date(bean.getTimeLong()),bean.getDoctorId());
+                if(count!=0){
+                    bean.setPage((int)Math.ceil(count.doubleValue()/bean.getPageSize()));
+                }
+            }else{
+                Integer count = doctorCallInfoRepository.findByCreateTimeCount(new Date(bean.getTimeLong()));
+                if(count!=0){
+                    bean.setPage((int)Math.ceil(count.doubleValue()/bean.getPageSize()));
+                }
             }
         }
         PageRequest pagetable = super.getPage(bean);
@@ -130,6 +137,9 @@ public class DoctorCallService extends BaseService {
             @Override
             public Predicate toPredicate(Root<DoctorCallInfo> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
                 List<Predicate> predicates = new ArrayList<>();
+                if(bean.getDoctorId()!=null && bean.getDoctorId()>0){
+                    predicates.add(cb.equal(root.get("doctor").get("id").as(Long.class),bean.getDoctorId()));
+                }
                 predicates.add(cb.like(root.get("doctor").get("drugUserIds").as(String.class),"%"+bean.getDrugUserId()+",%"));
                 query.where(cb.and(cb.and(predicates.toArray(new Predicate[0]))));
                 return query.getRestriction();

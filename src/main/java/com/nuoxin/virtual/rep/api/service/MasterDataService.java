@@ -103,6 +103,22 @@ public class MasterDataService {
 
     }
 
+    /**
+     * 根据主数据医院名称和医生姓名得到主数据医生
+     * @param hospital 医院名称
+     * @param name 主数据医生姓名
+     * @return
+     */
+    @Cacheable(value = "virtual_rep_api_master_data", key="'getHcpByHciIdAndHcpName'+#hospital+#name" )
+    public Hcp getHcpByHciIdAndHcpName(String hospital, String name){
+        Hci hci = this.getHciByName(hospital);
+        if(hci!=null){
+            Hcp hcp = this.getHcpByHciIdAndHcpName(hci.getId(),name);
+            return hcp;
+        }
+        return null;
+    }
+
 
 
     /**
