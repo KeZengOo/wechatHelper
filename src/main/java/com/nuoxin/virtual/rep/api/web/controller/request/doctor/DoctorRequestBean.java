@@ -1,9 +1,11 @@
 package com.nuoxin.virtual.rep.api.web.controller.request.doctor;
 
+import com.nuoxin.virtual.rep.api.web.controller.request.customer.DoctorDynamicFieldValueRequestBean;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by fenggang on 9/12/17.
@@ -36,6 +38,9 @@ public class DoctorRequestBean implements Serializable {
     private String professor;
 
     private Long drugUserId;
+
+    @ApiModelProperty(value = "动态添加的字段")
+    List<DoctorDynamicFieldValueRequestBean> list;
 
     public Long getId() {
         return id;
@@ -131,5 +136,13 @@ public class DoctorRequestBean implements Serializable {
 
     public void setDrugUserId(Long drugUserId) {
         this.drugUserId = drugUserId;
+    }
+
+    public List<DoctorDynamicFieldValueRequestBean> getList() {
+        return list;
+    }
+
+    public void setList(List<DoctorDynamicFieldValueRequestBean> list) {
+        this.list = list;
     }
 }
