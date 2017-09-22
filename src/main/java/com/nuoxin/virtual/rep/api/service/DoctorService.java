@@ -1,8 +1,9 @@
 package com.nuoxin.virtual.rep.api.service;
 
 import com.nuoxin.virtual.rep.api.common.bean.DoctorExcel;
-import com.nuoxin.virtual.rep.api.common.bean.DoctorVo;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
+import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
+import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.common.service.BaseService;
 import com.nuoxin.virtual.rep.api.common.util.StringUtils;
 import com.nuoxin.virtual.rep.api.dao.DoctorRepository;
@@ -42,6 +43,9 @@ public class DoctorService extends BaseService {
     private CenterDataService centerDataService;
     @Autowired
     private MasterDataService masterDataService;
+
+    @Autowired
+    private DoctorDynamicFieldValueService DoctorDynamicFieldValueService;
 
     public Doctor findById(Long id) {
         return doctorRepository.findOne(id);
@@ -151,6 +155,11 @@ public class DoctorService extends BaseService {
         doctor = doctorRepository.saveAndFlush(doctor);
         if (doctor.getId() != null) {
             return true;
+        }
+
+        Boolean flag = DoctorDynamicFieldValueService.add(doctor.getId(), bean.getList());
+        if (!flag){
+            throw new BusinessException(ErrorEnum.ERROR);
         }
         return false;
     }
