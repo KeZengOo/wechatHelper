@@ -2,6 +2,7 @@ package com.nuoxin.virtual.rep.api.service;
 
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
+import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.common.exception.FileFormatException;
 import com.nuoxin.virtual.rep.api.common.service.BaseService;
 import com.nuoxin.virtual.rep.api.dao.DoctorRepository;
@@ -33,9 +34,8 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -55,6 +55,10 @@ public class MessageService extends BaseService{
 
     private static final String DRUG_USER_NICKNAME = "我";
 
+    private static final String filePath = "exceltemplate/wechatMessage.xls";
+
+    private static final String filename = "wechatMessage.xls";
+
     @Autowired
     private MessageRepository messageRepository;
 
@@ -66,6 +70,44 @@ public class MessageService extends BaseService{
 
     @Autowired
     private DoctorService doctorService;
+
+
+    public void downloadExcel(HttpServletResponse response){
+
+        response.setHeader("content-Type", "application/vnd.ms-excel");
+        // 下载文件的默认名称
+        response.setHeader("Content-Disposition", "attachment;filename="+ filename);
+        response.setContentType("application/octet-stream");
+
+        InputStream systemResourceAsStream = ClassLoader.getSystemResourceAsStream(filePath);
+        System.out.println(systemResourceAsStream);
+        byte[] buff = new byte[1024];
+        BufferedInputStream bis = null;
+        OutputStream os = null;
+        try {
+            os = response.getOutputStream();
+            bis = new BufferedInputStream(systemResourceAsStream);
+            int i = bis.read(buff);
+            while (i != -1) {
+                os.write(buff, 0, buff.length);
+                os.flush();
+                i = bis.read(buff);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new BusinessException(ErrorEnum.ERROR);
+        } finally {
+            if (bis != null) {
+                try {
+                    bis.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    throw new BusinessException(ErrorEnum.ERROR);
+                }
+            }
+        }
+
+    }
 
 
     /**
