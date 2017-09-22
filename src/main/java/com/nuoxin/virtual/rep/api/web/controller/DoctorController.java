@@ -90,6 +90,7 @@ public class DoctorController extends BaseController {
             responseBean.setMessage("导入数据为空");
             return responseBean;
         }
+        doctorService.saves(list);
         return responseBean;
     }
 }

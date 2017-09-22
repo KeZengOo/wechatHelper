@@ -91,7 +91,6 @@ public class DoctorCallService extends BaseService {
 
                 }
                 if(bean.getYear()!=0 && bean.getMonth()==0 && bean.getDay()==0){
-                    String date = bean.getYear()+"-01-01 00:00:00";
                     Calendar calendar = Calendar.getInstance();
                     calendar.set(bean.getYear(), bean.getMonth(), bean.getDay(), 0, 0, 0);
                     Date start =calendar.getTime();

@@ -1,5 +1,6 @@
 package com.nuoxin.virtual.rep.api.service;
 
+import com.nuoxin.virtual.rep.api.common.bean.DoctorExcel;
 import com.nuoxin.virtual.rep.api.common.bean.DoctorVo;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.service.BaseService;
@@ -146,7 +147,45 @@ public class DoctorService extends BaseService {
     }
 
     @Transactional(readOnly = false)
-    public Boolean saves(List<Doctor> list){
+    public Boolean saves(List<DoctorExcel> list){
+        List<String> mobiles = new ArrayList<>();
+        for (int i = 0,leng=list.size(); i < leng; i++) {
+            DoctorExcel excel = list.get(i);
+            if(StringUtils.isNotEmtity(excel.getMobile())){
+                mobiles.add(excel.getMobile());
+            }
+        }
+        List<Doctor> doctors = new ArrayList<>();
+        if(!mobiles.isEmpty()){
+            doctors = this.findByMobileIn(mobiles);
+        }
+
+        List<Doctor> savelist = new ArrayList<>();
+        for (int i = 0,leng=list.size(); i < leng; i++) {
+            DoctorExcel excel = list.get(i);
+            Doctor doctor = new Doctor();
+            if(doctors!=null && !doctors.isEmpty() && StringUtils.isNotEmtity(excel.getMobile())){
+                for (Doctor d:doctors) {
+                    if(d.getMobile().equals(excel.getMobile())){
+                        doctor = d;
+                    }
+                }
+            }
+            doctor.setCity(excel.getCity());
+            doctor.setName(excel.getDoctorName());
+            doctor.setHospitalName(excel.getHospitalName());
+            doctor.setDepartment(excel.getDepartment());
+            doctor.setProvince(excel.getProvince());
+            doctor.setDoctorLevel(excel.getPosition());
+            doctor.setMobile(excel.getMobile());
+            //TODO 主数据id
+
+            //TODO 营销id
+
+            savelist.add(doctor);
+        }
+
+        doctorRepository.save(savelist);
         return true;
     }
 }
