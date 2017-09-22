@@ -7,6 +7,7 @@ import com.nuoxin.virtual.rep.api.common.service.BaseService;
 import com.nuoxin.virtual.rep.api.common.util.StringUtils;
 import com.nuoxin.virtual.rep.api.dao.DoctorRepository;
 import com.nuoxin.virtual.rep.api.entity.Doctor;
+import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.doctor.DoctorRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorResponseBean;
@@ -23,10 +24,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by fenggang on 9/11/17.
@@ -160,6 +158,7 @@ public class DoctorService extends BaseService {
             doctors = this.findByMobileIn(mobiles);
         }
 
+        Map<String,Long> map = new HashMap<>();
         List<Doctor> savelist = new ArrayList<>();
         for (int i = 0,leng=list.size(); i < leng; i++) {
             DoctorExcel excel = list.get(i);
@@ -182,6 +181,26 @@ public class DoctorService extends BaseService {
 
             //TODO 营销id
 
+            //TODO 销售代表
+            if(StringUtils.isNotEmtity(excel.getDrugUserEmail())){
+                if(map.get(excel.getDrugUserEmail())==null){
+                    DrugUser drugUser = drugUserService.findByEmail(excel.getDrugUserEmail());
+                    if(drugUser!=null){
+                        if(StringUtils.isNotEmtity(doctor.getDrugUserIds())){
+                            doctor.setDrugUserIds(doctor.getDrugUserIds()+drugUser.getId()+",");
+                        }else{
+                            doctor.setDrugUserIds(drugUser.getId()+",");
+                        }
+                        map.put(excel.getDrugUserEmail(),drugUser.getId());
+                    }
+                }else{
+                    if(StringUtils.isNotEmtity(doctor.getDrugUserIds())){
+                        doctor.setDrugUserIds(doctor.getDrugUserIds()+map.get(excel.getDrugUserEmail())+",");
+                    }else{
+                        doctor.setDrugUserIds(map.get(excel.getDrugUserEmail())+",");
+                    }
+                }
+            }
             savelist.add(doctor);
         }
 
