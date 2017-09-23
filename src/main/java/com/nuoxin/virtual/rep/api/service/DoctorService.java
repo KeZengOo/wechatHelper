@@ -153,8 +153,8 @@ public class DoctorService extends BaseService {
 //        }
 
         doctor = doctorRepository.saveAndFlush(doctor);
-        if (doctor.getId() != null) {
-            return true;
+        if (doctor.getId() == null) {
+            throw new BusinessException(ErrorEnum.ERROR);
         }
 
         Boolean flag = DoctorDynamicFieldValueService.add(doctor.getId(), bean.getList());
