@@ -343,10 +343,11 @@ public class MessageService extends BaseService{
      * @return
      */
     public Map<String,Integer> getMessageCountList(Long drugUserId){
-        Map<String,Integer> map = new HashMap<>();
-        Integer wechatCount = messageRepository.messageCount(drugUserId, MessageTypeEnum.WECHAT.getMessageType(), UserTypeEnum.DOCTOR.getUserType());
+        Map<String, Integer> map = new HashMap<>();
 
-        Integer imCount = messageRepository.messageCount(drugUserId, MessageTypeEnum.IM.getMessageType(), UserTypeEnum.DOCTOR.getUserType());
+        Integer wechatCount = messageRepository.messageCount(drugUserId, MessageTypeEnum.WECHAT.getMessageType());
+
+        Integer imCount = messageRepository.messageCount(drugUserId, MessageTypeEnum.IM.getMessageType());
 
         map.put("wechat", wechatCount);
         map.put("im", imCount);
