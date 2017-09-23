@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
@@ -64,7 +65,9 @@ public class MessageController extends BaseController {
     @ApiOperation(value = "查询微信消息接口", notes = "查询微信消息接口")
     @PostMapping("/getList")
     @ResponseBody
-    public ResponseEntity<DefaultResponseBean<PageResponseBean<MessageResponseBean>>> getList(@RequestBody MessageRequestBean bean){
+    public ResponseEntity<DefaultResponseBean<PageResponseBean<MessageResponseBean>>> getList(@RequestBody MessageRequestBean bean, HttpServletRequest request){
+        Long loginId = getLoginId(request);
+        bean.setDrugUserId(loginId);
 
         PageResponseBean<MessageResponseBean> messageList = messageService.getMessageList(bean);
 
@@ -77,11 +80,12 @@ public class MessageController extends BaseController {
 
 
     @ApiOperation(value = "今日会话接口", notes = "今日会话接口")
-    @GetMapping("/getMessageCountList/{id}")
+    @GetMapping("/getMessageCountList")
     @ResponseBody
-    public ResponseEntity<DefaultResponseBean<Map<String,Integer>>> getList(@PathVariable(value = "id") Long drugUserId){
+    public ResponseEntity<DefaultResponseBean<Map<String,Integer>>> getList(HttpServletRequest request){
 
-        Map<String, Integer> messageCountList = messageService.getMessageCountList(drugUserId);
+        Long loginId = getLoginId(request);
+        Map<String, Integer> messageCountList = messageService.getMessageCountList(loginId);
 
         DefaultResponseBean<Map<String, Integer>> responseBean = new DefaultResponseBean<>();
         responseBean.setData(messageCountList);
@@ -94,7 +98,9 @@ public class MessageController extends BaseController {
     @ApiOperation(value = "消息联系人接口", notes = "消息联系人接口")
     @PostMapping("/getMessageLinkmanList")
     @ResponseBody
-    public ResponseEntity<DefaultResponseBean<PageResponseBean<MessageLinkmanResponseBean>>> getMessageLinkmanList(@RequestBody MessageRequestBean bean){
+    public ResponseEntity<DefaultResponseBean<PageResponseBean<MessageLinkmanResponseBean>>> getMessageLinkmanList(@RequestBody MessageRequestBean bean, HttpServletRequest request){
+        Long loginId = getLoginId(request);
+        bean.setDrugUserId(loginId);
 
         PageResponseBean<MessageLinkmanResponseBean> messageLinkmanList = messageService.getMessageLinkmanList(bean);
         DefaultResponseBean<PageResponseBean<MessageLinkmanResponseBean>> responseBean = new DefaultResponseBean<>();

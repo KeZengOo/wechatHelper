@@ -2,6 +2,7 @@ package com.nuoxin.virtual.rep.api.web.controller;
 
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
+import com.nuoxin.virtual.rep.api.common.controller.BaseController;
 import com.nuoxin.virtual.rep.api.service.HcpService;
 import com.nuoxin.virtual.rep.api.web.controller.request.hcp.HcpRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.hcp.*;
@@ -20,7 +21,7 @@ import java.util.TreeMap;
 @RestController
 @RequestMapping(value = "/hcp")
 @Api(value = "主数据医生接口")
-public class HcpController {
+public class HcpController extends BaseController {
 
 
     @Autowired
@@ -53,6 +54,8 @@ public class HcpController {
     @ApiOperation(value = "主数据医生对话列表")
     @PostMapping("/getDialogList")
     public ResponseEntity<DefaultResponseBean<PageResponseBean<HcpDialogResponseBean>>> getDialogList(@RequestBody HcpRequestBean bean, HttpServletRequest request) {
+        Long loginId = getLoginId(request);
+        bean.setDrugUserId(loginId);
 
         PageResponseBean<HcpDialogResponseBean> dialogList = hcpService.getDialogList(bean);
         DefaultResponseBean<PageResponseBean<HcpDialogResponseBean>> responseBean = new DefaultResponseBean<>();
@@ -63,6 +66,8 @@ public class HcpController {
     @ApiOperation(value = "主数据医生对话列表中关键词统计")
     @PostMapping("/getKeywordList")
     public ResponseEntity<DefaultResponseBean<KeywordListResponseBean>> getKeywordList(@RequestBody HcpRequestBean bean, HttpServletRequest request) {
+        Long loginId = getLoginId(request);
+        bean.setDrugUserId(loginId);
 
         KeywordListResponseBean keywordList = hcpService.getKeywordList(bean);
         DefaultResponseBean<KeywordListResponseBean> responseBean = new DefaultResponseBean<>();
@@ -96,7 +101,8 @@ public class HcpController {
     @ApiOperation(value = "主数据医生发表论文列表")
     @PostMapping("/getDocList")
     public ResponseEntity<DefaultResponseBean<PageResponseBean<HcpDocResponseBean>>> getDocList(@RequestBody HcpRequestBean bean, HttpServletRequest request) {
-
+        Long loginId = getLoginId(request);
+        bean.setDrugUserId(loginId);
         PageResponseBean<HcpDocResponseBean> docList = hcpService.getDocList(bean);
         DefaultResponseBean<PageResponseBean<HcpDocResponseBean>> responseBean = new DefaultResponseBean<>();
         responseBean.setData(docList);
