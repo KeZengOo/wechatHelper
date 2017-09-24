@@ -212,6 +212,10 @@ public class MessageService extends BaseService{
 
                 Long drugUserId = drugUser.getId();
                 Long doctorId = doctor.getId();
+                if (wechatNickName == null){
+                    throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
+                }
+
                 if (wechatNickName != null && DRUG_USER_NICKNAME.equals(wechatNickName)) {
                     userType = UserTypeEnum.DRUG_USER.getUserType();
                     nickname = drugUser.getName();

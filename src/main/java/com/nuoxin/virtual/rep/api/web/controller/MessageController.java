@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 @Api(value = "微信消息或者短信消息相关接口")
@@ -52,13 +51,13 @@ public class MessageController extends BaseController {
     }
 
 
-    @ApiOperation(value = "微信消息excel模板下载", notes = "微信消息excel模板下载")
-    @GetMapping("/wechat/downloadExcel")
-    @ResponseBody
-    public void downloadExcel(HttpServletResponse response){
-
-        messageService.downloadExcel(response);
-    }
+//    @ApiOperation(value = "微信消息excel模板下载", notes = "微信消息excel模板下载")
+//    @GetMapping("/wechat/downloadExcel")
+//    @ResponseBody
+//    public void downloadExcel(HttpServletResponse response){
+//
+//        messageService.downloadExcel(response);
+//    }
 
 
 
