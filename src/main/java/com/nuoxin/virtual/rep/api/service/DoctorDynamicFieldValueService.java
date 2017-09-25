@@ -24,7 +24,7 @@ public class DoctorDynamicFieldValueService {
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public Boolean add (Long doctorId, List<DoctorDynamicFieldValueRequestBean> doctorDynamicFieldValueList){
         if (doctorDynamicFieldValueList == null || doctorDynamicFieldValueList.isEmpty()){
-            return false;
+            return true;
         }
 
         Boolean flag = false;
