@@ -127,7 +127,7 @@ public class LoginController extends BaseController {
             responseBean.setMessage("验证码错误");
         }
         //校验密码格式
-        if(!Pattern.matches("^[0-9a-zA-Z]{6,20}", bean.getPwassword())){
+        if(!Pattern.matches("^[0-9a-zA-Z]{6,20}", bean.getPassword())){
             responseBean.setCode(300);
             responseBean.setMessage("请输入6-20位英文、数字组合");
         }

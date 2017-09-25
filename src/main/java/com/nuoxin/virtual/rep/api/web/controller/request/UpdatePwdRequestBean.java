@@ -13,7 +13,7 @@ public class UpdatePwdRequestBean implements Serializable {
     private static final long serialVersionUID = 4486648004694245210L;
     private String email;
     private String code;
-    private String pwassword;
+    private String password;
     private String token;
 
     public String getEmail() {
@@ -32,19 +32,19 @@ public class UpdatePwdRequestBean implements Serializable {
         this.code = code;
     }
 
-    public String getPwassword() {
-        return pwassword;
-    }
-
-    public void setPwassword(String pwassword) {
-        this.pwassword = pwassword;
-    }
-
     public String getToken() {
         return token;
     }
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

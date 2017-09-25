@@ -30,7 +30,7 @@ public class DrugUserService {
     public void updatePawd(UpdatePwdRequestBean bean){
         DrugUser user = this.findByEmail(bean.getEmail());
         if(user!=null){
-            String newPwd = PasswordEncoder.encode(bean.getPwassword());
+            String newPwd = PasswordEncoder.encode(bean.getPassword());
             user.setPassword(newPwd);
             drugUserRepository.saveAndFlush(user);
         }
