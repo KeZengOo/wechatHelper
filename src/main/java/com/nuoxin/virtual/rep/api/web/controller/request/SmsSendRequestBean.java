@@ -1,9 +1,11 @@
 package com.nuoxin.virtual.rep.api.web.controller.request;
 
+import com.nuoxin.virtual.rep.api.common.bean.TemplateMap;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by fenggang on 9/18/17.
@@ -18,6 +20,8 @@ public class SmsSendRequestBean implements Serializable {
     private Long templateId;
     @ApiModelProperty(value = "不用传")
     private Long drugUserId;
+    @ApiModelProperty(value = "动态参数")
+    private List<TemplateMapRequestBean> maps;
 
     public String getMobile() {
         return mobile;
@@ -41,5 +45,13 @@ public class SmsSendRequestBean implements Serializable {
 
     public void setDrugUserId(Long drugUserId) {
         this.drugUserId = drugUserId;
+    }
+
+    public List<TemplateMapRequestBean> getMaps() {
+        return maps;
+    }
+
+    public void setMaps(List<TemplateMapRequestBean> maps) {
+        this.maps = maps;
     }
 }

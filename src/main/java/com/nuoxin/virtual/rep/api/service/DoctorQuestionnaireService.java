@@ -41,11 +41,11 @@ public class DoctorQuestionnaireService {
                 List<QuestionRequestBean> qrList = bean.getQuestions();
                 if(qrList!=null && !qrList.isEmpty()){
                     for (QuestionRequestBean qrb:qrList) {
-                        for (int j = 0,jleng=list.size(); i < jleng; i++) {
+                        for (int j = 0,jleng=list.size(); j < jleng; j++) {
                             DoctorQuestionnaire dq2 = list.get(j);
                             if (dq2.getQuestionId().equals(qrb.getId())){
                                 qrb.setAnswer(dq2.getAnswer());
-                                jleng=list.size();
+                                //jleng=list.size();
                             }
                         }
                     }

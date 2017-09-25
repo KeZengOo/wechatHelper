@@ -36,4 +36,8 @@ public class SessionMemUtils extends MemcachedUtils {
         delete(SESSION_PREFIX + sessionId);
     }
 
+    public void delete(String key){
+        delete(key);
+    }
+
 }
