@@ -692,8 +692,8 @@ public class HcpService extends BaseService {
      */
     @Cacheable(value = "dashboard_api_hcp_service", key="'getDocKeywordList'+#hcpId" )
     public List<DocKeywordResponseBean> getDocKeywordList(Long hcpId){
-
-        hcpId = getMasterDataIdByHcpId(hcpId);
+        //此处不用加
+        //hcpId = getMasterDataIdByHcpId(hcpId);
 
         List<DocKeywordResponseBean> docKeywordList = new ArrayList<>();
         List<DocKeyWord> docKeyWordList = masterDataService.getDocKeyWordList(hcpId);
