@@ -45,7 +45,7 @@ public class EmailService {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage);
         messageHelper.setFrom(Sender);
-        messageHelper.setTo("gang.feng@naxions.com"); //自己给自己发送邮件
+        messageHelper.setTo(drugUser.getEmail()); //自己给自己发送邮件
         messageHelper.setSubject("找回密码");
         String code = ValidationCode.getCode();
 //        message.setText("测试邮件内容");

@@ -245,6 +245,9 @@ public class DoctorCallService extends BaseService {
             return false;
         }
         info.setCallTime(bean.getTimes());
+        if(StringUtils.isNotEmtity(bean.getUrl())){
+            //TODO 上传录音文件到阿里云
+        }
         info.setCallUrl(bean.getUrl());
         info.setRemark(bean.getRemark());
         //保存通话信息
