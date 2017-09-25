@@ -45,11 +45,11 @@ public class LoginValidationInterceptor extends HandlerInterceptorAdapter {
 			return true;
 		}
 		logger.info("接口【{}】请求开始登录验证",request.getServletPath());
-//		sercurityService.sessionValidation(request);
-//		DrugUser user = sercurityService.getDrugUser(request);
-//		logger.info("用户【"+user.getName()+"】操作了接口：【{}】",request.getServletPath());
-//		 //设置运营人员ID
-//		request.setAttribute(SessionConfig.DEFAULT_REQUEST_DRUG_USER,user);
+		sercurityService.sessionValidation(request);
+		DrugUser user = sercurityService.getDrugUser(request);
+		logger.info("用户【"+user.getName()+"】操作了接口：【{}】",request.getServletPath());
+		 //设置运营人员ID
+		request.setAttribute(SessionConfig.DEFAULT_REQUEST_DRUG_USER,user);
 		return true;
 	}
 
