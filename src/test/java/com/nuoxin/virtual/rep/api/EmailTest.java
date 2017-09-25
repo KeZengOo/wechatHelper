@@ -26,4 +26,9 @@ public class EmailTest {
     public void email() throws MessagingException {
         emailService.sendEmailCode(null);
     }
+
+    @Test
+    public void xxx(){
+        System.out.println('a'>'b');
+    }
 }

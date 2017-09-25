@@ -98,7 +98,7 @@ public class LoginController extends BaseController {
         }
         drugUserService.updatePawd(bean);
         responseBean.setMessage("修改密码成功");
-        memUtils.delete(bean.getEmail());
+        memUtils.deleteKey(bean.getEmail());
         return responseBean;
     }
 
