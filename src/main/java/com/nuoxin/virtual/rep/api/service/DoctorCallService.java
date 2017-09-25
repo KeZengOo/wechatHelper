@@ -24,6 +24,7 @@ import com.nuoxin.virtual.rep.api.web.controller.response.call.CallStatResponseB
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -119,6 +120,7 @@ public class DoctorCallService extends BaseService {
     }
 
     public PageResponseBean<CallHistoryResponseBean> doctorHistoryPage(CallHistoryRequestBean bean){
+        Sort sort = new Sort(Sort.Direction.DESC, "createTime");
         if(bean.getTimeLong()!=null && bean.getTimeLong()!=0){
             if(bean.getDoctorId()!=null && bean.getDoctorId()>0){
                 Integer count = doctorCallInfoRepository.findByCreateTimeCount(new Date(bean.getTimeLong()),bean.getDoctorId());
@@ -132,7 +134,7 @@ public class DoctorCallService extends BaseService {
                 }
             }
         }
-        PageRequest pagetable = super.getPage(bean);
+        PageRequest pagetable = super.getPage(bean,sort);
         Specification<DoctorCallInfo> spec = new Specification<DoctorCallInfo>() {
             @Override
             public Predicate toPredicate(Root<DoctorCallInfo> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
@@ -166,7 +168,7 @@ public class DoctorCallService extends BaseService {
         if(map!=null){
             responseBean.setCallOutAllNum(map.get("allNum").intValue());
             callTimes = map.get("callTimes");
-            num = map.get("num");
+            num = doctorCallInfoRepository.statDrugUserIdsCount("%"+drugUserId+",%", CallTypeEnum.CALL_TYPE_CALLOUT.getType());
             if(callTimes!=null){
                 responseBean.setCallOutAllTimes(callTimes);
             }
@@ -180,7 +182,7 @@ public class DoctorCallService extends BaseService {
         if (map != null) {
             responseBean.setInCallAllNum(map.get("allNum").intValue());
             callTimes = map.get("callTimes");
-            num = map.get("num");
+            num = doctorCallInfoRepository.statDrugUserIdsCount("%"+drugUserId+",%", CallTypeEnum.CALL_TYPE_INCALL.getType());
             if(callTimes!=null){
                 responseBean.setInCallAllTimes(callTimes);
             }
@@ -205,6 +207,12 @@ public class DoctorCallService extends BaseService {
         info.setDrugUserId(bean.getDrugUserId());
         doctorCallInfoRepository.saveAndFlush(info);
         bean.setId(info.getId());
+        DoctorCallInfoDetails infoDetails = new DoctorCallInfoDetails();
+        infoDetails.setCallId(info.getId());
+        infoDetails.setStatus(info.getStatus());
+        infoDetails.setStatusName(info.getStatusName());
+        infoDetails.setCreateTime(new Date());
+        doctorCallInfoDetailsRepository.save(infoDetails);
         return bean;
     }
 
