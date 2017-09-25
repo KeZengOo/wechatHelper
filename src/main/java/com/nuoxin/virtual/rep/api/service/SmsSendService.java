@@ -161,7 +161,12 @@ public class SmsSendService {
 
                 map.put("customer",doctor.getName());
 
-                map.putAll(baseMap);
+//                map.putAll(baseMap);
+
+                for (String key:baseMap.keySet()){
+                    map.put(key,baseMap.get(key));
+                }
+
                 smsBean.setMap(map);
                 List<String> mobiles = new ArrayList<>();
                 mobiles.add(doctor.getMobile());
