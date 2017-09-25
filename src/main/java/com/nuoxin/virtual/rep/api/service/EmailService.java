@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Date;
+import java.util.UUID;
 
 
 /**
@@ -40,7 +41,7 @@ public class EmailService {
     private Logger logger = LoggerFactory.getLogger(getClass());
 
     //发送邮箱验证码
-    public void sendEmailCode(DrugUser drugUser) throws MessagingException {
+    public String sendEmailCode(DrugUser drugUser) throws MessagingException {
         String msg = "<html><body><h3><b>尊敬的客户${userName}，您好！</b></h3><div>您在${time}提交了找回密码申请操作,你的验证码为${code}，为了安全请您尽快修改密码</div></body></html>";
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage);
@@ -53,10 +54,12 @@ public class EmailService {
                 .replace("${code}",code)
                 .replace("${time}", DateUtil.getDateTimeString(new Date()));
         messageHelper.setText( msg,true);
+        String uuid = UUID.randomUUID().toString();
         memUtils.set(drugUser.getEmail(),30*60*1000,code);
+        memUtils.set(uuid,30*60*1000,drugUser.getEmail());
         mailSender.send(mimeMessage);
         logger.info("retrieve.password.send.message【{}】",msg);
-
+        return uuid;
     }
 
     private String getEmailPwdSendMsg(){

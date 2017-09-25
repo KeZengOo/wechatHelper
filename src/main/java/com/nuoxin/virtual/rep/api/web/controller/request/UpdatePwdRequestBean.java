@@ -14,6 +14,7 @@ public class UpdatePwdRequestBean implements Serializable {
     private String email;
     private String code;
     private String pwassword;
+    private String token;
 
     public String getEmail() {
         return email;
@@ -37,5 +38,13 @@ public class UpdatePwdRequestBean implements Serializable {
 
     public void setPwassword(String pwassword) {
         this.pwassword = pwassword;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

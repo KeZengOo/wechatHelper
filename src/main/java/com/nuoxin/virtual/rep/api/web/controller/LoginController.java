@@ -73,7 +73,32 @@ public class LoginController extends BaseController {
             responseBean.setMessage("账号不存在");
         }
         responseBean.setMessage("验证码发送成功");
-        emailService.sendEmailCode(drugUser);
+        responseBean.setData(emailService.sendEmailCode(drugUser));
+        return responseBean;
+    }
+    @GetMapping("/retrieve/check/{token}/{code}")
+    @ResponseBody
+    public DefaultResponseBean<Object> emailCodeSend(@PathVariable String token,@PathVariable String code,
+                                                     HttpServletRequest request, HttpServletResponse response) throws MessagingException {
+        DefaultResponseBean<Object> responseBean = new DefaultResponseBean<>();
+        Object obj = memUtils.get(token);
+        if(obj==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("验证码失效");
+            return responseBean;
+        }
+        Object val = memUtils.get(obj.toString());
+        if(val==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("验证码失效");
+            return responseBean;
+        }
+        if(!code.equals(val.toString())){
+            responseBean.setCode(300);
+            responseBean.setMessage("验证码错误");
+            return responseBean;
+        }
+        responseBean.setMessage("验证成功");
         return responseBean;
     }
 
@@ -82,6 +107,16 @@ public class LoginController extends BaseController {
     public DefaultResponseBean<Object> updatePawd(@RequestBody UpdatePwdRequestBean bean,
                                                   HttpServletRequest request, HttpServletResponse response) throws MessagingException {
         DefaultResponseBean<Object> responseBean = new DefaultResponseBean<>();
+        Object email = memUtils.get(bean.getToken());
+        if(email==null || "".equals(email)) {
+            responseBean.setCode(300);
+            responseBean.setMessage("验证码过期");
+        }
+
+        if(email!=bean.getEmail() || !bean.getEmail().equals(email)){
+            responseBean.setCode(300);
+            responseBean.setMessage("邮箱错误");
+        }
         Object code = memUtils.get(bean.getEmail());
         if(code==null || "".equals(code)){
             responseBean.setCode(300);
@@ -99,6 +134,7 @@ public class LoginController extends BaseController {
         drugUserService.updatePawd(bean);
         responseBean.setMessage("修改密码成功");
         memUtils.deleteKey(bean.getEmail());
+        memUtils.deleteKey(bean.getToken());
         return responseBean;
     }
 
