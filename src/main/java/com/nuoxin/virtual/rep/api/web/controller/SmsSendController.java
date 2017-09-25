@@ -6,6 +6,7 @@ import com.nuoxin.virtual.rep.api.entity.SmsTemplate;
 import com.nuoxin.virtual.rep.api.service.SmsSendService;
 import com.nuoxin.virtual.rep.api.service.SmsTemplateService;
 import com.nuoxin.virtual.rep.api.web.controller.request.SmsSendRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.SmsTemplateResponseBean;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,9 +31,9 @@ public class SmsSendController extends BaseController {
 
     @ApiOperation(value = "短信模板", notes = "短信模板")
     @GetMapping("/template/list")
-    public DefaultResponseBean<List<SmsTemplate>> smsTemplate(HttpServletRequest request, HttpServletResponse response){
-        DefaultResponseBean<List<SmsTemplate>> responseBean = new DefaultResponseBean<>();
-        List<SmsTemplate> list = smsTemplateService.findByAll();
+    public DefaultResponseBean<List<SmsTemplateResponseBean>> smsTemplate(HttpServletRequest request, HttpServletResponse response){
+        DefaultResponseBean<List<SmsTemplateResponseBean>> responseBean = new DefaultResponseBean<>();
+        List<SmsTemplateResponseBean> list = smsTemplateService.findByAll();
         responseBean.setData(list);
         return responseBean;
     }

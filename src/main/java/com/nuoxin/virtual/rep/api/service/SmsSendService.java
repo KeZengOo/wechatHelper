@@ -23,6 +23,7 @@ import com.nuoxin.virtual.rep.api.enums.UserTypeEnum;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.utils.RegularUtils;
 import com.nuoxin.virtual.rep.api.web.controller.request.SmsSendRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.TemplateMapRequestBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -140,12 +141,27 @@ public class SmsSendService {
                 list.add(m);
             }
         }
+        Map<String,Object> baseMap = new HashMap<>();
+        //TODO 判断是否包含初始化参数
+        List<TemplateMapRequestBean> listMaps = bean.getMaps();
+        if(listMaps!=null && !listMaps.isEmpty()){
+            for (TemplateMapRequestBean tm:listMaps) {
+                baseMap.put(tm.getKey(),tm.getValue());
+            }
+        }
+
         List<Doctor> doctors = doctorService.findByMobileIn(list);
         if(doctors!=null && !doctors.isEmpty()){
             for (Doctor doctor:doctors) {
                 SmsMassageBean smsBean = new SmsMassageBean();
                 Map<String,Object> map = new HashMap<>();
+                map.put("doctor",doctor.getName());
+                map.put("druguser",drugUser.getName());
+                map.put("drug",drugUser.getDrugName());
+
                 map.put("customer",doctor.getName());
+
+                map.putAll(baseMap);
                 smsBean.setMap(map);
                 List<String> mobiles = new ArrayList<>();
                 mobiles.add(doctor.getMobile());

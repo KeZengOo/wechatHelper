@@ -22,6 +22,8 @@ public class SmsTemplate extends IdEntity {
     private Date createTime;
     private String name;
 
+    private String maps;
+
     public String getTemplate() {
         return template;
     }
@@ -76,5 +78,13 @@ public class SmsTemplate extends IdEntity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getMaps() {
+        return maps;
+    }
+
+    public void setMaps(String maps) {
+        this.maps = maps;
     }
 }
