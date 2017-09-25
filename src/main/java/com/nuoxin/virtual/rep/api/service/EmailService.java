@@ -1,7 +1,9 @@
 package com.nuoxin.virtual.rep.api.service;
 
+import com.nuoxin.virtual.rep.api.common.util.ValidationCode;
 import com.nuoxin.virtual.rep.api.common.util.mem.SessionMemUtils;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
+import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Date;
 
 
 /**
@@ -32,7 +35,7 @@ public class EmailService {
     private String Sender; //读取配置文件中的参数
 
     @Autowired
-    SessionMemUtils memUtils;
+    private SessionMemUtils memUtils;
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -44,13 +47,15 @@ public class EmailService {
         messageHelper.setFrom(Sender);
         messageHelper.setTo("gang.feng@naxions.com"); //自己给自己发送邮件
         messageHelper.setSubject("找回密码");
+        String code = ValidationCode.getCode();
 //        message.setText("测试邮件内容");
-        msg = msg.replace("${userName}","")
-                .replace("${code}","")
-                .replace("${time}","");
+        msg = msg.replace("${userName}",drugUser.getName())
+                .replace("${code}",code)
+                .replace("${time}", DateUtil.getDateTimeString(new Date()));
         messageHelper.setText( msg,true);
+        memUtils.set(drugUser.getEmail(),30*60*1000,code);
         mailSender.send(mimeMessage);
-       // logger.info("retrieve.password.send.message【{}】",mimeMessage.getContent());
+        logger.info("retrieve.password.send.message【{}】",msg);
 
     }
 
