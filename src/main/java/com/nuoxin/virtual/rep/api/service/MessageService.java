@@ -366,11 +366,12 @@ public class MessageService extends BaseService{
      */
     public PageResponseBean<MessageLinkmanResponseBean> getMessageLinkmanList(MessageRequestBean bean){
 
-        String drugUserId = "%" + bean.getDrugUserId() + "%";
+        Long drugUserId = bean.getDrugUserId();
+        String drugUserIdStr = drugUserId + "%";
         int page = bean.getPage();
         int pageSize = bean.getPageSize();
-        Integer messageListCount = messageRepository.getMessageListCount(drugUserId);
-        List<Message> messageList = messageRepository.getMessageList(drugUserId, page  * pageSize, pageSize);
+        Integer messageListCount = messageRepository.getMessageListCount(drugUserId, drugUserIdStr);
+        List<Message> messageList = messageRepository.getMessageList(drugUserId, drugUserIdStr, page  * pageSize, pageSize);
         if (messageListCount == null){
             messageListCount = 0;
         }
