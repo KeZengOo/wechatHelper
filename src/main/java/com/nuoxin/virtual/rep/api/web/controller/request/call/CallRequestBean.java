@@ -26,6 +26,8 @@ public class CallRequestBean implements Serializable {
     private Integer type;
     @ApiModelProperty(value = "通话时长")
     private Long times;
+    @ApiModelProperty(value = "录音文件url")
+    private String url;
 
     private Long drugUserId;
 
@@ -91,5 +93,13 @@ public class CallRequestBean implements Serializable {
 
     public void setTimes(Long times) {
         this.times = times;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

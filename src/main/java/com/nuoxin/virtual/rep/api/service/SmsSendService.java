@@ -65,22 +65,15 @@ public class SmsSendService {
      * @throws Exception
      */
     private void sendSms(SmsMassageBean bean) throws ServiceException,Exception{
-        /**
-         * Step 1. 获取主题引用
-         */
+        //Step 1. 获取主题引用
         MNSClient client = account.getMNSClient();
         CloudTopic topic = client.getTopicRef(bean.getTopic());
 
-        /**
-         * Step 2. 设置SMS消息体（必须）
-         *
-         * 注：目前暂时不支持消息内容为空，需要指定消息内容，不为空即可。
-         */
+        //Step 2. 设置SMS消息体（必须）
         RawTopicMessage msg = new RawTopicMessage();
         msg.setMessageBody(bean.getMessage());
-        /**
-         * Step 3. 生成SMS消息属性
-         */
+
+        //Step 3. 生成SMS消息属性
         MessageAttributes messageAttributes = new MessageAttributes();
         BatchSmsAttributes batchSmsAttributes = new BatchSmsAttributes();
         // 3.1 设置发送短信的签名（SMSSignName）
@@ -102,25 +95,25 @@ public class SmsSendService {
             }
             messageAttributes.setBatchSmsAttributes(batchSmsAttributes);
             try {
-                /**
-                 * Step 4. 发布SMS消息
-                 */
+                //Step 4. 发布SMS消息
                 TopicMessage ret = topic.publishMessage(msg, messageAttributes);
                 //System.out.println("MessageId: " + ret.getMessageId());
                 logger.info("sms send messageId : {}",ret.getMessageId());
                 logger.info("sms send message : {}", JSON.toJSON(ret));
             } catch (ServiceException se) {
+                se.printStackTrace();
                 logger.debug("sms send error code ：{},requestId：{}",se.getErrorCode() , se.getRequestId());
                 logger.debug("sms send error :",se);
                 throw se;
             } catch (Exception e) {
+                e.printStackTrace();
                 logger.debug("sms send error :",e);
                 throw e;
             } finally {
-                client.close();
+                //client.close();
             }
         }else{
-            client.close();
+            //client.close();
         }
 
     }
