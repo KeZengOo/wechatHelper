@@ -229,6 +229,11 @@ public class DoctorCallService extends BaseService {
         info.setStatusName(bean.getStatusName());
         info.setMobile(bean.getMobile());
         info.setType(bean.getType());
+        if(info.getCallTime()==null){
+            if(bean.getTimes()!=null && bean.getTimes()>0l){
+                info.setCallTime(bean.getTimes());
+            }
+        }
         doctorCallInfoRepository.saveAndFlush(info);
         DoctorCallInfoDetails infoDetails = new DoctorCallInfoDetails();
         infoDetails.setCallId(info.getId());

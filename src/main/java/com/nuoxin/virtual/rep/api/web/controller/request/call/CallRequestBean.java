@@ -24,6 +24,8 @@ public class CallRequestBean implements Serializable {
     private Integer status;
     @ApiModelProperty(value = "类型")
     private Integer type;
+    @ApiModelProperty(value = "通话时长")
+    private Long times;
 
     private Long drugUserId;
 
@@ -81,5 +83,13 @@ public class CallRequestBean implements Serializable {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public Long getTimes() {
+        return times;
+    }
+
+    public void setTimes(Long times) {
+        this.times = times;
     }
 }
