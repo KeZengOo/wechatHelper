@@ -42,7 +42,7 @@ import java.util.*;
  * 微信相关接口
  */
 @Service
-public class MessageService extends BaseService{
+public class MessageService extends BaseService {
 
     private static final String EXTENSION_XLS = "xls";
 
@@ -72,11 +72,11 @@ public class MessageService extends BaseService{
     private DoctorService doctorService;
 
 
-    public void downloadExcel(HttpServletResponse response){
+    public void downloadExcel(HttpServletResponse response) {
 
         response.setHeader("content-Type", "application/vnd.ms-excel");
         // 下载文件的默认名称
-        response.setHeader("Content-Disposition", "attachment;filename="+ filename);
+        response.setHeader("Content-Disposition", "attachment;filename=" + filename);
         response.setContentType("application/octet-stream");
 
         InputStream systemResourceAsStream = ClassLoader.getSystemResourceAsStream(filePath);
@@ -112,11 +112,12 @@ public class MessageService extends BaseService{
 
     /**
      * 导入微信聊天消息
+     *
      * @param file 消息的excel文件
      * @return
      */
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public boolean importExcel(MultipartFile file){
+    public boolean importExcel(MultipartFile file) {
         boolean success = false;
         InputStream inputStream = null;
         try {
@@ -130,34 +131,10 @@ public class MessageService extends BaseService{
         }
 
         String originalFilename = file.getOriginalFilename();
-        File excelFile = new File(originalFilename);
 
-
-//        String name = excelFile.getName();
-//        System.out.println(name);
-
-
-        if (!originalFilename.endsWith(EXTENSION_XLS) && !originalFilename.endsWith(EXTENSION_XLSX)){
+        if (!originalFilename.endsWith(EXTENSION_XLS) && !originalFilename.endsWith(EXTENSION_XLSX)) {
             throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
         }
-
-
-//        String[] split = originalFilename.split("-");
-//        if (null == split || split.length < 2){
-//            throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
-//        }
-//
-//        String drugUserNickname = split[0];
-//        String drugUserTelephone = split[1];
-//        drugUserTelephone = drugUserTelephone.substring(0, drugUserTelephone.indexOf("."));
-//        boolean matcher = RegularUtils.isMatcher(MATCH_TELEPHONE, drugUserTelephone);
-//        if (!matcher){
-//            throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
-//        }
-
-
-
-
 
 
         List<Message> list = new ArrayList<>();
@@ -166,18 +143,18 @@ public class MessageService extends BaseService{
         List<WechatMessageVo> wechatMessageVos = null;
 
         try {
-           wechatMessageVos = excelUtils.readFromFile(null, inputStream);
+            wechatMessageVos = excelUtils.readFromFile(null, inputStream);
         } catch (Exception e) {
-            logger.error("读取上传的excel文件失败。。" , e.getMessage());
+            logger.error("读取上传的excel文件失败。。", e.getMessage());
             e.printStackTrace();
             throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
         }
 
-        if (null == wechatMessageVos || wechatMessageVos.size() <= 0){
+        if (null == wechatMessageVos || wechatMessageVos.size() <= 0) {
             return false;
         }
 
-        for (WechatMessageVo wechatMessageVo:wechatMessageVos) {
+        for (WechatMessageVo wechatMessageVo : wechatMessageVos) {
             if (null != wechatMessageVo) {
                 String id = wechatMessageVo.getId();
                 if (StringUtils.isEmpty(id)) {
@@ -194,25 +171,32 @@ public class MessageService extends BaseService{
                 String drugUserTelephone = wechatMessageVo.getDrugUserTelephone();
                 String doctorTelephone = wechatMessageVo.getDoctorTelephone();
 
+                //判断数据库中是否存在该条数据
+                Message findMessage = messageRepository.findTopByMessageTypeAndWechatNumberAndMessageTimeOrderByMessageTimeDesc(MessageTypeEnum.WECHAT.getMessageType(), wechatNumber, wechatTime);
+                if (findMessage != null){
+
+                    //数据库存在该条数据
+                    continue;
+                }
+
                 int userType = 0;
                 String nickname = "";
                 String telephone = "";
                 Long userId = 0L;
                 DrugUser drugUser = drugUserRepository.findFirstByMobile(drugUserTelephone);
-                if (drugUser == null){
+                if (drugUser == null) {
                     throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
                 }
 
                 Doctor doctor = doctorRepository.findTopByMobile(doctorTelephone);
-                if (doctor == null){
+                if (doctor == null) {
                     throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
                 }
 
 
-
                 Long drugUserId = drugUser.getId();
                 Long doctorId = doctor.getId();
-                if (wechatNickName == null){
+                if (wechatNickName == null) {
                     throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
                 }
 
@@ -224,24 +208,6 @@ public class MessageService extends BaseService{
 
 
                 } else if (wechatNickName != null && !DRUG_USER_NICKNAME.equals(wechatNickName)) {
-//                    userType = UserTypeEnum.DOCTOR.getUserType();
-//                    String[] nicknameArray = wechatNickName.split("-");
-//                    if (null == nicknameArray || nicknameArray.length < 2) {
-//                        throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
-//                    }
-//                    nickname = nicknameArray[0];
-//                    telephone = nicknameArray[1];
-//                    boolean m = RegularUtils.isMatcher(MATCH_TELEPHONE, telephone);
-//                    if (!m){
-//                        throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
-//                    }
-//
-//                    Doctor doctor = doctorRepository.findTopByMobile(telephone);
-//                    if (null != doctor){
-//                        userId = doctor.getId();
-//                    }
-
-
                     userType = UserTypeEnum.DOCTOR.getUserType();
                     nickname = doctor.getName();
                     telephone = doctor.getMobile();
@@ -278,9 +244,7 @@ public class MessageService extends BaseService{
     }
 
 
-
-
-    public PageResponseBean<MessageResponseBean> getMessageList(MessageRequestBean bean){
+    public PageResponseBean<MessageResponseBean> getMessageList(MessageRequestBean bean) {
 
         //Pageable pageable = super.getPage(bean);
 
@@ -289,15 +253,15 @@ public class MessageService extends BaseService{
             public Predicate toPredicate(Root<Message> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
 
                 List<Predicate> predicates = new ArrayList<>();
-                predicates.add(criteriaBuilder.equal(root.get("drugUserId").as(Long.class),bean.getDrugUserId()));
-                predicates.add(criteriaBuilder.equal(root.get("doctorId").as(Long.class),bean.getDoctorId()));
-                predicates.add(criteriaBuilder.equal(root.get("messageType").as(Integer.class),bean.getMessageType()));
+                predicates.add(criteriaBuilder.equal(root.get("drugUserId").as(Long.class), bean.getDrugUserId()));
+                predicates.add(criteriaBuilder.equal(root.get("doctorId").as(Long.class), bean.getDoctorId()));
+                predicates.add(criteriaBuilder.equal(root.get("messageType").as(Integer.class), bean.getMessageType()));
 
                 String startTime = bean.getStartTime();
                 String endTime = bean.getEndTime();
 
-                if (!StringUtils.isEmpty(startTime) && !StringUtils.isEmpty(endTime)){
-                    predicates.add(criteriaBuilder.between(root.get("messageTime").as(String.class),startTime,endTime));
+                if (!StringUtils.isEmpty(startTime) && !StringUtils.isEmpty(endTime)) {
+                    predicates.add(criteriaBuilder.between(root.get("messageTime").as(String.class), startTime, endTime));
                 }
 
                 criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.and(predicates.toArray(new Predicate[0]))));
@@ -308,15 +272,15 @@ public class MessageService extends BaseService{
 
         Sort.Order order = new Sort.Order(Sort.Direction.DESC, "messageTime");
         Sort sort = new Sort(order);
-        Pageable pageable = new PageRequest(bean.getPage(),bean.getPageSize(),sort);
+        Pageable pageable = new PageRequest(bean.getPage(), bean.getPageSize(), sort);
 
         Page<Message> page = messageRepository.findAll(specification, pageable);
         PageResponseBean<MessageResponseBean> messagePage = new PageResponseBean<>(page);
         List<MessageResponseBean> list = new ArrayList<>();
         List<Message> content = page.getContent();
-        if (null != content && content.size() > 0){
+        if (null != content && content.size() > 0) {
 
-            for (Message message:content){
+            for (Message message : content) {
                 MessageResponseBean messageResponseBean = new MessageResponseBean();
                 messageResponseBean.setId(message.getId());
                 messageResponseBean.setUserId(message.getUserId());
@@ -343,16 +307,17 @@ public class MessageService extends BaseService{
 
     /**
      * 今日会话统计
+     *
      * @param drugUserId
      * @return
      */
-    public Map<String,Integer> getMessageCountList(Long drugUserId){
+    public Map<String, Integer> getMessageCountList(Long drugUserId) {
         String drugUserIdStr = drugUserId + "%";
         Map<String, Integer> map = new HashMap<>();
 
-        Integer wechatCount = messageRepository.messageCount(drugUserId,drugUserIdStr, MessageTypeEnum.WECHAT.getMessageType());
+        Integer wechatCount = messageRepository.messageCount(drugUserId, drugUserIdStr, MessageTypeEnum.WECHAT.getMessageType());
 
-        Integer imCount = messageRepository.messageCount(drugUserId,drugUserIdStr, MessageTypeEnum.IM.getMessageType());
+        Integer imCount = messageRepository.messageCount(drugUserId, drugUserIdStr, MessageTypeEnum.IM.getMessageType());
 
         map.put("wechat", wechatCount);
         map.put("im", imCount);
@@ -363,24 +328,25 @@ public class MessageService extends BaseService{
 
     /**
      * 微信消息联系人
+     *
      * @return
      */
-    public PageResponseBean<MessageLinkmanResponseBean> getMessageLinkmanList(MessageRequestBean bean){
+    public PageResponseBean<MessageLinkmanResponseBean> getMessageLinkmanList(MessageRequestBean bean) {
 
         Long drugUserId = bean.getDrugUserId();
         String drugUserIdStr = drugUserId + "%";
         int page = bean.getPage();
         int pageSize = bean.getPageSize();
         Integer messageListCount = messageRepository.getMessageListCount(drugUserId, drugUserIdStr);
-        List<Message> messageList = messageRepository.getMessageList(drugUserId, drugUserIdStr, page  * pageSize, pageSize);
-        if (messageListCount == null){
+        List<Message> messageList = messageRepository.getMessageList(drugUserId, drugUserIdStr, page * pageSize, pageSize);
+        if (messageListCount == null) {
             messageListCount = 0;
         }
 
         List<MessageLinkmanResponseBean> list = new ArrayList<>();
-        if (messageList != null && messageList.size() > 0){
+        if (messageList != null && messageList.size() > 0) {
 
-            for (Message message:messageList){
+            for (Message message : messageList) {
 
                 MessageLinkmanResponseBean messageLinkmanResponseBean = new MessageLinkmanResponseBean();
                 messageLinkmanResponseBean.setDoctorId(message.getUserId());
@@ -388,7 +354,7 @@ public class MessageService extends BaseService{
                 messageLinkmanResponseBean.setLastMessage(message.getMessage());
                 messageLinkmanResponseBean.setNickname(message.getNickname());
                 String messageTime = message.getMessageTime();
-                messageTime = messageTime.substring(0, messageTime.length()-2);
+                messageTime = messageTime.substring(0, messageTime.length() - 2);
                 messageLinkmanResponseBean.setLastTime(messageTime);
 
                 list.add(messageLinkmanResponseBean);
@@ -396,24 +362,14 @@ public class MessageService extends BaseService{
 
         }
 
-        PageResponseBean<MessageLinkmanResponseBean> pageResponseBean = new PageResponseBean<>(bean, messageListCount,list);
+        PageResponseBean<MessageLinkmanResponseBean> pageResponseBean = new PageResponseBean<>(bean, messageListCount, list);
 
 
         return pageResponseBean;
     }
 
 
-
-
-
-
-
-
-
-
-
-
-    public void test(){
+    public void test() {
 
         List<Message> messageList = messageRepository.test();
         System.out.println(messageList.size());

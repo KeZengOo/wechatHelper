@@ -16,6 +16,8 @@ import java.util.List;
  */
 public interface MessageRepository extends JpaRepository<Message, Long>,JpaSpecificationExecutor<Message> {
 
+    Message findTopByMessageTypeAndWechatNumberAndMessageTimeOrderByMessageTimeDesc(Integer wechatMessageType, String wechatNumber, String messageTime);
+
 
 
     @Query(value = "select count(distinct doctor_id) from virtual_message where drug_user_id = :drugUserId and doctor_id in (select id from virtual_doctor vd where vd.drug_user_ids like :drugUserIdStr) and message_type = :messageType and date_format(message_time,'%Y-%m-%d') = date_format(NOW(),'%Y-%m-%d') ", nativeQuery = true)
