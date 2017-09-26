@@ -14,6 +14,16 @@ public class LoginResponseBean implements Serializable {
     private String name;
     private String email;
 
+    private DrugUserCallDetaiBean callBean;
+
+    public DrugUserCallDetaiBean getCallBean() {
+        return callBean;
+    }
+
+    public void setCallBean(DrugUserCallDetaiBean callBean) {
+        this.callBean = callBean;
+    }
+
     public String getName() {
         return name;
     }
