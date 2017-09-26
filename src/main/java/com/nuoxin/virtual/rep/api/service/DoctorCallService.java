@@ -52,7 +52,8 @@ public class DoctorCallService extends BaseService {
     private DoctorRepository doctorRepository;
 
     public PageResponseBean<CallResponseBean> doctorPage(QueryRequestBean bean){
-        PageRequest pagetable = super.getPage(bean);
+        Sort sort = new Sort(Sort.Direction.DESC, "createTime");
+        PageRequest pagetable = super.getPage(bean,sort);
         Specification<DoctorCallInfo> spec = new Specification<DoctorCallInfo>() {
             @Override
             public Predicate toPredicate(Root<DoctorCallInfo> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
