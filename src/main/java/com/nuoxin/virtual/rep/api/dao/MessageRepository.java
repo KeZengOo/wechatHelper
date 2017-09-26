@@ -34,18 +34,11 @@ public interface MessageRepository extends JpaRepository<Message, Long>,JpaSpeci
      * @param pageSize
      * @return
      */
-    @Query(value = "select distinct vm.* from virtual_message vm ,(\n" +
-            "select  MAX(message_time) as maxMessageTime,message_type,user_id,user_type as userType from virtual_message where user_type=2 GROUP BY user_id, message_type\n" +
-            "\n" +
-            ") t where vm.user_id = t.user_id and vm.message_time = t.maxMessageTime\n" +
-            "and user_type=2\n" +
-            "and vm.user_id in\n" +
-            "(\n" +
-            "select id from virtual_doctor vd where vd.drug_user_ids like :drugUserId\n" +
-            ")\n" +
-            "order by message_time desc\n" +
-            "limit :offset,:pageSize", nativeQuery = true)
-    List<Message> getMessageList(@Param(value = "drugUserId") String drugUserId,@Param(value = "offset") Integer offset, @Param(value = "pageSize") Integer pageSize);
+    @Query(value = "select t.* from (\n" +
+            "select * from virtual_message order by message_time desc\n" +
+            ") t where t.drug_user_id = :drugUserId and doctor_id in (select id from virtual_doctor vd where vd.drug_user_ids like :drugUserIdStr) group by t.doctor_id, t.message_type order by t.message_time desc limit :offset,:pageSize ;\n" +
+            "\n", nativeQuery = true)
+    List<Message> getMessageList(@Param(value = "drugUserId") Long drugUserId,@Param(value = "drugUserIdStr") String drugUserIdStr,@Param(value = "offset") Integer offset, @Param(value = "pageSize") Integer pageSize);
 
 
     /**
@@ -53,17 +46,13 @@ public interface MessageRepository extends JpaRepository<Message, Long>,JpaSpeci
      * @param drugUserId
      * @return
      */
-    @Query(value = "select count(distinct vm.id) from virtual_message vm ,(\n" +
-            "select  MAX(message_time) as maxMessageTime,message_type,user_id,user_type as userType from virtual_message where user_type=2 GROUP BY user_id, message_type\n" +
+    @Query(value = "select count(1) from (\n" +
+            "select * from (\n" +
+            "select * from virtual_message order by message_time desc\n" +
+            ") t where t.drug_user_id = :drugUserId and doctor_id in (select id from virtual_doctor vd where vd.drug_user_ids like :drugUserIdStr) group by t.doctor_id, t.message_type order by t.message_time desc \n" +
             "\n" +
-            ") t where vm.user_id = t.user_id and vm.message_time = t.maxMessageTime\n" +
-            "and user_type=2\n" +
-            "and vm.user_id in\n" +
-            "(\n" +
-            "select id from virtual_doctor vd where vd.drug_user_ids like :drugUserId\n" +
-            ")\n" +
-            "order by message_time desc\n" , nativeQuery = true)
-    Integer getMessageListCount(@Param(value = "drugUserId") String drugUserId);
+            ") a" , nativeQuery = true)
+    Integer getMessageListCount(@Param(value = "drugUserId") Long drugUserId,@Param(value = "drugUserIdStr") String drugUserIdStr);
 
 
 
