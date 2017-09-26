@@ -18,8 +18,8 @@ public interface MessageRepository extends JpaRepository<Message, Long>,JpaSpeci
 
 
 
-    @Query(value = "select count(distinct doctor_id) from virtual_message where drug_user_id = :drugUserId and message_type = :messageType and date_format(message_time,'%Y-%m-%d') = date_format(NOW(),'%Y-%m-%d') ", nativeQuery = true)
-    Integer messageCount(@Param(value = "drugUserId") Long drugUserId, @Param(value = "messageType") Integer messageType);
+    @Query(value = "select count(distinct doctor_id) from virtual_message where drug_user_id = :drugUserId and doctor_id in (select id from virtual_doctor vd where vd.drug_user_ids like :drugUserIdStr) and message_type = :messageType and date_format(message_time,'%Y-%m-%d') = date_format(NOW(),'%Y-%m-%d') ", nativeQuery = true)
+    Integer messageCount(@Param(value = "drugUserId") Long drugUserId,@Param(value = "drugUserIdStr") String drugUserIdStr, @Param(value = "messageType") Integer messageType);
 
 
 
