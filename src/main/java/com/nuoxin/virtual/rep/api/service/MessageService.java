@@ -312,7 +312,7 @@ public class MessageService extends BaseService {
      * @return
      */
     public Map<String, Integer> getMessageCountList(Long drugUserId) {
-        String drugUserIdStr ="%," + drugUserId + ",%";
+        String drugUserIdStr ="%,"+  drugUserId + ",%";
         Map<String, Integer> map = new HashMap<>();
 
         Integer wechatCount = messageRepository.messageCount(drugUserId, drugUserIdStr, MessageTypeEnum.WECHAT.getMessageType());
