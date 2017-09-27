@@ -20,6 +20,9 @@ public class DoctorDynamicFieldValue extends IdEntity{
     @Column(name = "dynamic_field_id")
     private Long dynamicFieldId;
 
+    @Column(name = "dynamic_field_name")
+    private String dynamicFieldName;
+
     @Column(name = "dynamic_field_value")
     private String dynamicFieldValue;
 
@@ -68,5 +71,14 @@ public class DoctorDynamicFieldValue extends IdEntity{
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+
+    public String getDynamicFieldName() {
+        return dynamicFieldName;
+    }
+
+    public void setDynamicFieldName(String dynamicFieldName) {
+        this.dynamicFieldName = dynamicFieldName;
     }
 }

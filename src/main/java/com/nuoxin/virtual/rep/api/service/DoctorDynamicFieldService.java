@@ -61,6 +61,8 @@ public class DoctorDynamicFieldService {
     }
 
 
+
+
     public List<DoctorDynamicFieldResponseBean> getList(){
 
         Specification<DoctorDynamicField> specification = new Specification<DoctorDynamicField>() {

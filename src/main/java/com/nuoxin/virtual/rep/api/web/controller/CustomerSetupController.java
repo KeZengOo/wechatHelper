@@ -4,6 +4,7 @@ import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.service.DoctorDynamicFieldService;
 import com.nuoxin.virtual.rep.api.service.DoctorDynamicFieldValueService;
 import com.nuoxin.virtual.rep.api.web.controller.request.customer.DoctorDynamicFieldRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.customer.DoctorDymamicFieldValueResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.customer.DoctorDynamicFieldResponseBean;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -28,7 +29,6 @@ public class CustomerSetupController {
     @Autowired
     private DoctorDynamicFieldService doctorDynamicFieldService;
 
-
 //
 //    @ApiOperation(value = "添加动态新增的字段的值")
 //    @PostMapping("/addValues")
@@ -46,6 +46,7 @@ public class CustomerSetupController {
 
     @ApiOperation(value = "添加动态新增的字段")
     @PostMapping("/addField")
+    @ResponseBody
     public ResponseEntity<DefaultResponseBean<Boolean>> addField(@RequestBody List<DoctorDynamicFieldRequestBean> list) {
 
         Boolean flag = doctorDynamicFieldService.add(list);
@@ -58,6 +59,7 @@ public class CustomerSetupController {
 
     @ApiOperation(value = "获取所有动态新增的字段")
     @GetMapping("/getFields")
+    @ResponseBody
     public ResponseEntity<DefaultResponseBean<List<DoctorDynamicFieldResponseBean>>> getFields() {
 
         List<DoctorDynamicFieldResponseBean> list = doctorDynamicFieldService.getList();
@@ -66,5 +68,17 @@ public class CustomerSetupController {
         return ResponseEntity.ok(responseBean);
     }
 
+
+
+    @ApiOperation(value = "获取某个医生动态添加的字段的值")
+    @GetMapping("/getFieldValues/{id}")
+    @ResponseBody
+    public ResponseEntity<DefaultResponseBean<List<DoctorDymamicFieldValueResponseBean>>> getDoctorDymamicFieldValueList(@PathVariable(value = "id") Long id) {
+
+        List<DoctorDymamicFieldValueResponseBean> list = doctorDynamicFieldValueService.getDoctorDymamicFieldValueList(id);
+        DefaultResponseBean<List<DoctorDymamicFieldValueResponseBean>> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(list);
+        return ResponseEntity.ok(responseBean);
+    }
 
 }
