@@ -217,7 +217,7 @@ public class OssService {
 		if (StringUtils.isNotBlank(storagePath)) {
 			sb.append(storagePath).append("/");
 		}
-		sb.append(time).append("/").append(uuid);
+		sb.append(time);
 		if (StringUtils.isNotBlank(suffixName)) {
 			sb.append("/").append(suffixName);
 		}
