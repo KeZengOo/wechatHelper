@@ -21,6 +21,7 @@ import com.nuoxin.virtual.rep.api.web.controller.request.question.QuestionnaireR
 import com.nuoxin.virtual.rep.api.web.controller.response.call.CallHistoryResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.call.CallResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.call.CallStatResponseBean;
+import mp3.Main;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -411,48 +412,48 @@ public class DoctorCallService extends BaseService {
         return bos.toByteArray();
     }
 
-//    public void file(){
-//        try{
-//            downLoadFromUrl("http://106.75.91.226/16?file=/app/clpms/record/20170925/aaafc53bb1c14851b656bbb116b6674c.wav",
-//                    "aaaaa.wav","C:\\Users\\27168\\Desktop\\");
-//            File file = new File("C:\\Users\\27168\\Desktop\\aaaaa.wav");
-//            File file1 = new File("C:\\Users\\27168\\Desktop\\aaaaa.mp3");
-//            if(file1==null){
-//                file1.createNewFile();
-//            }
-//
-//            WavToMp3Util.execute(file,"C:\\Users\\27168\\Desktop\\aaaaa.mp3");
-//
-//            Main main = new mp3.Main();
-//            main.convertWAVToMP3("/Users/fenggang/Downloads/aaaaa");
-//            File mp3File = new File( "/Users/fenggang/Downloads/aaaaa.mp3");
-//            if (mp3File.length() == 0) {
-//                int retryTimes = 0;
-//                while (true) {
-//                    Thread.sleep(2000);
-//                    mp3File = new File("/Users/fenggang/Downloads/aaaaa.mp3");
-//                    if (mp3File.length() > 0 || retryTimes == 50) break;
-//                    retryTimes++;
-//                    System.out.println("=============tts retry " + retryTimes + " times.");
-//                }
-//                if (mp3File.length() == 0) {
-//                    try {
-//                        System.out.println("/Users/fenggang/Downloads/aaaaa.mp3 .mp3 file create failed..");
-//                        throw new Exception("/Users/fenggang/Downloads/aaaaa.mp3  .mp3 file create failed..");
-//                    } catch (Exception e) {
-//                        // do nothing
-//                        System.out.println(e.getMessage());
-//                    }
-//                }
-//            }
-//            //WavToMp3Util.execute(file,"/Users/fenggang/Downloads/aaaaa.mp3");
-//
-//
-//            //String url = ossService.uploadFile(file);
-//            //System.out.println(url);
-//        }catch (Exception e) {
-//            // TODO: handle exception
-//            e.printStackTrace();
-//        }
-//    }
+    public void file(){
+        try{
+            downLoadFromUrl("http://106.75.91.226/16?file=/app/clpms/record/20170925/aaafc53bb1c14851b656bbb116b6674c.wav",
+                    "aaaaa.wav","C:\\Users\\27168\\Desktop\\");
+            File file = new File("C:\\Users\\27168\\Desktop\\aaaaa.wav");
+            File file1 = new File("C:\\Users\\27168\\Desktop\\aaaaa.mp3");
+            if(file1==null){
+                file1.createNewFile();
+            }
+
+            WavToMp3Util.execute(file,"C:\\Users\\27168\\Desktop\\aaaaa.mp3");
+
+            Main main = new mp3.Main();
+            main.convertWAVToMP3("/Users/fenggang/Downloads/aaaaa");
+            File mp3File = new File( "/Users/fenggang/Downloads/aaaaa.mp3");
+            if (mp3File.length() == 0) {
+                int retryTimes = 0;
+                while (true) {
+                    Thread.sleep(2000);
+                    mp3File = new File("/Users/fenggang/Downloads/aaaaa.mp3");
+                    if (mp3File.length() > 0 || retryTimes == 50) break;
+                    retryTimes++;
+                    System.out.println("=============tts retry " + retryTimes + " times.");
+                }
+                if (mp3File.length() == 0) {
+                    try {
+                        System.out.println("/Users/fenggang/Downloads/aaaaa.mp3 .mp3 file create failed..");
+                        throw new Exception("/Users/fenggang/Downloads/aaaaa.mp3  .mp3 file create failed..");
+                    } catch (Exception e) {
+                        // do nothing
+                        System.out.println(e.getMessage());
+                    }
+                }
+            }
+            //WavToMp3Util.execute(file,"/Users/fenggang/Downloads/aaaaa.mp3");
+
+
+            //String url = ossService.uploadFile(file);
+            //System.out.println(url);
+        }catch (Exception e) {
+            // TODO: handle exception
+            e.printStackTrace();
+        }
+    }
 }
