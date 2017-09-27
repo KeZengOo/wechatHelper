@@ -1,5 +1,6 @@
 package com.nuoxin.virtual.rep.api.web.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
 import com.nuoxin.virtual.rep.api.common.util.mem.SessionMemUtils;
@@ -10,6 +11,7 @@ import com.nuoxin.virtual.rep.api.service.LoginService;
 import com.nuoxin.virtual.rep.api.service.SercurityService;
 import com.nuoxin.virtual.rep.api.web.controller.request.LoginRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.UpdatePwdRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserCallDetaiBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.LoginResponseBean;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +51,7 @@ public class LoginController extends BaseController {
         LoginResponseBean result = new LoginResponseBean();
         result.setName(drugUser.getName());
         result.setEmail(drugUser.getEmail());
+        result.setCallBean(JSON.parseObject(drugUser.getCallInfo(), DrugUserCallDetaiBean.class));
         DefaultResponseBean<LoginResponseBean> responseBean = new DefaultResponseBean<>();
         responseBean.setData(result);
         return responseBean;

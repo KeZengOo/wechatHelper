@@ -30,6 +30,8 @@ public class DrugUser extends IdEntity {
     private String drugName;
     @Column(name = "create_time")
     private Date createTime;
+    @Column(name = "call_info")
+    private String callInfo;
 
     public String getName() {
         return name;
@@ -85,5 +87,13 @@ public class DrugUser extends IdEntity {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public String getCallInfo() {
+        return callInfo;
+    }
+
+    public void setCallInfo(String callInfo) {
+        this.callInfo = callInfo;
     }
 }

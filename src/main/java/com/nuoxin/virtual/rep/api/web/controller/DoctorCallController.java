@@ -1,23 +1,24 @@
 package com.nuoxin.virtual.rep.api.web.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
+import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.DoctorCallService;
 import com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.CallHistoryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.CallInfoRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.CallRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserCallDetaiBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.LoginResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.call.CallHistoryResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.call.CallResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.call.CallStatResponseBean;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,6 +33,24 @@ public class DoctorCallController extends BaseController {
 
     @Autowired
     private DoctorCallService doctorCallService;
+
+    @ApiOperation(value = "获取销售信息", notes = "获取销售信息")
+    @GetMapping("/druguser/info")
+    public DefaultResponseBean<LoginResponseBean> druguser(HttpServletRequest request, HttpServletResponse response){
+        DefaultResponseBean<LoginResponseBean> responseBean = new DefaultResponseBean();
+        DrugUser drugUser = this.getLoginUser(request);
+        if (drugUser == null) {
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
+        }
+        LoginResponseBean result = new LoginResponseBean();
+        result.setName(drugUser.getName());
+        result.setEmail(drugUser.getEmail());
+        result.setCallBean(JSON.parseObject(drugUser.getCallInfo(), DrugUserCallDetaiBean.class));
+        responseBean.setData(result);
+        return responseBean;
+    }
 
     @ApiOperation(value = "客户电话搜索列表", notes = "客户电话搜索列表")
     @PostMapping("/doctor/page")

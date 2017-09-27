@@ -21,4 +21,11 @@ public class BaseController {
         }
         return 0l;
     }
+    protected DrugUser getLoginUser(HttpServletRequest request){
+        DrugUser du = (DrugUser) request.getAttribute(SessionConfig.DEFAULT_REQUEST_DRUG_USER);
+        if(du!=null){
+            return du;
+        }
+        return null;
+    }
 }

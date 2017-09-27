@@ -382,8 +382,8 @@ public class DoctorCallService extends BaseService {
 
     public void file(){
         try{
-            downLoadFromUrl("http://101.95.48.97:8005/res/upload/interface/apptutorials/manualstypeico/6f83ce8f-0da5-49b3-bac8-fd5fc67d2725.png",
-                    "百度.jpg","/Users/fenggang/Downloads/");
+            downLoadFromUrl("http://106.75.91.226/16?file=/app/clpms/record/20170925/aaafc53bb1c14851b656bbb116b6674c.wav",
+                    "aaaaa.wav","/Users/fenggang/Downloads/");
         }catch (Exception e) {
             // TODO: handle exception
             e.printStackTrace();
