@@ -22,6 +22,7 @@ import com.nuoxin.virtual.rep.api.web.controller.response.call.CallHistoryRespon
 import com.nuoxin.virtual.rep.api.web.controller.response.call.CallResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.call.CallStatResponseBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -53,6 +54,10 @@ public class DoctorCallService extends BaseService {
     private DoctorCallInfoRepository doctorCallInfoRepository;
     @Autowired
     private DoctorRepository doctorRepository;
+    @Autowired
+    private OssService ossService;
+    @Value("${recording.file.path}")
+    private String path;
 
     public PageResponseBean<CallResponseBean> doctorPage(QueryRequestBean bean){
         Sort sort = new Sort(Sort.Direction.DESC, "createTime");
@@ -239,7 +244,16 @@ public class DoctorCallService extends BaseService {
         }
         if(StringUtils.isNotEmtity(bean.getUrl())){
             //TODO 保存录音文件
-
+            try {
+                this.downLoadFromUrl("",info.getSinToken()+".wav",path);
+                File file = new File(path+info.getSinToken()+".wav");
+                String url = ossService.uploadFile(file);
+                info.setCallUrl(url);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else{
+            info.setCallUrl(bean.getUrl());
         }
         doctorCallInfoRepository.saveAndFlush(info);
         DoctorCallInfoDetails infoDetails = new DoctorCallInfoDetails();
@@ -259,9 +273,18 @@ public class DoctorCallService extends BaseService {
         }
         info.setCallTime(bean.getTimes());
         if(StringUtils.isNotEmtity(bean.getUrl())){
-            //TODO 上传录音文件到阿里云
+            //TODO 保存录音文件
+            try {
+                this.downLoadFromUrl("",info.getSinToken()+".wav",path);
+                File file = new File(path+info.getSinToken()+".wav");
+                String url = ossService.uploadFile(file);
+                info.setCallUrl(url);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else{
+            info.setCallUrl(bean.getUrl());
         }
-        info.setCallUrl(bean.getUrl());
         info.setRemark(bean.getRemark());
         //保存通话信息
         doctorCallInfoRepository.saveAndFlush(info);
@@ -384,6 +407,10 @@ public class DoctorCallService extends BaseService {
         try{
             downLoadFromUrl("http://106.75.91.226/16?file=/app/clpms/record/20170925/aaafc53bb1c14851b656bbb116b6674c.wav",
                     "aaaaa.wav","/Users/fenggang/Downloads/");
+            File file = new File("/Users/fenggang/Downloads/aaaaa.wav");
+
+            String url = ossService.uploadFile(file);
+            System.out.println(url);
         }catch (Exception e) {
             // TODO: handle exception
             e.printStackTrace();

@@ -113,7 +113,7 @@ public class AppBeanFactary {
 
     @Bean(name = "uploadOSSClient")
     public OSSClient uploadOSSClient() {
-        return new OSSClient(aliyunConfig.getUploadEndpoint(), aliyunConfig.getAccessKeyId(), aliyunConfig.getAccessKeySecret());
+        return new OSSClient(aliyunConfig.getUploadEndpoint(), aliyunConfig.getOssAccessKeyId(), aliyunConfig.getOssAccessKeySecret());
     }
 
     /**

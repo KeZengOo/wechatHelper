@@ -121,7 +121,7 @@ public class OssService {
 			String fileType = OSSContentTypeUtil.getContentType(suffixName);
 			// String fileType = "application/octet-stream";
 			// 设置文件名
-			String filePathName = generateRelativeStoragePath(suffixName);
+			String filePathName = generatePath(originFileName);
 			is = new FileInputStream(file);
 			byte[] fileContent = new byte[is.available()];
 			is.read(fileContent);
@@ -132,6 +132,10 @@ public class OssService {
 			String md5 = BinaryUtil.toBase64String(BinaryUtil.calculateMd5(fileContent));
 			meta.setHeader("Content-MD5",md5);
 			meta.setContentType(fileType);
+			if("wav".equals(suffixName)){
+				meta.setContentType("audio/x-ms-wax");
+
+			}
 			uploadOSSClient.putObject(aliyunConfig.getBucketName(), filePathName, new ByteArrayInputStream(fileContent), meta);
 			String path = aliyunConfig.getDownloadEndpoint() + FileUtils.getFileSeparator() + filePathName;
 			return path;
@@ -192,9 +196,30 @@ public class OssService {
 		if (StringUtils.isNotBlank(storagePath)) {
 			sb.append(storagePath).append("/");
 		}
-		sb.append(time).append(uuid);
+		sb.append(time).append("/").append(uuid);
 		if (StringUtils.isNotBlank(suffixName)) {
 			sb.append(".").append(suffixName);
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * 获取存储的相对路径 规则path + / + yyyyMMddHH + uuid
+	 *
+	 * @param suffixName 后缀名
+	 * @return
+	 */
+	private String generatePath(String suffixName) {
+		String time = DateUtil.gettDateStrFromSpecialDate(new Date(),"yyyyMMddHH");
+		String uuid = StringUtils.uuid();
+		StringBuilder sb = new StringBuilder();
+		String storagePath = aliyunConfig.getStoragePath();
+		if (StringUtils.isNotBlank(storagePath)) {
+			sb.append(storagePath).append("/");
+		}
+		sb.append(time).append("/").append(uuid);
+		if (StringUtils.isNotBlank(suffixName)) {
+			sb.append("/").append(suffixName);
 		}
 		return sb.toString();
 	}

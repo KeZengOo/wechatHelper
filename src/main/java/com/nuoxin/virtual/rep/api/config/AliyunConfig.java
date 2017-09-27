@@ -19,6 +19,8 @@ public class AliyunConfig {
 
     private String accessKeyId;
     private String accessKeySecret;
+    private String ossAccessKeyId;
+    private String ossAccessKeySecret;
     private String mnsEndpoint;
     private String uploadEndpoint;
     private String downloadEndpoint;
@@ -97,6 +99,22 @@ public class AliyunConfig {
 
     public void setStyleName(String styleName) {
         this.styleName = styleName;
+    }
+
+    public String getOssAccessKeyId() {
+        return ossAccessKeyId;
+    }
+
+    public void setOssAccessKeyId(String ossAccessKeyId) {
+        this.ossAccessKeyId = ossAccessKeyId;
+    }
+
+    public String getOssAccessKeySecret() {
+        return ossAccessKeySecret;
+    }
+
+    public void setOssAccessKeySecret(String ossAccessKeySecret) {
+        this.ossAccessKeySecret = ossAccessKeySecret;
     }
 
     @PostConstruct
