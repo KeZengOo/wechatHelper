@@ -3,6 +3,7 @@ package com.nuoxin.virtual.rep.api.service;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.service.BaseService;
 import com.nuoxin.virtual.rep.api.common.util.StringUtils;
+import com.nuoxin.virtual.rep.api.common.util.WavToMp3Util;
 import com.nuoxin.virtual.rep.api.dao.DoctorCallInfoDetailsRepository;
 import com.nuoxin.virtual.rep.api.dao.DoctorCallInfoRepository;
 import com.nuoxin.virtual.rep.api.dao.DoctorQuestionnaireRepository;
@@ -247,9 +248,13 @@ public class DoctorCallService extends BaseService {
             try {
                 this.downLoadFromUrl("",info.getSinToken()+".wav",path);
                 File file = new File(path+info.getSinToken()+".wav");
+                WavToMp3Util.execute(file,path+info.getSinToken()+".mp3");
+                file = new File(path+info.getSinToken()+".mp3");
                 String url = ossService.uploadFile(file);
                 info.setCallUrl(url);
             } catch (IOException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }else{
@@ -277,9 +282,13 @@ public class DoctorCallService extends BaseService {
             try {
                 this.downLoadFromUrl("",info.getSinToken()+".wav",path);
                 File file = new File(path+info.getSinToken()+".wav");
+                WavToMp3Util.execute(file,path+info.getSinToken()+".mp3");
+                file = new File(path+info.getSinToken()+".mp3");
                 String url = ossService.uploadFile(file);
                 info.setCallUrl(url);
             } catch (IOException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }else{
@@ -408,9 +417,14 @@ public class DoctorCallService extends BaseService {
             downLoadFromUrl("http://106.75.91.226/16?file=/app/clpms/record/20170925/aaafc53bb1c14851b656bbb116b6674c.wav",
                     "aaaaa.wav","/Users/fenggang/Downloads/");
             File file = new File("/Users/fenggang/Downloads/aaaaa.wav");
+            File file1 = new File("/Users/fenggang/Downloads/aaaaa.mp3");
+            if(file1==null){
+                file1.createNewFile();
+            }
+            WavToMp3Util.execute(file,"/Users/fenggang/Downloads/aaaaa.mp3");
 
-            String url = ossService.uploadFile(file);
-            System.out.println(url);
+            //String url = ossService.uploadFile(file);
+            //System.out.println(url);
         }catch (Exception e) {
             // TODO: handle exception
             e.printStackTrace();
