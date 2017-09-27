@@ -216,6 +216,13 @@
 			<artifactId>commons-lang3</artifactId>
 			<version>3.6</version>
 		</dependency>
+		<!-- jave -->
+
+		<dependency>
+			<groupId>com.jave</groupId>
+			<artifactId>jave</artifactId>
+			<version>1.0.2</version>
+		</dependency>
 
 	</dependencies>
 
