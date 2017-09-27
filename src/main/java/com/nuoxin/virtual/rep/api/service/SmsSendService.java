@@ -230,7 +230,7 @@ public class SmsSendService {
                     }
                     message.setMessage(imessage);
                     message.setMessageType(MessageTypeEnum.IM.getMessageType());
-                    message.setMessageTime(DateUtil.getDateString(new Date()));
+                    message.setMessageTime(DateUtil.getDateTimeString(new Date()));
                     message.setCreateTime(new Date());
                     messageRepository.save(message);
                 }

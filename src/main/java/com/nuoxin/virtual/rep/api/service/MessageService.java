@@ -312,7 +312,7 @@ public class MessageService extends BaseService {
      * @return
      */
     public Map<String, Integer> getMessageCountList(Long drugUserId) {
-        String drugUserIdStr = drugUserId + "%";
+        String drugUserIdStr ="%," + drugUserId + ",%";
         Map<String, Integer> map = new HashMap<>();
 
         Integer wechatCount = messageRepository.messageCount(drugUserId, drugUserIdStr, MessageTypeEnum.WECHAT.getMessageType());
@@ -334,7 +334,14 @@ public class MessageService extends BaseService {
     public PageResponseBean<MessageLinkmanResponseBean> getMessageLinkmanList(MessageRequestBean bean) {
 
         Long drugUserId = bean.getDrugUserId();
-        String drugUserIdStr = drugUserId + "%";
+//        DrugUser drugUser = drugUserRepository.findFirstById(drugUserId);
+//        if (drugUser == null){
+//            throw new BusinessException();
+//        }
+
+
+
+        String drugUserIdStr ="%," + drugUserId + ",%";
         int page = bean.getPage();
         int pageSize = bean.getPageSize();
         Integer messageListCount = messageRepository.getMessageListCount(drugUserId, drugUserIdStr);
