@@ -5,6 +5,8 @@ import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
@@ -22,7 +24,7 @@ import java.time.LocalDate;
 import static springfox.documentation.schema.AlternateTypeRules.newRule;
 
 @SpringBootApplication
-//@EnableDiscoveryClient
+@EnableDiscoveryClient
 @EnableSwagger2
 public class VirtualRepApiApplication {
 
@@ -61,7 +63,7 @@ public class VirtualRepApiApplication {
 
 
 	@Bean
-	//@LoadBalanced
+	@LoadBalanced
 	RestTemplate getRestTemplate(){
 
 		return new RestTemplate();

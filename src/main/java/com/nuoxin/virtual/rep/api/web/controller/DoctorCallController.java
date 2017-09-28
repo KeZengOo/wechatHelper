@@ -6,6 +6,7 @@ import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.DoctorCallService;
+import com.nuoxin.virtual.rep.api.web.controller.request.CallbackRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.CallHistoryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.CallInfoRequestBean;
@@ -22,6 +23,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 
 /**
  * Created by fenggang on 9/11/17.
@@ -33,6 +37,46 @@ public class DoctorCallController extends BaseController {
 
     @Autowired
     private DoctorCallService doctorCallService;
+
+    @RequestMapping("/callback")
+    public DefaultResponseBean<Object> callback(HttpServletRequest request, HttpServletResponse response){
+        DefaultResponseBean<Object> responseBean = new DefaultResponseBean<>();
+        response.setContentType("text/html");
+        response.setCharacterEncoding("gb2312");
+        PrintWriter out = null;
+        BufferedReader br = null;
+        StringBuilder sb = new StringBuilder();
+        CallbackRequestBean bean = null;
+        try{
+            out = response.getWriter();
+            request.getInputStream();
+            String line="";
+            br=new BufferedReader(new InputStreamReader(
+                    request.getInputStream()));
+            while((line = br.readLine())!=null){
+                sb.append(line);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            out.close();
+        }
+
+        if(sb!=null&&sb.toString().trim().length()>0){
+            try {
+                bean = JSON.parseObject(sb.toString(), CallbackRequestBean.class);
+            } catch (Exception e) {
+                e.printStackTrace();
+                logger.debug("获转码回调返回数据失败");
+                responseBean.setCode(500);
+                responseBean.setData(bean);
+                responseBean.setMessage("获转码回调返回数据失败");
+                return responseBean;
+            }
+        }
+        responseBean.setData(bean);
+        return responseBean;
+    }
 
     @ApiOperation(value = "获取销售信息", notes = "获取销售信息")
     @GetMapping("/druguser/info")
