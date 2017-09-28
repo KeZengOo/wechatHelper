@@ -23,7 +23,7 @@ public class DoctorExcel implements Serializable {
     private String hospitalName;
     @Excel(name = "医生姓名",width=100)
     private String doctorName;
-    @Excel(name = "性别",width=100)
+    @Excel(name = "客户级别",width=100)
     private String sex;
     @Excel(name = "科室",width=100)
     private String department;

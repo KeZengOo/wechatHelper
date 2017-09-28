@@ -197,6 +197,7 @@ public class DoctorService extends BaseService {
             doctor.setProvince(excel.getProvince());
             doctor.setDoctorLevel(excel.getPosition());
             doctor.setMobile(excel.getMobile());
+            doctor.setClientLevel(excel.getSex());
             //TODO 主数据id
             if (StringUtils.isNotEmtity(excel.getHospitalName())) {
                 Hcp hcp = masterDataService.getHcpByHciIdAndHcpName(excel.getHospitalName(), excel.getDoctorName());
