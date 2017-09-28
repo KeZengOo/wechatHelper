@@ -124,7 +124,7 @@ public class DoctorService extends BaseService {
         Doctor doctor = doctorRepository.findTopByMobile(bean.getMobile());
         if (doctor == null) {
             doctor = new Doctor();
-            doctor.setDrugUserIds(bean.getDrugUserId() + ",");
+            doctor.setDrugUserIds(","+bean.getDrugUserId() + ",");
         } else {
             doctor.setDrugUserIds(doctor.getDrugUserIds() + bean.getDrugUserId() + ',');
         }
@@ -216,7 +216,7 @@ public class DoctorService extends BaseService {
                         if (StringUtils.isNotEmtity(doctor.getDrugUserIds())) {
                             doctor.setDrugUserIds(doctor.getDrugUserIds() + drugUser.getId() + ",");
                         } else {
-                            doctor.setDrugUserIds(drugUser.getId() + ",");
+                            doctor.setDrugUserIds(","+drugUser.getId() + ",");
                         }
                         map.put(excel.getDrugUserEmail(), drugUser.getId());
                     }
@@ -224,7 +224,7 @@ public class DoctorService extends BaseService {
                     if (StringUtils.isNotEmtity(doctor.getDrugUserIds())) {
                         doctor.setDrugUserIds(doctor.getDrugUserIds() + map.get(excel.getDrugUserEmail()) + ",");
                     } else {
-                        doctor.setDrugUserIds(map.get(excel.getDrugUserEmail()) + ",");
+                        doctor.setDrugUserIds(","+map.get(excel.getDrugUserEmail()) + ",");
                     }
                 }
 

@@ -115,7 +115,7 @@ public class DoctorCallService extends BaseService {
                     predicates.add(cb.lessThanOrEqualTo(root.get("createTime").as(Date.class),end));
 
                 }
-                predicates.add(cb.like(root.get("doctor").get("drugUserIds").as(String.class),"%"+bean.getDrugUserId()+",%"));
+                predicates.add(cb.like(root.get("doctor").get("drugUserIds").as(String.class),"%,"+bean.getDrugUserId()+",%"));
                 query.where(cb.and(cb.and(predicates.toArray(new Predicate[0]))));
                 return query.getRestriction();
             }
@@ -156,7 +156,7 @@ public class DoctorCallService extends BaseService {
                 if(bean.getDoctorId()!=null && bean.getDoctorId()>0){
                     predicates.add(cb.equal(root.get("doctor").get("id").as(Long.class),bean.getDoctorId()));
                 }
-                predicates.add(cb.like(root.get("doctor").get("drugUserIds").as(String.class),"%"+bean.getDrugUserId()+",%"));
+                predicates.add(cb.like(root.get("doctor").get("drugUserIds").as(String.class),"%,"+bean.getDrugUserId()+",%"));
                 query.where(cb.and(cb.and(predicates.toArray(new Predicate[0]))));
                 return query.getRestriction();
             }
@@ -176,13 +176,13 @@ public class DoctorCallService extends BaseService {
 
     public CallStatResponseBean stat(Long drugUserId){
         CallStatResponseBean responseBean = new CallStatResponseBean();
-        Map<String,Long> map = doctorCallInfoRepository.statDrugUserIds("%"+drugUserId+",%", CallTypeEnum.CALL_TYPE_CALLOUT.getType());
+        Map<String,Long> map = doctorCallInfoRepository.statDrugUserIds("%,"+drugUserId+",%", CallTypeEnum.CALL_TYPE_CALLOUT.getType());
         Long callTimes = null;
         Long num = null;
         if(map!=null){
             responseBean.setCallOutAllNum(map.get("allNum").intValue());
             callTimes = map.get("callTimes");
-            num = doctorCallInfoRepository.statDrugUserIdsCount("%"+drugUserId+",%", CallTypeEnum.CALL_TYPE_CALLOUT.getType());
+            num = doctorCallInfoRepository.statDrugUserIdsCount("%,"+drugUserId+",%", CallTypeEnum.CALL_TYPE_CALLOUT.getType());
             if(callTimes!=null){
                 responseBean.setCallOutAllTimes(callTimes);
             }
@@ -192,11 +192,11 @@ public class DoctorCallService extends BaseService {
 
 
         }
-        map = doctorCallInfoRepository.statDrugUserIds("%"+drugUserId+",%", CallTypeEnum.CALL_TYPE_INCALL.getType());
+        map = doctorCallInfoRepository.statDrugUserIds("%,"+drugUserId+",%", CallTypeEnum.CALL_TYPE_INCALL.getType());
         if (map != null) {
             responseBean.setInCallAllNum(map.get("allNum").intValue());
             callTimes = map.get("callTimes");
-            num = doctorCallInfoRepository.statDrugUserIdsCount("%"+drugUserId+",%", CallTypeEnum.CALL_TYPE_INCALL.getType());
+            num = doctorCallInfoRepository.statDrugUserIdsCount("%,"+drugUserId+",%", CallTypeEnum.CALL_TYPE_INCALL.getType());
             if(callTimes!=null){
                 responseBean.setInCallAllTimes(callTimes);
             }
