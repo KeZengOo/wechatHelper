@@ -13,6 +13,7 @@ import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.Message;
 import com.nuoxin.virtual.rep.api.enums.MessageTypeEnum;
 import com.nuoxin.virtual.rep.api.enums.UserTypeEnum;
+import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.utils.ExcelUtils;
 import com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.vo.WechatMessageVo;
@@ -259,8 +260,12 @@ public class MessageService extends BaseService {
 
                 String startTime = bean.getStartTime();
                 String endTime = bean.getEndTime();
-
                 if (!StringUtils.isEmpty(startTime) && !StringUtils.isEmpty(endTime)) {
+                    startTime = startTime + " 00:00:00";
+                    endTime = endTime + " 00:00:00";
+                    Date endDate = DateUtil.getDateFromStr(endTime);
+                    Date date = DateUtil.addDay(endDate, 1);
+                    endTime = DateUtil.getDateTimeString(date);
                     predicates.add(criteriaBuilder.between(root.get("messageTime").as(String.class), startTime, endTime));
                 }
 
