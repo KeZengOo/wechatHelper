@@ -114,25 +114,30 @@ public class LoginController extends BaseController {
         if(email==null || "".equals(email)) {
             responseBean.setCode(500);
             responseBean.setMessage("验证码过期");
+            return responseBean;
         }
 
-        if(email!=bean.getEmail() || !bean.getEmail().equals(email)){
+        if(null==bean.getEmail() || !bean.getEmail().equals(email)){
             responseBean.setCode(500);
             responseBean.setMessage("邮箱错误");
+            return responseBean;
         }
         Object code = memUtils.get(bean.getEmail());
         if(code==null || "".equals(code)){
             responseBean.setCode(500);
             responseBean.setMessage("验证码过期");
+            return responseBean;
         }
         if(!code.toString().equals(bean.getCode())){
             responseBean.setCode(500);
             responseBean.setMessage("验证码错误");
+            return responseBean;
         }
         //校验密码格式
         if(!Pattern.matches("^[0-9a-zA-Z]{6,20}", bean.getPassword())){
             responseBean.setCode(500);
             responseBean.setMessage("请输入6-20位英文、数字组合");
+            return responseBean;
         }
         drugUserService.updatePawd(bean);
         responseBean.setMessage("修改密码成功");

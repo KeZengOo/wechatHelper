@@ -27,6 +27,7 @@ public class DrugUserService {
         return drugUserRepository.getOne(drugUserId);
     }
 
+    @Transactional(readOnly = false)
     public void updatePawd(UpdatePwdRequestBean bean){
         DrugUser user = this.findByEmail(bean.getEmail());
         if(user!=null){
