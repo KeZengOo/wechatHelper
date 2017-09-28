@@ -88,7 +88,7 @@ public class DoctorCallService extends BaseService {
                 }
                 if(bean.getYear()!=0 && bean.getMonth()!=0 && bean.getDay()!=0){
                     Calendar calendar = Calendar.getInstance();
-                    calendar.set(bean.getYear(), bean.getMonth(), bean.getDay(), 0, 0, 0);
+                    calendar.set(bean.getYear(), bean.getMonth()-1, bean.getDay(), 0, 0, 0);
                     Date start = calendar.getTime();
                     predicates.add(cb.greaterThanOrEqualTo(root.get("createTime").as(Date.class),start));
                     calendar.add(Calendar.DAY_OF_YEAR,+1);
@@ -97,7 +97,7 @@ public class DoctorCallService extends BaseService {
                 }
                 if(bean.getYear()!=0 && bean.getMonth()!=0 && bean.getDay()==0){
                     Calendar calendar = Calendar.getInstance();
-                    calendar.set(bean.getYear(), bean.getMonth(), bean.getDay(), 0, 0, 0);
+                    calendar.set(bean.getYear(), bean.getMonth()-1, bean.getDay(), 0, 0, 0);
                     Date start = calendar.getTime();
                     predicates.add(cb.greaterThanOrEqualTo(root.get("createTime").as(Date.class),start));
                     calendar.add(Calendar.DAY_OF_MONTH,+1);
