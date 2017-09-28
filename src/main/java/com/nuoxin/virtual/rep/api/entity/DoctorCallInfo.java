@@ -38,6 +38,8 @@ public class DoctorCallInfo extends IdEntity {
     private Date createTime = new Date();
     @Column(name = "mobile")
     private String mobile;
+    @Column(name = "info_json")
+    private String json;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH},fetch = FetchType.LAZY)
     @JoinColumn(name = "virtual_doctor_id")
@@ -145,5 +147,13 @@ public class DoctorCallInfo extends IdEntity {
 
     public void setStatusName(String statusName) {
         this.statusName = statusName;
+    }
+
+    public String getJson() {
+        return json;
+    }
+
+    public void setJson(String json) {
+        this.json = json;
     }
 }

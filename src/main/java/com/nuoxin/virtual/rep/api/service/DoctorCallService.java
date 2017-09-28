@@ -1,5 +1,6 @@
 package com.nuoxin.virtual.rep.api.service;
 
+import com.alibaba.fastjson.JSON;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.service.BaseService;
 import com.nuoxin.virtual.rep.api.common.util.StringUtils;
@@ -12,6 +13,8 @@ import com.nuoxin.virtual.rep.api.entity.DoctorCallInfoDetails;
 import com.nuoxin.virtual.rep.api.entity.DoctorQuestionnaire;
 import com.nuoxin.virtual.rep.api.enums.CallTypeEnum;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
+import com.nuoxin.virtual.rep.api.web.controller.request.CallbackListRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.CallbackRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.CallHistoryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.CallInfoRequestBean;
@@ -30,6 +33,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import springfox.documentation.spring.web.json.Json;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -454,6 +458,24 @@ public class DoctorCallService extends BaseService {
         }catch (Exception e) {
             // TODO: handle exception
             e.printStackTrace();
+        }
+    }
+
+    @Transactional(readOnly = false)
+    public void callback(CallbackRequestBean bean){
+        if(bean!=null){
+            if(bean.getCount()>0){
+                List<CallbackListRequestBean> list = bean.getRecordList();
+                if(list!=null && !list.isEmpty()){
+                    for (CallbackListRequestBean bl : list) {
+                        DoctorCallInfo info = doctorCallInfoRepository.findBySinToken(bl.getCallid());
+                        if(info!=null){
+                            info.setJson(JSON.toJSONString(bl));
+                            doctorCallInfoRepository.saveAndFlush(info);
+                        }
+                    }
+                }
+            }
         }
     }
 }

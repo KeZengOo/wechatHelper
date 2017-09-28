@@ -76,6 +76,7 @@ public class DoctorCallController extends BaseController {
             }
         }
         responseBean.setData(bean);
+        doctorCallService.callback(bean);
         return responseBean;
     }
 

@@ -27,4 +27,6 @@ public interface DoctorCallInfoRepository extends JpaRepository<DoctorCallInfo,L
             " where v1.type=:type and d.drug_user_ids like :drugUserIds",nativeQuery = true)
     Long statDrugUserIdsCount(@Param("drugUserIds") String drugUserIds,@Param("type") Integer type);
 
+    DoctorCallInfo findBySinToken(String sinToken);
+
 }
