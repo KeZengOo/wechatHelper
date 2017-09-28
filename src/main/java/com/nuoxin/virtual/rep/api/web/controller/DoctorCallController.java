@@ -40,7 +40,7 @@ public class DoctorCallController extends BaseController {
         DefaultResponseBean<LoginResponseBean> responseBean = new DefaultResponseBean();
         DrugUser drugUser = this.getLoginUser(request);
         if (drugUser == null) {
-            responseBean.setCode(300);
+            responseBean.setCode(500);
             responseBean.setMessage("登录失效");
             return responseBean;
         }
@@ -97,14 +97,14 @@ public class DoctorCallController extends BaseController {
         DefaultResponseBean responseBean = new DefaultResponseBean();
         Long id = bean.getId();
         if(id==null){
-            responseBean.setCode(300);
+            responseBean.setCode(500);
             responseBean.setMessage("请求参数id不能为空");
             return responseBean;
         }
         bean.setDrugUserId(super.getLoginId(request));
         bean = doctorCallService.update(bean);
         if(bean.getId()==null){
-            responseBean.setCode(300);
+            responseBean.setCode(500);
             responseBean.setMessage("状态更新失败");
         }
         responseBean.setData(bean);
@@ -118,7 +118,7 @@ public class DoctorCallController extends BaseController {
                                         HttpServletRequest request, HttpServletResponse response){
         DefaultResponseBean responseBean = new DefaultResponseBean();
         if(bean.getId()==null){
-            responseBean.setCode(300);
+            responseBean.setCode(500);
             responseBean.setMessage("请求参数id不能为空");
             return responseBean;
         }

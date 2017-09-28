@@ -89,13 +89,13 @@ public class DoctorController extends BaseController {
         try{
             list = excelUtils.readFromFile(null,file.getInputStream());
         }catch (Exception e){
-            responseBean.setCode(300);
+            responseBean.setCode(500);
             responseBean.setMessage("excel解析失败");
             responseBean.setDescription(e.getMessage());
             return responseBean;
         }
         if(list==null || list.isEmpty()){
-            responseBean.setCode(300);
+            responseBean.setCode(500);
             responseBean.setMessage("导入数据为空");
             return responseBean;
         }
