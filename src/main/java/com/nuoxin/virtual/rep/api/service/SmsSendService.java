@@ -225,7 +225,11 @@ public class SmsSendService {
                         for (Map.Entry<String, Object> entry:map.entrySet()){
                             String key = entry.getKey();
                             key = "${" + key + "}";
-                            imessage = imessage.replace(key, entry.getValue().toString());
+                            Object value = entry.getValue();
+                            if (value == null){
+                                value = "";
+                            }
+                            imessage = imessage.replace(key, value.toString());
                         }
                     }
                     message.setMessage(imessage);
@@ -242,13 +246,11 @@ public class SmsSendService {
     }
 
     public static void main(String[] args) {
-        String imessage = "内容尊敬的{customer}，欢123迎您使用阿里大鱼短信服务${hh}，阿里大鱼将为{aa}您提供便捷的通信服务！";
-        Matcher matcher = RegularUtils.getMatcher("(\\{.*})", imessage);
-        //Matcher matcher = RegularUtils.getMatcher("\\d", imessage);
+        String imessage = "内容尊敬的{customer}，欢123迎您{customer}使用阿里大鱼短信服务${hh}，阿里大鱼将为{aa}您提供便捷的通信服务！";
 
-        while(matcher.find()){
+        String imessage2 = imessage.replace("{customer}","tiancun");
+        System.out.println(imessage2);
 
-        }
     }
 
 }
