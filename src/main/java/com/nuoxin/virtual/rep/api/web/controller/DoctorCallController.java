@@ -55,6 +55,7 @@ public class DoctorCallController extends BaseController {
                     request.getInputStream()));
             while((line = br.readLine())!=null){
                 sb.append(line);
+                logger.info("回调数据：【{}】",line);
             }
         }catch (Exception e){
             e.printStackTrace();
