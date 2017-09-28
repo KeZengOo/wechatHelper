@@ -74,6 +74,7 @@ public class LoginController extends BaseController {
         if(drugUser==null){
             responseBean.setCode(500);
             responseBean.setMessage("账号不存在");
+            return responseBean;
         }
         responseBean.setMessage("验证码发送成功");
         responseBean.setData(emailService.sendEmailCode(drugUser));

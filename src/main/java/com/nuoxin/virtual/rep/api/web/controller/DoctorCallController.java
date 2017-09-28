@@ -152,6 +152,7 @@ public class DoctorCallController extends BaseController {
         if(bean.getId()==null){
             responseBean.setCode(500);
             responseBean.setMessage("状态更新失败");
+            return responseBean;
         }
         responseBean.setData(bean);
 
