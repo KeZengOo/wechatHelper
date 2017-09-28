@@ -73,30 +73,38 @@ public class HcpService extends BaseService {
 
     /**
      * 医生的基本信息
-     * @param hcpId
+     * @param id
      * @return
      */
-    @Cacheable(value = "virtual_rep_api_hcp_service", key="'getHcpBaseInfo'+#hcpId" )
-    public HcpBaseInfoResponseBean getHcpBaseInfo(Long hcpId){
+    @Cacheable(value = "virtual_rep_api_hcp_service", key="'getHcpBaseInfo'+#id" )
+    public HcpBaseInfoResponseBean getHcpBaseInfo(Long id){
         HcpBaseInfoResponseBean hcpBaseInfoResponseBean = new HcpBaseInfoResponseBean();
-        hcpId = getMasterDataIdByHcpId(hcpId);
+        Long hcpId = getMasterDataIdByHcpId(id);
 
 
         //第一个圈内容基本信息
-        long hciId = 0;
-        Hcp hcp = masterDataService.getHcpById(hcpId);
-        if (null != hcp){
-            hciId = hcp.getHciId();
-            hcpBaseInfoResponseBean.setDoctorName(hcp.getName());
-        }
+//        long hciId = 0;
+//        Hcp hcp = masterDataService.getHcpById(hcpId);
+//        if (null != hcp){
+//            hciId = hcp.getHciId();
+//            hcpBaseInfoResponseBean.setDoctorName(hcp.getName());
+//        }
+//
+//        Hci hci = masterDataService.getHciById(hciId);
+//        if (null != hci){
+//            String hospitalName = hci.getName();
+//            int hospitalLevel = hci.getMedicalGrade();
+//            hcpBaseInfoResponseBean.setHospitalName(hospitalName);
+//            String name = HospitalLevelEnum.getName(hospitalLevel);
+//            hcpBaseInfoResponseBean.setHospitalLevel(name);
+//        }
 
-        Hci hci = masterDataService.getHciById(hciId);
-        if (null != hci){
-            String hospitalName = hci.getName();
-            int hospitalLevel = hci.getMedicalGrade();
-            hcpBaseInfoResponseBean.setHospitalName(hospitalName);
-            String name = HospitalLevelEnum.getName(hospitalLevel);
-            hcpBaseInfoResponseBean.setHospitalLevel(name);
+
+        Doctor doctor = doctorRepository.findFirstById(id);
+        if (null != doctor){
+            hcpBaseInfoResponseBean.setDoctorName(doctor.getName());
+            hcpBaseInfoResponseBean.setHospitalName(doctor.getHospitalName());
+            hcpBaseInfoResponseBean.setHospitalLevel(doctor.getHospitalLevel());
         }
 
 

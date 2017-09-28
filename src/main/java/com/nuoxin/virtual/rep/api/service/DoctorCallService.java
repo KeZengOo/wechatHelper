@@ -6,7 +6,6 @@ import com.nuoxin.virtual.rep.api.common.util.StringUtils;
 import com.nuoxin.virtual.rep.api.common.util.WavToMp3Util;
 import com.nuoxin.virtual.rep.api.dao.DoctorCallInfoDetailsRepository;
 import com.nuoxin.virtual.rep.api.dao.DoctorCallInfoRepository;
-import com.nuoxin.virtual.rep.api.dao.DoctorQuestionnaireRepository;
 import com.nuoxin.virtual.rep.api.dao.DoctorRepository;
 import com.nuoxin.virtual.rep.api.entity.DoctorCallInfo;
 import com.nuoxin.virtual.rep.api.entity.DoctorCallInfoDetails;
@@ -416,12 +415,15 @@ public class DoctorCallService extends BaseService {
     public void file(){
         try{
             downLoadFromUrl("http://106.75.91.226/16?file=/app/clpms/record/20170925/aaafc53bb1c14851b656bbb116b6674c.wav",
-                    "aaaaa.wav","/Users/fenggang/Downloads/");
-            File file = new File("/Users/fenggang/Downloads/aaaaa.wav");
-            File file1 = new File("/Users/fenggang/Downloads/aaaaa.mp3");
+                    "aaaaa.wav","C:\\Users\\27168\\Desktop\\");
+            File file = new File("C:\\Users\\27168\\Desktop\\aaaaa.wav");
+            File file1 = new File("C:\\Users\\27168\\Desktop\\aaaaa.mp3");
             if(file1==null){
                 file1.createNewFile();
             }
+
+            WavToMp3Util.execute(file,"C:\\Users\\27168\\Desktop\\aaaaa.mp3");
+
             Main main = new mp3.Main();
             main.convertWAVToMP3("/Users/fenggang/Downloads/aaaaa");
             File mp3File = new File( "/Users/fenggang/Downloads/aaaaa.mp3");
@@ -445,6 +447,7 @@ public class DoctorCallService extends BaseService {
                 }
             }
             //WavToMp3Util.execute(file,"/Users/fenggang/Downloads/aaaaa.mp3");
+
 
             //String url = ossService.uploadFile(file);
             //System.out.println(url);

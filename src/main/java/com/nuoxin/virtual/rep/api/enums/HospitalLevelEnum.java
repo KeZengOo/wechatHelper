@@ -16,7 +16,10 @@ public enum HospitalLevelEnum {
     SECOND_CLASS_C(23, "二级丙等"),
     THIRD_CLASS_A(31, "三级甲等"),
     THIRD_CLASS_B(32, "三级乙等"),
-    THIRD_CLASS_C(33, "三级丙等");
+    THIRD_CLASS_C(33, "三级丙等"),
+    FOURTH_CLASS_D(40, "特级医院"),
+    FIFTH_CLASS_E(50, "民营医院");
+
 
 
     private int value;
@@ -63,6 +66,12 @@ public enum HospitalLevelEnum {
                 break;
             case 33:
                 name = "三级丙等";
+                break;
+            case 40:
+                name = "特级医院";
+                break;
+            case 50:
+                name = "民营医院";
                 break;
             default:
                 name = "未知";
