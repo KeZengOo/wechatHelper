@@ -37,9 +37,9 @@ public interface MessageRepository extends JpaRepository<Message, Long>,JpaSpeci
      * @return
      */
     @Query(value = "select distinct v.* from virtual_message v,(\n" +
-            "select doctor_id,message_type, max(message_time) as maxMessageTime from virtual_message where drug_user_id=:drugUserId group by doctor_id,message_type \n" +
+            "select doctor_id,message_type, max(message_time) as maxMessageTime from virtual_message where drug_user_id=:drugUserId and user_type=2 group by doctor_id,message_type \n" +
             "order by max(message_time) desc) a\n" +
-            "where v.drug_user_id=:drugUserId and v.doctor_id in (select id from virtual_doctor where drug_user_ids like :drugUserIdStr) and v.doctor_id = a.doctor_id and v.message_type = a.message_type and v.message_time = a.maxMessageTime order by v.message_time desc limit :offset,:pageSize\n", nativeQuery = true)
+            "where v.drug_user_id=:drugUserId and user_type=2 and v.doctor_id in (select id from virtual_doctor where drug_user_ids like :drugUserIdStr) and v.doctor_id = a.doctor_id and v.message_type = a.message_type and v.message_time = a.maxMessageTime order by v.message_time desc limit :offset,:pageSize\n", nativeQuery = true)
     List<Message> getMessageList(@Param(value = "drugUserId") Long drugUserId,@Param(value = "drugUserIdStr") String drugUserIdStr,@Param(value = "offset") Integer offset, @Param(value = "pageSize") Integer pageSize);
 
 
@@ -49,7 +49,7 @@ public interface MessageRepository extends JpaRepository<Message, Long>,JpaSpeci
      * @return
      */
     @Query(value = "select count(1) from (\n" +
-            "select id from virtual_message where drug_user_id=:drugUserId and doctor_id in (select id from virtual_doctor where drug_user_ids like :drugUserIdStr) group by doctor_id,message_type\n" +
+            "select doctor_id from virtual_message where drug_user_id=:drugUserId and user_type=2 and doctor_id in (select id from virtual_doctor where drug_user_ids like :drugUserIdStr) group by doctor_id,message_type\n" +
             ") t" , nativeQuery = true)
     Integer getMessageListCount(@Param(value = "drugUserId") Long drugUserId,@Param(value = "drugUserIdStr") String drugUserIdStr);
 
