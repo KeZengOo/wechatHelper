@@ -1,5 +1,7 @@
 package com.nuoxin.virtual.rep.api.web.intercept;
 
+import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
+import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.config.SessionConfig;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.SercurityService;
@@ -43,6 +45,9 @@ public class LoginValidationInterceptor extends HandlerInterceptorAdapter {
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		if(request.getMethod().equals("OPTIONS")){
 			return true;
+		}
+		if(request.getServletPath().equals("/error")){
+			throw new BusinessException(ErrorEnum.ERROR);
 		}
 		logger.info("接口【{}】请求开始登录验证",request.getServletPath());
 		sercurityService.sessionValidation(request);
