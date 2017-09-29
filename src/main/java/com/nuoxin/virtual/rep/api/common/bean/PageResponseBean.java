@@ -108,7 +108,7 @@ public class PageResponseBean<T> implements Serializable {
     this.first = page.isFirst();
     this.last = page.isLast();
     this.size = page.getSize();
-    this.number = page.getNumber();
+    this.number = page.getNumber() + 1;
     this.numberOfElements = page.getNumberOfElements();
   }
 
