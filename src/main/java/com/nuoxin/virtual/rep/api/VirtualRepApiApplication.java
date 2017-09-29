@@ -24,7 +24,7 @@ import java.time.LocalDate;
 import static springfox.documentation.schema.AlternateTypeRules.newRule;
 
 @SpringBootApplication
-//@EnableDiscoveryClient
+@EnableDiscoveryClient
 @EnableSwagger2
 public class VirtualRepApiApplication {
 
@@ -63,7 +63,7 @@ public class VirtualRepApiApplication {
 
 
 	@Bean
-	//@LoadBalanced
+	@LoadBalanced
 	RestTemplate getRestTemplate(){
 
 		return new RestTemplate();
