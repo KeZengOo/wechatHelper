@@ -101,4 +101,10 @@ public class QueryRequestBean extends PageRequestBean {
     public void setDrugUserId(Long drugUserId) {
         this.drugUserId = drugUserId;
     }
+
+    @Override
+    public String toString() {
+        return mobile +  year + month + day + name + hospital +  department +
+                doctorLevel +  drugUserId + super.toString();
+    }
 }

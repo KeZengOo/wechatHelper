@@ -102,4 +102,28 @@ public class DoctorController extends BaseController {
         doctorService.saves(list);
         return responseBean;
     }
+
+//    @ApiOperation(value = "dra医生excle导入", notes = "dra医生excle导入")
+//    @PostMapping("/dra")
+//    public DefaultResponseBean<Boolean> dra(MultipartFile file,
+//                                              HttpServletRequest request, HttpServletResponse response){
+//        DefaultResponseBean responseBean = new DefaultResponseBean();
+//        ExcelUtils<DraTable> excelUtils = new ExcelUtils<>(new DraTable());
+//        List<DraTable> list = new ArrayList<>();
+//        try{
+//            list = excelUtils.readFromFile(null,file.getInputStream());
+//        }catch (Exception e){
+//            responseBean.setCode(500);
+//            responseBean.setMessage("excel解析失败");
+//            responseBean.setDescription(e.getMessage());
+//            return responseBean;
+//        }
+//        if(list==null || list.isEmpty()){
+//            responseBean.setCode(500);
+//            responseBean.setMessage("导入数据为空");
+//            return responseBean;
+//        }
+//        doctorService.save(list);
+//        return responseBean;
+//    }
 }

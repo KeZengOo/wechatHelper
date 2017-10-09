@@ -16,6 +16,8 @@ import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorStatRespo
 import com.nuoxin.virtual.rep.api.web.controller.response.vo.Hcp;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
@@ -47,10 +49,12 @@ public class DoctorService extends BaseService {
     @Autowired
     private DoctorDynamicFieldValueService DoctorDynamicFieldValueService;
 
+    @Cacheable(value = "virtual_rep_api_doctor", key="'_details_'+#id" )
     public Doctor findById(Long id) {
         return doctorRepository.findOne(id);
     }
 
+    @Cacheable(value = "virtual_rep_api_doctor", key="'_mobile_'+#mobile" )
     public Doctor findByMobile(String mobile) {
         return doctorRepository.findTopByMobile(mobile);
     }
@@ -63,6 +67,7 @@ public class DoctorService extends BaseService {
         return doctorRepository.findByMobileIn(mobiles);
     }
 
+    @Cacheable(value = "virtual_rep_api_doctor", key="'_page_'+#bean" )
     public PageResponseBean<DoctorResponseBean> page(QueryRequestBean bean) {
         PageRequest pageable = super.getPage(bean);
         Specification<Doctor> spec = new Specification<Doctor>() {
@@ -109,6 +114,7 @@ public class DoctorService extends BaseService {
         return responseBean;
     }
 
+    @Cacheable(value = "virtual_rep_api_doctor", key="'_stat_'+#drugUserId" )
     public DoctorStatResponseBean stat(Long drugUserId) {
         DoctorStatResponseBean responseBean = new DoctorStatResponseBean();
         Map<String, Long> map = doctorRepository.statDrugUserDoctorNum("%" + drugUserId + ",%");
@@ -120,6 +126,7 @@ public class DoctorService extends BaseService {
     }
 
     @Transactional(readOnly = false)
+    @CacheEvict(value = "virtual_rep_api_doctor",allEntries = true)
     public Boolean save(DoctorRequestBean bean) {
         Doctor doctor = doctorRepository.findTopByMobile(bean.getMobile());
         if (doctor == null) {
@@ -164,7 +171,14 @@ public class DoctorService extends BaseService {
         return false;
     }
 
+//    @Transactional(readOnly = false)
+//    public Boolean save(List<DraTable> list){
+//        draTableRepository.save(list);
+//        return true;
+//    }
+
     @Transactional(readOnly = false)
+    @CacheEvict(value = "virtual_rep_api_doctor",allEntries = true)
     public Boolean saves(List<DoctorExcel> list) {
         List<String> mobiles = new ArrayList<>();
         for (int i = 0, leng = list.size(); i < leng; i++) {

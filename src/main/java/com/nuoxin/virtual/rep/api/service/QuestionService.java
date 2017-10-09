@@ -14,6 +14,8 @@ import com.nuoxin.virtual.rep.api.web.controller.request.question.QuestionQueryR
 import com.nuoxin.virtual.rep.api.web.controller.request.question.QuestionRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.question.QuestionnaireRequestBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -39,6 +41,7 @@ public class QuestionService extends BaseService {
     private QuestionnaireRepository questionnaireRepository;
 
     @Transactional(readOnly = false)
+    @CacheEvict(value = "virtual_rep_api_question",allEntries = true)
     public Boolean save(QuestionnaireRequestBean bean){
         Questionnaire questionnaire = new Questionnaire();
         questionnaire.setCreateTime(new Date());
@@ -65,6 +68,7 @@ public class QuestionService extends BaseService {
     }
 
     @Transactional(readOnly = false)
+    @CacheEvict(value = "virtual_rep_api_question",allEntries = true)
     public Boolean update(QuestionnaireRequestBean bean){
         Questionnaire questionnaire = new Questionnaire();
         questionnaire.setCreateTime(new Date());
@@ -92,18 +96,21 @@ public class QuestionService extends BaseService {
         return true;
     }
 
+    @Cacheable(value = "virtual_rep_api_question", key="'_details_'+#id" )
     public QuestionnaireRequestBean findById(Long id){
         Questionnaire questionnaire = questionnaireRepository.findOne(id);
         return this._getQuestionnaire(questionnaire);
     }
 
     @Transactional(readOnly = false)
+    @CacheEvict(value = "virtual_rep_api_question",allEntries = true)
     public Boolean delete(Long id){
         questionnaireRepository.delete(id);
         questionRepository.deleteByQuestionnaireId(id);
         return true;
     }
 
+    @Cacheable(value = "virtual_rep_api_question", key="'_page_'+#bean" )
     public PageResponseBean<QuestionnaireRequestBean> page(QuestionQueryRequestBean bean){
         Sort sort = new Sort(Sort.Direction.DESC, "createTime");
         PageRequest pageable = super.getPage(bean,sort);

@@ -33,4 +33,9 @@ public class QuestionQueryRequestBean extends PageRequestBean{
     public void setDrugUserId(Long drugUserId) {
         this.drugUserId = drugUserId;
     }
+
+    @Override
+    public String toString() {
+        return  query + drugUserId + super.toString();
+    }
 }
