@@ -11,9 +11,12 @@ import com.nuoxin.virtual.rep.api.entity.Doctor;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.doctor.DoctorRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.doctor.RelationRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorStatResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.vo.Hcp;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -37,6 +40,8 @@ import java.util.*;
 @Transactional(readOnly = true)
 public class DoctorService extends BaseService {
 
+    private Logger logger = LoggerFactory.getLogger(getClass());
+
     @Autowired
     private DoctorRepository doctorRepository;
     @Autowired
@@ -49,12 +54,12 @@ public class DoctorService extends BaseService {
     @Autowired
     private DoctorDynamicFieldValueService DoctorDynamicFieldValueService;
 
-    @Cacheable(value = "virtual_rep_api_doctor", key="'_details_'+#id" )
+    @Cacheable(value = "virtual_rep_api_doctor", key = "'_details_'+#id")
     public Doctor findById(Long id) {
         return doctorRepository.findOne(id);
     }
 
-    @Cacheable(value = "virtual_rep_api_doctor", key="'_mobile_'+#mobile" )
+    @Cacheable(value = "virtual_rep_api_doctor", key = "'_mobile_'+#mobile")
     public Doctor findByMobile(String mobile) {
         return doctorRepository.findTopByMobile(mobile);
     }
@@ -67,7 +72,7 @@ public class DoctorService extends BaseService {
         return doctorRepository.findByMobileIn(mobiles);
     }
 
-    @Cacheable(value = "virtual_rep_api_doctor", key="'_page_'+#bean" )
+    @Cacheable(value = "virtual_rep_api_doctor", key = "'_page_'+#bean")
     public PageResponseBean<DoctorResponseBean> page(QueryRequestBean bean) {
         PageRequest pageable = super.getPage(bean);
         Specification<Doctor> spec = new Specification<Doctor>() {
@@ -114,7 +119,7 @@ public class DoctorService extends BaseService {
         return responseBean;
     }
 
-    @Cacheable(value = "virtual_rep_api_doctor", key="'_stat_'+#drugUserId" )
+    @Cacheable(value = "virtual_rep_api_doctor", key = "'_stat_'+#drugUserId")
     public DoctorStatResponseBean stat(Long drugUserId) {
         DoctorStatResponseBean responseBean = new DoctorStatResponseBean();
         Map<String, Long> map = doctorRepository.statDrugUserDoctorNum("%" + drugUserId + ",%");
@@ -126,12 +131,12 @@ public class DoctorService extends BaseService {
     }
 
     @Transactional(readOnly = false)
-    @CacheEvict(value = "virtual_rep_api_doctor",allEntries = true)
+    @CacheEvict(value = "virtual_rep_api_doctor", allEntries = true)
     public Boolean save(DoctorRequestBean bean) {
         Doctor doctor = doctorRepository.findTopByMobile(bean.getMobile());
         if (doctor == null) {
             doctor = new Doctor();
-            doctor.setDrugUserIds(","+bean.getDrugUserId() + ",");
+            doctor.setDrugUserIds("," + bean.getDrugUserId() + ",");
         } else {
             doctor.setDrugUserIds(doctor.getDrugUserIds() + bean.getDrugUserId() + ',');
         }
@@ -145,9 +150,11 @@ public class DoctorService extends BaseService {
         doctor.setMobile(bean.getMobile());
         doctor.setName(bean.getName());
         //TODO  获取主数据id
+        logger.info("保存【{}】医生时查询主数据对应的医生id写入数据库", doctor.getName());
         if (StringUtils.isNotEmtity(bean.getHospitalName())) {
             Hcp hcp = masterDataService.getHcpByHciIdAndHcpName(bean.getHospitalName(), bean.getName());
             if (hcp != null) {
+                logger.info("保存【{}】医生时查询主数据对应的医生id写入数据库,写入成功", doctor.getName());
                 doctor.setMasterDateId(hcp.getId());
                 doctor.setHospitalId(hcp.getHciId());
             }
@@ -161,14 +168,62 @@ public class DoctorService extends BaseService {
 
         doctor = doctorRepository.saveAndFlush(doctor);
         if (doctor.getId() == null) {
-            throw new BusinessException(ErrorEnum.ERROR);
+            throw new BusinessException(ErrorEnum.ERROR.getStatus(), "医生添加失败");
         }
+        //TODO 添加关系到关系表
 
         Boolean flag = DoctorDynamicFieldValueService.add(doctor.getId(), bean.getList());
-        if (!flag){
-            throw new BusinessException(ErrorEnum.ERROR);
+        if (!flag) {
+            throw new BusinessException(ErrorEnum.ERROR.getStatus(), "医生动态属性数据添加修改");
         }
-        return false;
+        return true;
+    }
+
+    @Transactional(readOnly = false)
+    @CacheEvict(value = "virtual_rep_api_doctor", allEntries = true)
+    public Boolean update(DoctorRequestBean bean) {
+        Doctor doctor = doctorRepository.findTopByMobile(bean.getMobile());
+        if (doctor == null) {
+            doctor = new Doctor();
+            doctor.setDrugUserIds("," + bean.getDrugUserId() + ",");
+        } else {
+            doctor.setDrugUserIds(doctor.getDrugUserIds() + bean.getDrugUserId() + ',');
+        }
+//        BeanUtils.copyProperties(bean,doctor);
+        doctor.setCity(bean.getCity());
+        doctor.setClientLevel(bean.getClientLevel());
+        doctor.setDepartment(bean.getDepartment());
+        doctor.setDoctorLevel(bean.getDoctorLevel());
+        doctor.setHospitalLevel(bean.getHospitalLevel());
+        doctor.setHospitalName(bean.getHospitalName());
+        doctor.setMobile(bean.getMobile());
+        doctor.setName(bean.getName());
+        //TODO  获取主数据id
+//        if (StringUtils.isNotEmtity(bean.getHospitalName())) {
+//            Hcp hcp = masterDataService.getHcpByHciIdAndHcpName(bean.getHospitalName(), bean.getName());
+//            if (hcp != null) {
+//                doctor.setMasterDateId(hcp.getId());
+//                doctor.setHospitalId(hcp.getHciId());
+//            }
+//        }
+
+        //TODO 营销数据
+//        DoctorVo vo = centerDataService.checkout(doctor);
+//        if(vo!=null){
+//            doctor.setEappId(vo.getId());
+//        }
+
+        doctor = doctorRepository.saveAndFlush(doctor);
+        if (doctor.getId() == null) {
+            throw new BusinessException(ErrorEnum.ERROR.getStatus(), "医生修改失败");
+        }
+        //TODO 添加关系到关系表
+
+        Boolean flag = DoctorDynamicFieldValueService.add(doctor.getId(), bean.getList());
+        if (!flag) {
+            throw new BusinessException(ErrorEnum.ERROR.getStatus(), "医生动态属性数据修改修改");
+        }
+        return true;
     }
 
 //    @Transactional(readOnly = false)
@@ -178,7 +233,7 @@ public class DoctorService extends BaseService {
 //    }
 
     @Transactional(readOnly = false)
-    @CacheEvict(value = "virtual_rep_api_doctor",allEntries = true)
+    @CacheEvict(value = "virtual_rep_api_doctor", allEntries = true)
     public Boolean saves(List<DoctorExcel> list) {
         List<String> mobiles = new ArrayList<>();
         for (int i = 0, leng = list.size(); i < leng; i++) {
@@ -213,9 +268,11 @@ public class DoctorService extends BaseService {
             doctor.setMobile(excel.getMobile());
             doctor.setClientLevel(excel.getSex());
             //TODO 主数据id
+            logger.info("保存【{}】医生时查询主数据对应的医生id写入数据库", doctor.getName());
             if (StringUtils.isNotEmtity(excel.getHospitalName())) {
                 Hcp hcp = masterDataService.getHcpByHciIdAndHcpName(excel.getHospitalName(), excel.getDoctorName());
                 if (hcp != null) {
+                    logger.info("保存【{}】医生时查询主数据对应的医生id写入数据库,写入成功", doctor.getName());
                     doctor.setMasterDateId(hcp.getId());
                     doctor.setHospitalId(hcp.getHciId());
                     doctor.setHospitalLevel("");
@@ -223,6 +280,7 @@ public class DoctorService extends BaseService {
             }
 
             //TODO 销售代表
+            logger.info("保存【{}】医生时查询销售坐席写入医生表", doctor.getName());
             if (StringUtils.isNotEmtity(excel.getDrugUserEmail())) {
                 if (map.get(excel.getDrugUserEmail()) == null) {
                     DrugUser drugUser = drugUserService.findByEmail(excel.getDrugUserEmail());
@@ -230,7 +288,7 @@ public class DoctorService extends BaseService {
                         if (StringUtils.isNotEmtity(doctor.getDrugUserIds())) {
                             doctor.setDrugUserIds(doctor.getDrugUserIds() + drugUser.getId() + ",");
                         } else {
-                            doctor.setDrugUserIds(","+drugUser.getId() + ",");
+                            doctor.setDrugUserIds("," + drugUser.getId() + ",");
                         }
                         map.put(excel.getDrugUserEmail(), drugUser.getId());
                     }
@@ -238,20 +296,41 @@ public class DoctorService extends BaseService {
                     if (StringUtils.isNotEmtity(doctor.getDrugUserIds())) {
                         doctor.setDrugUserIds(doctor.getDrugUserIds() + map.get(excel.getDrugUserEmail()) + ",");
                     } else {
-                        doctor.setDrugUserIds(","+map.get(excel.getDrugUserEmail()) + ",");
+                        doctor.setDrugUserIds("," + map.get(excel.getDrugUserEmail()) + ",");
                     }
                 }
 
-                //TODO 营销id
-//                DoctorVo vo = centerDataService.checkout(doctor);
-//                if (vo != null) {
-//                    doctor.setEappId(vo.getId());
-//                }
             }
+            //TODO 营销id
+//          DoctorVo vo = centerDataService.checkout(doctor);
+//          if (vo != null) {
+//              doctor.setEappId(vo.getId());
+//          }
             savelist.add(doctor);
         }
-
         doctorRepository.save(savelist);
+
+        //TODO 添加关系到关系表
+        return true;
+    }
+
+    public boolean delete(RelationRequestBean bean) {
+        List<Long> ids = bean.getIds();
+        if(ids!=null && !ids.isEmpty()){
+            for (Long id:ids) {
+
+            }
+        }
+        return true;
+    }
+
+    public boolean relation(RelationRequestBean bean) {
+        List<Long> ids = bean.getIds();
+        if(ids!=null && !ids.isEmpty()){
+            for (Long id:ids) {
+
+            }
+        }
         return true;
     }
 }

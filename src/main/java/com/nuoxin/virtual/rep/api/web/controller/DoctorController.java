@@ -4,10 +4,12 @@ import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.bean.DoctorExcel;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
+import com.nuoxin.virtual.rep.api.common.util.StringUtils;
 import com.nuoxin.virtual.rep.api.service.DoctorService;
 import com.nuoxin.virtual.rep.api.utils.ExcelUtils;
 import com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.doctor.DoctorRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.doctor.RelationRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorDetailsResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorStatResponseBean;
@@ -79,6 +81,16 @@ public class DoctorController extends BaseController {
         return responseBean;
     }
 
+    @ApiOperation(value = "医生修改", notes = "医生修改")
+    @PostMapping("/update")
+    public DefaultResponseBean<Boolean> update(@RequestBody DoctorRequestBean bean,
+                                             HttpServletRequest request, HttpServletResponse response){
+        DefaultResponseBean responseBean = new DefaultResponseBean();
+        bean.setDrugUserId(super.getLoginId(request));
+        responseBean.setData(doctorService.update(bean));
+        return responseBean;
+    }
+
     @ApiOperation(value = "医生excle导入", notes = "医生excle导入")
     @PostMapping("/excel")
     public DefaultResponseBean<Boolean> excel(MultipartFile file,
@@ -100,6 +112,41 @@ public class DoctorController extends BaseController {
             return responseBean;
         }
         doctorService.saves(list);
+        return responseBean;
+    }
+
+    @ApiOperation(value = "删除医生信息", notes = "删除医生信息")
+    @PostMapping("/delete")
+    public DefaultResponseBean<Boolean> delete(@RequestBody RelationRequestBean bean,
+                                               HttpServletRequest request, HttpServletResponse response){
+        DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean();
+        bean.setOldDrugUserId(getLoginId(request));
+        if(!StringUtils.isNotEmtity(bean.getDoctorIds())){
+            responseBean.setCode(500);
+            responseBean.setMessage("医生id不能为空");
+            return responseBean;
+        }
+        responseBean.setData(doctorService.delete(bean));
+        return responseBean;
+    }
+
+    @ApiOperation(value = "关系转移", notes = "关系转移")
+    @PostMapping("/relation/update")
+    public DefaultResponseBean<Boolean> relation(@RequestBody RelationRequestBean bean,
+                                                 HttpServletRequest request, HttpServletResponse response){
+        DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean();
+        bean.setOldDrugUserId(getLoginId(request));
+        if(!StringUtils.isNotEmtity(bean.getDoctorIds())){
+            responseBean.setCode(500);
+            responseBean.setMessage("医生id不能为空");
+            return responseBean;
+        }
+        if(bean.getNewDrugUserId()==null){
+            responseBean.setCode(500);
+            responseBean.setMessage("坐席id不能为空");
+            return responseBean;
+        }
+        responseBean.setData(doctorService.relation(bean));
         return responseBean;
     }
 

@@ -19,6 +19,8 @@ public class DrugUserDoctor extends IdEntity {
     private Long doctorId;
     @Column(name = "virtual_drug_user_id")
     private Long drugUserId;
+    @Column(name = "product_id")
+    private Long productId;
 
     public Long getDoctorId() {
         return doctorId;
@@ -34,5 +36,13 @@ public class DrugUserDoctor extends IdEntity {
 
     public void setDrugUserId(Long drugUserId) {
         this.drugUserId = drugUserId;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 }

@@ -3,6 +3,7 @@ package com.nuoxin.virtual.rep.api.dao;
 import com.nuoxin.virtual.rep.api.entity.Doctor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -23,9 +24,10 @@ public interface DoctorRepository extends JpaRepository<Doctor,Long>,JpaSpecific
 
     List<Doctor> findByMobileIn(Collection<String> mobiles);
 
-
-
     @Query("select count(distinct d.id) as doctorNum,count(distinct d.hospitalName) as hospitalNum from Doctor d where d.drugUserIds like :drugUserId ")
     Map<String,Long> statDrugUserDoctorNum(@Param("drugUserId") String drugUserId);
+
+    @Modifying
+    void deleteByIdIn(Collection<Long> ids);
 
 }
