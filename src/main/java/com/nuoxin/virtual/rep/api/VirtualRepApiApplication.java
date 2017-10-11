@@ -2,6 +2,7 @@ package com.nuoxin.virtual.rep.api;
 
 import com.fasterxml.classmate.TypeResolver;
 import io.swagger.annotations.Api;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -26,6 +27,7 @@ import static springfox.documentation.schema.AlternateTypeRules.newRule;
 @SpringBootApplication
 //@EnableDiscoveryClient
 @EnableSwagger2
+@MapperScan(basePackages = "com.nuoxin.virtual.rep.api.mybatis")
 public class VirtualRepApiApplication {
 
 	public static void main(String[] args) {
