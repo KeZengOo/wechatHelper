@@ -1,0 +1,55 @@
+package com.nuoxin.virtual.rep.api.web.controller;
+
+import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
+import com.nuoxin.virtual.rep.api.common.controller.BaseController;
+import com.nuoxin.virtual.rep.api.web.controller.request.meeting.MeetingRequestBean;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+/**
+ *
+ * Create by tiancun on 2017/10/11
+ */
+@Api(value = "会议相关接口")
+@RequestMapping(value = "/meeting")
+@RestController
+public class MeetingController extends BaseController{
+
+
+
+    @ApiOperation(value = "会议导入接口", notes = "会议导入接口")
+    @PostMapping("/wechat/importExcel")
+    @ResponseBody
+    public ResponseEntity<DefaultResponseBean<Boolean>> importExcel(MultipartFile file){
+
+
+        return null;
+    }
+
+
+    @ApiOperation(value = "会议列表接口", notes = "会议列表接口")
+    @PostMapping("/getList")
+    @ResponseBody
+    public void getList(MeetingRequestBean bean){
+
+    }
+
+    @ApiOperation(value = "会议修改接口", notes = "会议修改接口")
+    @PostMapping("/update")
+    @ResponseBody
+    public void update(MeetingRequestBean bean){
+
+    }
+
+    @ApiOperation(value = "会议删除接口", notes = "会议删除接口")
+    @GetMapping("/delete/{id}")
+    @ResponseBody
+    public void delete(@PathVariable(value = "id") Long id){
+
+
+    }
+
+}
