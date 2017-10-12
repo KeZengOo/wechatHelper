@@ -2,6 +2,7 @@ package com.nuoxin.virtual.rep.api.web.controller;
 
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
+import com.nuoxin.virtual.rep.api.web.controller.request.TargetAnalysisRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.question.QuestionnaireAnalysisRequestBean;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -25,10 +26,28 @@ public class TargetAnalysisController extends BaseController{
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
-    @ApiOperation(value = "问卷次数，参与人数，图表接口", notes = "问卷次数，参与人数，图表接口")
+    @ApiOperation(value = "汇总统计接口", notes = "汇总统计接口")
     @PostMapping("/summation")
-    public DefaultResponseBean<Boolean> summation(@RequestBody QuestionnaireAnalysisRequestBean bean,
+    public DefaultResponseBean<Boolean> summation(@RequestBody TargetAnalysisRequestBean bean,
                                                   HttpServletRequest request, HttpServletResponse response) {
+        DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean();
+
+        return responseBean;
+    }
+
+    @ApiOperation(value = "客户统计接口", notes = "客户统计接口")
+    @PostMapping("/client")
+    public DefaultResponseBean<Boolean> client(@RequestBody TargetAnalysisRequestBean bean,
+                                                  HttpServletRequest request, HttpServletResponse response) {
+        DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean();
+
+        return responseBean;
+    }
+
+    @ApiOperation(value = "会议统计接口", notes = "会议统计接口")
+    @PostMapping("/meeting")
+    public DefaultResponseBean<Boolean> meeting(@RequestBody TargetAnalysisRequestBean bean,
+                                               HttpServletRequest request, HttpServletResponse response) {
         DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean();
 
         return responseBean;
