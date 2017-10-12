@@ -1,47 +1,44 @@
-package com.nuoxin.virtual.rep.api.web.controller.request.meeting;
+package com.nuoxin.virtual.rep.api.entity;
 
-import com.nuoxin.virtual.rep.api.common.bean.PageRequestBean;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import org.springframework.web.multipart.MultipartFile;
+import com.nuoxin.virtual.rep.api.common.entity.IdEntity;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import java.util.Date;
 
 /**
  * Create by tiancun on 2017/10/11
  */
+@Entity
+@Table(name = "virtual_meeting")
+public class Meeting extends IdEntity {
 
-@ApiModel(value = "会议请求类")
-public class MeetingRequestBean extends PageRequestBean {
-    private static final long serialVersionUID = 4391736961565565344L;
 
-    @ApiModelProperty(value = "会议id")
-    private Long id;
-
-    @ApiModelProperty(value = "标题")
+    @Column(name = "title")
     private String title;
 
-    @ApiModelProperty(value = "讲者")
+    @Column(name = "speaker")
     private String speaker;
 
-    @ApiModelProperty(value = "会议开始时间")
+    @Column(name = "meeting_start_time")
     private String meetingStartTime;
 
-    @ApiModelProperty(value = "会议结束时间")
+    @Column(name = "meeting_end_time")
     private String meetingEndTime;
 
-    @ApiModelProperty(value = "产品id")
+    @Column(name = "product_id")
     private Long productId;
 
-    @ApiModelProperty(value = "产品名称")
+    @Column(name = "product_name")
     private String productName;
 
+    @Column(name = "create_time")
+    private Date createTime;
 
-    public Long getId() {
-        return id;
-    }
+    @Column(name = "update_time")
+    private Date updateTime;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getTitle() {
         return title;
@@ -75,6 +72,21 @@ public class MeetingRequestBean extends PageRequestBean {
         this.meetingEndTime = meetingEndTime;
     }
 
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
 
     public Long getProductId() {
         return productId;

@@ -27,17 +27,11 @@ public class MeetingResponseBean implements Serializable{
     @ApiModelProperty(value = "会议结束时间")
     private String meetingEndTime;
 
-    @ApiModelProperty(value = "会议总时长")
-    private Integer meetingSumTime;
+    @ApiModelProperty(value = "产品id")
+    private Long productId;
 
-    @ApiModelProperty(value = "医生id")
-    private Long doctorId;
-
-    @ApiModelProperty(value = "医生姓名")
-    private String doctorName;
-
-    @ApiModelProperty(value = "医生手机号")
-    private String telephone;
+    @ApiModelProperty(value = "产品名称")
+    private String productName;
 
 
     public Long getId() {
@@ -80,35 +74,19 @@ public class MeetingResponseBean implements Serializable{
         this.meetingEndTime = meetingEndTime;
     }
 
-    public Integer getMeetingSumTime() {
-        return meetingSumTime;
+    public Long getProductId() {
+        return productId;
     }
 
-    public void setMeetingSumTime(Integer meetingSumTime) {
-        this.meetingSumTime = meetingSumTime;
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 
-    public Long getDoctorId() {
-        return doctorId;
+    public String getProductName() {
+        return productName;
     }
 
-    public void setDoctorId(Long doctorId) {
-        this.doctorId = doctorId;
-    }
-
-    public String getDoctorName() {
-        return doctorName;
-    }
-
-    public void setDoctorName(String doctorName) {
-        this.doctorName = doctorName;
-    }
-
-    public String getTelephone() {
-        return telephone;
-    }
-
-    public void setTelephone(String telephone) {
-        this.telephone = telephone;
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 }

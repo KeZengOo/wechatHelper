@@ -15,6 +15,7 @@ import com.nuoxin.virtual.rep.api.enums.MessageTypeEnum;
 import com.nuoxin.virtual.rep.api.enums.UserTypeEnum;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.utils.ExcelUtils;
+import com.nuoxin.virtual.rep.api.utils.RegularUtils;
 import com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.vo.WechatMessageVo;
 import com.nuoxin.virtual.rep.api.web.controller.response.message.MessageLinkmanResponseBean;
@@ -45,11 +46,6 @@ import java.util.*;
 @Service
 public class MessageService extends BaseService {
 
-    private static final String EXTENSION_XLS = "xls";
-
-    private static final String EXTENSION_XLSX = "xlsx";
-
-    private static final String MATCH_TELEPHONE = "^1\\d{10}$";
 
     //excel从哪行开始读取，这里excel标题占两行
     private static final Integer beginReadRow = 2;
@@ -133,7 +129,7 @@ public class MessageService extends BaseService {
 
         String originalFilename = file.getOriginalFilename();
 
-        if (!originalFilename.endsWith(EXTENSION_XLS) && !originalFilename.endsWith(EXTENSION_XLSX)) {
+        if (!originalFilename.endsWith(RegularUtils.EXTENSION_XLS) && !originalFilename.endsWith(RegularUtils.EXTENSION_XLSX)) {
             throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
         }
 
