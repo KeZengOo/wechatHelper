@@ -52,18 +52,24 @@ public class MeetingController extends BaseController{
         return ResponseEntity.ok(responseBean);
     }
 
-    @ApiOperation(value = "会议修改接口", notes = "会议修改接口")
-    @PostMapping("/update")
-    @ResponseBody
-    public void update(MeetingRequestBean bean){
 
-    }
 
     @ApiOperation(value = "会议删除接口", notes = "会议删除接口")
     @GetMapping("/delete/{id}")
     @ResponseBody
-    public void delete(@PathVariable(value = "id") Long id){
+    public ResponseEntity<DefaultResponseBean<Boolean>> delete(@PathVariable(value = "id") Long id){
 
+        boolean flag = meetingService.delete(id);
+        DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(flag);
+        return ResponseEntity.ok(responseBean);
+    }
+
+
+    @ApiOperation(value = "会议修改接口", notes = "会议修改接口")
+    @PostMapping("/update")
+    @ResponseBody
+    public void update(MeetingRequestBean bean){
 
     }
 
