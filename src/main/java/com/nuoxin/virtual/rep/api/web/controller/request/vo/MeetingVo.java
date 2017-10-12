@@ -23,11 +23,6 @@ public class MeetingVo {
     @Excel(name = "会议结束时间", width = 30)
     private Date meetingEndTime;
 
-    @Excel(name = "会议总时长", width = 4)
-    private Integer meetingSumTime;
-
-    @Excel(name = "医生手机号", width = 20)
-    private String telephone;
 
     public String getTitle() {
         return title;
@@ -61,19 +56,6 @@ public class MeetingVo {
         this.meetingEndTime = meetingEndTime;
     }
 
-    public Integer getMeetingSumTime() {
-        return meetingSumTime;
-    }
 
-    public void setMeetingSumTime(Integer meetingSumTime) {
-        this.meetingSumTime = meetingSumTime;
-    }
 
-    public String getTelephone() {
-        return telephone;
-    }
-
-    public void setTelephone(String telephone) {
-        this.telephone = telephone;
-    }
 }
