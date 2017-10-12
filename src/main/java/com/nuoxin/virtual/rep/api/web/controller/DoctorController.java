@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * Created by fenggang on 9/11/17.
  */
-@Api(value = "",description = "客户信息接口")
+@Api(value = "客户信息",description = "客户信息接口")
 @RestController
 @RequestMapping(value = "/doctor")
 public class DoctorController extends BaseController {

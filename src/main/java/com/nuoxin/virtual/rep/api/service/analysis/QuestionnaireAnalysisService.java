@@ -2,7 +2,7 @@ package com.nuoxin.virtual.rep.api.service.analysis;
 
 import com.nuoxin.virtual.rep.api.common.service.BaseService;
 import com.nuoxin.virtual.rep.api.mybatis.QuestionnaireAnalysisMapper;
-import com.nuoxin.virtual.rep.api.web.controller.request.question.QuestionnaireAnalysisRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.analysis.QuestionnaireAnalysisRequestBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

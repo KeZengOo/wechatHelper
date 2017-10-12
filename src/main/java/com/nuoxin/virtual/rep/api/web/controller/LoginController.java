@@ -147,5 +147,4 @@ public class LoginController extends BaseController {
         return responseBean;
     }
 
-
 }

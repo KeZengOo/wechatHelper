@@ -12,14 +12,14 @@ import java.io.Serializable;
 public class EmailRequestBean implements Serializable {
     private static final long serialVersionUID = 477753468333711704L;
 
-    @ApiModelProperty(name = "邮件发送医生的id（多个医生中间用英文逗号分隔）")
+    @ApiModelProperty(value = "邮件发送医生的id（多个医生中间用英文逗号分隔）")
     private String doctorIds;
-    @ApiModelProperty(name = "邮件标题")
+    @ApiModelProperty(value = "邮件标题")
     private String title;
-    @ApiModelProperty(name = "邮件内容")
+    @ApiModelProperty(value = "邮件内容")
     private String content;
 
-    @ApiModelProperty(name = "不用传")
+    @ApiModelProperty(value = "不用传")
     private Long drugUserId;
 
     public String getDoctorIds() {

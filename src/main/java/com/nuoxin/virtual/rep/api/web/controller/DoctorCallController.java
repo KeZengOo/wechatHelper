@@ -30,7 +30,7 @@ import java.io.PrintWriter;
 /**
  * Created by fenggang on 9/11/17.
  */
-@Api(value = "",description = "电话页面接口")
+@Api(value = "电话",description = "电话页面接口")
 @RestController
 @RequestMapping(value = "/call")
 public class DoctorCallController extends BaseController {

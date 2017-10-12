@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * Created by fenggang on 9/18/17.
  */
-@Api(value = "",description = "短信接口")
+@Api(value = "短信发送",description = "短信接口")
 @RestController
 @RequestMapping(value = "/sms")
 public class SmsSendController extends BaseController {
