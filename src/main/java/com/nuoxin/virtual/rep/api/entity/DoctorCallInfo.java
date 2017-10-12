@@ -40,6 +40,10 @@ public class DoctorCallInfo extends IdEntity {
     private String mobile;
     @Column(name = "info_json")
     private String json;
+    @Column(name = "product_id")
+    private Long productId;
+    @Column(name = "del_flag")
+    private Integer delFlag = 0;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH},fetch = FetchType.LAZY)
     @JoinColumn(name = "virtual_doctor_id")
@@ -155,5 +159,21 @@ public class DoctorCallInfo extends IdEntity {
 
     public void setJson(String json) {
         this.json = json;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
+    }
+
+    public Integer getDelFlag() {
+        return delFlag;
+    }
+
+    public void setDelFlag(Integer delFlag) {
+        this.delFlag = delFlag;
     }
 }

@@ -15,7 +15,7 @@ import java.util.List;
 public interface QuestionRepository extends JpaRepository<Question,Long>,JpaSpecificationExecutor<Question> {
 
     @Modifying
-    @Query("delete from Question q where q.questionnaireId=:questionnaireId")
+    @Query("update Question q set q.delFlag=1  where q.questionnaireId=:questionnaireId")
     void deleteByQuestionnaireId(@Param("questionnaireId") Long questionnaireId);
 
     List<Question> findByQuestionnaireId(Long questionnaireId);

@@ -7,8 +7,10 @@ import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.common.service.BaseService;
 import com.nuoxin.virtual.rep.api.common.util.StringUtils;
 import com.nuoxin.virtual.rep.api.dao.DoctorRepository;
+import com.nuoxin.virtual.rep.api.dao.DrugUserDoctorRepository;
 import com.nuoxin.virtual.rep.api.entity.Doctor;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
+import com.nuoxin.virtual.rep.api.entity.DrugUserDoctor;
 import com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.doctor.DoctorRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.doctor.RelationRequestBean;
@@ -50,7 +52,8 @@ public class DoctorService extends BaseService {
     private CenterDataService centerDataService;
     @Autowired
     private MasterDataService masterDataService;
-
+    @Autowired
+    private DrugUserDoctorRepository drugUserDoctorRepository;
     @Autowired
     private DoctorDynamicFieldValueService DoctorDynamicFieldValueService;
 
@@ -171,6 +174,12 @@ public class DoctorService extends BaseService {
             throw new BusinessException(ErrorEnum.ERROR.getStatus(), "医生添加失败");
         }
         //TODO 添加关系到关系表
+        DrugUserDoctor dud = new DrugUserDoctor();
+        dud.setDoctorId(doctor.getId());
+        dud.setProductId(bean.getProductId());
+        dud.setDrugUserId(bean.getDrugUserId());
+        drugUserDoctorRepository.saveAndFlush(dud);
+
 
         Boolean flag = DoctorDynamicFieldValueService.add(doctor.getId(), bean.getList());
         if (!flag) {
@@ -218,6 +227,15 @@ public class DoctorService extends BaseService {
             throw new BusinessException(ErrorEnum.ERROR.getStatus(), "医生修改失败");
         }
         //TODO 添加关系到关系表
+        DrugUserDoctor dud = drugUserDoctorRepository.findByDoctorIdAndDrugUserIdAndProductId(doctor.getId(), bean.getDrugUserId(), bean.getProductId());
+        if (dud == null) {
+            dud = new DrugUserDoctor();
+            dud.setDoctorId(doctor.getId());
+            dud.setProductId(bean.getProductId());
+            dud.setDrugUserId(bean.getDrugUserId());
+            drugUserDoctorRepository.saveAndFlush(dud);
+        }
+
 
         Boolean flag = DoctorDynamicFieldValueService.add(doctor.getId(), bean.getList());
         if (!flag) {
@@ -316,8 +334,8 @@ public class DoctorService extends BaseService {
 
     public boolean delete(RelationRequestBean bean) {
         List<Long> ids = bean.getIds();
-        if(ids!=null && !ids.isEmpty()){
-            for (Long id:ids) {
+        if (ids != null && !ids.isEmpty()) {
+            for (Long id : ids) {
 
             }
         }
@@ -326,8 +344,8 @@ public class DoctorService extends BaseService {
 
     public boolean relation(RelationRequestBean bean) {
         List<Long> ids = bean.getIds();
-        if(ids!=null && !ids.isEmpty()){
-            for (Long id:ids) {
+        if (ids != null && !ids.isEmpty()) {
+            for (Long id : ids) {
 
             }
         }

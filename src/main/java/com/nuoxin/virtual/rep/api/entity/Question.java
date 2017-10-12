@@ -28,6 +28,8 @@ public class Question extends IdEntity {
     private String answer;
     @Column(name = "create_time")
     private Date createTime;
+    @Column(name = "del_flag")
+    private Integer delFlag = 0;
 
     public Integer getType() {
         return type;
@@ -75,5 +77,13 @@ public class Question extends IdEntity {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public Integer getDelFlag() {
+        return delFlag;
+    }
+
+    public void setDelFlag(Integer delFlag) {
+        this.delFlag = delFlag;
     }
 }

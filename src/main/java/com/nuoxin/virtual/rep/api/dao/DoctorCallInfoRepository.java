@@ -3,6 +3,7 @@ package com.nuoxin.virtual.rep.api.dao;
 import com.nuoxin.virtual.rep.api.entity.DoctorCallInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -28,5 +29,9 @@ public interface DoctorCallInfoRepository extends JpaRepository<DoctorCallInfo,L
     Long statDrugUserIdsCount(@Param("drugUserIds") String drugUserIds,@Param("type") Integer type);
 
     DoctorCallInfo findBySinToken(String sinToken);
+
+    @Modifying
+    @Query("update DoctorCallInfo d set d.delFlag=1 where d.doctor.id=:doctorId and d.drugUserId=:drugUserId and d.productId=:productId")
+    void updateDoctorIdAndDrugUserIdAndProductId(@Param("doctorId") Long doctorId,@Param("drugUserId") Long drugUserId,@Param("productId") Long productId);
 
 }

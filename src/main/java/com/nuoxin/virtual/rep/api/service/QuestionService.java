@@ -47,6 +47,7 @@ public class QuestionService extends BaseService {
         questionnaire.setCreateTime(new Date());
         questionnaire.setTitle(bean.getTitle());
         questionnaire.setCreateId(bean.getDrugUserId());
+        questionnaire.setProductId(bean.getProductId());
 
         questionnaireRepository.saveAndFlush(questionnaire);
         List<QuestionRequestBean> list = bean.getQuestions();
@@ -75,6 +76,7 @@ public class QuestionService extends BaseService {
         questionnaire.setTitle(bean.getTitle());
         questionnaire.setCreateId(bean.getDrugUserId());
         questionnaire.setId(bean.getId());
+        questionnaire.setProductId(bean.getProductId());
 
         questionnaireRepository.saveAndFlush(questionnaire);
         List<QuestionRequestBean> list = bean.getQuestions();
@@ -105,7 +107,7 @@ public class QuestionService extends BaseService {
     @Transactional(readOnly = false)
     @CacheEvict(value = "virtual_rep_api_question",allEntries = true)
     public Boolean delete(Long id){
-        questionnaireRepository.delete(id);
+        questionnaireRepository.updateDelFlag(id);
         questionRepository.deleteByQuestionnaireId(id);
         return true;
     }
@@ -124,6 +126,7 @@ public class QuestionService extends BaseService {
                 if(StringUtils.isNotEmtity(bean.getQuery())){
                     predicates.add(cb.like(root.get("title").as(String.class),"%"+bean.getQuery()+"%"));
                 }
+                predicates.add(cb.equal(root.get("delFlag").as(Integer.class),0));
                 query.where(cb.and(cb.and(predicates.toArray(new Predicate[0]))));
                 return query.getRestriction();
             }

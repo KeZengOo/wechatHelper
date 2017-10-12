@@ -4,6 +4,7 @@ import com.nuoxin.virtual.rep.api.common.util.ValidationCode;
 import com.nuoxin.virtual.rep.api.common.util.mem.SessionMemUtils;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
+import com.nuoxin.virtual.rep.api.web.controller.request.EmailRequestBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,8 @@ public class EmailService {
 
     @Autowired
     private SessionMemUtils memUtils;
+    @Autowired
+    private DoctorService doctorService;
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -62,30 +65,8 @@ public class EmailService {
         return uuid;
     }
 
-    private String getEmailPwdSendMsg(){
-        StringBuffer sb = new StringBuffer("");
-        BufferedReader reader = null;
-        try {
-            File file = ResourceUtils.getFile("classpath:1pwd_email.vm");
-            reader = new BufferedReader(new FileReader(file));
-            String tempString = null;
-            int line = 1;
-            while ((tempString = reader.readLine()) != null) {
-                sb.append(tempString);
-                line++;
-            }
-            reader.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e1) {
-                }
-            }
-        }
-        return sb.toString();
+    public boolean commonEmailSend(EmailRequestBean bean){
+        return true;
     }
 
 }

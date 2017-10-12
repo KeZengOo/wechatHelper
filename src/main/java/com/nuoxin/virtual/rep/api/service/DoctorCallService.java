@@ -116,6 +116,7 @@ public class DoctorCallService extends BaseService {
 
                 }
                 predicates.add(cb.like(root.get("doctor").get("drugUserIds").as(String.class),"%,"+bean.getDrugUserId()+",%"));
+                predicates.add(cb.equal(root.get("delFlag").as(Integer.class),0));
                 query.where(cb.and(cb.and(predicates.toArray(new Predicate[0]))));
                 return query.getRestriction();
             }
@@ -157,6 +158,7 @@ public class DoctorCallService extends BaseService {
                     predicates.add(cb.equal(root.get("doctor").get("id").as(Long.class),bean.getDoctorId()));
                 }
                 predicates.add(cb.like(root.get("doctor").get("drugUserIds").as(String.class),"%,"+bean.getDrugUserId()+",%"));
+                predicates.add(cb.equal(root.get("delFlag").as(Integer.class),0));
                 query.where(cb.and(cb.and(predicates.toArray(new Predicate[0]))));
                 return query.getRestriction();
             }

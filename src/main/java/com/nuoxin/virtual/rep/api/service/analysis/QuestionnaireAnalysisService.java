@@ -1,4 +1,4 @@
-package com.nuoxin.virtual.rep.api.service;
+package com.nuoxin.virtual.rep.api.service.analysis;
 
 import com.nuoxin.virtual.rep.api.common.service.BaseService;
 import com.nuoxin.virtual.rep.api.mybatis.QuestionnaireAnalysisMapper;
