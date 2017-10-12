@@ -10,7 +10,7 @@ import javax.persistence.Table;
  * Created by fenggang on 9/14/17.
  */
 @Entity
-@Table(name = "virtual_doctor")
+@Table(name = "virtual_drug_user_doctor")
 public class DrugUserDoctor extends IdEntity {
 
     private static final long serialVersionUID = 4284825738968331250L;

@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public interface DrugUserDoctorRepository extends JpaRepository<DrugUserDoctor,Long>,JpaSpecificationExecutor<DrugUserDoctor> {
 
-    void deleteBydAndDoctorIdAndDrugUserId(Long doctorId,Long drugUserId);
-    void deleteBydAndDoctorIdAndDrugUserIdAAndProductId(Long doctorId,Long drugUserId,Long productId);
+    void deleteByDoctorIdAndDrugUserId(Long doctorId,Long drugUserId);
+    void deleteByDoctorIdAndDrugUserIdAndProductId(Long doctorId,Long drugUserId,Long productId);
 
 }
