@@ -349,11 +349,11 @@ public class HcpService extends BaseService {
 
         Long drugUserId = bean.getDrugUserId();
 
-        DrugUser firstById = drugUserRepository.findFirstById(drugUserId);
-        Long eappId = 0L;
-        if (firstById != null){
-            eappId = firstById.getEappId();
-        }
+//        DrugUser firstById = drugUserRepository.findFirstById(drugUserId);
+//        Long eappId = 0L;
+//        if (firstById != null){
+//            eappId = firstById.getEappId();
+//        }
 
         String allkeyword = "";
         /*Map<String, String> keys = getKeys(eappId);
@@ -372,7 +372,7 @@ public class HcpService extends BaseService {
             return keywordListResponseBean;
         }
 
-        Map<String, List<String>> map = getKeysList(eappId);
+        Map<String, List<String>> map = getKeysList(drugUserId);
         List<String> ckeywordList = new ArrayList<>();
         List<String> pkeywordList = new ArrayList<>();
         if (null != map && map.size() > 0){
