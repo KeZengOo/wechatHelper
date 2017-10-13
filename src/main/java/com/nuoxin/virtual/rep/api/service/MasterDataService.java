@@ -522,7 +522,7 @@ public class MasterDataService {
                     }
                 }
             }else {
-                logger.error("getHcpDocListByKeys of MasterDataService error!!! args id= "+ id
+                logger.error("getMagazine of MasterDataService error!!! args id= "+ id
 
                         +" resultcode =" +  magazineResult.getResultcode()
                         + " msg=" + magazineResult.getMsg() + " data=" + magazineResult.getData());
