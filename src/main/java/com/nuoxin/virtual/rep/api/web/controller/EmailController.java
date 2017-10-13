@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -35,7 +36,7 @@ public class EmailController extends BaseController {
     @ApiOperation(value = "邮件发送", notes = "邮件发送")
     @PostMapping("/send/ids")
     public DefaultResponseBean<Boolean> send(@RequestBody EmailRequestBean bean,
-                                             HttpServletRequest request, HttpServletResponse response){
+                                             HttpServletRequest request, HttpServletResponse response) throws MessagingException {
         logger.info("{}接口请求数据【】{}",request.getServletPath(), JSON.toJSONString(bean));
         DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
         if(!StringUtils.isNotEmtity(bean.getDoctorIds())){
