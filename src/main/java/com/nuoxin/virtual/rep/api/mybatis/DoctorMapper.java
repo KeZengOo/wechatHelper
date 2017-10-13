@@ -1,5 +1,6 @@
 package com.nuoxin.virtual.rep.api.mybatis;
 
+import com.nuoxin.virtual.rep.api.common.util.MyMapper;
 import com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.work.CustomerSumResponseBean;
 
@@ -8,7 +9,9 @@ import java.util.List;
 /**
  * Create by tiancun on 2017/10/12
  */
-public interface DoctorMapper {
+public interface DoctorMapper extends MyMapper{
+
+
 
     List<CustomerSumResponseBean> getCustomerSumStatistic(WorkStationRequestBean bean);
 

@@ -59,13 +59,24 @@ public class HcpService extends BaseService {
     private Long getMasterDataIdByHcpId(Long hcpId){
         Long id = 0L;
         Doctor doctor = doctorRepository.findFirstById(hcpId);
-        if (null != doctor){
-            Long masterDataId = doctor.getMasterDateId();
-            if (masterDataId != null && masterDataId > 0){
-                id = masterDataId;
-            }
+//        if (null != doctor){
+//            Long masterDataId = doctor.getMasterDateId();
+//            if (masterDataId != null && masterDataId > 0){
+//                id = masterDataId;
+//            }
+//
+//        }
 
+        //改成查营销的数据库了
+        if (null != doctor){
+            String name = doctor.getName();
+            String hospitalName = doctor.getHospitalName();
+            Hcp hcp = masterDataService.getHcpByHciIdAndHcpName(hospitalName, name);
+            if (null != hcp){
+                id = hcp.getId();
+            }
         }
+
 
         return id;
     }
@@ -168,7 +179,8 @@ public class HcpService extends BaseService {
     public HcpSocietyResponseBean getHcpSociety(Long hcpId){
         HcpSocietyResponseBean hcpSocietyResponseBean = new HcpSocietyResponseBean();
 
-        Doctor doctor = doctorRepository.findFirstById(hcpId);
+        //改成查营销的数据库了
+        //Doctor doctor = doctorRepository.findFirstById(hcpId);
         hcpId = getMasterDataIdByHcpId(hcpId);
 
 
@@ -252,7 +264,8 @@ public class HcpService extends BaseService {
 
         Long hcpId = bean.getHcpId();
 
-        Doctor doctor = doctorRepository.findFirstById(hcpId);
+        //改成查营销的数据了
+        //Doctor doctor = doctorRepository.findFirstById(hcpId);
         hcpId = getMasterDataIdByHcpId(hcpId);
 
 
@@ -417,7 +430,8 @@ public class HcpService extends BaseService {
     public HcpPentagonResponseBean getHcpPentagon(Long hcpId){
         HcpPentagonResponseBean hcpPentagonResponseBean = new HcpPentagonResponseBean();
 
-        Doctor doctor = doctorRepository.findFirstById(hcpId);
+        //改成查营销的数据库了
+        //Doctor doctor = doctorRepository.findFirstById(hcpId);
         hcpId = getMasterDataIdByHcpId(hcpId);
 
 
@@ -471,7 +485,8 @@ public class HcpService extends BaseService {
     public HcpResearchInfoResponseBean getHcpResearchInfo(Long hcpId){
         HcpResearchInfoResponseBean hcpResearchInfoResponseBean = new HcpResearchInfoResponseBean();
 
-        Doctor doctor = doctorRepository.findFirstById(hcpId);
+        //改成查营销的数据库了
+        //Doctor doctor = doctorRepository.findFirstById(hcpId);
         hcpId = getMasterDataIdByHcpId(hcpId);
 
 
