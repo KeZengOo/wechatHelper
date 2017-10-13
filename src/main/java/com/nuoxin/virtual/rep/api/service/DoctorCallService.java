@@ -115,7 +115,7 @@ public class DoctorCallService extends BaseService {
                     predicates.add(cb.lessThanOrEqualTo(root.get("createTime").as(Date.class),end));
 
                 }
-                predicates.add(cb.like(root.get("doctor").get("drugUserIds").as(String.class),"%,"+bean.getDrugUserId()+",%"));
+                predicates.add(cb.like(root.get("doctor").get("doctorVirtual").get("drugUserIds").as(String.class),"%,"+bean.getDrugUserId()+",%"));
                 predicates.add(cb.equal(root.get("delFlag").as(Integer.class),0));
                 query.where(cb.and(cb.and(predicates.toArray(new Predicate[0]))));
                 return query.getRestriction();
@@ -157,7 +157,7 @@ public class DoctorCallService extends BaseService {
                 if(bean.getDoctorId()!=null && bean.getDoctorId()>0){
                     predicates.add(cb.equal(root.get("doctor").get("id").as(Long.class),bean.getDoctorId()));
                 }
-                predicates.add(cb.like(root.get("doctor").get("drugUserIds").as(String.class),"%,"+bean.getDrugUserId()+",%"));
+                predicates.add(cb.like(root.get("doctor").get("doctorVirtual").get("drugUserIds").as(String.class),"%,"+bean.getDrugUserId()+",%"));
                 predicates.add(cb.equal(root.get("delFlag").as(Integer.class),0));
                 query.where(cb.and(cb.and(predicates.toArray(new Predicate[0]))));
                 return query.getRestriction();
@@ -352,7 +352,7 @@ public class DoctorCallService extends BaseService {
     private CallResponseBean _getCallResponseBean(DoctorCallInfo info){
         CallResponseBean responseBean = new CallResponseBean();
         if(info!=null){
-            responseBean.setClientLevel(info.getDoctor().getClientLevel());
+            //responseBean.setClientLevel(info.getDoctor().getClientLevel());
             responseBean.setDoctorId(info.getDoctor().getId());
             responseBean.setDoctorMobile(info.getDoctor().getMobile());
             responseBean.setDoctorName(info.getDoctor().getName());

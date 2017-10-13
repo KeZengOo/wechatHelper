@@ -60,10 +60,10 @@ public class HcpService extends BaseService {
         Long id = 0L;
         Doctor doctor = doctorRepository.findFirstById(hcpId);
         if (null != doctor){
-            Long masterDataId = doctor.getMasterDateId();
-            if (masterDataId != null && masterDataId > 0){
-                id = masterDataId;
-            }
+//            Long masterDataId = doctor.getMasterDateId();
+//            if (masterDataId != null && masterDataId > 0){
+//                id = masterDataId;
+//            }
 
         }
 
@@ -104,7 +104,7 @@ public class HcpService extends BaseService {
         if (null != doctor){
             hcpBaseInfoResponseBean.setDoctorName(doctor.getName());
             hcpBaseInfoResponseBean.setHospitalName(doctor.getHospitalName());
-            hcpBaseInfoResponseBean.setHospitalLevel(doctor.getHospitalLevel());
+            //hcpBaseInfoResponseBean.setHospitalLevel(doctor.getHospitalLevel());
         }
 
 

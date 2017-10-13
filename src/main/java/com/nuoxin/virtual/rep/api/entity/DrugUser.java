@@ -5,23 +5,28 @@ import com.nuoxin.virtual.rep.api.common.entity.IdEntity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.util.Date;
 
 /**
  * Created by fenggang on 9/11/17.
  */
 @Entity
-@Table(name = "virtual_drug_user")
+@Table(name = "drug_user")
 public class DrugUser extends IdEntity {
 
     private static final long serialVersionUID = 9090513690988883094L;
 
     @Column(name = "name")
     private String name;
-    @Column(name = "eapp_id")
+    @Transient
     private Long eappId;
+    @Column(name = "telephone")
+    private String telephone;
     @Column(name = "password")
     private String password;
+    @Column(name = "new_password")
+    private String newPassword;
     @Column(name = "email")
     private String email;
     @Column(name = "mobile")
@@ -32,6 +37,12 @@ public class DrugUser extends IdEntity {
     private Date createTime;
     @Column(name = "call_info")
     private String callInfo;
+    @Column(name = "leader_id")
+    private Long leaderId;
+    @Column(name = "leader_path")
+    private String leaderPath;
+    @Column(name = "user_type")
+    private Integer userType;
 
     public String getName() {
         return name;
@@ -95,5 +106,45 @@ public class DrugUser extends IdEntity {
 
     public void setCallInfo(String callInfo) {
         this.callInfo = callInfo;
+    }
+
+    public String getTelephone() {
+        return telephone;
+    }
+
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
+    }
+
+    public String getNewPassword() {
+        return newPassword;
+    }
+
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
+    }
+
+    public Long getLeaderId() {
+        return leaderId;
+    }
+
+    public void setLeaderId(Long leaderId) {
+        this.leaderId = leaderId;
+    }
+
+    public String getLeaderPath() {
+        return leaderPath;
+    }
+
+    public void setLeaderPath(String leaderPath) {
+        this.leaderPath = leaderPath;
+    }
+
+    public Integer getUserType() {
+        return userType;
+    }
+
+    public void setUserType(Integer userType) {
+        this.userType = userType;
     }
 }

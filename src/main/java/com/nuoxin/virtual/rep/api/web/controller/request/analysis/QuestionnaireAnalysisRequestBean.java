@@ -18,9 +18,13 @@ public class QuestionnaireAnalysisRequestBean implements Serializable {
     private String startDate;
     @ApiModelProperty(value = "结束日期")
     private String endDate;
+    @ApiModelProperty(value = "问卷id")
+    private Long questionnaireId;
 
     @ApiModelProperty(value = "不用传")
     private Long drugUserId;
+    @ApiModelProperty(value = "不用传")
+    private String leaderPath = "%";
 
     public Long getDrugUserId() {
         return drugUserId;
@@ -44,5 +48,21 @@ public class QuestionnaireAnalysisRequestBean implements Serializable {
 
     public void setEndDate(String endDate) {
         this.endDate = endDate;
+    }
+
+    public Long getQuestionnaireId() {
+        return questionnaireId;
+    }
+
+    public void setQuestionnaireId(Long questionnaireId) {
+        this.questionnaireId = questionnaireId;
+    }
+
+    public String getLeaderPath() {
+        return leaderPath;
+    }
+
+    public void setLeaderPath(String leaderPath) {
+        this.leaderPath = leaderPath;
     }
 }
