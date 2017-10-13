@@ -29,7 +29,7 @@ public class DrugUser extends IdEntity {
     private String newPassword;
     @Column(name = "email")
     private String email;
-    @Column(name = "mobile")
+    @Column(name = "telephone")
     private String mobile;
     @Column(name = "drug_name")
     private String drugName;

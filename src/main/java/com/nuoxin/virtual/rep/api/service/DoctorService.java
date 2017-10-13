@@ -209,13 +209,13 @@ public class DoctorService extends BaseService {
         doctor.setMobile(bean.getMobile());
         doctor.setName(bean.getName());
         //TODO  获取主数据id
-//        if (StringUtils.isNotEmtity(bean.getHospitalName())) {
-//            Hcp hcp = masterDataService.getHcpByHciIdAndHcpName(bean.getHospitalName(), bean.getName());
-//            if (hcp != null) {
+        if (StringUtils.isNotEmtity(bean.getHospitalName())) {
+            Hcp hcp = masterDataService.getHcpByHciIdAndHcpName(bean.getHospitalName(), bean.getName());
+            if (hcp != null) {
 //                doctor.setMasterDateId(hcp.getId());
-//                doctor.setHospitalId(hcp.getHciId());
-//            }
-//        }
+                doctor.setHospitalId(hcp.getHciId());
+            }
+        }
 
         //TODO 营销数据
 //        DoctorVo vo = centerDataService.checkout(doctor);
