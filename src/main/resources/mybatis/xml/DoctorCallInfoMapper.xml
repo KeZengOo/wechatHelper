@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.DoctorCallInfoMapper">
+
+    <select id="getCallInfoStatistics" resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.TodayStatisticsResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+
+            select (select count(vdci.virtual_doctor_id) callCount from virtual_doctor_call_info vdci
+            inner join virtual_doctor_call_info_details vdcid
+            on vdci.id = vdcid.call_id
+            inner join virtual_doctor vd
+            on vdci.virtual_doctor_id=vd.id
+            inner join virtual_drug_user_doctor vdud
+            on vd.id = vdud.virtual_doctor_id
+            where
+            vd.drug_user_ids like #{drugUserIdStr}
+            and vdud.product_id= #{productId}
+            and vdcid.status_name='answer'
+            and vdci.product_id=#{productId}
+            and date_format(vdci.create_time, '%Y-%m-%d')=date_format(NOW(), '%Y-%m-%d')
+            ) as callCount,
+            (select count(distinct vdci.virtual_doctor_id) from virtual_doctor_call_info vdci
+            inner join virtual_doctor_call_info_details vdcid
+            on vdci.id = vdcid.call_id
+            inner join virtual_doctor vd
+            on vdci.virtual_doctor_id=vd.id
+            inner join virtual_drug_user_doctor vdud
+            on vd.id = vdud.virtual_doctor_id
+            where
+            vd.drug_user_ids like #{drugUserIdStr}
+            and vdud.product_id= #{productId}
+            and vdcid.status_name='answer'
+            and vdci.product_id=#{productId}
+            and date_format(vdci.create_time, '%Y-%m-%d')=date_format(NOW(), '%Y-%m-%d')
+            ) as callSum
+
+    </select>
+
+
+    <select id="getCallInfoTimeStatistics" resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.TodayStatisticsResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+
+            select ifnull(sum(vdci.call_time),0) as callTotalTime from virtual_doctor_call_info vdci
+            inner join virtual_doctor_call_info_details vdcid
+            on vdci.id = vdcid.call_id
+            inner join virtual_doctor vd
+            on vdci.virtual_doctor_id=vd.id
+            inner join virtual_drug_user_doctor vdud
+            on vd.id = vdud.virtual_doctor_id
+            where
+            vd.drug_user_ids like  #{drugUserIdStr}
+            and vdud.product_id= #{productId}
+            and vdcid.status_name='answer'
+            and vdci.product_id=#{productId}
+            and date_format(vdci.create_time, '%Y-%m-%d')=date_format(NOW(), '%Y-%m-%d')
+
+    </select>
+
+</mapper>

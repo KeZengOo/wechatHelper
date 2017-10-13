@@ -5,6 +5,7 @@ import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BaseException;
 import com.nuoxin.virtual.rep.api.common.exception.FileFormatException;
 import com.nuoxin.virtual.rep.api.common.service.BaseService;
+import com.nuoxin.virtual.rep.api.dao.MeetingDetailRepository;
 import com.nuoxin.virtual.rep.api.dao.MeetingRepository;
 import com.nuoxin.virtual.rep.api.entity.Meeting;
 import com.nuoxin.virtual.rep.api.entity.Message;
@@ -47,6 +48,9 @@ public class MeetingService extends BaseService {
 
     @Autowired
     private MeetingRepository meetingRepository;
+
+    @Autowired
+    private MeetingDetailRepository meetingDetailRepository;
 
 
 
@@ -192,10 +196,15 @@ public class MeetingService extends BaseService {
         return meetingPage;
     }
 
+
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public boolean delete(Long id){
+        boolean flag = false;
+        meetingDetailRepository.deleteAllByMeetingId(id);
+        meetingRepository.delete(id);
 
-        return true;
+        flag = true;
+        return flag;
     }
 
 }

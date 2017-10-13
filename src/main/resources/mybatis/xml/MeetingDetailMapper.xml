@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.MeetingDetailMapper">
+
+    <select id="getMeetingStatistic" resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.TodayStatisticsResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+        select
+        count(vmd.doctor_id) as meetingCount,
+        ifnull(sum(vmd.attend_sum_time),0) as meetingTotalTime,
+        count(distinct vmd.doctor_id) as meetingTotalPerson,
+        ROUND(ifnull(sum(vmd.attend_sum_time),0)/if(count(distinct vmd.doctor_id)=0,1,count(distinct vmd.doctor_id)),1) as meetingAvgTime
+        from
+        virtual_meeting_detail vmd
+        inner join
+        virtual_meeting vm
+        on vmd.meeting_id=vm.id
+        inner join virtual_doctor vd
+        on vmd.doctor_id = vd.id
+        inner join virtual_drug_user_doctor vdud
+        on vd.id = vdud.virtual_doctor_id
+        where
+        vm.product_id = #{productId}
+        and date_format(vm.meeting_start_time,'%Y-%m-%d')=date_format(now(),'%Y-%m-%d')
+        and vd.drug_user_ids like #{drugUserIdStr}
+        and vdud.product_id = #{productId}
+    </select>
+
+
+</mapper>

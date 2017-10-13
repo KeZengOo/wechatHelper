@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.DoctorMapper">
+
+
+    <select id="getCustomerSumStatistic"
+            resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.CustomerSumResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+        select count(vd.client_level) as typeSum ,vd.client_level as type from virtual_doctor vd
+        inner join virtual_drug_user_doctor vdud
+        on vd.id = vdud.virtual_doctor_id
+        where vdud.product_id=#{productId}
+        and vd.drug_user_ids like #{drugUserIdStr}
+        group by vd.client_level
+
+    </select>
+
+
+    <select id="getCustomerAddStatistic"
+            resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.CustomerSumResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+
+    </select>
+
+
+    <select id="getCustomerCoveredStatistic"
+            resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.CustomerSumResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+
+    </select>
+
+</mapper>
