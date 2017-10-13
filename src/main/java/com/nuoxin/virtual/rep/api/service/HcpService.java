@@ -75,6 +75,7 @@ public class HcpService extends BaseService {
             if (null != hcp){
                 id = hcp.getId();
             }
+
         }
 
 
@@ -115,7 +116,7 @@ public class HcpService extends BaseService {
         if (null != doctor){
             hcpBaseInfoResponseBean.setDoctorName(doctor.getName());
             hcpBaseInfoResponseBean.setHospitalName(doctor.getHospitalName());
-            hcpBaseInfoResponseBean.setHospitalLevel(doctor.getHospitalLevel());
+            //hcpBaseInfoResponseBean.setHospitalLevel(doctor.getHospitalLevel());
         }
 
 

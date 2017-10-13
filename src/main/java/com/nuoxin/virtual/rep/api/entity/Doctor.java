@@ -2,49 +2,45 @@ package com.nuoxin.virtual.rep.api.entity;
 
 import com.nuoxin.virtual.rep.api.common.entity.IdEntity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 /**
  * Created by fenggang on 9/11/17.
  */
 @Entity
-@Table(name = "virtual_doctor")
+@Table(name = "doctor")
 public class Doctor extends IdEntity {
 
     private static final long serialVersionUID = 4739090689831737455L;
 
-    @Column(name = "eapp_id")
+    @Transient
     private Long eappId;
-    @Column(name = "master_data_id")
-    private Long masterDateId;
+    @Column(name = "email")
+    private String email;
     @Column(name = "name")
     private String name;
     @Column(name = "hospital_id")
     private Long hospitalId;
     @Column(name = "hospital_name")
     private String hospitalName;
-    @Column(name = "hospital_level")
-    private String hospitalLevel;
-    @Column(name = "province")
+    @Column(name = "provice")
     private String province;
     @Column(name = "city")
     private String city;
-    @Column(name = "department")
+    @Column(name = "depart")
     private String department;
-    @Column(name = "mobile")
+    @Column(name = "telephone")
     private String mobile;
-    @Column(name = "doctor_level")
+    @Column(name = "positions")
     private String doctorLevel;
-    @Column(name = "client_level")
-    private String clientLevel;
     @Column(name = "create_time")
     private Date createTime;
+    @Column(name = "status")
+    private Integer status;
 
-    @Column(name = "drug_user_ids")
-    private String drugUserIds;
+    @OneToOne(mappedBy = "doctor")
+    private DoctorVirtual doctorVirtual;
 
     public Long getEappId() {
         return eappId;
@@ -52,14 +48,6 @@ public class Doctor extends IdEntity {
 
     public void setEappId(Long eappId) {
         this.eappId = eappId;
-    }
-
-    public Long getMasterDateId() {
-        return masterDateId;
-    }
-
-    public void setMasterDateId(Long masterDateId) {
-        this.masterDateId = masterDateId;
     }
 
     public String getName() {
@@ -84,14 +72,6 @@ public class Doctor extends IdEntity {
 
     public void setHospitalName(String hospitalName) {
         this.hospitalName = hospitalName;
-    }
-
-    public String getHospitalLevel() {
-        return hospitalLevel;
-    }
-
-    public void setHospitalLevel(String hospitalLevel) {
-        this.hospitalLevel = hospitalLevel;
     }
 
     public String getProvince() {
@@ -134,14 +114,6 @@ public class Doctor extends IdEntity {
         this.doctorLevel = doctorLevel;
     }
 
-    public String getClientLevel() {
-        return clientLevel;
-    }
-
-    public void setClientLevel(String clientLevel) {
-        this.clientLevel = clientLevel;
-    }
-
     public Date getCreateTime() {
         return createTime;
     }
@@ -150,11 +122,27 @@ public class Doctor extends IdEntity {
         this.createTime = createTime;
     }
 
-    public String getDrugUserIds() {
-        return drugUserIds;
+    public String getEmail() {
+        return email;
     }
 
-    public void setDrugUserIds(String drugUserIds) {
-        this.drugUserIds = drugUserIds;
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public DoctorVirtual getDoctorVirtual() {
+        return doctorVirtual;
+    }
+
+    public void setDoctorVirtual(DoctorVirtual doctorVirtual) {
+        this.doctorVirtual = doctorVirtual;
     }
 }

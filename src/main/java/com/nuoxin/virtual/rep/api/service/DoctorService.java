@@ -139,16 +139,16 @@ public class DoctorService extends BaseService {
         Doctor doctor = doctorRepository.findTopByMobile(bean.getMobile());
         if (doctor == null) {
             doctor = new Doctor();
-            doctor.setDrugUserIds("," + bean.getDrugUserId() + ",");
+            //doctor.setDrugUserIds("," + bean.getDrugUserId() + ",");
         } else {
-            doctor.setDrugUserIds(doctor.getDrugUserIds() + bean.getDrugUserId() + ',');
+            //doctor.setDrugUserIds(doctor.getDrugUserIds() + bean.getDrugUserId() + ',');
         }
 //        BeanUtils.copyProperties(bean,doctor);
         doctor.setCity(bean.getCity());
-        doctor.setClientLevel(bean.getClientLevel());
+        //doctor.setClientLevel(bean.getClientLevel());
         doctor.setDepartment(bean.getDepartment());
         doctor.setDoctorLevel(bean.getDoctorLevel());
-        doctor.setHospitalLevel(bean.getHospitalLevel());
+       // doctor.setHospitalLevel(bean.getHospitalLevel());
         doctor.setHospitalName(bean.getHospitalName());
         doctor.setMobile(bean.getMobile());
         doctor.setName(bean.getName());
@@ -158,7 +158,7 @@ public class DoctorService extends BaseService {
             Hcp hcp = masterDataService.getHcpByHciIdAndHcpName(bean.getHospitalName(), bean.getName());
             if (hcp != null) {
                 logger.info("保存【{}】医生时查询主数据对应的医生id写入数据库,写入成功", doctor.getName());
-                doctor.setMasterDateId(hcp.getId());
+                //doctor.setMasterDateId(hcp.getId());
                 doctor.setHospitalId(hcp.getHciId());
             }
         }
@@ -178,6 +178,7 @@ public class DoctorService extends BaseService {
         dud.setDoctorId(doctor.getId());
         dud.setProductId(bean.getProductId());
         dud.setDrugUserId(bean.getDrugUserId());
+        dud.setCreateTime(new Date());
         drugUserDoctorRepository.saveAndFlush(dud);
 
 
@@ -194,16 +195,16 @@ public class DoctorService extends BaseService {
         Doctor doctor = doctorRepository.findTopByMobile(bean.getMobile());
         if (doctor == null) {
             doctor = new Doctor();
-            doctor.setDrugUserIds("," + bean.getDrugUserId() + ",");
+            //doctor.setDrugUserIds("," + bean.getDrugUserId() + ",");
         } else {
-            doctor.setDrugUserIds(doctor.getDrugUserIds() + bean.getDrugUserId() + ',');
+            //doctor.setDrugUserIds(doctor.getDrugUserIds() + bean.getDrugUserId() + ',');
         }
 //        BeanUtils.copyProperties(bean,doctor);
         doctor.setCity(bean.getCity());
-        doctor.setClientLevel(bean.getClientLevel());
+        //doctor.setClientLevel(bean.getClientLevel());
         doctor.setDepartment(bean.getDepartment());
         doctor.setDoctorLevel(bean.getDoctorLevel());
-        doctor.setHospitalLevel(bean.getHospitalLevel());
+        //doctor.setHospitalLevel(bean.getHospitalLevel());
         doctor.setHospitalName(bean.getHospitalName());
         doctor.setMobile(bean.getMobile());
         doctor.setName(bean.getName());
@@ -233,6 +234,7 @@ public class DoctorService extends BaseService {
             dud.setDoctorId(doctor.getId());
             dud.setProductId(bean.getProductId());
             dud.setDrugUserId(bean.getDrugUserId());
+            dud.setCreateTime(new Date());
             drugUserDoctorRepository.saveAndFlush(dud);
         }
 
@@ -284,16 +286,16 @@ public class DoctorService extends BaseService {
             doctor.setProvince(excel.getProvince());
             doctor.setDoctorLevel(excel.getPosition());
             doctor.setMobile(excel.getMobile());
-            doctor.setClientLevel(excel.getSex());
+            //doctor.setClientLevel(excel.getSex());
             //TODO 主数据id
             logger.info("保存【{}】医生时查询主数据对应的医生id写入数据库", doctor.getName());
             if (StringUtils.isNotEmtity(excel.getHospitalName())) {
                 Hcp hcp = masterDataService.getHcpByHciIdAndHcpName(excel.getHospitalName(), excel.getDoctorName());
                 if (hcp != null) {
                     logger.info("保存【{}】医生时查询主数据对应的医生id写入数据库,写入成功", doctor.getName());
-                    doctor.setMasterDateId(hcp.getId());
+                    //doctor.setMasterDateId(hcp.getId());
                     doctor.setHospitalId(hcp.getHciId());
-                    doctor.setHospitalLevel("");
+                    //doctor.setHospitalLevel("");
                 }
             }
 
@@ -303,19 +305,19 @@ public class DoctorService extends BaseService {
                 if (map.get(excel.getDrugUserEmail()) == null) {
                     DrugUser drugUser = drugUserService.findByEmail(excel.getDrugUserEmail());
                     if (drugUser != null) {
-                        if (StringUtils.isNotEmtity(doctor.getDrugUserIds())) {
-                            doctor.setDrugUserIds(doctor.getDrugUserIds() + drugUser.getId() + ",");
-                        } else {
-                            doctor.setDrugUserIds("," + drugUser.getId() + ",");
-                        }
+//                        if (StringUtils.isNotEmtity(doctor.getDrugUserIds())) {
+//                            doctor.setDrugUserIds(doctor.getDrugUserIds() + drugUser.getId() + ",");
+//                        } else {
+//                            doctor.setDrugUserIds("," + drugUser.getId() + ",");
+//                        }
                         map.put(excel.getDrugUserEmail(), drugUser.getId());
                     }
                 } else {
-                    if (StringUtils.isNotEmtity(doctor.getDrugUserIds())) {
-                        doctor.setDrugUserIds(doctor.getDrugUserIds() + map.get(excel.getDrugUserEmail()) + ",");
-                    } else {
-                        doctor.setDrugUserIds("," + map.get(excel.getDrugUserEmail()) + ",");
-                    }
+//                    if (StringUtils.isNotEmtity(doctor.getDrugUserIds())) {
+//                        doctor.setDrugUserIds(doctor.getDrugUserIds() + map.get(excel.getDrugUserEmail()) + ",");
+//                    } else {
+//                        doctor.setDrugUserIds("," + map.get(excel.getDrugUserEmail()) + ",");
+//                    }
                 }
 
             }

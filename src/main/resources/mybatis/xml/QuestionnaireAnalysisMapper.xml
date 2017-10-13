@@ -2,6 +2,21 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.nuoxin.virtual.rep.api.mybatis.QuestionnaireAnalysisMapper">
 
+    <resultMap id="questionnaireResponseBean" type="com.nuoxin.virtual.rep.api.web.controller.response.question.QuestionnaireResponseBean">
+        <result column="questionnaire_id" property="id" jdbcType="BIGINT"/>
+        <result column="title" property="title" jdbcType="VARCHAR"/>
+        <result column="product_id" property="productId" jdbcType="BIGINT"/>
+    </resultMap>
 
+    <select id="list" resultMap="questionnaireResponseBean" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.QuestionnaireAnalysisRequestBean">
+        select dq.virtual_questionnaire_id questionnaire_id,q.title,q.product_id from virtual_doctor_questionnaire dq join virtual_questionnaire q on q.id=dq.virtual_questionnaire_id join virtual_drug_user du on du.id=dq.virtual_drug_user_id where 1=1
+        <if test="startDate!=null and startDate!=''">
+            AND dq.create_time &gt;= '2017-02-01'
+        </if>
+        <if test="endDate!=null and endDate!=''">
+            AND dq.create_time &lt;= '2017-12-01'
+        </if>
+        and du.leader_path like #{leaderPath,jdbcType=VARCHAR} GROUP BY dq.virtual_questionnaire_id;
+    </select>
 
 </mapper>
