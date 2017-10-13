@@ -18,6 +18,8 @@ public class EmailRequestBean implements Serializable {
     private String title;
     @ApiModelProperty(value = "邮件内容")
     private String content;
+    @ApiModelProperty(value = "产品id")
+    private Long productId;
 
     @ApiModelProperty(value = "不用传")
     private Long drugUserId;
@@ -52,5 +54,13 @@ public class EmailRequestBean implements Serializable {
 
     public void setDrugUserId(Long drugUserId) {
         this.drugUserId = drugUserId;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 }

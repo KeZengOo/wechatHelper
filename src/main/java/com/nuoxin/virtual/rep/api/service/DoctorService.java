@@ -7,8 +7,10 @@ import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.common.service.BaseService;
 import com.nuoxin.virtual.rep.api.common.util.StringUtils;
 import com.nuoxin.virtual.rep.api.dao.DoctorRepository;
+import com.nuoxin.virtual.rep.api.dao.DoctorVirtualRepository;
 import com.nuoxin.virtual.rep.api.dao.DrugUserDoctorRepository;
 import com.nuoxin.virtual.rep.api.entity.Doctor;
+import com.nuoxin.virtual.rep.api.entity.DoctorVirtual;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.DrugUserDoctor;
 import com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean;
@@ -49,7 +51,7 @@ public class DoctorService extends BaseService {
     @Autowired
     private DrugUserService drugUserService;
     @Autowired
-    private CenterDataService centerDataService;
+    private DoctorVirtualRepository doctorVirtualRepository;
     @Autowired
     private MasterDataService masterDataService;
     @Autowired
@@ -137,11 +139,13 @@ public class DoctorService extends BaseService {
     @CacheEvict(value = "virtual_rep_api_doctor", allEntries = true)
     public Boolean save(DoctorRequestBean bean) {
         Doctor doctor = doctorRepository.findTopByMobile(bean.getMobile());
+        DoctorVirtual virtual = new DoctorVirtual();
         if (doctor == null) {
             doctor = new Doctor();
-            //doctor.setDrugUserIds("," + bean.getDrugUserId() + ",");
+            virtual.setDrugUserIds("," + bean.getDrugUserId() + ",");
         } else {
-            //doctor.setDrugUserIds(doctor.getDrugUserIds() + bean.getDrugUserId() + ',');
+            virtual = doctor.getDoctorVirtual();
+            virtual.setDrugUserIds(virtual.getDrugUserIds() + bean.getDrugUserId() + ',');
         }
 //        BeanUtils.copyProperties(bean,doctor);
         doctor.setCity(bean.getCity());
@@ -152,6 +156,9 @@ public class DoctorService extends BaseService {
         doctor.setHospitalName(bean.getHospitalName());
         doctor.setMobile(bean.getMobile());
         doctor.setName(bean.getName());
+        doctor.setStatus(1);
+        virtual.setClientLevel(bean.getClientLevel());
+        virtual.setHospitalLevel(bean.getHospitalLevel());
         //TODO  获取主数据id
         logger.info("保存【{}】医生时查询主数据对应的医生id写入数据库", doctor.getName());
         if (StringUtils.isNotEmtity(bean.getHospitalName())) {
@@ -159,6 +166,7 @@ public class DoctorService extends BaseService {
             if (hcp != null) {
                 logger.info("保存【{}】医生时查询主数据对应的医生id写入数据库,写入成功", doctor.getName());
                 //doctor.setMasterDateId(hcp.getId());
+                virtual.setMasterDateId(hcp.getId());
                 doctor.setHospitalId(hcp.getHciId());
             }
         }
@@ -173,6 +181,9 @@ public class DoctorService extends BaseService {
         if (doctor.getId() == null) {
             throw new BusinessException(ErrorEnum.ERROR.getStatus(), "医生添加失败");
         }
+        virtual.setDoctor(doctor);
+        doctorVirtualRepository.saveAndFlush(virtual);
+
         //TODO 添加关系到关系表
         DrugUserDoctor dud = new DrugUserDoctor();
         dud.setDoctorId(doctor.getId());
@@ -193,11 +204,13 @@ public class DoctorService extends BaseService {
     @CacheEvict(value = "virtual_rep_api_doctor", allEntries = true)
     public Boolean update(DoctorRequestBean bean) {
         Doctor doctor = doctorRepository.findTopByMobile(bean.getMobile());
+        DoctorVirtual virtual = new DoctorVirtual();
         if (doctor == null) {
             doctor = new Doctor();
-            //doctor.setDrugUserIds("," + bean.getDrugUserId() + ",");
+            virtual.setDrugUserIds("," + bean.getDrugUserId() + ",");
         } else {
-            //doctor.setDrugUserIds(doctor.getDrugUserIds() + bean.getDrugUserId() + ',');
+            virtual = doctor.getDoctorVirtual();
+            virtual.setDrugUserIds(virtual.getDrugUserIds() + bean.getDrugUserId() + ',');
         }
 //        BeanUtils.copyProperties(bean,doctor);
         doctor.setCity(bean.getCity());
@@ -208,11 +221,14 @@ public class DoctorService extends BaseService {
         doctor.setHospitalName(bean.getHospitalName());
         doctor.setMobile(bean.getMobile());
         doctor.setName(bean.getName());
+        virtual.setClientLevel(bean.getClientLevel());
+        virtual.setHospitalLevel(bean.getHospitalLevel());
         //TODO  获取主数据id
         if (StringUtils.isNotEmtity(bean.getHospitalName())) {
             Hcp hcp = masterDataService.getHcpByHciIdAndHcpName(bean.getHospitalName(), bean.getName());
             if (hcp != null) {
 //                doctor.setMasterDateId(hcp.getId());
+                virtual.setMasterDateId(hcp.getId());
                 doctor.setHospitalId(hcp.getHciId());
             }
         }
@@ -227,6 +243,10 @@ public class DoctorService extends BaseService {
         if (doctor.getId() == null) {
             throw new BusinessException(ErrorEnum.ERROR.getStatus(), "医生修改失败");
         }
+
+        virtual.setDoctor(doctor);
+        doctorVirtualRepository.saveAndFlush(virtual);
+
         //TODO 添加关系到关系表
         DrugUserDoctor dud = drugUserDoctorRepository.findByDoctorIdAndDrugUserIdAndProductId(doctor.getId(), bean.getDrugUserId(), bean.getProductId());
         if (dud == null) {
@@ -272,12 +292,16 @@ public class DoctorService extends BaseService {
         for (int i = 0, leng = list.size(); i < leng; i++) {
             DoctorExcel excel = list.get(i);
             Doctor doctor = new Doctor();
+            DoctorVirtual virtual = new DoctorVirtual();
             if (doctors != null && !doctors.isEmpty() && StringUtils.isNotEmtity(excel.getMobile())) {
                 for (Doctor d : doctors) {
                     if (d.getMobile().equals(excel.getMobile())) {
                         doctor = d;
                     }
                 }
+            }
+            if(doctor.getMobile()!=null){
+                virtual = doctor.getDoctorVirtual();
             }
             doctor.setCity(excel.getCity());
             doctor.setName(excel.getDoctorName());
@@ -286,16 +310,110 @@ public class DoctorService extends BaseService {
             doctor.setProvince(excel.getProvince());
             doctor.setDoctorLevel(excel.getPosition());
             doctor.setMobile(excel.getMobile());
-            //doctor.setClientLevel(excel.getSex());
+            virtual.setClientLevel(excel.getSex());
             //TODO 主数据id
             logger.info("保存【{}】医生时查询主数据对应的医生id写入数据库", doctor.getName());
             if (StringUtils.isNotEmtity(excel.getHospitalName())) {
                 Hcp hcp = masterDataService.getHcpByHciIdAndHcpName(excel.getHospitalName(), excel.getDoctorName());
                 if (hcp != null) {
                     logger.info("保存【{}】医生时查询主数据对应的医生id写入数据库,写入成功", doctor.getName());
-                    //doctor.setMasterDateId(hcp.getId());
+                    virtual.setMasterDateId(hcp.getId());
                     doctor.setHospitalId(hcp.getHciId());
-                    //doctor.setHospitalLevel("");
+                    virtual.setHospitalLevel("");
+                }
+            }
+
+            Long drugUserId = null;
+            //TODO 销售代表
+            logger.info("保存【{}】医生时查询销售坐席写入医生表", doctor.getName());
+            if (StringUtils.isNotEmtity(excel.getDrugUserEmail())) {
+                if (map.get(excel.getDrugUserEmail()) == null) {
+                    DrugUser drugUser = drugUserService.findByEmail(excel.getDrugUserEmail());
+                    if (drugUser != null) {
+                        if (StringUtils.isNotEmtity(virtual.getDrugUserIds())) {
+                            virtual.setDrugUserIds(virtual.getDrugUserIds() + drugUser.getId() + ",");
+                        } else {
+                            virtual.setDrugUserIds("," + drugUser.getId() + ",");
+                        }
+                        map.put(excel.getDrugUserEmail(), drugUser.getId());
+                        drugUserId = drugUser.getId();
+                    }
+                } else {
+                    if (StringUtils.isNotEmtity(virtual.getDrugUserIds())) {
+                        virtual.setDrugUserIds(virtual.getDrugUserIds() + map.get(excel.getDrugUserEmail()) + ",");
+                    } else {
+                        virtual.setDrugUserIds("," + map.get(excel.getDrugUserEmail()) + ",");
+                    }
+                    drugUserId = map.get(excel.getDrugUserEmail());
+                }
+
+            }
+            //TODO 营销id
+//          DoctorVo vo = centerDataService.checkout(doctor);
+//          if (vo != null) {
+//              doctor.setEappId(vo.getId());
+//          }
+            doctorRepository.saveAndFlush(doctor);
+            virtual.setDoctor(doctor);
+            doctorVirtualRepository.saveAndFlush(virtual);
+            //TODO 添加关系到关系表
+
+            savelist.add(doctor);
+        }
+        //doctorRepository.save(savelist);
+
+        //TODO 添加关系到关系表
+        return true;
+    }
+
+    @Transactional(readOnly = false)
+    @CacheEvict(value = "virtual_rep_api_doctor", allEntries = true)
+    public Boolean saves(List<DoctorExcel> list,Long productId,DrugUser user) {
+        List<String> mobiles = new ArrayList<>();
+        for (int i = 0, leng = list.size(); i < leng; i++) {
+            DoctorExcel excel = list.get(i);
+            if (StringUtils.isNotEmtity(excel.getMobile())) {
+                mobiles.add(excel.getMobile());
+            }
+        }
+        List<Doctor> doctors = new ArrayList<>();
+        if (!mobiles.isEmpty()) {
+            doctors = this.findByMobileIn(mobiles);
+        }
+
+        Map<String, Long> map = new HashMap<>();
+        List<Doctor> savelist = new ArrayList<>();
+        for (int i = 0, leng = list.size(); i < leng; i++) {
+            DoctorExcel excel = list.get(i);
+            Doctor doctor = new Doctor();
+            DoctorVirtual virtual = new DoctorVirtual();
+            if (doctors != null && !doctors.isEmpty() && StringUtils.isNotEmtity(excel.getMobile())) {
+                for (Doctor d : doctors) {
+                    if (d.getMobile().equals(excel.getMobile())) {
+                        doctor = d;
+                    }
+                }
+            }
+            if(doctor.getMobile()!=null){
+                virtual = doctor.getDoctorVirtual();
+            }
+            doctor.setCity(excel.getCity());
+            doctor.setName(excel.getDoctorName());
+            doctor.setHospitalName(excel.getHospitalName());
+            doctor.setDepartment(excel.getDepartment());
+            doctor.setProvince(excel.getProvince());
+            doctor.setDoctorLevel(excel.getPosition());
+            doctor.setMobile(excel.getMobile());
+            virtual.setClientLevel(excel.getSex());
+            //TODO 主数据id
+            logger.info("保存【{}】医生时查询主数据对应的医生id写入数据库", doctor.getName());
+            if (StringUtils.isNotEmtity(excel.getHospitalName())) {
+                Hcp hcp = masterDataService.getHcpByHciIdAndHcpName(excel.getHospitalName(), excel.getDoctorName());
+                if (hcp != null) {
+                    logger.info("保存【{}】医生时查询主数据对应的医生id写入数据库,写入成功", doctor.getName());
+                    virtual.setMasterDateId(hcp.getId());
+                    doctor.setHospitalId(hcp.getHciId());
+                    virtual.setHospitalLevel("");
                 }
             }
 
@@ -305,19 +423,19 @@ public class DoctorService extends BaseService {
                 if (map.get(excel.getDrugUserEmail()) == null) {
                     DrugUser drugUser = drugUserService.findByEmail(excel.getDrugUserEmail());
                     if (drugUser != null) {
-//                        if (StringUtils.isNotEmtity(doctor.getDrugUserIds())) {
-//                            doctor.setDrugUserIds(doctor.getDrugUserIds() + drugUser.getId() + ",");
-//                        } else {
-//                            doctor.setDrugUserIds("," + drugUser.getId() + ",");
-//                        }
+                        if (StringUtils.isNotEmtity(virtual.getDrugUserIds())) {
+                            virtual.setDrugUserIds(virtual.getDrugUserIds() + drugUser.getId() + ",");
+                        } else {
+                            virtual.setDrugUserIds("," + drugUser.getId() + ",");
+                        }
                         map.put(excel.getDrugUserEmail(), drugUser.getId());
                     }
                 } else {
-//                    if (StringUtils.isNotEmtity(doctor.getDrugUserIds())) {
-//                        doctor.setDrugUserIds(doctor.getDrugUserIds() + map.get(excel.getDrugUserEmail()) + ",");
-//                    } else {
-//                        doctor.setDrugUserIds("," + map.get(excel.getDrugUserEmail()) + ",");
-//                    }
+                    if (StringUtils.isNotEmtity(virtual.getDrugUserIds())) {
+                        virtual.setDrugUserIds(virtual.getDrugUserIds() + map.get(excel.getDrugUserEmail()) + ",");
+                    } else {
+                        virtual.setDrugUserIds("," + map.get(excel.getDrugUserEmail()) + ",");
+                    }
                 }
 
             }
@@ -326,9 +444,22 @@ public class DoctorService extends BaseService {
 //          if (vo != null) {
 //              doctor.setEappId(vo.getId());
 //          }
+            doctorRepository.saveAndFlush(doctor);
+            virtual.setDoctor(doctor);
+            doctorVirtualRepository.saveAndFlush(virtual);
+            //TODO 添加关系到关系表
+            DrugUserDoctor dud = drugUserDoctorRepository.findByDoctorIdAndDrugUserIdAndProductId(doctor.getId(), user.getId(), productId);
+            if (dud == null) {
+                dud = new DrugUserDoctor();
+                dud.setDoctorId(doctor.getId());
+                dud.setProductId(productId);
+                dud.setDrugUserId(user.getId());
+                dud.setCreateTime(new Date());
+                drugUserDoctorRepository.saveAndFlush(dud);
+            }
             savelist.add(doctor);
         }
-        doctorRepository.save(savelist);
+        //doctorRepository.save(savelist);
 
         //TODO 添加关系到关系表
         return true;

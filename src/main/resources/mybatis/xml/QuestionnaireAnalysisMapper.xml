@@ -9,7 +9,7 @@
     </resultMap>
 
     <select id="list" resultMap="questionnaireResponseBean" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.QuestionnaireAnalysisRequestBean">
-        select dq.virtual_questionnaire_id questionnaire_id,q.title,q.product_id from virtual_doctor_questionnaire dq join virtual_questionnaire q on q.id=dq.virtual_questionnaire_id join virtual_drug_user du on du.id=dq.virtual_drug_user_id where 1=1
+        select dq.virtual_questionnaire_id questionnaire_id,q.title,q.product_id from virtual_doctor_questionnaire dq join virtual_questionnaire q on q.id=dq.virtual_questionnaire_id join drug_user du on du.id=dq.virtual_drug_user_id where 1=1
         <if test="startDate!=null and startDate!=''">
             AND dq.create_time &gt;= '2017-02-01'
         </if>

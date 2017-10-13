@@ -97,6 +97,12 @@ public class DoctorController extends BaseController {
                                               HttpServletRequest request, HttpServletResponse response){
         DefaultResponseBean responseBean = new DefaultResponseBean();
         ExcelUtils<DoctorExcel> excelUtils = new ExcelUtils<>(new DoctorExcel());
+        String productId = request.getParameter("productId");
+        if(!StringUtils.isNotEmtity(productId)){
+            responseBean.setCode(500);
+            responseBean.setMessage("产品不能为空");
+            return responseBean;
+        }
         List<DoctorExcel> list = new ArrayList<>();
         try{
             list = excelUtils.readFromFile(null,file.getInputStream());
@@ -111,7 +117,7 @@ public class DoctorController extends BaseController {
             responseBean.setMessage("导入数据为空");
             return responseBean;
         }
-        doctorService.saves(list);
+        doctorService.saves(list,Long.valueOf(productId),getLoginUser(request));
         return responseBean;
     }
 
