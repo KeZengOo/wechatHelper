@@ -9,6 +9,7 @@ import com.nuoxin.virtual.rep.api.dao.DoctorRepository;
 import com.nuoxin.virtual.rep.api.dao.DrugUserRepository;
 import com.nuoxin.virtual.rep.api.entity.Doctor;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
+import com.nuoxin.virtual.rep.api.entity.ProductLine;
 import com.nuoxin.virtual.rep.api.enums.HospitalLevelEnum;
 import com.nuoxin.virtual.rep.api.enums.MagazineTypeEnum;
 import com.nuoxin.virtual.rep.api.utils.CollectionUtil;
@@ -35,8 +36,8 @@ public class HcpService extends BaseService {
     @Autowired
     private MasterDataService masterDataService;
 
-//    @Autowired
-//    private DrugUserService drugUserService;
+    @Autowired
+    private DrugUserService drugUserService;
 //
 //    @Autowired
 //    private DoctorMapper doctorMapper;
@@ -274,17 +275,23 @@ public class HcpService extends BaseService {
         Integer page = bean.getPage() + 1;
         Integer pageSize = bean.getPageSize();
 
-
         Long drugUserId = bean.getDrugUserId();
-        DrugUser firstById = drugUserRepository.findFirstById(drugUserId);
-        Long eappId = 0L;
-        if (firstById != null){
-            eappId = firstById.getEappId();
-        }
+        //改成从营销数据库中查询
+//        DrugUser firstById = drugUserRepository.findFirstById(drugUserId);
+//        Long eappId = 0L;
+//        if (firstById != null){
+//            eappId = firstById.getEappId();
+//        }
 
         //得到的关键词
         String allkeyword = "";
-        Map<String, String> keys = getKeys(eappId);
+        Map<String, String> keys = getKeys(drugUserId);
+
+
+        /*if (null != keys && keys.size() > 0){
+            allkeyword = keys.get("allkeyword");
+        }*/
+
         if (null != keys && keys.size() > 0){
             allkeyword = keys.get("allkeyword");
         }
@@ -349,10 +356,16 @@ public class HcpService extends BaseService {
         }
 
         String allkeyword = "";
-        Map<String, String> keys = getKeys(eappId);
+        /*Map<String, String> keys = getKeys(eappId);
+        if (null != keys && keys.size() > 0){
+            allkeyword = keys.get("allkeyword");
+        }*/
+
+        Map<String, String> keys = getKeys(drugUserId);
         if (null != keys && keys.size() > 0){
             allkeyword = keys.get("allkeyword");
         }
+
         //有关键词的对话
         List<ConsultDetail> consultDetailListByKey = masterDataService.getConsultDetailListByKey(hcpId, allkeyword);
         if (null == consultDetailListByKey || consultDetailListByKey.size() == 0){
@@ -572,11 +585,11 @@ public class HcpService extends BaseService {
 
 
         Long drugUserId = bean.getDrugUserId();
-        DrugUser firstById = drugUserRepository.findFirstById(drugUserId);
-        Long eappId = 0L;
-        if (firstById != null){
-            eappId = firstById.getEappId();
-        }
+//        DrugUser firstById = drugUserRepository.findFirstById(drugUserId);
+//        Long eappId = 0L;
+//        if (firstById != null){
+//            eappId = firstById.getEappId();
+//        }
 
         HcpResearchInfo hcpResearchInfo = masterDataService.getHcpResearchInfo(hcpId);
         List<Doc> docList = new ArrayList<>();
@@ -592,10 +605,21 @@ public class HcpService extends BaseService {
          * 得到后台配置的更关键词
          */
         //得到的关键词
+//        String allkeyword = "";
+//        String ckeyword = "";
+//        String pkeyword = "";
+//        Map<String, String> keys = getKeys(eappId);
+//        if (null != keys && keys.size() > 0){
+//            allkeyword = keys.get("allkeyword");
+//            ckeyword = keys.get("ckeyword");
+//            pkeyword = keys.get("pkeyword");
+//        }
+
+        //查询营销的
         String allkeyword = "";
         String ckeyword = "";
         String pkeyword = "";
-        Map<String, String> keys = getKeys(eappId);
+        Map<String, String> keys = getKeys(drugUserId);
         if (null != keys && keys.size() > 0){
             allkeyword = keys.get("allkeyword");
             ckeyword = keys.get("ckeyword");
@@ -745,56 +769,56 @@ public class HcpService extends BaseService {
      * @param drugUserId
      * @return
      */
-    private Map<String,String> getKeys(Long drugUserId){
-        Map<String,String> map = new HashMap<>();
-        String url = prefixUrl + "/hcp/getProductKeys/{id}";
-        DefaultResponseBean<HcpSocietyResponseBean> responseBean = restTemplate.getForObject(url, DefaultResponseBean.class, drugUserId);
-        JSONObject json = (JSONObject) JSONObject.toJSON(responseBean);
-        if (null != json){
-            int code = (int) json.get("code");
-            if (code == 200){
-                map = (Map<String, String>) json.get("data");
-            }
-        }
-
-
-        return map;
-    }
-
-    private Map<String,List<String>> getKeysList(Long drugUserId){
-
-        Map<String,List<String>> map = new HashMap<>();
-
-        List<String> ckeywordList = new ArrayList<>();
-        List<String> pkeyworkList = new ArrayList<>();
-
-        Map<String, String> keys = getKeys(drugUserId);
-        String pkeyword = keys.get("pkeyword");
-        if (!StringUtils.isEmpty(pkeyword)){
-            String[] split = pkeyword.split(",");
-            if (null != split && split.length > 0){
-                for (String pkey:split){
-                    pkeyworkList.add(pkey);
-                }
-            }
-        }
-
-        String ckeyword = keys.get("ckeyword");
-        if (!StringUtils.isEmpty(ckeyword)){
-            String[] split = ckeyword.split(",");
-            if (null != split && split.length > 0){
-                for (String ckey:split){
-                    ckeywordList.add(ckey);
-                }
-            }
-        }
-
-        map.put("ckeywordList",ckeywordList);
-        map.put("pkeywordList",pkeyworkList);
-
-        return map;
-
-    }
+//    private Map<String,String> getKeys(Long drugUserId){
+//        Map<String,String> map = new HashMap<>();
+//        String url = prefixUrl + "/hcp/getProductKeys/{id}";
+//        DefaultResponseBean<HcpSocietyResponseBean> responseBean = restTemplate.getForObject(url, DefaultResponseBean.class, drugUserId);
+//        JSONObject json = (JSONObject) JSONObject.toJSON(responseBean);
+//        if (null != json){
+//            int code = (int) json.get("code");
+//            if (code == 200){
+//                map = (Map<String, String>) json.get("data");
+//            }
+//        }
+//
+//
+//        return map;
+//    }
+//
+//    private Map<String,List<String>> getKeysList(Long drugUserId){
+//
+//        Map<String,List<String>> map = new HashMap<>();
+//
+//        List<String> ckeywordList = new ArrayList<>();
+//        List<String> pkeyworkList = new ArrayList<>();
+//
+//        Map<String, String> keys = getKeys(drugUserId);
+//        String pkeyword = keys.get("pkeyword");
+//        if (!StringUtils.isEmpty(pkeyword)){
+//            String[] split = pkeyword.split(",");
+//            if (null != split && split.length > 0){
+//                for (String pkey:split){
+//                    pkeyworkList.add(pkey);
+//                }
+//            }
+//        }
+//
+//        String ckeyword = keys.get("ckeyword");
+//        if (!StringUtils.isEmpty(ckeyword)){
+//            String[] split = ckeyword.split(",");
+//            if (null != split && split.length > 0){
+//                for (String ckey:split){
+//                    ckeywordList.add(ckey);
+//                }
+//            }
+//        }
+//
+//        map.put("ckeywordList",ckeywordList);
+//        map.put("pkeywordList",pkeyworkList);
+//
+//        return map;
+//
+//    }
 
 
     /**
@@ -804,54 +828,105 @@ public class HcpService extends BaseService {
      */
 
     /**
-     * 暂时没有实现
-     * @param drugUser
+     * 查询营销数据中的，得到产品关键词
+     * @param drugUserId
      * @return
      */
-    private Map<String,List<String>> getKeysList(DrugUser drugUser){
-        Map<String,List<String>> map = new HashMap<>();
+    private Map<String,String> getKeys(Long drugUserId){
+        Map<String,String> map = new HashMap<>();
 
-//        List<String> ckeywordList = new ArrayList<>();
-//        List<String> pkeyworkList = new ArrayList<>();
-//
-//        List<ProductLine> productKeyWordList = drugUserService.findByProductKeyWord(drugUser);
-//        if(null != productKeyWordList && productKeyWordList.size() > 0){
-//            StringBuilder allkeyWordStr = new StringBuilder("");
-//            for (ProductLine productLine:productKeyWordList){
-//                //竞品关键词
-//                String ckeyWord = productLine.getCkeyWord();
-//                if (null != ckeyWord && !"".equals(ckeyWord.trim())){
-//                    String[] ckeyWordArrays = ckeyWord.split(",");
-//                    if (null != ckeyWordArrays && ckeyWordArrays.length > 0){
-//                        for (String ckeyWordArray:ckeyWordArrays){
-//                            ckeywordList.add(ckeyWordArray);
-//                        }
-//                    }
-//                }
-//
-//                //产品关键词
-//                String pkeyword = productLine.getPkeyWord();
-//                if (null != pkeyword && !"".equals(pkeyword.trim())){
-//                    String[] pkeywordArrays = pkeyword.split(",");
-//                    if (null != pkeywordArrays && pkeywordArrays.length > 0){
-//                        for (String pkeywordArray:pkeywordArrays){
-//                            pkeyworkList.add(pkeywordArray);
-//                        }
-//                    }
-//                }
-//
-//
-//            }
-//            map.put("ckeywordList",ckeywordList);
-//            map.put("pkeywordList",pkeyworkList);
-//
-//
-//        }
 
+        List<ProductLine> productKeyWordList = drugUserService.findByProductKeyWord(drugUserId);
+        if(null != productKeyWordList && productKeyWordList.size() > 0){
+            StringBuilder ckeyWordStr = new StringBuilder("");
+            StringBuilder pkeyWordStr = new StringBuilder("");
+            StringBuilder allkeyWordStr = new StringBuilder("");
+            for (ProductLine productLine:productKeyWordList){
+                //竞品关键词
+                String ckeyWord = productLine.getCkeyWord();
+                if (null != ckeyWord && !"".equals(ckeyWord.trim())){
+                    String[] ckeyWordArrays = ckeyWord.split(",");
+                    if (null != ckeyWordArrays && ckeyWordArrays.length > 0){
+                        for (String ckeyWordArray:ckeyWordArrays){
+                            ckeyWordStr.append(ckeyWordArray+ ",");
+                            allkeyWordStr.append(ckeyWordArray+ ",");
+                        }
+                    }
+                }
+
+                //产品关键词
+                String pkeyword = productLine.getPkeyWord();
+                if (null != pkeyword && !"".equals(pkeyword.trim())){
+                    String[] pkeywordArrays = pkeyword.split(",");
+                    if (null != pkeywordArrays && pkeywordArrays.length > 0){
+                        for (String pkeywordArray:pkeywordArrays){
+                            pkeyWordStr.append(pkeywordArray+ ",");
+                            allkeyWordStr.append(pkeywordArray+ ",");
+                        }
+                    }
+                }
+
+
+            }
+            map.put("ckeyword",ckeyWordStr.toString());
+            map.put("pkeyword",pkeyWordStr.toString());
+            map.put("allkeyword",allkeyWordStr.toString());
+
+        }
 
         return map;
     }
 
+
+
+    /**
+     * 得到后台配置的关键词，value以list返回
+     * @param drugUserId
+     * @return
+     */
+    private Map<String,List<String>> getKeysList(Long drugUserId){
+        Map<String,List<String>> map = new HashMap<>();
+
+        List<String> ckeywordList = new ArrayList<>();
+        List<String> pkeyworkList = new ArrayList<>();
+
+        List<ProductLine> productKeyWordList = drugUserService.findByProductKeyWord(drugUserId);
+        if(null != productKeyWordList && productKeyWordList.size() > 0){
+            StringBuilder allkeyWordStr = new StringBuilder("");
+            for (ProductLine productLine:productKeyWordList){
+                //竞品关键词
+                String ckeyWord = productLine.getCkeyWord();
+                if (null != ckeyWord && !"".equals(ckeyWord.trim())){
+                    String[] ckeyWordArrays = ckeyWord.split(",");
+                    if (null != ckeyWordArrays && ckeyWordArrays.length > 0){
+                        for (String ckeyWordArray:ckeyWordArrays){
+                            ckeywordList.add(ckeyWordArray);
+                        }
+                    }
+                }
+
+                //产品关键词
+                String pkeyword = productLine.getPkeyWord();
+                if (null != pkeyword && !"".equals(pkeyword.trim())){
+                    String[] pkeywordArrays = pkeyword.split(",");
+                    if (null != pkeywordArrays && pkeywordArrays.length > 0){
+                        for (String pkeywordArray:pkeywordArrays){
+                            pkeyworkList.add(pkeywordArray);
+                        }
+                    }
+                }
+
+
+            }
+            map.put("ckeywordList",ckeywordList);
+            map.put("pkeywordList",pkeyworkList);
+
+
+        }
+
+
+        return map;
+    }
 
 
     /**
@@ -995,7 +1070,7 @@ public class HcpService extends BaseService {
     private List<Doc> getSortDocByKey(List<Doc> keyDocList, List<Doc> docList){
         List<Doc> list = new ArrayList<>();
         if (null == keyDocList || keyDocList.size() == 0){
-            return list;
+            return docList;
         }
 
         if (null == docList || docList.size() == 0){

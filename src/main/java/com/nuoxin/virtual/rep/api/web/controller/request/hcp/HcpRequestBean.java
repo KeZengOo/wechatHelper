@@ -2,6 +2,7 @@ package com.nuoxin.virtual.rep.api.web.controller.request.hcp;
 
 
 import com.nuoxin.virtual.rep.api.common.bean.PageRequestBean;
+import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -32,6 +33,7 @@ public class HcpRequestBean extends PageRequestBean implements Serializable {
 
     @ApiModelProperty(value = "销售id")
     private Long drugUserId;
+
 
     public Long getHcpId() {
         return hcpId;
@@ -80,6 +82,7 @@ public class HcpRequestBean extends PageRequestBean implements Serializable {
     public void setDrugUserId(Long drugUserId) {
         this.drugUserId = drugUserId;
     }
+
 
     @Override
     public String toString() {

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.nuoxin.backend.dao.ProductLineMapper">
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.ProductLineMapper">
 
-    <resultMap id="productResultMap" type="com.nuoxin.backend.entity.ProductLine">
+    <resultMap id="productResultMap" type="com.nuoxin.virtual.rep.api.entity.ProductLine">
         <id column="prod_id" property="id" jdbcType="BIGINT"/>
         <result column="e_id" property="drugId" jdbcType="BIGINT" />
         <result column="prod_name" property="name" jdbcType="VARCHAR" />

@@ -39,7 +39,7 @@ public class VirtualRepApiApplication {
 	 */
 	@Bean
 	public Docket generateApi() {
-		Docket docket = new Docket(DocumentationType.SWAGGER_2).apiInfo(apiInfo()).select()
+		Docket docket = new Docket( DocumentationType.SWAGGER_2).apiInfo(apiInfo()).select()
 				.apis(RequestHandlerSelectors.withClassAnnotation(Api.class))
 				.paths(PathSelectors.any()).build().pathMapping("/")
 				.directModelSubstitute(LocalDate.class, String.class)

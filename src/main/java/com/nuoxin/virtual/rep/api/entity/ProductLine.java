@@ -1,6 +1,4 @@
-package com.nuoxin.backend.entity;
-
-import com.nuoxin.backend.common.entity.IdEntity;
+package com.nuoxin.virtual.rep.api.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;

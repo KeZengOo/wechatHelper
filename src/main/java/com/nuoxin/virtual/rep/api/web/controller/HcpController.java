@@ -3,6 +3,7 @@ package com.nuoxin.virtual.rep.api.web.controller;
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
+import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.HcpService;
 import com.nuoxin.virtual.rep.api.web.controller.request.hcp.HcpRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.hcp.*;

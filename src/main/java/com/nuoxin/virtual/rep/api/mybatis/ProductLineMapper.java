@@ -1,7 +1,9 @@
-package com.nuoxin.backend.dao;
+package com.nuoxin.virtual.rep.api.mybatis;
 
-import com.nuoxin.backend.common.util.MyMapper;
-import com.nuoxin.backend.entity.ProductLine;
+
+
+import com.nuoxin.virtual.rep.api.common.util.MyMapper;
+import com.nuoxin.virtual.rep.api.entity.ProductLine;
 
 import java.util.List;
 

@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Create by tiancun on 2017/10/12
  */
-public interface DoctorMapper extends MyMapper{
+public interface DoctorMapper{
 
 
 
