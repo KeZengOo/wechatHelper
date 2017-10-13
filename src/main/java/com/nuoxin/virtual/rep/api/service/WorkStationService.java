@@ -4,12 +4,15 @@ import com.nuoxin.virtual.rep.api.mybatis.DoctorCallInfoMapper;
 import com.nuoxin.virtual.rep.api.mybatis.MeetingDetailMapper;
 import com.nuoxin.virtual.rep.api.mybatis.MessageMapper;
 import com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.work.CustomerStatisticResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.work.MonthTargetStatisticResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.work.TodayStatisticsResponseBean;
 import com.sun.mail.util.BEncoderStream;
 import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,6 +31,11 @@ public class WorkStationService {
     @Autowired
     private DoctorCallInfoMapper doctorCallInfoMapper;
 
+    /**
+     * 今日通话情况
+     * @param bean
+     * @return
+     */
     public TodayStatisticsResponseBean getTodayStatistic(WorkStationRequestBean bean){
         TodayStatisticsResponseBean todayStatisticsResponseBean = new TodayStatisticsResponseBean();
 
@@ -122,5 +130,52 @@ public class WorkStationService {
 
         return todayStatisticsResponseBean;
     }
+
+
+    /**
+     * 本月目标
+     * @param bean
+     * @return
+     */
+    public MonthTargetStatisticResponseBean getMonthTargetStatistic(WorkStationRequestBean bean){
+
+
+        return null;
+    }
+
+
+    /**
+     * 客户总数统计
+     * @param bean
+     * @return
+     */
+    public List<CustomerStatisticResponseBean> getTotalCustomerStatistic(WorkStationRequestBean bean){
+
+
+        return null;
+    }
+
+
+    /**
+     * 当月新增客户统计
+     * @param bean
+     * @return
+     */
+    public List<CustomerStatisticResponseBean> getAddCustomerStatistic(WorkStationRequestBean bean){
+
+        return null;
+    }
+
+    /**
+     * 当月覆盖客户总数统计
+     * @param bean
+     * @return
+     */
+    public List<CustomerStatisticResponseBean> getCoverCustomerStatistic(WorkStationRequestBean bean){
+
+        return null;
+    }
+
+
 
 }
