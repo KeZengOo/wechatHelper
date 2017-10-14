@@ -2,7 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.nuoxin.virtual.rep.api.mybatis.MessageMapper">
 
-    <select id="getMessageStatistics" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean"
+    <select id="getMessageStatistics"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean"
             resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.TodayStatisticsResponseBean">
 
         select
@@ -59,4 +60,149 @@
 
     </select>
 
+
+    <select id="getMessageLinkmanList"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean"
+            resultType="com.nuoxin.virtual.rep.api.web.controller.response.message.MessageLinkmanResponseBean">
+        select
+        t.doctor_id doctorId,
+        t.nickname nickname,
+        t.message_type messageType,
+        t.maxMessageTime lastTime,
+        (select message from virtual_message where doctor_id=t.doctor_id and message_type=t.message_type and message_time=t.maxMessageTime) lastMessage
+        from (
+        select
+        vm.doctor_id,
+        vm.nickname,
+        vm.message_type,max(vm.message_time) as maxMessageTime
+        from virtual_message vm
+        where vm.drug_user_id in (select id from drug_user where leader_path like #{leaderPath})
+        <if test="startTime !=null and endTime !=null">
+            and date_format(vm.message_time,'%Y-%m-%d') between #{startTime} and #{endTime}
+        </if>
+        and vm.doctor_id in (
+                select d.id from doctor d
+                inner join drug_user_doctor dud
+                on d.id=dud.doctor_id
+                inner join drug_user du
+                on dud.drug_user_id=du.id
+                where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+            )
+        group by  vm.doctor_id,vm.message_type  order by maxMessageTime desc
+        ) t limit #{page},#{pageSize}
+    </select>
+
+    <select id="getMessageLinkmanListCount"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean"
+            resultType="java.lang.Integer">
+        select count(1) from (
+        select
+        vm.doctor_id
+        from virtual_message vm
+        where vm.drug_user_id in (select id from drug_user where leader_path like #{leaderPath})
+        <if test="startTime !=null and endTime !=null">
+            and date_format(vm.message_time,'%Y-%m-%d') between #{startTime} and #{endTime}
+        </if>
+        and vm.doctor_id in (
+        select d.id from doctor d
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
+        where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+        )
+
+        group by  vm.doctor_id,vm.message_type
+        ) t
+    </select>
+
+    <select id="getMessageList" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean"
+            resultType="com.nuoxin.virtual.rep.api.web.controller.response.message.MessageResponseBean">
+
+        select
+        vm.id id,
+        vm.user_id userId,
+        vm.user_type userType,
+        vm.nickname nickname,
+        vm.wechat_number wechatNumber,
+        vm.telephone telephone,
+        vm.wechat_message_status wechatMessageStatus,
+        vm.wechat_message_type wechatMessageType,
+        vm.message message,
+        vm.message_type messageType,
+        vm.message_time messageTime
+        from virtual_message vm
+        where 1=1
+        <if test="messageType !=null and messageType==1">
+            and vm.message_type = #{messageType}
+        </if>
+
+        <if test="messageType !=null and messageType==2">
+            and vm.message_type = #{messageType}
+            and vm.product_id=#{productId}
+        </if>
+
+        and vm.doctor_id=#{doctorId}
+        <if test="startTime !=null and endTime !=null">
+            and date_format(vm.message_time,'%Y-%m-%d') between #{startTime} and #{endTime}
+        </if>
+        and vm.drug_user_id in (select id from drug_user where leader_path like #{leaderPath})
+        order by vm.message_time desc limit #{page},#{pageSize}
+
+
+    </select>
+
+
+    <select id="getMessageListCount" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean"
+            resultType="java.lang.Integer">
+
+        select
+        count(1)
+        from virtual_message vm
+        where 1=1
+        <if test="messageType !=null and messageType==1">
+            and vm.message_type = #{messageType}
+        </if>
+
+        <if test="messageType !=null and messageType==2">
+            and vm.message_type = #{messageType}
+            and vm.product_id=#{productId}
+        </if>
+
+        and vm.doctor_id=#{doctorId}
+        <if test="startTime !=null and endTime !=null">
+            and date_format(vm.message_time,'%Y-%m-%d') between #{startTime} and #{endTime}
+        </if>
+        and vm.drug_user_id in (select id from drug_user where leader_path like #{leaderPath})
+
+
+    </select>
+
+
+    <select id="messageCount" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean" resultType="java.lang.Integer">
+        select
+        count(distinct vm.doctor_id)
+        from virtual_message vm
+        where 1=1
+        <if test="messageType !=null and messageType==1">
+            and vm.message_type = #{messageType}
+        </if>
+
+        <if test="messageType !=null and messageType==2">
+            and vm.message_type = #{messageType}
+            and vm.product_id=#{productId}
+        </if>
+        and date_format(vm.message_time, '%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+        and vm.doctor_id in (
+                select d.id from doctor d
+                inner join drug_user_doctor dud
+                on d.id=dud.doctor_id
+                inner join drug_user du
+                on dud.drug_user_id=du.id
+                where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+            )
+        and vm.drug_user_id in (select id from drug_user where leader_path like #{leaderPath})
+
+
+    </select>
 </mapper>

@@ -13,6 +13,7 @@ import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.Message;
 import com.nuoxin.virtual.rep.api.enums.MessageTypeEnum;
 import com.nuoxin.virtual.rep.api.enums.UserTypeEnum;
+import com.nuoxin.virtual.rep.api.mybatis.MessageMapper;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.utils.ExcelUtils;
 import com.nuoxin.virtual.rep.api.utils.RegularUtils;
@@ -67,6 +68,9 @@ public class MessageService extends BaseService {
 
     @Autowired
     private DoctorService doctorService;
+
+    @Autowired
+    private MessageMapper messageMapper;
 
 
     public void downloadExcel(HttpServletResponse response) {
@@ -241,84 +245,119 @@ public class MessageService extends BaseService {
     }
 
 
+    //JPA的写法
+//    public PageResponseBean<MessageResponseBean> getMessageList(MessageRequestBean bean) {
+//
+//        //Pageable pageable = super.getPage(bean);
+//
+//        Specification<Message> specification = new Specification<Message>() {
+//            @Override
+//            public Predicate toPredicate(Root<Message> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+//
+//                List<Predicate> predicates = new ArrayList<>();
+//                predicates.add(criteriaBuilder.equal(root.get("drugUserId").as(Long.class), bean.getDrugUserId()));
+//                predicates.add(criteriaBuilder.equal(root.get("doctorId").as(Long.class), bean.getDoctorId()));
+//                predicates.add(criteriaBuilder.equal(root.get("messageType").as(Integer.class), bean.getMessageType()));
+//
+//                String startTime = bean.getStartTime();
+//                String endTime = bean.getEndTime();
+//                if (!StringUtils.isEmpty(startTime) && !StringUtils.isEmpty(endTime)) {
+//                    startTime = startTime + " 00:00:00";
+//                    endTime = endTime + " 00:00:00";
+//                    Date endDate = DateUtil.getDateFromStr(endTime);
+//                    Date date = DateUtil.addDay(endDate, 1);
+//                    endTime = DateUtil.getDateTimeString(date);
+//                    predicates.add(criteriaBuilder.between(root.get("messageTime").as(String.class), startTime, endTime));
+//                }
+//
+//                criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.and(predicates.toArray(new Predicate[0]))));
+//                return criteriaQuery.getRestriction();
+//
+//            }
+//        };
+//
+//        Sort.Order order = new Sort.Order(Sort.Direction.DESC, "messageTime");
+//        Sort sort = new Sort(order);
+//        Pageable pageable = new PageRequest(bean.getPage(), bean.getPageSize(), sort);
+//
+//        Page<Message> page = messageRepository.findAll(specification, pageable);
+//        PageResponseBean<MessageResponseBean> messagePage = new PageResponseBean<>(page);
+//        List<MessageResponseBean> list = new ArrayList<>();
+//        List<Message> content = page.getContent();
+//        if (null != content && content.size() > 0) {
+//
+//            for (Message message : content) {
+//                MessageResponseBean messageResponseBean = new MessageResponseBean();
+//                messageResponseBean.setId(message.getId());
+//                messageResponseBean.setUserId(message.getUserId());
+//                messageResponseBean.setUserType(message.getUserType());
+//                messageResponseBean.setNickname(message.getNickname());
+//                messageResponseBean.setWechatNumber(message.getWechatNumber());
+//                messageResponseBean.setTelephone(message.getTelephone());
+//                messageResponseBean.setWechatMessageStatus(message.getWechatMessageStatus());
+//                messageResponseBean.setMessage(message.getMessage());
+//                messageResponseBean.setWechatMessageType(message.getWechatMessageType());
+//                messageResponseBean.setMessageType(message.getMessageType());
+//                messageResponseBean.setMessageTime(message.getMessageTime());
+//
+//                list.add(messageResponseBean);
+//            }
+//
+//        }
+//
+//        messagePage.setContent(list);
+//
+//        return messagePage;
+//    }
+
+
+
+
+
+    //mybatis的写法
     public PageResponseBean<MessageResponseBean> getMessageList(MessageRequestBean bean) {
-
-        //Pageable pageable = super.getPage(bean);
-
-        Specification<Message> specification = new Specification<Message>() {
-            @Override
-            public Predicate toPredicate(Root<Message> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
-
-                List<Predicate> predicates = new ArrayList<>();
-                predicates.add(criteriaBuilder.equal(root.get("drugUserId").as(Long.class), bean.getDrugUserId()));
-                predicates.add(criteriaBuilder.equal(root.get("doctorId").as(Long.class), bean.getDoctorId()));
-                predicates.add(criteriaBuilder.equal(root.get("messageType").as(Integer.class), bean.getMessageType()));
-
-                String startTime = bean.getStartTime();
-                String endTime = bean.getEndTime();
-                if (!StringUtils.isEmpty(startTime) && !StringUtils.isEmpty(endTime)) {
-                    startTime = startTime + " 00:00:00";
-                    endTime = endTime + " 00:00:00";
-                    Date endDate = DateUtil.getDateFromStr(endTime);
-                    Date date = DateUtil.addDay(endDate, 1);
-                    endTime = DateUtil.getDateTimeString(date);
-                    predicates.add(criteriaBuilder.between(root.get("messageTime").as(String.class), startTime, endTime));
-                }
-
-                criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.and(predicates.toArray(new Predicate[0]))));
-                return criteriaQuery.getRestriction();
-
-            }
-        };
-
-        Sort.Order order = new Sort.Order(Sort.Direction.DESC, "messageTime");
-        Sort sort = new Sort(order);
-        Pageable pageable = new PageRequest(bean.getPage(), bean.getPageSize(), sort);
-
-        Page<Message> page = messageRepository.findAll(specification, pageable);
-        PageResponseBean<MessageResponseBean> messagePage = new PageResponseBean<>(page);
-        List<MessageResponseBean> list = new ArrayList<>();
-        List<Message> content = page.getContent();
-        if (null != content && content.size() > 0) {
-
-            for (Message message : content) {
-                MessageResponseBean messageResponseBean = new MessageResponseBean();
-                messageResponseBean.setId(message.getId());
-                messageResponseBean.setUserId(message.getUserId());
-                messageResponseBean.setUserType(message.getUserType());
-                messageResponseBean.setNickname(message.getNickname());
-                messageResponseBean.setWechatNumber(message.getWechatNumber());
-                messageResponseBean.setTelephone(message.getTelephone());
-                messageResponseBean.setWechatMessageStatus(message.getWechatMessageStatus());
-                messageResponseBean.setMessage(message.getMessage());
-                messageResponseBean.setWechatMessageType(message.getWechatMessageType());
-                messageResponseBean.setMessageType(message.getMessageType());
-                messageResponseBean.setMessageTime(message.getMessageTime());
-
-                list.add(messageResponseBean);
-            }
-
+        DrugUser drugUser = drugUserRepository.findFirstById(bean.getDrugUserId());
+        String leaderPath = drugUser.getLeaderPath();
+        if (leaderPath == null){
+            leaderPath = "";
         }
+        bean.setLeaderPath(leaderPath +"%");
+        Integer page = bean.getPage();
+        Integer pageSize = bean.getPageSize();
+        bean.setPage(page  * pageSize);
+        List<MessageResponseBean> messageList = messageMapper.getMessageList(bean);
+        Integer messageListCount = messageMapper.getMessageListCount(bean);
+        PageResponseBean<MessageResponseBean> pageResponseBean = new PageResponseBean<>(bean, messageListCount, messageList);
 
-        messagePage.setContent(list);
-
-        return messagePage;
+        return pageResponseBean;
     }
 
 
     /**
      * 今日会话统计
      *
-     * @param drugUserId
+     * @param bean
      * @return
      */
-    public Map<String, Integer> getMessageCountList(Long drugUserId) {
-        String drugUserIdStr ="%,"+  drugUserId + ",%";
+    public Map<String, Integer> getMessageCountList(MessageRequestBean bean) {
+//        String drugUserIdStr ="%,"+  drugUserId + ",%";
         Map<String, Integer> map = new HashMap<>();
+//
+//        Integer wechatCount = messageRepository.messageCount(drugUserId, drugUserIdStr, MessageTypeEnum.WECHAT.getMessageType());
+//
+//        Integer imCount = messageRepository.messageCount(drugUserId, drugUserIdStr, MessageTypeEnum.IM.getMessageType());
 
-        Integer wechatCount = messageRepository.messageCount(drugUserId, drugUserIdStr, MessageTypeEnum.WECHAT.getMessageType());
 
-        Integer imCount = messageRepository.messageCount(drugUserId, drugUserIdStr, MessageTypeEnum.IM.getMessageType());
+        DrugUser drugUser = drugUserRepository.findFirstById(bean.getDrugUserId());
+        String leaderPath = drugUser.getLeaderPath();
+        if (leaderPath == null){
+            leaderPath = "";
+        }
+        bean.setLeaderPath(leaderPath +"%");
+        bean.setMessageType(MessageTypeEnum.WECHAT.getMessageType());
+        Integer wechatCount = messageMapper.messageCount(bean);
+        bean.setMessageType(MessageTypeEnum.IM.getMessageType());
+        Integer imCount = messageMapper.messageCount(bean);
 
         map.put("wechat", wechatCount);
         map.put("im", imCount);
@@ -328,54 +367,75 @@ public class MessageService extends BaseService {
 
 
     /**
-     * 微信消息联系人
+     * 微信消息联系人(JPA)
+     *
+     * @return
+     */
+//    public PageResponseBean<MessageLinkmanResponseBean> getMessageLinkmanList(MessageRequestBean bean) {
+//
+//        Long drugUserId = bean.getDrugUserId();
+////        DrugUser drugUser = drugUserRepository.findFirstById(drugUserId);
+////        if (drugUser == null){
+////            throw new BusinessException();
+////        }
+//
+//
+//
+//        String drugUserIdStr ="%," + drugUserId + ",%";
+//        int page = bean.getPage();
+//        int pageSize = bean.getPageSize();
+//        Integer messageListCount = messageRepository.getMessageListCount(drugUserId, drugUserIdStr);
+//        List<Message> messageList = messageRepository.getMessageList(drugUserId, drugUserIdStr, page * pageSize, pageSize);
+//        if (messageListCount == null) {
+//            messageListCount = 0;
+//        }
+//
+//        List<MessageLinkmanResponseBean> list = new ArrayList<>();
+//        if (messageList != null && messageList.size() > 0) {
+//
+//            for (Message message : messageList) {
+//
+//                MessageLinkmanResponseBean messageLinkmanResponseBean = new MessageLinkmanResponseBean();
+//                messageLinkmanResponseBean.setDoctorId(message.getUserId());
+//                messageLinkmanResponseBean.setMessageType(message.getMessageType());
+//                messageLinkmanResponseBean.setLastMessage(message.getMessage());
+//                messageLinkmanResponseBean.setNickname(message.getNickname());
+//                String messageTime = message.getMessageTime();
+//                messageTime = messageTime.substring(0, messageTime.length() - 2);
+//                messageLinkmanResponseBean.setLastTime(messageTime);
+//
+//                list.add(messageLinkmanResponseBean);
+//            }
+//
+//        }
+//
+//        PageResponseBean<MessageLinkmanResponseBean> pageResponseBean = new PageResponseBean<>(bean, messageListCount, list);
+//
+//
+//        return pageResponseBean;
+//    }
+
+    /**
+     * 微信消息联系人(mybatis)
      *
      * @return
      */
     public PageResponseBean<MessageLinkmanResponseBean> getMessageLinkmanList(MessageRequestBean bean) {
-
-        Long drugUserId = bean.getDrugUserId();
-//        DrugUser drugUser = drugUserRepository.findFirstById(drugUserId);
-//        if (drugUser == null){
-//            throw new BusinessException();
-//        }
-
-
-
-        String drugUserIdStr ="%," + drugUserId + ",%";
-        int page = bean.getPage();
-        int pageSize = bean.getPageSize();
-        Integer messageListCount = messageRepository.getMessageListCount(drugUserId, drugUserIdStr);
-        List<Message> messageList = messageRepository.getMessageList(drugUserId, drugUserIdStr, page * pageSize, pageSize);
-        if (messageListCount == null) {
-            messageListCount = 0;
+        DrugUser drugUser = drugUserRepository.findFirstById(bean.getDrugUserId());
+        String leaderPath = drugUser.getLeaderPath();
+        if (leaderPath == null){
+            leaderPath = "";
         }
-
-        List<MessageLinkmanResponseBean> list = new ArrayList<>();
-        if (messageList != null && messageList.size() > 0) {
-
-            for (Message message : messageList) {
-
-                MessageLinkmanResponseBean messageLinkmanResponseBean = new MessageLinkmanResponseBean();
-                messageLinkmanResponseBean.setDoctorId(message.getUserId());
-                messageLinkmanResponseBean.setMessageType(message.getMessageType());
-                messageLinkmanResponseBean.setLastMessage(message.getMessage());
-                messageLinkmanResponseBean.setNickname(message.getNickname());
-                String messageTime = message.getMessageTime();
-                messageTime = messageTime.substring(0, messageTime.length() - 2);
-                messageLinkmanResponseBean.setLastTime(messageTime);
-
-                list.add(messageLinkmanResponseBean);
-            }
-
-        }
-
-        PageResponseBean<MessageLinkmanResponseBean> pageResponseBean = new PageResponseBean<>(bean, messageListCount, list);
-
+        bean.setLeaderPath(leaderPath+"%");
+        Integer page = bean.getPage();
+        Integer pageSize = bean.getPageSize();
+        bean.setPage(page * pageSize);
+        List<MessageLinkmanResponseBean> messageLinkmanList = messageMapper.getMessageLinkmanList(bean);
+        Integer messageLinkmanListCount = messageMapper.getMessageLinkmanListCount(bean);
+        PageResponseBean<MessageLinkmanResponseBean> pageResponseBean = new PageResponseBean<>(bean,messageLinkmanListCount, messageLinkmanList);
 
         return pageResponseBean;
     }
-
 
     public void test() {
 

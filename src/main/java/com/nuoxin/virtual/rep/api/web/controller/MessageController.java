@@ -79,12 +79,13 @@ public class MessageController extends BaseController {
 
 
     @ApiOperation(value = "今日会话接口", notes = "今日会话接口")
-    @GetMapping("/getMessageCountList")
+    @PostMapping("/getMessageCountList")
     @ResponseBody
-    public ResponseEntity<DefaultResponseBean<Map<String,Integer>>> getList(HttpServletRequest request){
+    public ResponseEntity<DefaultResponseBean<Map<String,Integer>>> getMessageCountList(@RequestBody MessageRequestBean bean, HttpServletRequest request){
 
         Long loginId = getLoginId(request);
-        Map<String, Integer> messageCountList = messageService.getMessageCountList(loginId);
+        bean.setDrugUserId(loginId);
+        Map<String, Integer> messageCountList = messageService.getMessageCountList(bean);
 
         DefaultResponseBean<Map<String, Integer>> responseBean = new DefaultResponseBean<>();
         responseBean.setData(messageCountList);
