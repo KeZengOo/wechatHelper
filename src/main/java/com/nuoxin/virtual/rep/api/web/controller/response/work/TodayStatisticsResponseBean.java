@@ -77,7 +77,10 @@ public class TodayStatisticsResponseBean implements Serializable{
     private Integer meetingTotalTime;
 
     @ApiModelProperty(value = "参加会议的人数")
-    private Integer meetingTotalPerson;
+    private Integer meetingTotalPersonNum;
+
+    @ApiModelProperty(value = "参加会议的人次")
+    private Integer meetingTotalPersonCount;
 
     @ApiModelProperty(value = "平均每人的参会时间")
     private String meetingAvgTime;
@@ -227,12 +230,20 @@ public class TodayStatisticsResponseBean implements Serializable{
         this.meetingTotalTime = meetingTotalTime;
     }
 
-    public Integer getMeetingTotalPerson() {
-        return meetingTotalPerson;
+    public Integer getMeetingTotalPersonNum() {
+        return meetingTotalPersonNum;
     }
 
-    public void setMeetingTotalPerson(Integer meetingTotalPerson) {
-        this.meetingTotalPerson = meetingTotalPerson;
+    public void setMeetingTotalPersonNum(Integer meetingTotalPersonNum) {
+        this.meetingTotalPersonNum = meetingTotalPersonNum;
+    }
+
+    public Integer getMeetingTotalPersonCount() {
+        return meetingTotalPersonCount;
+    }
+
+    public void setMeetingTotalPersonCount(Integer meetingTotalPersonCount) {
+        this.meetingTotalPersonCount = meetingTotalPersonCount;
     }
 
     public String getMeetingAvgTime() {

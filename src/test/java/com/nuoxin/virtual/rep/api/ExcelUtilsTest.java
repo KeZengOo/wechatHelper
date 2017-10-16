@@ -5,6 +5,7 @@ import org.apache.poi.ss.usermodel.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,12 +14,11 @@ import java.util.List;
 public class ExcelUtilsTest {
 
     public static void main(String [] args){
-        ///List<List<String>> result = testReadExcel();
-        File file = new File("C:\\Users\\27168\\Desktop\\hh.xls");
-        String name = file.getName();
-        System.out.println(name);
-
-        byte b = 'a';
+        BigDecimal bd = new BigDecimal("1.5712905821E10");
+        String str = bd.toPlainString();
+        Long i = Long.parseLong(str);
+        String telephone = i + "";
+        System.out.println(telephone.length());
 
     }
 

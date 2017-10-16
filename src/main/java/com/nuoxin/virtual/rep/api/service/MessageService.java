@@ -17,6 +17,7 @@ import com.nuoxin.virtual.rep.api.mybatis.MessageMapper;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.utils.ExcelUtils;
 import com.nuoxin.virtual.rep.api.utils.RegularUtils;
+import com.nuoxin.virtual.rep.api.utils.StringFormatUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.vo.WechatMessageVo;
 import com.nuoxin.virtual.rep.api.web.controller.response.message.MessageLinkmanResponseBean;
@@ -171,6 +172,18 @@ public class MessageService extends BaseService {
                 String message = wechatMessageVo.getMessage();
                 String drugUserTelephone = wechatMessageVo.getDrugUserTelephone();
                 String doctorTelephone = wechatMessageVo.getDoctorTelephone();
+
+                drugUserTelephone = StringFormatUtil.getTelephoneStr(drugUserTelephone);
+                boolean matcher = RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, drugUserTelephone);
+                if (!matcher){
+                    throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "手机号输入有误，请检查是否是文本格式");
+                }
+                doctorTelephone = StringFormatUtil.getTelephoneStr(doctorTelephone);
+
+                boolean matcher2 = RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, doctorTelephone);
+                if (!matcher2){
+                    throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "手机号输入有误，请检查是否是文本格式");
+                }
 
                 //判断数据库中是否存在该条数据
                 Message findMessage = messageRepository.findTopByMessageTypeAndWechatNumberAndMessageTimeOrderByMessageTimeDesc(MessageTypeEnum.WECHAT.getMessageType(), wechatNumber, wechatTime);

@@ -11,11 +11,14 @@ import java.util.Date;
 public class MeetingVo {
 
 
-    @Excel(name = "会议标题", width = 50)
+    @Excel(name = "标题", width = 50)
     private String title;
 
-    @Excel(name = "讲者", width = 30)
+    @Excel(name = "演讲人", width = 30)
     private String speaker;
+
+    @Excel(name = "演讲人所属医院", width = 50)
+    private String hospital;
 
     @Excel(name = "会议开始时间", width = 30)
     private Date meetingStartTime;
@@ -56,6 +59,11 @@ public class MeetingVo {
         this.meetingEndTime = meetingEndTime;
     }
 
+    public String getHospital() {
+        return hospital;
+    }
 
-
+    public void setHospital(String hospital) {
+        this.hospital = hospital;
+    }
 }

@@ -11,7 +11,7 @@ import java.util.Date;
  * Create by tiancun on 2017/10/11
  */
 @Entity
-@Table(name = "virtual_meeting_detail")
+@Table(name = "t_meeting_attend_details")
 public class MeetingDetail extends IdEntity{
 
     @Column(name = "meeting_id", length = 20)
@@ -32,14 +32,20 @@ public class MeetingDetail extends IdEntity{
     @Column(name = "doctor_name", length = 30)
     private String doctorName;
 
-    @Column(name = "telephone", length = 20)
+    @Column(name = "attend_type")
+    private Integer attendWay;
+
+    @Column(name = "type")
+    private Integer attendType;
+
+    @Column(name = "download")
+    private Integer download;
+
+    @Column(name = "doctor_tel", length = 20)
     private String telephone;
 
     @Column(name = "create_time")
     private Date createTime;
-
-    @Column(name = "update_time")
-    private Date updateTime;
 
 
     public Long getMeetingId() {
@@ -106,11 +112,27 @@ public class MeetingDetail extends IdEntity{
         this.createTime = createTime;
     }
 
-    public Date getUpdateTime() {
-        return updateTime;
+    public Integer getAttendWay() {
+        return attendWay;
     }
 
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
+    public void setAttendWay(Integer attendWay) {
+        this.attendWay = attendWay;
+    }
+
+    public Integer getAttendType() {
+        return attendType;
+    }
+
+    public void setAttendType(Integer attendType) {
+        this.attendType = attendType;
+    }
+
+    public Integer getDownload() {
+        return download;
+    }
+
+    public void setDownload(Integer download) {
+        this.download = download;
     }
 }

@@ -31,8 +31,8 @@ public class MeetingController extends BaseController{
     @ApiOperation(value = "会议导入接口", notes = "会议导入接口")
     @PostMapping("/import")
     @ResponseBody
-    public ResponseEntity<DefaultResponseBean<Boolean>> importExcel(MultipartFile file,@RequestParam(value = "productId", required = true) Long productId,@RequestParam(value = "productName", required = true) String productName){
-        boolean flag = meetingService.importExcel(file, productId, productName);
+    public ResponseEntity<DefaultResponseBean<Boolean>> importExcel(MultipartFile file,@RequestParam(value = "productId", required = true) Long productId){
+        boolean flag = meetingService.importExcel(file, productId);
         DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
         responseBean.setData(flag);
         return ResponseEntity.ok(responseBean);
@@ -43,7 +43,9 @@ public class MeetingController extends BaseController{
     @ApiOperation(value = "会议列表接口", notes = "会议列表接口")
     @PostMapping("/getList")
     @ResponseBody
-    public ResponseEntity<DefaultResponseBean<PageResponseBean<MeetingResponseBean>>> getList(@RequestBody MeetingRequestBean bean){
+    public ResponseEntity<DefaultResponseBean<PageResponseBean<MeetingResponseBean>>> getList(@RequestBody MeetingRequestBean bean, HttpServletRequest request){
+        Long loginId = getLoginId(request);
+        bean.setDrugUserId(loginId);
 
         PageResponseBean<MeetingResponseBean> pageResponseBean = meetingService.getList(bean);
 

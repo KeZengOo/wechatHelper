@@ -5,34 +5,38 @@
     <select id="getCallInfoStatistics" resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.TodayStatisticsResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
 
-            select (select count(vdci.virtual_doctor_id) callCount from virtual_doctor_call_info vdci
-            inner join virtual_doctor_call_info_details vdcid
-            on vdci.id = vdcid.call_id
-            inner join virtual_doctor vd
-            on vdci.virtual_doctor_id=vd.id
-            inner join virtual_drug_user_doctor vdud
-            on vd.id = vdud.virtual_doctor_id
-            where
-            vd.drug_user_ids like #{drugUserIdStr}
-            and vdud.product_id= #{productId}
-            and vdcid.status_name='answer'
-            and vdci.product_id=#{productId}
-            and date_format(vdci.create_time, '%Y-%m-%d')=date_format(NOW(), '%Y-%m-%d')
-            ) as callCount,
-            (select count(distinct vdci.virtual_doctor_id) from virtual_doctor_call_info vdci
-            inner join virtual_doctor_call_info_details vdcid
-            on vdci.id = vdcid.call_id
-            inner join virtual_doctor vd
-            on vdci.virtual_doctor_id=vd.id
-            inner join virtual_drug_user_doctor vdud
-            on vd.id = vdud.virtual_doctor_id
-            where
-            vd.drug_user_ids like #{drugUserIdStr}
-            and vdud.product_id= #{productId}
-            and vdcid.status_name='answer'
-            and vdci.product_id=#{productId}
-            and date_format(vdci.create_time, '%Y-%m-%d')=date_format(NOW(), '%Y-%m-%d')
-            ) as callSum
+              select (
+                select count(distinct vdci.virtual_doctor_id)
+                from virtual_doctor_call_info vdci
+                inner join virtual_doctor_call_info_details vdcid
+                on vdci.id = vdcid.call_id
+                inner join drug_user_doctor dud
+                on vdci.virtual_drug_user_id=dud.drug_user_id
+                inner join drug_user du
+                on du.id = dud.drug_user_id
+                where
+                dud.prod_id=#{productId}
+                and du.leader_path like #{leaderPath}
+                and vdcid.status_name='answer'
+                and vdci.product_id = #{productId}
+                and date_format(vdci.create_time, '%Y-%m-%d')=date_format(NOW(), '%Y-%m-%d')
+                ) as callSum,
+                (
+                select count(distinct vdci.id)
+                from virtual_doctor_call_info vdci
+                inner join virtual_doctor_call_info_details vdcid
+                on vdci.id = vdcid.call_id
+                inner join drug_user_doctor dud
+                on vdci.virtual_drug_user_id=dud.drug_user_id
+                inner join drug_user du
+                on du.id = dud.drug_user_id
+                where
+                dud.prod_id=#{productId}
+                and du.leader_path like #{leaderPath}
+                and vdcid.status_name='answer'
+                and vdci.product_id = #{productId}
+                and date_format(vdci.create_time, '%Y-%m-%d')=date_format(NOW(), '%Y-%m-%d')
+                ) as callCount
 
     </select>
 

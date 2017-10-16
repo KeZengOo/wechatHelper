@@ -16,7 +16,7 @@ public class WorkStationRequestBean implements Serializable{
     private Long drugUserId;
 
     @ApiModelProperty(value = "模糊查询销售，前端不用传")
-    private String drugUserIdStr;
+    private String leaderPath;
 
     @ApiModelProperty(value = "产品id")
     private Long productId;
@@ -37,12 +37,11 @@ public class WorkStationRequestBean implements Serializable{
         this.productId = productId;
     }
 
-
-    public String getDrugUserIdStr() {
-        return drugUserIdStr;
+    public String getLeaderPath() {
+        return leaderPath;
     }
 
-    public void setDrugUserIdStr(String drugUserIdStr) {
-        this.drugUserIdStr = drugUserIdStr;
+    public void setLeaderPath(String leaderPath) {
+        this.leaderPath = leaderPath;
     }
 }

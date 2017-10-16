@@ -11,7 +11,7 @@ import java.util.Date;
  * Create by tiancun on 2017/10/11
  */
 @Entity
-@Table(name = "virtual_meeting")
+@Table(name = "t_meeting_data")
 public class Meeting extends IdEntity {
 
 
@@ -21,11 +21,14 @@ public class Meeting extends IdEntity {
     @Column(name = "speaker")
     private String speaker;
 
-    @Column(name = "meeting_start_time")
+    @Column(name = "start_time")
     private String meetingStartTime;
 
-    @Column(name = "meeting_end_time")
+    @Column(name = "end_time")
     private String meetingEndTime;
+
+    @Column(name = "s_hospital")
+    private String hospital;
 
     @Column(name = "product_id")
     private Long productId;
@@ -102,5 +105,13 @@ public class Meeting extends IdEntity {
 
     public void setProductName(String productName) {
         this.productName = productName;
+    }
+
+    public String getHospital() {
+        return hospital;
+    }
+
+    public void setHospital(String hospital) {
+        this.hospital = hospital;
     }
 }

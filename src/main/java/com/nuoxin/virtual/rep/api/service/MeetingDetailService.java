@@ -10,6 +10,7 @@ import com.nuoxin.virtual.rep.api.entity.MeetingDetail;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.utils.ExcelUtils;
 import com.nuoxin.virtual.rep.api.utils.RegularUtils;
+import com.nuoxin.virtual.rep.api.utils.StringFormatUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.vo.MeetingDetailVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -91,6 +92,7 @@ public class MeetingDetailService extends BaseService{
                 int m = (int)((meetingEnd - meetingStart)/(1000*60));
                 meetingDetail.setAttendSumTime(m);
                 String telephone = meetingDetailVo.getTelephone();
+                telephone = StringFormatUtil.getTelephoneStr(telephone);
                 boolean matcher = RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, telephone);
                 if (!matcher){
                     throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "手机号输入有误，请检查是否是文本格式");
@@ -102,8 +104,10 @@ public class MeetingDetailService extends BaseService{
                     meetingDetail.setDoctorName(doctor.getName());
                 }
 
+                meetingDetail.setAttendType(meetingDetailVo.getAttendType());
+                meetingDetail.setAttendWay(meetingDetailVo.getAttendWay());
+                meetingDetail.setDownload(meetingDetailVo.getDownload());
                 meetingDetail.setCreateTime(new Date());
-                meetingDetail.setUpdateTime(new Date());
 
                 meetingDetails.add(meetingDetail);
             }

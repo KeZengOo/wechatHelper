@@ -34,6 +34,11 @@ public class MeetingRequestBean extends PageRequestBean {
     @ApiModelProperty(value = "产品名称")
     private String productName;
 
+    @ApiModelProperty(value = "销售id,前端不用传")
+    private Long drugUserId;
+
+    @ApiModelProperty(value = "前端不用传")
+    private String leaderPath;
 
     public Long getId() {
         return id;
@@ -90,5 +95,22 @@ public class MeetingRequestBean extends PageRequestBean {
 
     public void setProductName(String productName) {
         this.productName = productName;
+    }
+
+
+    public Long getDrugUserId() {
+        return drugUserId;
+    }
+
+    public void setDrugUserId(Long drugUserId) {
+        this.drugUserId = drugUserId;
+    }
+
+    public String getLeaderPath() {
+        return leaderPath;
+    }
+
+    public void setLeaderPath(String leaderPath) {
+        this.leaderPath = leaderPath;
     }
 }
