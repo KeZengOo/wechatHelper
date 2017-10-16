@@ -39,4 +39,20 @@ public class WorkStationController extends BaseController{
 
     }
 
+
+    @ApiOperation(value = "本月目标接口", notes = "本月目标接口")
+    @PostMapping("/month/statistics")
+    @ResponseBody
+    public ResponseEntity<DefaultResponseBean<TodayStatisticsResponseBean>>  monthStatistics(@RequestBody WorkStationRequestBean bean, HttpServletRequest request){
+        Long loginId = getLoginId(request);
+        bean.setDrugUserId(loginId);
+        TodayStatisticsResponseBean todayStatistic = workStationService.getTodayStatistic(bean);
+        DefaultResponseBean<TodayStatisticsResponseBean> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(todayStatistic);
+        return ResponseEntity.ok(responseBean);
+
+
+    }
+
+
 }

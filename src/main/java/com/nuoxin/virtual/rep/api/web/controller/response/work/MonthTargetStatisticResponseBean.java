@@ -38,8 +38,8 @@ public class MonthTargetStatisticResponseBean implements Serializable{
     @ApiModelProperty(value = "本月目标会议人数")
     private Integer targetMeetingSum;
 
-    @ApiModelProperty(value = "本月目标会议人次")
-    private Integer targetMeetingCount;
+    @ApiModelProperty(value = "本月目标会议时长,单位分钟")
+    private Integer targetMeetingTotalTime;
 
 
     public Integer getTargetVisitSum() {
@@ -106,11 +106,12 @@ public class MonthTargetStatisticResponseBean implements Serializable{
         this.targetMeetingSum = targetMeetingSum;
     }
 
-    public Integer getTargetMeetingCount() {
-        return targetMeetingCount;
+
+    public Integer getTargetMeetingTotalTime() {
+        return targetMeetingTotalTime;
     }
 
-    public void setTargetMeetingCount(Integer targetMeetingCount) {
-        this.targetMeetingCount = targetMeetingCount;
+    public void setTargetMeetingTotalTime(Integer targetMeetingTotalTime) {
+        this.targetMeetingTotalTime = targetMeetingTotalTime;
     }
 }

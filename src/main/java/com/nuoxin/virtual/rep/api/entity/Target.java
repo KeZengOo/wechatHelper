@@ -38,11 +38,21 @@ public class Target extends IdEntity{
     @Column(name = "month_im_num")
     private Integer monthImNum;
 
+    @Column(name = "month_im_count")
+    private Integer monthImCount;
+
     @Column(name = "month_wechat_num")
     private Integer monthWechatNum;
 
+    @Column(name = "month_wechat_count")
+    private Integer monthWechatCount;
+
+
     @Column(name = "month_email_num")
     private Integer monthEmailNum;
+
+    @Column(name = "month_email_count")
+    private Integer monthEmailCount;
 
     @Column(name = "month_meeting_num")
     private Integer monthMeetingNum;
@@ -190,5 +200,30 @@ public class Target extends IdEntity{
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+
+    public Integer getMonthImCount() {
+        return monthImCount;
+    }
+
+    public void setMonthImCount(Integer monthImCount) {
+        this.monthImCount = monthImCount;
+    }
+
+    public Integer getMonthWechatCount() {
+        return monthWechatCount;
+    }
+
+    public void setMonthWechatCount(Integer monthWechatCount) {
+        this.monthWechatCount = monthWechatCount;
+    }
+
+    public Integer getMonthEmailCount() {
+        return monthEmailCount;
+    }
+
+    public void setMonthEmailCount(Integer monthEmailCount) {
+        this.monthEmailCount = monthEmailCount;
     }
 }

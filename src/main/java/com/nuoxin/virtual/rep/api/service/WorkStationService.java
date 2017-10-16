@@ -8,6 +8,7 @@ import com.nuoxin.virtual.rep.api.mybatis.DoctorCallInfoMapper;
 import com.nuoxin.virtual.rep.api.mybatis.EmailMapper;
 import com.nuoxin.virtual.rep.api.mybatis.MeetingDetailMapper;
 import com.nuoxin.virtual.rep.api.mybatis.MessageMapper;
+import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.work.CustomerStatisticResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.work.MonthTargetStatisticResponseBean;
@@ -301,8 +302,12 @@ public class WorkStationService {
         Integer perDayTargetMeetingPersonSum = 0;
         Integer perDayTargetMeetingPersonCount = 0;
 
-        //目前一月按照30天来算,四舍五入
-        Integer month = 30;
+        //当前月的天数
+        Integer month = DateUtil.getCurrentMonthLastDay();
+        if (month == null || month == 0){
+            month = 1;
+        }
+
         Integer monthTargetWechatNum = monthTarget.get("monthTargetWechatNum");
         Integer monthTargetImSum = monthTarget.get("monthTargetImSum");
         Integer monthTargetEmailNum = monthTarget.get("monthTargetEmailNum");
