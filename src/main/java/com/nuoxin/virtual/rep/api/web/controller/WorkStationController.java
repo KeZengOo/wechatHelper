@@ -4,6 +4,7 @@ import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
 import com.nuoxin.virtual.rep.api.service.WorkStationService;
 import com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.work.MonthTargetStatisticResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.work.TodayStatisticsResponseBean;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -41,14 +42,14 @@ public class WorkStationController extends BaseController{
 
 
     @ApiOperation(value = "本月目标接口", notes = "本月目标接口")
-    @PostMapping("/month/statistics")
+    @PostMapping("/month/target/statistics")
     @ResponseBody
-    public ResponseEntity<DefaultResponseBean<TodayStatisticsResponseBean>>  monthStatistics(@RequestBody WorkStationRequestBean bean, HttpServletRequest request){
+    public ResponseEntity<DefaultResponseBean<MonthTargetStatisticResponseBean>>  monthStatistics(@RequestBody WorkStationRequestBean bean, HttpServletRequest request){
         Long loginId = getLoginId(request);
         bean.setDrugUserId(loginId);
-        TodayStatisticsResponseBean todayStatistic = workStationService.getTodayStatistic(bean);
-        DefaultResponseBean<TodayStatisticsResponseBean> responseBean = new DefaultResponseBean<>();
-        responseBean.setData(todayStatistic);
+        MonthTargetStatisticResponseBean monthTargetStatistic = workStationService.getMonthTargetStatistic(bean);
+        DefaultResponseBean<MonthTargetStatisticResponseBean> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(monthTargetStatistic);
         return ResponseEntity.ok(responseBean);
 
 

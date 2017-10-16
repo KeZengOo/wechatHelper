@@ -53,6 +53,9 @@ public class TodayStatisticsResponseBean implements Serializable{
     @ApiModelProperty(value = "微信目标人数")
     private Integer targetWechatSum;
 
+    @ApiModelProperty(value = "目标微信人次")
+    private Integer targetWechatCount;
+
     @ApiModelProperty(value = "短信人数")
     private Integer imSum;
 
@@ -62,12 +65,18 @@ public class TodayStatisticsResponseBean implements Serializable{
     @ApiModelProperty(value = "短信目标人数")
     private Integer targetImSum;
 
+    @ApiModelProperty(value = "目标短信人次")
+    private Integer targetImCount;
+
 
     @ApiModelProperty(value = "邮件人数")
     private Integer emailSum;
 
     @ApiModelProperty(value = "邮件目标人数")
     private Integer targetEmailSum;
+
+    @ApiModelProperty(value = "目标邮件人次")
+    private Integer targetEmailCount;
 
 
     @ApiModelProperty(value = "会议人次")
@@ -268,5 +277,29 @@ public class TodayStatisticsResponseBean implements Serializable{
 
     public void setImCount(Integer imCount) {
         this.imCount = imCount;
+    }
+
+    public Integer getTargetWechatCount() {
+        return targetWechatCount;
+    }
+
+    public void setTargetWechatCount(Integer targetWechatCount) {
+        this.targetWechatCount = targetWechatCount;
+    }
+
+    public Integer getTargetImCount() {
+        return targetImCount;
+    }
+
+    public void setTargetImCount(Integer targetImCount) {
+        this.targetImCount = targetImCount;
+    }
+
+    public Integer getTargetEmailCount() {
+        return targetEmailCount;
+    }
+
+    public void setTargetEmailCount(Integer targetEmailCount) {
+        this.targetEmailCount = targetEmailCount;
     }
 }

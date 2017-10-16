@@ -20,49 +20,64 @@ public class Target extends IdEntity{
     @Column(name = "level", length = 10)
     private String level;
 
+    //月目标覆盖
     @Column(name = "month_covered")
     private Integer monthCovered;
 
+    //月目标电话个数
     @Column(name = "month_tel_num")
     private Integer monthTelNum;
 
+    //月目标电话总时长(单位秒)
     @Column(name = "month_tel_time")
     private Integer monthTelTime;
 
+    //月目标电话人数
     @Column(name = "month_tel_person")
     private Integer monthTelPerson;
 
+    //月目标电话每次平均时长(单位秒)
     @Column(name = "month_tel_avg_time")
     private Integer monthTelAvgTime;
 
+    //月目标短信数
     @Column(name = "month_im_num")
     private Integer monthImNum;
 
+    //月目标短信人次
     @Column(name = "month_im_count")
     private Integer monthImCount;
 
+    //月目标微信数
     @Column(name = "month_wechat_num")
     private Integer monthWechatNum;
 
+    //月目标微信人次
     @Column(name = "month_wechat_count")
     private Integer monthWechatCount;
 
 
+    //月目标邮件数
     @Column(name = "month_email_num")
     private Integer monthEmailNum;
 
+    //月目标邮件人次
     @Column(name = "month_email_count")
     private Integer monthEmailCount;
 
+    //月目标会议场次
     @Column(name = "month_meeting_num")
     private Integer monthMeetingNum;
 
+    //月目标会议总时长(单位分钟)
     @Column(name = "month_meeting_time")
     private Integer monthMeetingTime;
 
+    //月目标会议参数人数
     @Column(name = "month_meeting_person_sum")
     private Integer monthMeetingPersonSum;
 
+    //月目标会议人次
     @Column(name = "month_meeting_person_count")
     private Integer monthMeetingPersonCount;
 

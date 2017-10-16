@@ -73,8 +73,11 @@ public class WorkStationService {
 
         //今日目标数据
         Integer perDayTargetWechatNum = 0;
+        Integer perDayTargetWechatCount = 0;
         Integer perDayTargetImSum = 0;
+        Integer perDayTargetImCount = 0;
         Integer perDayTargetEmailNum = 0;
+        Integer perDayTargetEmailCount = 0;
         Integer perDayTargetCallSum = 0;
         Integer perDayTargetCallCount = 0;
         Integer perDayTargetMeetingSum = 0;
@@ -84,8 +87,11 @@ public class WorkStationService {
 
         Map<String, Integer> perDayTarget = getPerDayTarget(bean.getProductId());
         perDayTargetWechatNum = perDayTarget.get("perDayTargetWechatNum");
+        perDayTargetWechatCount = perDayTarget.get("perDayTargetWechatCount");
         perDayTargetImSum = perDayTarget.get("perDayTargetImSum");
+        perDayTargetImCount = perDayTarget.get("perDayTargetImCount");
         perDayTargetEmailNum = perDayTarget.get("perDayTargetEmailNum");
+        perDayTargetEmailCount = perDayTarget.get("perDayTargetEmailCount");
         perDayTargetCallSum = perDayTarget.get("perDayTargetCallSum");
         perDayTargetCallCount = perDayTarget.get("perDayTargetCallCount");
         perDayTargetMeetingSum = perDayTarget.get("perDayTargetMeetingSum");
@@ -181,8 +187,8 @@ public class WorkStationService {
         Integer visitCount = meetingCount + wechatCount + imCount + todayEmailCount + callCount;
         todayStatisticsResponseBean.setCallCount(visitCount);
 
-        //目标人次没有短信，邮件，微信的
-        Integer targetVisitCount = perDayTargetMeetingPersonCount + perDayTargetCallCount ;
+        //目标人次没有微信的
+        Integer targetVisitCount = perDayTargetMeetingPersonCount + perDayTargetCallCount + perDayTargetWechatCount + perDayTargetImCount + perDayTargetEmailCount;
         Integer targetVisitSum = perDayTargetMeetingPersonCount + perDayTargetCallSum + perDayTargetWechatNum + perDayTargetImSum + perDayTargetEmailNum;
         todayStatisticsResponseBean.setTargetVisitCount(targetVisitCount);
         todayStatisticsResponseBean.setTargetVisitSum(targetVisitSum);
@@ -197,8 +203,34 @@ public class WorkStationService {
      */
     public MonthTargetStatisticResponseBean getMonthTargetStatistic(WorkStationRequestBean bean){
 
+        MonthTargetStatisticResponseBean monthTargetStatistic = new MonthTargetStatisticResponseBean();
 
-        return null;
+        Map<String, Integer> monthTarget = getMonthTarget(bean.getProductId());
+        Integer monthTargetMeetingPersonSum = monthTarget.get("monthTargetMeetingPersonSum");
+        Integer monthTargetMeetingPersonCount = monthTarget.get("monthTargetMeetingPersonCount");
+        Integer monthTargetMeetingTime = monthTarget.get("monthTargetMeetingTime");
+        Integer monthTargetWechatNum = monthTarget.get("monthTargetWechatNum");
+        Integer monthTargetWechatCount = monthTarget.get("monthTargetWechatCount");
+        Integer monthTargetImSum = monthTarget.get("monthTargetImSum");
+        Integer monthTargetImCount = monthTarget.get("monthTargetImCount");
+        Integer monthTargetEmailNum = monthTarget.get("monthTargetEmailNum");
+        Integer monthTargetEmailCount = monthTarget.get("monthTargetEmailCount");
+        Integer monthTargetCallSum = monthTarget.get("monthTargetCallSum");
+        Integer monthTargetCallCount = monthTarget.get("monthTargetCallCount");
+        Integer monthTargetCallTime = monthTarget.get("monthTargetCallTime");
+
+        monthTargetStatistic.setTargetMeetingSum(monthTargetMeetingPersonSum);
+        monthTargetStatistic.setTargetMeetingTotalTime(monthTargetMeetingTime);
+        monthTargetStatistic.setTargetMessageSum(monthTargetWechatNum + monthTargetImSum + monthTargetEmailNum);
+        monthTargetStatistic.setTargetMessageCount(monthTargetWechatCount + monthTargetImCount + monthTargetEmailCount);
+        monthTargetStatistic.setTargetCallSum(monthTargetCallSum);
+        monthTargetStatistic.setTargetCallCount(monthTargetCallCount);
+        monthTargetStatistic.setTargetCallTime(monthTargetCallTime);
+        monthTargetStatistic.setTargetVisitSum(monthTargetMeetingPersonSum + monthTargetWechatNum + monthTargetImSum + monthTargetEmailNum);
+
+        monthTargetStatistic.setTargetVisitCount(monthTargetMeetingPersonCount + monthTargetWechatCount + monthTargetImCount + monthTargetEmailCount);
+
+        return monthTargetStatistic;
     }
 
 
@@ -242,10 +274,14 @@ public class WorkStationService {
     private Map<String, Integer> getMonthTarget(Long productId){
         Map<String, Integer> map = new HashMap<>();
         Integer monthTargetWechatNum = 0;
+        Integer monthTargetWechatCount = 0;
         Integer monthTargetImSum = 0;
+        Integer monthTargetImCount = 0;
         Integer monthTargetEmailNum = 0;
+        Integer monthTargetEmailCount = 0;
         Integer monthTargetCallSum = 0;
         Integer monthTargetCallCount = 0;
+        Integer monthTargetCallTime = 0;
         Integer monthTargetMeetingSum = 0;
         Integer monthTargetMeetingTime = 0;
         Integer monthTargetMeetingPersonSum = 0;
@@ -255,10 +291,14 @@ public class WorkStationService {
             for (Target target:targets){
                 if (target != null){
                     monthTargetWechatNum += target.getMonthWechatNum();
+                    monthTargetWechatCount += target.getMonthWechatCount();
                     monthTargetImSum += target.getMonthImNum();
+                    monthTargetImCount += target.getMonthImCount();
                     monthTargetEmailNum += target.getMonthEmailNum();
+                    monthTargetEmailCount += target.getMonthEmailCount();
                     monthTargetCallSum += target.getMonthTelPerson();
                     monthTargetCallCount += target.getMonthTelNum();
+                    monthTargetCallTime += target.getMonthTelTime();
                     monthTargetMeetingSum += target.getMonthMeetingNum();
                     monthTargetMeetingTime += target.getMonthMeetingTime();
                     monthTargetMeetingPersonSum += target.getMonthMeetingPersonSum();
@@ -268,10 +308,14 @@ public class WorkStationService {
         }
 
         map.put("monthTargetWechatNum", monthTargetWechatNum);
+        map.put("monthTargetWechatCount", monthTargetWechatCount);
         map.put("monthTargetImSum", monthTargetImSum);
+        map.put("monthTargetImCount", monthTargetImCount);
         map.put("monthTargetEmailNum", monthTargetEmailNum);
+        map.put("monthTargetEmailCount", monthTargetEmailCount);
         map.put("monthTargetCallSum", monthTargetCallSum);
         map.put("monthTargetCallCount", monthTargetCallCount);
+        map.put("monthTargetCallTime", monthTargetCallTime);
         map.put("monthTargetMeetingSum", monthTargetMeetingSum);
         map.put("monthTargetMeetingTime", monthTargetMeetingTime);
         map.put("monthTargetMeetingPersonSum", monthTargetMeetingPersonSum);
@@ -293,10 +337,14 @@ public class WorkStationService {
         }
 
         Integer perDayTargetWechatNum = 0;
+        Integer perDayTargetWechatCount = 0;
         Integer perDayTargetImSum = 0;
+        Integer perDayTargetImCount = 0;
         Integer perDayTargetEmailNum = 0;
+        Integer perDayTargetEmailCount = 0;
         Integer perDayTargetCallSum = 0;
         Integer perDayTargetCallCount = 0;
+        Integer perDayTargetCallTime = 0;
         Integer perDayTargetMeetingSum = 0;
         Integer perDayTargetMeetingTime = 0;
         Integer perDayTargetMeetingPersonSum = 0;
@@ -309,20 +357,28 @@ public class WorkStationService {
         }
 
         Integer monthTargetWechatNum = monthTarget.get("monthTargetWechatNum");
+        Integer monthTargetWechatCount = monthTarget.get("monthTargetWechatCount");
         Integer monthTargetImSum = monthTarget.get("monthTargetImSum");
+        Integer monthTargetImCount = monthTarget.get("monthTargetImCount");
         Integer monthTargetEmailNum = monthTarget.get("monthTargetEmailNum");
+        Integer monthTargetEmailCount = monthTarget.get("monthTargetEmailCount");
         Integer monthTargetCallSum = monthTarget.get("monthTargetCallSum");
         Integer monthTargetCallCount = monthTarget.get("monthTargetCallCount");
+        Integer monthTargetCallTime = monthTarget.get("monthTargetCallTime");
         Integer monthTargetMeetingSum = monthTarget.get("monthTargetMeetingSum");
         Integer monthTargetMeetingTime = monthTarget.get("monthTargetMeetingTime");
         Integer monthTargetMeetingPersonSum = monthTarget.get("monthTargetMeetingPersonSum");
         Integer monthTargetMeetingPersonCount = monthTarget.get("monthTargetMeetingPersonCount");
 
         perDayTargetWechatNum = Math.round(monthTargetWechatNum/month);
+        perDayTargetWechatCount = Math.round(monthTargetWechatCount/month);
         perDayTargetImSum = Math.round(monthTargetImSum/month);
+        perDayTargetImCount = Math.round(monthTargetImCount/month);
         perDayTargetEmailNum = Math.round(monthTargetEmailNum/month);
+        perDayTargetEmailCount = Math.round(monthTargetEmailCount/month);
         perDayTargetCallSum = Math.round(monthTargetCallSum/month);
         perDayTargetCallCount = Math.round(monthTargetCallCount/month);
+        perDayTargetCallTime = Math.round(monthTargetCallTime/month);
         perDayTargetMeetingSum = Math.round(monthTargetMeetingSum/month);
         perDayTargetMeetingTime = Math.round(monthTargetMeetingTime/month);
         perDayTargetMeetingPersonSum = Math.round(monthTargetMeetingPersonSum/month);
@@ -330,10 +386,14 @@ public class WorkStationService {
 
 
         map.put("perDayTargetWechatNum", perDayTargetWechatNum);
+        map.put("perDayTargetWechatCount", perDayTargetWechatCount);
         map.put("perDayTargetImSum", perDayTargetImSum);
+        map.put("perDayTargetImCount", perDayTargetImCount);
         map.put("perDayTargetEmailNum", perDayTargetEmailNum);
+        map.put("perDayTargetEmailCount", perDayTargetEmailCount);
         map.put("perDayTargetCallSum", perDayTargetCallSum);
         map.put("perDayTargetCallCount", perDayTargetCallCount);
+        map.put("perDayTargetCallTime", perDayTargetCallTime);
         map.put("perDayTargetMeetingSum", perDayTargetMeetingSum);
         map.put("perDayTargetMeetingTime", perDayTargetMeetingTime);
         map.put("perDayTargetMeetingPersonSum", perDayTargetMeetingPersonSum);
