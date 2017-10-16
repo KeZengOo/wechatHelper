@@ -2,6 +2,31 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.nuoxin.virtual.rep.api.mybatis.TrendAnalysisMapper">
 
+    <resultMap id="statResponseBean"
+               type="com.nuoxin.virtual.rep.api.web.controller.response.analysis.tr.TrendStatResponseBean">
+        <result column="wechats" property="wechat" jdbcType="INTEGER"/>
+        <result column="smss" property="sms" jdbcType="INTEGER"/>
+        <result column="connects" property="connect" jdbcType="INTEGER"/>
+        <result column="hours" property="hour" jdbcType="INTEGER"/>
+    </resultMap>
 
+    <select id="callOut" resultMap="statResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TrendAnalysisRequestBean">
+        select COUNT(DISTINCT dc.sin_token) connects,DATE_FORMAT(dc.create_time,'%k') hours,dc.create_time from virtual_doctor_call_info dc join virtual_doctor_call_info_details dcd on dcd.call_id=dc.id join drug_user d on d.id=dc.virtual_drug_user_id where dcd.status_name='answer'
+        and dc.create_time BETWEEN #{startDate} AND #{endDate} and d.leader_path like #{leaderPath,jdbcType=VARCHAR} group by DATE_FORMAT(dc.create_time,'%k') order by dc.create_time asc
+    </select>
 
+    <select id="sessionType1" resultMap="statResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TrendAnalysisRequestBean">
+        select DATE_FORMAT(m.message_time,'%k') hours,count(1) wechats from virtual_message m join drug_user d on m.drug_user_id=d.id where
+        m.message_time BETWEEN #{startDate} AND #{endDate} and d.leader_path like #{leaderPath,jdbcType=VARCHAR} and m.message_type=1 group by DATE_FORMAT(m.message_time,'%k') order by m.message_time asc
+
+    </select>
+
+    <select id="sessionType2" resultMap="statResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TrendAnalysisRequestBean">
+        select DATE_FORMAT(m.message_time,'%k') hours,count(1) smss from virtual_message m join drug_user d on m.drug_user_id=d.id where
+        m.message_time BETWEEN #{startDate} AND #{endDate} and d.leader_path like #{leaderPath,jdbcType=VARCHAR} and m.message_type=2 group by DATE_FORMAT(m.message_time,'%k') order by m.message_time asc
+
+    </select>
 </mapper>

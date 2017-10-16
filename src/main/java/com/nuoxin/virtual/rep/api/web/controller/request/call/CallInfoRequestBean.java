@@ -24,6 +24,7 @@ public class CallInfoRequestBean implements Serializable {
     @ApiModelProperty(value = "通话时长")
     private Long times;
 
+    @ApiModelProperty(value = "不用传")
     private Long drugUserId;
 
     public Long getId() {

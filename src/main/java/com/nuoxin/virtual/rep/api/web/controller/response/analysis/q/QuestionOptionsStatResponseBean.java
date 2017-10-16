@@ -12,6 +12,7 @@ import java.io.Serializable;
 public class QuestionOptionsStatResponseBean implements Serializable {
     private static final long serialVersionUID = 2371495444436598429L;
 
+    private Long questionId;
     @ApiModelProperty(value = "选项")
     private String key;
     @ApiModelProperty(value = "数量")
@@ -41,5 +42,13 @@ public class QuestionOptionsStatResponseBean implements Serializable {
 
     public void setPercentage(Float percentage) {
         this.percentage = percentage;
+    }
+
+    public Long getQuestionId() {
+        return questionId;
+    }
+
+    public void setQuestionId(Long questionId) {
+        this.questionId = questionId;
     }
 }

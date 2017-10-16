@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by fenggang on 10/12/17.
@@ -16,6 +17,9 @@ public class QuestionnaireStatResponseBean implements Serializable{
     private Integer peopleNum;
     @ApiModelProperty(value = "次数")
     private Integer countNum;
+
+    @ApiModelProperty(value = "图表集合")
+    private List<QuestionDateResponseBean> list;
 
     public Integer getPeopleNum() {
         return peopleNum;
@@ -31,5 +35,13 @@ public class QuestionnaireStatResponseBean implements Serializable{
 
     public void setCountNum(Integer countNum) {
         this.countNum = countNum;
+    }
+
+    public List<QuestionDateResponseBean> getList() {
+        return list;
+    }
+
+    public void setList(List<QuestionDateResponseBean> list) {
+        this.list = list;
     }
 }

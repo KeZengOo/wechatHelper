@@ -2,6 +2,183 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.nuoxin.virtual.rep.api.mybatis.TargetAnalysisMapper">
 
+    <resultMap id="mettingTargetResponseBean"
+               type="com.nuoxin.virtual.rep.api.web.controller.response.analysis.ta.MettingTargetResponseBean">
+        <result column="mTargetCount" property="mTargetCount" jdbcType="INTEGER"/>
+        <result column="dTargetCount" property="dTargetCount" jdbcType="INTEGER"/>
+    </resultMap>
 
+    <resultMap id="targetResponseBean"
+               type="com.nuoxin.virtual.rep.api.web.controller.response.analysis.ta.TargetResponseBean">
+        <result column="coverNum" property="coverNum" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <select id="meeting" resultMap="mettingTargetResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TargetAnalysisRequestBean">
+        select count(DISTINCT mad.doctor_tel) dCount,count(DISTINCT mad.meeting_id) mCount from
+        t_meeting_data md join t_meeting_attend_details mad on md.id=mad.meeting_id join drug_user d on
+        d.id=mad.drug_user_id where
+        mad.attend_start_time BETWEEN #{startDate} AND #{endDate} AND d.leader_path like #{leaderPath,jdbcType=VARCHAR}
+        <if test="productId!=null and productId!=0">
+            AND md.product_id=#{productId}
+        </if>
+        <if test="drugUserId!=null and drugUserId!=0">
+            AND mad.drug_user_id = #{drugUserId}
+        </if>
+    </select>
+
+    <select id="summation" resultType="java.lang.Integer"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TargetAnalysisRequestBean">
+        select count(DISTINCT t.doctor_id) from (
+        select DISTINCT vd.virtual_doctor_id doctor_id from virtual_doctor_call_info vd join drug_user d on
+        d.id=vd.virtual_drug_user_id where d.leader_path like #{leaderPath,jdbcType=VARCHAR}
+        AND vd.create_time BETWEEN #{startDate} AND #{endDate}
+        <if test="productId!=null and productId!=0">
+            AND vd.product_id=#{productId}
+        </if>
+        <if test="drugUserId!=null and drugUserId!=0">
+            AND vd.drug_user_id = #{drugUserId}
+        </if>
+        UNION ALL
+        select DISTINCT vm.doctor_id from virtual_message vm join drug_user d on d.id=vm.drug_user_id where
+        d.leader_path like #{leaderPath,jdbcType=VARCHAR}
+        AND vm.message_time BETWEEN #{startDate} AND #{endDate}
+        <if test="productId!=null and productId!=0">
+            AND vm.product_id=#{productId}
+        </if>
+        <if test="drugUserId!=null and drugUserId!=0">
+            AND vm.drug_user_id = #{drugUserId}
+        </if>
+        UNION ALL
+        select DISTINCT mad.doctor_id from t_meeting_attend_details mad join t_meeting_data md on md.id=mad.meeting_id
+        join drug_user d on d.id=mad.drug_user_id where d.leader_path like #{leaderPath,jdbcType=VARCHAR}
+        AND mad.attend_start_time BETWEEN #{startDate} AND #{endDate}
+        <if test="productId!=null and productId!=0">
+            AND md.product_id=#{productId}
+        </if>
+        <if test="drugUserId!=null and drugUserId!=0">
+            AND mad.drug_user_id = #{drugUserId}
+        </if>
+        ) t
+    </select>
+
+    <select id="customTelPerson" resultMap="targetResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TargetAnalysisRequestBean">
+        select count(DISTINCT vd.virtual_doctor_id) coverNum from virtual_doctor_call_info vd join doctor_virtual dv on
+        dv.doctor_id=vd.virtual_doctor_id join doctor do on do.id=vd.virtual_doctor_id join drug_user d on
+        d.id=vd.virtual_drug_user_id where d.leader_path like #{leaderPath,jdbcType=VARCHAR}
+        AND vd.create_time BETWEEN #{startDate} AND #{endDate}
+        <if test="productId!=null and productId!=0">
+            AND vd.product_id=#{productId}
+        </if>
+        <if test="drugUserId!=null and drugUserId!=0">
+            AND vd.drug_user_id = #{drugUserId}
+        </if>
+        <if test="area!=null and area!=''">
+            AND do.provice = #{area}
+        </if>
+        <if test="customLevle!=null and customLevle!=''">
+            AND dv.client_level = #{customLevle}
+        </if>
+    </select>
+
+    <select id="customTelCount" resultMap="targetResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TargetAnalysisRequestBean">
+        select count(vd.id) coverNum from virtual_doctor_call_info vd join doctor_virtual dv on
+        dv.doctor_id=vd.virtual_doctor_id join doctor do on do.id=vd.virtual_doctor_id join drug_user d on
+        d.id=vd.virtual_drug_user_id where d.leader_path like #{leaderPath,jdbcType=VARCHAR}
+        AND vd.create_time BETWEEN #{startDate} AND #{endDate}
+        <if test="productId!=null and productId!=0">
+            AND vd.product_id=#{productId}
+        </if>
+        <if test="drugUserId!=null and drugUserId!=0">
+            AND vd.drug_user_id = #{drugUserId}
+        </if>
+        <if test="area!=null and area!=''">
+            AND do.provice = #{area}
+        </if>
+        <if test="customLevle!=null and customLevle!=''">
+            AND dv.client_level = #{customLevle}
+        </if>
+    </select>
+
+    <select id="customSms" resultMap="targetResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TargetAnalysisRequestBean">
+        select count(DISTINCT vm.doctor_id) coverNum from virtual_message vm join doctor do on do.id=vm.doctor_id join doctor_virtual dv on dv.doctor_id=vm.doctor_id join drug_user d on d.id=vm.drug_user_id where
+        d.leader_path like #{leaderPath,jdbcType=VARCHAR} and vm.message_type=2
+        AND vm.message_time BETWEEN #{startDate} AND #{endDate}
+        <if test="productId!=null and productId!=0">
+            AND vm.product_id=#{productId}
+        </if>
+        <if test="drugUserId!=null and drugUserId!=0">
+            AND vm.drug_user_id = #{drugUserId}
+        </if>
+        <if test="area!=null and area!=''">
+            AND do.provice = #{area}
+        </if>
+        <if test="customLevle!=null and customLevle!=''">
+            AND dv.client_level = #{customLevle}
+        </if>
+    </select>
+
+    <select id="customWechat" resultMap="targetResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TargetAnalysisRequestBean">
+        select count(DISTINCT vm.doctor_id) coverNum from virtual_message vm join doctor do on do.id=vm.doctor_id join doctor_virtual dv on dv.doctor_id=vm.doctor_id join drug_user d on d.id=vm.drug_user_id where
+        d.leader_path like #{leaderPath,jdbcType=VARCHAR} and vm.message_type=1
+        AND vm.message_time BETWEEN #{startDate} AND #{endDate}
+        <if test="productId!=null and productId!=0">
+            AND vm.product_id=#{productId}
+        </if>
+        <if test="drugUserId!=null and drugUserId!=0">
+            AND vm.drug_user_id = #{drugUserId}
+        </if>
+        <if test="area!=null and area!=''">
+            AND do.provice = #{area}
+        </if>
+        <if test="customLevle!=null and customLevle!=''">
+            AND dv.client_level = #{customLevle}
+        </if>
+    </select>
+
+    <select id="customTelSum" resultMap="targetResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TargetAnalysisRequestBean">
+        select sum(vd.call_time) coverNum from virtual_doctor_call_info vd join doctor_virtual dv on
+        dv.doctor_id=vd.virtual_doctor_id join doctor do on do.id=vd.virtual_doctor_id join drug_user d on
+        d.id=vd.virtual_drug_user_id where d.leader_path like #{leaderPath,jdbcType=VARCHAR}
+        AND vd.create_time BETWEEN #{startDate} AND #{endDate}
+        <if test="productId!=null and productId!=0">
+            AND vd.product_id=#{productId}
+        </if>
+        <if test="drugUserId!=null and drugUserId!=0">
+            AND vd.drug_user_id = #{drugUserId}
+        </if>
+        <if test="area!=null and area!=''">
+            AND do.provice = #{area}
+        </if>
+        <if test="customLevle!=null and customLevle!=''">
+            AND dv.client_level = #{customLevle}
+        </if>
+
+    </select>
+
+    <select id="customTelAvg" resultMap="targetResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TargetAnalysisRequestBean">
+        select avg(vd.call_time) coverNum from virtual_doctor_call_info vd join doctor_virtual dv on
+        dv.doctor_id=vd.virtual_doctor_id join doctor do on do.id=vd.virtual_doctor_id join drug_user d on
+        d.id=vd.virtual_drug_user_id where d.leader_path like #{leaderPath,jdbcType=VARCHAR}
+        AND vd.create_time BETWEEN #{startDate} AND #{endDate}
+        <if test="productId!=null and productId!=0">
+            AND vd.product_id=#{productId}
+        </if>
+        <if test="drugUserId!=null and drugUserId!=0">
+            AND vd.drug_user_id = #{drugUserId}
+        </if>
+        <if test="area!=null and area!=''">
+            AND do.provice = #{area}
+        </if>
+        <if test="customLevle!=null and customLevle!=''">
+            AND dv.client_level = #{customLevle}
+        </if>
+    </select>
 
 </mapper>

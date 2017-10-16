@@ -13,20 +13,11 @@ public class TrendResponseBean implements Serializable {
 
     private static final long serialVersionUID = 6433705231350969340L;
 
-    @ApiModelProperty(value = "横坐标")
-    private String title;
+
     @ApiModelProperty(value = "数量")
     private Integer num;
     @ApiModelProperty(value = "百分比")
     private Float percentage;
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
 
     public Integer getNum() {
         return num;

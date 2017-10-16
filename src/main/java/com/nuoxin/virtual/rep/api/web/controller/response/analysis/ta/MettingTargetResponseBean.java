@@ -13,18 +13,18 @@ public class MettingTargetResponseBean implements Serializable {
     private static final long serialVersionUID = -4188264882364262626L;
 
     @ApiModelProperty(value = "目标会议数")
-    private Integer mTargetCount;
+    private Integer mTargetCount = 0;
     @ApiModelProperty(value = "会议数")
-    private Integer mCount;
+    private Integer mCount = 0;
     @ApiModelProperty(value = "会议百分比")
-    private Float mPercentage;
+    private Float mPercentage = 0f;
 
     @ApiModelProperty(value = "目标医生数")
-    private Integer dTargetCount;
+    private Integer dTargetCount = 0;
     @ApiModelProperty(value = "邀请医生数")
-    private Integer dCount;
+    private Integer dCount = 0;
     @ApiModelProperty(value = "医生百分比")
-    private Float dPercentage;
+    private Float dPercentage = 0f;
 
     public Integer getmTargetCount() {
         return mTargetCount;

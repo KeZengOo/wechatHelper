@@ -14,11 +14,11 @@ public class TargetResponseBean implements Serializable {
     private static final long serialVersionUID = 2477200536129913041L;
 
     @ApiModelProperty(value = "目标数")
-    private Integer targerNum;
+    private Integer targerNum = 0;
     @ApiModelProperty(value = "覆盖数")
-    private Integer coverNum;
+    private Integer coverNum = 0;
     @ApiModelProperty(value = "比例")
-    private Float percentage;
+    private Float percentage = 0f;
 
     public Integer getTargerNum() {
         return targerNum;

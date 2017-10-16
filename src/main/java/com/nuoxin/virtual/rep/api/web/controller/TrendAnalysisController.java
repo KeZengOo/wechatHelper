@@ -3,12 +3,18 @@ package com.nuoxin.virtual.rep.api.web.controller;
 import com.alibaba.fastjson.JSON;
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
+import com.nuoxin.virtual.rep.api.common.util.StringUtils;
+import com.nuoxin.virtual.rep.api.service.analysis.TrendAnalysisService;
+import com.nuoxin.virtual.rep.api.utils.DateUtil;
+import com.nuoxin.virtual.rep.api.web.controller.request.analysis.QuestionnaireAnalysisRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.analysis.TrendAnalysisRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.analysis.tr.TrendResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.analysis.tr.TrendStatResponseBean;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,12 +35,21 @@ public class TrendAnalysisController extends BaseController {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
+    @Autowired
+    private TrendAnalysisService trendAnalysisService;
+
     @ApiOperation(value = "汇总统计接口-呼出", notes = "汇总统计接口")
     @PostMapping("/summation/callout")
     public DefaultResponseBean<List<TrendResponseBean>> summationCallout(@RequestBody TrendAnalysisRequestBean bean,
                                                   HttpServletRequest request, HttpServletResponse response) {
         logger.info("{}-接口的请求参数【{}】",request.getServletPath(), JSON.toJSONString(bean));
         DefaultResponseBean<List<TrendResponseBean>> responseBean = new DefaultResponseBean();
+        String error = super.checkoutDate(bean);
+        if(StringUtils.isNotEmtity(error)){
+            responseBean.setCode(500);
+            responseBean.setMessage(error);
+            return responseBean;
+        }
 
         return responseBean;
     }
@@ -44,6 +60,12 @@ public class TrendAnalysisController extends BaseController {
                                                                             HttpServletRequest request, HttpServletResponse response) {
         logger.info("{}-接口的请求参数【{}】",request.getServletPath(), JSON.toJSONString(bean));
         DefaultResponseBean<List<TrendResponseBean>> responseBean = new DefaultResponseBean();
+        String error = super.checkoutDate(bean);
+        if(StringUtils.isNotEmtity(error)){
+            responseBean.setCode(500);
+            responseBean.setMessage(error);
+            return responseBean;
+        }
 
         return responseBean;
     }
@@ -54,6 +76,12 @@ public class TrendAnalysisController extends BaseController {
                                                                        HttpServletRequest request, HttpServletResponse response) {
         logger.info("{}-接口的请求参数【{}】",request.getServletPath(), JSON.toJSONString(bean));
         DefaultResponseBean<List<TrendResponseBean>> responseBean = new DefaultResponseBean();
+        String error = super.checkoutDate(bean);
+        if(StringUtils.isNotEmtity(error)){
+            responseBean.setCode(500);
+            responseBean.setMessage(error);
+            return responseBean;
+        }
 
         return responseBean;
     }
@@ -64,27 +92,42 @@ public class TrendAnalysisController extends BaseController {
                                                                             HttpServletRequest request, HttpServletResponse response) {
         logger.info("{}-接口的请求参数【{}】",request.getServletPath(), JSON.toJSONString(bean));
         DefaultResponseBean<List<TrendResponseBean>> responseBean = new DefaultResponseBean();
-
+        String error = super.checkoutDate(bean);
+        if(StringUtils.isNotEmtity(error)){
+            responseBean.setCode(500);
+            responseBean.setMessage(error);
+            return responseBean;
+        }
         return responseBean;
     }
 
     @ApiOperation(value = "呼出统计接口", notes = "呼出统计接口")
     @PostMapping("/callout")
-    public DefaultResponseBean<List<TrendResponseBean>> callOut(@RequestBody TrendAnalysisRequestBean bean,
-                                                HttpServletRequest request, HttpServletResponse response) {
+    public DefaultResponseBean<List<TrendStatResponseBean>> callOut(@RequestBody TrendAnalysisRequestBean bean,
+                                                                    HttpServletRequest request, HttpServletResponse response) {
         logger.info("{}-接口的请求参数【{}】",request.getServletPath(), JSON.toJSONString(bean));
-        DefaultResponseBean<List<TrendResponseBean>> responseBean = new DefaultResponseBean();
-
+        DefaultResponseBean<List<TrendStatResponseBean>> responseBean = new DefaultResponseBean();
+        if(StringUtils.isNotEmtity(bean.getDate())){
+            responseBean.setCode(500);
+            responseBean.setMessage("时间不能为空");
+            return responseBean;
+        }
+        responseBean.setData(trendAnalysisService.callOut(bean));
         return responseBean;
     }
 
     @ApiOperation(value = "会话统计接口", notes = "会话统计接口")
     @PostMapping("/session")
-    public DefaultResponseBean<List<TrendResponseBean>> session(@RequestBody TrendAnalysisRequestBean bean,
+    public DefaultResponseBean<List<TrendStatResponseBean>> session(@RequestBody TrendAnalysisRequestBean bean,
                                                                 HttpServletRequest request, HttpServletResponse response) {
         logger.info("{}-接口的请求参数【{}】",request.getServletPath(), JSON.toJSONString(bean));
-        DefaultResponseBean<List<TrendResponseBean>> responseBean = new DefaultResponseBean();
-
+        DefaultResponseBean<List<TrendStatResponseBean>> responseBean = new DefaultResponseBean();
+        if(StringUtils.isNotEmtity(bean.getDate())){
+            responseBean.setCode(500);
+            responseBean.setMessage("时间不能为空");
+            return responseBean;
+        }
+        responseBean.setData(trendAnalysisService.session(bean));
         return responseBean;
     }
 

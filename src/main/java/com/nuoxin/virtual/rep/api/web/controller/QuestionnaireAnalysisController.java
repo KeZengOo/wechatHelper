@@ -3,8 +3,10 @@ package com.nuoxin.virtual.rep.api.web.controller;
 import com.alibaba.fastjson.JSON;
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
+import com.nuoxin.virtual.rep.api.common.util.StringUtils;
 import com.nuoxin.virtual.rep.api.entity.Questionnaire;
 import com.nuoxin.virtual.rep.api.service.analysis.QuestionnaireAnalysisService;
+import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.analysis.QuestionnaireAnalysisRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.analysis.q.QuestionStatResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.analysis.q.QuestionnaireStatResponseBean;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -39,6 +42,11 @@ public class QuestionnaireAnalysisController extends BaseController {
                                                                         HttpServletRequest request, HttpServletResponse response) {
         logger.info("{}-接口的请求参数【{}】",request.getServletPath(), JSON.toJSONString(bean));
         DefaultResponseBean<QuestionnaireStatResponseBean> responseBean = new DefaultResponseBean();
+        if(!this._checkoutDate(bean)){
+            responseBean.setCode(500);
+            responseBean.setMessage("时间选择错误");
+            return responseBean;
+        }
         responseBean.setData(questionnaireAnalysisService.summation(bean));
         return responseBean;
     }
@@ -49,6 +57,11 @@ public class QuestionnaireAnalysisController extends BaseController {
                                                          HttpServletRequest request, HttpServletResponse response) {
         logger.info("{}-接口的请求参数【{}】",request.getServletPath(), JSON.toJSONString(bean));
         DefaultResponseBean<List<QuestionnaireResponseBean>> responseBean = new DefaultResponseBean();
+        if(!this._checkoutDate(bean)){
+            responseBean.setCode(500);
+            responseBean.setMessage("时间选择错误");
+            return responseBean;
+        }
         responseBean.setData(questionnaireAnalysisService.list(bean));
         return responseBean;
     }
@@ -59,7 +72,43 @@ public class QuestionnaireAnalysisController extends BaseController {
                                                                        HttpServletRequest request, HttpServletResponse response) {
         logger.info("{}-接口的请求参数【{}】",request.getServletPath(), JSON.toJSONString(bean));
         DefaultResponseBean<List<QuestionStatResponseBean>> responseBean = new DefaultResponseBean();
+        if(!this._checkoutDate(bean)){
+            responseBean.setCode(500);
+            responseBean.setMessage("时间选择错误");
+            return responseBean;
+        }
         responseBean.setData(questionnaireAnalysisService.details(bean));
         return responseBean;
     }
+
+    /**
+     * 检查传入进来的时间是否符合时间格式
+     *
+     * @return
+     */
+    private boolean _checkoutDate(QuestionnaireAnalysisRequestBean bean) {
+        String startDate = bean.getStartDate();
+        String endDate = bean.getEndDate();
+        if (!StringUtils.isNotEmtity(startDate)) {
+            startDate = "2017-10-01";
+        }
+        if (!StringUtils.isNotEmtity(endDate)) {
+            endDate = DateUtil.gettDateStrFromSpecialDate(new Date(), DateUtil.DATE_FORMAT_YMD);
+        }
+
+        startDate = startDate + " 00:00:00";
+        endDate = endDate + " 23:59:59";
+
+        Date start = DateUtil.getDateFromStr(startDate);
+        Date end = DateUtil.getDateFromStr(endDate);
+        if (start != null && end != null) {
+            if (start.getTime() < end.getTime()) {
+                return true;
+            }
+            return false;
+        } else {
+            return false;
+        }
+    }
+
 }

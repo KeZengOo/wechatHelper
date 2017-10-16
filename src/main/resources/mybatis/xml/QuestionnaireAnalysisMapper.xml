@@ -2,21 +2,127 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.nuoxin.virtual.rep.api.mybatis.QuestionnaireAnalysisMapper">
 
-    <resultMap id="questionnaireResponseBean" type="com.nuoxin.virtual.rep.api.web.controller.response.question.QuestionnaireResponseBean">
+    <resultMap id="questionnaireResponseBean"
+               type="com.nuoxin.virtual.rep.api.web.controller.response.question.QuestionnaireResponseBean">
         <result column="questionnaire_id" property="id" jdbcType="BIGINT"/>
         <result column="title" property="title" jdbcType="VARCHAR"/>
         <result column="product_id" property="productId" jdbcType="BIGINT"/>
     </resultMap>
+    <resultMap id="qStatResponseBean"
+               type="com.nuoxin.virtual.rep.api.web.controller.response.analysis.q.QuestionnaireStatResponseBean">
+        <result column="people_num" property="peopleNum" jdbcType="INTEGER"/>
+        <result column="count_num" property="countNum" jdbcType="INTEGER"/>
+    </resultMap>
+    <resultMap id="qDateResponseBean"
+               type="com.nuoxin.virtual.rep.api.web.controller.response.analysis.q.QuestionDateResponseBean">
+        <result column="date_title" property="date" jdbcType="VARCHAR"/>
+        <result column="month_num" property="monthNum" jdbcType="INTEGER"/>
+        <result column="day_num" property="dayNum" jdbcType="INTEGER"/>
+        <result column="count_num" property="countNum" jdbcType="INTEGER"/>
+        <result column="people_num" property="peopleNum" jdbcType="INTEGER"/>
+    </resultMap>
+    <resultMap id="questionBean"
+               type="com.nuoxin.virtual.rep.api.web.controller.response.analysis.q.QuestionStatResponseBean">
+        <id column="id" property="id" jdbcType="BIGINT"></id>
+        <result column="virtual_questionnaire_id" property="questionnaireId" jdbcType="BIGINT"/>
+        <result column="options" property="option" jdbcType="VARCHAR"/>
+        <result column="title" property="title" jdbcType="VARCHAR"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
+        <result column="answerNum" property="answerNum" jdbcType="INTEGER"/>
+    </resultMap>
 
-    <select id="list" resultMap="questionnaireResponseBean" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.QuestionnaireAnalysisRequestBean">
-        select dq.virtual_questionnaire_id questionnaire_id,q.title,q.product_id from virtual_doctor_questionnaire dq join virtual_questionnaire q on q.id=dq.virtual_questionnaire_id join drug_user du on du.id=dq.virtual_drug_user_id where 1=1
+
+    <resultMap id="qAnswerResponseBean"
+               type="com.nuoxin.virtual.rep.api.web.controller.response.analysis.q.QuestionOptionsStatResponseBean">
+        <result column="key" property="key" jdbcType="VARCHAR"/>
+        <result column="count_num" property="num" jdbcType="INTEGER"/>
+        <result column="question_id" property="questionId" jdbcType="BIGINT"/>
+    </resultMap>
+
+    <select id="list" resultMap="questionnaireResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.QuestionnaireAnalysisRequestBean">
+        select dq.virtual_questionnaire_id questionnaire_id,q.title,q.product_id from virtual_doctor_questionnaire dq
+        join virtual_questionnaire q on q.id=dq.virtual_questionnaire_id join drug_user du on
+        du.id=dq.virtual_drug_user_id where 1=1
         <if test="startDate!=null and startDate!=''">
-            AND dq.create_time &gt;= '2017-02-01'
+            AND dq.create_time &gt;= #{startDate}
         </if>
         <if test="endDate!=null and endDate!=''">
-            AND dq.create_time &lt;= '2017-12-01'
+            AND dq.create_time &lt;= #{endDate}
         </if>
         and du.leader_path like #{leaderPath,jdbcType=VARCHAR} GROUP BY dq.virtual_questionnaire_id;
+    </select>
+
+    <select id="summation" resultMap="qStatResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.QuestionnaireAnalysisRequestBean">
+        select count(dq.id) count_num,count(DISTINCT dq.virtual_doctor_id) people_num from virtual_doctor_questionnaire
+        dq
+        join virtual_questionnaire q on q.id=dq.virtual_questionnaire_id join drug_user du on
+        du.id=dq.virtual_drug_user_id where 1=1
+        <if test="startDate!=null and startDate!=''">
+            AND dq.create_time &gt;= #{startDate}
+        </if>
+        <if test="endDate!=null and endDate!=''">
+            AND dq.create_time &lt;= #{endDate}
+        </if>
+        and du.leader_path like #{leaderPath,jdbcType=VARCHAR}
+    </select>
+
+    <select id="summationList" resultMap="qDateResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.QuestionnaireAnalysisRequestBean">
+        select dq.create_time,DATE_FORMAT(dq.create_time,'%Y-%m-%d') date_title,count(dq.id) count_num,count(DISTINCT
+        dq.virtual_doctor_id) people_num from virtual_doctor_questionnaire dq
+        join virtual_questionnaire q on q.id=dq.virtual_questionnaire_id join drug_user du on
+        du.id=dq.virtual_drug_user_id where 1=1
+        <if test="startDate!=null and startDate!=''">
+            AND dq.create_time &gt;= #{startDate}
+        </if>
+        <if test="endDate!=null and endDate!=''">
+            AND dq.create_time &lt;= #{endDate}
+        </if>
+        and du.leader_path like #{leaderPath,jdbcType=VARCHAR} group by DATE_FORMAT(dq.create_time,'%Y-%m-%d')
+    </select>
+
+    <select id="questionList" resultMap="questionBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.QuestionnaireAnalysisRequestBean">
+        select q.id,q.virtual_questionnaire_id,q.title,q.options,q.type,count(DISTINCT dq.id) answerNum from virtual_doctor_questionnaire dq join virtual_question
+        q on q.id=dq.virtual_question_id join drug_user du on du.id=dq.virtual_drug_user_id where 1=1
+        <if test="startDate!=null and startDate!=''">
+            AND dq.create_time &gt;= #{startDate}
+        </if>
+        <if test="endDate!=null and endDate!=''">
+            AND dq.create_time &lt;= #{endDate}
+        </if>
+        and du.leader_path like #{leaderPath,jdbcType=VARCHAR}
+        and dq.virtual_questionnaire_id =#{questionnaireId} group by dq.virtual_question_id
+    </select>
+
+    <select id="questionUsreAnswerType0" resultMap="qAnswerResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.QuestionnaireAnalysisRequestBean">
+        select COUNT(dq.id),dq.virtual_question_id,dq.answer from virtual_doctor_questionnaire dq join virtual_question
+        q on q.id=dq.virtual_question_id join drug_user du on du.id=dq.virtual_drug_user_id where q.type=0
+        <if test="startDate!=null and startDate!=''">
+            AND dq.create_time &gt;= #{startDate}
+        </if>
+        <if test="endDate!=null and endDate!=''">
+            AND dq.create_time &lt;= #{endDate}
+        </if>
+        and du.leader_path like #{leaderPath,jdbcType=VARCHAR}
+        and dq.virtual_questionnaire_id =#{questionnaireId} group by dq.virtual_question_id,dq.answer
+    </select>
+
+    <select id="questionUsreAnswerType1" resultMap="qAnswerResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.QuestionnaireAnalysisRequestBean">
+        select COUNT(dq.id),dq.virtual_question_id,dq.answer from virtual_doctor_questionnaire dq join virtual_question
+        q on q.id=dq.virtual_question_id join drug_user du on du.id=dq.virtual_drug_user_id where q.type=0
+        <if test="startDate!=null and startDate!=''">
+            AND dq.create_time &gt;= #{startDate}
+        </if>
+        <if test="endDate!=null and endDate!=''">
+            AND dq.create_time &lt;= #{endDate}
+        </if>
+        and du.leader_path like #{leaderPath,jdbcType=VARCHAR}
+        and dq.virtual_questionnaire_id =#{questionnaireId} group by dq.virtual_question_id
     </select>
 
 </mapper>

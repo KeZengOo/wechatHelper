@@ -18,6 +18,8 @@ public class QuestionStatResponseBean extends QuestionRequestBean {
     @ApiModelProperty(value = "选项统计")
     private List<QuestionOptionsStatResponseBean> optionsStat;
 
+    private String option;
+
     public Integer getAnswerNum() {
         return answerNum;
     }
@@ -32,5 +34,13 @@ public class QuestionStatResponseBean extends QuestionRequestBean {
 
     public void setOptionsStat(List<QuestionOptionsStatResponseBean> optionsStat) {
         this.optionsStat = optionsStat;
+    }
+
+    public String getOption() {
+        return option;
+    }
+
+    public void setOption(String option) {
+        this.option = option;
     }
 }
