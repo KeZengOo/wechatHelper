@@ -10,6 +10,21 @@
         <result column="hours" property="hour" jdbcType="INTEGER"/>
     </resultMap>
 
+    <resultMap id="trendResponseBean"
+               type="com.nuoxin.virtual.rep.api.web.controller.response.analysis.tr.TrendResponseBean">
+        <result column="years" property="year" jdbcType="INTEGER"/>
+        <result column="months" property="month" jdbcType="INTEGER"/>
+        <result column="days" property="day" jdbcType="INTEGER"/>
+        <result column="weeks" property="week" jdbcType="INTEGER"/>
+        <result column="quarters" property="quarter" jdbcType="INTEGER"/>
+        <result column="date" property="date" jdbcType="VARCHAR"/>
+        <result column="num" property="num" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <select id="summationCallout" resultMap="trendResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TrendAnalysisRequestBean">
+    </select>
+
     <select id="callOut" resultMap="statResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TrendAnalysisRequestBean">
         select COUNT(DISTINCT dc.sin_token) connects,DATE_FORMAT(dc.create_time,'%k') hours,dc.create_time from virtual_doctor_call_info dc join virtual_doctor_call_info_details dcd on dcd.call_id=dc.id join drug_user d on d.id=dc.virtual_drug_user_id where dcd.status_name='answer'

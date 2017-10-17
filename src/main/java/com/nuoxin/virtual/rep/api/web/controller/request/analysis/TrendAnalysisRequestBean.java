@@ -90,8 +90,8 @@ public class TrendAnalysisRequestBean implements Serializable {
         String[] dates = getDate().split("-");
         if (dateType == 1) {
             Calendar calendar = Calendar.getInstance();
-            calendar.set(Integer.valueOf(dates[0]), Integer.valueOf(dates[1]) - 1, Integer.valueOf(dates[2]), 0, 0, 0);
-            calendar.set(Calendar.DAY_OF_YEAR, -6);
+            calendar.set(Integer.valueOf(dates[0]), Integer.valueOf(dates[1])- 1, Integer.valueOf(dates[2]) , 0, 0, 0);
+            calendar.add(Calendar.DAY_OF_YEAR, -6);
             setStartDate(DateUtil.getDateTimeString(calendar.getTime()));
             setEndDate(getDate() + " 23:00:00");
         } else if (dateType == 2) {
@@ -101,9 +101,11 @@ public class TrendAnalysisRequestBean implements Serializable {
             if (weekDay == 1) {
                 setEndDate(getDate() + " 23:59:59");
                 calendar.add(Calendar.DAY_OF_YEAR, -6);
+                calendar.add(Calendar.WEEK_OF_YEAR,-3);
                 setStartDate(DateUtil.getDateTimeString(calendar.getTime()));
             } else {
                 calendar.add(Calendar.DAY_OF_YEAR, 2 - weekDay);
+                calendar.add(Calendar.WEEK_OF_YEAR,-3);
                 setStartDate(DateUtil.getDateTimeString(calendar.getTime()));
                 calendar.add(Calendar.DAY_OF_YEAR, 9 - weekDay);
                 setEndDate(DateUtil.getDateTimeString(calendar.getTime()));

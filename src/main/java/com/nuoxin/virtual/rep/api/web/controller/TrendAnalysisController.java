@@ -50,7 +50,7 @@ public class TrendAnalysisController extends BaseController {
             responseBean.setMessage(error);
             return responseBean;
         }
-
+        responseBean.setData(trendAnalysisService.summationCallout(bean));
         return responseBean;
     }
 
@@ -66,7 +66,7 @@ public class TrendAnalysisController extends BaseController {
             responseBean.setMessage(error);
             return responseBean;
         }
-
+        responseBean.setData(trendAnalysisService.summationCalloutAvg(bean));
         return responseBean;
     }
 
@@ -82,7 +82,7 @@ public class TrendAnalysisController extends BaseController {
             responseBean.setMessage(error);
             return responseBean;
         }
-
+        responseBean.setData(trendAnalysisService.summationCover(bean));
         return responseBean;
     }
 
@@ -98,6 +98,7 @@ public class TrendAnalysisController extends BaseController {
             responseBean.setMessage(error);
             return responseBean;
         }
+        responseBean.setData(trendAnalysisService.summationSession(bean));
         return responseBean;
     }
 
