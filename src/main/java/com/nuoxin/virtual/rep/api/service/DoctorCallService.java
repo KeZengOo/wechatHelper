@@ -300,6 +300,7 @@ public class DoctorCallService extends BaseService {
         }else{
             info.setCallUrl(bean.getUrl());
         }
+        info.setFollowUpType(bean.getType());
         info.setRemark(bean.getRemark());
         //保存通话信息
         doctorCallInfoRepository.saveAndFlush(info);
@@ -339,6 +340,7 @@ public class DoctorCallService extends BaseService {
         callBean.setRemark(info.getRemark());
         callBean.setTimeLong(info.getCreateTime().getTime());
         callBean.setTimes(info.getCallTime());
+        callBean.setFollowUpType(info.getFollowUpType());
         callBean.setTimeStr(DateUtil.getDateTimeString(info.getCreateTime()));
         if(timeLong!=null && timeLong.equals(callBean.getTimeLong())){
             callBean.setCurrent(true);

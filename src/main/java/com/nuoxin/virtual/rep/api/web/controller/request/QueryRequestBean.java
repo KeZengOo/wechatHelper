@@ -28,7 +28,10 @@ public class QueryRequestBean extends PageRequestBean {
     @ApiModelProperty(value = "医生级别")
     private String doctorLevel;
 
+    @ApiModelProperty(value = "不用传")
     private Long drugUserId;
+    @ApiModelProperty(value = "不用传")
+    private String leaderPath;
 
     public String getMobile() {
         return mobile;
@@ -106,5 +109,13 @@ public class QueryRequestBean extends PageRequestBean {
     public String toString() {
         return mobile +  year + month + day + name + hospital +  department +
                 doctorLevel +  drugUserId + super.toString();
+    }
+
+    public String getLeaderPath() {
+        return leaderPath;
+    }
+
+    public void setLeaderPath(String leaderPath) {
+        this.leaderPath = leaderPath;
     }
 }

@@ -31,6 +31,8 @@ public class CallHistoryResponseBean implements Serializable {
     private Long timeLong;
     @ApiModelProperty(value = "问卷信息")
     private List<QuestionnaireRequestBean> questions;
+    @ApiModelProperty(value = "跟进类型")
+    private String followUpType;
 
     public Long getDoctorId() {
         return doctorId;
@@ -94,5 +96,13 @@ public class CallHistoryResponseBean implements Serializable {
 
     public void setCurrent(Boolean current) {
         this.current = current;
+    }
+
+    public String getFollowUpType() {
+        return followUpType;
+    }
+
+    public void setFollowUpType(String followUpType) {
+        this.followUpType = followUpType;
     }
 }

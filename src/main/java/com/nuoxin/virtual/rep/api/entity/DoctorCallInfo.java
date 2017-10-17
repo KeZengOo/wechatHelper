@@ -44,6 +44,8 @@ public class DoctorCallInfo extends IdEntity {
     private Long productId;
     @Column(name = "del_flag")
     private Integer delFlag = 0;
+    @Column(name = "follow_up_type")
+    private String followUpType;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH},fetch = FetchType.LAZY)
     @JoinColumn(name = "virtual_doctor_id")
@@ -175,5 +177,13 @@ public class DoctorCallInfo extends IdEntity {
 
     public void setDelFlag(Integer delFlag) {
         this.delFlag = delFlag;
+    }
+
+    public String getFollowUpType() {
+        return followUpType;
+    }
+
+    public void setFollowUpType(String followUpType) {
+        this.followUpType = followUpType;
     }
 }

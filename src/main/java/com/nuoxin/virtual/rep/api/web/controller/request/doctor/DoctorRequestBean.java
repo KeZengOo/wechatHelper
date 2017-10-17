@@ -39,7 +39,10 @@ public class DoctorRequestBean implements Serializable {
     @ApiModelProperty(value = "产品id")
     private Long productId;
 
+    @ApiModelProperty(value = "不用传")
     private Long drugUserId;
+    @ApiModelProperty(value = "不用传")
+    private String leaderPath;
 
     @ApiModelProperty(value = "动态添加的字段")
     List<DoctorDynamicFieldValueRequestBean> list;
@@ -154,5 +157,13 @@ public class DoctorRequestBean implements Serializable {
 
     public void setProductId(Long productId) {
         this.productId = productId;
+    }
+
+    public String getLeaderPath() {
+        return leaderPath;
+    }
+
+    public void setLeaderPath(String leaderPath) {
+        this.leaderPath = leaderPath;
     }
 }

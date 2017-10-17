@@ -32,8 +32,9 @@ public class DrugUserService {
         return drugUserRepository.findFirstByEmail(email);
     }
 
+    @Cacheable(value="virtual_app_web_druguser",key = "'_findById_'+#drugUserId")
     public DrugUser findById(Long drugUserId){
-        return drugUserRepository.getOne(drugUserId);
+        return drugUserRepository.findOne(drugUserId);
     }
 
     @Transactional(readOnly = false)

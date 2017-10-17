@@ -6,12 +6,14 @@ import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.DoctorCallService;
+import com.nuoxin.virtual.rep.api.service.FollowUpTypeService;
 import com.nuoxin.virtual.rep.api.web.controller.request.CallbackRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.CallHistoryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.CallInfoRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.CallRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserCallDetaiBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.FollowUpTypResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.LoginResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.call.CallHistoryResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.call.CallResponseBean;
@@ -26,6 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.List;
 
 /**
  * Created by fenggang on 9/11/17.
@@ -37,6 +40,8 @@ public class DoctorCallController extends BaseController {
 
     @Autowired
     private DoctorCallService doctorCallService;
+    @Autowired
+    private FollowUpTypeService followUpTypeService;
 
     @RequestMapping("/callback")
     public DefaultResponseBean<Object> callback(HttpServletRequest request, HttpServletResponse response){
@@ -176,9 +181,16 @@ public class DoctorCallController extends BaseController {
 
     @ApiOperation(value = "获取跟进类型集合", notes = "获取跟进类型集合")
     @GetMapping("/type/list")
-    public DefaultResponseBean<Object> typeList(HttpServletRequest request, HttpServletResponse response){
-
-        return null;
+    public DefaultResponseBean<List<FollowUpTypResponseBean>> typeList(HttpServletRequest request, HttpServletResponse response){
+        DefaultResponseBean responseBean = new DefaultResponseBean();
+        DrugUser user = this.getLoginUser(request);
+        if(user==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
+        }
+        responseBean.setData(followUpTypeService.list(user.getLeaderPath()));
+        return responseBean;
     }
 
 }

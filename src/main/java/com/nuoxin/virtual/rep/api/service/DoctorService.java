@@ -31,6 +31,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.management.StringValueExp;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
@@ -77,10 +78,6 @@ public class DoctorService extends BaseService {
         return doctorRepository.findByMobileIn(mobiles);
     }
 
-    public List<Doctor> findByEmailIn(Collection<String> emails) {
-        return doctorRepository.findByEmailIn(emails);
-    }
-
     @Cacheable(value = "virtual_rep_api_doctor", key = "'_page_'+#bean")
     public PageResponseBean<DoctorResponseBean> page(QueryRequestBean bean) {
         PageRequest pageable = super.getPage(bean);
@@ -89,7 +86,7 @@ public class DoctorService extends BaseService {
             public Predicate toPredicate(Root<Doctor> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
                 List<Predicate> predicates = new ArrayList<>();
                 if (bean.getDrugUserId() != null && bean.getDrugUserId() != 0) {
-                    predicates.add(cb.like(root.get("drugUserIds").as(String.class), "%" + bean.getDrugUserId() + ",%"));
+                    predicates.add(cb.like(root.get("doctorVirtual").get("drugUserIds").as(String.class), "%," + bean.getDrugUserId() + ",%"));
                 }
                 if (StringUtils.isNotEmtity(bean.getName())) {
                     predicates.add(cb.like(root.get("name").as(String.class), "%" + bean.getName() + "%"));
@@ -131,7 +128,7 @@ public class DoctorService extends BaseService {
     @Cacheable(value = "virtual_rep_api_doctor", key = "'_stat_'+#drugUserId")
     public DoctorStatResponseBean stat(Long drugUserId) {
         DoctorStatResponseBean responseBean = new DoctorStatResponseBean();
-        Map<String, Long> map = doctorRepository.statDrugUserDoctorNum("%" + drugUserId + ",%");
+        Map<String, Long> map = doctorRepository.statDrugUserDoctorNum("%," + drugUserId + ",%");
         if (map != null) {
             responseBean.setDoctorNum(map.get("doctorNum") != null ? Integer.valueOf(map.get("doctorNum") + "") : 0);
             responseBean.setHospitalNum(map.get("hospitalNum") != null ? Integer.valueOf(map.get("hospitalNum") + "") : 0);
@@ -146,10 +143,10 @@ public class DoctorService extends BaseService {
         DoctorVirtual virtual = new DoctorVirtual();
         if (doctor == null) {
             doctor = new Doctor();
-            virtual.setDrugUserIds("," + bean.getDrugUserId() + ",");
+            virtual.setDrugUserIds(this.assembleLeaderPath(bean.getLeaderPath(),bean.getDrugUserId()));
         } else {
             virtual = doctor.getDoctorVirtual();
-            virtual.setDrugUserIds(virtual.getDrugUserIds() + bean.getDrugUserId() + ',');
+            virtual.setDrugUserIds(this.assembleLeaderPath(this.assembleLeaderPath(virtual.getDrugUserIds(),bean.getDrugUserId()),bean.getDrugUserId()));
         }
 //        BeanUtils.copyProperties(bean,doctor);
         doctor.setCity(bean.getCity());
@@ -211,10 +208,10 @@ public class DoctorService extends BaseService {
         DoctorVirtual virtual = new DoctorVirtual();
         if (doctor == null) {
             doctor = new Doctor();
-            virtual.setDrugUserIds("," + bean.getDrugUserId() + ",");
+            virtual.setDrugUserIds(this.assembleLeaderPath(bean.getLeaderPath(),bean.getDrugUserId()));
         } else {
             virtual = doctor.getDoctorVirtual();
-            virtual.setDrugUserIds(virtual.getDrugUserIds() + bean.getDrugUserId() + ',');
+            virtual.setDrugUserIds(this.assembleLeaderPath(this.assembleLeaderPath(virtual.getDrugUserIds(),bean.getDrugUserId()),bean.getDrugUserId()));
         }
 //        BeanUtils.copyProperties(bean,doctor);
         doctor.setCity(bean.getCity());
@@ -291,7 +288,7 @@ public class DoctorService extends BaseService {
             doctors = this.findByMobileIn(mobiles);
         }
 
-        Map<String, Long> map = new HashMap<>();
+        Map<String, DrugUser> map = new HashMap<>();
         List<Doctor> savelist = new ArrayList<>();
         for (int i = 0, leng = list.size(); i < leng; i++) {
             DoctorExcel excel = list.get(i);
@@ -336,19 +333,20 @@ public class DoctorService extends BaseService {
                     if (drugUser != null) {
                         if (StringUtils.isNotEmtity(virtual.getDrugUserIds())) {
                             virtual.setDrugUserIds(virtual.getDrugUserIds() + drugUser.getId() + ",");
+                            virtual.setDrugUserIds(this.assembleLeaderPath(virtual.getDrugUserIds()+drugUser.getLeaderPath(),drugUser.getId()));
                         } else {
-                            virtual.setDrugUserIds("," + drugUser.getId() + ",");
+                            virtual.setDrugUserIds(this.assembleLeaderPath(drugUser.getLeaderPath(),drugUser.getId()));
                         }
-                        map.put(excel.getDrugUserEmail(), drugUser.getId());
+                        map.put(excel.getDrugUserEmail(), drugUser);
                         drugUserId = drugUser.getId();
                     }
                 } else {
                     if (StringUtils.isNotEmtity(virtual.getDrugUserIds())) {
-                        virtual.setDrugUserIds(virtual.getDrugUserIds() + map.get(excel.getDrugUserEmail()) + ",");
+                        virtual.setDrugUserIds(this.assembleLeaderPath(virtual.getDrugUserIds() + map.get(excel.getDrugUserEmail()).getLeaderPath() ,map.get(excel.getDrugUserEmail()).getId()));
                     } else {
-                        virtual.setDrugUserIds("," + map.get(excel.getDrugUserEmail()) + ",");
+                        virtual.setDrugUserIds(this.assembleLeaderPath(map.get(excel.getDrugUserEmail()).getLeaderPath(),map.get(excel.getDrugUserEmail()).getId()));
                     }
-                    drugUserId = map.get(excel.getDrugUserEmail());
+                    drugUserId = map.get(excel.getDrugUserEmail()).getId();
                 }
 
             }
@@ -385,7 +383,7 @@ public class DoctorService extends BaseService {
             doctors = this.findByMobileIn(mobiles);
         }
 
-        Map<String, Long> map = new HashMap<>();
+        Map<String, DrugUser> map = new HashMap<>();
         List<Doctor> savelist = new ArrayList<>();
         for (int i = 0, leng = list.size(); i < leng; i++) {
             DoctorExcel excel = list.get(i);
@@ -429,16 +427,17 @@ public class DoctorService extends BaseService {
                     if (drugUser != null) {
                         if (StringUtils.isNotEmtity(virtual.getDrugUserIds())) {
                             virtual.setDrugUserIds(virtual.getDrugUserIds() + drugUser.getId() + ",");
+                            virtual.setDrugUserIds(this.assembleLeaderPath(virtual.getDrugUserIds()+drugUser.getLeaderPath(),drugUser.getId()));
                         } else {
-                            virtual.setDrugUserIds("," + drugUser.getId() + ",");
+                            virtual.setDrugUserIds(this.assembleLeaderPath(drugUser.getLeaderPath(),drugUser.getId()));
                         }
-                        map.put(excel.getDrugUserEmail(), drugUser.getId());
+                        map.put(excel.getDrugUserEmail(), drugUser);
                     }
                 } else {
                     if (StringUtils.isNotEmtity(virtual.getDrugUserIds())) {
-                        virtual.setDrugUserIds(virtual.getDrugUserIds() + map.get(excel.getDrugUserEmail()) + ",");
+                        virtual.setDrugUserIds(this.assembleLeaderPath(virtual.getDrugUserIds() + map.get(excel.getDrugUserEmail()).getLeaderPath() ,map.get(excel.getDrugUserEmail()).getId()));
                     } else {
-                        virtual.setDrugUserIds("," + map.get(excel.getDrugUserEmail()) + ",");
+                        virtual.setDrugUserIds(this.assembleLeaderPath(map.get(excel.getDrugUserEmail()).getLeaderPath(),map.get(excel.getDrugUserEmail()).getId()));
                     }
                 }
 
@@ -487,5 +486,20 @@ public class DoctorService extends BaseService {
             }
         }
         return true;
+    }
+
+    private String assembleLeaderPath(String drugUserIds,Long drugUserId){
+        String[] ids = drugUserIds.split(",");
+        Map<String,String> map = new HashMap<>();
+        for (String id:ids) {
+            if(StringUtils.isNotEmtity(id))
+                map.put(id,id);
+        }
+        StringBuffer sb = new StringBuffer(",");
+        map.put(drugUserId.toString(),drugUserIds.toLowerCase());
+        for (String key:map.keySet()) {
+            sb.append(map.get(key)+",");
+        }
+        return sb.toString();
     }
 }

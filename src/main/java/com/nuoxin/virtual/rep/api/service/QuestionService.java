@@ -123,6 +123,9 @@ public class QuestionService extends BaseService {
                 if(bean.getDrugUserId()!=null&&bean.getDrugUserId()!=0){
                     predicates.add(cb.equal(root.get("createId").as(Long.class),bean.getDrugUserId()));
                 }
+                if(bean.getProductId()!=null&&bean.getProductId()!=0){
+                    predicates.add(cb.equal(root.get("productId").as(Long.class),bean.getProductId()));
+                }
                 if(StringUtils.isNotEmtity(bean.getQuery())){
                     predicates.add(cb.like(root.get("title").as(String.class),"%"+bean.getQuery()+"%"));
                 }
