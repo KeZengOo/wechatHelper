@@ -5,6 +5,7 @@ import com.nuoxin.virtual.rep.api.common.bean.DoctorExcel;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
 import com.nuoxin.virtual.rep.api.common.util.StringUtils;
+import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.DoctorService;
 import com.nuoxin.virtual.rep.api.utils.ExcelUtils;
 import com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean;
@@ -58,7 +59,14 @@ public class DoctorController extends BaseController {
     public DefaultResponseBean<PageResponseBean<DoctorResponseBean>> page(@RequestBody QueryRequestBean bean,
                                                                           HttpServletRequest request, HttpServletResponse response){
         DefaultResponseBean responseBean = new DefaultResponseBean();
-        bean.setDrugUserId(super.getLoginId(request));
+        DrugUser user = super.getLoginUser(request);
+        if(user==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
+        }
+        bean.setDrugUserId(user.getId());
+        bean.setLeaderPath(user.getLeaderPath());
         responseBean.setData(doctorService.page(bean));
         return responseBean;
     }
@@ -76,7 +84,14 @@ public class DoctorController extends BaseController {
     public DefaultResponseBean<Boolean> save(@RequestBody DoctorRequestBean bean,
                                              HttpServletRequest request, HttpServletResponse response){
         DefaultResponseBean responseBean = new DefaultResponseBean();
-        bean.setDrugUserId(super.getLoginId(request));
+        DrugUser user = super.getLoginUser(request);
+        if(user==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
+        }
+        bean.setDrugUserId(user.getId());
+        bean.setLeaderPath(user.getLeaderPath());
         responseBean.setData(doctorService.save(bean));
         return responseBean;
     }
@@ -86,7 +101,14 @@ public class DoctorController extends BaseController {
     public DefaultResponseBean<Boolean> update(@RequestBody DoctorRequestBean bean,
                                              HttpServletRequest request, HttpServletResponse response){
         DefaultResponseBean responseBean = new DefaultResponseBean();
-        bean.setDrugUserId(super.getLoginId(request));
+        DrugUser user = super.getLoginUser(request);
+        if(user==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
+        }
+        bean.setDrugUserId(user.getId());
+        bean.setLeaderPath(user.getLeaderPath());
         responseBean.setData(doctorService.update(bean));
         return responseBean;
     }

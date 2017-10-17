@@ -91,7 +91,7 @@ public class DoctorCallController extends BaseController {
         DefaultResponseBean<LoginResponseBean> responseBean = new DefaultResponseBean();
         DrugUser drugUser = this.getLoginUser(request);
         if (drugUser == null) {
-            responseBean.setCode(500);
+            responseBean.setCode(300);
             responseBean.setMessage("登录失效");
             return responseBean;
         }
@@ -108,7 +108,14 @@ public class DoctorCallController extends BaseController {
     public DefaultResponseBean<PageResponseBean<CallResponseBean>> doctorPage(@RequestBody QueryRequestBean bean,
                                                                               HttpServletRequest request, HttpServletResponse response){
         DefaultResponseBean responseBean = new DefaultResponseBean();
-        bean.setDrugUserId(super.getLoginId(request));
+        DrugUser user = super.getLoginUser(request);
+        if(user==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
+        }
+        bean.setDrugUserId(user.getId());
+        bean.setLeaderPath(user.getLeaderPath());
         responseBean.setData(doctorCallService.doctorPage(bean));
         return responseBean;
     }
@@ -118,7 +125,14 @@ public class DoctorCallController extends BaseController {
     public DefaultResponseBean<PageResponseBean<CallHistoryResponseBean>> doctorHistoryPage(@RequestBody CallHistoryRequestBean bean,
                                                                                             HttpServletRequest request, HttpServletResponse response){
         DefaultResponseBean responseBean = new DefaultResponseBean();
-        bean.setDrugUserId(super.getLoginId(request));
+        DrugUser user = super.getLoginUser(request);
+        if(user==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
+        }
+        bean.setDrugUserId(user.getId());
+        bean.setLeaderPath(user.getLeaderPath());
         responseBean.setData(doctorCallService.doctorHistoryPage(bean));
         return responseBean;
     }
@@ -136,7 +150,13 @@ public class DoctorCallController extends BaseController {
     public DefaultResponseBean<CallRequestBean> save(@RequestBody CallRequestBean bean,
                                     HttpServletRequest request, HttpServletResponse response){
         DefaultResponseBean responseBean = new DefaultResponseBean();
-        bean.setDrugUserId(super.getLoginId(request));
+        DrugUser user = super.getLoginUser(request);
+        if(user==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
+        }
+        bean.setDrugUserId(user.getId());
         responseBean.setData(doctorCallService.save(bean));
         return responseBean;
     }
@@ -152,7 +172,13 @@ public class DoctorCallController extends BaseController {
             responseBean.setMessage("请求参数id不能为空");
             return responseBean;
         }
-        bean.setDrugUserId(super.getLoginId(request));
+        DrugUser user = super.getLoginUser(request);
+        if(user==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
+        }
+        bean.setDrugUserId(user.getId());
         bean = doctorCallService.update(bean);
         if(bean.getId()==null){
             responseBean.setCode(500);
@@ -174,7 +200,13 @@ public class DoctorCallController extends BaseController {
             responseBean.setMessage("请求参数id不能为空");
             return responseBean;
         }
-        bean.setDrugUserId(super.getLoginId(request));
+        DrugUser user = super.getLoginUser(request);
+        if(user==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
+        }
+        bean.setDrugUserId(user.getId());
         responseBean.setData(doctorCallService.stopUpdate(bean));
         return responseBean;
     }

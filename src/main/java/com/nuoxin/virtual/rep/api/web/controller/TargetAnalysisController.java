@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
 import com.nuoxin.virtual.rep.api.common.util.StringUtils;
+import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.analysis.TargetAnalysisService;
 import com.nuoxin.virtual.rep.api.web.controller.request.analysis.TargetAnalysisRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.analysis.ta.MettingTargetResponseBean;
@@ -47,6 +48,14 @@ public class TargetAnalysisController extends BaseController{
             responseBean.setMessage(error);
             return responseBean;
         }
+        DrugUser user = super.getLoginUser(request);
+        if(user==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
+        }
+        bean.setDrugUserId(user.getId());
+        bean.setLeaderPath(user.getLeaderPath());
         responseBean.setData(targetAnalysisService.summation(bean));
         return responseBean;
     }
@@ -63,6 +72,14 @@ public class TargetAnalysisController extends BaseController{
             responseBean.setMessage(error);
             return responseBean;
         }
+        DrugUser user = super.getLoginUser(request);
+        if(user==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
+        }
+        bean.setDrugUserId(user.getId());
+        bean.setLeaderPath(user.getLeaderPath());
         responseBean.setData(targetAnalysisService.custom_tel_person(bean));
         return responseBean;
     }
@@ -79,6 +96,14 @@ public class TargetAnalysisController extends BaseController{
             responseBean.setMessage(error);
             return responseBean;
         }
+        DrugUser user = super.getLoginUser(request);
+        if(user==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
+        }
+        bean.setDrugUserId(user.getId());
+        bean.setLeaderPath(user.getLeaderPath());
         responseBean.setData(targetAnalysisService.custom_tel_count(bean));
         return responseBean;
     }
@@ -95,6 +120,14 @@ public class TargetAnalysisController extends BaseController{
             responseBean.setMessage(error);
             return responseBean;
         }
+        DrugUser user = super.getLoginUser(request);
+        if(user==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
+        }
+        bean.setDrugUserId(user.getId());
+        bean.setLeaderPath(user.getLeaderPath());
         responseBean.setData(targetAnalysisService.custom_sms(bean));
         return responseBean;
     }
@@ -111,6 +144,14 @@ public class TargetAnalysisController extends BaseController{
             responseBean.setMessage(error);
             return responseBean;
         }
+        DrugUser user = super.getLoginUser(request);
+        if(user==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
+        }
+        bean.setDrugUserId(user.getId());
+        bean.setLeaderPath(user.getLeaderPath());
         responseBean.setData(targetAnalysisService.custom_wechat(bean));
         return responseBean;
     }
@@ -127,6 +168,14 @@ public class TargetAnalysisController extends BaseController{
             responseBean.setMessage(error);
             return responseBean;
         }
+        DrugUser user = super.getLoginUser(request);
+        if(user==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
+        }
+        bean.setDrugUserId(user.getId());
+        bean.setLeaderPath(user.getLeaderPath());
         responseBean.setData(targetAnalysisService.custom_tel_sum(bean));
         return responseBean;
     }
@@ -143,6 +192,14 @@ public class TargetAnalysisController extends BaseController{
             responseBean.setMessage(error);
             return responseBean;
         }
+        DrugUser user = super.getLoginUser(request);
+        if(user==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
+        }
+        bean.setDrugUserId(user.getId());
+        bean.setLeaderPath(user.getLeaderPath());
         responseBean.setData(targetAnalysisService.custom_tel_avg(bean));
         return responseBean;
     }
@@ -159,6 +216,14 @@ public class TargetAnalysisController extends BaseController{
             responseBean.setMessage(error);
             return responseBean;
         }
+        DrugUser user = super.getLoginUser(request);
+        if(user==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
+        }
+        bean.setDrugUserId(user.getId());
+        bean.setLeaderPath(user.getLeaderPath());
         responseBean.setData(targetAnalysisService.meeting(bean));
         return responseBean;
     }

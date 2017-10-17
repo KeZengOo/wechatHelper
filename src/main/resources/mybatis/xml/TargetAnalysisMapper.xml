@@ -62,7 +62,7 @@
         UNION ALL
         select DISTINCT ei.doctor_id from virtual_email_info ei join drug_user d on d.id=ei.drug_user_id
         where d.leader_path like #{leaderPath,jdbcType=VARCHAR}
-        AND mad.attend_start_time BETWEEN #{startDate} AND #{endDate}
+        AND ei.create_time BETWEEN #{startDate} AND #{endDate}
         <if test="productId!=null and productId!=0">
             AND ei.product_id=#{productId}
         </if>

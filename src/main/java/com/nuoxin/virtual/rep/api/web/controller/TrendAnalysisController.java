@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
 import com.nuoxin.virtual.rep.api.common.util.StringUtils;
+import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.analysis.TrendAnalysisService;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.analysis.QuestionnaireAnalysisRequestBean;
@@ -51,6 +52,14 @@ public class TrendAnalysisController extends BaseController {
             responseBean.setMessage(error);
             return responseBean;
         }
+        DrugUser user = super.getLoginUser(request);
+        if(user==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
+        }
+        bean.setDrugUserId(user.getId());
+        bean.setLeaderPath(user.getLeaderPath());
         responseBean.setData(trendAnalysisService.summationCallout(bean));
         return responseBean;
     }
@@ -67,6 +76,14 @@ public class TrendAnalysisController extends BaseController {
             responseBean.setMessage(error);
             return responseBean;
         }
+        DrugUser user = super.getLoginUser(request);
+        if(user==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
+        }
+        bean.setDrugUserId(user.getId());
+        bean.setLeaderPath(user.getLeaderPath());
         responseBean.setData(trendAnalysisService.summationCalloutAvg(bean));
         return responseBean;
     }
@@ -83,6 +100,14 @@ public class TrendAnalysisController extends BaseController {
             responseBean.setMessage(error);
             return responseBean;
         }
+        DrugUser user = super.getLoginUser(request);
+        if(user==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
+        }
+        bean.setDrugUserId(user.getId());
+        bean.setLeaderPath(user.getLeaderPath());
         responseBean.setData(trendAnalysisService.summationCalloutCount(bean));
         return responseBean;
     }
@@ -99,6 +124,14 @@ public class TrendAnalysisController extends BaseController {
             responseBean.setMessage(error);
             return responseBean;
         }
+        DrugUser user = super.getLoginUser(request);
+        if(user==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
+        }
+        bean.setDrugUserId(user.getId());
+        bean.setLeaderPath(user.getLeaderPath());
         responseBean.setData(trendAnalysisService.summationSession(bean));
         return responseBean;
     }
@@ -109,11 +142,19 @@ public class TrendAnalysisController extends BaseController {
                                                                     HttpServletRequest request, HttpServletResponse response) {
         logger.info("{}-接口的请求参数【{}】",request.getServletPath(), JSON.toJSONString(bean));
         DefaultResponseBean<List<TrendStatResponseBean>> responseBean = new DefaultResponseBean();
-        if(StringUtils.isNotEmtity(bean.getDate())){
+        if(!StringUtils.isNotEmtity(bean.getDate())){
             responseBean.setCode(500);
             responseBean.setMessage("时间不能为空");
             return responseBean;
         }
+        DrugUser user = super.getLoginUser(request);
+        if(user==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
+        }
+        bean.setDrugUserId(user.getId());
+        bean.setLeaderPath(user.getLeaderPath());
         responseBean.setData(trendAnalysisService.callOut(bean));
         return responseBean;
     }
@@ -124,11 +165,19 @@ public class TrendAnalysisController extends BaseController {
                                                                 HttpServletRequest request, HttpServletResponse response) {
         logger.info("{}-接口的请求参数【{}】",request.getServletPath(), JSON.toJSONString(bean));
         DefaultResponseBean<List<TrendStatResponseBean>> responseBean = new DefaultResponseBean();
-        if(StringUtils.isNotEmtity(bean.getDate())){
+        if(!StringUtils.isNotEmtity(bean.getDate())){
             responseBean.setCode(500);
             responseBean.setMessage("时间不能为空");
             return responseBean;
         }
+        DrugUser user = super.getLoginUser(request);
+        if(user==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
+        }
+        bean.setDrugUserId(user.getId());
+        bean.setLeaderPath(user.getLeaderPath());
         responseBean.setData(trendAnalysisService.session(bean));
         return responseBean;
     }

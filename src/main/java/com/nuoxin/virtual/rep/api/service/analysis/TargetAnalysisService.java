@@ -42,7 +42,7 @@ public class TargetAnalysisService {
         if (target != null) {
             responseBean.setTargerNum(target.getMonthCovered());
         }
-        if(responseBean.getTargerNum()!=0){
+        if(responseBean.getTargerNum()!=null && responseBean.getTargerNum()!=0){
             responseBean.setPercentage(new BigDecimal(responseBean.getCoverNum()/responseBean.getTargerNum().doubleValue()).floatValue());
         }
         return responseBean;
@@ -58,12 +58,12 @@ public class TargetAnalysisService {
         Target target = targetService.findFirstByProductIdAndLevel(bean.getProductId(), bean.getCustomLevel());
         TargetResponseBean responseBean = targetAnalysisMapper.customTelPerson(bean);
         if(responseBean==null){
-
+            responseBean = new TargetResponseBean();
         }
         if(target!=null){
             responseBean.setTargerNum(target.getMonthTelPerson());
         }
-        if(responseBean.getTargerNum()!=0){
+        if(responseBean.getTargerNum()!=null && responseBean.getTargerNum()!=0){
             responseBean.setPercentage(new BigDecimal(responseBean.getCoverNum()/responseBean.getTargerNum().floatValue()).floatValue());
         }
         return responseBean;
@@ -79,12 +79,12 @@ public class TargetAnalysisService {
         Target target = targetService.findFirstByProductIdAndLevel(bean.getProductId(), bean.getCustomLevel());
         TargetResponseBean responseBean = targetAnalysisMapper.customTelCount(bean);
         if(responseBean==null){
-
+            responseBean = new TargetResponseBean();
         }
         if(target!=null){
             responseBean.setTargerNum(target.getMonthTelNum());
         }
-        if(responseBean.getTargerNum()!=0){
+        if(responseBean.getTargerNum()!=null && responseBean.getTargerNum()!=0){
             responseBean.setPercentage(new BigDecimal(responseBean.getCoverNum()/responseBean.getTargerNum().floatValue()).floatValue());
         }
         return responseBean;
@@ -100,12 +100,12 @@ public class TargetAnalysisService {
         Target target = targetService.findFirstByProductIdAndLevel(bean.getProductId(), bean.getCustomLevel());
         TargetResponseBean responseBean = targetAnalysisMapper.customSms(bean);
         if(responseBean==null){
-
+            responseBean = new TargetResponseBean();
         }
         if(target!=null){
             responseBean.setTargerNum(target.getMonthImNum());
         }
-        if(responseBean.getTargerNum()!=0){
+        if(responseBean.getTargerNum()!=null && responseBean.getTargerNum()!=0){
             responseBean.setPercentage(new BigDecimal(responseBean.getCoverNum()/responseBean.getTargerNum().floatValue()).floatValue());
         }
         return responseBean;
@@ -121,12 +121,12 @@ public class TargetAnalysisService {
         Target target = targetService.findFirstByProductIdAndLevel(bean.getProductId(), bean.getCustomLevel());
         TargetResponseBean responseBean = targetAnalysisMapper.customWechat(bean);
         if(responseBean==null){
-
+            responseBean = new TargetResponseBean();
         }
         if(target!=null){
             responseBean.setTargerNum(target.getMonthWechatNum());
         }
-        if(responseBean.getTargerNum()!=0){
+        if(responseBean.getTargerNum()!=null &&responseBean.getTargerNum()!=0){
             responseBean.setPercentage(new BigDecimal(responseBean.getCoverNum()/responseBean.getTargerNum().floatValue()).floatValue());
         }
         return responseBean;
@@ -142,12 +142,12 @@ public class TargetAnalysisService {
         Target target = targetService.findFirstByProductIdAndLevel(bean.getProductId(), bean.getCustomLevel());
         TargetResponseBean responseBean = targetAnalysisMapper.customTelSum(bean);
         if(responseBean==null){
-
+            responseBean = new TargetResponseBean();
         }
         if(target!=null){
             responseBean.setTargerNum(target.getMonthTelTime()*60);
         }
-        if(responseBean.getTargerNum()!=0){
+        if(responseBean.getTargerNum()!=null && responseBean.getTargerNum()!=0){
             responseBean.setPercentage(new BigDecimal(responseBean.getCoverNum()/responseBean.getTargerNum().floatValue()).floatValue());
         }
         return responseBean;
@@ -163,12 +163,12 @@ public class TargetAnalysisService {
         Target target = targetService.findFirstByProductIdAndLevel(bean.getProductId(), bean.getCustomLevel());
         TargetResponseBean responseBean = targetAnalysisMapper.customTelAvg(bean);
         if(responseBean==null){
-
+            responseBean = new TargetResponseBean();
         }
         if(target!=null){
             responseBean.setTargerNum(target.getMonthTelAvgTime()*60);
         }
-        if(responseBean.getTargerNum()!=0){
+        if(responseBean.getTargerNum()!=null && responseBean.getTargerNum()!=0){
             responseBean.setPercentage(new BigDecimal(responseBean.getCoverNum()/responseBean.getTargerNum().floatValue()).floatValue());
         }
         return responseBean;

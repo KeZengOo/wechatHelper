@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
 import com.nuoxin.virtual.rep.api.common.util.StringUtils;
+import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.Questionnaire;
 import com.nuoxin.virtual.rep.api.service.analysis.QuestionnaireAnalysisService;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
@@ -47,6 +48,14 @@ public class QuestionnaireAnalysisController extends BaseController {
             responseBean.setMessage("时间选择错误");
             return responseBean;
         }
+        DrugUser user = super.getLoginUser(request);
+        if(user==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
+        }
+        bean.setDrugUserId(user.getId());
+        bean.setLeaderPath(user.getLeaderPath());
         responseBean.setData(questionnaireAnalysisService.summation(bean));
         return responseBean;
     }
@@ -62,6 +71,14 @@ public class QuestionnaireAnalysisController extends BaseController {
             responseBean.setMessage("时间选择错误");
             return responseBean;
         }
+        DrugUser user = super.getLoginUser(request);
+        if(user==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
+        }
+        bean.setDrugUserId(user.getId());
+        bean.setLeaderPath(user.getLeaderPath());
         responseBean.setData(questionnaireAnalysisService.list(bean));
         return responseBean;
     }
@@ -77,6 +94,14 @@ public class QuestionnaireAnalysisController extends BaseController {
             responseBean.setMessage("时间选择错误");
             return responseBean;
         }
+        DrugUser user = super.getLoginUser(request);
+        if(user==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
+        }
+        bean.setDrugUserId(user.getId());
+        bean.setLeaderPath(user.getLeaderPath());
         responseBean.setData(questionnaireAnalysisService.details(bean));
         return responseBean;
     }
@@ -91,9 +116,11 @@ public class QuestionnaireAnalysisController extends BaseController {
         String endDate = bean.getEndDate();
         if (!StringUtils.isNotEmtity(startDate)) {
             startDate = "2017-10-01";
+            return false;
         }
         if (!StringUtils.isNotEmtity(endDate)) {
             endDate = DateUtil.gettDateStrFromSpecialDate(new Date(), DateUtil.DATE_FORMAT_YMD);
+            return false;
         }
 
         startDate = startDate + " 00:00:00";
