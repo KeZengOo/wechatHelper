@@ -137,7 +137,7 @@
 
     <select id="minCallTotalTime" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean"
             resultType="java.util.Map">
-        select t.name as drugUserName,concat(min(t.sum_call_time),'') as minCallTime  from (
+        select t.name as drugUserName,concat(min(t.sum_call_time),'') as minCallTotalTime  from (
         select ifnull(sum(vdci.call_time),0) as sum_call_time,du.id, du.name
         from virtual_doctor_call_info vdci
         inner join virtual_doctor_call_info_details vdcid

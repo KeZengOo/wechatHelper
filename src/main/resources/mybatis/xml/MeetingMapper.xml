@@ -20,7 +20,9 @@
         inner join drug_user du
         on pu.user_id= du.id
         where du.leader_path like #{leaderPath}
-        and tma.product_id=#{productId}
+        <if test="productId !=null and productId!=0">
+            and tma.product_id=#{productId}
+        </if>
         <if test="title != null and title !=''">
             and tma.title like #{title}
         </if>
@@ -52,7 +54,10 @@
         inner join drug_user du
         on pu.user_id= du.id
         where du.leader_path like #{leaderPath}
-        and tma.product_id=#{productId}
+        <if test="productId !=null and productId!=0">
+            and tma.product_id=#{productId}
+        </if>
+
         <if test="title != null and title !=''">
             and tma.title like #{title}
         </if>

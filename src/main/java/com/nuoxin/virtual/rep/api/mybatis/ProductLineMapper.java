@@ -4,6 +4,9 @@ package com.nuoxin.virtual.rep.api.mybatis;
 
 import com.nuoxin.virtual.rep.api.common.util.MyMapper;
 import com.nuoxin.virtual.rep.api.entity.ProductLine;
+import com.nuoxin.virtual.rep.api.web.controller.request.product.ProductRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.product.ProductResponseBean;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -15,4 +18,7 @@ public interface ProductLineMapper extends MyMapper<ProductLine> {
     List<ProductLine> findByLeaderPath(String leaderPath);
 
     List<Long> getProductIds(String leaderPath);
+
+
+    List<ProductResponseBean> getList(@Param(value = "leaderPath") String leaderPath);
 }

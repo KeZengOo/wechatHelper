@@ -17,6 +17,11 @@
         pl.prod_id,pl.e_id,pl.prod_name,pl.prod_desc,pl.prod_remarks,pl.p_key_word,pl.c_key_word,pl.wechat_share_icon
     </sql>
 
+    <select id="getList" parameterType="java.lang.String"
+            resultType="com.nuoxin.virtual.rep.api.web.controller.response.product.ProductResponseBean">
+        select distinct  pl.prod_id productId, pl.prod_name productName from product_line pl inner join product_user pu on pu.prod_id=pl.prod_id join drug_user du on du.id=pu.user_id where du.leader_path like #{leaderPath}  group by pl.prod_id
+    </select>
+
     <select id="findByLeaderPath" resultMap="productResultMap">
         select <include refid="keywordsql"/> from product_line pl join product_user pu on pu.prod_id=pl.prod_id join drug_user du on du.id=pu.user_id where du.leader_path like #{0,jdbcType=VARCHAR}  group by pl.prod_id
     </select>

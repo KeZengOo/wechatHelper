@@ -23,6 +23,7 @@ public interface WorkStationMapper {
     Integer getOneMonthNoFollowCustomerListCount(WorkStationRequestBean bean);
 
     //总通话时间最短
+    //Integer minCallTotalTime(WorkStationRequestBean bean);
     Map<String, String> minCallTotalTime(WorkStationRequestBean bean);
 
     //平均通话时间最短,按照次数
