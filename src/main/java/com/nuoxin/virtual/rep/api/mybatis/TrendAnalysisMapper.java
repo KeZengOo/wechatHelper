@@ -39,9 +39,9 @@ public interface TrendAnalysisMapper {
      * @param bean
      * @return
      */
-    List<TrendResponseBean> summationSession1(TrendAnalysisRequestBean bean);
-    List<TrendResponseBean> summationSession2(TrendAnalysisRequestBean bean);
-    List<TrendResponseBean> summationSession3(TrendAnalysisRequestBean bean);
+    List<TrendResponseBean> summationSessionType1(TrendAnalysisRequestBean bean);
+    List<TrendResponseBean> summationSessionType2(TrendAnalysisRequestBean bean);
+    List<TrendResponseBean> summationSessionType3(TrendAnalysisRequestBean bean);
 
     /**
      * 呼出数

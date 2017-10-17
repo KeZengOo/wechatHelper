@@ -132,9 +132,9 @@ public class TrendAnalysisService extends BaseService {
         bean.checkDate();
         List<TrendSessionStatResponseBean> responseBeans = new ArrayList<>();
         List<TrendResponseBean> list = this. _getTrendResponseBean(bean);
-        List<TrendResponseBean> wechat = trendAnalysisMapper.summationSession1(bean);
-        List<TrendResponseBean> sms = trendAnalysisMapper.summationSession2(bean);
-        List<TrendResponseBean> email = trendAnalysisMapper.summationSession3(bean);
+        List<TrendResponseBean> wechat = trendAnalysisMapper.summationSessionType1(bean);
+        List<TrendResponseBean> sms = trendAnalysisMapper.summationSessionType2(bean);
+        List<TrendResponseBean> email = trendAnalysisMapper.summationSessionType3(bean);
 
         if(list!=null && !list.isEmpty()){
             for (TrendResponseBean trend:list) {
