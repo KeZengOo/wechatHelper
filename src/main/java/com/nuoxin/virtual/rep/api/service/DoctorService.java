@@ -78,6 +78,10 @@ public class DoctorService extends BaseService {
         return doctorRepository.findByMobileIn(mobiles);
     }
 
+    public List<Doctor> findByEmailIn(Collection<String> emails) {
+        return doctorRepository.findByEmailIn(emails);
+    }
+
     @Cacheable(value = "virtual_rep_api_doctor", key = "'_page_'+#bean")
     public PageResponseBean<DoctorResponseBean> page(QueryRequestBean bean) {
         PageRequest pageable = super.getPage(bean);
