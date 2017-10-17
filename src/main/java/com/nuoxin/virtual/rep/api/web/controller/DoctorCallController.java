@@ -174,4 +174,11 @@ public class DoctorCallController extends BaseController {
         return responseBean;
     }
 
+    @ApiOperation(value = "获取跟进类型集合", notes = "获取跟进类型集合")
+    @GetMapping("/type/list")
+    public DefaultResponseBean<Object> typeList(HttpServletRequest request, HttpServletResponse response){
+
+        return null;
+    }
+
 }

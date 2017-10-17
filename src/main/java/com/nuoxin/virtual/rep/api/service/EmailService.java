@@ -9,6 +9,7 @@ import com.nuoxin.virtual.rep.api.entity.Doctor;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.Email;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
+import com.nuoxin.virtual.rep.api.web.controller.request.EmailQueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.EmailRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.vo.Doc;
 import org.slf4j.Logger;
@@ -20,6 +21,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ResourceUtils;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -141,6 +143,11 @@ public class EmailService {
             }
         }
         return true;
+    }
+
+    public Object page(EmailQueryRequestBean bean){
+
+        return null;
     }
 
     private Doctor _getDoctorToEmail(List<Doctor> doctorList,String email){

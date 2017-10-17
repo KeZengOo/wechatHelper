@@ -5,6 +5,7 @@ import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
 import com.nuoxin.virtual.rep.api.common.util.StringUtils;
 import com.nuoxin.virtual.rep.api.service.EmailService;
+import com.nuoxin.virtual.rep.api.web.controller.request.EmailQueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.EmailRequestBean;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -60,6 +61,20 @@ public class EmailController extends BaseController {
             return responseBean;
         }
         responseBean.setData(emailService.commonEmailSendTo(bean));
+        return responseBean;
+    }
+
+    @ApiOperation(value = "邮件历史", notes = "邮件历史")
+    @PostMapping("/page")
+    public DefaultResponseBean<Boolean> page(@RequestBody EmailQueryRequestBean bean,
+                                                HttpServletRequest request, HttpServletResponse response){
+        logger.info("{}接口请求数据【】{}",request.getServletPath(), JSON.toJSONString(bean));
+        DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
+        if(bean.getDoctorId()==null || bean.getDoctorId()==0l){
+            responseBean.setCode(500);
+            responseBean.setMessage("医生id不能为空");
+            return responseBean;
+        }
         return responseBean;
     }
 }
