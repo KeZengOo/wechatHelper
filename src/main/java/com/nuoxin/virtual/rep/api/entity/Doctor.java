@@ -39,7 +39,8 @@ public class Doctor extends IdEntity {
     @Column(name = "status")
     private Integer status;
 
-    @OneToOne(mappedBy = "doctor")
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH},fetch = FetchType.EAGER)
+    @JoinColumn(name = "virtual_doctor_id")
     private DoctorVirtual doctorVirtual;
 
     public Long getEappId() {

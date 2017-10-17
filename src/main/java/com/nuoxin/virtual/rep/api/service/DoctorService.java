@@ -186,9 +186,10 @@ public class DoctorService extends BaseService {
         if (doctor.getId() == null) {
             throw new BusinessException(ErrorEnum.ERROR.getStatus(), "医生添加失败");
         }
-        virtual.setDoctor(doctor);
+        virtual.setDoctorId(doctor.getId());
         doctorVirtualRepository.saveAndFlush(virtual);
-
+        doctor.setDoctorVirtual(virtual);
+        doctorRepository.saveAndFlush(doctor);
         //TODO 添加关系到关系表
         DrugUserDoctor dud = new DrugUserDoctor();
         dud.setDoctorId(doctor.getId());
@@ -249,9 +250,11 @@ public class DoctorService extends BaseService {
             throw new BusinessException(ErrorEnum.ERROR.getStatus(), "医生修改失败");
         }
 
-        virtual.setDoctor(doctor);
+        virtual.setDoctorId(doctor.getId());
         doctorVirtualRepository.saveAndFlush(virtual);
 
+        doctor.setDoctorVirtual(virtual);
+        doctorRepository.saveAndFlush(doctor);
         //TODO 添加关系到关系表
         DrugUserDoctor dud = drugUserDoctorRepository.findByDoctorIdAndDrugUserIdAndProductId(doctor.getId(), bean.getDrugUserId(), bean.getProductId());
         if (dud == null) {
@@ -360,13 +363,13 @@ public class DoctorService extends BaseService {
 //              doctor.setEappId(vo.getId());
 //          }
             doctorRepository.saveAndFlush(doctor);
-            virtual.setDoctor(doctor);
+            virtual.setDoctorId(doctor.getId());
             doctorVirtualRepository.saveAndFlush(virtual);
             //TODO 添加关系到关系表
 
             savelist.add(doctor);
         }
-        //doctorRepository.save(savelist);
+        doctorRepository.updateVirtualDoctorId();
 
         //TODO 添加关系到关系表
         return true;
@@ -452,7 +455,7 @@ public class DoctorService extends BaseService {
 //              doctor.setEappId(vo.getId());
 //          }
             doctorRepository.saveAndFlush(doctor);
-            virtual.setDoctor(doctor);
+            virtual.setDoctorId(doctor.getId());
             doctorVirtualRepository.saveAndFlush(virtual);
             //TODO 添加关系到关系表
             DrugUserDoctor dud = drugUserDoctorRepository.findByDoctorIdAndDrugUserIdAndProductId(doctor.getId(), user.getId(), productId);
@@ -466,7 +469,7 @@ public class DoctorService extends BaseService {
             }
             savelist.add(doctor);
         }
-        //doctorRepository.save(savelist);
+        doctorRepository.updateVirtualDoctorId();
 
         //TODO 添加关系到关系表
         return true;

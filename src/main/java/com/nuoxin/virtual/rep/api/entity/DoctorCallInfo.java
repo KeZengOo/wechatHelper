@@ -47,7 +47,7 @@ public class DoctorCallInfo extends IdEntity {
     @Column(name = "follow_up_type")
     private String followUpType;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH},fetch = FetchType.LAZY)
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH},fetch = FetchType.EAGERg)
     @JoinColumn(name = "virtual_doctor_id")
     private Doctor doctor;
 

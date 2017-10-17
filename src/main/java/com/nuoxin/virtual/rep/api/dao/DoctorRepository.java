@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * Created by fenggang on 9/11/17.
  */
-public interface DoctorRepository extends JpaRepository<Doctor,Long>,JpaSpecificationExecutor<Doctor> {
+public interface DoctorRepository extends JpaRepository<Doctor, Long>, JpaSpecificationExecutor<Doctor> {
 
     Doctor findTopByMobile(String mobile);
 
@@ -28,9 +28,13 @@ public interface DoctorRepository extends JpaRepository<Doctor,Long>,JpaSpecific
     List<Doctor> findByEmailIn(Collection<String> emails);
 
     @Query("select count(distinct d.id) as doctorNum,count(distinct d.hospitalName) as hospitalNum from Doctor d where d.doctorVirtual.drugUserIds like :drugUserId ")
-    Map<String,Long> statDrugUserDoctorNum(@Param("drugUserId") String drugUserId);
+    Map<String, Long> statDrugUserDoctorNum(@Param("drugUserId") String drugUserId);
 
     @Modifying
     void deleteByIdIn(Collection<Long> ids);
+
+    @Modifying
+    @Query(value = "update doctor d join doctor_virtual v on v.doctor_id=d.id set d.virtual_doctor_id=v.id where d.virtual_doctor_id is null", nativeQuery = true)
+    void updateVirtualDoctorId();
 
 }

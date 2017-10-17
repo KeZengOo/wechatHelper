@@ -24,9 +24,8 @@ public class DoctorVirtual extends IdEntity {
     @Column(name = "create_time")
     private Date createTime;
 
-    @OneToOne
-    @JoinColumn(name = "doctor_id")
-    private Doctor doctor;
+    @Column(name = "doctor_id")
+    private Long doctorId;
 
     public String getDrugUserIds() {
         return drugUserIds;
@@ -68,11 +67,12 @@ public class DoctorVirtual extends IdEntity {
         this.createTime = createTime;
     }
 
-    public Doctor getDoctor() {
-        return doctor;
+    public Long getDoctorId() {
+        return doctorId;
     }
 
-    public void setDoctor(Doctor doctor) {
-        this.doctor = doctor;
+    public void setDoctorId(Long doctorId) {
+        this.doctorId = doctorId;
     }
+
 }
