@@ -13,7 +13,18 @@ import java.util.List;
 public class DrugUserAnalysisListResponseBean implements Serializable{
     private static final long serialVersionUID = -645082110497219239L;
 
+    @ApiModelProperty(value = "总通话时间最短")
+    private List<DrugUserAnalysisResponseBean> minTotalCallTimeList;
 
-    private List<DrugUserAnalysisResponseBean> minCallTotalList;
+    @ApiModelProperty(value = "平均通话时间最短")
+    private List<DrugUserAnalysisResponseBean> minAvgCallTimeList;
+
+    @ApiModelProperty(value = "电话数量最少")
+    private List<DrugUserAnalysisResponseBean> minTotalCallCountList;
+
+    @ApiModelProperty(value = "电话覆盖数量最少")
+    private List<DrugUserAnalysisResponseBean> minCallCoveredCount;
+
+    private List<DrugUserAnalysisResponseBean> minTotal;
 
 }

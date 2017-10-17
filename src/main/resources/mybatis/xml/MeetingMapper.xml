@@ -11,7 +11,7 @@
         date_format(tma.start_time,'%Y-%m-%d %H:%i:%s') meetingStartTime,
         date_format(tma.end_time,'%Y-%m-%d %H:%i:%s') meetingEndTime,
         tma.product_id productId,
-        tma.product_name product_name
+        tma.product_name productName
         from t_meeting_data tma
         inner join product_line pl
         on tma.product_id = pl.prod_id
