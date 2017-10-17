@@ -1,5 +1,6 @@
 package com.nuoxin.virtual.rep.api.web.controller.request;
 
+import com.nuoxin.virtual.rep.api.common.bean.PageRequestBean;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -9,7 +10,7 @@ import java.io.Serializable;
  * Create by tiancun on 2017/10/12
  */
 @ApiModel(value = "工作台请求类")
-public class WorkStationRequestBean implements Serializable{
+public class WorkStationRequestBean extends PageRequestBean implements Serializable{
     private static final long serialVersionUID = 3083177023027501328L;
 
     @ApiModelProperty(value = "销售id，前端不用传")
@@ -20,6 +21,9 @@ public class WorkStationRequestBean implements Serializable{
 
     @ApiModelProperty(value = "产品id")
     private Long productId;
+
+    @ApiModelProperty(value = "日期类型，1是今天，2是本周，3是本月，4是本季度")
+    private Integer dateType;
 
     public Long getDrugUserId() {
         return drugUserId;
@@ -43,5 +47,14 @@ public class WorkStationRequestBean implements Serializable{
 
     public void setLeaderPath(String leaderPath) {
         this.leaderPath = leaderPath;
+    }
+
+
+    public Integer getDateType() {
+        return dateType;
+    }
+
+    public void setDateType(Integer dateType) {
+        this.dateType = dateType;
     }
 }

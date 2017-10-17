@@ -1,18 +1,14 @@
 package com.nuoxin.virtual.rep.api.service;
 
+import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.dao.DrugUserRepository;
 import com.nuoxin.virtual.rep.api.dao.TargetRepository;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.Target;
-import com.nuoxin.virtual.rep.api.mybatis.DoctorCallInfoMapper;
-import com.nuoxin.virtual.rep.api.mybatis.EmailMapper;
-import com.nuoxin.virtual.rep.api.mybatis.MeetingDetailMapper;
-import com.nuoxin.virtual.rep.api.mybatis.MessageMapper;
+import com.nuoxin.virtual.rep.api.mybatis.*;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.work.CustomerStatisticResponseBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.work.MonthTargetStatisticResponseBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.work.TodayStatisticsResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.work.*;
 import com.sun.mail.util.BEncoderStream;
 import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +36,9 @@ public class WorkStationService {
 
     @Autowired
     private EmailMapper emailMapper;
+
+    @Autowired
+    private WorkStationMapper workStationMapper;
 
     @Autowired
     private DrugUserRepository drugUserRepository;
@@ -203,6 +202,13 @@ public class WorkStationService {
      */
     public MonthTargetStatisticResponseBean getMonthTargetStatistic(WorkStationRequestBean bean){
 
+        DrugUser drugUser = drugUserRepository.findFirstById(bean.getDrugUserId());
+        String leaderPath = drugUser.getLeaderPath();
+        if (leaderPath == null) {
+            leaderPath = "";
+        }
+        bean.setLeaderPath(leaderPath + "%");
+
         MonthTargetStatisticResponseBean monthTargetStatistic = new MonthTargetStatisticResponseBean();
 
         Map<String, Integer> monthTarget = getMonthTarget(bean.getProductId());
@@ -239,10 +245,17 @@ public class WorkStationService {
      * @param bean
      * @return
      */
-    public List<CustomerStatisticResponseBean> getTotalCustomerStatistic(WorkStationRequestBean bean){
+    public List<CustomerSumResponseBean> getTotalCustomerStatistic(WorkStationRequestBean bean){
 
+        DrugUser drugUser = drugUserRepository.findFirstById(bean.getDrugUserId());
+        String leaderPath = drugUser.getLeaderPath();
+        if (leaderPath == null) {
+            leaderPath = "";
+        }
+        bean.setLeaderPath(leaderPath + "%");
+        List<CustomerSumResponseBean> totalCustomerStatistic = workStationMapper.getTotalCustomerStatistic(bean);
 
-        return null;
+        return totalCustomerStatistic;
     }
 
 
@@ -251,9 +264,16 @@ public class WorkStationService {
      * @param bean
      * @return
      */
-    public List<CustomerStatisticResponseBean> getAddCustomerStatistic(WorkStationRequestBean bean){
+    public List<CustomerSumResponseBean> getAddCustomerStatistic(WorkStationRequestBean bean){
 
-        return null;
+        DrugUser drugUser = drugUserRepository.findFirstById(bean.getDrugUserId());
+        String leaderPath = drugUser.getLeaderPath();
+        if (leaderPath == null) {
+            leaderPath = "";
+        }
+        bean.setLeaderPath(leaderPath + "%");
+        List<CustomerSumResponseBean> addCustomerStatistic = workStationMapper.getAddCustomerStatistic(bean);
+        return addCustomerStatistic;
     }
 
     /**
@@ -261,11 +281,42 @@ public class WorkStationService {
      * @param bean
      * @return
      */
-    public List<CustomerStatisticResponseBean> getCoverCustomerStatistic(WorkStationRequestBean bean){
-
-        return null;
+    public List<CustomerSumResponseBean> getCoverCustomerStatistic(WorkStationRequestBean bean){
+        DrugUser drugUser = drugUserRepository.findFirstById(bean.getDrugUserId());
+        String leaderPath = drugUser.getLeaderPath();
+        if (leaderPath == null) {
+            leaderPath = "";
+        }
+        bean.setLeaderPath(leaderPath + "%");
+        List<CustomerSumResponseBean> coverCustomerStatistic = workStationMapper.getCoverCustomerStatistic(bean);
+        return coverCustomerStatistic;
     }
 
+
+    /**
+     * 连续一个月未跟进客户
+     * @param bean
+     * @return
+     */
+    public PageResponseBean<OneMonthNoFollowCustomerResponseBean> getOneMonthNoFollowCustomers(WorkStationRequestBean bean){
+        DrugUser drugUser = drugUserRepository.findFirstById(bean.getDrugUserId());
+        String leaderPath = drugUser.getLeaderPath();
+        if (leaderPath == null) {
+            leaderPath = "";
+        }
+        bean.setLeaderPath(leaderPath + "%");
+        Integer page = bean.getPage();
+        Integer pageSize = bean.getPageSize();
+        bean.setPage(page  * pageSize);
+
+        List<OneMonthNoFollowCustomerResponseBean> oneMonthNoFollowCustomerList = workStationMapper.getOneMonthNoFollowCustomerList(bean);
+        Integer count = workStationMapper.getOneMonthNoFollowCustomerListCount(bean);
+
+
+        PageResponseBean<OneMonthNoFollowCustomerResponseBean> pageResponseBean = new PageResponseBean<>(bean, count, oneMonthNoFollowCustomerList);
+
+        return pageResponseBean;
+    }
 
     /**
      * 本月目标

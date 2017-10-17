@@ -4,6 +4,7 @@ import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
 import com.nuoxin.virtual.rep.api.service.WorkStationService;
 import com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.work.CustomerSumResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.work.MonthTargetStatisticResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.work.TodayStatisticsResponseBean;
 import io.swagger.annotations.Api;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * Create by tiancun on 2017/10/12
@@ -54,6 +56,50 @@ public class WorkStationController extends BaseController{
 
 
     }
+
+
+    @ApiOperation(value = "客户总数统计接口", notes = "客户统计接口")
+    @PostMapping("/total/customer/statistic")
+    @ResponseBody
+    public ResponseEntity<DefaultResponseBean<List<CustomerSumResponseBean>>>  getTotalCustomerStatistic(@RequestBody WorkStationRequestBean bean, HttpServletRequest request){
+        Long loginId = getLoginId(request);
+        bean.setDrugUserId(loginId);
+        List<CustomerSumResponseBean> totalCustomerStatistic = workStationService.getTotalCustomerStatistic(bean);
+        DefaultResponseBean<List<CustomerSumResponseBean>> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(totalCustomerStatistic);
+        return ResponseEntity.ok(responseBean);
+
+    }
+
+
+    @ApiOperation(value = "当月新增客户统计接口", notes = "当月新增客户统计接口")
+    @PostMapping("/add/customer/statistic")
+    @ResponseBody
+    public ResponseEntity<DefaultResponseBean<List<CustomerSumResponseBean>>>  getAddCustomerStatistic(@RequestBody WorkStationRequestBean bean, HttpServletRequest request){
+        Long loginId = getLoginId(request);
+        bean.setDrugUserId(loginId);
+        List<CustomerSumResponseBean> totalCustomerStatistic = workStationService.getAddCustomerStatistic(bean);
+        DefaultResponseBean<List<CustomerSumResponseBean>> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(totalCustomerStatistic);
+        return ResponseEntity.ok(responseBean);
+
+    }
+
+
+    @ApiOperation(value = "当月覆盖客户统计接口", notes = "当月覆盖客户统计接口")
+    @PostMapping("/cover/customer/statistic")
+    @ResponseBody
+    public ResponseEntity<DefaultResponseBean<List<CustomerSumResponseBean>>>  getCoverCustomerStatistic(@RequestBody WorkStationRequestBean bean, HttpServletRequest request){
+        Long loginId = getLoginId(request);
+        bean.setDrugUserId(loginId);
+        List<CustomerSumResponseBean> totalCustomerStatistic = workStationService.getCoverCustomerStatistic(bean);
+        DefaultResponseBean<List<CustomerSumResponseBean>> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(totalCustomerStatistic);
+        return ResponseEntity.ok(responseBean);
+
+    }
+
+
 
 
 }
