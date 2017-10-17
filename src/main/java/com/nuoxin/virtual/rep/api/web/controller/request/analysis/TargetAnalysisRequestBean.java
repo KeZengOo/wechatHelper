@@ -24,7 +24,7 @@ public class TargetAnalysisRequestBean implements Serializable{
     @ApiModelProperty(value = "坐席id")
     private Long drugUserId;
     @ApiModelProperty(value = "客户等级")
-    private String customLevle;
+    private String customLevel;
     @ApiModelProperty(value = "区域")
     private String area;
 
@@ -59,12 +59,12 @@ public class TargetAnalysisRequestBean implements Serializable{
         this.drugUserId = drugUserId;
     }
 
-    public String getCustomLevle() {
-        return customLevle;
+    public String getCustomLevel() {
+        return customLevel;
     }
 
-    public void setCustomLevle(String customLevle) {
-        this.customLevle = customLevle;
+    public void setCustomLevel(String customLevel) {
+        this.customLevel = customLevel;
     }
 
     public String getArea() {

@@ -9,6 +9,7 @@ import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.analysis.QuestionnaireAnalysisRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.analysis.TrendAnalysisRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.analysis.tr.TrendResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.analysis.tr.TrendSessionStatResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.analysis.tr.TrendStatResponseBean;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -70,8 +71,8 @@ public class TrendAnalysisController extends BaseController {
         return responseBean;
     }
 
-    @ApiOperation(value = "汇总统计接口-覆盖", notes = "汇总统计接口")
-    @PostMapping("/summation/cover")
+    @ApiOperation(value = "汇总统计接口-人数", notes = "汇总统计接口")
+    @PostMapping("/summation/count")
     public DefaultResponseBean<List<TrendResponseBean>> summationCover(@RequestBody TrendAnalysisRequestBean bean,
                                                                        HttpServletRequest request, HttpServletResponse response) {
         logger.info("{}-接口的请求参数【{}】",request.getServletPath(), JSON.toJSONString(bean));
@@ -82,16 +83,16 @@ public class TrendAnalysisController extends BaseController {
             responseBean.setMessage(error);
             return responseBean;
         }
-        responseBean.setData(trendAnalysisService.summationCover(bean));
+        responseBean.setData(trendAnalysisService.summationCalloutCount(bean));
         return responseBean;
     }
 
     @ApiOperation(value = "汇总统计接口-会话", notes = "汇总统计接口")
     @PostMapping("/summation/session")
-    public DefaultResponseBean<List<TrendResponseBean>> summationSession(@RequestBody TrendAnalysisRequestBean bean,
-                                                                            HttpServletRequest request, HttpServletResponse response) {
+    public DefaultResponseBean<List<TrendSessionStatResponseBean>> summationSession(@RequestBody TrendAnalysisRequestBean bean,
+                                                                                    HttpServletRequest request, HttpServletResponse response) {
         logger.info("{}-接口的请求参数【{}】",request.getServletPath(), JSON.toJSONString(bean));
-        DefaultResponseBean<List<TrendResponseBean>> responseBean = new DefaultResponseBean();
+        DefaultResponseBean<List<TrendSessionStatResponseBean>> responseBean = new DefaultResponseBean();
         String error = super.checkoutDate(bean);
         if(StringUtils.isNotEmtity(error)){
             responseBean.setCode(500);

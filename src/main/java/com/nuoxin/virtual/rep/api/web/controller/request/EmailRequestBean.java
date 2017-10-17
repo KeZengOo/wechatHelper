@@ -14,6 +14,8 @@ public class EmailRequestBean implements Serializable {
 
     @ApiModelProperty(value = "邮件发送医生的id（多个医生中间用英文逗号分隔）")
     private String doctorIds;
+    @ApiModelProperty(value = "邮件发送地址（多个地址中间用英文分号号分隔）手动输入地址才有值")
+    private String emails;
     @ApiModelProperty(value = "邮件标题")
     private String title;
     @ApiModelProperty(value = "邮件内容")
@@ -62,5 +64,13 @@ public class EmailRequestBean implements Serializable {
 
     public void setProductId(Long productId) {
         this.productId = productId;
+    }
+
+    public String getEmails() {
+        return emails;
+    }
+
+    public void setEmails(String emails) {
+        this.emails = emails;
     }
 }

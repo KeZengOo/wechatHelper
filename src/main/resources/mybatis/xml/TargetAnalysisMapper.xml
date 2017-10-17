@@ -59,6 +59,16 @@
         <if test="drugUserId!=null and drugUserId!=0">
             AND mad.drug_user_id = #{drugUserId}
         </if>
+        UNION ALL
+        select DISTINCT ei.doctor_id from virtual_email_info ei join drug_user d on d.id=ei.drug_user_id
+        where d.leader_path like #{leaderPath,jdbcType=VARCHAR}
+        AND mad.attend_start_time BETWEEN #{startDate} AND #{endDate}
+        <if test="productId!=null and productId!=0">
+            AND ei.product_id=#{productId}
+        </if>
+        <if test="drugUserId!=null and drugUserId!=0">
+            AND ei.drug_user_id = #{drugUserId}
+        </if>
         ) t
     </select>
 
@@ -77,8 +87,8 @@
         <if test="area!=null and area!=''">
             AND do.provice = #{area}
         </if>
-        <if test="customLevle!=null and customLevle!=''">
-            AND dv.client_level = #{customLevle}
+        <if test="customLevel!=null and customLevel!=''">
+            AND dv.client_level = #{customLevel}
         </if>
     </select>
 
@@ -97,8 +107,8 @@
         <if test="area!=null and area!=''">
             AND do.provice = #{area}
         </if>
-        <if test="customLevle!=null and customLevle!=''">
-            AND dv.client_level = #{customLevle}
+        <if test="customLevel!=null and customLevel!=''">
+            AND dv.client_level = #{customLevel}
         </if>
     </select>
 
@@ -116,8 +126,8 @@
         <if test="area!=null and area!=''">
             AND do.provice = #{area}
         </if>
-        <if test="customLevle!=null and customLevle!=''">
-            AND dv.client_level = #{customLevle}
+        <if test="customLevel!=null and customLevel!=''">
+            AND dv.client_level = #{customLevel}
         </if>
     </select>
 
@@ -135,8 +145,8 @@
         <if test="area!=null and area!=''">
             AND do.provice = #{area}
         </if>
-        <if test="customLevle!=null and customLevle!=''">
-            AND dv.client_level = #{customLevle}
+        <if test="customLevel!=null and customLevel!=''">
+            AND dv.client_level = #{customLevel}
         </if>
     </select>
 
@@ -155,8 +165,8 @@
         <if test="area!=null and area!=''">
             AND do.provice = #{area}
         </if>
-        <if test="customLevle!=null and customLevle!=''">
-            AND dv.client_level = #{customLevle}
+        <if test="customLevel!=null and customLevel!=''">
+            AND dv.client_level = #{customLevel}
         </if>
 
     </select>
@@ -176,8 +186,8 @@
         <if test="area!=null and area!=''">
             AND do.provice = #{area}
         </if>
-        <if test="customLevle!=null and customLevle!=''">
-            AND dv.client_level = #{customLevle}
+        <if test="customLevel!=null and customLevel!=''">
+            AND dv.client_level = #{customLevel}
         </if>
     </select>
 

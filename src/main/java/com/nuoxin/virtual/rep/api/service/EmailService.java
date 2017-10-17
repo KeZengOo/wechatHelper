@@ -77,7 +77,7 @@ public class EmailService {
     }
 
     @Transactional(readOnly = false)
-    public boolean commonEmailSend(EmailRequestBean bean) throws MessagingException {
+    public boolean commonEmailSendIds(EmailRequestBean bean) throws MessagingException {
         String doctorIds = bean.getDoctorIds();
         List<Long> ids = new ArrayList<>();
         String[] doctorid = doctorIds.split(",");
@@ -91,7 +91,7 @@ public class EmailService {
                 Doctor doctor = doctorList.get(i);
                 MimeMessage mimeMessage = this._getMimeMessage(bean,doctor.getEmail());
                 mailSender.send(mimeMessage);
-                logger.info("retrieve.password.send.message【{}】", JSON.toJSONString(mimeMessage));
+                logger.info("common.id.send.message【{}】", JSON.toJSONString(mimeMessage));
 
                 //保存邮件发送记录
                 Email entity = new Email();
@@ -106,6 +106,52 @@ public class EmailService {
             }
         }
         return true;
+    }
+
+    @Transactional(readOnly = false)
+    public boolean commonEmailSendTo(EmailRequestBean bean) throws MessagingException {
+        String email = bean.getEmails();
+        List<String> emails = new ArrayList<>();
+        String[] doctorid = email.split(",");
+        for (String to:doctorid) {
+            if(StringUtils.isNotEmtity(to))
+                emails.add(to);
+        }
+        List<Doctor> doctorList = doctorService.findByEmailIn(emails);
+        if(emails!=null && !emails.isEmpty()){
+            for (int i = 0,leng=emails.size(); i < leng; i++) {
+                String toEmail = emails.get(i);
+                Doctor doctor = this._getDoctorToEmail(doctorList,toEmail);
+                MimeMessage mimeMessage = this._getMimeMessage(bean,toEmail);
+                mailSender.send(mimeMessage);
+                logger.info("common.email.send.message【{}】", JSON.toJSONString(mimeMessage));
+
+                //保存邮件发送记录
+                Email entity = new Email();
+                entity.setContent(bean.getContent());
+                entity.setCreateTime(new Date());
+                if(doctor!=null){
+                    entity.setDoctorId(doctor.getId());
+                }
+                entity.setDrugUserId(bean.getDrugUserId());
+                entity.setProductId(bean.getProductId());
+                entity.setTitle(bean.getTitle());
+                entity.setType(2);
+                emailRepository.save(entity);
+            }
+        }
+        return true;
+    }
+
+    private Doctor _getDoctorToEmail(List<Doctor> doctorList,String email){
+        if(doctorList!=null && !doctorList.isEmpty()){
+            for (Doctor d : doctorList) {
+                if(StringUtils.isNotEmtity(d.getEmail()) && email.equals(d.getEmail())){
+                    return d;
+                }
+            }
+        }
+        return null;
     }
 
     private MimeMessage _getMimeMessage(EmailRequestBean bean,String email) throws MessagingException {

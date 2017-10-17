@@ -14,9 +14,9 @@ public class TrendResponseBean implements Serializable {
     private static final long serialVersionUID = 6433705231350969340L;
 
     @ApiModelProperty(value = "数量")
-    private Integer num;
+    private Integer num = 0;
     @ApiModelProperty(value = "百分比")
-    private Float percentage;
+    private Float percentage = 0f;
     @ApiModelProperty(value = "日期")
     private String date;
     @ApiModelProperty(value = "月")

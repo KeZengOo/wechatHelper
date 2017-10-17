@@ -36,7 +36,7 @@ public class TargetAnalysisService {
     public TargetResponseBean summation(TargetAnalysisRequestBean bean) {
         bean.checkDate();
         TargetResponseBean responseBean = new TargetResponseBean();
-        Target target = targetService.findFirstByProductIdAndLevel(bean.getProductId(), bean.getCustomLevle());
+        Target target = targetService.findFirstByProductIdAndLevel(bean.getProductId(), bean.getCustomLevel());
         Integer count = targetAnalysisMapper.summation(bean);
         responseBean.setCoverNum(count);
         if (target != null) {
@@ -55,7 +55,7 @@ public class TargetAnalysisService {
      */
     public TargetResponseBean custom_tel_person(TargetAnalysisRequestBean bean) {
         bean.checkDate();
-        Target target = targetService.findFirstByProductIdAndLevel(bean.getProductId(), bean.getCustomLevle());
+        Target target = targetService.findFirstByProductIdAndLevel(bean.getProductId(), bean.getCustomLevel());
         TargetResponseBean responseBean = targetAnalysisMapper.customTelPerson(bean);
         if(responseBean==null){
 
@@ -76,7 +76,7 @@ public class TargetAnalysisService {
      */
     public TargetResponseBean custom_tel_count(TargetAnalysisRequestBean bean) {
         bean.checkDate();
-        Target target = targetService.findFirstByProductIdAndLevel(bean.getProductId(), bean.getCustomLevle());
+        Target target = targetService.findFirstByProductIdAndLevel(bean.getProductId(), bean.getCustomLevel());
         TargetResponseBean responseBean = targetAnalysisMapper.customTelCount(bean);
         if(responseBean==null){
 
@@ -97,7 +97,7 @@ public class TargetAnalysisService {
      */
     public TargetResponseBean custom_sms(TargetAnalysisRequestBean bean) {
         bean.checkDate();
-        Target target = targetService.findFirstByProductIdAndLevel(bean.getProductId(), bean.getCustomLevle());
+        Target target = targetService.findFirstByProductIdAndLevel(bean.getProductId(), bean.getCustomLevel());
         TargetResponseBean responseBean = targetAnalysisMapper.customSms(bean);
         if(responseBean==null){
 
@@ -118,7 +118,7 @@ public class TargetAnalysisService {
      */
     public TargetResponseBean custom_wechat(TargetAnalysisRequestBean bean) {
         bean.checkDate();
-        Target target = targetService.findFirstByProductIdAndLevel(bean.getProductId(), bean.getCustomLevle());
+        Target target = targetService.findFirstByProductIdAndLevel(bean.getProductId(), bean.getCustomLevel());
         TargetResponseBean responseBean = targetAnalysisMapper.customWechat(bean);
         if(responseBean==null){
 
@@ -139,7 +139,7 @@ public class TargetAnalysisService {
      */
     public TargetResponseBean custom_tel_sum(TargetAnalysisRequestBean bean) {
         bean.checkDate();
-        Target target = targetService.findFirstByProductIdAndLevel(bean.getProductId(), bean.getCustomLevle());
+        Target target = targetService.findFirstByProductIdAndLevel(bean.getProductId(), bean.getCustomLevel());
         TargetResponseBean responseBean = targetAnalysisMapper.customTelSum(bean);
         if(responseBean==null){
 
@@ -160,7 +160,7 @@ public class TargetAnalysisService {
      */
     public TargetResponseBean custom_tel_avg(TargetAnalysisRequestBean bean) {
         bean.checkDate();
-        Target target = targetService.findFirstByProductIdAndLevel(bean.getProductId(), bean.getCustomLevle());
+        Target target = targetService.findFirstByProductIdAndLevel(bean.getProductId(), bean.getCustomLevel());
         TargetResponseBean responseBean = targetAnalysisMapper.customTelAvg(bean);
         if(responseBean==null){
 
@@ -176,7 +176,7 @@ public class TargetAnalysisService {
 
     public MettingTargetResponseBean meeting(TargetAnalysisRequestBean bean) {
         bean.checkDate();
-        Target target = targetService.findFirstByProductIdAndLevel(bean.getProductId(), bean.getCustomLevle());
+        Target target = targetService.findFirstByProductIdAndLevel(bean.getProductId(), bean.getCustomLevel());
         MettingTargetResponseBean responseBean = targetAnalysisMapper.meeting(bean);
         if (responseBean == null) {
             responseBean = new MettingTargetResponseBean();

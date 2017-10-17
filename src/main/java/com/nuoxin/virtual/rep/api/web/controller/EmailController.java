@@ -35,7 +35,7 @@ public class EmailController extends BaseController {
 
     @ApiOperation(value = "邮件发送", notes = "邮件发送")
     @PostMapping("/send/ids")
-    public DefaultResponseBean<Boolean> send(@RequestBody EmailRequestBean bean,
+    public DefaultResponseBean<Boolean> sendIds(@RequestBody EmailRequestBean bean,
                                              HttpServletRequest request, HttpServletResponse response) throws MessagingException {
         logger.info("{}接口请求数据【】{}",request.getServletPath(), JSON.toJSONString(bean));
         DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
@@ -44,7 +44,22 @@ public class EmailController extends BaseController {
             responseBean.setMessage("发送医生不能为空");
             return responseBean;
         }
-        responseBean.setData(emailService.commonEmailSend(bean));
+        responseBean.setData(emailService.commonEmailSendIds(bean));
+        return responseBean;
+    }
+
+    @ApiOperation(value = "邮件发送", notes = "邮件发送")
+    @PostMapping("/send/to")
+    public DefaultResponseBean<Boolean> sendEmail(@RequestBody EmailRequestBean bean,
+                                             HttpServletRequest request, HttpServletResponse response) throws MessagingException {
+        logger.info("{}接口请求数据【】{}",request.getServletPath(), JSON.toJSONString(bean));
+        DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
+        if(!StringUtils.isNotEmtity(bean.getDoctorIds())){
+            responseBean.setCode(500);
+            responseBean.setMessage("发送医生不能为空");
+            return responseBean;
+        }
+        responseBean.setData(emailService.commonEmailSendTo(bean));
         return responseBean;
     }
 }

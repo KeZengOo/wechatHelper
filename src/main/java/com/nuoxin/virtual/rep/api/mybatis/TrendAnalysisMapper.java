@@ -32,13 +32,16 @@ public interface TrendAnalysisMapper {
      * @return
      */
     List<TrendResponseBean> summationCover(TrendAnalysisRequestBean bean);
+    List<TrendResponseBean> summationCalloutCount(TrendAnalysisRequestBean bean);
 
     /**
      * 会话
      * @param bean
      * @return
      */
-    List<TrendResponseBean> summationSession(TrendAnalysisRequestBean bean);
+    List<TrendResponseBean> summationSession1(TrendAnalysisRequestBean bean);
+    List<TrendResponseBean> summationSession2(TrendAnalysisRequestBean bean);
+    List<TrendResponseBean> summationSession3(TrendAnalysisRequestBean bean);
 
     /**
      * 呼出数
@@ -63,4 +66,5 @@ public interface TrendAnalysisMapper {
      * @return
      */
     List<TrendStatResponseBean> sessionType2(TrendAnalysisRequestBean bean);
+    List<TrendStatResponseBean> sessionType3(TrendAnalysisRequestBean bean);
 }

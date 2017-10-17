@@ -1,13 +1,16 @@
 package com.nuoxin.virtual.rep.api.service.analysis;
 
 import com.nuoxin.virtual.rep.api.common.service.BaseService;
+import com.nuoxin.virtual.rep.api.entity.Target;
 import com.nuoxin.virtual.rep.api.mybatis.TrendAnalysisMapper;
+import com.nuoxin.virtual.rep.api.service.TargetService;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.analysis.TargetAnalysisRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.analysis.TrendAnalysisRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.analysis.ta.MettingTargetResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.analysis.ta.TargetResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.analysis.tr.TrendResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.analysis.tr.TrendSessionStatResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.analysis.tr.TrendStatResponseBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +43,12 @@ public class TrendAnalysisService extends BaseService {
     public List<TrendResponseBean> summationCallout(TrendAnalysisRequestBean bean) {
         bean.checkDate();
         List<TrendResponseBean> responseBeans = this. _getTrendResponseBean(bean);
+        List<TrendResponseBean> list = trendAnalysisMapper.summationCallout(bean);
+        if(responseBeans!=null && !list.isEmpty()){
+            for (TrendResponseBean trend:responseBeans) {
+                trend.setNum(this._getNum(list,bean.getDateType(),trend));
+            }
+        }
         return responseBeans;
     }
 
@@ -52,9 +61,33 @@ public class TrendAnalysisService extends BaseService {
     public List<TrendResponseBean> summationCalloutAvg(TrendAnalysisRequestBean bean) {
         bean.checkDate();
         List<TrendResponseBean> responseBeans = this. _getTrendResponseBean(bean);
+        List<TrendResponseBean> list = trendAnalysisMapper.summationCalloutAvg(bean);
+        if(responseBeans!=null && !list.isEmpty()){
+            for (TrendResponseBean trend:responseBeans) {
+                trend.setNum(this._getNum(list,bean.getDateType(),trend));
+            }
+        }
         return responseBeans;
     }
 
+
+    /**
+     * 呼出次数
+     *
+     * @param bean
+     * @return
+     */
+    public List<TrendResponseBean> summationCalloutCount(TrendAnalysisRequestBean bean) {
+        bean.checkDate();
+        List<TrendResponseBean> responseBeans = this. _getTrendResponseBean(bean);
+        List<TrendResponseBean> list = trendAnalysisMapper.summationCalloutCount(bean);
+        if(responseBeans!=null && !list.isEmpty()){
+            for (TrendResponseBean trend:responseBeans) {
+                trend.setNum(this._getNum(list,bean.getDateType(),trend));
+            }
+        }
+        return responseBeans;
+    }
     /**
      * 覆盖
      *
@@ -64,6 +97,13 @@ public class TrendAnalysisService extends BaseService {
     public List<TrendResponseBean> summationCover(TrendAnalysisRequestBean bean) {
         bean.checkDate();
         List<TrendResponseBean> responseBeans = this. _getTrendResponseBean(bean);
+//        Target target = targetService.findFirstByProductIdAndLevel(bean.getProductId(), bean.getCustomLevel());
+//        List<TrendResponseBean> list = trendAnalysisMapper.summationCover(bean);
+//        if(responseBeans!=null && !list.isEmpty()){
+//            for (TrendResponseBean trend:responseBeans) {
+//                trend.setNum(this._getNum(list,bean.getDateType(),trend));
+//            }
+//        }
         return responseBeans;
     }
 
@@ -73,10 +113,58 @@ public class TrendAnalysisService extends BaseService {
      * @param bean
      * @return
      */
-    public List<TrendResponseBean> summationSession(TrendAnalysisRequestBean bean) {
+    public List<TrendSessionStatResponseBean> summationSession(TrendAnalysisRequestBean bean) {
         bean.checkDate();
-        List<TrendResponseBean> responseBeans = this. _getTrendResponseBean(bean);
+        List<TrendSessionStatResponseBean> responseBeans = new ArrayList<>();
+        List<TrendResponseBean> list = this. _getTrendResponseBean(bean);
+        List<TrendResponseBean> wechat = trendAnalysisMapper.summationSession1(bean);
+        List<TrendResponseBean> sms = trendAnalysisMapper.summationSession2(bean);
+        List<TrendResponseBean> email = trendAnalysisMapper.summationSession3(bean);
+
+        if(list!=null && !list.isEmpty()){
+            for (TrendResponseBean trend:list) {
+                TrendSessionStatResponseBean responseBean = new TrendSessionStatResponseBean();
+                responseBean.setDate(trend.getDate());
+                responseBean.setDay(trend.getDay());
+                responseBean.setMonth(trend.getMonth());
+                responseBean.setYear(trend.getYear());
+                responseBean.setQuarter(trend.getQuarter());
+                responseBean.setWeek(trend.getWeek());
+
+                responseBean.setWechat(this._getNum(wechat,bean.getDateType(),trend));
+                responseBean.setEmail(this._getNum(email,bean.getDateType(),trend));
+                responseBean.setSms(this._getNum(sms,bean.getDateType(),trend));
+
+                responseBeans.add(responseBean);
+            }
+        }
+
         return responseBeans;
+    }
+
+    private Integer _getNum(List<TrendResponseBean> list,Integer type,TrendResponseBean trend){
+        if(list!=null && !list.isEmpty()){
+            for (TrendResponseBean bean:list) {
+                if(type==1){
+                    if(trend.getDate().equals(bean.getDate())){
+                        return bean.getNum();
+                    }
+                }else if(type==2){
+                    if(bean.getYear()==trend.getYear() && bean.getWeek()==trend.getWeek()){
+                        return bean.getNum();
+                    }
+                }else if(type==3){
+                    if(bean.getYear()==trend.getYear() && bean.getMonth()==trend.getMonth()){
+                        return bean.getNum();
+                    }
+                }else if(type==4){
+                    if(bean.getYear()==trend.getYear() && bean.getQuarter()==trend.getQuarter()){
+                        return bean.getNum();
+                    }
+                }
+            }
+        }
+        return 0;
     }
 
     /**
@@ -106,6 +194,7 @@ public class TrendAnalysisService extends BaseService {
         List<TrendStatResponseBean> responseBeans = new ArrayList<>();
         List<TrendStatResponseBean> wechat = trendAnalysisMapper.sessionType1(bean);
         List<TrendStatResponseBean> sms = trendAnalysisMapper.sessionType2(bean);
+        List<TrendStatResponseBean> email = trendAnalysisMapper.sessionType3(bean);
         for (int i = 0; i < 24; i++) {
             TrendStatResponseBean responseBean = new TrendStatResponseBean();
             responseBean.setHour(i);
@@ -120,6 +209,13 @@ public class TrendAnalysisService extends BaseService {
                 for (TrendStatResponseBean stat : sms) {
                     if (stat.getHour() != null && stat.getHour().intValue() == i) {
                         responseBean.setWechat(stat.getSms());
+                    }
+                }
+            }
+            if (email != null && !email.isEmpty()) {
+                for (TrendStatResponseBean stat : email) {
+                    if (stat.getHour() != null && stat.getHour().intValue() == i) {
+                        responseBean.setEmail(stat.getEmail());
                     }
                 }
             }
@@ -147,6 +243,7 @@ public class TrendAnalysisService extends BaseService {
                 responseBean.setMonth(calendar.get(Calendar.MONTH) + 1);
                 responseBean.setWeek(calendar.get(Calendar.WEEK_OF_YEAR));
                 responseBean.setYear(calendar.get(Calendar.YEAR));
+                responseBean.setQuarter(((int) calendar.get(Calendar.MONTH) / 3)+1);
                 responseBeans.add(responseBean);
                 calendar.add(Calendar.DAY_OF_YEAR, +1);
             }
@@ -158,6 +255,7 @@ public class TrendAnalysisService extends BaseService {
                 responseBean.setMonth(calendar.get(Calendar.MONTH) + 1);
                 responseBean.setWeek(calendar.get(Calendar.WEEK_OF_YEAR));
                 responseBean.setYear(calendar.get(Calendar.YEAR));
+                responseBean.setQuarter(((int) calendar.get(Calendar.MONTH) / 3)+1);
                 responseBeans.add(responseBean);
                 calendar.add(Calendar.WEEK_OF_YEAR, +1);
             }
@@ -170,6 +268,7 @@ public class TrendAnalysisService extends BaseService {
                 responseBean.setMonth(calendar.get(Calendar.MONTH) + 1);
                 responseBean.setWeek(calendar.get(Calendar.WEEK_OF_YEAR));
                 responseBean.setYear(calendar.get(Calendar.YEAR));
+                responseBean.setQuarter(((int) calendar.get(Calendar.MONTH) / 3)+1);
                 responseBeans.add(responseBean);
                 calendar.add(Calendar.MONTH, +1);
             }

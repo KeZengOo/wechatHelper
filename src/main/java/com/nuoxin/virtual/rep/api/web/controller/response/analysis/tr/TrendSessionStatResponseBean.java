@@ -3,14 +3,12 @@ package com.nuoxin.virtual.rep.api.web.controller.response.analysis.tr;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import java.io.Serializable;
-
 /**
- * Created by fenggang on 10/16/17.
+ * Created by fenggang on 10/17/17.
  */
 @ApiModel
-public class TrendStatResponseBean implements Serializable {
-    private static final long serialVersionUID = 172396389288114416L;
+public class TrendSessionStatResponseBean extends TrendResponseBean {
+    private static final long serialVersionUID = -6705566658957915262L;
 
     @ApiModelProperty(value = "微信")
     private Integer wechat = 0;
@@ -18,10 +16,6 @@ public class TrendStatResponseBean implements Serializable {
     private Integer sms = 0;
     @ApiModelProperty(value = "邮件")
     private Integer email = 0;
-    @ApiModelProperty(value = "接通数")
-    private Integer connect = 0;
-    @ApiModelProperty(value = "时间")
-    private Integer hour;
 
     public Integer getWechat() {
         return wechat;
@@ -37,22 +31,6 @@ public class TrendStatResponseBean implements Serializable {
 
     public void setSms(Integer sms) {
         this.sms = sms;
-    }
-
-    public Integer getHour() {
-        return hour;
-    }
-
-    public void setHour(Integer hour) {
-        this.hour = hour;
-    }
-
-    public Integer getConnect() {
-        return connect;
-    }
-
-    public void setConnect(Integer connect) {
-        this.connect = connect;
     }
 
     public Integer getEmail() {
