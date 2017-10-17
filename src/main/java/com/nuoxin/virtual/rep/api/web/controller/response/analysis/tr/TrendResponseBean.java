@@ -15,6 +15,8 @@ public class TrendResponseBean implements Serializable {
 
     @ApiModelProperty(value = "数量")
     private Integer num = 0;
+    @ApiModelProperty(value = "次数")
+    private Integer count = 0;
     @ApiModelProperty(value = "百分比")
     private Float percentage = 0f;
     @ApiModelProperty(value = "日期")
@@ -92,5 +94,13 @@ public class TrendResponseBean implements Serializable {
 
     public void setQuarter(Integer quarter) {
         this.quarter = quarter;
+    }
+
+    public Integer getCount() {
+        return count;
+    }
+
+    public void setCount(Integer count) {
+        this.count = count;
     }
 }
