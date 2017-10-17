@@ -25,6 +25,15 @@ public class WorkStationRequestBean extends PageRequestBean implements Serializa
     @ApiModelProperty(value = "日期类型，1是今天，2是本周，3是本月，4是本季度")
     private Integer dateType;
 
+    @ApiModelProperty(value = "通话达标设置的值，前端不用传")
+    private Integer callReach;
+
+    @ApiModelProperty(value = "微信达标设置的值，前端不用传")
+    private Integer wechatReach;
+
+    @ApiModelProperty(value = "短信达标设置的值，前端不用传")
+    private Integer imReach;
+
     public Long getDrugUserId() {
         return drugUserId;
     }
@@ -56,5 +65,30 @@ public class WorkStationRequestBean extends PageRequestBean implements Serializa
 
     public void setDateType(Integer dateType) {
         this.dateType = dateType;
+    }
+
+
+    public Integer getCallReach() {
+        return callReach;
+    }
+
+    public void setCallReach(Integer callReach) {
+        this.callReach = callReach;
+    }
+
+    public Integer getWechatReach() {
+        return wechatReach;
+    }
+
+    public void setWechatReach(Integer wechatReach) {
+        this.wechatReach = wechatReach;
+    }
+
+    public Integer getImReach() {
+        return imReach;
+    }
+
+    public void setImReach(Integer imReach) {
+        this.imReach = imReach;
     }
 }

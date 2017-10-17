@@ -48,13 +48,13 @@ public interface WorkStationMapper {
     Map<String, String> minWechatCoveredCount(WorkStationRequestBean bean);
 
     //通话未达标，按照人数
-    Map<String, String> callNoReach(WorkStationRequestBean bean);
+    List<String> callNoReach(WorkStationRequestBean bean);
 
     //微信未达标，按照人数
-    Map<String, String> wechatNoReach(WorkStationRequestBean bean);
+    List<String> wechatNoReach(WorkStationRequestBean bean);
 
     //短信未达标，按照人数
-    Map<String, String> imNoReach(WorkStationRequestBean bean);
+    List<String> imNoReach(WorkStationRequestBean bean);
 
     //脱落客户最严重
     Map<String, String> dropCustomers(WorkStationRequestBean bean);
