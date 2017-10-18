@@ -20,6 +20,8 @@ public class TrendStatResponseBean implements Serializable {
     private Integer email = 0;
     @ApiModelProperty(value = "接通数")
     private Integer connect = 0;
+    @ApiModelProperty(value = "接通数")
+    private Integer callout = 0;
     @ApiModelProperty(value = "时间")
     private Integer hour;
 
@@ -61,5 +63,13 @@ public class TrendStatResponseBean implements Serializable {
 
     public void setEmail(Integer email) {
         this.email = email;
+    }
+
+    public Integer getCallout() {
+        return callout;
+    }
+
+    public void setCallout(Integer callout) {
+        this.callout = callout;
     }
 }

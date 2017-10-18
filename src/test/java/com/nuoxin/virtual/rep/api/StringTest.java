@@ -54,7 +54,13 @@ public class StringTest {
 //        String rgex = "<u>(.*?)</u>";
 //        System.out.println(getSubUtil(str,rgex));
 //        System.out.println(getSubUtilSimple(str, rgex));
-
+        String[] dates = "2017-09-01".split("-");
+        Calendar a = Calendar.getInstance();
+        a.set(Integer.valueOf(dates[0]),Integer.valueOf(dates[1])-1,1,0,0,0);
+        a.set(Calendar.DATE, 1);//把日期设置为当月第一天
+        a.roll(Calendar.DATE, -1);//日期回滚一天，也就是最后一天
+        int maxDate = a.get(Calendar.DATE);
+        System.out.println(maxDate);
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.DAY_OF_MONTH,16);
         calendar.set(2017,9,16,0,0,0);
