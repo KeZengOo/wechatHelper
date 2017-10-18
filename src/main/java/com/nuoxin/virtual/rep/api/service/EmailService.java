@@ -1,6 +1,7 @@
 package com.nuoxin.virtual.rep.api.service;
 
 import com.alibaba.fastjson.JSON;
+import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.util.StringUtils;
 import com.nuoxin.virtual.rep.api.common.util.ValidationCode;
 import com.nuoxin.virtual.rep.api.common.util.mem.SessionMemUtils;
@@ -8,9 +9,12 @@ import com.nuoxin.virtual.rep.api.dao.EmailRepository;
 import com.nuoxin.virtual.rep.api.entity.Doctor;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.Email;
+import com.nuoxin.virtual.rep.api.mybatis.EmailMapper;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.EmailQueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.EmailRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.EmailResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.call.CallHistoryResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.vo.Doc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +57,8 @@ public class EmailService {
     private DoctorService doctorService;
     @Autowired
     private EmailRepository emailRepository;
+    @Autowired
+    private EmailMapper emailMapper;
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -145,9 +151,12 @@ public class EmailService {
         return true;
     }
 
-    public Object page(EmailQueryRequestBean bean){
-
-        return null;
+    public PageResponseBean<EmailResponseBean> page(EmailQueryRequestBean bean){
+        bean.setCurrentSize(bean.getPageSize()*bean.getPage());
+        List<EmailResponseBean> list = emailMapper.historyPage(bean);
+        Integer count = emailMapper.historyPageCount(bean);
+        PageResponseBean<EmailResponseBean> responseBean = new PageResponseBean<>(bean,count,list);
+        return responseBean;
     }
 
     private Doctor _getDoctorToEmail(List<Doctor> doctorList,String email){

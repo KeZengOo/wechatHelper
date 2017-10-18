@@ -2,7 +2,44 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.nuoxin.virtual.rep.api.mybatis.EmailMapper">
 
-    <select id="getTodayEmailNum" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean"
+    <resultMap id="emaiResponseBean" type="com.nuoxin.virtual.rep.api.web.controller.response.EmailResponseBean">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="product_id" property="productId" jdbcType="BIGINT"/>
+        <result column="content" property="content" jdbcType="VARCHAR"/>
+        <result column="title" property="title" jdbcType="VARCHAR"/>
+        <result column="dates" property="date" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="historyPage" resultMap="emaiResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.EmailQueryRequestBean">
+        select ei.id,ei.content,ei.title,ei.product_id,DATE_FORMAT(ei.create_time,'%y-%m-%d %H:%I:%S') dates from
+        virtual_email_info ei join drug_user du on du.id=ei.drug_user_id where
+        du.leader_path like #{leaderPath,jdbcType=VARCHAR}
+        <if test="doctorId!=null and doctorId!=0">
+              and ei.doctor_id=#{doctorId}
+        </if>
+        <if test="productId!=null and productId!=0">
+            and ei.product_id=#{productId}
+        </if>
+        LIMIT ${currentSize},${pageSize}
+
+    </select>
+
+    <select id="historyPageCount" resultType="java.lang.Integer"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.EmailQueryRequestBean">
+        select count(1) num from
+        virtual_email_info ei join drug_user du on du.id=ei.drug_user_id where
+        du.leader_path like #{leaderPath,jdbcType=VARCHAR}
+        <if test="doctorId!=null and doctorId!=0">
+            and ei.doctor_id=#{doctorId}
+        </if>
+        <if test="productId!=null and productId!=0">
+            and ei.product_id=#{productId}
+        </if>
+    </select>
+
+    <select id="getTodayEmailNum"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean"
             resultType="java.lang.Integer">
 
         select count(distinct vei.doctor_id)
@@ -20,7 +57,8 @@
     </select>
 
 
-    <select id="getTodayEmailCount" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean"
+    <select id="getTodayEmailCount"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean"
             resultType="java.lang.Integer">
 
         select count(distinct vei.id)

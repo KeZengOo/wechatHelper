@@ -13,6 +13,8 @@ public class EmailQueryRequestBean extends PageRequestBean {
 
     @ApiModelProperty(value = "医生id")
     private Long doctorId;
+    @ApiModelProperty(value = "产品")
+    private Long productId;
     @ApiModelProperty(value = "不用传")
     private Long drugUserId;
     @ApiModelProperty(value = "不用传")
@@ -40,5 +42,13 @@ public class EmailQueryRequestBean extends PageRequestBean {
 
     public void setLeaderPath(String leaderPath) {
         this.leaderPath = leaderPath;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 }
