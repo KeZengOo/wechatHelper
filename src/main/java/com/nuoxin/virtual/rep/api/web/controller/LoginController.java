@@ -46,13 +46,20 @@ public class LoginController extends BaseController {
     public DefaultResponseBean<LoginResponseBean> login(@RequestBody LoginRequestBean bean,
                                      HttpServletRequest request, HttpServletResponse response){
         System.out.println(bean.getPassword());
+        DefaultResponseBean<LoginResponseBean> responseBean = new DefaultResponseBean<>();
         DrugUser drugUser = loginService.login(bean);
+        if(drugUser.getRoleId()==null){
+            responseBean.setCode(550);
+            responseBean.setMessage("权限不足");
+            return responseBean;
+        }
+
         sercurityService.saveSession(request,response,drugUser);
         LoginResponseBean result = new LoginResponseBean();
         result.setName(drugUser.getName());
         result.setEmail(drugUser.getEmail());
         result.setCallBean(JSON.parseObject(drugUser.getCallInfo(), DrugUserCallDetaiBean.class));
-        DefaultResponseBean<LoginResponseBean> responseBean = new DefaultResponseBean<>();
+        result.setRoleId(drugUser.getRoleId());
         responseBean.setData(result);
         return responseBean;
     }
