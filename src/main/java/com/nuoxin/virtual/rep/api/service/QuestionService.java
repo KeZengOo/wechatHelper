@@ -120,9 +120,9 @@ public class QuestionService extends BaseService {
             @Override
             public Predicate toPredicate(Root<Questionnaire> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
                 List<Predicate> predicates = new ArrayList<>();
-                if(bean.getDrugUserId()!=null&&bean.getDrugUserId()!=0){
-                    predicates.add(cb.equal(root.get("createId").as(Long.class),bean.getDrugUserId()));
-                }
+//                if(bean.getDrugUserId()!=null&&bean.getDrugUserId()!=0){
+//                    predicates.add(cb.equal(root.get("createId").as(Long.class),bean.getDrugUserId()));
+//                }
                 if(bean.getProductId()!=null&&bean.getProductId()!=0){
                     predicates.add(cb.equal(root.get("productId").as(Long.class),bean.getProductId()));
                 }

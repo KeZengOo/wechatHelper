@@ -25,6 +25,7 @@ public class LoginService {
         if (!PasswordEncoder.checkPassword(bean.getPassword(), drugUser.getPassword())) {
             throw new BusinessException(ErrorEnum.LOGIN_ERROR.getStatus(),"用户名密码不匹配");
         }
+        drugUser.setLeaderPath(drugUser.getLeaderPath()+"%");
         return drugUser;
     }
 }

@@ -4,7 +4,10 @@ import com.nuoxin.virtual.rep.api.common.util.PasswordEncoder;
 import com.nuoxin.virtual.rep.api.dao.DrugUserRepository;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.ProductLine;
+import com.nuoxin.virtual.rep.api.mybatis.DrugUserMapper;
+import com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.UpdatePwdRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorStatResponseBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -24,7 +27,8 @@ public class DrugUserService {
 
     @Autowired
     private DrugUserRepository drugUserRepository;
-
+    @Autowired
+    private DrugUserMapper drugUserMapper;
     @Autowired
     private ProductLineService productLineService;
 
@@ -47,7 +51,13 @@ public class DrugUserService {
         }
     }
 
+    public List<DoctorResponseBean> doctorPage(QueryRequestBean bean){
+        return drugUserMapper.doctorPage(bean);
+    }
 
+    public Integer doctorPageCount(QueryRequestBean bean){
+        return drugUserMapper.doctorPageCount(bean);
+    }
 
     @Cacheable(value="virtual_app_web_druguser",key = "'_findByProductKeyWord_'+#drugUserId")
     public List<ProductLine> findByProductKeyWord(Long drugUserId){

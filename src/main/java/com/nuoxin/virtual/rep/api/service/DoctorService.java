@@ -85,48 +85,50 @@ public class DoctorService extends BaseService {
 
     @Cacheable(value = "virtual_rep_api_doctor", key = "'_page_'+#bean")
     public PageResponseBean<DoctorResponseBean> page(QueryRequestBean bean) {
-        PageRequest pageable = super.getPage(bean);
-        Specification<Doctor> spec = new Specification<Doctor>() {
-            @Override
-            public Predicate toPredicate(Root<Doctor> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-                List<Predicate> predicates = new ArrayList<>();
-                if (bean.getDrugUserId() != null && bean.getDrugUserId() != 0) {
-                    predicates.add(cb.like(root.get("doctorVirtual").get("drugUserIds").as(String.class), "%," + bean.getDrugUserId() + ",%"));
-                }
-                if (StringUtils.isNotEmtity(bean.getName())) {
-                    predicates.add(cb.like(root.get("name").as(String.class), "%" + bean.getName() + "%"));
-                }
-                if (StringUtils.isNotEmtity(bean.getMobile())) {
-                    predicates.add(cb.like(root.get("mobile").as(String.class), "%" + bean.getMobile() + "%"));
-                }
-                if (StringUtils.isNotEmtity(bean.getDepartment())) {
-                    predicates.add(cb.like(root.get("department").as(String.class), "%" + bean.getDepartment() + "%"));
-                }
-                if (StringUtils.isNotEmtity(bean.getDoctorLevel())) {
-                    predicates.add(cb.like(root.get("doctorLevel").as(String.class), "%" + bean.getDoctorLevel() + "%"));
-                }
-                if (StringUtils.isNotEmtity(bean.getHospital())) {
-                    predicates.add(cb.like(root.get("hospitalName").as(String.class), "%" + bean.getHospital() + "%"));
-                }
-                query.where(cb.and(cb.and(predicates.toArray(new Predicate[0]))));
-                return query.getRestriction();
-            }
-        };
-        Page<Doctor> page = doctorRepository.findAll(spec, pageable);
-        PageResponseBean<DoctorResponseBean> responseBean = new PageResponseBean<>(page);
-        List<Doctor> pageList = page.getContent();
-        if (pageList != null && !pageList.isEmpty()) {
-            List<DoctorResponseBean> list = new ArrayList<>();
-            for (Doctor doctor : pageList) {
-                DoctorResponseBean listBean = new DoctorResponseBean();
-                BeanUtils.copyProperties(doctor, listBean);
-                listBean.setDoctorId(doctor.getId());
-                listBean.setDoctorMobile(doctor.getMobile());
-                listBean.setDoctorName(doctor.getName());
-                list.add(listBean);
-            }
-            responseBean.setContent(list);
+//        PageRequest pageable = super.getPage(bean);
+//        Specification<Doctor> spec = new Specification<Doctor>() {
+//            @Override
+//            public Predicate toPredicate(Root<Doctor> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+//                List<Predicate> predicates = new ArrayList<>();
+//
+//                query.where(cb.and(cb.and(predicates.toArray(new Predicate[0]))));
+//                return query.getRestriction();
+//            }
+//        };
+//        Page<Doctor> page = doctorRepository.findAll(spec, pageable);
+//        PageResponseBean<DoctorResponseBean> responseBean = new PageResponseBean<>(page);
+//        List<Doctor> pageList = page.getContent();
+//        if (pageList != null && !pageList.isEmpty()) {
+//            List<DoctorResponseBean> list = new ArrayList<>();
+//            for (Doctor doctor : pageList) {
+//                DoctorResponseBean listBean = new DoctorResponseBean();
+//                BeanUtils.copyProperties(doctor, listBean);
+//                listBean.setDoctorId(doctor.getId());
+//                listBean.setDoctorMobile(doctor.getMobile());
+//                listBean.setDoctorName(doctor.getName());
+//                list.add(listBean);
+//            }
+//            responseBean.setContent(list);
+//        }
+        bean.setCurrentSize(bean.getPageSize()*bean.getPage());
+        if (StringUtils.isNotEmtity(bean.getName())) {
+            bean.setName( "%" + bean.getName() + "%");
         }
+        if (StringUtils.isNotEmtity(bean.getMobile())) {
+            bean.setMobile( "%" + bean.getMobile() + "%");
+        }
+        if (StringUtils.isNotEmtity(bean.getDepartment())) {
+            bean.setDepartment( "%" + bean.getDepartment() + "%");
+        }
+        if (StringUtils.isNotEmtity(bean.getDoctorLevel())) {
+            bean.setDoctorLevel( "%" + bean.getDoctorLevel() + "%");
+        }
+        if (StringUtils.isNotEmtity(bean.getHospital())) {
+            bean.setHospital( "%" + bean.getHospital() + "%");
+        }
+        List<DoctorResponseBean> list = drugUserService.doctorPage(bean);
+        Integer count = drugUserService.doctorPageCount(bean);
+        PageResponseBean<DoctorResponseBean> responseBean = new PageResponseBean<>(bean,count,list);
         return responseBean;
     }
 

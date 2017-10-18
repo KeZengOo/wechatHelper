@@ -30,6 +30,8 @@ public class DoctorResponseBean implements Serializable {
     private String city;
     @ApiModelProperty(value = "科室")
     private String department;
+    @ApiModelProperty(value = "代表名称")
+    private String drugUserName;
 
     public Long getDoctorId() {
         return doctorId;
@@ -100,5 +102,13 @@ public class DoctorResponseBean implements Serializable {
 
     public void setHospitalLevel(String hospitalLevel) {
         this.hospitalLevel = hospitalLevel;
+    }
+
+    public String getDrugUserName() {
+        return drugUserName;
+    }
+
+    public void setDrugUserName(String drugUserName) {
+        this.drugUserName = drugUserName;
     }
 }
