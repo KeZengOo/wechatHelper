@@ -20,9 +20,9 @@ public class TrendStatResponseBean implements Serializable {
     private Integer email = 0;
     @ApiModelProperty(value = "接通数")
     private Integer connect = 0;
-    @ApiModelProperty(value = "接通数")
+    @ApiModelProperty(value = "呼出次数")
     private Integer callout = 0;
-    @ApiModelProperty(value = "时间")
+    @ApiModelProperty(value = "时间（横坐标）")
     private Integer hour;
 
     public Integer getWechat() {

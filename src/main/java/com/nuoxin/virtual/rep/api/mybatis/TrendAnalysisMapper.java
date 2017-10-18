@@ -50,6 +50,7 @@ public interface TrendAnalysisMapper {
      * @return
      */
     List<TrendStatResponseBean> callOut(TrendAnalysisRequestBean bean);
+    List<TrendStatResponseBean> callOutCount(TrendAnalysisRequestBean bean);
 
     /**
      * 微信数

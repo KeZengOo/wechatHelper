@@ -204,9 +204,30 @@ public class TrendAnalysisService extends BaseService {
      */
     public List<TrendStatResponseBean> callOut(TrendAnalysisRequestBean bean) {
         //TODO 获取时间
-        bean.setEndDate(bean.getDate() + " 23:00:00");
+        bean.setEndDate(bean.getDate() + " 23:59:59");
         bean.setStartDate(bean.getDate() + " 00:00:00");
-        List<TrendStatResponseBean> responseBeans = trendAnalysisMapper.callOut(bean);
+        List<TrendStatResponseBean> responseBeans = new ArrayList<>();
+        List<TrendStatResponseBean> connect = trendAnalysisMapper.callOut(bean);
+        List<TrendStatResponseBean> callout = trendAnalysisMapper.callOutCount(bean);
+        for (int i = 0; i < 24; i++) {
+            TrendStatResponseBean responseBean = new TrendStatResponseBean();
+            responseBean.setHour(i);
+            if (connect != null && !connect.isEmpty()) {
+                for (TrendStatResponseBean stat : connect) {
+                    if (stat.getHour() != null && stat.getHour().intValue() == i) {
+                        responseBean.setConnect(stat.getConnect());
+                    }
+                }
+            }
+            if (callout != null && !callout.isEmpty()) {
+                for (TrendStatResponseBean stat : callout) {
+                    if (stat.getHour() != null && stat.getHour().intValue() == i) {
+                        responseBean.setCallout(stat.getCallout());
+                    }
+                }
+            }
+            responseBeans.add(responseBean);
+        }
         return responseBeans;
     }
 
@@ -218,7 +239,7 @@ public class TrendAnalysisService extends BaseService {
      */
     public List<TrendStatResponseBean> session(TrendAnalysisRequestBean bean) {
         //TODO 获取时间
-        bean.setEndDate(bean.getDate() + " 23:00:00");
+        bean.setEndDate(bean.getDate() + " 23:59:59");
         bean.setStartDate(bean.getDate() + " 00:00:00");
         List<TrendStatResponseBean> responseBeans = new ArrayList<>();
         List<TrendStatResponseBean> wechat = trendAnalysisMapper.sessionType1(bean);

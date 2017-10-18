@@ -9,6 +9,7 @@
         <result column="emails" property="email" jdbcType="INTEGER"/>
         <result column="connects" property="connect" jdbcType="INTEGER"/>
         <result column="hours" property="hour" jdbcType="INTEGER"/>
+        <result column="callout" property="callout" jdbcType="INTEGER"/>
     </resultMap>
 
     <resultMap id="trendResponseBean"
@@ -231,6 +232,12 @@
     <select id="callOut" resultMap="statResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TrendAnalysisRequestBean">
         select COUNT(DISTINCT dc.sin_token) connects,DATE_FORMAT(dc.create_time,'%k') hours,dc.create_time from virtual_doctor_call_info dc join virtual_doctor_call_info_details dcd on dcd.call_id=dc.id join drug_user d on d.id=dc.virtual_drug_user_id where dcd.status_name='answer'
+        and dc.create_time BETWEEN #{startDate} AND #{endDate} and d.leader_path like #{leaderPath,jdbcType=VARCHAR} group by DATE_FORMAT(dc.create_time,'%k') order by dc.create_time asc
+    </select>
+
+    <select id="callOutCount" resultMap="statResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TrendAnalysisRequestBean">
+        select COUNT(DISTINCT dc.sin_token) callout,DATE_FORMAT(dc.create_time,'%k') hours,dc.create_time from virtual_doctor_call_info dc join virtual_doctor_call_info_details dcd on dcd.call_id=dc.id join drug_user d on d.id=dc.virtual_drug_user_id where 1=1
         and dc.create_time BETWEEN #{startDate} AND #{endDate} and d.leader_path like #{leaderPath,jdbcType=VARCHAR} group by DATE_FORMAT(dc.create_time,'%k') order by dc.create_time asc
     </select>
 

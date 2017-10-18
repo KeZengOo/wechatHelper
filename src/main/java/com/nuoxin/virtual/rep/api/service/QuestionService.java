@@ -154,6 +154,7 @@ public class QuestionService extends BaseService {
         requestBean.setId(questionnaire.getId());
         requestBean.setTitle(questionnaire.getTitle());
         requestBean.setQuestions(this._getQuestions(questionnaire.getId()));
+        requestBean.setProductId(questionnaire.getProductId());
         return requestBean;
     }
 
