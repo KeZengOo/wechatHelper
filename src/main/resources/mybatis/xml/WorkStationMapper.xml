@@ -134,11 +134,10 @@
 
     </select>
 
-
+    <!-- 查询出最短的总通话时长 -->
     <select id="minCallTotalTime" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean"
-            resultType="java.util.Map">
-        select t.name as drugUserName,concat(min(t.sum_call_time),'') as minCallTotalTime  from (
-        select ifnull(sum(vdci.call_time),0) as sum_call_time,du.id, du.name
+            resultType="java.lang.Integer">
+        select ifnull(sum(vdci.call_time),0) as sum_call_time
         from virtual_doctor_call_info vdci
         inner join virtual_doctor_call_info_details vdcid
         on vdci.id=vdcid.call_id
@@ -148,7 +147,7 @@
         and vdcid.status_name='answer'
         <if test="dateType !=null">
             <if test="dateType==1">
-                and date_format(vdci.create_time,'%Y-%m-%d')=WEEKOFYEAR(NOW(),'%Y-%m-%d')
+                and date_format(vdci.create_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
             </if>
             <if test="dateType==2">
                 and WEEKOFYEAR(vdci.create_time)=WEEKOFYEAR(NOW())
@@ -170,16 +169,54 @@
           where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
         )
         and du.leader_path like #{leaderPath}
-        group by vdci.virtual_drug_user_id
-        ) t group by t.id
+        group by vdci.virtual_drug_user_id order by sum_call_time limit 1
 
     </select>
 
+    <select id="minCallTotalTimeList" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean"
+            resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.DrugUserAnalysisResponseBean">
+        select distinct t.num,t.drugUserName from (
+        select ifnull(sum(vdci.call_time),0) as num,du.name as drugUserName
+        from virtual_doctor_call_info vdci
+        inner join virtual_doctor_call_info_details vdcid
+        on vdci.id=vdcid.call_id
+        inner join drug_user du
+        on vdci.virtual_drug_user_id = du.id
+        where vdci.product_id=#{productId}
+        and vdcid.status_name='answer'
+        <if test="dateType !=null">
+            <if test="dateType==1">
+                and date_format(vdci.create_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+            </if>
+            <if test="dateType==2">
+                and WEEKOFYEAR(vdci.create_time)=WEEKOFYEAR(NOW())
+            </if>
+            <if test="dateType==3">
+                and MONTH(vdci.create_time)=MONTH(NOW())
+            </if>
+            <if test="dateType==4">
+                and QUARTER(vdci.create_time)=QUARTER(NOW())
+            </if>
+        </if>
 
-    <select id="minAvgCallTotalTime" resultType="java.util.Map"
+        and vdci.virtual_doctor_id in (
+        select d.id from doctor d
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
+        where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+        )
+        and du.leader_path like #{leaderPath}
+        group by vdci.virtual_drug_user_id
+        ) t where t.num=#{minCallTotalTime}
+
+    </select>
+
+    <!-- 查询出最短的平均通话时长 -->
+    <select id="minAvgCallTotalTime" resultType="java.lang.Integer"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
-        select a.drugUserName,concat(min(a.avgCallTime),'') as minAvgCallTime from (
-        select t.id as drugUserId, t.name as drugUserName,(min(t.sum_call_time)/(if(ifnull(t.call_count,0)=0,1,t.call_count))) as avgCallTime from (
+        select (min(t.sum_call_time)/(if(ifnull(t.call_count,0)=0,1,t.call_count))) as minAvgCallTotalTime from (
         select ifnull(sum(vdci.call_time),0) as sum_call_time,count(distinct vdci.id) as call_count,du.id, du.name
         from virtual_doctor_call_info vdci
         inner join virtual_doctor_call_info_details vdcid
@@ -190,7 +227,7 @@
         and vdcid.status_name='answer'
         <if test="dateType !=null">
             <if test="dateType==1">
-                and date_format(vdci.create_time,'%Y-%m-%d')=WEEKOFYEAR(NOW(),'%Y-%m-%d')
+                and date_format(vdci.create_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
             </if>
             <if test="dateType==2">
                 and WEEKOFYEAR(vdci.create_time)=WEEKOFYEAR(NOW())
@@ -202,6 +239,7 @@
                 and QUARTER(vdci.create_time)=QUARTER(NOW())
             </if>
         </if>
+
         and vdci.virtual_doctor_id in (
             select d.id from doctor d
             inner join drug_user_doctor dud
@@ -212,15 +250,16 @@
         )
         and du.leader_path like #{leaderPath}
         group by vdci.virtual_drug_user_id
-        ) t group by t.id
-        ) a group by a.drugUserId
+        ) t group by t.id order by minAvgCallTotalTime limit 1
 
     </select>
 
 
-    <select id="minCallCount" resultType="java.util.Map" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
-        select t.drugUserName,concat(min(t.call_count),'') as minCallCount from (
-        select ifnull(count(distinct vdci.id),0) as call_count, du.name as drugUserName,vdci.virtual_drug_user_id as drugUserId
+    <select id="minAvgCallTotalTimeList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.DrugUserAnalysisResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+        select distinct a.drugUserName,a.num from (
+        select distinct t.name as drugUserName,(min(t.sum_call_time)/(if(ifnull(t.call_count,0)=0,1,t.call_count))) as num from (
+        select ifnull(sum(vdci.call_time),0) as sum_call_time,count(distinct vdci.id) as call_count,du.id, du.name
         from virtual_doctor_call_info vdci
         inner join virtual_doctor_call_info_details vdcid
         on vdci.id=vdcid.call_id
@@ -228,9 +267,10 @@
         on vdci.virtual_drug_user_id = du.id
         where vdci.product_id=#{productId}
         and vdcid.status_name='answer'
+
         <if test="dateType !=null">
             <if test="dateType==1">
-                and date_format(vdci.create_time,'%Y-%m-%d')=WEEKOFYEAR(NOW(),'%Y-%m-%d')
+                and date_format(vdci.create_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
             </if>
             <if test="dateType==2">
                 and WEEKOFYEAR(vdci.create_time)=WEEKOFYEAR(NOW())
@@ -242,25 +282,25 @@
                 and QUARTER(vdci.create_time)=QUARTER(NOW())
             </if>
         </if>
+
         and vdci.virtual_doctor_id in (
-            select d.id from doctor d
-            inner join drug_user_doctor dud
-          on d.id=dud.doctor_id
-          inner join drug_user du
-          on dud.drug_user_id=du.id
-          where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+        select d.id from doctor d
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
+        where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
         )
         and du.leader_path like #{leaderPath}
         group by vdci.virtual_drug_user_id
-        ) t group by t.drugUserId
+        ) t  group by t.id
+        ) a where a.num=#{minAvgCallTotalTime}
 
     </select>
 
 
-    <select id="minCallCoveredCount" resultType="java.util.Map"
-            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
-        select t.drugUserId, concat(min(t.covered_count),'') minCallCoveredCount from (
-        select ifnull(count(distinct vdci.virtual_doctor_id),0) as covered_count, du.name as drugUserName,vdci.virtual_drug_user_id as drugUserId
+    <select id="minCallCount" resultType="java.lang.Integer" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+        select ifnull(count(distinct vdci.id),0) as minCallCount
         from virtual_doctor_call_info vdci
         inner join virtual_doctor_call_info_details vdcid
         on vdci.id=vdcid.call_id
@@ -268,9 +308,10 @@
         on vdci.virtual_drug_user_id = du.id
         where vdci.product_id=#{productId}
         and vdcid.status_name='answer'
+
         <if test="dateType !=null">
             <if test="dateType==1">
-                and date_format(vdci.create_time,'%Y-%m-%d')=WEEKOFYEAR(NOW(),'%Y-%m-%d')
+                and date_format(vdci.create_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
             </if>
             <if test="dateType==2">
                 and WEEKOFYEAR(vdci.create_time)=WEEKOFYEAR(NOW())
@@ -282,6 +323,7 @@
                 and QUARTER(vdci.create_time)=QUARTER(NOW())
             </if>
         </if>
+
         and vdci.virtual_doctor_id in (
             select d.id from doctor d
             inner join drug_user_doctor dud
@@ -291,86 +333,315 @@
           where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
         )
         and du.leader_path like #{leaderPath}
-        group by vdci.virtual_drug_user_id
-        ) t group by t.drugUserId
+        group by vdci.virtual_drug_user_id order by minCallCount limit 1
 
     </select>
 
-    <select id="minImCount" resultType="java.util.Map" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
-        select t.drugUserName, min(t.message_count) as minMessageCount from (
-            select count(distinct vm.id) as message_count,du.name drugUserName,du.id as drugUserId
-            from virtual_message vm
-            inner join drug_user du
-            on vm.drug_user_id=du.id
-            where vm.product_id=#{productId}
-            and vm.message_type=2
-            and vm.user_type=1
-            <if test="dateType !=null">
-                <if test="dateType==1">
-                    and date_format(vdci.create_time,'%Y-%m-%d')=WEEKOFYEAR(NOW(),'%Y-%m-%d')
-                </if>
-                <if test="dateType==2">
-                    and WEEKOFYEAR(vdci.create_time)=WEEKOFYEAR(NOW())
-                </if>
-                <if test="dateType==3">
-                    and MONTH(vdci.create_time)=MONTH(NOW())
-                </if>
-                <if test="dateType==4">
-                    and QUARTER(vdci.create_time)=QUARTER(NOW())
-                </if>
-            </if>
-            and du.leader_path like #{leaderPath}
-            and vm.doctor_id in (
-            select d.id from doctor d
-            inner join drug_user_doctor dud
-          on d.id=dud.doctor_id
-          inner join drug_user du
-          on dud.drug_user_id=du.id
-          where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
-                )
-        group by vm.drug_user_id
-        ) t
-    </select>
 
-
-    <select id="minImCoveredCount" resultType="java.util.Map"
+    <select id="minCallCountList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.DrugUserAnalysisResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
-        select t.drugUserName, min(t.message_count) as minMessageCoveredCount from (
-        select count(distinct vm.doctor_id) as message_count,du.name drugUserName,du.id as drugUserId
+        select distinct t.num, t.drugUserName from (
+        select ifnull(count(distinct vdci.id),0) as num, du.name as drugUserName
+        from virtual_doctor_call_info vdci
+        inner join virtual_doctor_call_info_details vdcid
+        on vdci.id=vdcid.call_id
+        inner join drug_user du
+        on vdci.virtual_drug_user_id = du.id
+        where vdci.product_id=#{productId}
+        and vdcid.status_name='answer'
+
+        <if test="dateType !=null">
+            <if test="dateType==1">
+                and date_format(vdci.create_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+            </if>
+            <if test="dateType==2">
+                and WEEKOFYEAR(vdci.create_time)=WEEKOFYEAR(NOW())
+            </if>
+            <if test="dateType==3">
+                and MONTH(vdci.create_time)=MONTH(NOW())
+            </if>
+            <if test="dateType==4">
+                and QUARTER(vdci.create_time)=QUARTER(NOW())
+            </if>
+        </if>
+
+        and vdci.virtual_doctor_id in (
+        select d.id from doctor d
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
+        where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+        )
+        and du.leader_path like #{leaderPath}
+        group by vdci.virtual_drug_user_id
+        ) t where t.num = #{minCallCount}
+
+    </select>
+
+
+    <select id="minCallCoveredCount" resultType="java.lang.Integer"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+
+        select ifnull(count(distinct vdci.virtual_doctor_id),0) minCallCoveredCount
+        from virtual_doctor_call_info vdci
+        inner join virtual_doctor_call_info_details vdcid
+        on vdci.id=vdcid.call_id
+        inner join drug_user du
+        on vdci.virtual_drug_user_id = du.id
+        where vdci.product_id=#{productId}
+        and vdcid.status_name='answer'
+
+        <if test="dateType !=null">
+            <if test="dateType==1">
+                and date_format(vdci.create_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+            </if>
+            <if test="dateType==2">
+                and WEEKOFYEAR(vdci.create_time)=WEEKOFYEAR(NOW())
+            </if>
+            <if test="dateType==3">
+                and MONTH(vdci.create_time)=MONTH(NOW())
+            </if>
+            <if test="dateType==4">
+                and QUARTER(vdci.create_time)=QUARTER(NOW())
+            </if>
+        </if>
+
+        and vdci.virtual_doctor_id in (
+        select d.id from doctor d
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
+        where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+        )
+        and du.leader_path like #{leaderPath}
+        group by vdci.virtual_drug_user_id order by minCallCoveredCount limit 1
+
+
+    </select>
+
+
+    <select id="minCallCoveredCountList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.DrugUserAnalysisResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+        select distinct t.num,t.drugUserName from (
+        select ifnull(count(distinct vdci.virtual_doctor_id),0) as num, du.name as drugUserName
+        from virtual_doctor_call_info vdci
+        inner join virtual_doctor_call_info_details vdcid
+        on vdci.id=vdcid.call_id
+        inner join drug_user du
+        on vdci.virtual_drug_user_id = du.id
+        where vdci.product_id=#{productId}
+        and vdcid.status_name='answer'
+
+        <if test="dateType !=null">
+            <if test="dateType==1">
+                and date_format(vdci.create_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+            </if>
+            <if test="dateType==2">
+                and WEEKOFYEAR(vdci.create_time)=WEEKOFYEAR(NOW())
+            </if>
+            <if test="dateType==3">
+                and MONTH(vdci.create_time)=MONTH(NOW())
+            </if>
+            <if test="dateType==4">
+                and QUARTER(vdci.create_time)=QUARTER(NOW())
+            </if>
+        </if>
+
+        and vdci.virtual_doctor_id in (
+        select d.id from doctor d
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
+        where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+        )
+        and du.leader_path like #{leaderPath}
+        group by vdci.virtual_drug_user_id
+        ) t where t.num=#{minCallCoveredCount}
+
+    </select>
+
+
+    <select id="minImCount" resultType="java.lang.Integer" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+        select count(distinct vm.id) as minImCount
         from virtual_message vm
         inner join drug_user du
         on vm.drug_user_id=du.id
         where vm.product_id=#{productId}
         and vm.message_type=2
         and vm.user_type=1
-        and WEEKOFYEAR(vm.message_time)=WEEKOFYEAR(NOW())
-        and du.leader_path like #{drugUserId}
+
+        <if test="dateType !=null">
+            <if test="dateType==1">
+                and date_format(vm.message_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+            </if>
+            <if test="dateType==2">
+                and WEEKOFYEAR(vm.message_time)=WEEKOFYEAR(NOW())
+            </if>
+            <if test="dateType==3">
+                and MONTH(vm.message_time)=MONTH(NOW())
+            </if>
+            <if test="dateType==4">
+                and QUARTER(vm.message_time)=QUARTER(NOW())
+            </if>
+        </if>
+
+        and du.leader_path like #{leaderPath}
+        and vm.doctor_id in (
+        select d.id from doctor d
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
+        where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+        )
+        group by vm.drug_user_id order by minImCount limit 1
+    </select>
+
+
+    <select id="minImCountList" resultType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+        select distinct t.num, t.drugUserName from (
+        select count(distinct vm.id) as num,du.name drugUserName
+        from virtual_message vm
+        inner join drug_user du
+        on vm.drug_user_id=du.id
+        where vm.product_id=#{productId}
+        and vm.message_type=2
+        and vm.user_type=1
+
+        <if test="dateType !=null">
+            <if test="dateType==1">
+                and date_format(vm.message_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+            </if>
+            <if test="dateType==2">
+                and WEEKOFYEAR(vm.message_time)=WEEKOFYEAR(NOW())
+            </if>
+            <if test="dateType==3">
+                and MONTH(vm.message_time)=MONTH(NOW())
+            </if>
+            <if test="dateType==4">
+                and QUARTER(vm.message_time)=QUARTER(NOW())
+            </if>
+        </if>
+
+        and du.leader_path like #{leaderPath}
+        and vm.doctor_id in (
+        select d.id from doctor d
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
+        where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+        )
+        group by vm.drug_user_id
+        ) t where t.num = #{minImCount}
+    </select>
+
+
+    <select id="minImCoveredCount" resultType="java.lang.Integer"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+        select count(distinct vm.doctor_id) as minImCoveredCount
+        from virtual_message vm
+        inner join drug_user du
+        on vm.drug_user_id=du.id
+        where vm.product_id=#{productId}
+        and vm.message_type=2
+        and vm.user_type=1
+        <if test="dateType !=null">
+            <if test="dateType==1">
+                and date_format(vm.message_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+            </if>
+            <if test="dateType==2">
+                and WEEKOFYEAR(vm.message_time)=WEEKOFYEAR(NOW())
+            </if>
+            <if test="dateType==3">
+                and MONTH(vm.message_time)=MONTH(NOW())
+            </if>
+            <if test="dateType==4">
+                and QUARTER(vm.message_time)=QUARTER(NOW())
+            </if>
+        </if>
+        and du.leader_path like #{leaderPath}
         and vm.doctor_id in (
                     select d.id from doctor d
                     inner join drug_user_doctor dud
                   on d.id=dud.doctor_id
                   inner join drug_user du
                   on dud.drug_user_id=du.id
-                  where dud.prod_id=#{productId} and du.leader_path like #{drugUserId}
+                  where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
                 )
-        group by vm.drug_user_id
-        ) t
+        group by vm.drug_user_id order by minImCoveredCount limit 1
 
 
     </select>
 
 
-    <select id="minWechatCount" resultType="java.util.Map"
+    <select id="minImCoveredCountList" resultType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
-        select t.drugUserName, min(t.message_count) as minWechatCount from (
-        select count(distinct vm.id) as message_count,du.name drugUserName,du.id as drugUserId
+        select t.num, t.drugUserName from (
+        select count(distinct vm.doctor_id) as num,du.name drugUserName
+        from virtual_message vm
+        inner join drug_user du
+        on vm.drug_user_id=du.id
+        where vm.product_id=#{productId}
+        and vm.message_type=2
+        and vm.user_type=1
+        <if test="dateType !=null">
+            <if test="dateType==1">
+                and date_format(vm.message_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+            </if>
+            <if test="dateType==2">
+                and WEEKOFYEAR(vm.message_time)=WEEKOFYEAR(NOW())
+            </if>
+            <if test="dateType==3">
+                and MONTH(vm.message_time)=MONTH(NOW())
+            </if>
+            <if test="dateType==4">
+                and QUARTER(vm.message_time)=QUARTER(NOW())
+            </if>
+        </if>
+        and du.leader_path like #{leaderPath}
+        and vm.doctor_id in (
+        select d.id from doctor d
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
+        where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+        )
+        group by vm.drug_user_id
+        ) t where t.num=#{minImCoveredCount}
+
+
+    </select>
+
+
+    <select id="minWechatCount" resultType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+        select count(distinct vm.id) as minWechatCount
         from virtual_message vm
         inner join drug_user du
         on vm.drug_user_id=du.id
         where 1=1
         and vm.message_type=1
         and vm.user_type=1
-        and WEEKOFYEAR(vm.message_time)=WEEKOFYEAR(NOW())
+        <if test="dateType !=null">
+            <if test="dateType==1">
+                and date_format(vm.message_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+            </if>
+            <if test="dateType==2">
+                and WEEKOFYEAR(vm.message_time)=WEEKOFYEAR(NOW())
+            </if>
+            <if test="dateType==3">
+                and MONTH(vm.message_time)=MONTH(NOW())
+            </if>
+            <if test="dateType==4">
+                and QUARTER(vm.message_time)=QUARTER(NOW())
+            </if>
+        </if>
         and du.leader_path like #{leaderPath}
         and vm.doctor_id in (
                     select d.id from doctor d
@@ -380,23 +651,76 @@
                   on dud.drug_user_id=du.id
                   where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
                 )
-        group by vm.drug_user_id
-        ) t
+        group by vm.drug_user_id order by minWechatCount limit 1
+
 
 
     </select>
 
-    <select id="minWechatCoveredCount" resultType="java.util.Map"
+
+    <select id="minWechatCountList" resultType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
-        select t.drugUserName, min(t.message_count) as minWechatCoveredCount from (
-        select count(distinct vm.doctor_id) as message_count,du.name drugUserName,du.id as drugUserId
+
+        select distinct t.num, t.drugUserName from (
+        select count(distinct vm.id) as num,du.name drugUserName
+        from virtual_message vm
+        inner join drug_user du
+        on vm.drug_user_id=du.id
+        where 1=1
+        and vm.message_type=1
+        and vm.user_type=1
+        <if test="dateType !=null">
+            <if test="dateType==1">
+                and date_format(vm.message_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+            </if>
+            <if test="dateType==2">
+                and WEEKOFYEAR(vm.message_time)=WEEKOFYEAR(NOW())
+            </if>
+            <if test="dateType==3">
+                and MONTH(vm.message_time)=MONTH(NOW())
+            </if>
+            <if test="dateType==4">
+                and QUARTER(vm.message_time)=QUARTER(NOW())
+            </if>
+        </if>
+        and du.leader_path like #{leaderPath}
+        and vm.doctor_id in (
+        select d.id from doctor d
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
+        where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+        )
+        group by vm.drug_user_id
+    ) t where t.num=#{minWechatCount}
+
+
+    </select>
+
+    <select id="minWechatCoveredCount" resultType="java.lang.Integer"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+        select count(distinct vm.doctor_id) as minWechatCoveredCount
         from virtual_message vm
         inner join drug_user du
         on vm.drug_user_id=du.id
         where 1=1
         and vm.message_type=1
         and vm.user_type=2
-        and WEEKOFYEAR(vm.message_time)=WEEKOFYEAR(NOW())
+        <if test="dateType !=null">
+            <if test="dateType==1">
+                and date_format(vm.message_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+            </if>
+            <if test="dateType==2">
+                and WEEKOFYEAR(vm.message_time)=WEEKOFYEAR(NOW())
+            </if>
+            <if test="dateType==3">
+                and MONTH(vm.message_time)=MONTH(NOW())
+            </if>
+            <if test="dateType==4">
+                and QUARTER(vm.message_time)=QUARTER(NOW())
+            </if>
+        </if>
         and du.leader_path like #{leaderPath}
         and vm.doctor_id in (
                     select d.id from doctor d
@@ -406,10 +730,204 @@
                   on dud.drug_user_id=du.id
                   where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
                 )
+        group by vm.drug_user_id order by minWechatCoveredCount limit 1
+
+    </select>
+
+    <select id="minWechatCoveredCountList" resultType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+        select distinct t.num, t.drugUserName from (
+        select count(distinct vm.doctor_id) as num,du.name drugUserName
+        from virtual_message vm
+        inner join drug_user du
+        on vm.drug_user_id=du.id
+        where 1=1
+        and vm.message_type=1
+        and vm.user_type=2
+
+        <if test="dateType !=null">
+            <if test="dateType==1">
+                and date_format(vm.message_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+            </if>
+            <if test="dateType==2">
+                and WEEKOFYEAR(vm.message_time)=WEEKOFYEAR(NOW())
+            </if>
+            <if test="dateType==3">
+                and MONTH(vm.message_time)=MONTH(NOW())
+            </if>
+            <if test="dateType==4">
+                and QUARTER(vm.message_time)=QUARTER(NOW())
+            </if>
+        </if>
+
+        and du.leader_path like #{leaderPath}
+        and vm.doctor_id in (
+        select d.id from doctor d
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
+        where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+        )
         group by vm.drug_user_id
         ) t
 
     </select>
+
+
+    <select id="minEmailCount" resultType="java.lang.Integer" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+        select ifnull(count(vei.id),0) as minEmailCount
+        from virtual_email_info vei
+        inner join drug_user du
+        on vei.drug_user_id=du.id
+        where vei.product_id= #{productId}
+        and du.leader_path like #{leaderPath}
+
+        <if test="dateType !=null">
+            <if test="dateType==1">
+                and date_format(vei.create_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+            </if>
+            <if test="dateType==2">
+                and WEEKOFYEAR(vei.create_time)=WEEKOFYEAR(NOW())
+            </if>
+            <if test="dateType==3">
+                and MONTH(vei.create_time)=MONTH(NOW())
+            </if>
+            <if test="dateType==4">
+                and QUARTER(vei.create_time)=QUARTER(NOW())
+            </if>
+        </if>
+
+        and vei.doctor_id in (
+            select distinct d.id from doctor d
+            inner join drug_user_doctor dud
+            on d.id=dud.doctor_id
+          inner join drug_user du
+          on dud.drug_user_id= du.id
+          where dud.prod_id=#{productId}
+          and du.leader_path like #{leaderPath}
+        )
+        group by vei.drug_user_id order by minEmailCount limit 1
+
+    </select>
+
+
+    <select id="minEmailCountList" resultType="java.lang.String" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+        select distinct t.num, t.drugUserName from (
+        select ifnull(count(vei.id),0) as num,du.name as drugUserName
+        from virtual_email_info vei
+        inner join drug_user du
+        on vei.drug_user_id=du.id
+        where vei.product_id= #{productId}
+        and du.leader_path like #{leaderPath}
+
+
+        <if test="dateType !=null">
+            <if test="dateType==1">
+                and date_format(vei.create_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+            </if>
+            <if test="dateType==2">
+                and WEEKOFYEAR(vei.create_time)=WEEKOFYEAR(NOW())
+            </if>
+            <if test="dateType==3">
+                and MONTH(vei.create_time)=MONTH(NOW())
+            </if>
+            <if test="dateType==4">
+                and QUARTER(vei.create_time)=QUARTER(NOW())
+            </if>
+        </if>
+
+
+        and vei.doctor_id in (
+            select distinct d.id from doctor d
+            inner join drug_user_doctor dud
+            on d.id=dud.doctor_id
+          inner join drug_user du
+          on dud.drug_user_id= du.id
+          where dud.prod_id=#{productId}
+          and du.leader_path like #{leaderPath}
+        )
+        group by vei.drug_user_id
+        ) t  where t.num=#{minEmailCount}
+    </select>
+
+    <select id="minEmailCoveredCount" resultType="java.lang.Integer" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+        select ifnull(count(vei.doctor_id),0) as minEmailCoveredCount
+        from virtual_email_info vei
+        inner join drug_user du
+        on vei.drug_user_id=du.id
+        where vei.product_id= #{productId}
+        and du.leader_path like #{leaderPath}
+
+        <if test="dateType !=null">
+            <if test="dateType==1">
+                and date_format(vei.create_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+            </if>
+            <if test="dateType==2">
+                and WEEKOFYEAR(vei.create_time)=WEEKOFYEAR(NOW())
+            </if>
+            <if test="dateType==3">
+                and MONTH(vei.create_time)=MONTH(NOW())
+            </if>
+            <if test="dateType==4">
+                and QUARTER(vei.create_time)=QUARTER(NOW())
+            </if>
+        </if>
+
+        and vei.doctor_id in (
+        select distinct d.id from doctor d
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id= du.id
+        where dud.prod_id=#{productId}
+        and du.leader_path like #{leaderPath}
+        )
+        group by vei.drug_user_id order by minEmailCoveredCount limit 1
+    </select>
+
+    <select id="minEmailCoveredCountList" resultType="java.lang.String" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+
+        select distinct t.num, t.drugUserName from (
+        select ifnull(count(vei.doctor_id),0) as num,du.name as drugUserName
+                from virtual_email_info vei
+                inner join drug_user du
+                on vei.drug_user_id=du.id
+                where vei.product_id= #{productId}
+                and du.leader_path like #{leaderPath}
+
+
+                <if test="dateType !=null">
+                    <if test="dateType==1">
+                        and date_format(vei.create_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+                    </if>
+                    <if test="dateType==2">
+                        and WEEKOFYEAR(vei.create_time)=WEEKOFYEAR(NOW())
+                    </if>
+                    <if test="dateType==3">
+                        and MONTH(vei.create_time)=MONTH(NOW())
+                    </if>
+                    <if test="dateType==4">
+                        and QUARTER(vei.create_time)=QUARTER(NOW())
+                    </if>
+                </if>
+
+
+                and vei.doctor_id in (
+                select distinct d.id from doctor d
+                inner join drug_user_doctor dud
+                on d.id=dud.doctor_id
+                inner join drug_user du
+                on dud.drug_user_id= du.id
+                where dud.prod_id=#{productId}
+                and du.leader_path like #{leaderPath}
+                )
+                group by vei.drug_user_id
+
+        ) t where t.num = #{minEmailCoveredCount}
+    </select>
+
+
 
     <select id="callNoReach" resultType="java.lang.String"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
@@ -423,7 +941,20 @@
             where vdci.product_id=#{productId}
             and vdcid.status_name='answer'
 
-            and WEEKOFYEAR(vdci.create_time)=WEEKOFYEAR(NOW())
+            <if test="dateType !=null">
+                <if test="dateType==1">
+                    and date_format(vdci.create_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+                </if>
+                <if test="dateType==2">
+                    and WEEKOFYEAR(vdci.create_time)=WEEKOFYEAR(NOW())
+                </if>
+                <if test="dateType==3">
+                    and MONTH(vdci.create_time)=MONTH(NOW())
+                </if>
+                <if test="dateType==4">
+                    and QUARTER(vdci.create_time)=QUARTER(NOW())
+                </if>
+            </if>
 
             and vdci.virtual_doctor_id in (
                     select d.id from doctor d
@@ -449,7 +980,20 @@
         where 1=1
         and vm.message_type=1
         and vm.user_type=2
-        and WEEKOFYEAR(vm.message_time)=WEEKOFYEAR(NOW())
+        <if test="dateType !=null">
+            <if test="dateType==1">
+                and date_format(vm.message_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+            </if>
+            <if test="dateType==2">
+                and WEEKOFYEAR(vm.message_time)=WEEKOFYEAR(NOW())
+            </if>
+            <if test="dateType==3">
+                and MONTH(vm.message_time)=MONTH(NOW())
+            </if>
+            <if test="dateType==4">
+                and QUARTER(vm.message_time)=QUARTER(NOW())
+            </if>
+        </if>
         and du.leader_path like #{leaderPath}
         and vm.doctor_id in (
         select d.id from doctor d
@@ -477,7 +1021,20 @@
         and vm.product_id = #{productId}
         and vm.message_type=2
         and vm.user_type=2
-        and WEEKOFYEAR(vm.message_time)=WEEKOFYEAR(NOW())
+        <if test="dateType !=null">
+            <if test="dateType==1">
+                and date_format(vm.message_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+            </if>
+            <if test="dateType==2">
+                and WEEKOFYEAR(vm.message_time)=WEEKOFYEAR(NOW())
+            </if>
+            <if test="dateType==3">
+                and MONTH(vm.message_time)=MONTH(NOW())
+            </if>
+            <if test="dateType==4">
+                and QUARTER(vm.message_time)=QUARTER(NOW())
+            </if>
+        </if>
         and du.leader_path like #{leaderPath}
         and vm.doctor_id in (
         select d.id from doctor d
@@ -492,9 +1049,663 @@
         ) t where t.message_count &lt; #{imReach}
     </select>
 
+
+
+    <select id="emailNoReach" resultType="java.lang.String"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+
+        select distinct t.drugUserName from (
+        select ifnull(count(vei.doctor_id),0) as num,du.name as drugUserName
+        from virtual_email_info vei
+        inner join drug_user du
+        on vei.drug_user_id=du.id
+        where vei.product_id= #{productId}
+        and du.leader_path like #{leaderPath}
+
+        <if test="dateType !=null">
+            <if test="dateType==1">
+                and date_format(vei.create_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+            </if>
+            <if test="dateType==2">
+                and WEEKOFYEAR(vei.create_time)=WEEKOFYEAR(NOW())
+            </if>
+            <if test="dateType==3">
+                and MONTH(vei.create_time)=MONTH(NOW())
+            </if>
+            <if test="dateType==4">
+                and QUARTER(vei.create_time)=QUARTER(NOW())
+            </if>
+        </if>
+
+        and vei.doctor_id in (
+        select distinct d.id from doctor d
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id= du.id
+        where dud.prod_id=#{productId}
+        and du.leader_path like #{leaderPath}
+        )
+        group by vei.drug_user_id
+
+        ) t where t.num &lt; #{emailReach}
+
+    </select>
+
+
+
     <select id="dropCustomers" resultType="java.util.Map"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
 
+
+    </select>
+    
+    
+    <!-- ********************************** 客户分析 ****************************************** -->
+
+    <select id="minDoctorCallTotalTime" resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.DoctorAnalysisResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+        select ifnull(sum(vdci.call_time),0) as minCallTotalTime
+        from virtual_doctor_call_info vdci
+        inner join virtual_doctor_call_info_details vdcid
+        on vdci.id=vdcid.call_id
+        inner join doctor d
+        on vdci.virtual_doctor_id = d.id
+				inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+				on dud.drug_user_id=du.id
+        where vdci.product_id=#{productId}
+        and vdcid.status_name='answer'
+				and du.leader_path like #{leaderPath}
+
+        <if test="dateType !=null">
+            <if test="dateType==1">
+                and date_format(vdci.create_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+            </if>
+            <if test="dateType==2">
+                and WEEKOFYEAR(vdci.create_time)=WEEKOFYEAR(NOW())
+            </if>
+            <if test="dateType==3">
+                and MONTH(vdci.create_time)=MONTH(NOW())
+            </if>
+            <if test="dateType==4">
+                and QUARTER(vdci.create_time)=QUARTER(NOW())
+            </if>
+        </if>
+
+
+        and vdci.virtual_drug_user_id in (
+            select distinct du.id from doctor d
+            inner join drug_user_doctor dud
+          on d.id=dud.doctor_id
+          inner join drug_user du
+          on dud.drug_user_id=du.id
+          where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+        )
+        group by vdci.virtual_doctor_id order by minCallTotalTime limit 1
+    </select>
+
+    <select id="minDoctorCallTotalTimeList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.DoctorAnalysisResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+          select distinct t.num, t.doctorName from (
+            select ifnull(sum(vdci.call_time),0) as num,d.name doctorName
+            from virtual_doctor_call_info vdci
+            inner join virtual_doctor_call_info_details vdcid
+            on vdci.id=vdcid.call_id
+            inner join doctor d
+            on vdci.virtual_doctor_id = d.id
+                    inner join drug_user_doctor dud
+            on d.id=dud.doctor_id
+            inner join drug_user du
+                    on dud.drug_user_id=du.id
+            where vdci.product_id=#{productId}
+            and vdcid.status_name='answer'
+            and du.leader_path like #{leaderPath}
+
+
+            <if test="dateType !=null">
+                <if test="dateType==1">
+                    and date_format(vdci.create_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+                </if>
+                <if test="dateType==2">
+                    and WEEKOFYEAR(vdci.create_time)=WEEKOFYEAR(NOW())
+                </if>
+                <if test="dateType==3">
+                    and MONTH(vdci.create_time)=MONTH(NOW())
+                </if>
+                <if test="dateType==4">
+                    and QUARTER(vdci.create_time)=QUARTER(NOW())
+                </if>
+            </if>
+
+
+
+            and vdci.virtual_drug_user_id in (
+                    select distinct du.id from doctor d
+                    inner join drug_user_doctor dud
+                  on d.id=dud.doctor_id
+                  inner join drug_user du
+                  on dud.drug_user_id=du.id
+                  where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+                )
+                group by vdci.virtual_doctor_id
+          ) t where t.num = #{minCallTotalTime}
+
+    </select>
+
+
+    <select id="minDoctorAvgCallTotalTime" resultType="java.lang.Integer"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+        select (min(t.sum_call_time)/(if(ifnull(t.call_count,0)=0,1,t.call_count))) as minAvgCallTotalTime from (
+        select ifnull(sum(vdci.call_time),0) as sum_call_time,count(distinct vdci.id) as call_count,du.id, du.name
+        from virtual_doctor_call_info vdci
+        inner join virtual_doctor_call_info_details vdcid
+        on vdci.id=vdcid.call_id
+        inner join doctor d
+        on vdci.virtual_doctor_id=d.id
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
+        where vdci.product_id=#{productId}
+        and vdcid.status_name='answer'
+        and du.leader_path like #{leaderPath}
+
+        <if test="dateType !=null">
+            <if test="dateType==1">
+                and date_format(vdci.create_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+            </if>
+            <if test="dateType==2">
+                and WEEKOFYEAR(vdci.create_time)=WEEKOFYEAR(NOW())
+            </if>
+            <if test="dateType==3">
+                and MONTH(vdci.create_time)=MONTH(NOW())
+            </if>
+            <if test="dateType==4">
+                and QUARTER(vdci.create_time)=QUARTER(NOW())
+            </if>
+        </if>
+
+
+        and vdci.virtual_drug_user_id in (
+                select distinct du.id from doctor d
+                inner join drug_user_doctor dud
+            on d.id=dud.doctor_id
+            inner join drug_user du
+            on dud.drug_user_id=du.id
+            where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+        )
+        group by vdci.virtual_doctor_id
+        ) t group by t.id order by minAvgCallTotalTime limit 1
+    </select>
+
+
+    <select id="minDoctorAvgCallTotalTimeList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.DoctorAnalysisResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+          select distinct a.num, a.doctorName from(
+            select (min(t.sum_call_time)/(if(ifnull(t.call_count,0)=0,1,t.call_count))) as num,t.doctorName from (
+            select ifnull(sum(vdci.call_time),0) as sum_call_time,count(distinct vdci.id) as call_count,d.id as doctorId, du.name doctorName
+            from virtual_doctor_call_info vdci
+            inner join virtual_doctor_call_info_details vdcid
+            on vdci.id=vdcid.call_id
+            inner join doctor d
+            on vdci.virtual_doctor_id=d.id
+            inner join drug_user_doctor dud
+            on d.id=dud.doctor_id
+            inner join drug_user du
+            on dud.drug_user_id=du.id
+            where vdci.product_id=#{productId}
+            and vdcid.status_name='answer'
+            and du.leader_path like #{leaderPath}
+
+
+            <if test="dateType !=null">
+                <if test="dateType==1">
+                    and date_format(vdci.create_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+                </if>
+                <if test="dateType==2">
+                    and WEEKOFYEAR(vdci.create_time)=WEEKOFYEAR(NOW())
+                </if>
+                <if test="dateType==3">
+                    and MONTH(vdci.create_time)=MONTH(NOW())
+                </if>
+                <if test="dateType==4">
+                    and QUARTER(vdci.create_time)=QUARTER(NOW())
+                </if>
+            </if>
+            and vdci.virtual_drug_user_id in (
+                    select distinct du.id from doctor d
+                    inner join drug_user_doctor dud
+                on d.id=dud.doctor_id
+                inner join drug_user du
+                on dud.drug_user_id=du.id
+                where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+            )
+            group by vdci.virtual_doctor_id
+            ) t group by t.doctorId
+            ) a where a.num=#{minAvgCallTotalTime}
+    </select>
+    
+    
+    <select id="minDoctorCallCount" resultType="java.lang.Integer"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+      select ifnull(count(distinct vdci.id),0) as minCallCount
+        from virtual_doctor_call_info vdci
+        inner join virtual_doctor_call_info_details vdcid
+        on vdci.id=vdcid.call_id
+        inner join doctor d
+        on vdci.virtual_doctor_id=d.id
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
+        where vdci.product_id=#{productId}
+        and vdcid.status_name='answer'
+        and du.leader_path like #{leaderPath}
+
+        <if test="dateType !=null">
+            <if test="dateType==1">
+                and date_format(vdci.create_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+            </if>
+            <if test="dateType==2">
+                and WEEKOFYEAR(vdci.create_time)=WEEKOFYEAR(NOW())
+            </if>
+            <if test="dateType==3">
+                and MONTH(vdci.create_time)=MONTH(NOW())
+            </if>
+            <if test="dateType==4">
+                and QUARTER(vdci.create_time)=QUARTER(NOW())
+            </if>
+        </if>
+
+
+        and vdci.virtual_drug_user_id in (
+                select distinct du.id from doctor d
+                inner join drug_user_doctor dud
+            on d.id=dud.doctor_id
+            inner join drug_user du
+            on dud.drug_user_id=du.id
+            where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+        )
+
+        group by vdci.virtual_doctor_id order by minCallCount limit 1
+
+    </select>
+
+
+    <select id="minDoctorCallCountList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.DoctorAnalysisResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+        select distinct t.num, t.doctorName from (
+        select ifnull(count(distinct vdci.id),0) as num,d.name doctorName
+        from virtual_doctor_call_info vdci
+        inner join virtual_doctor_call_info_details vdcid
+        on vdci.id=vdcid.call_id
+        inner join doctor d
+        on vdci.virtual_doctor_id=d.id
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
+        where vdci.product_id=#{productId}
+        and vdcid.status_name='answer'
+        and du.leader_path like #{leaderPath}
+
+        <if test="dateType !=null">
+            <if test="dateType==1">
+                and date_format(vdci.create_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+            </if>
+            <if test="dateType==2">
+                and WEEKOFYEAR(vdci.create_time)=WEEKOFYEAR(NOW())
+            </if>
+            <if test="dateType==3">
+                and MONTH(vdci.create_time)=MONTH(NOW())
+            </if>
+            <if test="dateType==4">
+                and QUARTER(vdci.create_time)=QUARTER(NOW())
+            </if>
+        </if>
+
+
+        and vdci.virtual_drug_user_id in (
+                select distinct du.id from doctor d
+                inner join drug_user_doctor dud
+            on d.id=dud.doctor_id
+            inner join drug_user du
+            on dud.drug_user_id=du.id
+            where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+        )
+
+        group by vdci.virtual_doctor_id
+        ) t where t.num=#{minCallCount}
+
+    </select>
+
+
+    <select id="minDoctorImCount" resultType="java.lang.Integer"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+          select count(distinct vm.id) as minImCount
+        from virtual_message vm
+        inner join doctor d
+        on vm.doctor_id=d.id
+				inner join drug_user_doctor dud
+				on d.id=dud.doctor_id
+				inner join drug_user du
+				on dud.drug_user_id=du.id
+        where vm.product_id=#{productId}
+        and vm.message_type=2
+        and vm.user_type=2
+
+        <if test="dateType !=null">
+            <if test="dateType==1">
+                and date_format(vm.message_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+            </if>
+            <if test="dateType==2">
+                and WEEKOFYEAR(vm.message_time)=WEEKOFYEAR(NOW())
+            </if>
+            <if test="dateType==3">
+                and MONTH(vm.message_time)=MONTH(NOW())
+            </if>
+            <if test="dateType==4">
+                and QUARTER(vm.message_time)=QUARTER(NOW())
+            </if>
+        </if>
+
+
+        and du.leader_path like #{leaderPath}
+        and vm.drug_user_id in (
+        select distinct du.id from doctor d
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
+        where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+        )
+        group by vm.doctor_id order by minImCount limit 1
+    </select>
+
+    <select id="minDoctorImCountList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.DoctorAnalysisResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+        select distinct t.num,t.doctorName from (
+        select count(distinct vm.id) as num,d.name as doctorName
+        from virtual_message vm
+        inner join doctor d
+        on vm.doctor_id=d.id
+				inner join drug_user_doctor dud
+				on d.id=dud.doctor_id
+				inner join drug_user du
+				on dud.drug_user_id=du.id
+        where vm.product_id=#{productId}
+        and vm.message_type=2
+        and vm.user_type=2
+
+        <if test="dateType !=null">
+            <if test="dateType==1">
+                and date_format(vm.message_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+            </if>
+            <if test="dateType==2">
+                and WEEKOFYEAR(vm.message_time)=WEEKOFYEAR(NOW())
+            </if>
+            <if test="dateType==3">
+                and MONTH(vm.message_time)=MONTH(NOW())
+            </if>
+            <if test="dateType==4">
+                and QUARTER(vm.message_time)=QUARTER(NOW())
+            </if>
+        </if>
+
+
+        and du.leader_path like #{leaderPath}
+        and vm.drug_user_id in (
+        select distinct du.id from doctor d
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
+        where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+        )
+        group by vm.doctor_id
+        ) t where t.num=#{minImCount}
+    </select>
+
+
+    <select id="minDoctorWechatCount" resultType="java.lang.Integer"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+        select count(distinct vm.id) as minWechatCount
+        from virtual_message vm
+        inner join doctor d
+        on vm.doctor_id=d.id
+				inner join drug_user_doctor dud
+				on d.id=dud.doctor_id
+				inner join drug_user du
+				on dud.drug_user_id=du.id
+        where 1=1
+        and vm.message_type=1
+        and vm.user_type=2
+
+
+        <if test="dateType !=null">
+            <if test="dateType==1">
+                and date_format(vm.message_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+            </if>
+            <if test="dateType==2">
+                and WEEKOFYEAR(vm.message_time)=WEEKOFYEAR(NOW())
+            </if>
+            <if test="dateType==3">
+                and MONTH(vm.message_time)=MONTH(NOW())
+            </if>
+            <if test="dateType==4">
+                and QUARTER(vm.message_time)=QUARTER(NOW())
+            </if>
+        </if>
+
+
+        and du.leader_path like #{leaderPath}
+        and vm.drug_user_id in (
+        select distinct du.id from doctor d
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
+        where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+        )
+        group by vm.doctor_id order by minWechatCount limit 1
+
+    </select>
+
+
+
+    <select id="minDoctorWechatCountList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.DoctorAnalysisResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+        select distinct t.num, t.doctorName from (
+        select count(distinct vm.id) as num,d.name as doctorName
+        from virtual_message vm
+        inner join doctor d
+        on vm.doctor_id=d.id
+				inner join drug_user_doctor dud
+				on d.id=dud.doctor_id
+				inner join drug_user du
+				on dud.drug_user_id=du.id
+        where 1=1
+        and vm.message_type=1
+        and vm.user_type=2
+
+
+        <if test="dateType !=null">
+            <if test="dateType==1">
+                and date_format(vm.message_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+            </if>
+            <if test="dateType==2">
+                and WEEKOFYEAR(vm.message_time)=WEEKOFYEAR(NOW())
+            </if>
+            <if test="dateType==3">
+                and MONTH(vm.message_time)=MONTH(NOW())
+            </if>
+            <if test="dateType==4">
+                and QUARTER(vm.message_time)=QUARTER(NOW())
+            </if>
+        </if>
+
+
+
+
+        and du.leader_path like #{leaderPath}
+        and vm.drug_user_id in (
+        select distinct du.id from doctor d
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
+        where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+        )
+        group by vm.doctor_id
+        ) t where t.num=#{minWechatCount}
+
+    </select>
+
+
+    <select id="minDoctorEmailCount" resultType="java.lang.Integer"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+        select ifnull(count(vei.id),0) as minEmailCount
+        from virtual_email_info vei
+        inner join doctor d
+        on vei.doctor_id=d.id
+				inner join drug_user_doctor dud
+				on d.id=dud.doctor_id
+				inner join drug_user du
+				on dud.drug_user_id=du.id
+        where vei.product_id= #{productId}
+        and du.leader_path like #{leaderPath}
+
+
+
+        <if test="dateType !=null">
+            <if test="dateType==1">
+                and date_format(vei.create_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+            </if>
+            <if test="dateType==2">
+                and WEEKOFYEAR(vei.create_time)=WEEKOFYEAR(NOW())
+            </if>
+            <if test="dateType==3">
+                and MONTH(vei.create_time)=MONTH(NOW())
+            </if>
+            <if test="dateType==4">
+                and QUARTER(vei.create_time)=QUARTER(NOW())
+            </if>
+        </if>
+
+        and vei.drug_user_id in (
+            select distinct du.id from doctor d
+            inner join drug_user_doctor dud
+            on d.id=dud.doctor_id
+          inner join drug_user du
+          on dud.drug_user_id= du.id
+          where dud.prod_id=#{productId}
+          and du.leader_path like #{leaderPath}
+        )
+        group by vei.doctor_id order by minEmailCount limit 1
+    </select>
+
+    <select id="minDoctorEmailCountList" resultType="java.lang.Integer"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+        select distinct t.num,t.doctorName from (
+        select ifnull(count(vei.id),0) as num,d.name as doctorName
+        from virtual_email_info vei
+        inner join doctor d
+        on vei.doctor_id=d.id
+				inner join drug_user_doctor dud
+				on d.id=dud.doctor_id
+				inner join drug_user du
+				on dud.drug_user_id=du.id
+        where vei.product_id= #{productId}
+        and du.leader_path like #{leaderPath}
+
+
+                and WEEKOFYEAR(vei.create_time)=WEEKOFYEAR(NOW())
+
+
+        and vei.drug_user_id in (
+            select distinct du.id from doctor d
+            inner join drug_user_doctor dud
+            on d.id=dud.doctor_id
+          inner join drug_user du
+          on dud.drug_user_id= du.id
+          where dud.prod_id=#{productId}
+          and du.leader_path like #{leaderPath}
+        )
+        group by vei.doctor_id
+        ) t where t.num=#{minEmailCount}
+    </select>
+
+
+    <select id="minDoctorMeetingTime" resultType="java.lang.Integer"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+        select ifnull(sum(tmad.attend_sum_time),0)  minMeetingTime
+        from t_meeting_attend_details tmad
+        inner join t_meeting_data tma
+        on tmad.meeting_id=tma.id
+        inner join doctor d
+        on tmad.doctor_id=d.id
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
+        where tma.product_id=#{productId}
+        and dud.prod_id=#{productId}
+        and du.leader_path like #{leaderPath}
+        <if test="dateType !=null">
+            <if test="dateType==1">
+                and date_format(tmad.attend_end_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+            </if>
+            <if test="dateType==2">
+                and WEEKOFYEAR(tmad.attend_end_time)=WEEKOFYEAR(NOW())
+            </if>
+            <if test="dateType==3">
+                and MONTH(tmad.attend_end_time)=MONTH(NOW())
+            </if>
+            <if test="dateType==4">
+                and QUARTER(tmad.attend_end_time)=QUARTER(NOW())
+            </if>
+        </if>
+
+        group by tmad.doctor_id order by minMeetingTime limit 1
+
+    </select>
+
+
+    <select id="minDoctorMeetingTimeList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.DoctorAnalysisResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+        select distinct t.num,t.doctorName from (
+        select ifnull(sum(tmad.attend_sum_time),0) num, d.name as doctorName
+        from t_meeting_attend_details tmad
+        inner join t_meeting_data tma
+        on tmad.meeting_id=tma.id
+        inner join doctor d
+        on tmad.doctor_id=d.id
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
+        where tma.product_id=#{productId}
+        and dud.prod_id=#{productId}
+        and du.leader_path like #{leaderPath}
+        <if test="dateType !=null">
+            <if test="dateType==1">
+                and date_format(tmad.attend_end_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+            </if>
+            <if test="dateType==2">
+                and WEEKOFYEAR(tmad.attend_end_time)=WEEKOFYEAR(NOW())
+            </if>
+            <if test="dateType==3">
+                and MONTH(tmad.attend_end_time)=MONTH(NOW())
+            </if>
+            <if test="dateType==4">
+                and QUARTER(tmad.attend_end_time)=QUARTER(NOW())
+            </if>
+        </if>
+
+        group by tmad.doctor_id
+        ) t where t.num=#{minMeetingTime}
 
     </select>
 

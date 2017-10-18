@@ -5,15 +5,18 @@ import com.nuoxin.virtual.rep.api.dao.DrugUserRepository;
 import com.nuoxin.virtual.rep.api.dao.TargetRepository;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.Target;
+import com.nuoxin.virtual.rep.api.enums.DateTypeEnum;
 import com.nuoxin.virtual.rep.api.mybatis.*;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.analysis.ta.TargetResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.work.*;
 import com.sun.mail.util.BEncoderStream;
 import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.management.Query;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,19 +87,19 @@ public class WorkStationService {
         Integer perDayTargetMeetingPersonSum = 0;
         Integer perDayTargetMeetingPersonCount = 0;
 
-        Map<String, Integer> perDayTarget = getPerDayTarget(bean.getProductId());
-        perDayTargetWechatNum = perDayTarget.get("perDayTargetWechatNum");
-        perDayTargetWechatCount = perDayTarget.get("perDayTargetWechatCount");
-        perDayTargetImSum = perDayTarget.get("perDayTargetImSum");
-        perDayTargetImCount = perDayTarget.get("perDayTargetImCount");
-        perDayTargetEmailNum = perDayTarget.get("perDayTargetEmailNum");
-        perDayTargetEmailCount = perDayTarget.get("perDayTargetEmailCount");
-        perDayTargetCallSum = perDayTarget.get("perDayTargetCallSum");
-        perDayTargetCallCount = perDayTarget.get("perDayTargetCallCount");
-        perDayTargetMeetingSum = perDayTarget.get("perDayTargetMeetingSum");
-        perDayTargetMeetingTime = perDayTarget.get("perDayTargetMeetingTime");
-        perDayTargetMeetingPersonSum = perDayTarget.get("perDayTargetMeetingPersonSum");
-        perDayTargetMeetingPersonCount = perDayTarget.get("perDayTargetMeetingPersonCount");
+        DayTargetResponseBean perDayTarget = getPerDayTarget(bean.getProductId());
+        perDayTargetWechatNum = perDayTarget.getDayTargetWechatNum();
+        perDayTargetWechatCount = perDayTarget.getDayTargetWechatCount();
+        perDayTargetImSum = perDayTarget.getDayTargetImSum();
+        perDayTargetImCount = perDayTarget.getDayTargetImCount();
+        perDayTargetEmailNum = perDayTarget.getDayTargetEmailNum();
+        perDayTargetEmailCount = perDayTarget.getDayTargetEmailCount();
+        perDayTargetCallSum = perDayTarget.getDayTargetCallSum();
+        perDayTargetCallCount = perDayTarget.getDayTargetCallCount();
+        perDayTargetMeetingSum = perDayTarget.getDayTargetMeetingSum();
+        perDayTargetMeetingTime = perDayTarget.getDayTargetMeetingTime();
+        perDayTargetMeetingPersonSum = perDayTarget.getDayTargetMeetingPersonSum();
+        perDayTargetMeetingPersonCount = perDayTarget.getDayTargetMeetingPersonCount();
 
         //多渠道会话统计
         TodayStatisticsResponseBean messageStatistics = messageMapper.getMessageStatistics(bean);
@@ -211,19 +214,21 @@ public class WorkStationService {
 
         MonthTargetStatisticResponseBean monthTargetStatistic = new MonthTargetStatisticResponseBean();
 
-        Map<String, Integer> monthTarget = getMonthTarget(bean.getProductId());
-        Integer monthTargetMeetingPersonSum = monthTarget.get("monthTargetMeetingPersonSum");
-        Integer monthTargetMeetingPersonCount = monthTarget.get("monthTargetMeetingPersonCount");
-        Integer monthTargetMeetingTime = monthTarget.get("monthTargetMeetingTime");
-        Integer monthTargetWechatNum = monthTarget.get("monthTargetWechatNum");
-        Integer monthTargetWechatCount = monthTarget.get("monthTargetWechatCount");
-        Integer monthTargetImSum = monthTarget.get("monthTargetImSum");
-        Integer monthTargetImCount = monthTarget.get("monthTargetImCount");
-        Integer monthTargetEmailNum = monthTarget.get("monthTargetEmailNum");
-        Integer monthTargetEmailCount = monthTarget.get("monthTargetEmailCount");
-        Integer monthTargetCallSum = monthTarget.get("monthTargetCallSum");
-        Integer monthTargetCallCount = monthTarget.get("monthTargetCallCount");
-        Integer monthTargetCallTime = monthTarget.get("monthTargetCallTime");
+
+        MonthTargetResponseBean monthTarget = getMonthTarget(bean.getProductId());
+        Integer monthTargetWechatNum = monthTarget.getMonthTargetWechatNum();
+        Integer monthTargetWechatCount = monthTarget.getMonthTargetWechatCount();
+        Integer monthTargetImSum = monthTarget.getMonthTargetImSum();
+        Integer monthTargetImCount = monthTarget.getMonthTargetImCount();
+        Integer monthTargetEmailNum = monthTarget.getMonthTargetEmailNum();
+        Integer monthTargetEmailCount = monthTarget.getMonthTargetEmailCount();
+        Integer monthTargetCallSum = monthTarget.getMonthTargetCallSum();
+        Integer monthTargetCallCount = monthTarget.getMonthTargetCallCount();
+        Integer monthTargetCallTime = monthTarget.getMonthTargetCallTime();
+        Integer monthTargetMeetingSum = monthTarget.getMonthTargetMeetingSum();
+        Integer monthTargetMeetingTime = monthTarget.getMonthTargetMeetingTime();
+        Integer monthTargetMeetingPersonSum = monthTarget.getMonthTargetMeetingPersonSum();
+        Integer monthTargetMeetingPersonCount = monthTarget.getMonthTargetMeetingPersonCount();
 
         monthTargetStatistic.setTargetMeetingSum(monthTargetMeetingPersonSum);
         monthTargetStatistic.setTargetMeetingTotalTime(monthTargetMeetingTime);
@@ -318,12 +323,202 @@ public class WorkStationService {
         return pageResponseBean;
     }
 
+
     /**
-     * 本月目标
+     * 坐席分析
+     * @param bean
      * @return
      */
-    private Map<String, Integer> getMonthTarget(Long productId){
-        Map<String, Integer> map = new HashMap<>();
+    public DrugUserAnalysisListResponseBean getDrugUserAnalysisList(WorkStationRequestBean bean){
+        DrugUserAnalysisListResponseBean drugUserAnalysisList = new DrugUserAnalysisListResponseBean();
+        DrugUser drugUser = drugUserRepository.findFirstById(bean.getDrugUserId());
+        String leaderPath = drugUser.getLeaderPath();
+        if (leaderPath == null) {
+            leaderPath = "";
+        }
+        bean.setLeaderPath(leaderPath + "%");
+
+        Integer minCallTotalTime = workStationMapper.minCallTotalTime(bean);
+        bean.setMinCallTotalTime(minCallTotalTime);
+        List<DrugUserAnalysisResponseBean> minCallTotalTimeList = workStationMapper.minCallTotalTimeList(bean);
+
+        Integer minAvgCallTotalTime = workStationMapper.minAvgCallTotalTime(bean);
+        bean.setMinAvgCallTotalTime(minAvgCallTotalTime);
+        List<DrugUserAnalysisResponseBean> minAvgCallTotalTimeList = workStationMapper.minAvgCallTotalTimeList(bean);
+
+        Integer minCallCount = workStationMapper.minCallCount(bean);
+        bean.setMinCallCount(minCallCount);
+        List<DrugUserAnalysisResponseBean> minCallCountList = workStationMapper.minCallCountList(bean);
+
+        Integer minCallCoveredCount = workStationMapper.minCallCoveredCount(bean);
+        bean.setMinCallCoveredCount(minCallCoveredCount);
+        List<DrugUserAnalysisResponseBean> minCallCoveredCountList = workStationMapper.minCallCoveredCountList(bean);
+
+        Integer minImCount = workStationMapper.minImCount(bean);
+        bean.setMinImCount(minImCount);
+        List<DrugUserAnalysisResponseBean> minImCountList = workStationMapper.minImCountList(bean);
+
+        Integer minImCoveredCount = workStationMapper.minImCoveredCount(bean);
+        bean.setMinImCoveredCount(minImCoveredCount);
+        List<DrugUserAnalysisResponseBean> minImCoveredCountList = workStationMapper.minImCoveredCountList(bean);
+
+        Integer minWechatCount = workStationMapper.minWechatCount(bean);
+        bean.setMinWechatCount(minWechatCount);
+        List<DrugUserAnalysisResponseBean> minWechatCountList = workStationMapper.minWechatCountList(bean);
+
+        Integer minWechatCoveredCount = workStationMapper.minWechatCoveredCount(bean);
+        bean.setMinWechatCoveredCount(minWechatCoveredCount);
+        List<DrugUserAnalysisResponseBean> minWechatCoveredCountList = workStationMapper.minWechatCoveredCountList(bean);
+
+        Integer minEmailCount = workStationMapper.minEmailCount(bean);
+        bean.setMinEmailCount(minEmailCount);
+        List<DrugUserAnalysisResponseBean> minEmailCountList = workStationMapper.minEmailCountList(bean);
+
+
+        Integer minEmailCoveredCount = workStationMapper.minEmailCoveredCount(bean);
+        bean.setMinEmailCoveredCount(minEmailCoveredCount);
+        List<DrugUserAnalysisResponseBean> minEmailCoveredCountList = workStationMapper.minEmailCoveredCountList(bean);
+
+
+        Integer dateType = bean.getDateType();
+        if (dateType != null){
+            Integer targetCallSum = 0;
+            Integer targetWechatNum = 0;
+            Integer targetImSum = 0;
+            Integer targetEmailNum = 0;
+            if (dateType == DateTypeEnum.DAY.getValue()){
+                DayTargetResponseBean perDayTarget = getPerDayTarget(bean.getProductId());
+                targetCallSum = perDayTarget.getDayTargetCallSum();
+                targetWechatNum = perDayTarget.getDayTargetWechatNum();
+                targetImSum = perDayTarget.getDayTargetImSum();
+                targetEmailNum = perDayTarget.getDayTargetEmailNum();
+            }
+
+            if (dateType == DateTypeEnum.WEEK.getValue()){
+                WeekTargetResponseBean perWeekTarget = getPerWeekTarget(bean.getProductId());
+                targetCallSum = perWeekTarget.getWeekTargetCallSum();
+                targetWechatNum = perWeekTarget.getWeekTargetWechatNum();
+                targetImSum = perWeekTarget.getWeekTargetImSum();
+                targetEmailNum = perWeekTarget.getWeekTargetEmailNum();
+            }
+
+
+            if (dateType == DateTypeEnum.MONTH.getValue()){
+                MonthTargetResponseBean perMonthTarget = getMonthTarget(bean.getProductId());
+                targetCallSum = perMonthTarget.getMonthTargetCallSum();
+                targetWechatNum = perMonthTarget.getMonthTargetWechatNum();
+                targetImSum = perMonthTarget.getMonthTargetImSum();
+                targetEmailNum = perMonthTarget.getMonthTargetEmailNum();
+            }
+
+            if (dateType == DateTypeEnum.QUARTER.getValue()){
+                QuarterTargetResponseBean perQuarterTarget = getPerQuarterTarget(bean.getProductId());
+                targetCallSum = perQuarterTarget.getQuarterTargetCallSum();
+                targetWechatNum = perQuarterTarget.getQuarterTargetWechatNum();
+                targetImSum = perQuarterTarget.getQuarterTargetImSum();
+                targetEmailNum = perQuarterTarget.getQuarterTargetEmailNum();
+            }
+
+            bean.setCallReach(targetCallSum);
+            bean.setWechatReach(targetWechatNum);
+            bean.setImReach(targetImSum);
+            bean.setEmailReach(targetEmailNum);
+
+            List<String> callNoReachList = workStationMapper.callNoReach(bean);
+            List<String> wechatNoReachList = workStationMapper.wechatNoReach(bean);
+            List<String> imNoReachList = workStationMapper.imNoReach(bean);
+            List<String> emailNoReachList = workStationMapper.emailNoReach(bean);
+            drugUserAnalysisList.setCallNoReachList(callNoReachList);
+            drugUserAnalysisList.setWechatNoReachList(wechatNoReachList);
+            drugUserAnalysisList.setImNoReachList(imNoReachList);
+            drugUserAnalysisList.setEmailNoReachList(emailNoReachList);
+
+        }
+
+
+        drugUserAnalysisList.setMinTotalCallTimeList(minCallTotalTimeList);
+        drugUserAnalysisList.setMinAvgCallTimeList(minAvgCallTotalTimeList);
+        drugUserAnalysisList.setMinTotalCallCountList(minCallCountList);
+        drugUserAnalysisList.setMinCallCoveredCountList(minCallCoveredCountList);
+        drugUserAnalysisList.setMinTotalImCountList(minImCountList);
+        drugUserAnalysisList.setMinImCoveredCountList(minImCoveredCountList);
+        drugUserAnalysisList.setMinTotalWechatCountList(minWechatCountList);
+        drugUserAnalysisList.setMinWechatCoveredCountList(minWechatCoveredCountList);
+        drugUserAnalysisList.setMinEmailCountList(minEmailCountList);
+        drugUserAnalysisList.setMinWechatCoveredCountList(minEmailCoveredCountList);
+
+        return drugUserAnalysisList;
+
+    }
+
+
+    /**
+     * 客户分析
+     * @param bean
+     * @return
+     */
+    public DoctorAnalysisListResponseBean getDoctorAnalysisList(WorkStationRequestBean bean){
+        DoctorAnalysisListResponseBean doctorAnalysitList = new DoctorAnalysisListResponseBean();
+
+        DrugUserAnalysisListResponseBean drugUserAnalysisList = new DrugUserAnalysisListResponseBean();
+        DrugUser drugUser = drugUserRepository.findFirstById(bean.getDrugUserId());
+        String leaderPath = drugUser.getLeaderPath();
+        if (leaderPath == null) {
+            leaderPath = "";
+        }
+        bean.setLeaderPath(leaderPath + "%");
+
+        Integer minCallTotalTime = workStationMapper.minDoctorCallTotalTime(bean);
+        bean.setMinCallTotalTime(minCallTotalTime);
+        List<DoctorAnalysisResponseBean> minCallTotalTimeList = workStationMapper.minDoctorCallTotalTimeList(bean);
+
+        Integer minAvgCallTotalTime = workStationMapper.minDoctorAvgCallTotalTime(bean);
+        bean.setMinAvgCallTotalTime(minAvgCallTotalTime);
+        List<DoctorAnalysisResponseBean> minAvgCallTotalTimeList = workStationMapper.minDoctorAvgCallTotalTimeList(bean);
+
+        Integer minCallCount = workStationMapper.minDoctorCallCount(bean);
+        bean.setMinCallCount(minCallCount);
+        List<DoctorAnalysisResponseBean> minCallCountList = workStationMapper.minDoctorCallCountList(bean);
+
+        Integer minImCount = workStationMapper.minDoctorImCount(bean);
+        bean.setMinImCount(minImCount);
+        List<DoctorAnalysisResponseBean> minImCountList = workStationMapper.minDoctorImCountList(bean);
+
+
+        Integer minWechatCount = workStationMapper.minDoctorWechatCount(bean);
+        bean.setMinWechatCount(minWechatCount);
+        List<DoctorAnalysisResponseBean> minWechatCountList = workStationMapper.minDoctorWechatCountList(bean);
+
+
+        Integer minEmailCount = workStationMapper.minDoctorEmailCount(bean);
+        bean.setMinEmailCount(minEmailCount);
+        List<DoctorAnalysisResponseBean> minEmailCountList = workStationMapper.minDoctorEmailCountList(bean);
+
+        Integer minMeetingTime = workStationMapper.minDoctorMeetingTime(bean);
+        bean.setMinMeetingTime(minMeetingTime);
+        List<DoctorAnalysisResponseBean> minMeetingTimeList = workStationMapper.minDoctorMeetingTimeList(bean);
+
+
+        doctorAnalysitList.setMinTotalCallTimeList(minCallTotalTimeList);
+        doctorAnalysitList.setMinAvgCallTimeList(minAvgCallTotalTimeList);
+        doctorAnalysitList.setMinTotalCallCountList(minCallCountList);
+        doctorAnalysitList.setMinTotalImCountList(minImCountList);
+        doctorAnalysitList.setMinTotalWechatCountList(minWechatCountList);
+        doctorAnalysitList.setMinEmailCountList(minEmailCountList);
+        doctorAnalysitList.setMinMeetingTimeList(minMeetingTimeList);
+
+        return doctorAnalysitList;
+    }
+
+
+
+
+    /**
+     * 得到本月目标
+     * @return
+     */
+    private MonthTargetResponseBean getMonthTarget(Long productId){
+        MonthTargetResponseBean monthTarget = new MonthTargetResponseBean();
         Integer monthTargetWechatNum = 0;
         Integer monthTargetWechatCount = 0;
         Integer monthTargetImSum = 0;
@@ -358,34 +553,29 @@ public class WorkStationService {
             }
         }
 
-        map.put("monthTargetWechatNum", monthTargetWechatNum);
-        map.put("monthTargetWechatCount", monthTargetWechatCount);
-        map.put("monthTargetImSum", monthTargetImSum);
-        map.put("monthTargetImCount", monthTargetImCount);
-        map.put("monthTargetEmailNum", monthTargetEmailNum);
-        map.put("monthTargetEmailCount", monthTargetEmailCount);
-        map.put("monthTargetCallSum", monthTargetCallSum);
-        map.put("monthTargetCallCount", monthTargetCallCount);
-        map.put("monthTargetCallTime", monthTargetCallTime);
-        map.put("monthTargetMeetingSum", monthTargetMeetingSum);
-        map.put("monthTargetMeetingTime", monthTargetMeetingTime);
-        map.put("monthTargetMeetingPersonSum", monthTargetMeetingPersonSum);
-        map.put("monthTargetMeetingPersonCount", monthTargetMeetingPersonCount);
+        monthTarget.setMonthTargetWechatNum(monthTargetWechatNum);
+        monthTarget.setMonthTargetWechatCount(monthTargetWechatCount);
+        monthTarget.setMonthTargetImSum(monthTargetImSum);
+        monthTarget.setMonthTargetImCount(monthTargetImCount);
+        monthTarget.setMonthTargetEmailNum(monthTargetEmailNum);
+        monthTarget.setMonthTargetEmailCount(monthTargetEmailCount);
+        monthTarget.setMonthTargetCallSum(monthTargetCallSum);
+        monthTarget.setMonthTargetCallCount(monthTargetCallCount);
+        monthTarget.setMonthTargetMeetingSum(monthTargetMeetingSum);
+        monthTarget.setMonthTargetMeetingTime(monthTargetMeetingTime);
+        monthTarget.setMonthTargetMeetingPersonSum(monthTargetMeetingPersonSum);
+        monthTarget.setMonthTargetMeetingPersonCount(monthTargetMeetingPersonCount);
 
-
-        return map;
+        return monthTarget;
     }
 
     /**
      * 每天目标
      * @return
      */
-    private Map<String, Integer> getPerDayTarget(Long productId){
-        Map<String, Integer> map = new HashMap<>();
-        Map<String, Integer> monthTarget = getMonthTarget(productId);
-        if (null == monthTarget || monthTarget.isEmpty()){
-            return map;
-        }
+    private DayTargetResponseBean getPerDayTarget(Long productId){
+        DayTargetResponseBean dayTarget = new DayTargetResponseBean();
+
 
         Integer perDayTargetWechatNum = 0;
         Integer perDayTargetWechatCount = 0;
@@ -407,19 +597,22 @@ public class WorkStationService {
             month = 1;
         }
 
-        Integer monthTargetWechatNum = monthTarget.get("monthTargetWechatNum");
-        Integer monthTargetWechatCount = monthTarget.get("monthTargetWechatCount");
-        Integer monthTargetImSum = monthTarget.get("monthTargetImSum");
-        Integer monthTargetImCount = monthTarget.get("monthTargetImCount");
-        Integer monthTargetEmailNum = monthTarget.get("monthTargetEmailNum");
-        Integer monthTargetEmailCount = monthTarget.get("monthTargetEmailCount");
-        Integer monthTargetCallSum = monthTarget.get("monthTargetCallSum");
-        Integer monthTargetCallCount = monthTarget.get("monthTargetCallCount");
-        Integer monthTargetCallTime = monthTarget.get("monthTargetCallTime");
-        Integer monthTargetMeetingSum = monthTarget.get("monthTargetMeetingSum");
-        Integer monthTargetMeetingTime = monthTarget.get("monthTargetMeetingTime");
-        Integer monthTargetMeetingPersonSum = monthTarget.get("monthTargetMeetingPersonSum");
-        Integer monthTargetMeetingPersonCount = monthTarget.get("monthTargetMeetingPersonCount");
+        MonthTargetResponseBean monthTarget = getMonthTarget(productId);
+
+
+        Integer monthTargetWechatNum = monthTarget.getMonthTargetWechatNum();
+        Integer monthTargetWechatCount = monthTarget.getMonthTargetWechatCount();
+        Integer monthTargetImSum = monthTarget.getMonthTargetImSum();
+        Integer monthTargetImCount = monthTarget.getMonthTargetImCount();
+        Integer monthTargetEmailNum = monthTarget.getMonthTargetEmailNum();
+        Integer monthTargetEmailCount = monthTarget.getMonthTargetEmailCount();
+        Integer monthTargetCallSum = monthTarget.getMonthTargetCallSum();
+        Integer monthTargetCallCount = monthTarget.getMonthTargetCallCount();
+        Integer monthTargetCallTime = monthTarget.getMonthTargetCallTime();
+        Integer monthTargetMeetingSum = monthTarget.getMonthTargetMeetingSum();
+        Integer monthTargetMeetingTime = monthTarget.getMonthTargetMeetingTime();
+        Integer monthTargetMeetingPersonSum = monthTarget.getMonthTargetMeetingPersonSum();
+        Integer monthTargetMeetingPersonCount = monthTarget.getMonthTargetMeetingPersonCount();
 
         perDayTargetWechatNum = Math.round(monthTargetWechatNum/month);
         perDayTargetWechatCount = Math.round(monthTargetWechatCount/month);
@@ -436,22 +629,176 @@ public class WorkStationService {
         perDayTargetMeetingPersonCount = Math.round(monthTargetMeetingPersonCount/month);
 
 
-        map.put("perDayTargetWechatNum", perDayTargetWechatNum);
-        map.put("perDayTargetWechatCount", perDayTargetWechatCount);
-        map.put("perDayTargetImSum", perDayTargetImSum);
-        map.put("perDayTargetImCount", perDayTargetImCount);
-        map.put("perDayTargetEmailNum", perDayTargetEmailNum);
-        map.put("perDayTargetEmailCount", perDayTargetEmailCount);
-        map.put("perDayTargetCallSum", perDayTargetCallSum);
-        map.put("perDayTargetCallCount", perDayTargetCallCount);
-        map.put("perDayTargetCallTime", perDayTargetCallTime);
-        map.put("perDayTargetMeetingSum", perDayTargetMeetingSum);
-        map.put("perDayTargetMeetingTime", perDayTargetMeetingTime);
-        map.put("perDayTargetMeetingPersonSum", perDayTargetMeetingPersonSum);
-        map.put("perDayTargetMeetingPersonCount", perDayTargetMeetingPersonCount);
 
-        return map;
 
+        dayTarget.setDayTargetWechatNum(perDayTargetWechatNum);
+        dayTarget.setDayTargetWechatCount(perDayTargetWechatCount);
+        dayTarget.setDayTargetImSum(perDayTargetImSum);
+        dayTarget.setDayTargetImCount(perDayTargetImCount);
+        dayTarget.setDayTargetEmailNum(perDayTargetEmailNum);
+        dayTarget.setDayTargetEmailCount(perDayTargetEmailCount);
+        dayTarget.setDayTargetCallSum(perDayTargetCallSum);
+        dayTarget.setDayTargetCallCount(perDayTargetCallCount);
+        dayTarget.setDayTargetCallTime(perDayTargetCallTime);
+        dayTarget.setDayTargetMeetingPersonSum(perDayTargetMeetingPersonSum);
+        dayTarget.setDayTargetMeetingTime(perDayTargetMeetingTime);
+        dayTarget.setDayTargetMeetingPersonSum(perDayTargetMeetingPersonSum);
+        dayTarget.setDayTargetMeetingPersonCount(perDayTargetMeetingPersonCount);
+
+        return dayTarget;
+
+    }
+
+
+    /**
+     * 每周目标
+      * @param productId
+     * @return
+     */
+    private WeekTargetResponseBean getPerWeekTarget(Long productId){
+        WeekTargetResponseBean weekTarget = new WeekTargetResponseBean();
+
+
+        Integer perWeekTargetWechatNum = 0;
+        Integer perWeekTargetWechatCount = 0;
+        Integer perWeekTargetImSum = 0;
+        Integer perWeekTargetImCount = 0;
+        Integer perWeekTargetEmailNum = 0;
+        Integer perWeekTargetEmailCount = 0;
+        Integer perWeekTargetCallSum = 0;
+        Integer perWeekTargetCallCount = 0;
+        Integer perWeekTargetCallTime = 0;
+        Integer perWeekTargetMeetingSum = 0;
+        Integer perWeekTargetMeetingTime = 0;
+        Integer perWeekTargetMeetingPersonSum = 0;
+        Integer perWeekTargetMeetingPersonCount = 0;
+
+        //现在按一个月四周处理
+        Integer week = 4;
+
+        MonthTargetResponseBean monthTarget = getMonthTarget(productId);
+        Integer monthTargetWechatNum = monthTarget.getMonthTargetWechatNum();
+        Integer monthTargetWechatCount = monthTarget.getMonthTargetWechatCount();
+        Integer monthTargetImSum = monthTarget.getMonthTargetImSum();
+        Integer monthTargetImCount = monthTarget.getMonthTargetImCount();
+        Integer monthTargetEmailNum = monthTarget.getMonthTargetEmailNum();
+        Integer monthTargetEmailCount = monthTarget.getMonthTargetEmailCount();
+        Integer monthTargetCallSum = monthTarget.getMonthTargetCallSum();
+        Integer monthTargetCallCount = monthTarget.getMonthTargetCallCount();
+        Integer monthTargetCallTime = monthTarget.getMonthTargetCallTime();
+        Integer monthTargetMeetingSum = monthTarget.getMonthTargetMeetingSum();
+        Integer monthTargetMeetingTime = monthTarget.getMonthTargetMeetingTime();
+        Integer monthTargetMeetingPersonSum = monthTarget.getMonthTargetMeetingPersonSum();
+        Integer monthTargetMeetingPersonCount = monthTarget.getMonthTargetMeetingPersonCount();
+
+
+        perWeekTargetWechatNum = Math.round(monthTargetWechatNum/week);
+        perWeekTargetWechatCount = Math.round(monthTargetWechatCount/week);
+        perWeekTargetImSum = Math.round(monthTargetImSum/week);
+        perWeekTargetImCount = Math.round(monthTargetImCount/week);
+        perWeekTargetEmailNum = Math.round(monthTargetEmailNum/week);
+        perWeekTargetEmailCount = Math.round(monthTargetEmailCount/week);
+        perWeekTargetCallSum = Math.round(monthTargetCallSum/week);
+        perWeekTargetCallCount = Math.round(monthTargetCallCount/week);
+        perWeekTargetCallTime = Math.round(monthTargetCallTime/week);
+        perWeekTargetMeetingSum = Math.round(monthTargetMeetingSum/week);
+        perWeekTargetMeetingTime = Math.round(monthTargetMeetingTime/week);
+        perWeekTargetMeetingPersonSum = Math.round(monthTargetMeetingPersonSum/week);
+        perWeekTargetMeetingPersonCount = Math.round(monthTargetMeetingPersonCount/week);
+
+
+
+        weekTarget.setWeekTargetWechatNum(perWeekTargetWechatNum);
+        weekTarget.setWeekTargetWechatCount(perWeekTargetWechatCount);
+        weekTarget.setWeekTargetImSum(perWeekTargetImSum);
+        weekTarget.setWeekTargetImCount(perWeekTargetImCount);
+        weekTarget.setWeekTargetEmailNum(perWeekTargetEmailNum);
+        weekTarget.setWeekTargetEmailCount(perWeekTargetEmailCount);
+        weekTarget.setWeekTargetCallSum(perWeekTargetCallSum);
+        weekTarget.setWeekTargetCallCount(perWeekTargetCallCount);
+        weekTarget.setWeekTargetCallTime(perWeekTargetCallTime);
+        weekTarget.setWeekTargetMeetingSum(perWeekTargetMeetingSum);
+        weekTarget.setWeekTargetMeetingTime(perWeekTargetMeetingTime);
+        weekTarget.setWeekTargetMeetingPersonSum(perWeekTargetMeetingPersonSum);
+        weekTarget.setWeekTargetMeetingPersonCount(perWeekTargetMeetingPersonCount);
+
+        return weekTarget;
+    }
+
+    /**
+     * 每个季度的目标
+     * @param productId
+     * @return
+     */
+    private QuarterTargetResponseBean getPerQuarterTarget(Long productId){
+        QuarterTargetResponseBean quarterTarget = new QuarterTargetResponseBean();
+
+
+        Integer perQuarterTargetWechatNum = 0;
+        Integer perQuarterTargetWechatCount = 0;
+        Integer perQuarterTargetImSum = 0;
+        Integer perQuarterTargetImCount = 0;
+        Integer perQuarterTargetEmailNum = 0;
+        Integer perQuarterTargetEmailCount = 0;
+        Integer perQuarterTargetCallSum = 0;
+        Integer perQuarterTargetCallCount = 0;
+        Integer perQuarterTargetCallTime = 0;
+        Integer perQuarterTargetMeetingSum = 0;
+        Integer perQuarterTargetMeetingTime = 0;
+        Integer perQuarterTargetMeetingPersonSum = 0;
+        Integer perQuarterTargetMeetingPersonCount = 0;
+
+        //一个季度按三个月处理
+        Integer month = 3;
+
+
+
+        MonthTargetResponseBean monthTarget = getMonthTarget(productId);
+        Integer monthTargetWechatNum = monthTarget.getMonthTargetWechatNum();
+        Integer monthTargetWechatCount = monthTarget.getMonthTargetWechatCount();
+        Integer monthTargetImSum = monthTarget.getMonthTargetImSum();
+        Integer monthTargetImCount = monthTarget.getMonthTargetImCount();
+        Integer monthTargetEmailNum = monthTarget.getMonthTargetEmailNum();
+        Integer monthTargetEmailCount = monthTarget.getMonthTargetEmailCount();
+        Integer monthTargetCallSum = monthTarget.getMonthTargetCallSum();
+        Integer monthTargetCallCount = monthTarget.getMonthTargetCallCount();
+        Integer monthTargetCallTime = monthTarget.getMonthTargetCallTime();
+        Integer monthTargetMeetingSum = monthTarget.getMonthTargetMeetingSum();
+        Integer monthTargetMeetingTime = monthTarget.getMonthTargetMeetingTime();
+        Integer monthTargetMeetingPersonSum = monthTarget.getMonthTargetMeetingPersonSum();
+        Integer monthTargetMeetingPersonCount = monthTarget.getMonthTargetMeetingPersonCount();
+
+
+        perQuarterTargetWechatNum = Math.round(monthTargetWechatNum*month);
+        perQuarterTargetWechatCount = Math.round(monthTargetWechatCount*month);
+        perQuarterTargetImSum = Math.round(monthTargetImSum*month);
+        perQuarterTargetImCount = Math.round(monthTargetImCount*month);
+        perQuarterTargetEmailNum = Math.round(monthTargetEmailNum*month);
+        perQuarterTargetEmailCount = Math.round(monthTargetEmailCount*month);
+        perQuarterTargetCallSum = Math.round(monthTargetCallSum*month);
+        perQuarterTargetCallCount = Math.round(monthTargetCallCount*month);
+        perQuarterTargetCallTime = Math.round(monthTargetCallTime*month);
+        perQuarterTargetMeetingSum = Math.round(monthTargetMeetingSum*month);
+        perQuarterTargetMeetingTime = Math.round(monthTargetMeetingTime*month);
+        perQuarterTargetMeetingPersonSum = Math.round(monthTargetMeetingPersonSum*month);
+        perQuarterTargetMeetingPersonCount = Math.round(monthTargetMeetingPersonCount*month);
+
+        quarterTarget.setQuarterTargetWechatNum(perQuarterTargetWechatNum);
+        quarterTarget.setQuarterTargetWechatCount(perQuarterTargetWechatCount);
+        quarterTarget.setQuarterTargetImSum(perQuarterTargetImSum);
+        quarterTarget.setQuarterTargetImCount(perQuarterTargetImCount);
+        quarterTarget.setQuarterTargetEmailNum(perQuarterTargetEmailNum);
+        quarterTarget.setQuarterTargetEmailCount(perQuarterTargetEmailCount);
+        quarterTarget.setQuarterTargetCallSum(perQuarterTargetCallSum);
+        quarterTarget.setQuarterTargetCallCount(perQuarterTargetCallCount);
+        quarterTarget.setQuarterTargetCallTime(perQuarterTargetCallTime);
+        quarterTarget.setQuarterTargetMeetingSum(perQuarterTargetMeetingSum);
+        quarterTarget.setQuarterTargetMeetingTime(perQuarterTargetMeetingTime);
+        quarterTarget.setQuarterTargetMeetingPersonSum(perQuarterTargetMeetingPersonSum);
+        quarterTarget.setQuarterTargetMeetingPersonCount(perQuarterTargetMeetingPersonCount);
+
+
+        return quarterTarget;
     }
 
 
