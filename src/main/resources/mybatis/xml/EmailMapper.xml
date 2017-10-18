@@ -50,9 +50,16 @@
         on d.id = dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id = du.id
-        where vei.product_id = #{productId}
+        where 1=1
+        <if test="productId !=null and productId !=0">
+            and vei.product_id = #{productId}
+        </if>
+
         and date_format(vei.create_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
-        and dud.prod_id = #{productId}
+        <if test="productId !=null and productId !=0">
+            and dud.prod_id = #{productId}
+        </if>
+
         and du.leader_path like #{leaderPath}
     </select>
 

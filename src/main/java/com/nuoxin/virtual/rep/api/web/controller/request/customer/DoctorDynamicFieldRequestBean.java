@@ -26,6 +26,9 @@ public class DoctorDynamicFieldRequestBean implements Serializable{
     @ApiModelProperty(value = "下拉框的值")
     private String value;
 
+    @ApiModelProperty(value = "分类，目前1基本信息，2医生的处方信息，3之前拜访记录，4分析")
+    private Integer classification;
+
 
     public String getName() {
         return name;
@@ -57,5 +60,14 @@ public class DoctorDynamicFieldRequestBean implements Serializable{
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+
+    public Integer getClassification() {
+        return classification;
+    }
+
+    public void setClassification(Integer classification) {
+        this.classification = classification;
     }
 }

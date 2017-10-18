@@ -26,6 +26,10 @@ public class DoctorDynamicFieldValue extends IdEntity{
     @Column(name = "dynamic_field_value")
     private String dynamicFieldValue;
 
+    //分类，目前1基本信息，2医生的处方信息，3之前拜访记录，4分析
+    @Column(name = "classification")
+    private Integer classification;
+
     @Column(name = "create_time")
     private Date createTime;
 
@@ -80,5 +84,13 @@ public class DoctorDynamicFieldValue extends IdEntity{
 
     public void setDynamicFieldName(String dynamicFieldName) {
         this.dynamicFieldName = dynamicFieldName;
+    }
+
+    public Integer getClassification() {
+        return classification;
+    }
+
+    public void setClassification(Integer classification) {
+        this.classification = classification;
     }
 }

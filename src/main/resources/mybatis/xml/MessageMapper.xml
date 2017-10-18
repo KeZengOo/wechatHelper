@@ -154,7 +154,10 @@
 
         <if test="messageType !=null and messageType==2">
             and vm.message_type = #{messageType}
-            and vm.product_id=#{productId}
+            <if test="productId !=null and productId !=0">
+                and vm.product_id=#{productId}
+            </if>
+
         </if>
 
         and vm.doctor_id=#{doctorId}
@@ -181,7 +184,9 @@
 
         <if test="messageType !=null and messageType==2">
             and vm.message_type = #{messageType}
-            and vm.product_id=#{productId}
+            <if test="productId !=null and productId !=0">
+                and vm.product_id=#{productId}
+            </if>
         </if>
 
         and vm.doctor_id=#{doctorId}
@@ -205,7 +210,9 @@
 
         <if test="messageType !=null and messageType==2">
             and vm.message_type = #{messageType}
-            and vm.product_id=#{productId}
+            <if test="productId !=null and productId !=0">
+                and vm.product_id=#{productId}
+            </if>
         </if>
         and date_format(vm.message_time, '%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
         and vm.doctor_id in (
@@ -214,7 +221,12 @@
                 on d.id=dud.doctor_id
                 inner join drug_user du
                 on dud.drug_user_id=du.id
-                where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+                where 1=1
+
+                <if test="productId !=null and productId !=0">
+                    dud.prod_id=#{productId}
+                </if>
+                and du.leader_path like #{leaderPath}
             )
         and vm.drug_user_id in (select id from drug_user where leader_path like #{leaderPath})
 

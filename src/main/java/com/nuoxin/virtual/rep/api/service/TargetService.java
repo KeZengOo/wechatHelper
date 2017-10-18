@@ -20,4 +20,9 @@ public class TargetService extends BaseService {
     public Target findFirstByProductIdAndLevel(Long productId, String level){
         return targetRepository.findFirstByProductIdAndLevel(productId,level);
     }
+
+
+
+
+
 }

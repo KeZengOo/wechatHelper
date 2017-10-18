@@ -44,6 +44,9 @@ public class DoctorRequestBean implements Serializable {
     @ApiModelProperty(value = "不用传")
     private String leaderPath;
 
+    @ApiModelProperty(value = "分类，目前1基本信息，2医生的处方信息，3之前拜访记录，4分析")
+    private Integer classification;
+
     @ApiModelProperty(value = "动态添加的字段")
     List<DoctorDynamicFieldValueRequestBean> list;
 
@@ -165,5 +168,13 @@ public class DoctorRequestBean implements Serializable {
 
     public void setLeaderPath(String leaderPath) {
         this.leaderPath = leaderPath;
+    }
+
+    public Integer getClassification() {
+        return classification;
+    }
+
+    public void setClassification(Integer classification) {
+        this.classification = classification;
     }
 }

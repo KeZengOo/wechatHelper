@@ -40,12 +40,14 @@ public class DoctorDynamicFieldService {
             String name = bean.getName();
             Integer type = bean.getType();
             String value = bean.getValue();
+            Integer classification = bean.getClassification();
 
             DoctorDynamicField doctorDynamicField = new DoctorDynamicField();
 
             doctorDynamicField.setName(name);
             doctorDynamicField.setType(type);
             doctorDynamicField.setValue(value);
+            doctorDynamicField.setClassification(classification);
             doctorDynamicField.setCreateTime(new Date());
             doctorDynamicField.setUpdateTime(new Date());
 
@@ -86,6 +88,7 @@ public class DoctorDynamicFieldService {
                     doctorDynamicFieldResponseBean.setName(doctorDynamicField.getName());
                     doctorDynamicFieldResponseBean.setType(doctorDynamicField.getType());
                     doctorDynamicFieldResponseBean.setValue(doctorDynamicField.getValue());
+                    doctorDynamicFieldResponseBean.setClassification(doctorDynamicField.getClassification());
                     list.add(doctorDynamicFieldResponseBean);
                 }
 

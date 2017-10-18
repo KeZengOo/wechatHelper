@@ -202,7 +202,7 @@ public class DoctorService extends BaseService {
         drugUserDoctorRepository.saveAndFlush(dud);
 
 
-        Boolean flag = DoctorDynamicFieldValueService.add(doctor.getId(), bean.getList());
+        Boolean flag = DoctorDynamicFieldValueService.add(doctor.getId(),bean.getList());
         if (!flag) {
             throw new BusinessException(ErrorEnum.ERROR.getStatus(), "医生动态属性数据添加修改");
         }

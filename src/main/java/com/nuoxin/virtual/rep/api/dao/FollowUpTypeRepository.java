@@ -15,4 +15,8 @@ public interface FollowUpTypeRepository extends JpaRepository<FollowUpType,Long>
 
     List<FollowUpType> findByProductIdIn(Collection<Long> productIds);
 
+    void deleteByProductId(Long productId);
+
+    List<FollowUpType> findByProductId(Long productId);
+
 }
