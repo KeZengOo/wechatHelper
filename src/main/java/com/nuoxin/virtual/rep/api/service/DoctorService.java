@@ -481,9 +481,11 @@ public class DoctorService extends BaseService {
     @Transactional(readOnly = false)
     public boolean delete(RelationRequestBean bean) {
         List<Long> ids = bean.getIds();
+        List<Long> pIds = bean.getpIds();
         if (ids != null && !ids.isEmpty()) {
-            for (Long id : ids) {
-                List<DrugUserDoctor> list = drugUserDoctorRepository.findByDoctorId(id);
+            for (int i=0,leng=ids.size();i<leng;i++) {
+                Long id = ids.get(i);
+                List<DrugUserDoctor> list = drugUserDoctorRepository.findByDoctorIdAndProductId(id,pIds.get(i));
                 DoctorVirtual virtual = doctorVirtualService.findByDoctorId(id);
                 if(list!=null && !list.isEmpty()){
                     Map<String,String> map = new HashMap<>();
@@ -522,15 +524,12 @@ public class DoctorService extends BaseService {
 
     @Transactional(readOnly = false)
     public boolean relation(RelationRequestBean bean) {
-        List<ProductResponseBean> list = productLineService.getList(bean.getDrugUserId());
-        if(list!=null && !list.isEmpty()){
-            bean.setProductId(list.get(0).getProductId());
-        }
+        List<Long> pId = bean.getpIds();
 
         List<Long> ids = bean.getIds();
         if (ids != null && !ids.isEmpty()) {
             for (Long id : ids) {
-                List<DrugUserDoctor> drugUserDoctors = drugUserDoctorRepository.findByDoctorIdAndProductId(id,bean.getProductId());
+                List<DrugUserDoctor> drugUserDoctors = drugUserDoctorRepository.findByDoctorIdAndProductId(id,pId.get(0));
                 DoctorVirtual virtual = doctorVirtualService.findByDoctorId(id);
                 String drugUserIds = virtual.getDrugUserIds();
                 if(drugUserDoctors!=null && !drugUserDoctors.isEmpty()){
@@ -545,7 +544,7 @@ public class DoctorService extends BaseService {
                 DrugUserDoctor entity = new DrugUserDoctor();
                 entity.setCreateTime(new Date());
                 entity.setDrugUserId(bean.getNewDrugUserId());
-                entity.setProductId(bean.getProductId());
+                entity.setProductId(pId.get(0));
                 entity.setDoctorId(id);
                 drugUserDoctorRepository.saveAndFlush(entity);
             }

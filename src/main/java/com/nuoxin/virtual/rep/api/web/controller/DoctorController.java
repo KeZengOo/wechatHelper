@@ -7,10 +7,12 @@ import com.nuoxin.virtual.rep.api.common.controller.BaseController;
 import com.nuoxin.virtual.rep.api.common.util.StringUtils;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.DoctorService;
+import com.nuoxin.virtual.rep.api.service.DrugUserService;
 import com.nuoxin.virtual.rep.api.utils.ExcelUtils;
 import com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.doctor.DoctorRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.doctor.RelationRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorDetailsResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorStatResponseBean;
@@ -35,6 +37,8 @@ public class DoctorController extends BaseController {
 
     @Autowired
     private DoctorService doctorService;
+    @Autowired
+    private DrugUserService drugUserService;
 
     @ApiOperation(value = "获取医生信息", notes = "获取医生信息")
     @GetMapping("/details/{doctorId}")
@@ -154,6 +158,16 @@ public class DoctorController extends BaseController {
             responseBean.setMessage("医生id不能为空");
             return responseBean;
         }
+        if(!StringUtils.isNotEmtity(bean.getProductIds())){
+            responseBean.setCode(500);
+            responseBean.setMessage("产品id不能为空");
+            return responseBean;
+        }
+        if(bean.getIds().size()!=bean.getpIds().size()){
+            responseBean.setCode(500);
+            responseBean.setMessage("产品id跟医生id对不上");
+            return responseBean;
+        }
         responseBean.setData(doctorService.delete(bean));
         return responseBean;
     }
@@ -174,7 +188,32 @@ public class DoctorController extends BaseController {
             responseBean.setMessage("坐席id不能为空");
             return responseBean;
         }
+        if(bean.getProductIds()==null){
+            responseBean.setCode(500);
+            responseBean.setMessage("产品id不能为空");
+            return responseBean;
+        }
+        if(bean.getIds().size()!=bean.getpIds().size()){
+            responseBean.setCode(500);
+            responseBean.setMessage("产品id跟医生id对不上");
+            return responseBean;
+        }
         responseBean.setData(doctorService.relation(bean));
+        return responseBean;
+    }
+
+    @ApiOperation(value = "关系转移的坐席", notes = "关系转移的坐席")
+    @PostMapping("/relation/druguser/{productId}")
+    public DefaultResponseBean<List<DrugUserResponseBean>> relationDrugUser(@PathVariable Long productId,
+                                                                            HttpServletRequest request, HttpServletResponse response){
+        DefaultResponseBean<List<DrugUserResponseBean>> responseBean = new DefaultResponseBean();
+        DrugUser user = super.getLoginUser(request);
+        if(user==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
+        }
+        responseBean.setData(drugUserService.relationDrugUser(user.getLeaderPath(),productId));
         return responseBean;
     }
 

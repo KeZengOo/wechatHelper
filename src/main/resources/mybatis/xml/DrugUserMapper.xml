@@ -18,7 +18,7 @@
         <result column="doctor_id" property="doctorId" jdbcType="BIGINT"/>
         <result column="hospital_level" property="hospitalLevel" jdbcType="VARCHAR"/>
         <result column="client_level" property="clientLevel" jdbcType="VARCHAR"/>
-        <!--<result column="product_id" property="" jdbcType=""/>-->
+        <result column="product_id" property="productId" jdbcType="BIGINT"/>
         <result column="drug_user_name" property="drugUserName" jdbcType="VARCHAR"/>
     </resultMap>
 
@@ -84,5 +84,15 @@
 
             and d.hospital_name like #{hospital,jdbcType=VARCHAR}
         </if>
+    </select>
+
+    <resultMap id="drugUserResponseBean" type="com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="relationDrugUser" resultMap="drugUserResponseBean">
+      select du.id,du.name from product_user pu join drug_user du on pu.user_id=du.id where du.leader_path like #{leaderPath,jdbcType=VARCHAR} and pu.prod_id = #{productId} group by du.id
+
     </select>
 </mapper>

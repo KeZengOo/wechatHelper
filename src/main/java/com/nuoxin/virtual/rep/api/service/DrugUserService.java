@@ -7,6 +7,7 @@ import com.nuoxin.virtual.rep.api.entity.ProductLine;
 import com.nuoxin.virtual.rep.api.mybatis.DrugUserMapper;
 import com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.UpdatePwdRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorStatResponseBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +50,10 @@ public class DrugUserService {
             user.setPassword(newPwd);
             drugUserRepository.saveAndFlush(user);
         }
+    }
+
+    public List<DrugUserResponseBean> relationDrugUser(String leaderPath,Long productId){
+        return drugUserMapper.relationDrugUser(leaderPath,productId);
     }
 
     public List<DoctorResponseBean> doctorPage(QueryRequestBean bean){

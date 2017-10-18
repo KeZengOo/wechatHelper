@@ -1,5 +1,6 @@
 package com.nuoxin.virtual.rep.api.web.controller.request.doctor;
 
+import com.nuoxin.virtual.rep.api.common.util.StringUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -18,14 +19,16 @@ public class RelationRequestBean implements Serializable {
     private String doctorIds;
     @ApiModelProperty(value = "坐席id(删除接口调用时不用传)")
     private Long newDrugUserId;
-    @ApiModelProperty(value = "产品id")
-    private Long productId;
+    @ApiModelProperty(value = "产品id(多个中间用英文逗号分隔）")
+    private String productIds;
     @ApiModelProperty(value = "不用传")
     private Long oldDrugUserId;
     @ApiModelProperty(value = "不用传")
     private Long drugUserId;
     @ApiModelProperty(value = "不用传")
     private List<Long> ids;
+    @ApiModelProperty(value = "不用传")
+    private List<Long> pIds;
 
     public String getDoctorIds() {
         return doctorIds;
@@ -55,7 +58,8 @@ public class RelationRequestBean implements Serializable {
         ids = new ArrayList<>();
         String[] d_ids = getDoctorIds().split(",");
         for (String s:d_ids) {
-            ids.add(Long.valueOf(s));
+            if(StringUtils.isNotEmtity(s))
+                ids.add(Long.valueOf(s));
         }
         return ids;
     }
@@ -64,19 +68,33 @@ public class RelationRequestBean implements Serializable {
         this.ids = ids;
     }
 
-    public Long getProductId() {
-        return productId;
-    }
-
-    public void setProductId(Long productId) {
-        this.productId = productId;
-    }
-
     public Long getDrugUserId() {
         return drugUserId;
     }
 
     public void setDrugUserId(Long drugUserId) {
         this.drugUserId = drugUserId;
+    }
+
+    public String getProductIds() {
+        return productIds;
+    }
+
+    public void setProductIds(String productIds) {
+        this.productIds = productIds;
+    }
+
+    public List<Long> getpIds() {
+        pIds = new ArrayList<>();
+        String[] d_ids = getProductIds().split(",");
+        for (String s:d_ids) {
+            if(StringUtils.isNotEmtity(s))
+                pIds.add(Long.valueOf(s));
+        }
+        return pIds;
+    }
+
+    public void setpIds(List<Long> pIds) {
+        this.pIds = pIds;
     }
 }
