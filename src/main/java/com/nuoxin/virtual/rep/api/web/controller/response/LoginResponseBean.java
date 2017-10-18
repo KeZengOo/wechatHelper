@@ -17,7 +17,7 @@ public class LoginResponseBean implements Serializable {
     private String name;
     @ApiModelProperty(value = "邮箱")
     private String email;
-    @ApiModelProperty(value = "角色")
+    @ApiModelProperty(value = "角色（101-普通虚拟代表，102-虚拟代表管理员）")
     private Long roleId;
 
     private DrugUserCallDetaiBean callBean;
