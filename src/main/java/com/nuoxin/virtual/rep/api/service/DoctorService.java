@@ -50,7 +50,7 @@ public class DoctorService extends BaseService {
     @Autowired
     private DrugUserService drugUserService;
     @Autowired
-    private DoctorVirtualRepository doctorVirtualRepository;
+    private DoctorVirtualService doctorVirtualService;
     @Autowired
     private MasterDataService masterDataService;
     @Autowired
@@ -188,7 +188,7 @@ public class DoctorService extends BaseService {
             throw new BusinessException(ErrorEnum.ERROR.getStatus(), "医生添加失败");
         }
         virtual.setDoctorId(doctor.getId());
-        doctorVirtualRepository.saveAndFlush(virtual);
+        doctorVirtualService.save(virtual);
         doctor.setDoctorVirtual(virtual);
         doctorRepository.saveAndFlush(doctor);
         //TODO 添加关系到关系表
@@ -252,7 +252,7 @@ public class DoctorService extends BaseService {
         }
 
         virtual.setDoctorId(doctor.getId());
-        doctorVirtualRepository.saveAndFlush(virtual);
+        doctorVirtualService.save(virtual);
 
         doctor.setDoctorVirtual(virtual);
         doctorRepository.saveAndFlush(doctor);
@@ -365,7 +365,7 @@ public class DoctorService extends BaseService {
 //          }
             doctorRepository.saveAndFlush(doctor);
             virtual.setDoctorId(doctor.getId());
-            doctorVirtualRepository.saveAndFlush(virtual);
+            doctorVirtualService.save(virtual);
             //TODO 添加关系到关系表
 
             savelist.add(doctor);
@@ -457,7 +457,7 @@ public class DoctorService extends BaseService {
 //          }
             doctorRepository.saveAndFlush(doctor);
             virtual.setDoctorId(doctor.getId());
-            doctorVirtualRepository.saveAndFlush(virtual);
+            doctorVirtualService.save(virtual);
             //TODO 添加关系到关系表
             DrugUserDoctor dud = drugUserDoctorRepository.findByDoctorIdAndDrugUserIdAndProductId(doctor.getId(), user.getId(), productId);
             if (dud == null) {
@@ -482,7 +482,7 @@ public class DoctorService extends BaseService {
         if (ids != null && !ids.isEmpty()) {
             for (Long id : ids) {
                 List<DrugUserDoctor> list = drugUserDoctorRepository.findByDoctorId(id);
-                DoctorVirtual virtual = doctorVirtualRepository.findByDoctorId(id);
+                DoctorVirtual virtual = doctorVirtualService.findByDoctorId(id);
                 if(list!=null && !list.isEmpty()){
                     Map<String,String> map = new HashMap<>();
                     if(virtual!=null){
@@ -510,7 +510,7 @@ public class DoctorService extends BaseService {
                         }
                     }
                     virtual.setDrugUserIds(sb.toString());
-                    doctorVirtualRepository.saveAndFlush(virtual);
+                    doctorVirtualService.save(virtual);
                     drugUserDoctorRepository.delete(list);
                 }
             }
@@ -529,16 +529,23 @@ public class DoctorService extends BaseService {
         if (ids != null && !ids.isEmpty()) {
             for (Long id : ids) {
                 List<DrugUserDoctor> drugUserDoctors = drugUserDoctorRepository.findByDoctorIdAndProductId(id,bean.getProductId());
-                DoctorVirtual virtual = doctorVirtualRepository.findByDoctorId(id);
+                DoctorVirtual virtual = doctorVirtualService.findByDoctorId(id);
                 String drugUserIds = virtual.getDrugUserIds();
                 if(drugUserDoctors!=null && !drugUserDoctors.isEmpty()){
                     for (DrugUserDoctor druguserdoctr:drugUserDoctors) {
                         drugUserIds = drugUserIds.replaceAll(","+druguserdoctr.getDrugUserId()+",",",");
                     }
-                    virtual.setDrugUserIds(drugUserIds);
-                    doctorVirtualRepository.saveAndFlush(virtual);
                     drugUserDoctorRepository.delete(drugUserDoctors);
                 }
+
+                virtual.setDrugUserIds(drugUserIds+bean.getNewDrugUserId()+",");
+                doctorVirtualService.save(virtual);
+                DrugUserDoctor entity = new DrugUserDoctor();
+                entity.setCreateTime(new Date());
+                entity.setDrugUserId(bean.getNewDrugUserId());
+                entity.setProductId(bean.getProductId());
+                entity.setDoctorId(id);
+                drugUserDoctorRepository.saveAndFlush(entity);
             }
         }
         return true;
