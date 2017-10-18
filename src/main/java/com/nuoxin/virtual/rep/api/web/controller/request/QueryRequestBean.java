@@ -29,6 +29,8 @@ public class QueryRequestBean extends PageRequestBean {
     private String doctorLevel;
     @ApiModelProperty(value = "代表名称")
     private String drugUserName;
+    @ApiModelProperty(value = "产品id")
+    private Long productId;
 
     @ApiModelProperty(value = "不用传")
     private Long drugUserId;
@@ -131,5 +133,13 @@ public class QueryRequestBean extends PageRequestBean {
 
     public void setDrugUserName(String drugUserName) {
         this.drugUserName = drugUserName;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 }

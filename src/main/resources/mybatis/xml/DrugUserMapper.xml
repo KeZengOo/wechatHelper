@@ -53,6 +53,10 @@
 
             and d.hospital_name like #{hospital,jdbcType=VARCHAR}
         </if>
+        <if test="productId!=null and productId!=0">
+
+            and dud.prod_id like #{productId,jdbcType=BIGINT}
+        </if>
         LIMIT ${currentSize},${pageSize}
     </select>
     <select id="doctorPageCount" resultType="java.lang.Integer"
@@ -83,6 +87,10 @@
         <if test="hospital!=null and hospital!=''">
 
             and d.hospital_name like #{hospital,jdbcType=VARCHAR}
+        </if>
+        <if test="productId!=null and productId!=0">
+
+            and dud.prod_id like #{productId,jdbcType=BIGINT}
         </if>
     </select>
 
