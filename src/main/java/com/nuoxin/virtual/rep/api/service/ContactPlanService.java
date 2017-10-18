@@ -64,6 +64,7 @@ public class ContactPlanService extends BaseService {
     public void updateStatus(Long id){
         ContactPlan contactPlan = contactPlanRepository.findOne(id);
         contactPlan.setStatus(1);
+        contactPlan.setFinishTime(new Date());
         contactPlanRepository.saveAndFlush(contactPlan);
     }
 

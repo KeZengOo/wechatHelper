@@ -28,6 +28,8 @@ public class ContactPlan extends IdEntity {
     private Integer status;
     @Column(name = "date_time")
     private Date dateTime;
+    @Column(name = "finish_time")
+    private Date finishTime;
 
     public Date getCreateTime() {
         return createTime;
@@ -75,5 +77,13 @@ public class ContactPlan extends IdEntity {
 
     public void setDateTime(Date dateTime) {
         this.dateTime = dateTime;
+    }
+
+    public Date getFinishTime() {
+        return finishTime;
+    }
+
+    public void setFinishTime(Date finishTime) {
+        this.finishTime = finishTime;
     }
 }
