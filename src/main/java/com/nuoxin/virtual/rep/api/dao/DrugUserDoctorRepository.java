@@ -25,6 +25,8 @@ public interface DrugUserDoctorRepository extends JpaRepository<DrugUserDoctor,L
 
     List<DrugUserDoctor> findByDoctorId(Long doctorId);
 
+    List<DrugUserDoctor> findByDoctorIdAndProductId(Long doctorId,Long productId);
+
     @Modifying
     void deleteByDoctorId(Long doctorId);
 }

@@ -9,15 +9,13 @@ import com.nuoxin.virtual.rep.api.common.util.StringUtils;
 import com.nuoxin.virtual.rep.api.dao.DoctorRepository;
 import com.nuoxin.virtual.rep.api.dao.DoctorVirtualRepository;
 import com.nuoxin.virtual.rep.api.dao.DrugUserDoctorRepository;
-import com.nuoxin.virtual.rep.api.entity.Doctor;
-import com.nuoxin.virtual.rep.api.entity.DoctorVirtual;
-import com.nuoxin.virtual.rep.api.entity.DrugUser;
-import com.nuoxin.virtual.rep.api.entity.DrugUserDoctor;
+import com.nuoxin.virtual.rep.api.entity.*;
 import com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.doctor.DoctorRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.doctor.RelationRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorStatResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.product.ProductResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.vo.Hcp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +57,9 @@ public class DoctorService extends BaseService {
     private DrugUserDoctorRepository drugUserDoctorRepository;
     @Autowired
     private DoctorDynamicFieldValueService DoctorDynamicFieldValueService;
+
+    @Autowired
+    private ProductLineService productLineService;
 
     @Cacheable(value = "virtual_rep_api_doctor", key = "'_details_'+#id")
     public Doctor findById(Long id) {
@@ -519,10 +520,25 @@ public class DoctorService extends BaseService {
 
     @Transactional(readOnly = false)
     public boolean relation(RelationRequestBean bean) {
+        List<ProductResponseBean> list = productLineService.getList(bean.getDrugUserId());
+        if(list!=null && !list.isEmpty()){
+            bean.setProductId(list.get(0).getProductId());
+        }
+
         List<Long> ids = bean.getIds();
         if (ids != null && !ids.isEmpty()) {
             for (Long id : ids) {
-
+                List<DrugUserDoctor> drugUserDoctors = drugUserDoctorRepository.findByDoctorIdAndProductId(id,bean.getProductId());
+                DoctorVirtual virtual = doctorVirtualRepository.findByDoctorId(id);
+                String drugUserIds = virtual.getDrugUserIds();
+                if(drugUserDoctors!=null && !drugUserDoctors.isEmpty()){
+                    for (DrugUserDoctor druguserdoctr:drugUserDoctors) {
+                        drugUserIds = drugUserIds.replaceAll(","+druguserdoctr.getDrugUserId()+",",",");
+                    }
+                    virtual.setDrugUserIds(drugUserIds);
+                    doctorVirtualRepository.saveAndFlush(virtual);
+                    drugUserDoctorRepository.delete(drugUserDoctors);
+                }
             }
         }
         return true;

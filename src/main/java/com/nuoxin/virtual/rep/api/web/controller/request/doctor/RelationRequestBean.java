@@ -23,6 +23,8 @@ public class RelationRequestBean implements Serializable {
     @ApiModelProperty(value = "不用传")
     private Long oldDrugUserId;
     @ApiModelProperty(value = "不用传")
+    private Long drugUserId;
+    @ApiModelProperty(value = "不用传")
     private List<Long> ids;
 
     public String getDoctorIds() {
@@ -68,5 +70,13 @@ public class RelationRequestBean implements Serializable {
 
     public void setProductId(Long productId) {
         this.productId = productId;
+    }
+
+    public Long getDrugUserId() {
+        return drugUserId;
+    }
+
+    public void setDrugUserId(Long drugUserId) {
+        this.drugUserId = drugUserId;
     }
 }
