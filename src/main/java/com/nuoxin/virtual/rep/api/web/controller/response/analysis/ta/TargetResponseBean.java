@@ -14,18 +14,18 @@ public class TargetResponseBean implements Serializable {
     private static final long serialVersionUID = 2477200536129913041L;
 
     @ApiModelProperty(value = "目标数")
-    private Integer targerNum = 0;
+    private Integer targetNum = 0;
     @ApiModelProperty(value = "覆盖数")
     private Integer coverNum = 0;
     @ApiModelProperty(value = "比例")
     private Float percentage = 0f;
 
-    public Integer getTargerNum() {
-        return targerNum;
+    public Integer getTargetNum() {
+        return targetNum;
     }
 
-    public void setTargerNum(Integer targerNum) {
-        this.targerNum = targerNum;
+    public void setTargetNum(Integer targetNum) {
+        this.targetNum = targetNum;
     }
 
     public Integer getCoverNum() {
@@ -41,6 +41,6 @@ public class TargetResponseBean implements Serializable {
     }
 
     public void setPercentage(Float percentage) {
-        this.percentage = percentage;
+        this.percentage = percentage*100;
     }
 }

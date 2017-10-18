@@ -41,10 +41,10 @@ public class TargetAnalysisService {
         Integer count = targetAnalysisMapper.summation(bean);
         responseBean.setCoverNum(count);
         if (target != null) {
-            responseBean.setTargerNum(this._getTarget(target.getMonthCovered(),bean.getDateType(),bean.getDate()));
+            responseBean.setTargetNum(this._getTarget(target.getMonthCovered(),bean.getDateType(),bean.getDate()));
         }
-        if(responseBean.getTargerNum()!=null && responseBean.getTargerNum()!=0){
-            responseBean.setPercentage(new BigDecimal(responseBean.getCoverNum()/responseBean.getTargerNum().doubleValue()).floatValue());
+        if(responseBean.getTargetNum()!=null && responseBean.getTargetNum()!=0){
+            responseBean.setPercentage(new BigDecimal(responseBean.getCoverNum()/responseBean.getTargetNum().doubleValue()).floatValue());
         }
         return responseBean;
     }
@@ -62,10 +62,10 @@ public class TargetAnalysisService {
             responseBean = new TargetResponseBean();
         }
         if(target!=null){
-            responseBean.setTargerNum(this._getTarget(target.getMonthTelPerson(),bean.getDateType(),bean.getDate()));
+            responseBean.setTargetNum(this._getTarget(target.getMonthTelPerson(),bean.getDateType(),bean.getDate()));
         }
-        if(responseBean.getTargerNum()!=null && responseBean.getTargerNum()!=0){
-            responseBean.setPercentage(new BigDecimal(responseBean.getCoverNum()/responseBean.getTargerNum().floatValue()).floatValue());
+        if(responseBean.getTargetNum()!=null && responseBean.getTargetNum()!=0){
+            responseBean.setPercentage(new BigDecimal(responseBean.getCoverNum()/responseBean.getTargetNum().floatValue()).floatValue());
         }
         return responseBean;
     }
@@ -83,10 +83,10 @@ public class TargetAnalysisService {
             responseBean = new TargetResponseBean();
         }
         if(target!=null){
-            responseBean.setTargerNum(this._getTarget(target.getMonthTelNum(),bean.getDateType(),bean.getDate()));
+            responseBean.setTargetNum(this._getTarget(target.getMonthTelNum(),bean.getDateType(),bean.getDate()));
         }
-        if(responseBean.getTargerNum()!=null && responseBean.getTargerNum()!=0){
-            responseBean.setPercentage(new BigDecimal(responseBean.getCoverNum()/responseBean.getTargerNum().floatValue()).floatValue());
+        if(responseBean.getTargetNum()!=null && responseBean.getTargetNum()!=0){
+            responseBean.setPercentage(new BigDecimal(responseBean.getCoverNum()/responseBean.getTargetNum().floatValue()).floatValue());
         }
         return responseBean;
     }
@@ -104,10 +104,10 @@ public class TargetAnalysisService {
             responseBean = new TargetResponseBean();
         }
         if(target!=null){
-            responseBean.setTargerNum(this._getTarget(target.getMonthImNum(),bean.getDateType(),bean.getDate()));
+            responseBean.setTargetNum(this._getTarget(target.getMonthImNum(),bean.getDateType(),bean.getDate()));
         }
-        if(responseBean.getTargerNum()!=null && responseBean.getTargerNum()!=0){
-            responseBean.setPercentage(new BigDecimal(responseBean.getCoverNum()/responseBean.getTargerNum().floatValue()).floatValue());
+        if(responseBean.getTargetNum()!=null && responseBean.getTargetNum()!=0){
+            responseBean.setPercentage(new BigDecimal(responseBean.getCoverNum()/responseBean.getTargetNum().floatValue()).floatValue());
         }
         return responseBean;
     }
@@ -125,10 +125,10 @@ public class TargetAnalysisService {
             responseBean = new TargetResponseBean();
         }
         if(target!=null){
-            responseBean.setTargerNum(this._getTarget(target.getMonthWechatNum(),bean.getDateType(),bean.getDate()));
+            responseBean.setTargetNum(this._getTarget(target.getMonthWechatNum(),bean.getDateType(),bean.getDate()));
         }
-        if(responseBean.getTargerNum()!=null &&responseBean.getTargerNum()!=0){
-            responseBean.setPercentage(new BigDecimal(responseBean.getCoverNum()/responseBean.getTargerNum().floatValue()).floatValue());
+        if(responseBean.getTargetNum()!=null &&responseBean.getTargetNum()!=0){
+            responseBean.setPercentage(new BigDecimal(responseBean.getCoverNum()/responseBean.getTargetNum().floatValue()).floatValue());
         }
         return responseBean;
     }
@@ -146,10 +146,10 @@ public class TargetAnalysisService {
             responseBean = new TargetResponseBean();
         }
         if(target!=null){
-            responseBean.setTargerNum(this._getTarget(target.getMonthTelTime()*60,bean.getDateType(),bean.getDate()));
+            responseBean.setTargetNum(this._getTarget(target.getMonthTelTime()*60,bean.getDateType(),bean.getDate()));
         }
-        if(responseBean.getTargerNum()!=null && responseBean.getTargerNum()!=0){
-            responseBean.setPercentage(new BigDecimal(responseBean.getCoverNum()/responseBean.getTargerNum().floatValue()).floatValue());
+        if(responseBean.getTargetNum()!=null && responseBean.getTargetNum()!=0){
+            responseBean.setPercentage(new BigDecimal(responseBean.getCoverNum()/responseBean.getTargetNum().floatValue()).floatValue());
         }
         return responseBean;
     }
@@ -167,10 +167,10 @@ public class TargetAnalysisService {
             responseBean = new TargetResponseBean();
         }
         if(target!=null){
-            responseBean.setTargerNum(this._getTarget(target.getMonthTelAvgTime()*60,bean.getDateType(),bean.getDate()));
+            responseBean.setTargetNum(this._getTarget(target.getMonthTelAvgTime()*60,bean.getDateType(),bean.getDate()));
         }
-        if(responseBean.getTargerNum()!=null && responseBean.getTargerNum()!=0){
-            responseBean.setPercentage(new BigDecimal(responseBean.getCoverNum()/responseBean.getTargerNum().floatValue()).floatValue());
+        if(responseBean.getTargetNum()!=null && responseBean.getTargetNum()!=0){
+            responseBean.setPercentage(new BigDecimal(responseBean.getCoverNum()/responseBean.getTargetNum().floatValue()).floatValue());
         }
         return responseBean;
     }
