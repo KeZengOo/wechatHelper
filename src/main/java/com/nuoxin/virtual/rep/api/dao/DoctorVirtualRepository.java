@@ -17,5 +17,6 @@ import java.util.Map;
  */
 public interface DoctorVirtualRepository extends JpaRepository<DoctorVirtual,Long>,JpaSpecificationExecutor<DoctorVirtual> {
 
+    DoctorVirtual findByDoctorId(Long doctorId);
 
 }

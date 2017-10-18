@@ -475,16 +475,49 @@ public class DoctorService extends BaseService {
         return true;
     }
 
+    @Transactional(readOnly = false)
     public boolean delete(RelationRequestBean bean) {
         List<Long> ids = bean.getIds();
         if (ids != null && !ids.isEmpty()) {
             for (Long id : ids) {
+                List<DrugUserDoctor> list = drugUserDoctorRepository.findByDoctorId(id);
+                DoctorVirtual virtual = doctorVirtualRepository.findByDoctorId(id);
+                if(list!=null && !list.isEmpty()){
+                    Map<String,String> map = new HashMap<>();
+                    if(virtual!=null){
+                        String drugUsreIds = virtual.getDrugUserIds();
+                        if(StringUtils.isNotEmtity(drugUsreIds)){
+                            String[] drugUserid = drugUsreIds.split(".");
+                            for (String duserId:drugUserid) {
+                                if(StringUtils.isNotEmtity(duserId)){
+                                    map.put(duserId,duserId);
+                                }
+                            }
+                        }
+                    }
+                    for (DrugUserDoctor drugUserDoctor:list) {
+                        String value = map.get(drugUserDoctor.getDoctorId().toString());
+                        if(StringUtils.isNotEmtity(value)){
+                            map.remove(value);
+                        }
+                    }
+                    StringBuffer sb = new StringBuffer(",");
+                    if(map!=null && !map.isEmpty()){
 
+                        for (String key:map.keySet()) {
+                            sb.append(map.get(key)+",");
+                        }
+                    }
+                    virtual.setDrugUserIds(sb.toString());
+                    doctorVirtualRepository.saveAndFlush(virtual);
+                    drugUserDoctorRepository.delete(list);
+                }
             }
         }
         return true;
     }
 
+    @Transactional(readOnly = false)
     public boolean relation(RelationRequestBean bean) {
         List<Long> ids = bean.getIds();
         if (ids != null && !ids.isEmpty()) {

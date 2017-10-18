@@ -37,7 +37,7 @@
             AND vd.product_id=#{productId}
         </if>
         <if test="drugUserId!=null and drugUserId!=0">
-            AND vd.drug_user_id = #{drugUserId}
+            AND vd.virtual_drug_user_id = #{drugUserId}
         </if>
         UNION ALL
         select DISTINCT vm.doctor_id from virtual_message vm join drug_user d on d.id=vm.drug_user_id where
@@ -82,7 +82,7 @@
             AND vd.product_id=#{productId}
         </if>
         <if test="drugUserId!=null and drugUserId!=0">
-            AND vd.drug_user_id = #{drugUserId}
+            AND vd.virtual_drug_user_id = #{drugUserId}
         </if>
         <if test="area!=null and area!=''">
             AND do.provice = #{area}
@@ -102,7 +102,7 @@
             AND vd.product_id=#{productId}
         </if>
         <if test="drugUserId!=null and drugUserId!=0">
-            AND vd.drug_user_id = #{drugUserId}
+            AND vd.virtual_drug_user_id = #{drugUserId}
         </if>
         <if test="area!=null and area!=''">
             AND do.provice = #{area}
@@ -160,7 +160,7 @@
             AND vd.product_id=#{productId}
         </if>
         <if test="drugUserId!=null and drugUserId!=0">
-            AND vd.drug_user_id = #{drugUserId}
+            AND vd.virtual_drug_user_id = #{drugUserId}
         </if>
         <if test="area!=null and area!=''">
             AND do.provice = #{area}
@@ -181,7 +181,7 @@
             AND vd.product_id=#{productId}
         </if>
         <if test="drugUserId!=null and drugUserId!=0">
-            AND vd.drug_user_id = #{drugUserId}
+            AND vd.virtual_drug_user_id = #{drugUserId}
         </if>
         <if test="area!=null and area!=''">
             AND do.provice = #{area}

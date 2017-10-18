@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,4 +22,9 @@ public interface DrugUserDoctorRepository extends JpaRepository<DrugUserDoctor,L
     void deleteByDoctorIdAndDrugUserIdAndProductId(Long doctorId,Long drugUserId,Long productId);
 
     DrugUserDoctor findByDoctorIdAndDrugUserIdAndProductId(Long doctorId,Long drugUserId,Long productId);
+
+    List<DrugUserDoctor> findByDoctorId(Long doctorId);
+
+    @Modifying
+    void deleteByDoctorId(Long doctorId);
 }
