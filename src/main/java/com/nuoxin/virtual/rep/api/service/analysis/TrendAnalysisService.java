@@ -146,20 +146,20 @@ public class TrendAnalysisService extends BaseService {
                 responseBean.setQuarter(trend.getQuarter());
                 responseBean.setWeek(trend.getWeek());
 
-                trend = this._getTrendResponseBean(wechat,bean.getDateType(),trend);
-                if(trend!=null){
-                    responseBean.setWechat(trend.getNum());
-                    responseBean.setWechatCount(trend.getCount());
+                TrendResponseBean trendwechat = this._getTrendResponseBean(wechat,bean.getDateType(),trend);
+                if(trendwechat!=null){
+                    responseBean.setWechat(trendwechat.getNum());
+                    responseBean.setWechatCount(trendwechat.getCount());
                 }
-                trend = this._getTrendResponseBean(email,bean.getDateType(),trend);
-                if(trend!=null){
-                    responseBean.setEmailCount(trend.getCount());
-                    responseBean.setEmail(trend.getNum());
+                TrendResponseBean trendemail = this._getTrendResponseBean(email,bean.getDateType(),trend);
+                if(trendemail!=null){
+                    responseBean.setEmailCount(trendemail.getCount());
+                    responseBean.setEmail(trendemail.getNum());
                 }
-                trend = this._getTrendResponseBean(sms,bean.getDateType(),trend);
-                if(trend!=null){
-                    responseBean.setSms(trend.getNum());
-                    responseBean.setSmsCount(trend.getCount());
+                TrendResponseBean trendsms = this._getTrendResponseBean(sms,bean.getDateType(),trend);
+                if(trendsms!=null){
+                    responseBean.setSms(trendsms.getNum());
+                    responseBean.setSmsCount(trendsms.getCount());
                 }
 
                 responseBeans.add(responseBean);
