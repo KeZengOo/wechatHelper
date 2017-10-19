@@ -2,9 +2,8 @@ package com.nuoxin.virtual.rep.api.service;
 
 import com.nuoxin.virtual.rep.api.dao.CoveredTargetRepository;
 import com.nuoxin.virtual.rep.api.entity.CoveredTarget;
-import com.nuoxin.virtual.rep.api.web.controller.request.target.MonthCoverTargetSetRequestBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.target.MonthCoverTargetResponseBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.work.MonthTargetResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.month_target.MonthCoverTargetSetRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.month_target.MonthCoverTargetResponseBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
