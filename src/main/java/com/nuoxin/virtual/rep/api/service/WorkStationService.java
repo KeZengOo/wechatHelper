@@ -561,6 +561,7 @@ public class WorkStationService {
         monthTarget.setMonthTargetEmailCount(monthTargetEmailCount);
         monthTarget.setMonthTargetCallSum(monthTargetCallSum);
         monthTarget.setMonthTargetCallCount(monthTargetCallCount);
+        monthTarget.setMonthTargetCallTime(monthTargetCallTime);
         monthTarget.setMonthTargetMeetingSum(monthTargetMeetingSum);
         monthTarget.setMonthTargetMeetingTime(monthTargetMeetingTime);
         monthTarget.setMonthTargetMeetingPersonSum(monthTargetMeetingPersonSum);
