@@ -6,6 +6,7 @@ import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
 import com.nuoxin.virtual.rep.api.common.util.StringUtils;
 import com.nuoxin.virtual.rep.api.entity.ContactPlan;
+import com.nuoxin.virtual.rep.api.entity.Doctor;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.ContactPlanService;
 import com.nuoxin.virtual.rep.api.service.DoctorService;
@@ -16,6 +17,7 @@ import com.nuoxin.virtual.rep.api.web.controller.request.ContactPlanRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.doctor.DoctorRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.doctor.RelationRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.ContactPlanResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorDetailsResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorResponseBean;
@@ -204,6 +206,25 @@ public class DoctorController extends BaseController {
             responseBean.setMessage("产品id跟医生id对不上");
             return responseBean;
         }
+        List<Long> ids = bean.getpIds();
+        long check = 0;
+        int index = 0;
+        for (int i = 0,leng=ids.size(); i < leng ; i++) {
+            if(check==ids.get(i)){
+                index = i;
+                break;
+            }
+            check=ids.get(i);
+        }
+        if(index!=0){
+            Long doctorId = bean.getIds().get(index);
+            Doctor doctor = doctorService.findById(doctorId);
+            if(doctor!=null){
+                responseBean.setCode(500);
+                responseBean.setMessage(doctor.getName()+"医生的产品跟其他的不一样");
+                return responseBean;
+            }
+        }
         responseBean.setData(doctorService.relation(bean));
         return responseBean;
     }
@@ -225,9 +246,9 @@ public class DoctorController extends BaseController {
 
     @ApiOperation(value = "联系计划page", notes = "联系计划page")
     @PostMapping("/contact/plan/page")
-    public DefaultResponseBean<PageResponseBean<ContactPlanRequestBean>> pageContactPlan(@RequestBody ContactPlanQueryRequestBean bean,
-                                                                                         HttpServletRequest request, HttpServletResponse response){
-        DefaultResponseBean<PageResponseBean<ContactPlanRequestBean>> responseBean = new DefaultResponseBean();
+    public DefaultResponseBean<PageResponseBean<ContactPlanResponseBean>> pageContactPlan(@RequestBody ContactPlanQueryRequestBean bean,
+                                                                                          HttpServletRequest request, HttpServletResponse response){
+        DefaultResponseBean<PageResponseBean<ContactPlanResponseBean>> responseBean = new DefaultResponseBean();
         DrugUser user = super.getLoginUser(request);
         if(user==null){
             responseBean.setCode(300);
