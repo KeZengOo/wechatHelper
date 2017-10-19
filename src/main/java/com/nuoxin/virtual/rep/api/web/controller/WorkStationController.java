@@ -137,6 +137,24 @@ public class WorkStationController extends BaseController{
     }
 
 
+    @ApiOperation(value = "销售互动前5名接口", notes = "销售互动前5名接口")
+    @PostMapping("/drugUserInteract")
+    @ResponseBody
+    public ResponseEntity<DefaultResponseBean<List<DrugUserInteractResponseBean>>>  drugUserInteract(@RequestBody WorkStationRequestBean bean, HttpServletRequest request){
+        Long drugUserId = bean.getDrugUserId();
+        if (drugUserId == null || drugUserId == 0){
+            drugUserId = getLoginId(request);
+        }
+
+        bean.setDrugUserId(drugUserId);
+        List<DrugUserInteractResponseBean> drugUserInteractResponseBeans = workStationService.drugUserInteract(bean);
+        DefaultResponseBean<List<DrugUserInteractResponseBean>> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(drugUserInteractResponseBeans);
+        return ResponseEntity.ok(responseBean);
+
+    }
+
+
 
     @ApiOperation(value = "坐席分析统计接口", notes = "坐席分析统计接口")
     @PostMapping("/drugUser/analysis")

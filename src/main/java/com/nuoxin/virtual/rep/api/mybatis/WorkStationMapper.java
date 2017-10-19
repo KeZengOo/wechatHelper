@@ -1,10 +1,7 @@
 package com.nuoxin.virtual.rep.api.mybatis;
 
 import com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.work.CustomerSumResponseBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.work.DoctorAnalysisResponseBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.work.DrugUserAnalysisResponseBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.work.OneMonthNoFollowCustomerResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.work.*;
 
 import java.util.List;
 import java.util.Map;
@@ -23,6 +20,8 @@ public interface WorkStationMapper {
     List<OneMonthNoFollowCustomerResponseBean> getOneMonthNoFollowCustomerList(WorkStationRequestBean bean);
 
     Integer getOneMonthNoFollowCustomerListCount(WorkStationRequestBean bean);
+
+    List<DrugUserInteractResponseBean> drugUserInteract(WorkStationRequestBean bean);
 
 
     /**

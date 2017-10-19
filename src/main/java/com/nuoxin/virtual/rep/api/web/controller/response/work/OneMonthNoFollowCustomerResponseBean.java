@@ -18,6 +18,9 @@ public class OneMonthNoFollowCustomerResponseBean implements Serializable{
     @ApiModelProperty(value = "医生姓名")
     private String doctorName;
 
+    @ApiModelProperty(value = "医生手机号")
+    private String doctorTel;
+
     @ApiModelProperty(value = "医院名称")
     private String hospitalName;
 
@@ -76,5 +79,14 @@ public class OneMonthNoFollowCustomerResponseBean implements Serializable{
 
     public void setDepart(String depart) {
         this.depart = depart;
+    }
+
+
+    public String getDoctorTel() {
+        return doctorTel;
+    }
+
+    public void setDoctorTel(String doctorTel) {
+        this.doctorTel = doctorTel;
     }
 }

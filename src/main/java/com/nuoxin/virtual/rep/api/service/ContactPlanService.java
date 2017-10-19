@@ -8,6 +8,7 @@ import com.nuoxin.virtual.rep.api.entity.DoctorCallInfo;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.ContactPlanQueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.ContactPlanRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.ContactPlanResponseBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,7 +69,7 @@ public class ContactPlanService extends BaseService {
         contactPlanRepository.saveAndFlush(contactPlan);
     }
 
-    public PageResponseBean<ContactPlanRequestBean> page(ContactPlanQueryRequestBean bean){
+    public PageResponseBean<ContactPlanResponseBean> page(ContactPlanQueryRequestBean bean){
         Sort sort = new Sort(Sort.Direction.DESC, "dateTime");
         PageRequest pagetable = super.getPage(bean,sort);
         Specification<ContactPlan> spec = new Specification<ContactPlan>() {
@@ -87,12 +88,12 @@ public class ContactPlanService extends BaseService {
             }
         };
         Page<ContactPlan> page = contactPlanRepository.findAll(spec,pagetable);
-        PageResponseBean<ContactPlanRequestBean> responseBean = new PageResponseBean<>(page);
+        PageResponseBean<ContactPlanResponseBean> responseBean = new PageResponseBean<>(page);
         List<ContactPlan> list = page.getContent();
         if(list!=null && !list.isEmpty()){
-            List<ContactPlanRequestBean> beans = new ArrayList<>();
+            List<ContactPlanResponseBean> beans = new ArrayList<>();
             for (ContactPlan contactPlan :list) {
-                ContactPlanRequestBean contact = new ContactPlanRequestBean();
+                ContactPlanResponseBean contact = new ContactPlanResponseBean();
                 contact.setContent(contactPlan.getContent());
                 contact.setDate(DateUtil.getDateTimeString(contactPlan.getDateTime()));
                 contact.setDoctorId(contactPlan.getDoctorId());
