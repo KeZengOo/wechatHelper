@@ -14,4 +14,6 @@ public interface DoctorDynamicFieldValueRepository extends JpaRepository<DoctorD
 
     List<DoctorDynamicFieldValue> findByDoctorId(Long doctorId);
 
+    void deleteByDynamicFieldId(Long id);
+
 }

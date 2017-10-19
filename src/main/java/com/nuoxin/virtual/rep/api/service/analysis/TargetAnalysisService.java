@@ -1,8 +1,10 @@
 package com.nuoxin.virtual.rep.api.service.analysis;
 
 import com.nuoxin.virtual.rep.api.dao.TargetRepository;
+import com.nuoxin.virtual.rep.api.entity.CoveredTarget;
 import com.nuoxin.virtual.rep.api.entity.Target;
 import com.nuoxin.virtual.rep.api.mybatis.TargetAnalysisMapper;
+import com.nuoxin.virtual.rep.api.service.CoveredTargetService;
 import com.nuoxin.virtual.rep.api.service.TargetService;
 import com.nuoxin.virtual.rep.api.web.controller.request.analysis.TargetAnalysisRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.analysis.ta.MettingTargetResponseBean;
@@ -26,6 +28,10 @@ public class TargetAnalysisService {
 
     @Autowired
     private TargetService targetService;
+
+    @Autowired
+    private CoveredTargetService coveredTargetService;
+
     @Autowired
     private TargetAnalysisMapper targetAnalysisMapper;
 
@@ -37,7 +43,8 @@ public class TargetAnalysisService {
     public TargetResponseBean summation(TargetAnalysisRequestBean bean) {
         bean.checkDate();
         TargetResponseBean responseBean = new TargetResponseBean();
-        Target target = targetService.findFirstByProductIdAndLevel(bean.getProductId(), bean.getCustomLevel());
+        //Target target = targetService.findFirstByProductIdAndLevel(bean.getProductId(), bean.getCustomLevel());
+        CoveredTarget target = coveredTargetService.findFirstByProductIdAndLevel(bean.getProductId(), bean.getCustomLevel());
         Integer count = targetAnalysisMapper.summation(bean);
         responseBean.setCoverNum(count);
         if (target != null) {

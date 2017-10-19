@@ -14,4 +14,6 @@ public interface TargetRepository extends JpaRepository<Target,Long>,JpaSpecific
     List<Target> findByProductId(Long productId);
 
     Target findFirstByProductIdAndLevel(Long productId, String level);
+
+    void deleteByProductId(Long productId);
 }

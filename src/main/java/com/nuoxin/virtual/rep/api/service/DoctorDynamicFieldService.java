@@ -1,7 +1,9 @@
 package com.nuoxin.virtual.rep.api.service;
 
 import com.nuoxin.virtual.rep.api.dao.DoctorDynamicFieldRepository;
+import com.nuoxin.virtual.rep.api.dao.DoctorDynamicFieldValueRepository;
 import com.nuoxin.virtual.rep.api.entity.DoctorDynamicField;
+import com.nuoxin.virtual.rep.api.entity.DoctorDynamicFieldValue;
 import com.nuoxin.virtual.rep.api.web.controller.request.customer.DoctorDynamicFieldRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.customer.DoctorDynamicFieldResponseBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,9 @@ public class DoctorDynamicFieldService {
 
     @Autowired
     private DoctorDynamicFieldRepository doctorDynamicFieldRepository;
+
+    @Autowired
+    private DoctorDynamicFieldValueRepository doctorDynamicFieldValueRepository;
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public Boolean add(List<DoctorDynamicFieldRequestBean> list){
@@ -62,6 +67,36 @@ public class DoctorDynamicFieldService {
 
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    public Boolean delete(Long id){
+        Boolean flag = false;
+        doctorDynamicFieldRepository.delete(id);
+        doctorDynamicFieldValueRepository.deleteByDynamicFieldId(id);
+        flag=true;
+
+        return flag;
+
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    public Boolean update(DoctorDynamicFieldRequestBean bean){
+        Boolean flag = false;
+        DoctorDynamicField doctorDynamicField = new DoctorDynamicField();
+        Long id = bean.getId();
+        DoctorDynamicField dynamicFieldRepositoryOne = doctorDynamicFieldRepository.getOne(id);
+        doctorDynamicField.setId(id);
+        doctorDynamicField.setName(bean.getName());
+        doctorDynamicField.setValue(bean.getValue());
+        doctorDynamicField.setClassification(bean.getClassification());
+        doctorDynamicField.setUpdateTime(new Date());
+        doctorDynamicField.setCreateTime(dynamicFieldRepositoryOne.getCreateTime());
+
+        doctorDynamicFieldRepository.saveAndFlush(doctorDynamicField);
+
+        flag = true;
+
+        return flag;
+    }
 
 
 

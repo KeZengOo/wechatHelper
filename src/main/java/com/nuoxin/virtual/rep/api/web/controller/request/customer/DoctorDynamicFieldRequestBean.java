@@ -12,12 +12,11 @@ import java.io.Serializable;
 public class DoctorDynamicFieldRequestBean implements Serializable{
     private static final long serialVersionUID = 4172100860423852688L;
 
+    @ApiModelProperty(value = "id")
+    private Long id;
 
     @ApiModelProperty(value = "字段名称")
     private String name;
-
-//    @ApiModelProperty(value = "字段别名或者英文名称")
-//    private String alias;
 
 
     @ApiModelProperty(value = "字段类型，1是文本，2是下拉框")
@@ -38,13 +37,6 @@ public class DoctorDynamicFieldRequestBean implements Serializable{
         this.name = name;
     }
 
-//    public String getAlias() {
-//        return alias;
-//    }
-//
-//    public void setAlias(String alias) {
-//        this.alias = alias;
-//    }
 
     public Integer getType() {
         return type;
@@ -69,5 +61,14 @@ public class DoctorDynamicFieldRequestBean implements Serializable{
 
     public void setClassification(Integer classification) {
         this.classification = classification;
+    }
+
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

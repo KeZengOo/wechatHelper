@@ -20,10 +20,6 @@ public class Target extends IdEntity{
     @Column(name = "level", length = 10)
     private String level;
 
-    //月目标覆盖
-    @Column(name = "month_covered")
-    private Integer monthCovered;
-
     //月目标电话个数
     @Column(name = "month_tel_num")
     private Integer monthTelNum;
@@ -104,13 +100,6 @@ public class Target extends IdEntity{
         this.level = level;
     }
 
-    public Integer getMonthCovered() {
-        return monthCovered;
-    }
-
-    public void setMonthCovered(Integer monthCovered) {
-        this.monthCovered = monthCovered;
-    }
 
     public Integer getMonthTelNum() {
         return monthTelNum;
