@@ -324,6 +324,21 @@ public class WorkStationService {
     }
 
 
+
+    public List<DrugUserInteractResponseBean> drugUserInteract(WorkStationRequestBean bean){
+        DrugUser drugUser = drugUserRepository.findFirstById(bean.getDrugUserId());
+        String leaderPath = drugUser.getLeaderPath();
+        if (leaderPath == null) {
+            leaderPath = "";
+        }
+        bean.setLeaderPath(leaderPath + "%");
+
+        List<DrugUserInteractResponseBean> drugUserInteractResponseBeans = workStationMapper.drugUserInteract(bean);
+
+
+        return drugUserInteractResponseBeans;
+    }
+
     /**
      * 坐席分析
      * @param bean
