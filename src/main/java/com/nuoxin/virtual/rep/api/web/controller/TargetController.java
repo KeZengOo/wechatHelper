@@ -1,13 +1,13 @@
 package com.nuoxin.virtual.rep.api.web.controller;
 
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
-import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
+
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
-import com.nuoxin.virtual.rep.api.entity.CoveredTarget;
+
 import com.nuoxin.virtual.rep.api.service.CoveredTargetService;
 import com.nuoxin.virtual.rep.api.service.FollowUpTypeService;
 import com.nuoxin.virtual.rep.api.service.TargetService;
-import com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean;
+
 import com.nuoxin.virtual.rep.api.web.controller.request.target.FollowUpSetRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.target.MonthCoverTargetSetRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.target.MonthWorkTargetSetRequestBean;
