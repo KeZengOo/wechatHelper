@@ -85,15 +85,11 @@ public interface WorkStationMapper {
      * 脱落客户最严重
      */
 
-    //A级脱落总数
-    Integer getDropAcount(WorkStationRequestBean bean);
+    //级别脱落总数
+    Integer getDropCount(WorkStationRequestBean bean);
 
-    //B级脱落总数
-    Integer getDropBcount(WorkStationRequestBean bean);
-
-
-    //B级脱落总数
-    //Integer getDropBcount(WorkStationRequestBean bean);
+    //每个级别的最大脱落总数
+    Integer maxDropCount(WorkStationRequestBean bean);
 
 
     /**
