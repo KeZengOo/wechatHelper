@@ -35,7 +35,6 @@ public class ContactPlanController extends BaseController{
         if (drugUserId == null || drugUserId == 0){
             drugUserId = getLoginId(request);
         }
-
         bean.setDrugUserId(drugUserId);
         PageResponseBean<ContactPlanResponseBean> page = contactPlanService.page(bean);
         DefaultResponseBean<PageResponseBean<ContactPlanResponseBean>> responseBean = new DefaultResponseBean<>();
@@ -53,7 +52,7 @@ public class ContactPlanController extends BaseController{
             drugUserId = getLoginId(request);
         }
 
-        bean.setDrugUserId(drugUserId);
+//        bean.setDrugUserId(drugUserId);
         contactPlanService.save(bean);
         DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
         responseBean.setData(true);
