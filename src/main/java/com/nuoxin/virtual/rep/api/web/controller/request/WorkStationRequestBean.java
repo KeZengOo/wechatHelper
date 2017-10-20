@@ -13,6 +13,12 @@ import java.io.Serializable;
 public class WorkStationRequestBean extends PageRequestBean implements Serializable{
     private static final long serialVersionUID = 3083177023027501328L;
 
+    @ApiModelProperty(value = "医生级别")
+    private String level;
+
+    @ApiModelProperty(value = "级别脱落总数")
+    private Integer levelDropCount;
+
     @ApiModelProperty(value = "销售id，默认取登录的，前端传就用前端的")
     private Long drugUserId;
 
@@ -229,5 +235,22 @@ public class WorkStationRequestBean extends PageRequestBean implements Serializa
 
     public void setMinMeetingTime(Integer minMeetingTime) {
         this.minMeetingTime = minMeetingTime;
+    }
+
+
+    public String getLevel() {
+        return level;
+    }
+
+    public void setLevel(String level) {
+        this.level = level;
+    }
+
+    public Integer getLevelDropCount() {
+        return levelDropCount;
+    }
+
+    public void setLevelDropCount(Integer levelDropCount) {
+        this.levelDropCount = levelDropCount;
     }
 }
