@@ -31,7 +31,7 @@ public interface DoctorCallInfoRepository extends JpaRepository<DoctorCallInfo,L
     DoctorCallInfo findBySinToken(String sinToken);
 
     @Modifying
-    @Query("update DoctorCallInfo d set d.delFlag=1 where d.doctor.id=:doctorId and d.drugUserId=:drugUserId and d.productId=:productId")
+    @Query("update DoctorCallInfo d set d.delFlag=1 where d.doctor.id=:doctorId and d.drugUser.id=:drugUserId and d.productId=:productId")
     void updateDoctorIdAndDrugUserIdAndProductId(@Param("doctorId") Long doctorId,@Param("drugUserId") Long drugUserId,@Param("productId") Long productId);
 
 }
