@@ -15,8 +15,8 @@ public class FollowUpSetRequestBean implements Serializable{
     @ApiModelProperty(value = "产品id")
     private Long productId;
 
-    @ApiModelProperty(value = "跟进类型，多个以英文逗号分开")
-    private String types;
+    @ApiModelProperty(value = "跟进类型")
+    private String type;
 
 
     public Long getProductId() {
@@ -27,14 +27,11 @@ public class FollowUpSetRequestBean implements Serializable{
         this.productId = productId;
     }
 
-    public String getTypes() {
-        return types;
+    public String getType() {
+        return type;
     }
 
-    public void setTypes(String types) {
-        this.types = types;
+    public void setType(String type) {
+        this.type = type;
     }
-
-
-
 }

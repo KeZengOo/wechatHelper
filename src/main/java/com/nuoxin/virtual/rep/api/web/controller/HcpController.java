@@ -6,6 +6,7 @@ import com.nuoxin.virtual.rep.api.common.controller.BaseController;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.HcpService;
 import com.nuoxin.virtual.rep.api.web.controller.request.hcp.HcpRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorBasicInfoResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.hcp.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.TreeMap;
 
 /**
@@ -31,10 +33,11 @@ public class HcpController extends BaseController {
 
     @ApiOperation(value = "主数据医生基本信息")
     @GetMapping("/getHcpBaseInfo/{id}")
-    public ResponseEntity<DefaultResponseBean<HcpBaseInfoResponseBean>> getHcpBaseInfo(@PathVariable(value = "id") Long hcpId) {
+    public ResponseEntity<DefaultResponseBean<List<DoctorBasicInfoResponseBean>>> getHcpBaseInfo(@PathVariable(value = "id") Long hcpId) {
 
-        HcpBaseInfoResponseBean hcpBaseInfo = hcpService.getHcpBaseInfo(hcpId);
-        DefaultResponseBean<HcpBaseInfoResponseBean> responseBean = new DefaultResponseBean<>();
+        //HcpBaseInfoResponseBean hcpBaseInfo = hcpService.getHcpBaseInfo(hcpId);
+        List<DoctorBasicInfoResponseBean> hcpBaseInfo = hcpService.getHcpBaseInfo(hcpId);
+        DefaultResponseBean<List<DoctorBasicInfoResponseBean>> responseBean = new DefaultResponseBean<>();
         responseBean.setData(hcpBaseInfo);
         return ResponseEntity.ok(responseBean);
     }

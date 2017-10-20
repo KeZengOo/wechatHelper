@@ -28,61 +28,56 @@ public class TargetService extends BaseService {
     @Autowired
     private CoveredTargetRepository coveredTargetRepository;
 
-    public Target findFirstByProductIdAndLevel(Long productId, String level){
-        return targetRepository.findFirstByProductIdAndLevel(productId,level);
+    public Target findFirstByProductIdAndLevel(Long productId, String level) {
+        return targetRepository.findFirstByProductIdAndLevel(productId, level);
     }
 
 
-
-
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public Boolean add(List<MonthWorkTargetSetRequestBean> list, Long productId){
+    public Boolean add(MonthWorkTargetSetRequestBean bean) {
         Boolean flag = false;
-        if (null == list||list.isEmpty()){
-            return true;
+
+        Target t = targetRepository.findFirstByProductIdAndLevel(bean.getProductId(), bean.getLevel());
+        if (t != null) {
+            targetRepository.deleteByProductIdAndLevel(bean.getProductId(), bean.getLevel());
         }
 
-        targetRepository.deleteByProductId(productId);
 
-        List<Target> targets = new ArrayList<>();
-        for (MonthWorkTargetSetRequestBean bean:list){
-            if (null != bean){
-                Target target = new Target();
-                target.setProductId(productId);
-                target.setLevel(bean.getLevel());
-                target.setMonthTelNum(bean.getMonthTelNum());
-                target.setMonthTelTime(bean.getMonthTelTime());
-                target.setMonthTelPerson(bean.getMonthTelPerson());
-                target.setMonthTelAvgTime(bean.getMonthTelAvgTime());
-                target.setMonthImNum(bean.getMonthImNum());
-                target.setMonthImCount(bean.getMonthImCount());
-                target.setMonthWechatNum(bean.getMonthWechatNum());
-                target.setMonthWechatCount(bean.getMonthWechatCount());
-                target.setMonthEmailNum(bean.getMonthEmailNum());
-                target.setMonthEmailCount(bean.getMonthEmailCount());
-                target.setMonthMeetingNum(bean.getMonthMeetingNum());
-                target.setMonthMeetingTime(bean.getMonthMeetingTime());
-                target.setMonthMeetingPersonSum(bean.getMonthMeetingPersonSum());
-                target.setMonthMeetingPersonCount(bean.getMonthMeetingPersonCount());
-                target.setCreateTime(new Date());
-                target.setUpdateTime(new Date());
-            }
-        }
+        Target target = new Target();
+        target.setProductId(bean.getProductId());
+        target.setLevel(bean.getLevel());
+        target.setMonthTelNum(bean.getMonthTelNum());
+        target.setMonthTelTime(bean.getMonthTelTime());
+        target.setMonthTelPerson(bean.getMonthTelPerson());
+        target.setMonthTelAvgTime(bean.getMonthTelAvgTime());
+        target.setMonthImNum(bean.getMonthImNum());
+        target.setMonthImCount(bean.getMonthImCount());
+        target.setMonthWechatNum(bean.getMonthWechatNum());
+        target.setMonthWechatCount(bean.getMonthWechatCount());
+        target.setMonthEmailNum(bean.getMonthEmailNum());
+        target.setMonthEmailCount(bean.getMonthEmailCount());
+        target.setMonthMeetingNum(bean.getMonthMeetingNum());
+        target.setMonthMeetingTime(bean.getMonthMeetingTime());
+        target.setMonthMeetingPersonSum(bean.getMonthMeetingPersonSum());
+        target.setMonthMeetingPersonCount(bean.getMonthMeetingPersonCount());
+        target.setCreateTime(new Date());
+        target.setUpdateTime(new Date());
 
-        targetRepository.save(targets);
+
+        targetRepository.save(target);
 
         flag = true;
         return flag;
     }
 
 
-    public List<MonthWorkTargetResponseBean> getMonthWorkTargetList(Long productId){
+    public List<MonthWorkTargetResponseBean> getMonthWorkTargetList(Long productId) {
         List<MonthWorkTargetResponseBean> list = new ArrayList<>();
         List<Target> targetList = targetRepository.findByProductId(productId);
-        if (null != targetList && !targetList.isEmpty()){
-            for (Target target:targetList){
-                if (null != target){
-                    MonthWorkTargetResponseBean monthWorkTarget= new MonthWorkTargetResponseBean();
+        if (null != targetList && !targetList.isEmpty()) {
+            for (Target target : targetList) {
+                if (null != target) {
+                    MonthWorkTargetResponseBean monthWorkTarget = new MonthWorkTargetResponseBean();
                     monthWorkTarget.setId(target.getId());
                     monthWorkTarget.setLevel(target.getLevel());
                     monthWorkTarget.setMonthTelNum(target.getMonthTelNum());

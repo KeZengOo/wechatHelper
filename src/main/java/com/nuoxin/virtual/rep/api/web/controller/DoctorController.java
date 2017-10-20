@@ -16,6 +16,7 @@ import com.nuoxin.virtual.rep.api.web.controller.request.ContactPlanRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.doctor.DoctorRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.doctor.RelationRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.ContactPlanResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorDetailsResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorResponseBean;
@@ -225,9 +226,9 @@ public class DoctorController extends BaseController {
 
     @ApiOperation(value = "联系计划page", notes = "联系计划page")
     @PostMapping("/contact/plan/page")
-    public DefaultResponseBean<PageResponseBean<ContactPlanRequestBean>> pageContactPlan(@RequestBody ContactPlanQueryRequestBean bean,
-                                                                                         HttpServletRequest request, HttpServletResponse response){
-        DefaultResponseBean<PageResponseBean<ContactPlanRequestBean>> responseBean = new DefaultResponseBean();
+    public DefaultResponseBean<PageResponseBean<ContactPlanResponseBean>> pageContactPlan(@RequestBody ContactPlanQueryRequestBean bean,
+                                                                                          HttpServletRequest request, HttpServletResponse response){
+        DefaultResponseBean<PageResponseBean<ContactPlanResponseBean>> responseBean = new DefaultResponseBean();
         DrugUser user = super.getLoginUser(request);
         if(user==null){
             responseBean.setCode(300);

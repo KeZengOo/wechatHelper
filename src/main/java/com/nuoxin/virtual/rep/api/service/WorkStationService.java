@@ -316,7 +316,9 @@ public class WorkStationService {
 
         List<OneMonthNoFollowCustomerResponseBean> oneMonthNoFollowCustomerList = workStationMapper.getOneMonthNoFollowCustomerList(bean);
         Integer count = workStationMapper.getOneMonthNoFollowCustomerListCount(bean);
-
+        if (count == null){
+            count = 0;
+        }
 
         PageResponseBean<OneMonthNoFollowCustomerResponseBean> pageResponseBean = new PageResponseBean<>(bean, count, oneMonthNoFollowCustomerList);
 

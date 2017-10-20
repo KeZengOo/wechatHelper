@@ -62,31 +62,49 @@ public class FollowUpTypeService extends BaseService {
 
     /**
      * 跟进类型新增,修改
-     * @param bean
+     * @param list
      * @return
      */
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public Boolean addFollowUp(FollowUpSetRequestBean bean){
-        Boolean flag = false;
-        Long productId = bean.getProductId();
-        followUpTypeRepository.deleteByProductId(productId);
-        String types = bean.getTypes();
-        if (!StringUtils.isEmpty(types)){
-            List<FollowUpType> list = new ArrayList<>();
-            String[] strings = types.split(",");
-            if (null != strings && strings.length > 0){
-                for (String type:strings){
-                    FollowUpType followUpType = new FollowUpType();
-                    followUpType.setProductId(productId);
-                    followUpType.setType(type);
-                    followUpType.setCreateTime(new Date());
-                    followUpType.setUpdateTime(new Date());
-                    list.add(followUpType);
-                }
-            }
-
-            followUpTypeRepository.save(list);
+    public Boolean addFollowUp(List<FollowUpSetRequestBean> list){
+        if (null == list || list.isEmpty()){
+            return true;
         }
+        Boolean flag = false;
+
+        followUpTypeRepository.deleteByProductId(list.get(0).getProductId());
+//        String types = bean.getTypes();
+//        if (!StringUtils.isEmpty(types)){
+//            List<FollowUpType> list = new ArrayList<>();
+//            String[] strings = types.split(",");
+//            if (null != strings && strings.length > 0){
+//                for (String type:strings){
+//                    FollowUpType followUpType = new FollowUpType();
+//                    followUpType.setProductId(productId);
+//                    followUpType.setType(type);
+//                    followUpType.setCreateTime(new Date());
+//                    followUpType.setUpdateTime(new Date());
+//                    list.add(followUpType);
+//                }
+//            }
+//
+//
+//            followUpTypeRepository.save(list);
+//        }
+
+        List<FollowUpType> followUpTypeList = new ArrayList<>();
+        for (FollowUpSetRequestBean followUpSetRequestBean:list){
+            if (null != followUpSetRequestBean){
+                FollowUpType followUpType = new FollowUpType();
+                followUpType.setProductId(followUpSetRequestBean.getProductId());
+                followUpType.setType(followUpSetRequestBean.getType());
+                followUpType.setCreateTime(new Date());
+                followUpType.setUpdateTime(new Date());
+                followUpTypeList.add(followUpType);
+            }
+        }
+
+        followUpTypeRepository.save(followUpTypeList);
 
         flag = true;
         return flag;

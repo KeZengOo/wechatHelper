@@ -12,6 +12,11 @@ import java.io.Serializable;
 public class DrugUserInteractResponseBean implements Serializable{
     private static final long serialVersionUID = -6388110600109245756L;
 
+    @ApiModelProperty(value = "销售id")
+    private Long drugUserId;
+
+    @ApiModelProperty(value = "销售姓名")
+    private String drugUserName;
 
     @ApiModelProperty(value = "通话总时长，单位秒")
     private Integer callSumTime;
@@ -45,5 +50,21 @@ public class DrugUserInteractResponseBean implements Serializable{
 
     public void setAvgCallTime(Integer avgCallTime) {
         this.avgCallTime = avgCallTime;
+    }
+
+    public Long getDrugUserId() {
+        return drugUserId;
+    }
+
+    public void setDrugUserId(Long drugUserId) {
+        this.drugUserId = drugUserId;
+    }
+
+    public String getDrugUserName() {
+        return drugUserName;
+    }
+
+    public void setDrugUserName(String drugUserName) {
+        this.drugUserName = drugUserName;
     }
 }

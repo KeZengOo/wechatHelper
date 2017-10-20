@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.DynamicFieldMapper">
+
+    <select id="getDoctorBasicInfo" parameterType="java.lang.Long"
+            resultType="com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorBasicInfoResponseBean">
+        select distinct vddf.type,vddf.field_name field,vddf.field_value fieldValue, vddfv.dynamic_field_value value,vddf.classification from
+        virtual_doctor_dynamic_field vddf
+        inner join virtual_doctor_dynamic_field_value vddfv
+        on vddf.id=vddfv.dynamic_field_id
+        where vddfv.doctor_id=#{doctorId}
+    </select>
+
+</mapper>

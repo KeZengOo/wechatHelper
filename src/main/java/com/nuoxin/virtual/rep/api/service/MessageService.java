@@ -444,6 +444,14 @@ public class MessageService extends BaseService {
         Integer pageSize = bean.getPageSize();
         bean.setPage(page * pageSize);
         List<MessageLinkmanResponseBean> messageLinkmanList = messageMapper.getMessageLinkmanList(bean);
+        if (null != messageLinkmanList && !messageLinkmanList.isEmpty()){
+            for (MessageLinkmanResponseBean messageLinkmanResponseBean:messageLinkmanList){
+
+
+            }
+
+        }
+
         Integer messageLinkmanListCount = messageMapper.getMessageLinkmanListCount(bean);
         PageResponseBean<MessageLinkmanResponseBean> pageResponseBean = new PageResponseBean<>(bean,messageLinkmanListCount, messageLinkmanList);
 

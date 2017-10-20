@@ -102,9 +102,9 @@
     <select id="drugUserInteract" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean"
             resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.DrugUserInteractResponseBean">
 
-        select t.sum_call_time callSumTime,t.sum_call_num callNum,round((t.sum_call_time/if(t.sum_call_count=0,1,t.sum_call_count))) avgCallTime from (
+        select t.sum_call_time callSumTime,t.sum_call_num callNum,round((t.sum_call_time/if(t.sum_call_count=0,1,t.sum_call_count))) avgCallTime,t.drugUserId,t.drugUserName from (
         select ifnull(sum(vdci.call_time),0) as sum_call_time,ifnull(count(distinct vdci.virtual_doctor_id),0) as sum_call_num,
-			if(ifnull(count(distinct vdci.id),0)=0,1,ifnull(count(distinct vdci.id),0)) as sum_call_count
+			if(ifnull(count(distinct vdci.id),0)=0,1,ifnull(count(distinct vdci.id),0)) as sum_call_count,du.id drugUserId, du.name drugUserName
         from virtual_doctor_call_info vdci
         inner join virtual_doctor_call_info_details vdcid
         on vdci.id=vdcid.call_id
