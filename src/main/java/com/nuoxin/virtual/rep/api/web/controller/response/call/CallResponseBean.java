@@ -26,6 +26,12 @@ public class CallResponseBean implements Serializable {
     private Long timeLong;
     @ApiModelProperty(value = "通话时间（yyyy-MM-dd HH:mm）")
     private String timeStr;
+    @ApiModelProperty(value = "druguserId")
+    private Long drugUserId;
+    @ApiModelProperty(value = "产品id")
+    private Long productId;
+    @ApiModelProperty(value = "druguserName")
+    private String drugUserName;
 
     public Long getDoctorId() {
         return doctorId;
@@ -73,5 +79,29 @@ public class CallResponseBean implements Serializable {
 
     public void setTimeStr(String timeStr) {
         this.timeStr = timeStr;
+    }
+
+    public String getDrugUserName() {
+        return drugUserName;
+    }
+
+    public void setDrugUserName(String drugUserName) {
+        this.drugUserName = drugUserName;
+    }
+
+    public Long getDrugUserId() {
+        return drugUserId;
+    }
+
+    public void setDrugUserId(Long drugUserId) {
+        this.drugUserId = drugUserId;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 }

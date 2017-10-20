@@ -16,7 +16,7 @@ public class ContactPlanQueryRequestBean extends PageRequestBean {
     private Integer status;
     @ApiModelProperty(value = "医生id")
     private Long doctorId;
-    @ApiModelProperty(value = "不用传")
+    @ApiModelProperty(value = "销售id（从左边的列表上获取）")
     private Long drugUserId;
 
     public Integer getStatus() {

@@ -9,6 +9,7 @@ import com.nuoxin.virtual.rep.api.service.EmailService;
 import com.nuoxin.virtual.rep.api.web.controller.request.EmailQueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.EmailRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.EmailResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.message.MessageResponseBean;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -68,10 +69,10 @@ public class EmailController extends BaseController {
 
     @ApiOperation(value = "邮件历史", notes = "邮件历史")
     @PostMapping("/page")
-    public DefaultResponseBean<PageResponseBean<EmailResponseBean>> page(@RequestBody EmailQueryRequestBean bean,
+    public DefaultResponseBean<PageResponseBean<MessageResponseBean>> page(@RequestBody EmailQueryRequestBean bean,
                                                                          HttpServletRequest request, HttpServletResponse response){
         logger.info("{}接口请求数据【】{}",request.getServletPath(), JSON.toJSONString(bean));
-        DefaultResponseBean<PageResponseBean<EmailResponseBean>> responseBean = new DefaultResponseBean<>();
+        DefaultResponseBean<PageResponseBean<MessageResponseBean>> responseBean = new DefaultResponseBean<>();
         if(bean.getDoctorId()==null || bean.getDoctorId()==0l){
             responseBean.setCode(500);
             responseBean.setMessage("医生id不能为空");

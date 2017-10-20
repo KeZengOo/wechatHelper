@@ -8,11 +8,12 @@
         <result column="content" property="content" jdbcType="VARCHAR"/>
         <result column="title" property="title" jdbcType="VARCHAR"/>
         <result column="dates" property="date" jdbcType="VARCHAR"/>
+        <result column="drug_user_name" property="drugUserName" jdbcType="VARCHAR"/>
     </resultMap>
 
     <select id="historyPage" resultMap="emaiResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.EmailQueryRequestBean">
-        select ei.id,ei.content,ei.title,ei.product_id,DATE_FORMAT(ei.create_time,'%y-%m-%d %H:%I:%S') dates from
+        select du.name drug_user_name,ei.id,ei.content,ei.title,ei.product_id,DATE_FORMAT(ei.create_time,'%y-%m-%d %H:%I:%S') dates from
         virtual_email_info ei join drug_user du on du.id=ei.drug_user_id where
         du.leader_path like #{leaderPath,jdbcType=VARCHAR}
         <if test="doctorId!=null and doctorId!=0">
