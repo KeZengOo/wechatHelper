@@ -20,13 +20,14 @@
         <result column="client_level" property="clientLevel" jdbcType="VARCHAR"/>
         <result column="product_id" property="productId" jdbcType="BIGINT"/>
         <result column="drug_user_name" property="drugUserName" jdbcType="VARCHAR"/>
+        <result column="drug_user_id" property="drugUserId" jdbcType="BIGINT"/>
     </resultMap>
 
     <select id="doctorPage" resultMap="doctorResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean">
         select
         d.id,d.name,d.email,d.hospital_id,d.hospital_name,d.provice,d.city,d.depart,d.telephone,d.positions,d.create_time,d.status,dv.doctor_id,dv.hospital_level,dv.client_level,dv.master_data_id,du.name
-        drug_user_name,dud.prod_id product_id from drug_user_doctor dud join doctor d on d.id=dud.doctor_id join
+        drug_user_name,dud.prod_id product_id,dud.drug_user_id from drug_user_doctor dud join doctor d on d.id=dud.doctor_id join
         drug_user du on du.id=dud.drug_user_id join doctor_virtual dv on dv.doctor_id=dud.doctor_id where du.leader_path
         like #{leaderPath,jdbcType=VARCHAR}
         <if test="name!=null and name!=''">

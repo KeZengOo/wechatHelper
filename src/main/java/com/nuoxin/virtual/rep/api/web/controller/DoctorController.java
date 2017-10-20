@@ -6,6 +6,7 @@ import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
 import com.nuoxin.virtual.rep.api.common.util.StringUtils;
 import com.nuoxin.virtual.rep.api.entity.ContactPlan;
+import com.nuoxin.virtual.rep.api.entity.Doctor;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.ContactPlanService;
 import com.nuoxin.virtual.rep.api.service.DoctorService;
@@ -140,6 +141,7 @@ public class DoctorController extends BaseController {
         try{
             list = excelUtils.readFromFile(null,file.getInputStream());
         }catch (Exception e){
+            e.printStackTrace();
             responseBean.setCode(500);
             responseBean.setMessage("excel解析失败");
             responseBean.setDescription(e.getMessage());
@@ -204,6 +206,25 @@ public class DoctorController extends BaseController {
             responseBean.setCode(500);
             responseBean.setMessage("产品id跟医生id对不上");
             return responseBean;
+        }
+        List<Long> ids = bean.getpIds();
+        long check = 0;
+        int index = 0;
+        for (int i = 0,leng=ids.size(); i < leng ; i++) {
+            if(check==ids.get(i)){
+                index = i;
+                break;
+            }
+            check=ids.get(i);
+        }
+        if(index!=0){
+            Long doctorId = bean.getIds().get(index);
+            Doctor doctor = doctorService.findById(doctorId);
+            if(doctor!=null){
+                responseBean.setCode(500);
+                responseBean.setMessage(doctor.getName()+"医生的产品跟其他的不一样");
+                return responseBean;
+            }
         }
         responseBean.setData(doctorService.relation(bean));
         return responseBean;

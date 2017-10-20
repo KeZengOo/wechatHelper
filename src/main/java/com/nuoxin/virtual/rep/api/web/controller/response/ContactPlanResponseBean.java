@@ -23,6 +23,8 @@ public class ContactPlanResponseBean implements Serializable {
     private String date;
     @ApiModelProperty(value = "状态")
     private Integer status;
+    @ApiModelProperty(value = "处理人")
+    private String drugUserName;
 
     @ApiModelProperty(value = "不用传")
     private Long drugUserId;
@@ -73,5 +75,13 @@ public class ContactPlanResponseBean implements Serializable {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public String getDrugUserName() {
+        return drugUserName;
+    }
+
+    public void setDrugUserName(String drugUserName) {
+        this.drugUserName = drugUserName;
     }
 }

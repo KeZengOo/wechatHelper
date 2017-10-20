@@ -15,6 +15,7 @@ import com.nuoxin.virtual.rep.api.web.controller.request.EmailQueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.EmailRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.EmailResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.call.CallHistoryResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.message.MessageResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.vo.Doc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -151,11 +152,24 @@ public class EmailService {
         return true;
     }
 
-    public PageResponseBean<EmailResponseBean> page(EmailQueryRequestBean bean){
+    public PageResponseBean<MessageResponseBean> page(EmailQueryRequestBean bean){
         bean.setCurrentSize(bean.getPageSize()*bean.getPage());
+        List<MessageResponseBean> result = new ArrayList<>();
         List<EmailResponseBean> list = emailMapper.historyPage(bean);
+        if(list!=null && !list.isEmpty()){
+            for (EmailResponseBean e : list) {
+                MessageResponseBean mbean = new MessageResponseBean();
+                mbean.setId(e.getId());
+                mbean.setMessage(e.getContent());
+                mbean.setUserType(2);
+                mbean.setMessageType(3);
+                mbean.setTitle(e.getTitle());
+                mbean.setMessageTime(e.getDate());
+                result.add(mbean);
+            }
+        }
         Integer count = emailMapper.historyPageCount(bean);
-        PageResponseBean<EmailResponseBean> responseBean = new PageResponseBean<>(bean,count,list);
+        PageResponseBean<MessageResponseBean> responseBean = new PageResponseBean<>(bean,count,result);
         return responseBean;
     }
 

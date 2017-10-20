@@ -22,6 +22,10 @@ public class EmailResponseBean implements Serializable {
     private String content;
     @ApiModelProperty(value = "时间")
     private String date;
+    @ApiModelProperty(value = "发件人")
+    private String drugUserName;
+    private Long doctorId;
+    private Long drugUserId;
 
     public Long getId() {
         return id;
@@ -61,5 +65,29 @@ public class EmailResponseBean implements Serializable {
 
     public void setProductId(Long productId) {
         this.productId = productId;
+    }
+
+    public String getDrugUserName() {
+        return drugUserName;
+    }
+
+    public void setDrugUserName(String drugUserName) {
+        this.drugUserName = drugUserName;
+    }
+
+    public Long getDoctorId() {
+        return doctorId;
+    }
+
+    public void setDoctorId(Long doctorId) {
+        this.doctorId = doctorId;
+    }
+
+    public Long getDrugUserId() {
+        return drugUserId;
+    }
+
+    public void setDrugUserId(Long drugUserId) {
+        this.drugUserId = drugUserId;
     }
 }

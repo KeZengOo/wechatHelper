@@ -360,6 +360,8 @@ public class DoctorCallService extends BaseService {
             responseBean.setDoctorName(info.getDoctor().getName());
             responseBean.setTimeLong(info.getCreateTime().getTime());
             responseBean.setTimeStr(DateUtil.getDateTimeString(info.getCreateTime()));
+            responseBean.setDrugUserId(info.getDrugUserId());
+            responseBean.setProductId(info.getProductId());
         }
         return responseBean;
     }

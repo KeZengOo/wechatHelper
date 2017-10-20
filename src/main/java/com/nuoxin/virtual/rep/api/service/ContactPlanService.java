@@ -5,6 +5,7 @@ import com.nuoxin.virtual.rep.api.common.service.BaseService;
 import com.nuoxin.virtual.rep.api.dao.ContactPlanRepository;
 import com.nuoxin.virtual.rep.api.entity.ContactPlan;
 import com.nuoxin.virtual.rep.api.entity.DoctorCallInfo;
+import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.ContactPlanQueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.ContactPlanRequestBean;
@@ -23,9 +24,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by fenggang on 10/18/17.
@@ -38,6 +37,8 @@ public class ContactPlanService extends BaseService {
 
     @Autowired
     private ContactPlanRepository contactPlanRepository;
+    @Autowired
+    private DrugUserService drugUserService;
 
     @Transactional(readOnly = false)
     public void save(ContactPlanRequestBean bean){
@@ -90,6 +91,7 @@ public class ContactPlanService extends BaseService {
         Page<ContactPlan> page = contactPlanRepository.findAll(spec,pagetable);
         PageResponseBean<ContactPlanResponseBean> responseBean = new PageResponseBean<>(page);
         List<ContactPlan> list = page.getContent();
+        Map<Long,DrugUser> map = new HashMap<>();
         if(list!=null && !list.isEmpty()){
             List<ContactPlanResponseBean> beans = new ArrayList<>();
             for (ContactPlan contactPlan :list) {
@@ -100,6 +102,15 @@ public class ContactPlanService extends BaseService {
                 contact.setDrugUserId(contactPlan.getDrugUserId());
                 contact.setId(contactPlan.getId());
                 contact.setStatus(contactPlan.getStatus());
+                DrugUser drugUser = map.get(contactPlan.getDrugUserId());
+                if(drugUser==null){
+                    drugUser = drugUserService.findById(contactPlan.getDrugUserId());
+                    map.put(contactPlan.getDrugUserId(),drugUser);
+                }
+                if(drugUser!=null){
+                    contact.setDrugUserName(drugUser.getName());
+                }
+
                 beans.add(contact);
             }
             responseBean.setContent(beans);

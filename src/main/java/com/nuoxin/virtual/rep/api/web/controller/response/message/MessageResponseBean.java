@@ -36,6 +36,9 @@ public class MessageResponseBean implements Serializable{
     @ApiModelProperty(value = "微信消息的类型")
     private String wechatMessageType;
 
+    @ApiModelProperty(value = "邮件标题")
+    private String title;
+
     @ApiModelProperty(value = "微信聊天消息或者短信消息")
     private String message;
 
@@ -132,5 +135,13 @@ public class MessageResponseBean implements Serializable{
 
     public void setMessageTime(String messageTime) {
         this.messageTime = messageTime;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }
