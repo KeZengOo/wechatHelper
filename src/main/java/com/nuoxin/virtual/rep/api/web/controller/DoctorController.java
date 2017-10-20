@@ -141,6 +141,7 @@ public class DoctorController extends BaseController {
         try{
             list = excelUtils.readFromFile(null,file.getInputStream());
         }catch (Exception e){
+            e.printStackTrace();
             responseBean.setCode(500);
             responseBean.setMessage("excel解析失败");
             responseBean.setDescription(e.getMessage());
