@@ -15,6 +15,8 @@ public class MonthCoverTargetSetRequestBean implements Serializable{
     @ApiModelProperty(value = "id")
     private Long id;
 
+    @ApiModelProperty(value = "产品id")
+    private Long productId;
 
     @ApiModelProperty(value = "医生的等级")
     private String level;
@@ -47,5 +49,14 @@ public class MonthCoverTargetSetRequestBean implements Serializable{
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 }

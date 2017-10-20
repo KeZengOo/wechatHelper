@@ -2,6 +2,7 @@ package com.nuoxin.virtual.rep.api.web.controller.request.month_target;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
 
@@ -12,6 +13,8 @@ import java.io.Serializable;
 public class MonthWorkTargetSetRequestBean implements Serializable{
     private static final long serialVersionUID = 7939224146015146634L;
 
+    @ApiModelProperty(value = "产品id")
+    private Long productId;
 
     @ApiModelProperty(value = "医生等级")
     private String level;
@@ -59,6 +62,14 @@ public class MonthWorkTargetSetRequestBean implements Serializable{
     @ApiModelProperty(value = "月目标会议参会人次")
     private Integer monthMeetingPersonCount;
 
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
+    }
 
     public String getLevel() {
         return level;

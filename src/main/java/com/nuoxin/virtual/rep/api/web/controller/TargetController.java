@@ -27,6 +27,8 @@ import java.util.List;
  * Create by tiancun on 2017/10/18
  */
 @Api(value = "目标设置相关接口")
+@RequestMapping(value = "/target")
+@RestController
 public class TargetController extends BaseController{
 
     @Autowired
@@ -42,10 +44,10 @@ public class TargetController extends BaseController{
     @ApiOperation(value = "新增或者修改跟进类型接口", notes = "新增或者修改跟进类型接口")
     @PostMapping("/addOrUpdateFollowUp")
     @ResponseBody
-    public ResponseEntity<DefaultResponseBean<Boolean>>  getOneMonthNoFollowCustomers(@RequestBody FollowUpSetRequestBean bean, HttpServletRequest request){
+    public ResponseEntity<DefaultResponseBean<Boolean>>  getOneMonthNoFollowCustomers(@RequestBody List<FollowUpSetRequestBean> list, HttpServletRequest request){
 
 
-        Boolean flag = followUpTypeService.addFollowUp(bean);
+        Boolean flag = followUpTypeService.addFollowUp(list);
         DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
         responseBean.setData(flag);
         return ResponseEntity.ok(responseBean);
@@ -71,10 +73,10 @@ public class TargetController extends BaseController{
     @ApiOperation(value = "新增或者修改月覆盖目标接口", notes = "新增或者修改月覆盖目标接口")
     @PostMapping("/addOrUpdateMonthCover")
     @ResponseBody
-    public ResponseEntity<DefaultResponseBean<Boolean>>  addOrUpdateMonthCover(@RequestBody List<MonthCoverTargetSetRequestBean> list, @RequestParam(value = "productId", required = true) Long productId, HttpServletRequest request){
+    public ResponseEntity<DefaultResponseBean<Boolean>>  addOrUpdateMonthCover(@RequestBody List<MonthCoverTargetSetRequestBean> list, HttpServletRequest request){
 
 
-        Boolean flag = coveredTargetService.add(list, productId);
+        Boolean flag = coveredTargetService.add(list);
         DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
         responseBean.setData(flag);
         return ResponseEntity.ok(responseBean);
@@ -99,10 +101,10 @@ public class TargetController extends BaseController{
     @ApiOperation(value = "新增或者修改月工作量目标接口", notes = "新增或者修改月工作量目标接口")
     @PostMapping("/addOrUpdateMonthWorkMonth")
     @ResponseBody
-    public ResponseEntity<DefaultResponseBean<Boolean>>  addOrUpdateMonthWorkMonth(@RequestBody List<MonthWorkTargetSetRequestBean> list, @RequestParam(value = "productId", required = true) Long productId, HttpServletRequest request){
+    public ResponseEntity<DefaultResponseBean<Boolean>>  addOrUpdateMonthWorkMonth(@RequestBody MonthWorkTargetSetRequestBean bean, HttpServletRequest request){
 
 
-        Boolean flag = targetService.add(list, productId);
+        Boolean flag = targetService.add(bean);
         DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
         responseBean.setData(flag);
         return ResponseEntity.ok(responseBean);

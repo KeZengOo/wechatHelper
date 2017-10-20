@@ -87,6 +87,7 @@ public class DoctorDynamicFieldService {
         doctorDynamicField.setId(id);
         doctorDynamicField.setName(bean.getName());
         doctorDynamicField.setValue(bean.getValue());
+        doctorDynamicField.setType(bean.getType());
         doctorDynamicField.setClassification(bean.getClassification());
         doctorDynamicField.setUpdateTime(new Date());
         doctorDynamicField.setCreateTime(dynamicFieldRepositoryOne.getCreateTime());

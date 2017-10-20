@@ -29,19 +29,19 @@ public class CoveredTargetService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public Boolean add(List<MonthCoverTargetSetRequestBean> list, Long productId){
+    public Boolean add(List<MonthCoverTargetSetRequestBean> list){
         Boolean flag = false;
 
         if (null == list || list.isEmpty()){
             return true;
         }
 
-        coveredTargetRepository.deleteByProductId(productId);
+        coveredTargetRepository.deleteByProductId(list.get(0).getProductId());
         List<CoveredTarget> coveredTargetList = new ArrayList<>();
         for (MonthCoverTargetSetRequestBean bean:list){
             if (null != bean){
                 CoveredTarget coveredTarget = new CoveredTarget();
-                coveredTarget.setProductId(productId);
+                coveredTarget.setProductId(bean.getProductId());
                 coveredTarget.setLevel(bean.getLevel());
                 coveredTarget.setMonthCovered(bean.getMonthCovered());
                 coveredTarget.setCreateTime(new Date());

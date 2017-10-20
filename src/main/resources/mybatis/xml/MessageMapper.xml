@@ -79,7 +79,7 @@
     <select id="getMessageLinkmanList"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean"
             resultType="com.nuoxin.virtual.rep.api.web.controller.response.message.MessageLinkmanResponseBean">
-        select
+        <!--select
         t.doctor_id doctorId,
         t.nickname nickname,
         t.message_type messageType,
@@ -104,13 +104,66 @@
                 where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
             )
         group by  vm.doctor_id,vm.message_type  order by maxMessageTime desc
-        ) t limit #{page},#{pageSize}
+        ) t limit #{page},#{pageSize}-->
+
+
+        select
+        a.doctor_id doctorId,
+        (select name from doctor where id = a.doctor_id) nickname
+        a.maxMessageTime lastTime,
+        a.type messageType
+        from (
+        select t.doctor_id,max(message_time) as maxMessageTime,t.type from (
+        select vm.doctor_id,vm.message,vm.message_time, 1 type from virtual_message vm
+        inner join doctor d
+        on vm.doctor_id =d.id
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
+        where du.leader_path like #{leaderPath}
+        and vm.message_type=1
+        union
+        select vm.doctor_id,vm.message,vm.message_time, 2 type from virtual_message vm
+        inner join doctor d
+        on vm.doctor_id =d.id
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
+        where 1=1
+        <if test="productId !=null and productId !=0">
+            and dud.prod_id=#{productId}
+            and vm.productId=#{productId}
+        </if>
+        and du.leader_path like #{leaderPath}
+        and vm.message_type=2
+        union
+        select vei.doctor_id,vei.content message,vei.create_time message_time, 3 type
+        from virtual_email_info vei
+        inner join doctor d
+        on vei.doctor_id=d.id
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
+        where 1=1
+        <if test="productId != null and productId !=0">
+            and vei.productId=#{productId}
+            and dud.prod_id=#{productId}
+        </if>
+        and du.leader_path like #{leaderPath}
+        ) t group by t.type,t.doctor_id
+        ) a order by a.maxMessageTime desc limit #{page},#{pageSize}
+
+
+
     </select>
 
     <select id="getMessageLinkmanListCount"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean"
             resultType="java.lang.Integer">
-        select count(1) from (
+        <!--select count(1) from (
         select
         vm.doctor_id
         from virtual_message vm
@@ -128,7 +181,63 @@
         )
 
         group by  vm.doctor_id,vm.message_type
-        ) t
+        ) t-->
+
+
+
+        select count(1) from (
+        select t.doctor_id,max(message_time) as maxMessageTime,t.type from (
+        select vm.doctor_id,vm.message,vm.message_time, 1 type from virtual_message vm
+        inner join doctor d
+        on vm.doctor_id =d.id
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
+        where du.leader_path like #{leaderPath}
+        and vm.message_type=1
+        union
+        select vm.doctor_id,vm.message,vm.message_time, 2 type from virtual_message vm
+        inner join doctor d
+        on vm.doctor_id =d.id
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
+        where 1=1
+        <if test="productId !=null and productId !=0">
+            and dud.prod_id=#{productId}
+            and vm.productId=#{productId}
+        </if>
+
+        and du.leader_path like like #{leaderPath}
+        and vm.message_type=2
+        union
+        select vei.doctor_id,vei.content message,vei.create_time message_time, 3 type
+        from virtual_email_info vei
+        inner join doctor d
+        on vei.doctor_id=d.id
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
+        where 1=1
+        <if test="productId != null and productId !=0">
+            and vei.productId=#{productId}
+            and dud.prod_id=#{productId}
+        </if>
+
+        and du.leader_path like like #{leaderPath}
+        ) t group by t.type,t.doctor_id
+        ) a
+
+
+
+    </select>
+
+    <select id="getLastMessage" resultType="java.lang.String">
+
+
     </select>
 
     <select id="getMessageList" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean"
