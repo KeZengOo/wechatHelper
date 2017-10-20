@@ -25,6 +25,13 @@ public class TrendStatResponseBean implements Serializable {
     @ApiModelProperty(value = "时间（横坐标）")
     private Integer hour;
 
+    @ApiModelProperty(value = "微信")
+    private Integer wechatCount = 0;
+    @ApiModelProperty(value = "短信")
+    private Integer smsCount = 0;
+    @ApiModelProperty(value = "邮件")
+    private Integer emailCount = 0;
+
     public Integer getWechat() {
         return wechat;
     }
@@ -71,5 +78,29 @@ public class TrendStatResponseBean implements Serializable {
 
     public void setCallout(Integer callout) {
         this.callout = callout;
+    }
+
+    public Integer getWechatCount() {
+        return wechatCount;
+    }
+
+    public void setWechatCount(Integer wechatCount) {
+        this.wechatCount = wechatCount;
+    }
+
+    public Integer getSmsCount() {
+        return smsCount;
+    }
+
+    public void setSmsCount(Integer smsCount) {
+        this.smsCount = smsCount;
+    }
+
+    public Integer getEmailCount() {
+        return emailCount;
+    }
+
+    public void setEmailCount(Integer emailCount) {
+        this.emailCount = emailCount;
     }
 }
