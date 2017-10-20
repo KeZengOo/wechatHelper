@@ -64,6 +64,9 @@ public class DoctorCallInfo extends IdEntity {
     }
 
     public Long getDrugUserId() {
+        if(drugUser!=null){
+            return drugUser.getId();
+        }
         return drugUserId;
     }
 
