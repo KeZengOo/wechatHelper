@@ -17,4 +17,5 @@ public interface DropTargetRepository extends JpaRepository<DropTarget,Long>,Jpa
     DropTarget findFirstByProductIdAndLevel(Long productId,String level);
 
     List<DropTarget> findByProductId(Long productId);
+
 }

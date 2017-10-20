@@ -397,6 +397,9 @@ public class WorkStationService {
         List<DrugUserAnalysisResponseBean> minEmailCoveredCountList = workStationMapper.minEmailCoveredCountList(bean);
 
 
+        //脱落客户
+
+
         Integer dateType = bean.getDateType();
         if (dateType != null){
             Integer targetCallSum = 0;

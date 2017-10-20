@@ -81,8 +81,19 @@ public interface WorkStationMapper {
     //邮件未达标，按照人数
     List<String> emailNoReach(WorkStationRequestBean bean);
 
-    //脱落客户最严重
-    Map<String, String> dropCustomers(WorkStationRequestBean bean);
+    /**
+     * 脱落客户最严重
+     */
+
+    //A级脱落总数
+    Integer getDropAcount(WorkStationRequestBean bean);
+
+    //B级脱落总数
+    Integer getDropBcount(WorkStationRequestBean bean);
+
+
+    //B级脱落总数
+    //Integer getDropBcount(WorkStationRequestBean bean);
 
 
     /**

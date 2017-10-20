@@ -13,6 +13,9 @@ import java.io.Serializable;
 public class DoctorDymamicFieldValueResponseBean implements Serializable{
     private static final long serialVersionUID = 6656422391172399317L;
 
+    @ApiModelProperty(value = "动态字段的id")
+    private Long dynamicFieldId;
+
     @ApiModelProperty(value = "字段名称")
     private String fieldName;
 
@@ -56,5 +59,14 @@ public class DoctorDymamicFieldValueResponseBean implements Serializable{
 
     public void setFieldTypeValue(String fieldTypeValue) {
         this.fieldTypeValue = fieldTypeValue;
+    }
+
+
+    public Long getDynamicFieldId() {
+        return dynamicFieldId;
+    }
+
+    public void setDynamicFieldId(Long dynamicFieldId) {
+        this.dynamicFieldId = dynamicFieldId;
     }
 }

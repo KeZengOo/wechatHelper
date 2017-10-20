@@ -65,10 +65,6 @@ public class DoctorDynamicFieldValueService {
 
 
 
-
-
-
-
     public List<DoctorDymamicFieldValueResponseBean> getDoctorDymamicFieldValueList(Long doctorId){
 
         List<DoctorDynamicFieldValue> doctorDynamicFieldValueList = doctorDynamicFieldValueRepository.findByDoctorId(doctorId);
@@ -88,6 +84,7 @@ public class DoctorDynamicFieldValueService {
                 if (null != doctorDynamicField){
                     doctorDymamicFieldValueResponseBean.setType(doctorDynamicField.getType());
                     doctorDymamicFieldValueResponseBean.setFieldTypeValue(doctorDynamicField.getValue());
+                    doctorDymamicFieldValueResponseBean.setDynamicFieldId(doctorDynamicField.getId());
                 }
                 list.add(doctorDymamicFieldValueResponseBean);
 
