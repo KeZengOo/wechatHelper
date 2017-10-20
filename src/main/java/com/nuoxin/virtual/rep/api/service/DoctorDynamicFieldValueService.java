@@ -36,7 +36,7 @@ public class DoctorDynamicFieldValueService {
         Boolean flag = false;
 
 
-
+        doctorDynamicFieldValueRepository.deleteByDoctorId(doctorId);
         List<DoctorDynamicFieldValue> list = new ArrayList<>();
 
 
