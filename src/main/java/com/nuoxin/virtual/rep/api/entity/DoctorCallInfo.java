@@ -18,7 +18,8 @@ public class DoctorCallInfo extends IdEntity {
     private Long doctorId;
     @Column(name = "type")
     private Integer type;
-    @Column(name = "virtual_drug_user_id")
+//    @Column(name = "")
+    @Transient
     private Long drugUserId;
     @Column(name = "sin_token")
     private String sinToken;
@@ -50,6 +51,9 @@ public class DoctorCallInfo extends IdEntity {
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH},fetch = FetchType.EAGER)
     @JoinColumn(name = "virtual_doctor_id")
     private Doctor doctor;
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH},fetch = FetchType.EAGER)
+    @JoinColumn(name = "virtual_drug_user_id")
+    private DrugUser drugUser;
 
     public Long getDoctorId() {
         return doctorId;
@@ -185,5 +189,13 @@ public class DoctorCallInfo extends IdEntity {
 
     public void setFollowUpType(String followUpType) {
         this.followUpType = followUpType;
+    }
+
+    public DrugUser getDrugUser() {
+        return drugUser;
+    }
+
+    public void setDrugUser(DrugUser drugUser) {
+        this.drugUser = drugUser;
     }
 }
