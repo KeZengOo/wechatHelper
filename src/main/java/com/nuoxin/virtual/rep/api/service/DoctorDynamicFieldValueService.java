@@ -79,12 +79,12 @@ public class DoctorDynamicFieldValueService {
                 DoctorDynamicField doctorDynamicField = doctorDynamicFieldRepository.getOne(doctorDynamicFieldValue.getDynamicFieldId());
 
                 DoctorDymamicFieldValueResponseBean doctorDymamicFieldValueResponseBean = new DoctorDymamicFieldValueResponseBean();
-                doctorDymamicFieldValueResponseBean.setFieldName(doctorDynamicFieldValue.getDynamicFieldName());
+                doctorDymamicFieldValueResponseBean.setName(doctorDynamicFieldValue.getDynamicFieldName());
                 doctorDymamicFieldValueResponseBean.setFieldValue(doctorDynamicFieldValue.getDynamicFieldValue());
                 if (null != doctorDynamicField){
                     doctorDymamicFieldValueResponseBean.setType(doctorDynamicField.getType());
                     doctorDymamicFieldValueResponseBean.setFieldTypeValue(doctorDynamicField.getValue());
-                    doctorDymamicFieldValueResponseBean.setDynamicFieldId(doctorDynamicField.getId());
+                    doctorDymamicFieldValueResponseBean.setId(doctorDynamicField.getId());
                 }
                 list.add(doctorDymamicFieldValueResponseBean);
 

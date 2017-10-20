@@ -48,7 +48,7 @@ public class QuestionnaireAnalysisService extends BaseService {
         //获取从开始时间到结束时间中间所有的横坐标，纵坐标默认为0
         List<QuestionDateResponseBean> responseBeans = this._lineChartResult(bean);
         if(sumList!=null && !sumList.isEmpty()){
-            for (int i = 0,leng=responseBeans.size(); i < leng; i++) {
+            for (int i = 0,leng=sumList.size(); i < leng; i++) {
                 QuestionDateResponseBean responseBean = responseBeans.get(i);
                 for (int j = 0,jleng=sumList.size(); j < jleng ; j++) {
                     QuestionDateResponseBean qbean = sumList.get(j);
@@ -158,6 +158,7 @@ public class QuestionnaireAnalysisService extends BaseService {
             dateBean.setDayNum(Integer.valueOf(dates[1]));
             dateBean.setMonthNum(Integer.valueOf(dates[2]));
             calendar.add(Calendar.DAY_OF_YEAR,+1);
+            responseBeans.add(dateBean);
         }
 
         return responseBeans;

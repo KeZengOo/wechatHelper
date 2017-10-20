@@ -130,6 +130,10 @@ public class DoctorCallService extends BaseService {
         if(list!=null && !list.isEmpty()){
             List<CallResponseBean> responseBeans = new ArrayList<>();
             for (DoctorCallInfo info:list) {
+
+                if(info.getDoctor()==null){
+                    continue;
+                }
                 responseBeans.add(this._getCallResponseBean(info));
             }
             responseBean.setContent(responseBeans);

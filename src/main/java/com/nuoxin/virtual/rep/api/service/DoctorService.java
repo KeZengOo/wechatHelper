@@ -12,7 +12,9 @@ import com.nuoxin.virtual.rep.api.dao.DrugUserDoctorRepository;
 import com.nuoxin.virtual.rep.api.entity.*;
 import com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.doctor.DoctorRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.doctor.DoctorUpdateRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.doctor.RelationRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorDetailsResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorStatResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.product.ProductResponseBean;
@@ -62,13 +64,51 @@ public class DoctorService extends BaseService {
     private ProductLineService productLineService;
 
     @Cacheable(value = "virtual_rep_api_doctor", key = "'_details_'+#id")
+    public DoctorDetailsResponseBean details(Long id) {
+        DoctorDetailsResponseBean responseBean = new DoctorDetailsResponseBean();
+        Doctor doctor =  doctorRepository.findOne(id);
+        //BeanUtils.copyProperties(doctor,responseBean);
+        responseBean.setCity(doctor.getCity());
+        responseBean.setClientLevel(doctor.getDoctorVirtual().getClientLevel());
+        responseBean.setDepartment(doctor.getDepartment());
+        responseBean.setDoctorId(doctor.getId());
+        responseBean.setDoctorLevel(doctor.getDoctorLevel());
+        responseBean.setDoctorName(doctor.getName());
+        responseBean.setHospitalId(doctor.getHospitalId());
+        responseBean.setHospitalLevel(doctor.getDoctorVirtual().getHospitalLevel());
+        responseBean.setHospitalName(doctor.getHospitalName());
+        responseBean.setMasterDateId(doctor.getDoctorVirtual().getMasterDateId());
+        responseBean.setMobile(doctor.getMobile());
+        responseBean.setProvince(doctor.getProvince());
+        responseBean.setList(DoctorDynamicFieldValueService.getDoctorDymamicFieldValueList(doctor.getId()));
+        return responseBean;
+    }
+
+    @Cacheable(value = "virtual_rep_api_doctor", key = "'_details_'+#id")
     public Doctor findById(Long id) {
         return doctorRepository.findOne(id);
     }
 
     @Cacheable(value = "virtual_rep_api_doctor", key = "'_mobile_'+#mobile")
-    public Doctor findByMobile(String mobile) {
-        return doctorRepository.findTopByMobile(mobile);
+    public DoctorDetailsResponseBean findByMobile(String mobile) {
+
+        DoctorDetailsResponseBean responseBean = new DoctorDetailsResponseBean();
+        Doctor doctor =  doctorRepository.findTopByMobile(mobile);
+
+        responseBean.setCity(doctor.getCity());
+        responseBean.setClientLevel(doctor.getDoctorVirtual().getClientLevel());
+        responseBean.setDepartment(doctor.getDepartment());
+        responseBean.setDoctorId(doctor.getId());
+        responseBean.setDoctorLevel(doctor.getDoctorLevel());
+        responseBean.setDoctorName(doctor.getName());
+        responseBean.setHospitalId(doctor.getHospitalId());
+        responseBean.setHospitalLevel(doctor.getDoctorVirtual().getHospitalLevel());
+        responseBean.setHospitalName(doctor.getHospitalName());
+        responseBean.setMasterDateId(doctor.getDoctorVirtual().getMasterDateId());
+        responseBean.setMobile(doctor.getMobile());
+        responseBean.setProvince(doctor.getProvince());
+        responseBean.setList(DoctorDynamicFieldValueService.getDoctorDymamicFieldValueList(doctor.getId()));
+        return responseBean;
     }
 
     public List<Doctor> findByIdIn(Collection<Long> ids) {
@@ -211,7 +251,7 @@ public class DoctorService extends BaseService {
 
     @Transactional(readOnly = false)
     @CacheEvict(value = "virtual_rep_api_doctor", allEntries = true)
-    public Boolean update(DoctorRequestBean bean) {
+    public Boolean update(DoctorUpdateRequestBean bean) {
         Doctor doctor = doctorRepository.findTopByMobile(bean.getMobile());
         DoctorVirtual virtual = new DoctorVirtual();
         if (doctor == null) {
@@ -229,12 +269,12 @@ public class DoctorService extends BaseService {
         //doctor.setHospitalLevel(bean.getHospitalLevel());
         doctor.setHospitalName(bean.getHospitalName());
         doctor.setMobile(bean.getMobile());
-        doctor.setName(bean.getName());
+        doctor.setName(bean.getDoctorName());
         virtual.setClientLevel(bean.getClientLevel());
         virtual.setHospitalLevel(bean.getHospitalLevel());
         //TODO  获取主数据id
         if (StringUtils.isNotEmtity(bean.getHospitalName())) {
-            Hcp hcp = masterDataService.getHcpByHciIdAndHcpName(bean.getHospitalName(), bean.getName());
+            Hcp hcp = masterDataService.getHcpByHciIdAndHcpName(bean.getHospitalName(), bean.getDoctorName());
             if (hcp != null) {
 //                doctor.setMasterDateId(hcp.getId());
                 virtual.setMasterDateId(hcp.getId());
@@ -416,6 +456,7 @@ public class DoctorService extends BaseService {
             doctor.setProvince(excel.getProvince());
             doctor.setDoctorLevel(excel.getPosition());
             doctor.setMobile(excel.getMobile());
+            doctor.setStatus(1);
             virtual.setClientLevel(excel.getSex());
             //TODO 主数据id
             logger.info("保存【{}】医生时查询主数据对应的医生id写入数据库", doctor.getName());

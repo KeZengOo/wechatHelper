@@ -35,10 +35,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 
 /**
@@ -60,6 +57,8 @@ public class EmailService {
     private EmailRepository emailRepository;
     @Autowired
     private EmailMapper emailMapper;
+    @Autowired
+    private DrugUserService drugUserService;
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -165,6 +164,7 @@ public class EmailService {
                 mbean.setMessageType(3);
                 mbean.setTitle(e.getTitle());
                 mbean.setMessageTime(e.getDate());
+                mbean.setNickname(e.getDrugUserName());
                 result.add(mbean);
             }
         }

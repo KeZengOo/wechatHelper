@@ -14,10 +14,10 @@ public class DoctorDymamicFieldValueResponseBean implements Serializable{
     private static final long serialVersionUID = 6656422391172399317L;
 
     @ApiModelProperty(value = "动态字段的id")
-    private Long dynamicFieldId;
+    private Long id;
 
     @ApiModelProperty(value = "字段名称")
-    private String fieldName;
+    private String name;
 
     @ApiModelProperty(value = "字段的值")
     private String fieldValue;
@@ -29,13 +29,6 @@ public class DoctorDymamicFieldValueResponseBean implements Serializable{
     private String fieldTypeValue;
 
 
-    public String getFieldName() {
-        return fieldName;
-    }
-
-    public void setFieldName(String fieldName) {
-        this.fieldName = fieldName;
-    }
 
     public String getFieldValue() {
         return fieldValue;
@@ -61,12 +54,19 @@ public class DoctorDymamicFieldValueResponseBean implements Serializable{
         this.fieldTypeValue = fieldTypeValue;
     }
 
-
-    public Long getDynamicFieldId() {
-        return dynamicFieldId;
+    public Long getId() {
+        return id;
     }
 
-    public void setDynamicFieldId(Long dynamicFieldId) {
-        this.dynamicFieldId = dynamicFieldId;
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

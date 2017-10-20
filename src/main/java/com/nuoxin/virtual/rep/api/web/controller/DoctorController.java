@@ -16,6 +16,7 @@ import com.nuoxin.virtual.rep.api.web.controller.request.ContactPlanQueryRequest
 import com.nuoxin.virtual.rep.api.web.controller.request.ContactPlanRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.doctor.DoctorRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.doctor.DoctorUpdateRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.doctor.RelationRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.ContactPlanResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean;
@@ -53,7 +54,7 @@ public class DoctorController extends BaseController {
     public DefaultResponseBean<DoctorDetailsResponseBean> doctorDetails(@PathVariable Long doctorId,
                                                                         HttpServletRequest request, HttpServletResponse response){
         DefaultResponseBean responseBean = new DefaultResponseBean();
-        responseBean.setData(doctorService.findById(doctorId));
+        responseBean.setData(doctorService.details(doctorId));
         return responseBean;
     }
 
@@ -110,7 +111,7 @@ public class DoctorController extends BaseController {
 
     @ApiOperation(value = "医生修改", notes = "医生修改")
     @PostMapping("/update")
-    public DefaultResponseBean<Boolean> update(@RequestBody DoctorRequestBean bean,
+    public DefaultResponseBean<Boolean> update(@RequestBody DoctorUpdateRequestBean bean,
                                              HttpServletRequest request, HttpServletResponse response){
         DefaultResponseBean responseBean = new DefaultResponseBean();
         DrugUser user = super.getLoginUser(request);
