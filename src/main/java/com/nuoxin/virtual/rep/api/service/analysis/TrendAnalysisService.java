@@ -252,13 +252,15 @@ public class TrendAnalysisService extends BaseService {
                 for (TrendStatResponseBean stat : wechat) {
                     if (stat.getHour() != null && stat.getHour().intValue() == i) {
                         responseBean.setWechat(stat.getWechat());
+                        responseBean.setWechatCount(stat.getWechatCount());
                     }
                 }
             }
             if (sms != null && !sms.isEmpty()) {
                 for (TrendStatResponseBean stat : sms) {
                     if (stat.getHour() != null && stat.getHour().intValue() == i) {
-                        responseBean.setWechat(stat.getSms());
+                        responseBean.setSms(stat.getSms());
+                        responseBean.setSmsCount(stat.getSmsCount());
                     }
                 }
             }
@@ -266,6 +268,7 @@ public class TrendAnalysisService extends BaseService {
                 for (TrendStatResponseBean stat : email) {
                     if (stat.getHour() != null && stat.getHour().intValue() == i) {
                         responseBean.setEmail(stat.getEmail());
+                        responseBean.setEmailCount(stat.getEmailCount());
                     }
                 }
             }
