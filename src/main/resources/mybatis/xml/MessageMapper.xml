@@ -154,7 +154,19 @@
         </if>
         and du.leader_path like #{leaderPath}
         ) t group by t.type,t.doctor_id
-        ) a order by a.maxMessageTime desc limit #{page},#{pageSize}
+        ) a
+        where 1=1
+        <if test="startTime !=null and startTime !=''">
+            and date_format(a.maxMessageTime,'%Y-%m-%d') &gt;=#{startTime}
+        </if>
+
+        <if test="endTime !=null and endTime !=''">
+            and date_format(a.maxMessageTime,'%Y-%m-%d') &lt;=#{endTime}
+        </if>
+        <if test="messageType !=null and messageType !=0">
+            and a.type=#{messageType}
+        </if>
+        order by a.maxMessageTime desc limit #{page},#{pageSize}
 
 
 
@@ -210,7 +222,7 @@
             and vm.productId=#{productId}
         </if>
 
-        and du.leader_path like like #{leaderPath}
+        and du.leader_path like #{leaderPath}
         and vm.message_type=2
         union
         select vei.doctor_id,vei.content message,vei.create_time message_time, 3 type
@@ -227,17 +239,34 @@
             and dud.prod_id=#{productId}
         </if>
 
-        and du.leader_path like like #{leaderPath}
+        and du.leader_path  like #{leaderPath}
         ) t group by t.type,t.doctor_id
-        ) a
+        ) a where 1=1
+
+        <if test="startTime !=null and startTime !=''">
+            and date_format(a.maxMessageTime,'%Y-%m-%d') &gt;=#{startTime}
+        </if>
+
+        <if test="endTime !=null and endTime !=''">
+            and date_format(a.maxMessageTime,'%Y-%m-%d') &lt;=#{endTime}
+        </if>
+        <if test="messageType !=null and messageType !=0">
+            and a.type=#{messageType}
+        </if>
 
 
 
     </select>
 
     <select id="getLastMessage" resultType="java.lang.String">
+      select vm.message from virtual_message vm
+      where vm.message_type=#{type} and vm.doctor_id=#{doctorId} and vm.message_time=#{maxMessageTime} limit 1
+    </select>
 
 
+    <select id="getLastEmailMessage" resultType="java.lang.String">
+        select vei.content from virtual_email_info vei
+        where vei.doctor_id=#{doctorId} and vei.create_time=#{maxMessageTime} limit 1
     </select>
 
     <select id="getMessageList" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean"
@@ -303,6 +332,73 @@
             and date_format(vm.message_time,'%Y-%m-%d') between #{startTime} and #{endTime}
         </if>
         and vm.drug_user_id in (select id from drug_user where leader_path like #{leaderPath})
+
+
+    </select>
+
+
+    <select id="getEmailMessageList"  resultType="com.nuoxin.virtual.rep.api.web.controller.response.message.MessageResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean">
+        select vei.id,
+        vei.doctor_id doctorId,
+        (select name from doctor d where d.id =vei.doctor_id) nickname,
+        vei.title,
+        vei.content message,
+        3 messageType,
+        vei.create_time messageTime
+        from virtual_email_info vei
+        inner join doctor d
+        on vei.doctor_id=d.id
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
+        where 1=1
+        <if test="productId !=null and productId !=0">
+            and vei.product_id=#{productId}
+            and dud.prod_id=#{productId}
+        </if>
+
+        <if test="startTime !=null and startTime !=''">
+            and date_format(vei.createTime,'%Y-%m-%d') &gt;= #{startTime}
+        </if>
+
+        <if test="endTime !=null and endTime !=''">
+            and date_format(vei.createTime,'%Y-%m-%d') &lt;= #{endTime}
+        </if>
+
+        and du.leader_path like #{leaderPath}
+        order by vei.create_time desc
+        limit #{page}, #{pageSize}
+
+    </select>
+
+
+    <select id="getEmailMessageList"  resultType="java.lang.Integer"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean">
+        select count(distinct vei.id)
+        from virtual_email_info vei
+        inner join doctor d
+        on vei.doctor_id=d.id
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
+        where 1=1
+        <if test="productId !=null and productId !=0">
+            and vei.product_id=#{productId}
+            and dud.prod_id=#{productId}
+        </if>
+
+        <if test="startTime !=null and startTime !=''">
+            and date_format(vei.createTime,'%Y-%m-%d') &gt;= #{startTime}
+        </if>
+
+        <if test="endTime !=null and endTime !=''">
+            and date_format(vei.createTime,'%Y-%m-%d') &lt;= #{endTime}
+        </if>
+
+        and du.leader_path like #{leaderPath}
 
 
     </select>
