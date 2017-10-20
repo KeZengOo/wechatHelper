@@ -117,4 +117,8 @@ public class ContactPlanService extends BaseService {
         }
         return responseBean;
     }
+
+    public List<?> contactPlan(String leaderPath){
+        return null;
+    }
 }

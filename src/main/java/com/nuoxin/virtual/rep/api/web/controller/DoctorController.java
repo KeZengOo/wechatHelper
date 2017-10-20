@@ -283,6 +283,7 @@ public class DoctorController extends BaseController {
 
     @ApiOperation(value = "联系计划状态修改", notes = "状态修改")
     @PostMapping("/contact/plan/update/status/{id}")
+    @ResponseBody
     public DefaultResponseBean<Boolean> ContactPlanUpdateStatus(@PathVariable Long id,
                                                                             HttpServletRequest request, HttpServletResponse response){
         DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean();
@@ -294,6 +295,19 @@ public class DoctorController extends BaseController {
         }
         contactPlanService.updateStatus(id);
         responseBean.setData(true);
+        return responseBean;
+    }
+
+    @ApiOperation(value = "联系计划最近弹窗提醒数据", notes = "联系计划最近弹窗提醒数据")
+    @PostMapping("/contact/plan/alert/data")
+    public DefaultResponseBean<Object> contactPlan(HttpServletRequest request, HttpServletResponse response){
+        DefaultResponseBean<Object> responseBean = new DefaultResponseBean();
+        DrugUser user = super.getLoginUser(request);
+        if(user==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
+        }
         return responseBean;
     }
 

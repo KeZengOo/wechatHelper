@@ -597,8 +597,9 @@ public class DoctorService extends BaseService {
         String[] ids = drugUserIds.split(",");
         Map<String,String> map = new HashMap<>();
         for (String id:ids) {
-            if(StringUtils.isNotEmtity(id))
+            if(StringUtils.isNotEmtity(id)){
                 map.put(id,id);
+            }
         }
         StringBuffer sb = new StringBuffer(",");
         map.put(drugUserId.toString(),drugUserIds.toLowerCase());

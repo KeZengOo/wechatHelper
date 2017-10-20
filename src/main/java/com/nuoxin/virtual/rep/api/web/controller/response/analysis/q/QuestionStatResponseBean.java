@@ -17,6 +17,7 @@ public class QuestionStatResponseBean extends QuestionRequestBean {
     private Integer answerNum;
     @ApiModelProperty(value = "选项统计")
     private List<QuestionOptionsStatResponseBean> optionsStat;
+    private Long questionnaireId;
 
     private String option;
 
@@ -42,5 +43,13 @@ public class QuestionStatResponseBean extends QuestionRequestBean {
 
     public void setOption(String option) {
         this.option = option;
+    }
+
+    public Long getQuestionnaireId() {
+        return questionnaireId;
+    }
+
+    public void setQuestionnaireId(Long questionnaireId) {
+        this.questionnaireId = questionnaireId;
     }
 }

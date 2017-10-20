@@ -83,7 +83,7 @@ public class DoctorDynamicFieldValueService {
                 doctorDymamicFieldValueResponseBean.setFieldValue(doctorDynamicFieldValue.getDynamicFieldValue());
                 if (null != doctorDynamicField){
                     doctorDymamicFieldValueResponseBean.setType(doctorDynamicField.getType());
-                    doctorDymamicFieldValueResponseBean.setFieldTypeValue(doctorDynamicField.getValue());
+                    doctorDymamicFieldValueResponseBean.setValue(doctorDynamicField.getValue());
                     doctorDymamicFieldValueResponseBean.setId(doctorDynamicField.getId());
                 }
                 list.add(doctorDymamicFieldValueResponseBean);

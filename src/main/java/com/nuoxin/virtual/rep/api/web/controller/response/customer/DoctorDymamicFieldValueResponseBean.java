@@ -26,7 +26,7 @@ public class DoctorDymamicFieldValueResponseBean implements Serializable{
     private Integer type;
 
     @ApiModelProperty(value = "下拉框类型字段的值，多个以英文逗号分开")
-    private String fieldTypeValue;
+    private String value;
 
 
 
@@ -46,12 +46,12 @@ public class DoctorDymamicFieldValueResponseBean implements Serializable{
         this.type = type;
     }
 
-    public String getFieldTypeValue() {
-        return fieldTypeValue;
+    public String getValue() {
+        return value;
     }
 
-    public void setFieldTypeValue(String fieldTypeValue) {
-        this.fieldTypeValue = fieldTypeValue;
+    public void setValue(String value) {
+        this.value = value;
     }
 
     public Long getId() {
