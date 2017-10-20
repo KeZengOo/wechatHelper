@@ -374,7 +374,7 @@
     </select>
 
 
-    <select id="getEmailMessageList"  resultType="java.lang.Integer"
+    <select id="getEmailMessageListCount"  resultType="java.lang.Integer"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean">
         select count(distinct vei.id)
         from virtual_email_info vei
