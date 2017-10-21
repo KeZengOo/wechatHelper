@@ -434,7 +434,7 @@
                 where 1=1
 
                 <if test="productId !=null and productId !=0">
-                    dud.prod_id=#{productId}
+                    and dud.prod_id=#{productId}
                 </if>
                 and du.leader_path like #{leaderPath}
             )
@@ -455,8 +455,8 @@
         on dud.drug_user_id=du.id
         where 1=1
         <if test="productId !=null and productId !=0">
-            and vei.product_id=4
-            and dud.prod_id=4
+            and vei.product_id=#{productId}
+            and dud.prod_id=#{productId}
         </if>
 
         and du.leader_path like #{leaderPath}
