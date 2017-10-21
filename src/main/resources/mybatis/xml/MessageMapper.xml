@@ -191,11 +191,11 @@
         ) a
         where 1=1
         <if test="startTime !=null and startTime !=''">
-            and date_format(a.maxMessageTime,'%Y-%m-%d') &gt;=#{startTime}
+            and date_format(a.maxMessageTime,'%Y-%m-%d %H:%i:%s') &gt;=#{startTime}
         </if>
 
         <if test="endTime !=null and endTime !=''">
-            and date_format(a.maxMessageTime,'%Y-%m-%d') &lt;=#{endTime}
+            and date_format(a.maxMessageTime,'%Y-%m-%d %H:%i:%s') &lt;=#{endTime}
         </if>
         <if test="messageType !=null and messageType !=0">
             and a.type=#{messageType}
@@ -267,11 +267,11 @@
         ) a
         where 1=1
         <if test="startTime !=null and startTime !=''">
-            and date_format(a.maxMessageTime,'%Y-%m-%d') &gt;=#{startTime}
+            and date_format(a.maxMessageTime,'%Y-%m-%d %H:%i:%s') &gt;=#{startTime}
         </if>
 
         <if test="endTime !=null and endTime !=''">
-            and date_format(a.maxMessageTime,'%Y-%m-%d') &lt;=#{endTime}
+            and date_format(a.maxMessageTime,'%Y-%m-%d %H:%i:%s') &lt;=#{endTime}
         </if>
         <if test="messageType !=null and messageType !=0">
             and a.type=#{messageType}
@@ -334,11 +334,11 @@
         </if>-->
 
         <if test="startTime !=null and startTime !=''">
-            and date_format(vm.message_time,'%Y-%m-%d') &gt;=#{startTime}
+            and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &gt;=#{startTime}
         </if>
 
         <if test="endTime !=null and endTime !=''">
-            and date_format(vm.message_time,'%Y-%m-%d') &lt;=#{endTime}
+            and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &lt;=#{endTime}
         </if>
         and vm.drug_user_id in (select id from drug_user where leader_path like #{leaderPath})
         order by vm.message_time desc limit #{page},#{pageSize}
@@ -371,11 +371,11 @@
         </if>-->
 
         <if test="startTime !=null and startTime !=''">
-            and date_format(vm.message_time,'%Y-%m-%d') &gt;=#{startTime}
+            and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &gt;=#{startTime}
         </if>
 
         <if test="endTime !=null and endTime !=''">
-            and date_format(vm.message_time,'%Y-%m-%d') &lt;=#{endTime}
+            and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &lt;=#{endTime}
         </if>
         and vm.drug_user_id in (select id from drug_user where leader_path like #{leaderPath})
 
@@ -406,11 +406,11 @@
         </if>
 
         <if test="startTime !=null and startTime !=''">
-            and date_format(vei.createTime,'%Y-%m-%d') &gt;= #{startTime}
+            and date_format(vei.createTime,'%Y-%m-%d %H:%i:%s') &gt;= #{startTime}
         </if>
 
         <if test="endTime !=null and endTime !=''">
-            and date_format(vei.createTime,'%Y-%m-%d') &lt;= #{endTime}
+            and date_format(vei.createTime,'%Y-%m-%d %H:%i:%s') &lt;= #{endTime}
         </if>
 
         and du.leader_path like #{leaderPath}
@@ -437,11 +437,11 @@
         </if>
 
         <if test="startTime !=null and startTime !=''">
-            and date_format(vei.createTime,'%Y-%m-%d') &gt;= #{startTime}
+            and date_format(vei.createTime,'%Y-%m-%d %H:%i:%s') &gt;= #{startTime}
         </if>
 
         <if test="endTime !=null and endTime !=''">
-            and date_format(vei.createTime,'%Y-%m-%d') &lt;= #{endTime}
+            and date_format(vei.createTime,'%Y-%m-%d %H:%i:%s') &lt;= #{endTime}
         </if>
 
         and du.leader_path like #{leaderPath}
