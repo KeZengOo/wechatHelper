@@ -53,16 +53,16 @@ public class DropTargetService {
 
 
 
-    public List<DropTargetResponseBean> getDropTargetList(DropTargetRequestBean bean){
+    public List<DropTargetResponseBean> getDropTargetList(Long productId){
         List<DropTargetResponseBean> list = new ArrayList<>();
-        List<DropTarget> dropTargets = dropTargetRepository.findByProductId(bean.getProductId());
+        List<DropTarget> dropTargets = dropTargetRepository.findByProductId(productId);
         if (null != dropTargets && !dropTargets.isEmpty()){
             for (DropTarget dropTarget:dropTargets){
                 DropTargetResponseBean dropTargetResponseBean = new DropTargetResponseBean();
                 dropTargetResponseBean.setDropPeriod(dropTarget.getDropPriod());
                 dropTargetResponseBean.setId(dropTarget.getId());
-                dropTargetResponseBean.setLevel(bean.getLevel());
-                dropTargetResponseBean.setProductId(bean.getProductId());
+                dropTargetResponseBean.setLevel(dropTarget.getLevel());
+                dropTargetResponseBean.setProductId(dropTarget.getProductId());
                 list.add(dropTargetResponseBean);
             }
         }
