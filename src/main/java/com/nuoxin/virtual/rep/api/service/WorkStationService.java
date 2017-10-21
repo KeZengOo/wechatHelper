@@ -252,7 +252,7 @@ public class WorkStationService {
         }
 
         Integer visitCount = meetingCount + wechatCount + imCount + todayEmailCount + callCount;
-        todayStatisticsResponseBean.setCallCount(visitCount);
+        todayStatisticsResponseBean.setVisitCount(visitCount);
 
         //目标人次没有微信的
         Integer targetVisitCount = perDayTargetMeetingPersonCount + perDayTargetCallCount + perDayTargetWechatCount + perDayTargetImCount + perDayTargetEmailCount;
