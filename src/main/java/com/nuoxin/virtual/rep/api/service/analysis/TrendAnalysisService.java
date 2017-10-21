@@ -12,16 +12,14 @@ import com.nuoxin.virtual.rep.api.web.controller.response.analysis.ta.TargetResp
 import com.nuoxin.virtual.rep.api.web.controller.response.analysis.tr.TrendResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.analysis.tr.TrendSessionStatResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.analysis.tr.TrendStatResponseBean;
+import org.hibernate.mapping.Collection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by fenggang on 10/12/17.
@@ -54,6 +52,13 @@ public class TrendAnalysisService extends BaseService {
                 }
             }
         }
+        Collections.sort(responseBeans,new Comparator<TrendResponseBean> () {
+
+            @Override
+            public int compare(TrendResponseBean o1, TrendResponseBean o2) {
+                return o1.getDate().compareTo(o2.getDate());
+            }
+        });
         return responseBeans;
     }
 
@@ -77,6 +82,13 @@ public class TrendAnalysisService extends BaseService {
                 }
             }
         }
+        Collections.sort(responseBeans,new Comparator<TrendResponseBean> () {
+
+            @Override
+            public int compare(TrendResponseBean o1, TrendResponseBean o2) {
+                return o1.getDate().compareTo(o2.getDate());
+            }
+        });
         return responseBeans;
     }
 
@@ -101,6 +113,13 @@ public class TrendAnalysisService extends BaseService {
                 }
             }
         }
+        Collections.sort(responseBeans,new Comparator<TrendResponseBean> () {
+
+            @Override
+            public int compare(TrendResponseBean o1, TrendResponseBean o2) {
+                return o1.getDate().compareTo(o2.getDate());
+            }
+        });
         return responseBeans;
     }
     /**
@@ -119,6 +138,14 @@ public class TrendAnalysisService extends BaseService {
 //                trend.setNum(this._getNum(list,bean.getDateType(),trend));
 //            }
 //        }
+
+        Collections.sort(responseBeans,new Comparator<TrendResponseBean> () {
+
+            @Override
+            public int compare(TrendResponseBean o1, TrendResponseBean o2) {
+                return o1.getDate().compareTo(o2.getDate());
+            }
+        });
         return responseBeans;
     }
 
@@ -166,6 +193,13 @@ public class TrendAnalysisService extends BaseService {
             }
         }
 
+        Collections.sort(responseBeans,new Comparator<TrendSessionStatResponseBean> () {
+
+            @Override
+            public int compare(TrendSessionStatResponseBean o1, TrendSessionStatResponseBean o2) {
+                return o1.getDate().compareTo(o2.getDate());
+            }
+        });
         return responseBeans;
     }
 
@@ -228,6 +262,13 @@ public class TrendAnalysisService extends BaseService {
             }
             responseBeans.add(responseBean);
         }
+        Collections.sort(responseBeans,new Comparator<TrendStatResponseBean> () {
+
+            @Override
+            public int compare(TrendStatResponseBean o1, TrendStatResponseBean o2) {
+                return o1.getHour().compareTo(o2.getHour());
+            }
+        });
         return responseBeans;
     }
 
@@ -275,6 +316,13 @@ public class TrendAnalysisService extends BaseService {
 
             responseBeans.add(responseBean);
         }
+        Collections.sort(responseBeans,new Comparator<TrendStatResponseBean> () {
+
+            @Override
+            public int compare(TrendStatResponseBean o1, TrendStatResponseBean o2) {
+                return o1.getHour().compareTo(o2.getHour());
+            }
+        });
         return responseBeans;
     }
 

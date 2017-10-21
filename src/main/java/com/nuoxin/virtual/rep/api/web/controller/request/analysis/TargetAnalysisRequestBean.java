@@ -110,7 +110,7 @@ public class TargetAnalysisRequestBean implements Serializable{
     public void checkDate(){
         if(dateType==1){
             setStartDate(getDate()+" 00:00:00");
-            setEndDate(getDate()+" 23:00:00");
+            setEndDate(getDate()+" 23:59:59");
         }else if(dateType==2){
             String[] dates = getDate().split("-");
             Calendar calendar = Calendar.getInstance();
@@ -121,9 +121,9 @@ public class TargetAnalysisRequestBean implements Serializable{
                 calendar.add(Calendar.DAY_OF_YEAR,-6);
                 setStartDate(DateUtil.getDateTimeString(calendar.getTime()));
             }else{
-                calendar.add(Calendar.DAY_OF_YEAR,2-weekDay);
+                calendar.add(Calendar.DAY_OF_YEAR,1-weekDay);
                 setStartDate(DateUtil.getDateTimeString(calendar.getTime()));
-                calendar.add(Calendar.DAY_OF_YEAR,9-weekDay);
+                calendar.add(Calendar.DAY_OF_YEAR,7);
                 setEndDate(DateUtil.getDateTimeString(calendar.getTime()));
             }
         }else if(dateType==3){

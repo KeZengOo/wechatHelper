@@ -93,7 +93,7 @@ public class TrendAnalysisRequestBean implements Serializable {
             calendar.set(Integer.valueOf(dates[0]), Integer.valueOf(dates[1])- 1, Integer.valueOf(dates[2]) , 0, 0, 0);
             calendar.add(Calendar.DAY_OF_YEAR, -6);
             setStartDate(DateUtil.getDateTimeString(calendar.getTime()));
-            setEndDate(getDate() + " 23:00:00");
+            setEndDate(getDate() + " 23:59:59");
         } else if (dateType == 2) {
             Calendar calendar = Calendar.getInstance();
             calendar.set(Integer.valueOf(dates[0]), Integer.valueOf(dates[1]) - 1, Integer.valueOf(dates[2]), 0, 0, 0);
@@ -107,7 +107,8 @@ public class TrendAnalysisRequestBean implements Serializable {
                 calendar.add(Calendar.DAY_OF_YEAR, 2 - weekDay);
                 calendar.add(Calendar.WEEK_OF_YEAR,-3);
                 setStartDate(DateUtil.getDateTimeString(calendar.getTime()));
-                calendar.add(Calendar.DAY_OF_YEAR, 9 - weekDay);
+                calendar.set(Integer.valueOf(dates[0]), Integer.valueOf(dates[1]) - 1, Integer.valueOf(dates[2]), 0, 0, 0);
+                calendar.add(Calendar.DAY_OF_YEAR, 8-weekDay);
                 setEndDate(DateUtil.getDateTimeString(calendar.getTime()));
             }
         } else if (dateType == 3) {
@@ -115,13 +116,15 @@ public class TrendAnalysisRequestBean implements Serializable {
             calendar.set(Integer.valueOf(dates[0]), Integer.valueOf(dates[1]) - 1, 1, 0, 0, 0);
             calendar.add(Calendar.MONTH, -3);
             setStartDate(DateUtil.getDateTimeString(calendar.getTime()));
+            calendar.set(Integer.valueOf(dates[0]), Integer.valueOf(dates[1]) - 1, 1, 0, 0, 0);
             calendar.add(Calendar.MONTH, +1);
             setEndDate(DateUtil.getDateTimeString(calendar.getTime()));
         } else if (dateType == 4) {
             Calendar calendar = Calendar.getInstance();
-            calendar.set(Integer.valueOf(dates[0]), ((int) calendar.get(Calendar.MONTH) / 3) * 3, 1, 0, 0, 0);
+            calendar.set(Integer.valueOf(dates[0]), ((int) calendar.get(Calendar.MONTH) / 3) * 3 , 1, 0, 0, 0);
             calendar.add(Calendar.MONTH, -9);
             setStartDate(DateUtil.getDateTimeString(calendar.getTime()));
+            calendar.set(Integer.valueOf(dates[0]), Integer.valueOf(dates[1]) - 1, 1, 0, 0, 0);
             calendar.set(Integer.valueOf(dates[0]), ((int) calendar.get(Calendar.MONTH) / 3) * 3 + 2, 1, 0, 0, 0);
             calendar.add(Calendar.MONTH, +1);
             setEndDate(DateUtil.getDateTimeString(calendar.getTime()));
