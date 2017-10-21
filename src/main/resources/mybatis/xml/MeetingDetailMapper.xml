@@ -19,11 +19,17 @@
         on d.id = dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id = du.id
-        where
-        tma.product_id = #{productId}
+        where 1=1
+        <if test="productId !=null and productId !=0">
+            and tma.product_id = #{productId}
+        </if>
+
         and date_format(tmad.attend_start_time,'%Y-%m-%d')=date_format(now(),'%Y-%m-%d')
         and du.leader_path like #{leaderPath}
-        and dud.prod_id = #{productId}
+        <if test="productId !=null and productId !=0">
+            and dud.prod_id = #{productId}
+        </if>
+
     </select>
 
 
