@@ -274,6 +274,11 @@ public class DoctorController extends BaseController {
             responseBean.setMessage("登录失效");
             return responseBean;
         }
+        if(bean.getDoctorId()==null || bean.getDoctorId()==0){
+            responseBean.setCode(500);
+            responseBean.setMessage("医生id不能为空");
+            return responseBean;
+        }
         bean.setDrugUserId(user.getId());
         contactPlanService.save(bean);
         responseBean.setData(true);
@@ -300,14 +305,15 @@ public class DoctorController extends BaseController {
 
     @ApiOperation(value = "联系计划最近弹窗提醒数据", notes = "联系计划最近弹窗提醒数据")
     @PostMapping("/contact/plan/alert/data")
-    public DefaultResponseBean<Object> contactPlan(HttpServletRequest request, HttpServletResponse response){
-        DefaultResponseBean<Object> responseBean = new DefaultResponseBean();
+    public DefaultResponseBean<List<ContactPlanResponseBean>> contactPlan(HttpServletRequest request, HttpServletResponse response){
+        DefaultResponseBean<List<ContactPlanResponseBean>> responseBean = new DefaultResponseBean();
         DrugUser user = super.getLoginUser(request);
         if(user==null){
             responseBean.setCode(300);
             responseBean.setMessage("登录失效");
             return responseBean;
         }
+        responseBean.setData(contactPlanService.contactPlan(user.getLeaderPath(),user.getId()));
         return responseBean;
     }
 

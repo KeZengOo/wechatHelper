@@ -17,6 +17,8 @@ public class ContactPlanResponseBean implements Serializable {
     private Long id;
     @ApiModelProperty(value = "医生id")
     private Long doctorId;
+    @ApiModelProperty(value = "医生名称")
+    private String doctorName;
     @ApiModelProperty(value = "内容")
     private String content;
     @ApiModelProperty(value = "时间（格式：yyyy-MM-dd HH:mm:ss）")
@@ -83,5 +85,13 @@ public class ContactPlanResponseBean implements Serializable {
 
     public void setDrugUserName(String drugUserName) {
         this.drugUserName = drugUserName;
+    }
+
+    public String getDoctorName() {
+        return doctorName;
+    }
+
+    public void setDoctorName(String doctorName) {
+        this.doctorName = doctorName;
     }
 }

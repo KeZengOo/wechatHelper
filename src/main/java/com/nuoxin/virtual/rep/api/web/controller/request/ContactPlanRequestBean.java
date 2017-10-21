@@ -17,6 +17,8 @@ public class ContactPlanRequestBean implements Serializable {
     private Long id;
     @ApiModelProperty(value = "医生id")
     private Long doctorId;
+    @ApiModelProperty(value = "医生名称（不用传）")
+    private String doctorName;
     @ApiModelProperty(value = "内容")
     private String content;
     @ApiModelProperty(value = "时间（格式：yyyy-MM-dd HH:mm:ss）")
@@ -24,7 +26,7 @@ public class ContactPlanRequestBean implements Serializable {
     @ApiModelProperty(value = "状态")
     private Integer status;
 
-    @ApiModelProperty(value = "不用传")
+    @ApiModelProperty(value = "坐席id")
     private Long drugUserId;
 
     public Long getId() {
@@ -73,5 +75,13 @@ public class ContactPlanRequestBean implements Serializable {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public String getDoctorName() {
+        return doctorName;
+    }
+
+    public void setDoctorName(String doctorName) {
+        this.doctorName = doctorName;
     }
 }

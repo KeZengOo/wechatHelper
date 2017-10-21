@@ -41,7 +41,7 @@ public class QuestionOptionsStatResponseBean implements Serializable {
     }
 
     public void setPercentage(Float percentage) {
-        this.percentage = percentage;
+        this.percentage = percentage*100;
     }
 
     public Long getQuestionId() {

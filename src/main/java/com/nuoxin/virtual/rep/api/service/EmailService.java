@@ -99,7 +99,7 @@ public class EmailService {
                 Doctor doctor = doctorList.get(i);
                 MimeMessage mimeMessage = this._getMimeMessage(bean,doctor.getEmail());
                 mailSender.send(mimeMessage);
-                logger.info("common.id.send.message【{}】", JSON.toJSONString(mimeMessage));
+                //logger.info("common.id.send.message【{}】", JSON.toJSONString(mimeMessage));
 
                 //保存邮件发送记录
                 Email entity = new Email();

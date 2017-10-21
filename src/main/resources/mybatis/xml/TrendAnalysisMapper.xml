@@ -246,14 +246,14 @@
 
     <select id="sessionType1" resultMap="statResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TrendAnalysisRequestBean">
-        select DATE_FORMAT(m.message_time,'%k') hours,count(1) wechatsCount,count(DISTINCT m.doctorId) wechats from virtual_message m join drug_user d on m.drug_user_id=d.id where
+        select DATE_FORMAT(m.message_time,'%k') hours,count(1) wechatsCount,count(DISTINCT m.doctor_id) wechats from virtual_message m join drug_user d on m.drug_user_id=d.id where
         m.message_time BETWEEN #{startDate} AND #{endDate} and d.leader_path like #{leaderPath,jdbcType=VARCHAR} and m.message_type=1 group by DATE_FORMAT(m.message_time,'%k') order by m.message_time asc
 
     </select>
 
     <select id="sessionType2" resultMap="statResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TrendAnalysisRequestBean">
-        select DATE_FORMAT(m.message_time,'%k') hours,count(1) smssCount,count(DISTINCT m.doctorId) smss from virtual_message m join drug_user d on m.drug_user_id=d.id where
+        select DATE_FORMAT(m.message_time,'%k') hours,count(1) smssCount,count(DISTINCT m.doctor_id) smss from virtual_message m join drug_user d on m.drug_user_id=d.id where
         m.message_time BETWEEN #{startDate} AND #{endDate} and d.leader_path like #{leaderPath,jdbcType=VARCHAR} and m.message_type=2 group by DATE_FORMAT(m.message_time,'%k') order by m.message_time asc
 
     </select>

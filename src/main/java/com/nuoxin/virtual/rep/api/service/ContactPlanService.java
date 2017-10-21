@@ -4,12 +4,14 @@ import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.service.BaseService;
 import com.nuoxin.virtual.rep.api.dao.ContactPlanRepository;
 import com.nuoxin.virtual.rep.api.entity.ContactPlan;
+import com.nuoxin.virtual.rep.api.entity.Doctor;
 import com.nuoxin.virtual.rep.api.entity.DoctorCallInfo;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.ContactPlanQueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.ContactPlanRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.ContactPlanResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.vo.Doc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +41,8 @@ public class ContactPlanService extends BaseService {
     private ContactPlanRepository contactPlanRepository;
     @Autowired
     private DrugUserService drugUserService;
+    @Autowired
+    private DoctorService doctorService;
 
     @Transactional(readOnly = false)
     public void save(ContactPlanRequestBean bean){
@@ -118,7 +122,44 @@ public class ContactPlanService extends BaseService {
         return responseBean;
     }
 
-    public List<?> contactPlan(String leaderPath){
+    public List<ContactPlanResponseBean> contactPlan(String leaderPath,Long drugUserId){
+        Calendar calendar = Calendar.getInstance();
+        Date start = calendar.getTime();
+        calendar.add(Calendar.HOUR_OF_DAY,+2);
+        Date end = calendar.getTime();
+        Map<Long,DrugUser> map = new HashMap<>();
+        Map<Long,Doctor> m = new HashMap<>();
+        List<ContactPlan> list = contactPlanRepository.getDrugUserDate(drugUserId,start,end);
+        if(list!=null && !list.isEmpty()){
+            List<ContactPlanResponseBean> requestBeans = new ArrayList<>();
+            for (ContactPlan contactPlan:list) {
+                ContactPlanResponseBean contact = new ContactPlanResponseBean();
+                contact.setContent(contactPlan.getContent());
+                contact.setDate(DateUtil.getDateTimeString(contactPlan.getDateTime()));
+                contact.setDoctorId(contactPlan.getDoctorId());
+                contact.setDrugUserId(contactPlan.getDrugUserId());
+                contact.setId(contactPlan.getId());
+                contact.setStatus(contactPlan.getStatus());
+                DrugUser drugUser = map.get(contactPlan.getDrugUserId());
+                if(drugUser==null){
+                    drugUser = drugUserService.findById(contactPlan.getDrugUserId());
+                    map.put(contactPlan.getDrugUserId(),drugUser);
+                }
+                if(drugUser!=null){
+                    contact.setDrugUserName(drugUser.getName());
+                }
+                Doctor doctor = m.get(contact.getDoctorId());
+                if(doctor==null) {
+                    doctor = doctorService.findById(contactPlan.getDoctorId());
+                    m.put(contactPlan.getDoctorId(),doctor);
+                }
+                if(doctor!=null){
+                    contact.setDoctorName(doctor.getName());
+                }
+                requestBeans.add(contact);
+            }
+            return requestBeans;
+        }
         return null;
     }
 }

@@ -84,7 +84,7 @@ public class QuestionnaireAnalysisService extends BaseService {
         List<QuestionStatResponseBean> questions = questionnaireAnalysisMapper.questionList(bean);
 
         List<QuestionOptionsStatResponseBean> radios = questionnaireAnalysisMapper.questionUsreAnswerType0(bean);
-        List<QuestionOptionsStatResponseBean> checkbox = questionnaireAnalysisMapper.questionUsreAnswerType0(bean);
+        List<QuestionOptionsStatResponseBean> checkbox = questionnaireAnalysisMapper.questionUsreAnswerType1(bean);
 
         Map<Long,List<QuestionOptionsStatResponseBean>> map = new HashMap<Long,List<QuestionOptionsStatResponseBean>>();
         if(radios!=null && !radios.isEmpty()){

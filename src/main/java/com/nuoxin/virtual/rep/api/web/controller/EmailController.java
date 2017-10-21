@@ -5,6 +5,7 @@ import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
 import com.nuoxin.virtual.rep.api.common.util.StringUtils;
+import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.EmailService;
 import com.nuoxin.virtual.rep.api.web.controller.request.EmailQueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.EmailRequestBean;
@@ -48,6 +49,13 @@ public class EmailController extends BaseController {
             responseBean.setMessage("发送医生不能为空");
             return responseBean;
         }
+        DrugUser user = super.getLoginUser(request);
+        if(user==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
+        }
+        bean.setDrugUserId(user.getId());
         responseBean.setData(emailService.commonEmailSendIds(bean));
         return responseBean;
     }
@@ -62,7 +70,13 @@ public class EmailController extends BaseController {
             responseBean.setCode(500);
             responseBean.setMessage("发送医生不能为空");
             return responseBean;
+        } DrugUser user = super.getLoginUser(request);
+        if(user==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
         }
+        bean.setDrugUserId(user.getId());
         responseBean.setData(emailService.commonEmailSendTo(bean));
         return responseBean;
     }
@@ -73,7 +87,7 @@ public class EmailController extends BaseController {
                                                                          HttpServletRequest request, HttpServletResponse response){
         logger.info("{}接口请求数据【】{}",request.getServletPath(), JSON.toJSONString(bean));
         DefaultResponseBean<PageResponseBean<MessageResponseBean>> responseBean = new DefaultResponseBean<>();
-        if(bean.getDoctorId()==null || bean.getDoctorId()==0l){
+        if(bean.getDoctorId()==null || bean.getDoctorId()==0){
             responseBean.setCode(500);
             responseBean.setMessage("医生id不能为空");
             return responseBean;
