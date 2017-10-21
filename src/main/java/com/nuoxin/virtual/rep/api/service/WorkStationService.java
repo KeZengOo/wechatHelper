@@ -167,7 +167,7 @@ public class WorkStationService {
             callSum = 0;
         }
         //拜访客户总人数
-        Integer visitTotalSum = meetingTotalPerson + wechatSum + imSum + todayEmailCount + callSum;
+        Integer visitTotalSum = meetingTotalPerson + wechatSum + imSum + todayEmailNum + callSum;
         todayStatisticsResponseBean.setVisitSum(visitTotalSum);
 
         //拜访客户总人次
