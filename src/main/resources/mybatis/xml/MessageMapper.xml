@@ -17,7 +17,12 @@
                 on d.id=dud.doctor_id
                 inner join drug_user du
                 on dud.drug_user_id=du.id
-                                where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+                                where 1=1
+                                <if test="productId !=null and productId !=0">
+                                    and dud.prod_id=#{productId}
+                                </if>
+
+                                and du.leader_path like #{leaderPath}
                         )
                 ) as wechatSum,
                 (
@@ -32,7 +37,12 @@
                                 on d.id=dud.doctor_id
                                 inner join drug_user du
                                 on dud.drug_user_id=du.id
-                                where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+                                where 1=1
+                                <if test="productId !=null and productId !=0">
+                                    and dud.prod_id=#{productId}
+                                </if>
+
+                                and du.leader_path like #{leaderPath}
                         )
                 ) as wechatCount,
                 (
@@ -40,7 +50,10 @@
                 from virtual_message vm
                 where vm.message_type=2
                 and vm.user_type=2
-                and vm.product_id = #{productId}
+                <if test="productId !=null and productId !=0">
+                    and vm.product_id = #{productId}
+                </if>
+
                 and date_format(vm.message_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
                 and vm.drug_user_id in (select id from drug_user where leader_path like #{leaderPath})
                 and vm.doctor_id in (select d.id from doctor d
@@ -48,7 +61,12 @@
                 on d.id=dud.doctor_id
                 inner join drug_user du
                 on dud.drug_user_id=du.id
-                where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+                where 1=1
+                  <if test="productId !=null and productId !=0">
+                      and dud.prod_id=#{productId}
+                  </if>
+
+                  and du.leader_path like #{leaderPath}
                         )
 
                 ) as imSum,
@@ -57,7 +75,10 @@
                 from virtual_message vm
                 where vm.message_type=2
                 and vm.user_type=2
-                and vm.product_id = #{productId}
+                <if test="productId != null and productId !=0">
+                    and vm.product_id = #{productId}
+                </if>
+
                 and date_format(vm.message_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
                 and vm.drug_user_id in (select id from drug_user where leader_path like #{leaderPath})
                 and vm.doctor_id in (select d.id from doctor d
@@ -65,7 +86,12 @@
                                 on d.id=dud.doctor_id
                                 inner join drug_user du
                                 on dud.drug_user_id=du.id
-                                where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+                                where 1=1
+                                <if test="productId != null and productId !=0">
+                                    and dud.prod_id=#{productId}
+                                </if>
+
+                                and du.leader_path like #{leaderPath}
                         )
                 ) as imCount
 
@@ -107,14 +133,15 @@
         ) t limit #{page},#{pageSize}-->
 
 
-        select distinct
+        select
         a.doctor_id doctorId,
         a.doctorName nickname,
         a.maxMessageTime lastTime,
-        a.type messageType
+        a.type messageType,
+        a.product_id productId
         from (
-        select t.doctor_id,max(message_time) as maxMessageTime,t.type,t.doctorName from (
-        select vm.doctor_id,vm.message,vm.message_time, 1 type, d.name doctorName from virtual_message vm
+        select t.doctor_id,max(message_time) as maxMessageTime,t.type,t.doctorName,t.product_id from (
+        select vm.doctor_id,vm.message,vm.message_time, 1 type, d.name doctorName, vm.product_id from virtual_message vm
         inner join doctor d
         on vm.doctor_id =d.id
         inner join drug_user_doctor dud
@@ -124,13 +151,15 @@
         where du.leader_path like #{leaderPath}
         and vm.message_type=1
         union
-        select vm.doctor_id,vm.message,vm.message_time, 2 type, d.name doctorName from virtual_message vm
+        select vm.doctor_id,vm.message,vm.message_time, 2 type, d.name doctorName, vm.product_id from virtual_message vm
         inner join doctor d
         on vm.doctor_id =d.id
         inner join drug_user_doctor dud
         on d.id=dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id=du.id
+        inner join product_line pl
+        on dud.prod_id=pl.prod_id
         where 1=1
         <if test="productId !=null and productId !=0">
             and dud.prod_id=#{productId}
@@ -138,8 +167,9 @@
         </if>
         and du.leader_path like #{leaderPath}
         and vm.message_type=2
+        group by vm.product_id
         union
-        select vei.doctor_id,vei.content message,vei.create_time message_time, 3 type, d.name doctorName
+        select vei.doctor_id,vei.content message,vei.create_time message_time, 3 type, d.name doctorName,vei.product_id
         from virtual_email_info vei
         inner join doctor d
         on vei.doctor_id=d.id
@@ -147,12 +177,16 @@
         on d.id=dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id=du.id
+        inner join product_line pl
+        on
+        vei.product_id=pl.prod_id
         where 1=1
         <if test="productId != null and productId !=0">
             and vei.product_id=#{productId}
             and dud.prod_id=#{productId}
         </if>
         and du.leader_path like #{leaderPath}
+        group by vei.product_id
         ) t group by t.type,t.doctor_id
         ) a
         where 1=1
@@ -180,31 +214,11 @@
     <select id="getMessageLinkmanListCount"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean"
             resultType="java.lang.Integer">
-        <!--select count(1) from (
-        select
-        vm.doctor_id
-        from virtual_message vm
-        where vm.drug_user_id in (select id from drug_user where leader_path like #{leaderPath})
-        <if test="startTime !=null and endTime !=null">
-            and date_format(vm.message_time,'%Y-%m-%d') between #{startTime} and #{endTime}
-        </if>
-        and vm.doctor_id in (
-        select d.id from doctor d
-        inner join drug_user_doctor dud
-        on d.id=dud.doctor_id
-        inner join drug_user du
-        on dud.drug_user_id=du.id
-        where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
-        )
 
-        group by  vm.doctor_id,vm.message_type
-        ) t-->
-
-
-
-        select count(1) from (
-        select t.doctor_id,max(message_time) as maxMessageTime,t.type from (
-        select vm.doctor_id,vm.message,vm.message_time, 1 type from virtual_message vm
+        select count(1)
+        from (
+        select t.doctor_id,max(message_time) as maxMessageTime,t.type,t.doctorName,t.product_id from (
+        select vm.doctor_id,vm.message,vm.message_time, 1 type, d.name doctorName, vm.product_id from virtual_message vm
         inner join doctor d
         on vm.doctor_id =d.id
         inner join drug_user_doctor dud
@@ -214,23 +228,25 @@
         where du.leader_path like #{leaderPath}
         and vm.message_type=1
         union
-        select vm.doctor_id,vm.message,vm.message_time, 2 type from virtual_message vm
+        select vm.doctor_id,vm.message,vm.message_time, 2 type, d.name doctorName, vm.product_id from virtual_message vm
         inner join doctor d
         on vm.doctor_id =d.id
         inner join drug_user_doctor dud
         on d.id=dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id=du.id
+        inner join product_line pl
+        on dud.prod_id=pl.prod_id
         where 1=1
         <if test="productId !=null and productId !=0">
             and dud.prod_id=#{productId}
             and vm.product_id=#{productId}
         </if>
-
         and du.leader_path like #{leaderPath}
         and vm.message_type=2
+        group by vm.product_id
         union
-        select vei.doctor_id,vei.content message,vei.create_time message_time, 3 type
+        select vei.doctor_id,vei.content message,vei.create_time message_time, 3 type, d.name doctorName,vei.product_id
         from virtual_email_info vei
         inner join doctor d
         on vei.doctor_id=d.id
@@ -238,16 +254,18 @@
         on d.id=dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id=du.id
+        inner join product_line pl
+        on vei.product_id=pl.prod_id
         where 1=1
         <if test="productId != null and productId !=0">
             and vei.product_id=#{productId}
             and dud.prod_id=#{productId}
         </if>
-
-        and du.leader_path  like #{leaderPath}
+        and du.leader_path like #{leaderPath}
+        group by vei.product_id
         ) t group by t.type,t.doctor_id
-        ) a where 1=1
-
+        ) a
+        where 1=1
         <if test="startTime !=null and startTime !=''">
             and date_format(a.maxMessageTime,'%Y-%m-%d') &gt;=#{startTime}
         </if>
@@ -258,6 +276,13 @@
         <if test="messageType !=null and messageType !=0">
             and a.type=#{messageType}
         </if>
+        <if test="nickname !=null and nickname !=''">
+            and a.doctorName like concat('%',#{nickname},'%')
+        </if>
+
+
+
+
 
 
 
@@ -304,8 +329,16 @@
         </if>
 
         and vm.doctor_id=#{doctorId}
-        <if test="startTime !=null and endTime !=null">
+        <!--<if test="startTime !=null and endTime !=null">
             and date_format(vm.message_time,'%Y-%m-%d') between #{startTime} and #{endTime}
+        </if>-->
+
+        <if test="startTime !=null and startTime !=''">
+            and date_format(vm.message_time,'%Y-%m-%d') &gt;=#{startTime}
+        </if>
+
+        <if test="endTime !=null and endTime !=''">
+            and date_format(vm.message_time,'%Y-%m-%d') &lt;=#{endTime}
         </if>
         and vm.drug_user_id in (select id from drug_user where leader_path like #{leaderPath})
         order by vm.message_time desc limit #{page},#{pageSize}
@@ -333,8 +366,16 @@
         </if>
 
         and vm.doctor_id=#{doctorId}
-        <if test="startTime !=null and endTime !=null">
+        <!--<if test="startTime !=null and endTime !=null">
             and date_format(vm.message_time,'%Y-%m-%d') between #{startTime} and #{endTime}
+        </if>-->
+
+        <if test="startTime !=null and startTime !=''">
+            and date_format(vm.message_time,'%Y-%m-%d') &gt;=#{startTime}
+        </if>
+
+        <if test="endTime !=null and endTime !=''">
+            and date_format(vm.message_time,'%Y-%m-%d') &lt;=#{endTime}
         </if>
         and vm.drug_user_id in (select id from drug_user where leader_path like #{leaderPath})
 
