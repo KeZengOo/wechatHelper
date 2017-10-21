@@ -197,7 +197,7 @@ public class WorkStationService {
 
         //目标人次没有微信的
         Integer targetVisitCount = perDayTargetMeetingPersonCount + perDayTargetCallCount + perDayTargetWechatCount + perDayTargetImCount + perDayTargetEmailCount;
-        Integer targetVisitSum = perDayTargetMeetingPersonCount + perDayTargetCallSum + perDayTargetWechatNum + perDayTargetImSum + perDayTargetEmailNum;
+        Integer targetVisitSum = perDayTargetMeetingPersonSum + perDayTargetCallSum + perDayTargetWechatNum + perDayTargetImSum + perDayTargetEmailNum;
         todayStatisticsResponseBean.setTargetVisitCount(targetVisitCount);
         todayStatisticsResponseBean.setTargetVisitSum(targetVisitSum);
         return todayStatisticsResponseBean;
