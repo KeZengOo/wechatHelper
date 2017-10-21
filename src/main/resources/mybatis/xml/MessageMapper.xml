@@ -406,11 +406,11 @@
         </if>
 
         <if test="startTime !=null and startTime !=''">
-            and date_format(vei.createTime,'%Y-%m-%d %H:%i:%s') &gt;= #{startTime}
+            and date_format(vei.create_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startTime}
         </if>
 
         <if test="endTime !=null and endTime !=''">
-            and date_format(vei.createTime,'%Y-%m-%d %H:%i:%s') &lt;= #{endTime}
+            and date_format(vei.create_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endTime}
         </if>
 
         and du.leader_path like #{leaderPath}
@@ -437,11 +437,11 @@
         </if>
 
         <if test="startTime !=null and startTime !=''">
-            and date_format(vei.createTime,'%Y-%m-%d %H:%i:%s') &gt;= #{startTime}
+            and date_format(vei.create_time,'%Y-%m-%d %H:%i:%s') &gt;= #{startTime}
         </if>
 
         <if test="endTime !=null and endTime !=''">
-            and date_format(vei.createTime,'%Y-%m-%d %H:%i:%s') &lt;= #{endTime}
+            and date_format(vei.create_time,'%Y-%m-%d %H:%i:%s') &lt;= #{endTime}
         </if>
 
         and du.leader_path like #{leaderPath}
