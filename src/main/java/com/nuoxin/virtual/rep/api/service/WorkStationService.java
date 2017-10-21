@@ -611,19 +611,96 @@ public class WorkStationService {
         if (targets != null && !targets.isEmpty()){
             for (Target target:targets){
                 if (target != null){
-                    monthTargetWechatNum += target.getMonthWechatNum();
-                    monthTargetWechatCount += target.getMonthWechatCount();
-                    monthTargetImSum += target.getMonthImNum();
-                    monthTargetImCount += target.getMonthImCount();
-                    monthTargetEmailNum += target.getMonthEmailNum();
-                    monthTargetEmailCount += target.getMonthEmailCount();
-                    monthTargetCallSum += target.getMonthTelPerson();
-                    monthTargetCallCount += target.getMonthTelNum();
-                    monthTargetCallTime += target.getMonthTelTime();
-                    monthTargetMeetingSum += target.getMonthMeetingNum();
-                    monthTargetMeetingTime += target.getMonthMeetingTime();
-                    monthTargetMeetingPersonSum += target.getMonthMeetingPersonSum();
-                    monthTargetMeetingPersonCount += target.getMonthMeetingPersonCount();
+
+                    Integer monthWechatNum = target.getMonthWechatNum();
+                    if (monthWechatNum == null){
+                        monthWechatNum = 0;
+                    }
+                    monthTargetWechatNum += monthWechatNum;
+
+
+                    Integer monthWechatCount = target.getMonthWechatCount();
+                    if (monthWechatCount == null){
+                        monthWechatCount = 0;
+                    }
+                    monthTargetWechatCount += monthWechatCount;
+
+
+                    Integer monthImNum = target.getMonthImNum();
+                    if (monthImNum == null){
+                        monthImNum = 0;
+                    }
+                    monthTargetImSum += monthImNum;
+
+
+                    Integer monthImCount = target.getMonthImCount();
+                    if (monthImCount == null){
+                        monthImCount = 0;
+                    }
+                    monthTargetImCount += monthImCount;
+
+
+                    Integer monthEmailNum = target.getMonthEmailNum();
+                    if (monthEmailNum == null){
+                        monthEmailNum = 0;
+                    }
+                    monthTargetEmailNum += monthEmailNum;
+
+
+                    Integer monthEmailCount = target.getMonthEmailCount();
+                    if (monthEmailCount == null){
+                        monthEmailCount = 0;
+                    }
+                    monthTargetEmailCount += monthEmailCount;
+
+
+                    Integer monthTelPerson = target.getMonthTelPerson();
+                    if (monthTelPerson == null){
+                        monthTelPerson = 0;
+                    }
+                    monthTargetCallSum += monthTelPerson;
+
+
+                    Integer monthTelNum = target.getMonthTelNum();
+                    if (monthTelNum == null){
+                        monthTelNum = 0;
+                    }
+                    monthTargetCallCount += monthTelNum;
+
+
+                    Integer monthTelTime = target.getMonthTelTime();
+                    if (monthTelTime == null){
+                        monthTelTime = 0;
+                    }
+                    monthTargetCallTime += monthTelTime;
+
+
+                    Integer monthMeetingNum = target.getMonthMeetingNum();
+                    if (monthMeetingNum == null){
+                        monthMeetingNum = 0;
+                    }
+                    monthTargetMeetingSum += monthMeetingNum;
+
+
+                    Integer monthMeetingTime = target.getMonthMeetingTime();
+                    if (monthMeetingTime == null){
+                        monthMeetingTime = 0;
+                    }
+                    monthTargetMeetingTime += monthMeetingTime;
+
+
+                    Integer monthMeetingPersonSum = target.getMonthMeetingPersonSum();
+                    if (monthMeetingPersonSum == null){
+                        monthMeetingPersonSum = 0;
+                    }
+                    monthTargetMeetingPersonSum += monthMeetingPersonSum;
+
+
+                    Integer monthMeetingPersonCount = target.getMonthMeetingPersonCount();
+                    if (monthMeetingPersonCount == null){
+                        monthMeetingPersonCount = 0;
+                    }
+                    monthTargetMeetingPersonCount += monthMeetingPersonCount;
                 }
             }
         }

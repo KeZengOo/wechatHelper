@@ -14,11 +14,17 @@
                 on vdci.virtual_drug_user_id=dud.drug_user_id
                 inner join drug_user du
                 on du.id = dud.drug_user_id
-                where
-                dud.prod_id=#{productId}
+                inner join product_line pl
+                on dud.prod_id=pl.prod_id
+                where 1=1
+                <if test="productId != null and productId !=0">
+                    and dud.prod_id=#{productId}
+                    and vdci.product_id = #{productId}
+                </if>
+
                 and du.leader_path like #{leaderPath}
                 and vdcid.status_name='answer'
-                and vdci.product_id = #{productId}
+
                 and date_format(vdci.create_time, '%Y-%m-%d')=date_format(NOW(), '%Y-%m-%d')
                 ) as callSum,
                 (
@@ -30,11 +36,17 @@
                 on vdci.virtual_drug_user_id=dud.drug_user_id
                 inner join drug_user du
                 on du.id = dud.drug_user_id
-                where
-                dud.prod_id=#{productId}
+                inner join product_line pl
+                on dud.prod_id=pl.prod_id
+                where 1=1
+                <if test="productId!=null and productId !=0">
+                    and dud.prod_id=#{productId}
+                    and vdci.product_id = #{productId}
+                </if>
+
                 and du.leader_path like #{leaderPath}
                 and vdcid.status_name='answer'
-                and vdci.product_id = #{productId}
+
                 and date_format(vdci.create_time, '%Y-%m-%d')=date_format(NOW(), '%Y-%m-%d')
                 ) as callCount
 
@@ -51,11 +63,17 @@
             on vdci.virtual_drug_user_id=dud.drug_user_id
             inner join drug_user du
             on du.id = dud.drug_user_id
-            where
-            dud.prod_id=#{productId}
+            inner join product_line pl
+            on dud.prod_id=pl.prod_id
+            where 1=1
+            <if test="productId !=null and productId !=0">
+                and dud.prod_id=#{productId}
+                and vdci.product_id=#{productId}
+            </if>
+
             and du.leader_path like #{leaderPath}
             and vdcid.status_name='answer'
-            and vdci.product_id=#{productId}
+
             and date_format(vdci.create_time, '%Y-%m-%d')=date_format(NOW(), '%Y-%m-%d')
 
     </select>

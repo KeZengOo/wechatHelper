@@ -105,33 +105,6 @@
     <select id="getMessageLinkmanList"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean"
             resultType="com.nuoxin.virtual.rep.api.web.controller.response.message.MessageLinkmanResponseBean">
-        <!--select
-        t.doctor_id doctorId,
-        t.nickname nickname,
-        t.message_type messageType,
-        t.maxMessageTime lastTime,
-        (select message from virtual_message where doctor_id=t.doctor_id and message_type=t.message_type and message_time=t.maxMessageTime) lastMessage
-        from (
-        select
-        vm.doctor_id,
-        vm.nickname,
-        vm.message_type,max(vm.message_time) as maxMessageTime
-        from virtual_message vm
-        where vm.drug_user_id in (select id from drug_user where leader_path like #{leaderPath})
-        <if test="startTime !=null and endTime !=null">
-            and date_format(vm.message_time,'%Y-%m-%d') between #{startTime} and #{endTime}
-        </if>
-        and vm.doctor_id in (
-                select d.id from doctor d
-                inner join drug_user_doctor dud
-                on d.id=dud.doctor_id
-                inner join drug_user du
-                on dud.drug_user_id=du.id
-                where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
-            )
-        group by  vm.doctor_id,vm.message_type  order by maxMessageTime desc
-        ) t limit #{page},#{pageSize}-->
-
 
         select
         a.doctor_id doctorId,
@@ -206,6 +179,7 @@
 
 
         order by a.maxMessageTime desc limit #{page},#{pageSize}
+       /* order by a.maxMessageTime desc limit 2,2*/
 
 
 
