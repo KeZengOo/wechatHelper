@@ -73,9 +73,25 @@ public class WorkStationService {
         //会议的统计
         TodayStatisticsResponseBean meetingStatistic = meetingDetailMapper.getMeetingStatistic(bean);
         if (null != meetingStatistic){
-            todayStatisticsResponseBean.setMeetingCount(meetingStatistic.getMeetingCount());
-            todayStatisticsResponseBean.setMeetingTotalTime(meetingStatistic.getMeetingTotalTime());
-            todayStatisticsResponseBean.setMeetingTotalPersonNum(meetingStatistic.getMeetingTotalPersonNum());
+            Integer meetingCount = meetingStatistic.getMeetingCount();
+            if (meetingCount == null){
+                meetingCount = 0;
+            }
+            todayStatisticsResponseBean.setMeetingCount(meetingCount);
+
+
+            Integer meetingTotalTime = meetingStatistic.getMeetingTotalTime();
+            if (meetingTotalTime == null){
+                meetingTotalTime = 0;
+            }
+            todayStatisticsResponseBean.setMeetingTotalTime(meetingTotalTime);
+
+            Integer meetingTotalPersonNum = meetingStatistic.getMeetingTotalPersonNum();
+            if (meetingTotalPersonNum == null){
+                meetingTotalPersonNum = 0;
+            }
+            todayStatisticsResponseBean.setMeetingTotalPersonNum(meetingTotalPersonNum);
+
             todayStatisticsResponseBean.setMeetingAvgTime(meetingStatistic.getMeetingAvgTime());
         }
 
@@ -110,17 +126,46 @@ public class WorkStationService {
         //多渠道会话统计
         TodayStatisticsResponseBean messageStatistics = messageMapper.getMessageStatistics(bean);
         if (null != meetingStatistic){
-            todayStatisticsResponseBean.setWechatSum(meetingStatistic.getWechatSum());
-            todayStatisticsResponseBean.setWechatCount(meetingStatistic.getWechatCount());
-            todayStatisticsResponseBean.setImSum(meetingStatistic.getImSum());
-            todayStatisticsResponseBean.setImCount(meetingStatistic.getImCount());
+
+            Integer wechatSum = meetingStatistic.getWechatSum();
+            if (wechatSum == null){
+                wechatSum = 0;
+            }
+            todayStatisticsResponseBean.setWechatSum(wechatSum);
+
+
+            Integer wechatCount = meetingStatistic.getWechatCount();
+            if (wechatCount == null){
+                wechatCount = 0;
+            }
+            todayStatisticsResponseBean.setWechatCount(wechatCount);
+
+
+            Integer imSum = meetingStatistic.getImSum();
+            if (imSum == null){
+                imSum = 0;
+            }
+            todayStatisticsResponseBean.setImSum(imSum);
+
+
+            Integer imCount = meetingStatistic.getImCount();
+            if (imCount == null){
+                imCount = 0;
+            }
+            todayStatisticsResponseBean.setImCount(imCount);
         }
 
         //今日邮件人数
         Integer todayEmailNum = emailMapper.getTodayEmailNum(bean);
+        if (todayEmailNum == null){
+            todayEmailNum = 0;
+        }
 
         //今日邮件人次
         Integer todayEmailCount = emailMapper.getTodayEmailCount(bean);
+        if (todayEmailCount == null){
+            todayEmailCount = 0;
+        }
 
         todayStatisticsResponseBean.setEmailSum(todayEmailNum);
         todayStatisticsResponseBean.setTargetWechatSum(perDayTargetWechatNum);
@@ -131,8 +176,18 @@ public class WorkStationService {
         //呼出统计
         TodayStatisticsResponseBean callInfoStatistics = doctorCallInfoMapper.getCallInfoStatistics(bean);
         if (null != callInfoStatistics){
-            todayStatisticsResponseBean.setCallCount(callInfoStatistics.getCallCount());
-            todayStatisticsResponseBean.setCallSum(callInfoStatistics.getCallSum());
+            Integer callCount = callInfoStatistics.getCallCount();
+            if (callCount == null){
+                callCount = 0;
+            }
+            todayStatisticsResponseBean.setCallCount(callCount);
+
+
+            Integer callSum = callInfoStatistics.getCallSum();
+            if (callSum == null){
+                callSum = 0;
+            }
+            todayStatisticsResponseBean.setCallSum(callSum);
 
         }
 
@@ -141,7 +196,11 @@ public class WorkStationService {
 
         TodayStatisticsResponseBean callInfoTimeStatistics = doctorCallInfoMapper.getCallInfoTimeStatistics(bean);
         if (null != callInfoStatistics){
-            todayStatisticsResponseBean.setCallTotalTime(callInfoTimeStatistics.getCallTotalTime());
+            Integer callTotalTime = callInfoTimeStatistics.getCallTotalTime();
+            if (callTotalTime == null){
+                callTotalTime = 0;
+            }
+            todayStatisticsResponseBean.setCallTotalTime(callTotalTime);
         }
 
 
