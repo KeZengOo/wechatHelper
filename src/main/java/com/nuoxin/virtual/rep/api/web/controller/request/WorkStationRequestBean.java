@@ -16,8 +16,11 @@ public class WorkStationRequestBean extends PageRequestBean implements Serializa
     @ApiModelProperty(value = "医生级别")
     private String level;
 
-    @ApiModelProperty(value = "级别脱落总数")
+    @ApiModelProperty(value = "数据库查询的级别脱落总数")
     private Integer levelDropCount;
+
+    @ApiModelProperty(value = "最大级别的脱落数")
+    private Integer maxLevelDropCount;
 
     @ApiModelProperty(value = "销售id，默认取登录的，前端传就用前端的")
     private Long drugUserId;
@@ -253,4 +256,15 @@ public class WorkStationRequestBean extends PageRequestBean implements Serializa
     public void setLevelDropCount(Integer levelDropCount) {
         this.levelDropCount = levelDropCount;
     }
+
+    public Integer getMaxLevelDropCount() {
+        return maxLevelDropCount;
+    }
+
+    public void setMaxLevelDropCount(Integer maxLevelDropCount) {
+        this.maxLevelDropCount = maxLevelDropCount;
+    }
+
+
+
 }

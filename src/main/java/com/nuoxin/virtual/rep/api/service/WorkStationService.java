@@ -1,8 +1,10 @@
 package com.nuoxin.virtual.rep.api.service;
 
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
+import com.nuoxin.virtual.rep.api.dao.DropTargetRepository;
 import com.nuoxin.virtual.rep.api.dao.DrugUserRepository;
 import com.nuoxin.virtual.rep.api.dao.TargetRepository;
+import com.nuoxin.virtual.rep.api.entity.DropTarget;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.Target;
 import com.nuoxin.virtual.rep.api.enums.DateTypeEnum;
@@ -17,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.management.Query;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +51,9 @@ public class WorkStationService {
 
     @Autowired
     private TargetRepository targetRepository;
+
+    @Autowired
+    private DropTargetRepository dropTargetRepository;
 
     /**
      * 今日通话情况
@@ -398,7 +404,30 @@ public class WorkStationService {
 
 
         //脱落客户
+        List<DropCustomerListResponseBean> dropCustomerListResponseBeanList = new ArrayList<>();
+        //A级别
+        bean.setLevel("A");
+        DropCustomerListResponseBean dropACustomerListResponseBean = getDropCustomerListResponseBean(bean);
+        dropCustomerListResponseBeanList.add(dropACustomerListResponseBean);
+        //B级客户
+        bean.setLevel("B");
+        DropCustomerListResponseBean dropBCustomerListResponseBean = getDropCustomerListResponseBean(bean);
+        dropCustomerListResponseBeanList.add(dropBCustomerListResponseBean);
 
+        //C级客户
+        bean.setLevel("C");
+        DropCustomerListResponseBean dropCCustomerListResponseBean = getDropCustomerListResponseBean(bean);
+        dropCustomerListResponseBeanList.add(dropCCustomerListResponseBean);
+
+        //D级客户
+        bean.setLevel("D");
+        DropCustomerListResponseBean dropDCustomerListResponseBean = getDropCustomerListResponseBean(bean);
+        dropCustomerListResponseBeanList.add(dropDCustomerListResponseBean);
+
+        //其他级别
+        bean.setLevel("other");
+        DropCustomerListResponseBean dropOtherCustomerListResponseBean = getDropCustomerListResponseBean(bean);
+        dropCustomerListResponseBeanList.add(dropOtherCustomerListResponseBean);
 
         Integer dateType = bean.getDateType();
         if (dateType != null){
@@ -530,6 +559,32 @@ public class WorkStationService {
         return doctorAnalysitList;
     }
 
+
+
+    private DropCustomerListResponseBean getDropCustomerListResponseBean(WorkStationRequestBean bean){
+        DropCustomerListResponseBean dropCustomerListResponseBean = new DropCustomerListResponseBean();
+        Long productId = bean.getProductId();
+        String level = bean.getLevel();
+        DropTarget dropTarget = dropTargetRepository.findFirstByProductIdAndLevel(productId,level);
+        if (null != dropTarget){
+            bean.setLevel(level);
+            Integer dropPriod = dropTarget.getDropPriod();
+            if (dropPriod == null){
+                dropPriod=0;
+            }
+            bean.setLevelDropCount(dropPriod * 7);
+            Integer dropCount = workStationMapper.getDropCount(bean);
+            Integer maxDropCount = workStationMapper.maxDropCount(bean);
+            bean.setMaxLevelDropCount(maxDropCount);
+            List<DrugUserAnalysisResponseBean> maxDropCountList = workStationMapper.maxDropCountList(bean);
+            dropCustomerListResponseBean.setLevel(level);
+            dropCustomerListResponseBean.setLevelDropCount(dropCount);
+            dropCustomerListResponseBean.setMaxDropDrugUserList(maxDropCountList);
+        }
+
+
+        return dropCustomerListResponseBean;
+    }
 
 
 

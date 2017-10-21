@@ -43,9 +43,11 @@ public interface MessageMapper {
     Integer getEmailMessageListCount(MessageRequestBean bean);
 
 
-    //今日会话数
+    //今日会话数(短信和微信)
     Integer messageCount(MessageRequestBean bean);
 
+    //今日邮件会话数
+    Integer emailMessageCount(MessageRequestBean bean);
 
 
 }

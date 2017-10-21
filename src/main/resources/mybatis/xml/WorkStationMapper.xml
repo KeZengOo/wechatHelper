@@ -1247,9 +1247,9 @@
         group by du.id order by maxDropcount desc limit 1
     </select>
 
-    <select id="maxDropCountList" resultType="java.lang.Integer"
+    <select id="maxDropCountList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.DrugUserAnalysisResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
-        select distinct t.maxDropCount, t.drugUserName from (
+        select distinct t.num, t.drugUserName from (
         select count(distinct d.id) as maxDropcount,du.name as drugUserName from doctor d
         inner join doctor_virtual dv
         on d.id=dv.doctor_id
@@ -1299,7 +1299,7 @@
         </if>
         du.leader_path like #{leaderPath}
         and dv.client_level=#{level}
-        ) t where t.maxDropCount=1
+        ) t where t.num=#{maxLevelDropCount}
     </select>
 
 

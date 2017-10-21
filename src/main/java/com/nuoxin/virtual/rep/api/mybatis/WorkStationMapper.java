@@ -91,6 +91,8 @@ public interface WorkStationMapper {
     //每个级别的最大脱落总数
     Integer maxDropCount(WorkStationRequestBean bean);
 
+    //每个级别的最大脱落总数
+    List<DrugUserAnalysisResponseBean> maxDropCountList(WorkStationRequestBean bean);
 
     /**
      * 客户分析

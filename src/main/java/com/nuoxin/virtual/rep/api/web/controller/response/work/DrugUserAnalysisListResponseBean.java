@@ -57,7 +57,7 @@ public class DrugUserAnalysisListResponseBean implements Serializable{
     private List<String> emailNoReachList;
 
     @ApiModelProperty(value = "脱落客户最严重")
-    private List<String> dropCustomerList;
+    private List<DropCustomerListResponseBean> dropCustomerList;
 
     public List<DrugUserAnalysisResponseBean> getMinTotalCallTimeList() {
         return minTotalCallTimeList;
@@ -147,11 +147,12 @@ public class DrugUserAnalysisListResponseBean implements Serializable{
         this.imNoReachList = imNoReachList;
     }
 
-    public List<String> getDropCustomerList() {
+
+    public List<DropCustomerListResponseBean> getDropCustomerList() {
         return dropCustomerList;
     }
 
-    public void setDropCustomerList(List<String> dropCustomerList) {
+    public void setDropCustomerList(List<DropCustomerListResponseBean> dropCustomerList) {
         this.dropCustomerList = dropCustomerList;
     }
 
