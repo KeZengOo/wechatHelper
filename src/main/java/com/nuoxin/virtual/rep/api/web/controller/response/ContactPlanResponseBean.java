@@ -19,6 +19,10 @@ public class ContactPlanResponseBean implements Serializable {
     private Long doctorId;
     @ApiModelProperty(value = "医生名称")
     private String doctorName;
+
+    @ApiModelProperty(value = "医院名称")
+    private String hospitalName;
+
     @ApiModelProperty(value = "内容")
     private String content;
     @ApiModelProperty(value = "时间（格式：yyyy-MM-dd HH:mm:ss）")
@@ -93,5 +97,14 @@ public class ContactPlanResponseBean implements Serializable {
 
     public void setDoctorName(String doctorName) {
         this.doctorName = doctorName;
+    }
+
+
+    public String getHospitalName() {
+        return hospitalName;
+    }
+
+    public void setHospitalName(String hospitalName) {
+        this.hospitalName = hospitalName;
     }
 }

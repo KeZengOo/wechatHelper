@@ -3,6 +3,7 @@ package com.nuoxin.virtual.rep.api.service;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.service.BaseService;
 import com.nuoxin.virtual.rep.api.dao.ContactPlanRepository;
+import com.nuoxin.virtual.rep.api.dao.DoctorRepository;
 import com.nuoxin.virtual.rep.api.entity.ContactPlan;
 import com.nuoxin.virtual.rep.api.entity.Doctor;
 import com.nuoxin.virtual.rep.api.entity.DoctorCallInfo;
@@ -39,6 +40,10 @@ public class ContactPlanService extends BaseService {
 
     @Autowired
     private ContactPlanRepository contactPlanRepository;
+
+    @Autowired
+    private DoctorRepository doctorRepository;
+
     @Autowired
     private DrugUserService drugUserService;
     @Autowired
@@ -99,13 +104,23 @@ public class ContactPlanService extends BaseService {
         if(list!=null && !list.isEmpty()){
             List<ContactPlanResponseBean> beans = new ArrayList<>();
             for (ContactPlan contactPlan :list) {
+                Long doctorId = contactPlan.getDoctorId();
+
                 ContactPlanResponseBean contact = new ContactPlanResponseBean();
                 contact.setContent(contactPlan.getContent());
                 contact.setDate(DateUtil.getDateTimeString(contactPlan.getDateTime()));
-                contact.setDoctorId(contactPlan.getDoctorId());
+                //contact.setDoctorId(contactPlan.getDoctorId());
                 contact.setDrugUserId(contactPlan.getDrugUserId());
                 contact.setId(contactPlan.getId());
                 contact.setStatus(contactPlan.getStatus());
+
+                Doctor doctor = doctorRepository.findFirstById(doctorId);
+                if (null != doctor){
+                    contact.setDoctorId(doctor.getId());
+                    contact.setDoctorName(doctor.getName());
+                    contact.setHospitalName(doctor.getHospitalName());
+                }
+
                 DrugUser drugUser = map.get(contactPlan.getDrugUserId());
                 if(drugUser==null){
                     drugUser = drugUserService.findById(contactPlan.getDrugUserId());
