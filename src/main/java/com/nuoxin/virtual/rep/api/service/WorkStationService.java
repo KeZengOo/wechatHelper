@@ -453,43 +453,73 @@ public class WorkStationService {
         bean.setLeaderPath(leaderPath + "%");
 
         Integer minCallTotalTime = workStationMapper.minCallTotalTime(bean);
+        if (minCallTotalTime == null){
+            minCallTotalTime = 0;
+        }
         bean.setMinCallTotalTime(minCallTotalTime);
         List<DrugUserAnalysisResponseBean> minCallTotalTimeList = workStationMapper.minCallTotalTimeList(bean);
 
         Integer minAvgCallTotalTime = workStationMapper.minAvgCallTotalTime(bean);
+        if (minAvgCallTotalTime == null){
+            minAvgCallTotalTime = 0;
+        }
         bean.setMinAvgCallTotalTime(minAvgCallTotalTime);
         List<DrugUserAnalysisResponseBean> minAvgCallTotalTimeList = workStationMapper.minAvgCallTotalTimeList(bean);
 
         Integer minCallCount = workStationMapper.minCallCount(bean);
+        if (minCallCount == null){
+            minCallCount = 0;
+        }
         bean.setMinCallCount(minCallCount);
         List<DrugUserAnalysisResponseBean> minCallCountList = workStationMapper.minCallCountList(bean);
 
         Integer minCallCoveredCount = workStationMapper.minCallCoveredCount(bean);
+        if (minCallCoveredCount == null){
+            minCallCoveredCount = 0;
+        }
         bean.setMinCallCoveredCount(minCallCoveredCount);
         List<DrugUserAnalysisResponseBean> minCallCoveredCountList = workStationMapper.minCallCoveredCountList(bean);
 
         Integer minImCount = workStationMapper.minImCount(bean);
+        if (minImCount == null){
+            minImCount = 0;
+        }
         bean.setMinImCount(minImCount);
         List<DrugUserAnalysisResponseBean> minImCountList = workStationMapper.minImCountList(bean);
 
         Integer minImCoveredCount = workStationMapper.minImCoveredCount(bean);
+        if (minImCoveredCount == null){
+            minImCoveredCount = 0;
+        }
         bean.setMinImCoveredCount(minImCoveredCount);
         List<DrugUserAnalysisResponseBean> minImCoveredCountList = workStationMapper.minImCoveredCountList(bean);
 
         Integer minWechatCount = workStationMapper.minWechatCount(bean);
+        if (minWechatCount == null){
+            minWechatCount = 0;
+        }
         bean.setMinWechatCount(minWechatCount);
         List<DrugUserAnalysisResponseBean> minWechatCountList = workStationMapper.minWechatCountList(bean);
 
         Integer minWechatCoveredCount = workStationMapper.minWechatCoveredCount(bean);
+        if (minWechatCoveredCount == null){
+            minWechatCoveredCount = 0;
+        }
         bean.setMinWechatCoveredCount(minWechatCoveredCount);
         List<DrugUserAnalysisResponseBean> minWechatCoveredCountList = workStationMapper.minWechatCoveredCountList(bean);
 
         Integer minEmailCount = workStationMapper.minEmailCount(bean);
+        if (minEmailCount == null){
+            minEmailCount = 0;
+        }
         bean.setMinEmailCount(minEmailCount);
         List<DrugUserAnalysisResponseBean> minEmailCountList = workStationMapper.minEmailCountList(bean);
 
 
         Integer minEmailCoveredCount = workStationMapper.minEmailCoveredCount(bean);
+        if (minEmailCoveredCount == null){
+            minEmailCoveredCount = 0;
+        }
         bean.setMinEmailCoveredCount(minEmailCoveredCount);
         List<DrugUserAnalysisResponseBean> minEmailCoveredCountList = workStationMapper.minEmailCoveredCountList(bean);
 
@@ -665,7 +695,13 @@ public class WorkStationService {
             }
             bean.setLevelDropCount(dropPriod * 7);
             Integer dropCount = workStationMapper.getDropCount(bean);
+            if (dropCount == null){
+                dropCount = 0;
+            }
             Integer maxDropCount = workStationMapper.maxDropCount(bean);
+            if (maxDropCount == null){
+                maxDropCount = 0;
+            }
             bean.setMaxLevelDropCount(maxDropCount);
             List<DrugUserAnalysisResponseBean> maxDropCountList = workStationMapper.maxDropCountList(bean);
             dropCustomerListResponseBean.setLevel(level);
