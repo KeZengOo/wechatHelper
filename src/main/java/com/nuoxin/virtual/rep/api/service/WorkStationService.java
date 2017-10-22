@@ -11,6 +11,7 @@ import com.nuoxin.virtual.rep.api.enums.DateTypeEnum;
 import com.nuoxin.virtual.rep.api.mybatis.*;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.analysis.ta.TargetResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.work.*;
 import com.sun.mail.util.BEncoderStream;
@@ -54,6 +55,36 @@ public class WorkStationService {
 
     @Autowired
     private DropTargetRepository dropTargetRepository;
+
+
+    /**
+     * 得到管理员下所有的坐席
+     * @param drugUserId
+     * @return
+     */
+    public List<DrugUserResponseBean> getDrugUserList(Long drugUserId){
+        List<DrugUserResponseBean> list = new ArrayList<>();
+
+        DrugUser drugUser = drugUserRepository.findFirstById(drugUserId);
+        String leaderPath = drugUser.getLeaderPath();
+        if (leaderPath == null) {
+            leaderPath = "";
+        }
+        leaderPath = leaderPath + "%";
+
+        List<DrugUser> drugUsers = drugUserRepository.findByLeaderPathLike(leaderPath);
+        if (drugUsers != null && !drugUsers.isEmpty()){
+            for (DrugUser du:drugUsers){
+                DrugUserResponseBean drugUserResponseBean = new DrugUserResponseBean();
+                drugUserResponseBean.setId(du.getId());
+                drugUserResponseBean.setName(du.getName());
+                list.add(drugUserResponseBean);
+            }
+        }
+
+        return list;
+    }
+
 
     /**
      * 今日通话情况
@@ -378,7 +409,7 @@ public class WorkStationService {
         Integer page = bean.getPage();
         Integer pageSize = bean.getPageSize();
         bean.setPage(page  * pageSize);
-
+        //List<OneMonthNoFollowCustomerResponseBean> oneMonthNoFollowCustomerList = null;
         List<OneMonthNoFollowCustomerResponseBean> oneMonthNoFollowCustomerList = workStationMapper.getOneMonthNoFollowCustomerList(bean);
         Integer count = workStationMapper.getOneMonthNoFollowCustomerListCount(bean);
         if (count == null){
