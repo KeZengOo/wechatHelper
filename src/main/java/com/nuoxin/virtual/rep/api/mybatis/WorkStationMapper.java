@@ -2,6 +2,7 @@ package com.nuoxin.virtual.rep.api.mybatis;
 
 import com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.work.*;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,7 @@ public interface WorkStationMapper {
     List<CustomerSumResponseBean> getCoverCustomerStatistic(WorkStationRequestBean bean);
 
     List<OneMonthNoFollowCustomerResponseBean> getOneMonthNoFollowCustomerList(WorkStationRequestBean bean);
+    //List<OneMonthNoFollowCustomerResponseBean> getOneMonthNoFollowCustomerList(@Param(value = "productId") Long productId,@Param(value = "leaderPath") String leaderPath, @Param(value = "page") Integer page,@Param(value = "pageSize") Integer pageSize);
 
     Integer getOneMonthNoFollowCustomerListCount(WorkStationRequestBean bean);
 

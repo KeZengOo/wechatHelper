@@ -409,8 +409,9 @@ public class WorkStationService {
         Integer page = bean.getPage();
         Integer pageSize = bean.getPageSize();
         bean.setPage(page  * pageSize);
-        //List<OneMonthNoFollowCustomerResponseBean> oneMonthNoFollowCustomerList = null;
+
         List<OneMonthNoFollowCustomerResponseBean> oneMonthNoFollowCustomerList = workStationMapper.getOneMonthNoFollowCustomerList(bean);
+        //List<OneMonthNoFollowCustomerResponseBean> oneMonthNoFollowCustomerList = workStationMapper.getOneMonthNoFollowCustomerList(bean.getProductId(),bean.getLeaderPath(),bean.getPage(),bean.getPageSize());
         Integer count = workStationMapper.getOneMonthNoFollowCustomerListCount(bean);
         if (count == null){
             count = 0;
