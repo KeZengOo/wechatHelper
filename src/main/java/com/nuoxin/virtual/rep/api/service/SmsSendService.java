@@ -220,6 +220,7 @@ public class SmsSendService {
                     message.setDoctorId(doctor.getId());
                     message.setTelephone(doctor.getMobile());
 
+                    Long productId = sms.getProductId();
                     //模板消息，需要自己组装
                     String imessage = sms.getMessage();
                     Map<String, Object> map = sms.getMap();
@@ -234,6 +235,7 @@ public class SmsSendService {
                             imessage = imessage.replace(key, value.toString());
                         }
                     }
+                    message.setProductId(productId);
                     message.setMessage(imessage);
                     message.setMessageType(MessageTypeEnum.IM.getMessageType());
                     message.setMessageTime(DateUtil.getDateTimeString(new Date()));

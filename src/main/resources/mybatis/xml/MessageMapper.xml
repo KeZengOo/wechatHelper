@@ -114,7 +114,7 @@
         a.product_id productId
         from (
         select t.doctor_id,max(message_time) as maxMessageTime,t.type,t.doctorName,t.product_id from (
-        select vm.doctor_id,vm.message,vm.message_time, 1 type, d.name doctorName, vm.product_id from virtual_message vm
+        select vm.doctor_id,vm.message,max(vm.message_time) message_time, 1 type, d.name doctorName, vm.product_id from virtual_message vm
         inner join doctor d
         on vm.doctor_id =d.id
         inner join drug_user_doctor dud
@@ -123,8 +123,9 @@
         on dud.drug_user_id=du.id
         where du.leader_path like #{leaderPath}
         and vm.message_type=1
+        group by vm.doctor_id
         union
-        select vm.doctor_id,vm.message,vm.message_time, 2 type, d.name doctorName, vm.product_id from virtual_message vm
+        select vm.doctor_id,vm.message,max(vm.message_time) message_time, 2 type, d.name doctorName, vm.product_id from virtual_message vm
         inner join doctor d
         on vm.doctor_id =d.id
         inner join drug_user_doctor dud
@@ -140,9 +141,9 @@
         </if>
         and du.leader_path like #{leaderPath}
         and vm.message_type=2
-        group by vm.product_id
+        group by vm.product_id,vm.doctor_id
         union
-        select vei.doctor_id,vei.content message,vei.create_time message_time, 3 type, d.name doctorName,vei.product_id
+        select vei.doctor_id,vei.content message,max(vei.create_time) message_time, 3 type, d.name doctorName,vei.product_id
         from virtual_email_info vei
         inner join doctor d
         on vei.doctor_id=d.id
@@ -159,8 +160,8 @@
             and dud.prod_id=#{productId}
         </if>
         and du.leader_path like #{leaderPath}
-        group by vei.product_id
-        ) t group by t.type,t.doctor_id
+        group by vei.product_id,vei.doctor_id
+        ) t group by t.type,t.product_id,t.doctor_id
         ) a
         where 1=1
         <if test="startTime !=null and startTime !=''">
@@ -191,7 +192,7 @@
         select count(1)
         from (
         select t.doctor_id,max(message_time) as maxMessageTime,t.type,t.doctorName,t.product_id from (
-        select vm.doctor_id,vm.message,vm.message_time, 1 type, d.name doctorName, vm.product_id from virtual_message vm
+        select vm.doctor_id,vm.message,max(vm.message_time) message_time, 1 type, d.name doctorName, vm.product_id from virtual_message vm
         inner join doctor d
         on vm.doctor_id =d.id
         inner join drug_user_doctor dud
@@ -200,8 +201,9 @@
         on dud.drug_user_id=du.id
         where du.leader_path like #{leaderPath}
         and vm.message_type=1
+        group by vm.doctor_id
         union
-        select vm.doctor_id,vm.message,vm.message_time, 2 type, d.name doctorName, vm.product_id from virtual_message vm
+        select vm.doctor_id,vm.message,max(vm.message_time) message_time, 2 type, d.name doctorName, vm.product_id from virtual_message vm
         inner join doctor d
         on vm.doctor_id =d.id
         inner join drug_user_doctor dud
@@ -217,9 +219,9 @@
         </if>
         and du.leader_path like #{leaderPath}
         and vm.message_type=2
-        group by vm.product_id
+        group by vm.product_id,vm.doctor_id
         union
-        select vei.doctor_id,vei.content message,vei.create_time message_time, 3 type, d.name doctorName,vei.product_id
+        select vei.doctor_id,vei.content message,max(vei.create_time) message_time, 3 type, d.name doctorName,vei.product_id
         from virtual_email_info vei
         inner join doctor d
         on vei.doctor_id=d.id
@@ -235,8 +237,8 @@
             and dud.prod_id=#{productId}
         </if>
         and du.leader_path like #{leaderPath}
-        group by vei.product_id
-        ) t group by t.type,t.doctor_id
+        group by vei.product_id,vei.doctor_id
+        ) t group by t.type,t.product_id,t.doctor_id
         ) a
         where 1=1
         <if test="startTime !=null and startTime !=''">
