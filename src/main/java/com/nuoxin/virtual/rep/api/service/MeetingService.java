@@ -36,6 +36,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.swing.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -223,18 +224,24 @@ public class MeetingService extends BaseService {
         }
         bean.setLeaderPath(leaderPath + "%");
         String title = bean.getTitle();
-        if (title != null) {
+        if (!StringUtils.isEmpty(title)) {
             bean.setTitle("%" + title + "%");
         }
 
         String productName = bean.getProductName();
-        if (productName != null) {
+        if (!StringUtils.isEmpty(productName)) {
             bean.setProductName("%" + productName + "%");
+        }
+
+        String speaker = bean.getSpeaker();
+        if (!StringUtils.isEmpty(speaker)){
+            bean.setSpeaker("%" + speaker + "%");
         }
 
         Integer page = bean.getPage();
         Integer pageSize = bean.getPageSize();
-        bean.setPage(page  * pageSize);
+        //bean.setPage(page  * pageSize);
+        bean.setCurrentSize(page  * pageSize);
 
         String meetingStartTime = bean.getMeetingStartTime();
         String meetingEndTime = bean.getMeetingEndTime();

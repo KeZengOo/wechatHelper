@@ -39,8 +39,12 @@
             and tma.end_time &lt;= #{meetingEndTime}
         </if>
 
+        <if test="speaker !=null and speaker!=''">
+            and tma.speaker like #{speaker}
+        </if>
+
         order by tma.create_time desc
-        limit #{page},#{pageSize}
+        limit #{currentSize},#{pageSize}
     </select>
 
     <select id="getListCount" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.meeting.MeetingRequestBean"
@@ -72,6 +76,10 @@
 
         <if test="meetingEndTime != null and meetingEndTime !=''">
             and tma.end_time &lt;= #{meetingEndTime}
+        </if>
+
+        <if test="speaker !=null and speaker!=''">
+            and tma.speaker like #{speaker}
         </if>
 
     </select>

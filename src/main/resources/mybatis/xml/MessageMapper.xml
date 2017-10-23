@@ -178,8 +178,7 @@
         </if>
 
 
-        order by a.maxMessageTime desc limit #{page},#{pageSize}
-       /* order by a.maxMessageTime desc limit 2,2*/
+        order by a.maxMessageTime desc limit #{currentSize},#{pageSize}
 
 
 
@@ -315,7 +314,7 @@
             and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &lt;=#{endTime}
         </if>
         and vm.drug_user_id in (select id from drug_user where leader_path like #{leaderPath})
-        order by vm.message_time desc limit #{page},#{pageSize}
+        order by vm.message_time desc limit #{currentSize},#{pageSize}
 
 
     </select>
@@ -389,7 +388,7 @@
 
         and du.leader_path like #{leaderPath}
         order by vei.create_time desc
-        limit #{page}, #{pageSize}
+        limit #{currentSize}, #{pageSize}
 
     </select>
 

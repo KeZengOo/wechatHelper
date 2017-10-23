@@ -337,7 +337,8 @@ public class MessageService extends BaseService {
         bean.setLeaderPath(leaderPath +"%");
         Integer page = bean.getPage();
         Integer pageSize = bean.getPageSize();
-        bean.setPage(page  * pageSize);
+        //bean.setPage(page  * pageSize);
+        bean.setCurrentSize(page  * pageSize);
 
         List<MessageResponseBean> messageList = null;
         Integer messageListCount = 0;
@@ -465,7 +466,8 @@ public class MessageService extends BaseService {
         bean.setLeaderPath(leaderPath+"%");
         Integer page = bean.getPage();
         Integer pageSize = bean.getPageSize();
-        bean.setPage(page * pageSize);
+        //bean.setPage(page * pageSize);
+        bean.setCurrentSize(page * pageSize);
         List<MessageLinkmanResponseBean> messageLinkmanList = messageMapper.getMessageLinkmanList(bean);
         if (null != messageLinkmanList && !messageLinkmanList.isEmpty()){
             for (MessageLinkmanResponseBean messageLinkmanResponseBean:messageLinkmanList){
