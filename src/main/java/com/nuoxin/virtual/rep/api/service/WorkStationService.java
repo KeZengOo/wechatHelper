@@ -11,6 +11,7 @@ import com.nuoxin.virtual.rep.api.enums.DateTypeEnum;
 import com.nuoxin.virtual.rep.api.mybatis.*;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.analysis.ta.TargetResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.work.*;
 import com.sun.mail.util.BEncoderStream;
@@ -55,6 +56,36 @@ public class WorkStationService {
     @Autowired
     private DropTargetRepository dropTargetRepository;
 
+
+    /**
+     * 得到管理员下所有的坐席
+     * @param drugUserId
+     * @return
+     */
+    public List<DrugUserResponseBean> getDrugUserList(Long drugUserId){
+        List<DrugUserResponseBean> list = new ArrayList<>();
+
+        DrugUser drugUser = drugUserRepository.findFirstById(drugUserId);
+        String leaderPath = drugUser.getLeaderPath();
+        if (leaderPath == null) {
+            leaderPath = "";
+        }
+        leaderPath = leaderPath + "%";
+
+        List<DrugUser> drugUsers = drugUserRepository.findByLeaderPathLike(leaderPath);
+        if (drugUsers != null && !drugUsers.isEmpty()){
+            for (DrugUser du:drugUsers){
+                DrugUserResponseBean drugUserResponseBean = new DrugUserResponseBean();
+                drugUserResponseBean.setId(du.getId());
+                drugUserResponseBean.setName(du.getName());
+                list.add(drugUserResponseBean);
+            }
+        }
+
+        return list;
+    }
+
+
     /**
      * 今日通话情况
      * @param bean
@@ -73,9 +104,25 @@ public class WorkStationService {
         //会议的统计
         TodayStatisticsResponseBean meetingStatistic = meetingDetailMapper.getMeetingStatistic(bean);
         if (null != meetingStatistic){
-            todayStatisticsResponseBean.setMeetingCount(meetingStatistic.getMeetingCount());
-            todayStatisticsResponseBean.setMeetingTotalTime(meetingStatistic.getMeetingTotalTime());
-            todayStatisticsResponseBean.setMeetingTotalPersonNum(meetingStatistic.getMeetingTotalPersonNum());
+            Integer meetingCount = meetingStatistic.getMeetingCount();
+            if (meetingCount == null){
+                meetingCount = 0;
+            }
+            todayStatisticsResponseBean.setMeetingCount(meetingCount);
+
+
+            Integer meetingTotalTime = meetingStatistic.getMeetingTotalTime();
+            if (meetingTotalTime == null){
+                meetingTotalTime = 0;
+            }
+            todayStatisticsResponseBean.setMeetingTotalTime(meetingTotalTime);
+
+            Integer meetingTotalPersonNum = meetingStatistic.getMeetingTotalPersonNum();
+            if (meetingTotalPersonNum == null){
+                meetingTotalPersonNum = 0;
+            }
+            todayStatisticsResponseBean.setMeetingTotalPersonNum(meetingTotalPersonNum);
+
             todayStatisticsResponseBean.setMeetingAvgTime(meetingStatistic.getMeetingAvgTime());
         }
 
@@ -110,17 +157,46 @@ public class WorkStationService {
         //多渠道会话统计
         TodayStatisticsResponseBean messageStatistics = messageMapper.getMessageStatistics(bean);
         if (null != meetingStatistic){
-            todayStatisticsResponseBean.setWechatSum(meetingStatistic.getWechatSum());
-            todayStatisticsResponseBean.setWechatCount(meetingStatistic.getWechatCount());
-            todayStatisticsResponseBean.setImSum(meetingStatistic.getImSum());
-            todayStatisticsResponseBean.setImCount(meetingStatistic.getImCount());
+
+            Integer wechatSum = meetingStatistic.getWechatSum();
+            if (wechatSum == null){
+                wechatSum = 0;
+            }
+            todayStatisticsResponseBean.setWechatSum(wechatSum);
+
+
+            Integer wechatCount = meetingStatistic.getWechatCount();
+            if (wechatCount == null){
+                wechatCount = 0;
+            }
+            todayStatisticsResponseBean.setWechatCount(wechatCount);
+
+
+            Integer imSum = meetingStatistic.getImSum();
+            if (imSum == null){
+                imSum = 0;
+            }
+            todayStatisticsResponseBean.setImSum(imSum);
+
+
+            Integer imCount = meetingStatistic.getImCount();
+            if (imCount == null){
+                imCount = 0;
+            }
+            todayStatisticsResponseBean.setImCount(imCount);
         }
 
         //今日邮件人数
         Integer todayEmailNum = emailMapper.getTodayEmailNum(bean);
+        if (todayEmailNum == null){
+            todayEmailNum = 0;
+        }
 
         //今日邮件人次
         Integer todayEmailCount = emailMapper.getTodayEmailCount(bean);
+        if (todayEmailCount == null){
+            todayEmailCount = 0;
+        }
 
         todayStatisticsResponseBean.setEmailSum(todayEmailNum);
         todayStatisticsResponseBean.setTargetWechatSum(perDayTargetWechatNum);
@@ -131,8 +207,18 @@ public class WorkStationService {
         //呼出统计
         TodayStatisticsResponseBean callInfoStatistics = doctorCallInfoMapper.getCallInfoStatistics(bean);
         if (null != callInfoStatistics){
-            todayStatisticsResponseBean.setCallCount(callInfoStatistics.getCallCount());
-            todayStatisticsResponseBean.setCallSum(callInfoStatistics.getCallSum());
+            Integer callCount = callInfoStatistics.getCallCount();
+            if (callCount == null){
+                callCount = 0;
+            }
+            todayStatisticsResponseBean.setCallCount(callCount);
+
+
+            Integer callSum = callInfoStatistics.getCallSum();
+            if (callSum == null){
+                callSum = 0;
+            }
+            todayStatisticsResponseBean.setCallSum(callSum);
 
         }
 
@@ -141,7 +227,11 @@ public class WorkStationService {
 
         TodayStatisticsResponseBean callInfoTimeStatistics = doctorCallInfoMapper.getCallInfoTimeStatistics(bean);
         if (null != callInfoStatistics){
-            todayStatisticsResponseBean.setCallTotalTime(callInfoTimeStatistics.getCallTotalTime());
+            Integer callTotalTime = callInfoTimeStatistics.getCallTotalTime();
+            if (callTotalTime == null){
+                callTotalTime = 0;
+            }
+            todayStatisticsResponseBean.setCallTotalTime(callTotalTime);
         }
 
 
@@ -167,7 +257,7 @@ public class WorkStationService {
             callSum = 0;
         }
         //拜访客户总人数
-        Integer visitTotalSum = meetingTotalPerson + wechatSum + imSum + todayEmailCount + callSum;
+        Integer visitTotalSum = meetingTotalPerson + wechatSum + imSum + todayEmailNum + callSum;
         todayStatisticsResponseBean.setVisitSum(visitTotalSum);
 
         //拜访客户总人次
@@ -193,11 +283,11 @@ public class WorkStationService {
         }
 
         Integer visitCount = meetingCount + wechatCount + imCount + todayEmailCount + callCount;
-        todayStatisticsResponseBean.setCallCount(visitCount);
+        todayStatisticsResponseBean.setVisitCount(visitCount);
 
         //目标人次没有微信的
         Integer targetVisitCount = perDayTargetMeetingPersonCount + perDayTargetCallCount + perDayTargetWechatCount + perDayTargetImCount + perDayTargetEmailCount;
-        Integer targetVisitSum = perDayTargetMeetingPersonCount + perDayTargetCallSum + perDayTargetWechatNum + perDayTargetImSum + perDayTargetEmailNum;
+        Integer targetVisitSum = perDayTargetMeetingPersonSum + perDayTargetCallSum + perDayTargetWechatNum + perDayTargetImSum + perDayTargetEmailNum;
         todayStatisticsResponseBean.setTargetVisitCount(targetVisitCount);
         todayStatisticsResponseBean.setTargetVisitSum(targetVisitSum);
         return todayStatisticsResponseBean;
@@ -321,6 +411,7 @@ public class WorkStationService {
         bean.setPage(page  * pageSize);
 
         List<OneMonthNoFollowCustomerResponseBean> oneMonthNoFollowCustomerList = workStationMapper.getOneMonthNoFollowCustomerList(bean);
+        //List<OneMonthNoFollowCustomerResponseBean> oneMonthNoFollowCustomerList = workStationMapper.getOneMonthNoFollowCustomerList(bean.getProductId(),bean.getLeaderPath(),bean.getPage(),bean.getPageSize());
         Integer count = workStationMapper.getOneMonthNoFollowCustomerListCount(bean);
         if (count == null){
             count = 0;
@@ -362,43 +453,73 @@ public class WorkStationService {
         bean.setLeaderPath(leaderPath + "%");
 
         Integer minCallTotalTime = workStationMapper.minCallTotalTime(bean);
+        if (minCallTotalTime == null){
+            minCallTotalTime = 0;
+        }
         bean.setMinCallTotalTime(minCallTotalTime);
         List<DrugUserAnalysisResponseBean> minCallTotalTimeList = workStationMapper.minCallTotalTimeList(bean);
 
         Integer minAvgCallTotalTime = workStationMapper.minAvgCallTotalTime(bean);
+        if (minAvgCallTotalTime == null){
+            minAvgCallTotalTime = 0;
+        }
         bean.setMinAvgCallTotalTime(minAvgCallTotalTime);
         List<DrugUserAnalysisResponseBean> minAvgCallTotalTimeList = workStationMapper.minAvgCallTotalTimeList(bean);
 
         Integer minCallCount = workStationMapper.minCallCount(bean);
+        if (minCallCount == null){
+            minCallCount = 0;
+        }
         bean.setMinCallCount(minCallCount);
         List<DrugUserAnalysisResponseBean> minCallCountList = workStationMapper.minCallCountList(bean);
 
         Integer minCallCoveredCount = workStationMapper.minCallCoveredCount(bean);
+        if (minCallCoveredCount == null){
+            minCallCoveredCount = 0;
+        }
         bean.setMinCallCoveredCount(minCallCoveredCount);
         List<DrugUserAnalysisResponseBean> minCallCoveredCountList = workStationMapper.minCallCoveredCountList(bean);
 
         Integer minImCount = workStationMapper.minImCount(bean);
+        if (minImCount == null){
+            minImCount = 0;
+        }
         bean.setMinImCount(minImCount);
         List<DrugUserAnalysisResponseBean> minImCountList = workStationMapper.minImCountList(bean);
 
         Integer minImCoveredCount = workStationMapper.minImCoveredCount(bean);
+        if (minImCoveredCount == null){
+            minImCoveredCount = 0;
+        }
         bean.setMinImCoveredCount(minImCoveredCount);
         List<DrugUserAnalysisResponseBean> minImCoveredCountList = workStationMapper.minImCoveredCountList(bean);
 
         Integer minWechatCount = workStationMapper.minWechatCount(bean);
+        if (minWechatCount == null){
+            minWechatCount = 0;
+        }
         bean.setMinWechatCount(minWechatCount);
         List<DrugUserAnalysisResponseBean> minWechatCountList = workStationMapper.minWechatCountList(bean);
 
         Integer minWechatCoveredCount = workStationMapper.minWechatCoveredCount(bean);
+        if (minWechatCoveredCount == null){
+            minWechatCoveredCount = 0;
+        }
         bean.setMinWechatCoveredCount(minWechatCoveredCount);
         List<DrugUserAnalysisResponseBean> minWechatCoveredCountList = workStationMapper.minWechatCoveredCountList(bean);
 
         Integer minEmailCount = workStationMapper.minEmailCount(bean);
+        if (minEmailCount == null){
+            minEmailCount = 0;
+        }
         bean.setMinEmailCount(minEmailCount);
         List<DrugUserAnalysisResponseBean> minEmailCountList = workStationMapper.minEmailCountList(bean);
 
 
         Integer minEmailCoveredCount = workStationMapper.minEmailCoveredCount(bean);
+        if (minEmailCoveredCount == null){
+            minEmailCoveredCount = 0;
+        }
         bean.setMinEmailCoveredCount(minEmailCoveredCount);
         List<DrugUserAnalysisResponseBean> minEmailCoveredCountList = workStationMapper.minEmailCoveredCountList(bean);
 
@@ -574,7 +695,13 @@ public class WorkStationService {
             }
             bean.setLevelDropCount(dropPriod * 7);
             Integer dropCount = workStationMapper.getDropCount(bean);
+            if (dropCount == null){
+                dropCount = 0;
+            }
             Integer maxDropCount = workStationMapper.maxDropCount(bean);
+            if (maxDropCount == null){
+                maxDropCount = 0;
+            }
             bean.setMaxLevelDropCount(maxDropCount);
             List<DrugUserAnalysisResponseBean> maxDropCountList = workStationMapper.maxDropCountList(bean);
             dropCustomerListResponseBean.setLevel(level);
@@ -611,19 +738,96 @@ public class WorkStationService {
         if (targets != null && !targets.isEmpty()){
             for (Target target:targets){
                 if (target != null){
-                    monthTargetWechatNum += target.getMonthWechatNum();
-                    monthTargetWechatCount += target.getMonthWechatCount();
-                    monthTargetImSum += target.getMonthImNum();
-                    monthTargetImCount += target.getMonthImCount();
-                    monthTargetEmailNum += target.getMonthEmailNum();
-                    monthTargetEmailCount += target.getMonthEmailCount();
-                    monthTargetCallSum += target.getMonthTelPerson();
-                    monthTargetCallCount += target.getMonthTelNum();
-                    monthTargetCallTime += target.getMonthTelTime();
-                    monthTargetMeetingSum += target.getMonthMeetingNum();
-                    monthTargetMeetingTime += target.getMonthMeetingTime();
-                    monthTargetMeetingPersonSum += target.getMonthMeetingPersonSum();
-                    monthTargetMeetingPersonCount += target.getMonthMeetingPersonCount();
+
+                    Integer monthWechatNum = target.getMonthWechatNum();
+                    if (monthWechatNum == null){
+                        monthWechatNum = 0;
+                    }
+                    monthTargetWechatNum += monthWechatNum;
+
+
+                    Integer monthWechatCount = target.getMonthWechatCount();
+                    if (monthWechatCount == null){
+                        monthWechatCount = 0;
+                    }
+                    monthTargetWechatCount += monthWechatCount;
+
+
+                    Integer monthImNum = target.getMonthImNum();
+                    if (monthImNum == null){
+                        monthImNum = 0;
+                    }
+                    monthTargetImSum += monthImNum;
+
+
+                    Integer monthImCount = target.getMonthImCount();
+                    if (monthImCount == null){
+                        monthImCount = 0;
+                    }
+                    monthTargetImCount += monthImCount;
+
+
+                    Integer monthEmailNum = target.getMonthEmailNum();
+                    if (monthEmailNum == null){
+                        monthEmailNum = 0;
+                    }
+                    monthTargetEmailNum += monthEmailNum;
+
+
+                    Integer monthEmailCount = target.getMonthEmailCount();
+                    if (monthEmailCount == null){
+                        monthEmailCount = 0;
+                    }
+                    monthTargetEmailCount += monthEmailCount;
+
+
+                    Integer monthTelPerson = target.getMonthTelPerson();
+                    if (monthTelPerson == null){
+                        monthTelPerson = 0;
+                    }
+                    monthTargetCallSum += monthTelPerson;
+
+
+                    Integer monthTelNum = target.getMonthTelNum();
+                    if (monthTelNum == null){
+                        monthTelNum = 0;
+                    }
+                    monthTargetCallCount += monthTelNum;
+
+
+                    Integer monthTelTime = target.getMonthTelTime();
+                    if (monthTelTime == null){
+                        monthTelTime = 0;
+                    }
+                    monthTargetCallTime += monthTelTime;
+
+
+                    Integer monthMeetingNum = target.getMonthMeetingNum();
+                    if (monthMeetingNum == null){
+                        monthMeetingNum = 0;
+                    }
+                    monthTargetMeetingSum += monthMeetingNum;
+
+
+                    Integer monthMeetingTime = target.getMonthMeetingTime();
+                    if (monthMeetingTime == null){
+                        monthMeetingTime = 0;
+                    }
+                    monthTargetMeetingTime += monthMeetingTime;
+
+
+                    Integer monthMeetingPersonSum = target.getMonthMeetingPersonSum();
+                    if (monthMeetingPersonSum == null){
+                        monthMeetingPersonSum = 0;
+                    }
+                    monthTargetMeetingPersonSum += monthMeetingPersonSum;
+
+
+                    Integer monthMeetingPersonCount = target.getMonthMeetingPersonCount();
+                    if (monthMeetingPersonCount == null){
+                        monthMeetingPersonCount = 0;
+                    }
+                    monthTargetMeetingPersonCount += monthMeetingPersonCount;
                 }
             }
         }

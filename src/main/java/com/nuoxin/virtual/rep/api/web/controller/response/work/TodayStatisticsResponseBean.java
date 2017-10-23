@@ -13,86 +13,87 @@ public class TodayStatisticsResponseBean implements Serializable{
     private static final long serialVersionUID = 8880700649104706377L;
 
     @ApiModelProperty(value = "拜访客户人数")
-    private Integer visitSum;
+    private Integer visitSum = 0;
 
     @ApiModelProperty(value = "拜访客户目标人数")
-    private Integer targetVisitSum;
+    private Integer targetVisitSum = 0;
 
     @ApiModelProperty(value = "拜访客户人次")
-    private Integer visitCount;
+    private Integer visitCount = 0;
 
     @ApiModelProperty(value = "拜访客户目标人次")
-    private Integer targetVisitCount;
+    private Integer targetVisitCount = 0;
 
 
     @ApiModelProperty(value = "呼出人数")
-    private Integer callSum;
+    private Integer callSum = 0;
 
     @ApiModelProperty(value = "目标呼出人数")
-    private Integer targetCallSum;
+    private Integer targetCallSum = 0;
 
     @ApiModelProperty(value = "呼出人次")
-    private Integer callCount;
+    private Integer callCount = 0;
 
     @ApiModelProperty(value = "目标呼出人次")
-    private Integer targetCallCount;
+    private Integer targetCallCount = 0;
 
     @ApiModelProperty(value = "通话总时长，单位是秒")
-    private Integer callTotalTime;
+    private Integer callTotalTime = 0;
 
 //    @ApiModelProperty(value = "通话平均时长，单位是秒")
 //    private Integer callAvgTime;
 
 
     @ApiModelProperty(value = "微信人数")
-    private Integer wechatSum;
+    private Integer wechatSum = 0;
 
     @ApiModelProperty(value = "微信人次")
-    private Integer wechatCount;
+    private Integer wechatCount = 0;
 
     @ApiModelProperty(value = "微信目标人数")
-    private Integer targetWechatSum;
+    private Integer targetWechatSum = 0;
 
     @ApiModelProperty(value = "目标微信人次")
-    private Integer targetWechatCount;
+    private Integer targetWechatCount = 0;
 
     @ApiModelProperty(value = "短信人数")
-    private Integer imSum;
+    private Integer imSum = 0;
 
     @ApiModelProperty(value = "短信人次")
-    private Integer imCount;
+    private Integer imCount = 0;
 
     @ApiModelProperty(value = "短信目标人数")
-    private Integer targetImSum;
+    private Integer targetImSum = 0;
 
     @ApiModelProperty(value = "目标短信人次")
-    private Integer targetImCount;
+    private Integer targetImCount = 0;
 
 
     @ApiModelProperty(value = "邮件人数")
-    private Integer emailSum;
+    private Integer emailSum = 0;
 
     @ApiModelProperty(value = "邮件目标人数")
-    private Integer targetEmailSum;
+    private Integer targetEmailSum = 0;
 
     @ApiModelProperty(value = "目标邮件人次")
-    private Integer targetEmailCount;
+    private Integer targetEmailCount = 0;
 
 
     @ApiModelProperty(value = "会议人次")
-    private Integer meetingCount;
+    private Integer meetingCount = 0;
+
 
     @ApiModelProperty(value = "会议总时长")
-    private Integer meetingTotalTime;
+    private Integer meetingTotalTime = 0;
 
     @ApiModelProperty(value = "参加会议的人数")
-    private Integer meetingTotalPersonNum;
+    private Integer meetingTotalPersonNum = 0;
 
     @ApiModelProperty(value = "参加会议的人次")
-    private Integer meetingTotalPersonCount;
+    private Integer meetingTotalPersonCount = 0;
 
     @ApiModelProperty(value = "平均每人的参会时间")
-    private String meetingAvgTime;
+    private String meetingAvgTime = "0.0";
 
 
     public Integer getVisitSum() {

@@ -5,6 +5,7 @@ import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
 import com.nuoxin.virtual.rep.api.service.WorkStationService;
 import com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.work.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -26,6 +27,23 @@ public class WorkStationController extends BaseController{
 
     @Autowired
     private WorkStationService workStationService;
+
+
+    @ApiOperation(value = "管理员下所有的坐席", notes = "管理员下所有的坐席")
+    @PostMapping("/getDrugUserList")
+    @ResponseBody
+    public ResponseEntity<DefaultResponseBean<List<DrugUserResponseBean>>>  getDrugUserList(HttpServletRequest request){
+        Long drugUserId = getLoginId(request);
+
+        List<DrugUserResponseBean> drugUserList = workStationService.getDrugUserList(drugUserId);
+        DefaultResponseBean<List<DrugUserResponseBean>> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(drugUserList);
+        return ResponseEntity.ok(responseBean);
+
+
+    }
+
+
 
     @ApiOperation(value = "今日统计接口", notes = "今日统计接口")
     @PostMapping("/today/statistics")
