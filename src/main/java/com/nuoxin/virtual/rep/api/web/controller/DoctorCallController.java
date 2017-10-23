@@ -149,6 +149,8 @@ public class DoctorCallController extends BaseController {
     @PostMapping("/save")
     public DefaultResponseBean<CallRequestBean> save(@RequestBody CallRequestBean bean,
                                     HttpServletRequest request, HttpServletResponse response){
+
+        logger.info("{}接口请求数据【】{}",request.getServletPath(), JSON.toJSONString(bean));
         DefaultResponseBean responseBean = new DefaultResponseBean();
         DrugUser user = super.getLoginUser(request);
         if(user==null){
@@ -165,6 +167,8 @@ public class DoctorCallController extends BaseController {
     @PostMapping("/update")
     public DefaultResponseBean<CallRequestBean> update(@RequestBody CallRequestBean bean,
                                                      HttpServletRequest request, HttpServletResponse response){
+
+        logger.info("{}接口请求数据【】{}",request.getServletPath(), JSON.toJSONString(bean));
         DefaultResponseBean responseBean = new DefaultResponseBean();
         Long id = bean.getId();
         if(id==null){
@@ -194,6 +198,8 @@ public class DoctorCallController extends BaseController {
     @PostMapping("/stop/update")
     public DefaultResponseBean<Boolean> stopSave(@RequestBody CallInfoRequestBean bean,
                                         HttpServletRequest request, HttpServletResponse response){
+
+        logger.info("{}接口请求数据【】{}",request.getServletPath(), JSON.toJSONString(bean));
         DefaultResponseBean responseBean = new DefaultResponseBean();
         if(bean.getId()==null){
             responseBean.setCode(500);

@@ -89,15 +89,16 @@ public class ContactPlanService extends BaseService {
                 if(bean.getDoctorId()!=null && bean.getDoctorId()>0){
                     predicates.add(cb.equal(root.get("doctorId").as(Long.class),bean.getDoctorId()));
                 }
-                if(bean.getStatus()!=null){
-                    predicates.add(cb.equal(root.get("status").as(Long.class),bean.getStatus()));
-                }
+//                if(bean.getStatus()!=null){
+//                    predicates.add(cb.equal(root.get("status").as(Long.class),bean.getStatus()));
+//                }
                 predicates.add(cb.equal(root.get("drugUserId").as(Long.class),bean.getDrugUserId()));
                 if(bean.getStatus()==0){
+                    predicates.add(cb.equal(root.get("status").as(Long.class),0));
                     predicates.add(cb.greaterThan(root.get("dateTime").as(Date.class),new Date()));
                 }
                 if(bean.getStatus()==1){
-                    predicates.add(cb.lessThan(root.get("dateTime").as(Date.class),new Date()));
+                    predicates.add(cb.or(cb.lessThan(root.get("dateTime").as(Date.class),new Date()),cb.equal(root.get("status").as(Long.class),1)));
                 }
                 query.where(cb.and(cb.and(predicates.toArray(new Predicate[0]))));
                 return query.getRestriction();
