@@ -27,7 +27,8 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long>, JpaSpecif
 
     List<Doctor> findByEmailIn(Collection<String> emails);
 
-    @Query("select count(distinct d.id) as doctorNum,count(distinct d.hospitalName) as hospitalNum from Doctor d where d.doctorVirtual.drugUserIds like :drugUserId ")
+    //@Query("select count(distinct d.id) as doctorNum,count(distinct d.hospitalName) as hospitalNum from DrugUserDoctor d where d.doctorVirtual.drugUserIds like :drugUserId ")
+    @Query(value = "select count(distinct d.id) as doctorNum,count(distinct d.hospitalName) as hospitalNum from drug_user_doctor dud join drug_user du on du.id=dud.drug_user_id join doctor d on d.id=dud.doctor_id where du.leader_path like :drugUserId",nativeQuery = true)
     Map<String, Long> statDrugUserDoctorNum(@Param("drugUserId") String drugUserId);
 
     @Modifying

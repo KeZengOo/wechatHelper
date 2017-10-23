@@ -173,9 +173,9 @@ public class DoctorService extends BaseService {
     }
 
     @Cacheable(value = "virtual_rep_api_doctor", key = "'_stat_'+#drugUserId")
-    public DoctorStatResponseBean stat(Long drugUserId) {
+    public DoctorStatResponseBean stat(Long drugUserId,String leaderPath) {
         DoctorStatResponseBean responseBean = new DoctorStatResponseBean();
-        Map<String, Long> map = doctorRepository.statDrugUserDoctorNum("%," + drugUserId + ",%");
+        Map<String, Long> map = doctorRepository.statDrugUserDoctorNum(leaderPath);
         if (map != null) {
             responseBean.setDoctorNum(map.get("doctorNum") != null ? Integer.valueOf(map.get("doctorNum") + "") : 0);
             responseBean.setHospitalNum(map.get("hospitalNum") != null ? Integer.valueOf(map.get("hospitalNum") + "") : 0);
@@ -234,12 +234,15 @@ public class DoctorService extends BaseService {
         doctor.setDoctorVirtual(virtual);
         doctorRepository.saveAndFlush(doctor);
         //TODO 添加关系到关系表
-        DrugUserDoctor dud = new DrugUserDoctor();
-        dud.setDoctorId(doctor.getId());
-        dud.setProductId(bean.getProductId());
-        dud.setDrugUserId(bean.getDrugUserId());
-        dud.setCreateTime(new Date());
-        drugUserDoctorRepository.saveAndFlush(dud);
+        DrugUserDoctor dud = drugUserDoctorRepository.findByDoctorIdAndDrugUserIdAndProductId(doctor.getId(), bean.getDrugUserId(), bean.getProductId());
+        if (dud == null) {
+            dud = new DrugUserDoctor();
+            dud.setDoctorId(doctor.getId());
+            dud.setProductId(bean.getProductId());
+            dud.setDrugUserId(bean.getDrugUserId());
+            dud.setCreateTime(new Date());
+            drugUserDoctorRepository.saveAndFlush(dud);
+        }
 
 
         Boolean flag = DoctorDynamicFieldValueService.add(doctor.getId(),bean.getList());

@@ -88,7 +88,13 @@ public class DoctorController extends BaseController {
     @PostMapping("/top/stat")
     public DefaultResponseBean<DoctorStatResponseBean> stat(HttpServletRequest request, HttpServletResponse response){
         DefaultResponseBean responseBean = new DefaultResponseBean();
-        responseBean.setData(doctorService.stat(super.getLoginId(request)));
+        DrugUser user = super.getLoginUser(request);
+        if(user==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
+        }
+        responseBean.setData(doctorService.stat(user.getId(),user.getLeaderPath()));
         return responseBean;
     }
 
