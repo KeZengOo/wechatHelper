@@ -229,6 +229,7 @@ public class DoctorCallService extends BaseService {
         info.setMobile(bean.getMobile());
         info.setType(bean.getType());
         info.setDrugUserId(bean.getDrugUserId());
+        info.setDrugUser(drugUserService.findById(bean.getDrugUserId()));
         doctorCallInfoRepository.saveAndFlush(info);
         bean.setId(info.getId());
         DoctorCallInfoDetails infoDetails = new DoctorCallInfoDetails();

@@ -174,7 +174,7 @@ public class TargetAnalysisService {
             responseBean = new TargetResponseBean();
         }
         if(target!=null){
-            responseBean.setTargetNum(this._getTarget(target.getMonthTelAvgTime()*60,bean.getDateType(),bean.getDate()));
+            responseBean.setTargetNum(this._getTarget(target.getMonthTelAvgTime()==null?0:target.getMonthTelTime()*60,bean.getDateType(),bean.getDate()));
         }
         if(responseBean.getTargetNum()!=null && responseBean.getTargetNum()!=0){
             responseBean.setPercentage(new BigDecimal(responseBean.getCoverNum()/responseBean.getTargetNum().floatValue()).floatValue());
