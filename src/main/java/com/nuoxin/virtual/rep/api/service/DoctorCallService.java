@@ -363,7 +363,7 @@ public class DoctorCallService extends BaseService {
     private CallResponseBean _getCallResponseBean(DoctorCallInfo info){
         CallResponseBean responseBean = new CallResponseBean();
         if(info!=null){
-            //responseBean.setClientLevel(info.getDoctor().getClientLevel());
+            responseBean.setClientLevel(info.getDoctor().getDoctorVirtual().getClientLevel());
             responseBean.setDoctorId(info.getDoctor().getId());
             responseBean.setDoctorMobile(info.getDoctor().getMobile());
             responseBean.setDoctorName(info.getDoctor().getName());
