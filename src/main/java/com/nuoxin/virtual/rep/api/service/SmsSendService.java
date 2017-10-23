@@ -168,6 +168,7 @@ public class SmsSendService {
                 smsBean.setMessage(smsTemplate.getMessage());
                 smsBean.setTopic(smsTemplate.getTopic());
                 smsBean.setSignName(smsTemplate.getSigName());
+                smsBean.setProductId(smsTemplate.getProductId());
                 sendList.add(smsBean);
             }
         }
@@ -218,6 +219,7 @@ public class SmsSendService {
                     message.setDrugUserId(drugUser.getId());
                     message.setDoctorId(doctor.getId());
                     message.setTelephone(doctor.getMobile());
+
                     //模板消息，需要自己组装
                     String imessage = sms.getMessage();
                     Map<String, Object> map = sms.getMap();
