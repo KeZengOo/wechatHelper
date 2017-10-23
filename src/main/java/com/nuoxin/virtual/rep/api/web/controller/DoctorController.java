@@ -54,7 +54,18 @@ public class DoctorController extends BaseController {
     public DefaultResponseBean<DoctorDetailsResponseBean> doctorDetails(@PathVariable Long doctorId,
                                                                         HttpServletRequest request, HttpServletResponse response){
         DefaultResponseBean responseBean = new DefaultResponseBean();
-        responseBean.setData(doctorService.details(doctorId));
+        DoctorDetailsResponseBean bean = doctorService.details(doctorId);
+        responseBean.setData(bean);
+        return responseBean;
+    }
+    @ApiOperation(value = "根据产品获取医生信息", notes = "根据产品获取医生信息")
+    @GetMapping("/details/{doctorId}/{productId}")
+    public DefaultResponseBean<DoctorDetailsResponseBean> doctorProductDetails(@PathVariable Long doctorId,@PathVariable Long productId,
+                                                                        HttpServletRequest request, HttpServletResponse response){
+        DefaultResponseBean responseBean = new DefaultResponseBean();
+        DoctorDetailsResponseBean bean = doctorService.details(doctorId);
+        bean.setProductId(productId);
+        responseBean.setData(bean);
         return responseBean;
     }
 

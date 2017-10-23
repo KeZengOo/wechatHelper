@@ -40,6 +40,8 @@ public class DoctorDetailsResponseBean implements Serializable {
     private String doctorLevel;
     @ApiModelProperty(value = "客户等级")
     private String clientLevel;
+    @ApiModelProperty(value = "产品id")
+    private Long productId;
 
     @ApiModelProperty(value = "动态字段")
     private List<DoctorDymamicFieldValueResponseBean> list;
@@ -154,5 +156,13 @@ public class DoctorDetailsResponseBean implements Serializable {
 
     public void setList(List<DoctorDymamicFieldValueResponseBean> list) {
         this.list = list;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 }

@@ -230,6 +230,8 @@ public class DoctorService extends BaseService {
             throw new BusinessException(ErrorEnum.ERROR.getStatus(), "医生添加失败");
         }
         virtual.setDoctorId(doctor.getId());
+        virtual.setClientLevel(bean.getClientLevel());
+        virtual.setHospitalLevel(bean.getHospitalLevel());
         doctorVirtualService.save(virtual);
         doctor.setDoctorVirtual(virtual);
         doctorRepository.saveAndFlush(doctor);
@@ -297,6 +299,8 @@ public class DoctorService extends BaseService {
         }
 
         virtual.setDoctorId(doctor.getId());
+        virtual.setClientLevel(bean.getClientLevel());
+        virtual.setHospitalLevel(bean.getHospitalLevel());
         doctorVirtualService.save(virtual);
 
         doctor.setDoctorVirtual(virtual);
