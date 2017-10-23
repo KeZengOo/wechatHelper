@@ -734,7 +734,7 @@ public class WorkStationService {
         Integer monthTargetMeetingTime = 0;
         Integer monthTargetMeetingPersonSum = 0;
         Integer monthTargetMeetingPersonCount = 0;
-        List<Target> targets = targetRepository.findByProductId(productId);
+        List<Target> targets = targetRepository.findByProductIdOrderByLevel(productId);
         if (targets != null && !targets.isEmpty()){
             for (Target target:targets){
                 if (target != null){

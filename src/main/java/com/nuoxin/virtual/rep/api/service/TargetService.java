@@ -73,7 +73,7 @@ public class TargetService extends BaseService {
 
     public List<MonthWorkTargetResponseBean> getMonthWorkTargetList(Long productId) {
         List<MonthWorkTargetResponseBean> list = new ArrayList<>();
-        List<Target> targetList = targetRepository.findByProductId(productId);
+        List<Target> targetList = targetRepository.findByProductIdOrderByLevel(productId);
         if (null != targetList && !targetList.isEmpty()) {
             for (Target target : targetList) {
                 if (null != target) {

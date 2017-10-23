@@ -11,7 +11,7 @@ import java.util.List;
  */
 public interface TargetRepository extends JpaRepository<Target,Long>,JpaSpecificationExecutor<Target> {
 
-    List<Target> findByProductId(Long productId);
+    List<Target> findByProductIdOrderByLevel(Long productId);
 
     Target findFirstByProductIdAndLevel(Long productId, String level);
 
