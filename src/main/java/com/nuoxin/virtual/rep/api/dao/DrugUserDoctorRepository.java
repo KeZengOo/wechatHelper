@@ -19,9 +19,10 @@ public interface DrugUserDoctorRepository extends JpaRepository<DrugUserDoctor,L
     @Modifying
     void deleteByDoctorIdAndDrugUserId(Long doctorId,Long drugUserId);
     @Modifying
-    void deleteByDoctorIdAndDrugUserIdAndProductId(Long doctorId,Long drugUserId,Long productId);
+    @Query("delete from DrugUserDoctor d where d.drugUserId=:drugUserId and d.doctorId=:doctorId and d.productId=:productId")
+    void deleteByDoctorIdAndDrugUserIdAndProductId(@Param("doctorId") Long doctorId,@Param("drugUserId") Long drugUserId,@Param("productId") Long productId);
 
-    DrugUserDoctor findByDoctorIdAndDrugUserIdAndProductId(Long doctorId,Long drugUserId,Long productId);
+    List<DrugUserDoctor> findByDoctorIdAndDrugUserIdAndProductId(Long doctorId,Long drugUserId,Long productId);
 
     List<DrugUserDoctor> findByDoctorId(Long doctorId);
 

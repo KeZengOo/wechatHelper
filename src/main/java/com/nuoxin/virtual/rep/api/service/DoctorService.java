@@ -237,9 +237,9 @@ public class DoctorService extends BaseService {
         doctor.setDoctorVirtual(virtual);
         doctorRepository.saveAndFlush(doctor);
         //TODO 添加关系到关系表
-        DrugUserDoctor dud = drugUserDoctorRepository.findByDoctorIdAndDrugUserIdAndProductId(doctor.getId(), bean.getDrugUserId(), bean.getProductId());
-        if (dud == null) {
-            dud = new DrugUserDoctor();
+        List<DrugUserDoctor> list = drugUserDoctorRepository.findByDoctorIdAndDrugUserIdAndProductId(doctor.getId(), bean.getDrugUserId(), bean.getProductId());
+        if (list == null || list.isEmpty()) {
+            DrugUserDoctor dud = new DrugUserDoctor();
             dud.setDoctorId(doctor.getId());
             dud.setProductId(bean.getProductId());
             dud.setDrugUserId(bean.getDrugUserId());
@@ -307,9 +307,10 @@ public class DoctorService extends BaseService {
         doctor.setDoctorVirtual(virtual);
         doctorRepository.saveAndFlush(doctor);
         //TODO 添加关系到关系表
-        DrugUserDoctor dud = drugUserDoctorRepository.findByDoctorIdAndDrugUserIdAndProductId(doctor.getId(), bean.getDrugUserId(), bean.getProductId());
-        if (dud == null) {
-            dud = new DrugUserDoctor();
+        drugUserDoctorRepository.deleteByDoctorIdAndDrugUserIdAndProductId(doctor.getId(), bean.getDrugUserId(), bean.getOldProductId());
+        List<DrugUserDoctor> list = drugUserDoctorRepository.findByDoctorIdAndDrugUserIdAndProductId(doctor.getId(), bean.getDrugUserId(), bean.getProductId());
+        if (list == null || list.isEmpty()) {
+            DrugUserDoctor dud = new DrugUserDoctor();
             dud.setDoctorId(doctor.getId());
             dud.setProductId(bean.getProductId());
             dud.setDrugUserId(bean.getDrugUserId());
@@ -510,9 +511,9 @@ public class DoctorService extends BaseService {
             virtual.setDoctorId(doctor.getId());
             doctorVirtualService.save(virtual);
             //TODO 添加关系到关系表
-            DrugUserDoctor dud = drugUserDoctorRepository.findByDoctorIdAndDrugUserIdAndProductId(doctor.getId(), user.getId(), productId);
-            if (dud == null) {
-                dud = new DrugUserDoctor();
+            List<DrugUserDoctor> list1 = drugUserDoctorRepository.findByDoctorIdAndDrugUserIdAndProductId(doctor.getId(), user.getId(), productId);
+            if (list1 == null || list1.isEmpty()) {
+                DrugUserDoctor dud = new DrugUserDoctor();
                 dud.setDoctorId(doctor.getId());
                 dud.setProductId(productId);
                 dud.setDrugUserId(user.getId());

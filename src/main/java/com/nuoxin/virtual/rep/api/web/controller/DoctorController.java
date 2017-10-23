@@ -137,8 +137,10 @@ public class DoctorController extends BaseController {
             responseBean.setMessage("登录失效");
             return responseBean;
         }
-        bean.setDrugUserId(user.getId());
-        bean.setLeaderPath(user.getLeaderPath());
+        if(bean.getDrugUserId()==null){
+            bean.setDrugUserId(user.getId());
+        }
+        bean.setLeaderPath(drugUserService.findById(bean.getDrugUserId()).getLeaderPath());
         responseBean.setData(doctorService.update(bean));
         return responseBean;
     }

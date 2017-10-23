@@ -38,6 +38,8 @@ public class DoctorUpdateRequestBean implements Serializable {
     private String professor;
     @ApiModelProperty(value = "产品id")
     private Long productId;
+    @ApiModelProperty(value = "原来的产品id产品id")
+    private Long oldProductId;
 
     @ApiModelProperty(value = "不用传")
     private Long drugUserId;
@@ -176,5 +178,13 @@ public class DoctorUpdateRequestBean implements Serializable {
 
     public void setDoctorName(String doctorName) {
         this.doctorName = doctorName;
+    }
+
+    public Long getOldProductId() {
+        return oldProductId;
+    }
+
+    public void setOldProductId(Long oldProductId) {
+        this.oldProductId = oldProductId;
     }
 }
