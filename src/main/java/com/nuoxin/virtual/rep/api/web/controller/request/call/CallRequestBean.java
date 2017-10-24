@@ -29,6 +29,8 @@ public class CallRequestBean implements Serializable {
     @ApiModelProperty(value = "录音文件url")
     private String url;
 
+    @ApiModelProperty(value = "产品id")
+    private Long productId;
     private Long drugUserId;
 
     public String getMobile() {
@@ -101,5 +103,13 @@ public class CallRequestBean implements Serializable {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 }
