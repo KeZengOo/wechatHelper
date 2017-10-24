@@ -54,6 +54,9 @@ public class DoctorController extends BaseController {
     public DefaultResponseBean<DoctorDetailsResponseBean> doctorDetails(@PathVariable Long doctorId,
                                                                         HttpServletRequest request, HttpServletResponse response){
         DefaultResponseBean responseBean = new DefaultResponseBean();
+        if(doctorId==0){
+            return responseBean;
+        }
         DoctorDetailsResponseBean bean = doctorService.details(doctorId);
         responseBean.setData(bean);
         return responseBean;
@@ -63,6 +66,9 @@ public class DoctorController extends BaseController {
     public DefaultResponseBean<DoctorDetailsResponseBean> doctorProductDetails(@PathVariable Long doctorId,@PathVariable Long productId,
                                                                         HttpServletRequest request, HttpServletResponse response){
         DefaultResponseBean responseBean = new DefaultResponseBean();
+        if(doctorId==0){
+            return responseBean;
+        }
         DoctorDetailsResponseBean bean = doctorService.details(doctorId);
         bean.setProductId(productId);
         responseBean.setData(bean);

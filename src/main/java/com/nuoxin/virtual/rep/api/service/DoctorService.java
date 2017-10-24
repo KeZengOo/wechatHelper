@@ -97,7 +97,9 @@ public class DoctorService extends BaseService {
 
         DoctorDetailsResponseBean responseBean = new DoctorDetailsResponseBean();
         Doctor doctor = doctorRepository.findTopByMobile(mobile);
-
+        if(doctor==null){
+            return null;
+        }
         responseBean.setCity(doctor.getCity());
         responseBean.setClientLevel(doctor.getDoctorVirtual().getClientLevel());
         responseBean.setDepartment(doctor.getDepartment());
