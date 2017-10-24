@@ -21,7 +21,7 @@ public interface DoctorCallInfoRepository extends JpaRepository<DoctorCallInfo,L
     @Query("select count(distinct d.id) from DoctorCallInfo d where d.createTime>=:date and d.doctor.id=:doctorId and d.delFlag=0")
     Integer findByCreateTimeCount(@Param("date") Date date,@Param("doctorId") Long doctorId);
 
-    @Query("select count(distinct d.id) as allNum,sum(d.callTime) as callTimes,0 as num from DoctorCallInfo d where d.drugUser.leaderPath like :drugUserIds and d.type=:type and d.delFlag=0")
+    @Query("select count(distinct d.id) as allNum,sum(d.callTime) as callTimes,0 as num from DoctorCallInfo d where d.drugUser.leaderPath like :drugUserIds and d.type=:type and d.delFlag=0 and d.doctor.id is not null")
     Map<String,Long> statDrugUserIds(@Param("drugUserIds") String drugUserIds,@Param("type") Integer type);
 
     @Query(value = "select count(DISTINCT v1.id) num from virtual_doctor_call_info v1 join drug_user_doctor dud on dud.doctor_id=v1.virtual_doctor_id AND dud.drug_user_id=v1.virtual_drug_user_id join virtual_doctor_call_info_details v2 on v1.id=v2.call_id join doctor_virtual d on d.doctor_id=v1.virtual_doctor_id join drug_user du on du.id=v1.virtual_drug_user_id " +
