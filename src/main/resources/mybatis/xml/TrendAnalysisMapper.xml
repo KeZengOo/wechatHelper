@@ -30,7 +30,7 @@
     <select id="summationCallout" resultMap="trendResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TrendAnalysisRequestBean">
         select
-        DATE_FORMAT(dc.create_time,'%Y-%m-%d') date,sum(dc.call_time) num,WEEK(dc.create_time,1) weeks,MONTH(dc.create_time) months,YEAR(dc.create_time) years,DAY(dc.create_time) days,FLOOR((date_format(dc.create_time,'%m')+2)/3) quarters from virtual_doctor_call_info dc join drug_user du on du.id=dc.virtual_drug_user_id WHERE
+        DATE_FORMAT(dc.create_time,'%Y-%m-%d') date,sum(dc.call_time) num,WEEK(dc.create_time,1) weeks,MONTH(dc.create_time) months,YEAR(dc.create_time) years,DAY(dc.create_time) days,FLOOR((date_format(dc.create_time,'%m')+2)/3) quarters from virtual_doctor_call_info dc join drug_user_doctor dud on dud.doctor_id=dc.virtual_doctor_id AND dud.drug_user_id=dc.virtual_drug_user_id join drug_user du on du.id=dc.virtual_drug_user_id WHERE
         du.leader_path like #{leaderPath,jdbcType=VARCHAR} and dc.create_time BETWEEN #{startDate} AND #{endDate}
         <if test="drugUserId!=null and drugUserId!=0">
             AND dc.virtual_drug_user_id = #{drugUserId}
@@ -54,7 +54,7 @@
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TrendAnalysisRequestBean">
         select
         DATE_FORMAT(dc.create_time,'%Y-%m-%d') date,FLOOR(sum(dc.call_time)/count(dc.id)) num,WEEK(dc.create_time,1) weeks,MONTH(dc.create_time) months,YEAR(dc.create_time) years,DAY(dc.create_time) days,FLOOR((date_format(dc.create_time,'%m')+2)/3) quarters
-        from virtual_doctor_call_info dc join drug_user du on du.id=dc.virtual_drug_user_id WHERE
+        from virtual_doctor_call_info dc join drug_user_doctor dud on dud.doctor_id=dc.virtual_doctor_id AND dud.drug_user_id=dc.virtual_drug_user_id join drug_user du on du.id=dc.virtual_drug_user_id WHERE
         du.leader_path like #{leaderPath,jdbcType=VARCHAR} and dc.create_time BETWEEN #{startDate} AND #{endDate}
         <if test="drugUserId!=null and drugUserId!=0">
             AND dc.virtual_drug_user_id = #{drugUserId}
@@ -78,7 +78,7 @@
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TrendAnalysisRequestBean">
         select
         DATE_FORMAT(dc.create_time,'%Y-%m-%d') date,count(DISTINCT dc.virtual_doctor_id) num,count(dc.id) countnum,WEEK(dc.create_time,1) weeks,MONTH(dc.create_time) months,YEAR(dc.create_time) years,DAY(dc.create_time) days,FLOOR((date_format(dc.create_time,'%m')+2)/3) quarters
-        from virtual_doctor_call_info dc join drug_user du on du.id=dc.virtual_drug_user_id WHERE
+        from virtual_doctor_call_info dc join drug_user_doctor dud on dud.doctor_id=dc.virtual_doctor_id AND dud.drug_user_id=dc.virtual_drug_user_id join drug_user du on du.id=dc.virtual_drug_user_id WHERE
         du.leader_path like #{leaderPath,jdbcType=VARCHAR} and dc.create_time BETWEEN #{startDate} AND #{endDate}
         <if test="drugUserId!=null and drugUserId!=0">
             AND dc.virtual_drug_user_id = #{drugUserId}
@@ -101,7 +101,7 @@
     <select id="summationCover" resultMap="trendResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TrendAnalysisRequestBean">
         select DATE_FORMAT(t.create_time,'%Y-%m-%d') date,WEEK(t.create_time,1) weeks,MONTH(t.create_time) months,YEAR(t.create_time) years,DAY(t.create_time) days,FLOOR((date_format(t.create_time,'%m')+2)/3) quarters,count(DISTINCT t.doctor_id) num  from (
-        select DISTINCT vd.virtual_doctor_id doctor_id,vd.create_time from virtual_doctor_call_info vd join drug_user d
+        select DISTINCT vd.virtual_doctor_id doctor_id,vd.create_time from virtual_doctor_call_info vd  join drug_user_doctor dud on dud.doctor_id=vd.virtual_doctor_id AND dud.drug_user_id=vd.virtual_drug_user_id join drug_user d
         on
         d.id=vd.virtual_drug_user_id where d.leader_path like #{leaderPath,jdbcType=VARCHAR}
         AND vd.create_time BETWEEN #{startDate} AND #{endDate}
@@ -112,7 +112,7 @@
             AND vd.drug_user_id = #{drugUserId}
         </if>
         UNION ALL
-        select DISTINCT vm.doctor_id,vm.message_time create_time from virtual_message vm join drug_user d on
+        select DISTINCT vm.doctor_id,vm.message_time create_time from virtual_message vm join drug_user_doctor dud on dud.doctor_id=vm.doctor_id AND dud.drug_user_id=vm.drug_user_id join drug_user d on
         d.id=vm.drug_user_id where
         d.leader_path like #{leaderPath,jdbcType=VARCHAR}
         AND vm.message_time BETWEEN #{startDate} AND #{endDate}
@@ -123,7 +123,7 @@
             AND vm.drug_user_id = #{drugUserId}
         </if>
         UNION ALL
-        select DISTINCT mad.doctor_id,mad.attend_start_time create_time from t_meeting_attend_details mad join
+        select DISTINCT mad.doctor_id,mad.attend_start_time create_time from t_meeting_attend_details mad join join drug_user_doctor dud on dud.doctor_id=mad.doctor_id AND dud.drug_user_id=mad.drug_user_id
         t_meeting_data md on md.id=mad.meeting_id
         join drug_user d on d.id=mad.drug_user_id where d.leader_path like #{leaderPath,jdbcType=VARCHAR}
         AND mad.attend_start_time BETWEEN #{startDate} AND #{endDate}
@@ -134,7 +134,7 @@
             AND mad.drug_user_id = #{drugUserId}
         </if>
         UNION ALL
-        select DISTINCT ei.doctor_id,ei.create_time from virtual_email_info ei join drug_user d on d.id=ei.drug_user_id
+        select DISTINCT ei.doctor_id,ei.create_time from virtual_email_info ei join drug_user_doctor dud on dud.doctor_id=ei.doctor_id AND dud.drug_user_id=ei.drug_user_id join drug_user d on d.id=ei.drug_user_id
         where d.leader_path like #{leaderPath,jdbcType=VARCHAR}
         AND mad.attend_start_time BETWEEN #{startDate} AND #{endDate}
         <if test="productId!=null and productId!=0">
@@ -163,7 +163,7 @@
 
     <select id="summationSessionType1" resultMap="trendResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TrendAnalysisRequestBean">
-        select DATE_FORMAT(m.message_time,'%Y-%m-%d') date,WEEK(m.message_time,1) weeks,MONTH(m.message_time) months,YEAR(m.message_time) years,DAY(m.message_time) days,FLOOR((date_format(m.message_time,'%m')+2)/3) quarters,count(DISTINCT m.doctor_id) num,count(m.id) countnum from virtual_message m join drug_user d on m.drug_user_id=d.id where
+        select DATE_FORMAT(m.message_time,'%Y-%m-%d') date,WEEK(m.message_time,1) weeks,MONTH(m.message_time) months,YEAR(m.message_time) years,DAY(m.message_time) days,FLOOR((date_format(m.message_time,'%m')+2)/3) quarters,count(DISTINCT m.doctor_id) num,count(m.id) countnum from virtual_message m join drug_user_doctor dud on dud.doctor_id=m.doctor_id AND dud.drug_user_id=m.drug_user_id join drug_user d on m.drug_user_id=d.id where
         m.message_time BETWEEN #{startDate} AND #{endDate} and d.leader_path like #{leaderPath,jdbcType=VARCHAR} and m.message_type=1
         <if test="drugUserId!=null and drugUserId!=0">
             AND m.drug_user_id = #{drugUserId}
@@ -187,7 +187,7 @@
 
     <select id="summationSessionType2" resultMap="trendResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TrendAnalysisRequestBean">
-        select DATE_FORMAT(m.message_time,'%Y-%m-%d') date,WEEK(m.message_time,1) weeks,MONTH(m.message_time) months,YEAR(m.message_time) years,DAY(m.message_time) days,FLOOR((date_format(m.message_time,'%m')+2)/3) quarters,count(DISTINCT m.doctor_id) num,count(m.id) countnum from virtual_message m join drug_user d on m.drug_user_id=d.id where
+        select DATE_FORMAT(m.message_time,'%Y-%m-%d') date,WEEK(m.message_time,1) weeks,MONTH(m.message_time) months,YEAR(m.message_time) years,DAY(m.message_time) days,FLOOR((date_format(m.message_time,'%m')+2)/3) quarters,count(DISTINCT m.doctor_id) num,count(m.id) countnum from virtual_message m join drug_user_doctor dud on dud.doctor_id=m.doctor_id AND dud.drug_user_id=m.drug_user_id join drug_user d on m.drug_user_id=d.id where
         m.message_time BETWEEN #{startDate} AND #{endDate} and d.leader_path like #{leaderPath,jdbcType=VARCHAR} and m.message_type=2
         <if test="drugUserId!=null and drugUserId!=0">
             AND m.drug_user_id = #{drugUserId}
@@ -211,7 +211,7 @@
 
     <select id="summationSessionType3" resultMap="trendResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TrendAnalysisRequestBean">
-        select DATE_FORMAT(ei.create_time,'%Y-%m-%d') date,WEEK(ei.create_time,1) weeks,MONTH(ei.create_time) months,YEAR(ei.create_time) years,DAY(ei.create_time) days,FLOOR((date_format(ei.create_time,'%m')+2)/3) quarters,count(DISTINCT ei.doctor_id) num,count(ei.id) countnum from virtual_email_info ei join drug_user d on ei.drug_user_id=d.id where
+        select DATE_FORMAT(ei.create_time,'%Y-%m-%d') date,WEEK(ei.create_time,1) weeks,MONTH(ei.create_time) months,YEAR(ei.create_time) years,DAY(ei.create_time) days,FLOOR((date_format(ei.create_time,'%m')+2)/3) quarters,count(DISTINCT ei.doctor_id) num,count(ei.id) countnum from virtual_email_info ei join drug_user_doctor dud on dud.doctor_id=ei.doctor_id AND dud.drug_user_id=ei.drug_user_id join drug_user d on ei.drug_user_id=d.id where
         ei.create_time BETWEEN #{startDate} AND #{endDate} and d.leader_path like #{leaderPath,jdbcType=VARCHAR}
         <if test="drugUserId!=null and drugUserId!=0">
             AND ei.drug_user_id = #{drugUserId}
@@ -234,32 +234,32 @@
 
     <select id="callOut" resultMap="statResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TrendAnalysisRequestBean">
-        select COUNT(DISTINCT dc.sin_token) connects,DATE_FORMAT(dc.create_time,'%k') hours,dc.create_time from virtual_doctor_call_info dc join virtual_doctor_call_info_details dcd on dcd.call_id=dc.id join drug_user d on d.id=dc.virtual_drug_user_id where dcd.status_name='answer'
+        select COUNT(DISTINCT dc.sin_token) connects,DATE_FORMAT(dc.create_time,'%k') hours,dc.create_time from virtual_doctor_call_info dc join drug_user_doctor dud on dud.doctor_id=dc.virtual_doctor_id AND dud.drug_user_id=dc.virtual_drug_user_id join virtual_doctor_call_info_details dcd on dcd.call_id=dc.id join drug_user d on d.id=dc.virtual_drug_user_id where dcd.status_name='answer'
         and dc.create_time BETWEEN #{startDate} AND #{endDate} and d.leader_path like #{leaderPath,jdbcType=VARCHAR} group by DATE_FORMAT(dc.create_time,'%k') order by dc.create_time asc
     </select>
 
     <select id="callOutCount" resultMap="statResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TrendAnalysisRequestBean">
-        select COUNT(DISTINCT dc.sin_token) callout,DATE_FORMAT(dc.create_time,'%k') hours,dc.create_time from virtual_doctor_call_info dc join virtual_doctor_call_info_details dcd on dcd.call_id=dc.id join drug_user d on d.id=dc.virtual_drug_user_id where 1=1
+        select COUNT(DISTINCT dc.sin_token) callout,DATE_FORMAT(dc.create_time,'%k') hours,dc.create_time from virtual_doctor_call_info dc join drug_user_doctor dud on dud.doctor_id=dc.virtual_doctor_id AND dud.drug_user_id=dc.virtual_drug_user_id join virtual_doctor_call_info_details dcd on dcd.call_id=dc.id join drug_user d on d.id=dc.virtual_drug_user_id where 1=1
         and dc.create_time BETWEEN #{startDate} AND #{endDate} and d.leader_path like #{leaderPath,jdbcType=VARCHAR} group by DATE_FORMAT(dc.create_time,'%k') order by dc.create_time asc
     </select>
 
     <select id="sessionType1" resultMap="statResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TrendAnalysisRequestBean">
-        select DATE_FORMAT(m.message_time,'%k') hours,count(1) wechatsCount,count(DISTINCT m.doctor_id) wechats from virtual_message m join drug_user d on m.drug_user_id=d.id where
+        select DATE_FORMAT(m.message_time,'%k') hours,count(1) wechatsCount,count(DISTINCT m.doctor_id) wechats from virtual_message m join drug_user_doctor dud on dud.doctor_id=m.doctor_id AND dud.drug_user_id=m.drug_user_id join drug_user d on m.drug_user_id=d.id where
         m.message_time BETWEEN #{startDate} AND #{endDate} and d.leader_path like #{leaderPath,jdbcType=VARCHAR} and m.message_type=1 group by DATE_FORMAT(m.message_time,'%k') order by m.message_time asc
 
     </select>
 
     <select id="sessionType2" resultMap="statResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TrendAnalysisRequestBean">
-        select DATE_FORMAT(m.message_time,'%k') hours,count(1) smssCount,count(DISTINCT m.doctor_id) smss from virtual_message m join drug_user d on m.drug_user_id=d.id where
+        select DATE_FORMAT(m.message_time,'%k') hours,count(1) smssCount,count(DISTINCT m.doctor_id) smss from virtual_message m join drug_user_doctor dud on dud.doctor_id=m.doctor_id AND dud.drug_user_id=m.drug_user_id join drug_user d on m.drug_user_id=d.id where
         m.message_time BETWEEN #{startDate} AND #{endDate} and d.leader_path like #{leaderPath,jdbcType=VARCHAR} and m.message_type=2 group by DATE_FORMAT(m.message_time,'%k') order by m.message_time asc
 
     </select>
 
     <select id="sessionType3" resultMap="statResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TrendAnalysisRequestBean">
-        select DATE_FORMAT(ei.create_time,'%k') hours,count(1) emailsCount,count(DISTINCT ei.doctor_id) emails from virtual_email_info ei join drug_user d on ei.drug_user_id=d.id where ei.create_time BETWEEN #{startDate} AND #{endDate} and d.leader_path like #{leaderPath,jdbcType=VARCHAR} group by DATE_FORMAT(ei.create_time,'%k') order by ei.create_time asc
+        select DATE_FORMAT(ei.create_time,'%k') hours,count(1) emailsCount,count(DISTINCT ei.doctor_id) emails from virtual_email_info ei join drug_user_doctor dud on dud.doctor_id=ei.doctor_id AND dud.drug_user_id=ei.drug_user_id join drug_user d on ei.drug_user_id=d.id where ei.create_time BETWEEN #{startDate} AND #{endDate} and d.leader_path like #{leaderPath,jdbcType=VARCHAR} group by DATE_FORMAT(ei.create_time,'%k') order by ei.create_time asc
     </select>
 </mapper>

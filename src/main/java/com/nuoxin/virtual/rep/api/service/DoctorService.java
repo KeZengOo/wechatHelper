@@ -6,6 +6,7 @@ import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.common.service.BaseService;
 import com.nuoxin.virtual.rep.api.common.util.StringUtils;
+import com.nuoxin.virtual.rep.api.dao.DoctorCallInfoRepository;
 import com.nuoxin.virtual.rep.api.dao.DoctorRepository;
 import com.nuoxin.virtual.rep.api.dao.DoctorVirtualRepository;
 import com.nuoxin.virtual.rep.api.dao.DrugUserDoctorRepository;
@@ -59,6 +60,8 @@ public class DoctorService extends BaseService {
     private DrugUserDoctorRepository drugUserDoctorRepository;
     @Autowired
     private DoctorDynamicFieldValueService DoctorDynamicFieldValueService;
+    @Autowired
+    private DoctorCallInfoRepository doctorCallInfoRepository;
 
     @Autowired
     private ProductLineService productLineService;
@@ -245,6 +248,7 @@ public class DoctorService extends BaseService {
             dud.setDrugUserId(bean.getDrugUserId());
             dud.setCreateTime(new Date());
             drugUserDoctorRepository.saveAndFlush(dud);
+            doctorCallInfoRepository.updateDoctorIdAndDrugUserIdAndProductId(dud.getDoctorId(),dud.getDrugUserId(),dud.getProductId(),0);
         }
 
 
@@ -308,6 +312,7 @@ public class DoctorService extends BaseService {
         doctorRepository.saveAndFlush(doctor);
         //TODO 添加关系到关系表
         drugUserDoctorRepository.deleteByDoctorIdAndDrugUserIdAndProductId(doctor.getId(), bean.getDrugUserId(), bean.getOldProductId());
+        doctorCallInfoRepository.updateDoctorIdAndDrugUserIdAndProductId(doctor.getId(), bean.getDrugUserId(), bean.getOldProductId(),1);
         List<DrugUserDoctor> list = drugUserDoctorRepository.findByDoctorIdAndDrugUserIdAndProductId(doctor.getId(), bean.getDrugUserId(), bean.getProductId());
         if (list == null || list.isEmpty()) {
             DrugUserDoctor dud = new DrugUserDoctor();
@@ -316,6 +321,7 @@ public class DoctorService extends BaseService {
             dud.setDrugUserId(bean.getDrugUserId());
             dud.setCreateTime(new Date());
             drugUserDoctorRepository.saveAndFlush(dud);
+            doctorCallInfoRepository.updateDoctorIdAndDrugUserIdAndProductId(dud.getDoctorId(),dud.getDrugUserId(),dud.getProductId(),0);
         }
 
 
@@ -519,6 +525,7 @@ public class DoctorService extends BaseService {
                 dud.setDrugUserId(user.getId());
                 dud.setCreateTime(new Date());
                 drugUserDoctorRepository.saveAndFlush(dud);
+                doctorCallInfoRepository.updateDoctorIdAndDrugUserIdAndProductId(dud.getDoctorId(),dud.getDrugUserId(),dud.getProductId(),0);
             }
             savelist.add(doctor);
         }
@@ -565,7 +572,11 @@ public class DoctorService extends BaseService {
                     }
                     virtual.setDrugUserIds(sb.toString());
                     doctorVirtualService.save(virtual);
+                    for (DrugUserDoctor dud:list) {
+                        doctorCallInfoRepository.updateDoctorIdAndDrugUserIdAndProductId(dud.getDoctorId(),dud.getDrugUserId(),dud.getProductId(),1);
+                    }
                     drugUserDoctorRepository.delete(list);
+
                 }
             }
         }
@@ -585,6 +596,7 @@ public class DoctorService extends BaseService {
                 if (drugUserDoctors != null && !drugUserDoctors.isEmpty()) {
                     for (DrugUserDoctor druguserdoctr : drugUserDoctors) {
                         drugUserIds = drugUserIds.replaceAll("," + druguserdoctr.getDrugUserId() + ",", ",");
+                        doctorCallInfoRepository.updateDoctorIdAndDrugUserIdAndProductId(druguserdoctr.getDoctorId(),druguserdoctr.getDrugUserId(),druguserdoctr.getProductId(),1);
                     }
                     drugUserDoctorRepository.delete(drugUserDoctors);
                 }
@@ -597,6 +609,7 @@ public class DoctorService extends BaseService {
                 entity.setProductId(pId.get(0));
                 entity.setDoctorId(id);
                 drugUserDoctorRepository.saveAndFlush(entity);
+                doctorCallInfoRepository.updateDoctorIdAndDrugUserIdAndProductId(entity.getDoctorId(),entity.getDrugUserId(),entity.getProductId(),0);
             }
         }
         return true;

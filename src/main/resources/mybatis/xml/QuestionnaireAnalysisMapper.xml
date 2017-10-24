@@ -41,7 +41,7 @@
 
     <select id="list" resultMap="questionnaireResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.QuestionnaireAnalysisRequestBean">
-        select dq.virtual_questionnaire_id questionnaire_id,q.title,q.product_id from virtual_doctor_questionnaire dq
+        select dq.virtual_questionnaire_id questionnaire_id,q.title,q.product_id from virtual_doctor_questionnaire dq join drug_user_doctor dud on dud.doctor_id=dq.virtual_doctor_id AND dud.drug_user_id=dq.virtual_drug_user_id
         join virtual_questionnaire q on q.id=dq.virtual_questionnaire_id join drug_user du on
         du.id=dq.virtual_drug_user_id where 1=1
         <if test="startDate!=null and startDate!=''">
@@ -56,7 +56,7 @@
     <select id="summation" resultMap="qStatResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.QuestionnaireAnalysisRequestBean">
         select count(DISTINCT dq.virtual_questionnaire_id,dq.call_id) count_num,count(DISTINCT dq.virtual_doctor_id) people_num from virtual_doctor_questionnaire
-        dq
+        dq join drug_user_doctor dud on dud.doctor_id=dq.virtual_doctor_id AND dud.drug_user_id=dq.virtual_drug_user_id
         join virtual_questionnaire q on q.id=dq.virtual_questionnaire_id join drug_user du on
         du.id=dq.virtual_drug_user_id where 1=1
         <if test="startDate!=null and startDate!=''">
@@ -71,7 +71,7 @@
     <select id="summationList" resultMap="qDateResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.QuestionnaireAnalysisRequestBean">
         select dq.create_time,DATE_FORMAT(dq.create_time,'%Y-%m-%d') date_title,count(DISTINCT dq.virtual_questionnaire_id,dq.call_id) count_num,count(DISTINCT
-        dq.virtual_doctor_id) people_num from virtual_doctor_questionnaire dq
+        dq.virtual_doctor_id) people_num from virtual_doctor_questionnaire dq join drug_user_doctor dud on dud.doctor_id=dq.virtual_doctor_id AND dud.drug_user_id=dq.virtual_drug_user_id
         join virtual_questionnaire q on q.id=dq.virtual_questionnaire_id join drug_user du on
         du.id=dq.virtual_drug_user_id where 1=1
         <if test="startDate!=null and startDate!=''">
@@ -85,7 +85,7 @@
 
     <select id="questionList" resultMap="questionBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.QuestionnaireAnalysisRequestBean">
-        select q.id,q.virtual_questionnaire_id,q.title,q.options,q.type,count(DISTINCT dq.virtual_doctor_id) answerNum from virtual_doctor_questionnaire dq join virtual_question
+        select q.id,q.virtual_questionnaire_id,q.title,q.options,q.type,count(DISTINCT dq.virtual_doctor_id) answerNum from virtual_doctor_questionnaire dq join drug_user_doctor dud on dud.doctor_id=dq.virtual_doctor_id AND dud.drug_user_id=dq.virtual_drug_user_id join virtual_question
         q on q.id=dq.virtual_question_id join drug_user du on du.id=dq.virtual_drug_user_id where 1=1
         <if test="startDate!=null and startDate!=''">
             AND dq.create_time &gt;= #{startDate}
@@ -99,7 +99,7 @@
 
     <select id="questionUsreAnswerType0" resultMap="qAnswerResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.QuestionnaireAnalysisRequestBean">
-        select COUNT(DISTINCT dq.virtual_doctor_id) count_num,dq.virtual_question_id question_id,dq.answer from virtual_doctor_questionnaire dq join virtual_question
+        select COUNT(DISTINCT dq.virtual_doctor_id) count_num,dq.virtual_question_id question_id,dq.answer from virtual_doctor_questionnaire dq join drug_user_doctor dud on dud.doctor_id=dq.virtual_doctor_id AND dud.drug_user_id=dq.virtual_drug_user_id join virtual_question
         q on q.id=dq.virtual_question_id join drug_user du on du.id=dq.virtual_drug_user_id where q.type=0
         <if test="startDate!=null and startDate!=''">
             AND dq.create_time &gt;= #{startDate}
@@ -113,7 +113,7 @@
 
     <select id="questionUsreAnswerType1" resultMap="qAnswerResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.QuestionnaireAnalysisRequestBean">
-        select COUNT(DISTINCT dq.virtual_doctor_id) count_num,dq.virtual_question_id question_id,dq.answer from virtual_doctor_questionnaire dq join virtual_question
+        select COUNT(DISTINCT dq.virtual_doctor_id) count_num,dq.virtual_question_id question_id,dq.answer from virtual_doctor_questionnaire dq join drug_user_doctor dud on dud.doctor_id=dq.virtual_doctor_id AND dud.drug_user_id=dq.virtual_drug_user_id join virtual_question
         q on q.id=dq.virtual_question_id join drug_user du on du.id=dq.virtual_drug_user_id where q.type=1
         <if test="startDate!=null and startDate!=''">
             AND dq.create_time &gt;= #{startDate}

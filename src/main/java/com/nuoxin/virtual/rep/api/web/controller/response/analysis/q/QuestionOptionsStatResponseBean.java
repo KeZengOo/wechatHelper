@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * Created by fenggang on 10/12/17.
@@ -41,7 +42,8 @@ public class QuestionOptionsStatResponseBean implements Serializable {
     }
 
     public void setPercentage(Float percentage) {
-        this.percentage = percentage*100;
+        percentage = new BigDecimal(percentage*100).setScale(2,BigDecimal.ROUND_HALF_UP).floatValue();
+        this.percentage = percentage;
     }
 
     public Long getQuestionId() {
