@@ -63,6 +63,8 @@ public class DoctorCallService extends BaseService {
     @Autowired
     private DrugUserService drugUserService;
     @Autowired
+    private ProductLineService productLineService;
+    @Autowired
     private OssService ossService;
     @Value("${recording.file.path}")
     private String path;
@@ -127,6 +129,7 @@ public class DoctorCallService extends BaseService {
         Page<DoctorCallInfo> page = doctorCallInfoRepository.findAll(spec,pagetable);
         PageResponseBean<CallResponseBean> responseBean = new PageResponseBean<>(page);
         List<DoctorCallInfo> list = page.getContent();
+        Map<Long,String> map = new HashMap<>();
         if(list!=null && !list.isEmpty()){
             List<CallResponseBean> responseBeans = new ArrayList<>();
             for (DoctorCallInfo info:list) {
@@ -134,7 +137,18 @@ public class DoctorCallService extends BaseService {
                 if(info.getDoctor()==null){
                     continue;
                 }
-                responseBeans.add(this._getCallResponseBean(info));
+                CallResponseBean callResponseBean = this._getCallResponseBean(info);
+                if(info.getProductId()!=null){
+                    String name = map.get(info.getProductId());
+                    if(StringUtils.isNotEmtity(name)){
+                        callResponseBean.setProductName(name);
+                    }else{
+                        name = productLineService.findById(info.getProductId()).getName();
+                        map.put(info.getProductId(),name);
+                        callResponseBean.setProductName(name);
+                    }
+                }
+                responseBeans.add(callResponseBean);
             }
             responseBean.setContent(responseBeans);
         }
@@ -363,7 +377,13 @@ public class DoctorCallService extends BaseService {
     private CallResponseBean _getCallResponseBean(DoctorCallInfo info){
         CallResponseBean responseBean = new CallResponseBean();
         if(info!=null){
-            responseBean.setClientLevel(info.getDoctor().getDoctorVirtual().getClientLevel());
+            if(info.getDoctor()!=null && info.getDoctor().getDoctorVirtual()!=null) {
+                responseBean.setClientLevel(info.getDoctor().getDoctorVirtual().getClientLevel());
+            }
+            if(info.getDrugUser()!=null){
+                responseBean.setDrugUserName(info.getDrugUser().getName());
+                responseBean.setDrugUserId(info.getDrugUser().getId());
+            }
             responseBean.setDoctorId(info.getDoctor().getId());
             responseBean.setDoctorMobile(info.getDoctor().getMobile());
             responseBean.setDoctorName(info.getDoctor().getName());
@@ -371,6 +391,7 @@ public class DoctorCallService extends BaseService {
             responseBean.setTimeStr(DateUtil.getDateTimeString(info.getCreateTime()));
             responseBean.setDrugUserId(info.getDrugUserId());
             responseBean.setProductId(info.getProductId());
+
         }
         return responseBean;
     }

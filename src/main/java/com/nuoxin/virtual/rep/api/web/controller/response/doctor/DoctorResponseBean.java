@@ -16,6 +16,8 @@ public class DoctorResponseBean implements Serializable {
     private Long doctorId;
     @ApiModelProperty(value = "产品id")
     private Long productId;
+    @ApiModelProperty(value = "产品名称")
+    private String productName;
     @ApiModelProperty(value = "姓名")
     private String doctorName;
     @ApiModelProperty(value = "电话")
@@ -130,5 +132,13 @@ public class DoctorResponseBean implements Serializable {
 
     public void setDrugUserId(Long drugUserId) {
         this.drugUserId = drugUserId;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 }

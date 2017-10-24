@@ -32,6 +32,8 @@ public class CallResponseBean implements Serializable {
     private Long productId;
     @ApiModelProperty(value = "druguserName")
     private String drugUserName;
+    @ApiModelProperty(value = "产品名称")
+    private String productName;
 
     public Long getDoctorId() {
         return doctorId;
@@ -103,5 +105,13 @@ public class CallResponseBean implements Serializable {
 
     public void setProductId(Long productId) {
         this.productId = productId;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 }

@@ -14,7 +14,7 @@
         <result column="telephone" property="doctorMobile" jdbcType="VARCHAR"/>
         <!--<result column="positions" property="" jdbcType=""/>-->
         <!--<result column="create_time" property="" jdbcType=""/>-->
-        <!--<result column="status" property="" jdbcType=""/>-->
+        <result column="product_name" property="productName" jdbcType="VARCHAR"/>
         <result column="doctor_id" property="doctorId" jdbcType="BIGINT"/>
         <result column="hospital_level" property="hospitalLevel" jdbcType="VARCHAR"/>
         <result column="client_level" property="clientLevel" jdbcType="VARCHAR"/>
@@ -27,8 +27,8 @@
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean">
         select
         d.id,d.name,d.email,d.hospital_id,d.hospital_name,d.provice,d.city,d.depart,d.telephone,d.positions,d.create_time,d.status,dv.doctor_id,dv.hospital_level,dv.client_level,dv.master_data_id,du.name
-        drug_user_name,dud.prod_id product_id,dud.drug_user_id from drug_user_doctor dud join doctor d on d.id=dud.doctor_id join
-        drug_user du on du.id=dud.drug_user_id join doctor_virtual dv on dv.doctor_id=dud.doctor_id where du.leader_path
+        drug_user_name,dud.prod_id product_id,dud.drug_user_id,pl.prod_name product_name from drug_user_doctor dud join doctor d on d.id=dud.doctor_id join
+        drug_user du on du.id=dud.drug_user_id join doctor_virtual dv on dv.doctor_id=dud.doctor_id join product_line pl on pl.prod_id=dud.prod_id where du.leader_path
         like #{leaderPath,jdbcType=VARCHAR}
         <if test="name!=null and name!=''">
 
