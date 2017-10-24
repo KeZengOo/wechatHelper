@@ -17,8 +17,8 @@
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TargetAnalysisRequestBean">
         select count(DISTINCT mad.doctor_tel) dCount,count(DISTINCT mad.meeting_id) mCount from
         t_meeting_data md join t_meeting_attend_details mad on md.id=mad.meeting_id join doctor_virtual dv on
-        dv.doctor_id=mad.doctor_id  join drug_user d on
-        d.id=mad.drug_user_id where
+        dv.doctor_id=mad.doctor_id  join drug_user_doctor dud on dud.doctor_id=mad.doctor_id join drug_user d on
+        d.id=dud.drug_user_id where
         mad.attend_start_time BETWEEN #{startDate} AND #{endDate} AND d.leader_path like #{leaderPath,jdbcType=VARCHAR}
         <if test="productId!=null and productId!=0">
             AND md.product_id=#{productId}
