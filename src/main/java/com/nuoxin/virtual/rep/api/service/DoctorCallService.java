@@ -306,6 +306,7 @@ public class DoctorCallService extends BaseService {
             return false;
         }
         info.setCallTime(bean.getTimes());
+        info.setProductId(bean.getProductId());
         if(StringUtils.isNotEmtity(bean.getUrl())){
             //TODO 保存录音文件
             try {

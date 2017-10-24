@@ -26,6 +26,8 @@ public class CallInfoRequestBean implements Serializable {
     private Long times;
     @ApiModelProperty(value = "跟进类型")
     private String type;
+    @ApiModelProperty(value = "产品id")
+    private Long productId;
 
     @ApiModelProperty(value = "不用传")
     private Long drugUserId;
@@ -84,5 +86,13 @@ public class CallInfoRequestBean implements Serializable {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 }
