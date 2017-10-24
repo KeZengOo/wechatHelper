@@ -16,7 +16,8 @@
     <select id="meeting" resultMap="mettingTargetResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TargetAnalysisRequestBean">
         select count(DISTINCT mad.doctor_tel) dCount,count(DISTINCT mad.meeting_id) mCount from
-        t_meeting_data md join t_meeting_attend_details mad on md.id=mad.meeting_id join drug_user d on
+        t_meeting_data md join t_meeting_attend_details mad on md.id=mad.meeting_id join doctor_virtual dv on
+        dv.doctor_id=mad.doctor_id  join drug_user d on
         d.id=mad.drug_user_id where
         mad.attend_start_time BETWEEN #{startDate} AND #{endDate} AND d.leader_path like #{leaderPath,jdbcType=VARCHAR}
         <if test="productId!=null and productId!=0">
@@ -25,12 +26,16 @@
         <if test="drugUserId!=null and drugUserId!=0">
             AND mad.drug_user_id = #{drugUserId}
         </if>
+        <if test="customLevel!=null and customLevel!=''">
+            AND dv.client_level = #{customLevel}
+        </if>
     </select>
 
     <select id="summation" resultType="java.lang.Integer"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TargetAnalysisRequestBean">
         select count(DISTINCT t.doctor_id) from (
-        select DISTINCT vd.virtual_doctor_id doctor_id from virtual_doctor_call_info vd join drug_user_doctor dud on dud.doctor_id=vd.virtual_doctor_id AND dud.drug_user_id=vd.virtual_drug_user_id join drug_user d on
+        select DISTINCT vd.virtual_doctor_id doctor_id from virtual_doctor_call_info vd join doctor_virtual dv on
+        dv.doctor_id=vd.virtual_doctor_id join drug_user_doctor dud on dud.doctor_id=vd.virtual_doctor_id AND dud.drug_user_id=vd.virtual_drug_user_id join drug_user d on
         d.id=vd.virtual_drug_user_id where d.leader_path like #{leaderPath,jdbcType=VARCHAR}
         AND vd.create_time BETWEEN #{startDate} AND #{endDate}
         <if test="productId!=null and productId!=0">
@@ -39,8 +44,12 @@
         <if test="drugUserId!=null and drugUserId!=0">
             AND vd.virtual_drug_user_id = #{drugUserId}
         </if>
+        <if test="customLevel!=null and customLevel!=''">
+            AND dv.client_level = #{customLevel}
+        </if>
         UNION ALL
-        select DISTINCT vm.doctor_id from virtual_message vm join drug_user d on d.id=vm.drug_user_id  join drug_user_doctor dud on dud.doctor_id=vm.doctor_id AND dud.drug_user_id=vm.drug_user_id where
+        select DISTINCT vm.doctor_id from virtual_message vm join doctor_virtual dv on
+        dv.doctor_id=vm.doctor_id join drug_user d on d.id=vm.drug_user_id  join drug_user_doctor dud on dud.doctor_id=vm.doctor_id AND dud.drug_user_id=vm.drug_user_id where
         d.leader_path like #{leaderPath,jdbcType=VARCHAR}
         AND vm.message_time BETWEEN #{startDate} AND #{endDate}
         <if test="productId!=null and productId!=0">
@@ -49,8 +58,12 @@
         <if test="drugUserId!=null and drugUserId!=0">
             AND vm.drug_user_id = #{drugUserId}
         </if>
+        <if test="customLevel!=null and customLevel!=''">
+            AND dv.client_level = #{customLevel}
+        </if>
         UNION ALL
-        select DISTINCT mad.doctor_id from t_meeting_attend_details mad join t_meeting_data md on md.id=mad.meeting_id join drug_user_doctor dud on dud.doctor_id=mad.doctor_id AND dud.drug_user_id=mad.drug_user_id
+        select DISTINCT mad.doctor_id from t_meeting_attend_details mad join doctor_virtual dv on
+        dv.doctor_id=mad.doctor_id join t_meeting_data md on md.id=mad.meeting_id join drug_user_doctor dud on dud.doctor_id=mad.doctor_id AND dud.drug_user_id=mad.drug_user_id
         join drug_user d on d.id=mad.drug_user_id where d.leader_path like #{leaderPath,jdbcType=VARCHAR}
         AND mad.attend_start_time BETWEEN #{startDate} AND #{endDate}
         <if test="productId!=null and productId!=0">
@@ -59,8 +72,12 @@
         <if test="drugUserId!=null and drugUserId!=0">
             AND mad.drug_user_id = #{drugUserId}
         </if>
+        <if test="customLevel!=null and customLevel!=''">
+            AND dv.client_level = #{customLevel}
+        </if>
         UNION ALL
-        select DISTINCT ei.doctor_id from virtual_email_info ei join drug_user d on d.id=ei.drug_user_id join drug_user_doctor dud on dud.doctor_id=ei.doctor_id AND dud.drug_user_id=ei.drug_user_id
+        select DISTINCT ei.doctor_id from virtual_email_info ei join doctor_virtual dv on
+        dv.doctor_id=ei.doctor_id join drug_user d on d.id=ei.drug_user_id join drug_user_doctor dud on dud.doctor_id=ei.doctor_id AND dud.drug_user_id=ei.drug_user_id
         where d.leader_path like #{leaderPath,jdbcType=VARCHAR}
         AND ei.create_time BETWEEN #{startDate} AND #{endDate}
         <if test="productId!=null and productId!=0">
@@ -68,6 +85,9 @@
         </if>
         <if test="drugUserId!=null and drugUserId!=0">
             AND ei.drug_user_id = #{drugUserId}
+        </if>
+        <if test="customLevel!=null and customLevel!=''">
+            AND dv.client_level = #{customLevel}
         </if>
         ) t
     </select>
@@ -84,9 +104,9 @@
         <if test="drugUserId!=null and drugUserId!=0">
             AND vd.virtual_drug_user_id = #{drugUserId}
         </if>
-        <if test="area!=null and area!=''">
+        <!--<if test="area!=null and area!=''">
             AND do.provice = #{area}
-        </if>
+        </if>-->
         <if test="customLevel!=null and customLevel!=''">
             AND dv.client_level = #{customLevel}
         </if>
@@ -104,9 +124,9 @@
         <if test="drugUserId!=null and drugUserId!=0">
             AND vd.virtual_drug_user_id = #{drugUserId}
         </if>
-        <if test="area!=null and area!=''">
+       <!-- <if test="area!=null and area!=''">
             AND do.provice = #{area}
-        </if>
+        </if>-->
         <if test="customLevel!=null and customLevel!=''">
             AND dv.client_level = #{customLevel}
         </if>
@@ -123,9 +143,9 @@
         <if test="drugUserId!=null and drugUserId!=0">
             AND vm.drug_user_id = #{drugUserId}
         </if>
-        <if test="area!=null and area!=''">
+        <!--<if test="area!=null and area!=''">
             AND do.provice = #{area}
-        </if>
+        </if>-->
         <if test="customLevel!=null and customLevel!=''">
             AND dv.client_level = #{customLevel}
         </if>
@@ -142,9 +162,9 @@
         <if test="drugUserId!=null and drugUserId!=0">
             AND vm.drug_user_id = #{drugUserId}
         </if>
-        <if test="area!=null and area!=''">
+        <!--<if test="area!=null and area!=''">
             AND do.provice = #{area}
-        </if>
+        </if>-->
         <if test="customLevel!=null and customLevel!=''">
             AND dv.client_level = #{customLevel}
         </if>
@@ -162,9 +182,9 @@
         <if test="drugUserId!=null and drugUserId!=0">
             AND vd.virtual_drug_user_id = #{drugUserId}
         </if>
-        <if test="area!=null and area!=''">
-            AND do.provice = #{area}
-        </if>
+        <!--<if test="area!=null and area!=''">-->
+            <!--AND do.provice = #{area}-->
+        <!--</if>-->
         <if test="customLevel!=null and customLevel!=''">
             AND dv.client_level = #{customLevel}
         </if>
@@ -183,9 +203,9 @@
         <if test="drugUserId!=null and drugUserId!=0">
             AND vd.virtual_drug_user_id = #{drugUserId}
         </if>
-        <if test="area!=null and area!=''">
-            AND do.provice = #{area}
-        </if>
+        <!--<if test="area!=null and area!=''">-->
+            <!--AND do.provice = #{area}-->
+        <!--</if>-->
         <if test="customLevel!=null and customLevel!=''">
             AND dv.client_level = #{customLevel}
         </if>

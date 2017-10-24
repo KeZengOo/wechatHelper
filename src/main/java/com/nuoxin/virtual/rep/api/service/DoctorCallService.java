@@ -121,7 +121,7 @@ public class DoctorCallService extends BaseService {
 
                 }
                 predicates.add(cb.like(root.get("drugUser").get("leaderPath").as(String.class),bean.getLeaderPath()+"%"));
-                predicates.add(cb.equal(root.get("delFlag").as(Integer.class),0));
+                //predicates.add(cb.equal(root.get("delFlag").as(Integer.class),0));
                 query.where(cb.and(cb.and(predicates.toArray(new Predicate[0]))));
                 return query.getRestriction();
             }
