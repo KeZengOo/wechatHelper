@@ -123,6 +123,16 @@
         on dud.drug_user_id=du.id
         where du.leader_path like #{leaderPath}
         and vm.message_type=1
+
+        <if test="startTime !=null and startTime !=''">
+            and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &gt;=#{startTime}
+        </if>
+
+        <if test="endTime !=null and endTime !=''">
+            and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &lt;=#{endTime}
+        </if>
+
+
         group by vm.doctor_id
         union
         select vm.doctor_id,vm.message,max(vm.message_time) message_time, 2 type, d.name doctorName, vm.product_id from virtual_message vm
@@ -141,6 +151,14 @@
         </if>
         and du.leader_path like #{leaderPath}
         and vm.message_type=2
+        <if test="startTime !=null and startTime !=''">
+            and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &gt;=#{startTime}
+        </if>
+
+        <if test="endTime !=null and endTime !=''">
+            and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &lt;=#{endTime}
+        </if>
+
         group by vm.product_id,vm.doctor_id
         union
         select vei.doctor_id,vei.content message,max(vei.create_time) message_time, 3 type, d.name doctorName,vei.product_id
@@ -159,18 +177,27 @@
             and vei.product_id=#{productId}
             and dud.prod_id=#{productId}
         </if>
+
+        <if test="startTime !=null and startTime !=''">
+            and date_format(vei.create_time,'%Y-%m-%d %H:%i:%s') &gt;=#{startTime}
+        </if>
+
+        <if test="endTime !=null and endTime !=''">
+            and date_format(vei.create_time,'%Y-%m-%d %H:%i:%s') &lt;=#{endTime}
+        </if>
+
         and du.leader_path like #{leaderPath}
         group by vei.product_id,vei.doctor_id
         ) t group by t.type,t.product_id,t.doctor_id
         ) a
         where 1=1
-        <if test="startTime !=null and startTime !=''">
+       <!-- <if test="startTime !=null and startTime !=''">
             and date_format(a.maxMessageTime,'%Y-%m-%d %H:%i:%s') &gt;=#{startTime}
         </if>
 
         <if test="endTime !=null and endTime !=''">
             and date_format(a.maxMessageTime,'%Y-%m-%d %H:%i:%s') &lt;=#{endTime}
-        </if>
+        </if>-->
         <if test="messageType !=null and messageType !=0">
             and a.type=#{messageType}
         </if>
@@ -201,6 +228,14 @@
         on dud.drug_user_id=du.id
         where du.leader_path like #{leaderPath}
         and vm.message_type=1
+        <if test="startTime !=null and startTime !=''">
+            and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &gt;=#{startTime}
+        </if>
+
+        <if test="endTime !=null and endTime !=''">
+            and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &lt;=#{endTime}
+        </if>
+
         group by vm.doctor_id
         union
         select vm.doctor_id,vm.message,max(vm.message_time) message_time, 2 type, d.name doctorName, vm.product_id from virtual_message vm
@@ -219,6 +254,15 @@
         </if>
         and du.leader_path like #{leaderPath}
         and vm.message_type=2
+
+        <if test="startTime !=null and startTime !=''">
+            and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &gt;=#{startTime}
+        </if>
+
+        <if test="endTime !=null and endTime !=''">
+            and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &lt;=#{endTime}
+        </if>
+
         group by vm.product_id,vm.doctor_id
         union
         select vei.doctor_id,vei.content message,max(vei.create_time) message_time, 3 type, d.name doctorName,vei.product_id
@@ -236,18 +280,26 @@
             and vei.product_id=#{productId}
             and dud.prod_id=#{productId}
         </if>
+
+        <if test="startTime !=null and startTime !=''">
+            and date_format(vei.create_time,'%Y-%m-%d %H:%i:%s') &gt;=#{startTime}
+        </if>
+
+        <if test="endTime !=null and endTime !=''">
+            and date_format(vei.create_time,'%Y-%m-%d %H:%i:%s') &lt;=#{endTime}
+        </if>
         and du.leader_path like #{leaderPath}
         group by vei.product_id,vei.doctor_id
         ) t group by t.type,t.product_id,t.doctor_id
         ) a
         where 1=1
-        <if test="startTime !=null and startTime !=''">
+        <!--<if test="startTime !=null and startTime !=''">
             and date_format(a.maxMessageTime,'%Y-%m-%d %H:%i:%s') &gt;=#{startTime}
         </if>
 
         <if test="endTime !=null and endTime !=''">
             and date_format(a.maxMessageTime,'%Y-%m-%d %H:%i:%s') &lt;=#{endTime}
-        </if>
+        </if>-->
         <if test="messageType !=null and messageType !=0">
             and a.type=#{messageType}
         </if>
@@ -278,6 +330,7 @@
             resultType="com.nuoxin.virtual.rep.api.web.controller.response.message.MessageResponseBean">
 
         select
+        distinct
         vm.id id,
         vm.user_id userId,
         vm.user_type userType,
@@ -290,7 +343,14 @@
         vm.message_type messageType,
         vm.message_time messageTime
         from virtual_message vm
+        inner join doctor d
+        on vm.doctor_id=d.id
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
         where 1=1
+        and du.leader_path like #{leaderPath}
         <if test="messageType !=null and messageType==1">
             and vm.message_type = #{messageType}
         </if>
@@ -299,6 +359,7 @@
             and vm.message_type = #{messageType}
             <if test="productId !=null and productId !=0">
                 and vm.product_id=#{productId}
+                and dud.prod_id=#{productId}
             </if>
 
         </if>
@@ -326,9 +387,16 @@
             resultType="java.lang.Integer">
 
         select
-        count(1)
+        count(distinct vm.id)
         from virtual_message vm
+        inner join doctor d
+        on vm.doctor_id=d.id
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
         where 1=1
+        and du.leader_path like #{leaderPath}
         <if test="messageType !=null and messageType==1">
             and vm.message_type = #{messageType}
         </if>
@@ -337,13 +405,12 @@
             and vm.message_type = #{messageType}
             <if test="productId !=null and productId !=0">
                 and vm.product_id=#{productId}
+                and dud.prod_id=#{productId}
             </if>
         </if>
 
         and vm.doctor_id=#{doctorId}
-        <!--<if test="startTime !=null and endTime !=null">
-            and date_format(vm.message_time,'%Y-%m-%d') between #{startTime} and #{endTime}
-        </if>-->
+
 
         <if test="startTime !=null and startTime !=''">
             and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &gt;=#{startTime}
