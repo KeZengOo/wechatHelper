@@ -35,9 +35,9 @@
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TargetAnalysisRequestBean">
         select count(DISTINCT t.doctor_id) from (
         select DISTINCT vd.virtual_doctor_id doctor_id from virtual_doctor_call_info vd join doctor_virtual dv on
-        dv.doctor_id=vd.virtual_doctor_id join drug_user_doctor dud on dud.doctor_id=vd.virtual_doctor_id AND dud.drug_user_id=vd.virtual_drug_user_id join drug_user d on
+        dv.doctor_id=vd.virtual_doctor_id join drug_user_doctor dud on dud.doctor_id=vd.virtual_doctor_id join drug_user d on
         d.id=vd.virtual_drug_user_id where d.leader_path like #{leaderPath,jdbcType=VARCHAR}
-        AND vd.create_time BETWEEN #{startDate} AND #{endDate}
+        AND vd.create_time BETWEEN #{startDate} AND #{endDate} AND vd.del_flag=0
         <if test="productId!=null and productId!=0">
             AND vd.product_id=#{productId}
         </if>
@@ -95,9 +95,9 @@
     <select id="customTelPerson" resultMap="targetResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TargetAnalysisRequestBean">
         select count(DISTINCT vd.virtual_doctor_id) coverNum from virtual_doctor_call_info vd join doctor_virtual dv on
-        dv.doctor_id=vd.virtual_doctor_id join drug_user_doctor dud on dud.doctor_id=vd.virtual_doctor_id AND dud.drug_user_id=vd.virtual_drug_user_id join doctor do on do.id=vd.virtual_doctor_id join drug_user d on
+        dv.doctor_id=vd.virtual_doctor_id join drug_user_doctor dud on dud.doctor_id=vd.virtual_doctor_id  join doctor do on do.id=vd.virtual_doctor_id join drug_user d on
         d.id=vd.virtual_drug_user_id where d.leader_path like #{leaderPath,jdbcType=VARCHAR}
-        AND vd.create_time BETWEEN #{startDate} AND #{endDate}
+        AND vd.create_time BETWEEN #{startDate} AND #{endDate} AND vd.del_flag=0
         <if test="productId!=null and productId!=0">
             AND vd.product_id=#{productId}
         </if>
@@ -115,9 +115,9 @@
     <select id="customTelCount" resultMap="targetResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TargetAnalysisRequestBean">
         select count(vd.id) coverNum from virtual_doctor_call_info vd join doctor_virtual dv on
-        dv.doctor_id=vd.virtual_doctor_id join drug_user_doctor dud on dud.doctor_id=vd.virtual_doctor_id AND dud.drug_user_id=vd.virtual_drug_user_id join doctor do on do.id=vd.virtual_doctor_id join drug_user d on
+        dv.doctor_id=vd.virtual_doctor_id join drug_user_doctor dud on dud.doctor_id=vd.virtual_doctor_id join doctor do on do.id=vd.virtual_doctor_id join drug_user d on
         d.id=vd.virtual_drug_user_id where d.leader_path like #{leaderPath,jdbcType=VARCHAR}
-        AND vd.create_time BETWEEN #{startDate} AND #{endDate}
+        AND vd.create_time BETWEEN #{startDate} AND #{endDate} AND vd.del_flag=0
         <if test="productId!=null and productId!=0">
             AND vd.product_id=#{productId}
         </if>
@@ -172,10 +172,10 @@
 
     <select id="customTelSum" resultMap="targetResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TargetAnalysisRequestBean">
-        select sum(vd.call_time) coverNum from virtual_doctor_call_info vd join drug_user_doctor dud on dud.doctor_id=vd.virtual_doctor_id AND dud.drug_user_id=vd.virtual_drug_user_id join doctor_virtual dv on
+        select sum(vd.call_time) coverNum from virtual_doctor_call_info vd join drug_user_doctor dud on dud.doctor_id=vd.virtual_doctor_id join doctor_virtual dv on
         dv.doctor_id=vd.virtual_doctor_id join doctor do on do.id=vd.virtual_doctor_id join drug_user d on
         d.id=vd.virtual_drug_user_id where d.leader_path like #{leaderPath,jdbcType=VARCHAR}
-        AND vd.create_time BETWEEN #{startDate} AND #{endDate}
+        AND vd.create_time BETWEEN #{startDate} AND #{endDate} AND vd.del_flag=0
         <if test="productId!=null and productId!=0">
             AND vd.product_id=#{productId}
         </if>
@@ -193,10 +193,11 @@
 
     <select id="customTelAvg" resultMap="targetResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TargetAnalysisRequestBean">
-        select avg(vd.call_time) coverNum from virtual_doctor_call_info vd join drug_user_doctor dud on dud.doctor_id=vd.virtual_doctor_id AND dud.drug_user_id=vd.virtual_drug_user_id join doctor_virtual dv on
+        select avg(vd.call_time) coverNum from virtual_doctor_call_info vd join drug_user_doctor dud on dud.doctor_id=vd.virtual_doctor_id join doctor_virtual dv on
         dv.doctor_id=vd.virtual_doctor_id join doctor do on do.id=vd.virtual_doctor_id join drug_user d on
         d.id=vd.virtual_drug_user_id where d.leader_path like #{leaderPath,jdbcType=VARCHAR}
-        AND vd.create_time BETWEEN #{startDate} AND #{endDate}
+        AND vd.create_time BETWEEN #{startDate} AND #{endDate}  AND vd.del_flag=0
+
         <if test="productId!=null and productId!=0">
             AND vd.product_id=#{productId}
         </if>
