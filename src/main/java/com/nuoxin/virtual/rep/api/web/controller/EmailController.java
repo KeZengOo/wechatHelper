@@ -92,7 +92,7 @@ public class EmailController extends BaseController {
             responseBean.setMessage("医生id不能为空");
             return responseBean;
         }
-        if(bean.getDoctorId()!=null || bean.getDoctorId()==0){
+        if(bean.getDoctorId()!=null && bean.getDoctorId()==0){
             return responseBean;
         }
         responseBean.setData(emailService.page(bean));
