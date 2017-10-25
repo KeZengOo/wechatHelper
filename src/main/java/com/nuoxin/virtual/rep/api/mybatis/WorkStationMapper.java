@@ -143,4 +143,9 @@ public interface WorkStationMapper {
     //会议时长,单位为分钟
     Integer getMeeingTime(WorkStationRequestBean bean);
 
+
+    //最短的微信，短信，邮件阅读时长
+    Map<String,Integer> getMinMessageTime(WorkStationRequestBean bean);
+
+
 }
