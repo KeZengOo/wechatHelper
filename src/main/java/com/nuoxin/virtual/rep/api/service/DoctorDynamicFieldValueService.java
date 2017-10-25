@@ -66,28 +66,24 @@ public class DoctorDynamicFieldValueService {
 
 
     public List<DoctorDymamicFieldValueResponseBean> getDoctorDymamicFieldValueList(Long doctorId){
-
-        List<DoctorDynamicFieldValue> doctorDynamicFieldValueList = doctorDynamicFieldValueRepository.findByDoctorId(doctorId);
-
-        if (null == doctorDynamicFieldValueList || doctorDynamicFieldValueList.isEmpty()){
-            return null;
-        }
-
         List<DoctorDymamicFieldValueResponseBean> list = new ArrayList<>();
-        for (DoctorDynamicFieldValue doctorDynamicFieldValue:doctorDynamicFieldValueList){
-            if (doctorDynamicFieldValue != null){
-                DoctorDynamicField doctorDynamicField = doctorDynamicFieldRepository.getOne(doctorDynamicFieldValue.getDynamicFieldId());
+        List<DoctorDynamicField> doctorDynamicFieldList = doctorDynamicFieldRepository.findAll();
+        if (null !=doctorDynamicFieldList && !doctorDynamicFieldList.isEmpty()){
+            for (DoctorDynamicField doctorDynamicField:doctorDynamicFieldList){
 
                 DoctorDymamicFieldValueResponseBean doctorDymamicFieldValueResponseBean = new DoctorDymamicFieldValueResponseBean();
-                doctorDymamicFieldValueResponseBean.setName(doctorDynamicFieldValue.getDynamicFieldName());
-                doctorDymamicFieldValueResponseBean.setFieldValue(doctorDynamicFieldValue.getDynamicFieldValue());
-                if (null != doctorDynamicField){
-                    doctorDymamicFieldValueResponseBean.setType(doctorDynamicField.getType());
-                    doctorDymamicFieldValueResponseBean.setValue(doctorDynamicField.getValue());
-                    doctorDymamicFieldValueResponseBean.setId(doctorDynamicField.getId());
-                }
-                list.add(doctorDymamicFieldValueResponseBean);
+                doctorDymamicFieldValueResponseBean.setName(doctorDynamicField.getName());
 
+                doctorDymamicFieldValueResponseBean.setId(doctorDynamicField.getId());
+                doctorDymamicFieldValueResponseBean.setType(doctorDynamicField.getType());
+                doctorDymamicFieldValueResponseBean.setValue(doctorDynamicField.getValue());
+
+                DoctorDynamicFieldValue doctorDynamicFieldValue = doctorDynamicFieldValueRepository.findFirstByDynamicFieldIdAndDoctorId(doctorDynamicField.getId(), doctorId);
+                if (null != doctorDynamicFieldValue){
+                    doctorDymamicFieldValueResponseBean.setFieldValue(doctorDynamicFieldValue.getDynamicFieldValue());
+                }
+
+                list.add(doctorDymamicFieldValueResponseBean);
             }
         }
 

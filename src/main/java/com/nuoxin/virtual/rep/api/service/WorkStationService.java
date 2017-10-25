@@ -285,9 +285,11 @@ public class WorkStationService {
         Integer visitCount = meetingCount + wechatCount + imCount + todayEmailCount + callCount;
         todayStatisticsResponseBean.setVisitCount(visitCount);
 
-        //目标人次没有微信的
-        Integer targetVisitCount = perDayTargetMeetingPersonCount + perDayTargetCallCount + perDayTargetWechatCount + perDayTargetImCount + perDayTargetEmailCount;
-        Integer targetVisitSum = perDayTargetMeetingPersonSum + perDayTargetCallSum + perDayTargetWechatNum + perDayTargetImSum + perDayTargetEmailNum;
+        //拜访数没有会议的
+        //Integer targetVisitCount = perDayTargetMeetingPersonCount + perDayTargetCallCount + perDayTargetWechatCount + perDayTargetImCount + perDayTargetEmailCount;
+        Integer targetVisitCount =  perDayTargetCallCount + perDayTargetWechatCount + perDayTargetImCount + perDayTargetEmailCount;
+        //Integer targetVisitSum = perDayTargetMeetingPersonSum + perDayTargetCallSum + perDayTargetWechatNum + perDayTargetImSum + perDayTargetEmailNum;
+        Integer targetVisitSum =  perDayTargetCallSum + perDayTargetWechatNum + perDayTargetImSum + perDayTargetEmailNum;
         todayStatisticsResponseBean.setTargetVisitCount(targetVisitCount);
         todayStatisticsResponseBean.setTargetVisitSum(targetVisitSum);
         return todayStatisticsResponseBean;
@@ -333,10 +335,13 @@ public class WorkStationService {
         monthTargetStatistic.setTargetCallSum(monthTargetCallSum);
         monthTargetStatistic.setTargetCallCount(monthTargetCallCount);
         monthTargetStatistic.setTargetCallTime(monthTargetCallTime);
-        monthTargetStatistic.setTargetVisitSum(monthTargetMeetingPersonSum + monthTargetWechatNum + monthTargetImSum + monthTargetEmailNum);
 
-        monthTargetStatistic.setTargetVisitCount(monthTargetMeetingPersonCount + monthTargetWechatCount + monthTargetImCount + monthTargetEmailCount);
-
+        //拜访没有会议的
+        //monthTargetStatistic.setTargetVisitSum(monthTargetMeetingPersonSum + monthTargetWechatNum + monthTargetImSum + monthTargetEmailNum);
+        Integer totalMonthVisitSum = monthTargetWechatNum + monthTargetImSum + monthTargetEmailNum + monthTargetCallSum;
+        monthTargetStatistic.setTargetVisitSum(totalMonthVisitSum);
+        //monthTargetStatistic.setTargetVisitCount(monthTargetMeetingPersonCount + monthTargetWechatCount + monthTargetImCount + monthTargetEmailCount);
+        monthTargetStatistic.setTargetVisitCount(monthTargetWechatCount + monthTargetImCount + monthTargetEmailCount + monthTargetCallCount);
         return monthTargetStatistic;
     }
 
@@ -408,7 +413,8 @@ public class WorkStationService {
         bean.setLeaderPath(leaderPath + "%");
         Integer page = bean.getPage();
         Integer pageSize = bean.getPageSize();
-        bean.setPage(page  * pageSize);
+        //bean.setPage(page  * pageSize);
+        bean.setCurrentSize(page * pageSize);
 
         List<OneMonthNoFollowCustomerResponseBean> oneMonthNoFollowCustomerList = workStationMapper.getOneMonthNoFollowCustomerList(bean);
         //List<OneMonthNoFollowCustomerResponseBean> oneMonthNoFollowCustomerList = workStationMapper.getOneMonthNoFollowCustomerList(bean.getProductId(),bean.getLeaderPath(),bean.getPage(),bean.getPageSize());
@@ -439,246 +445,276 @@ public class WorkStationService {
     }
 
     /**
-     * 坐席分析
+     * 坐席或者客户分析接口
      * @param bean
      * @return
      */
-    public DrugUserAnalysisListResponseBean getDrugUserAnalysisList(WorkStationRequestBean bean){
-        DrugUserAnalysisListResponseBean drugUserAnalysisList = new DrugUserAnalysisListResponseBean();
-        DrugUser drugUser = drugUserRepository.findFirstById(bean.getDrugUserId());
-        String leaderPath = drugUser.getLeaderPath();
-        if (leaderPath == null) {
-            leaderPath = "";
-        }
-        bean.setLeaderPath(leaderPath + "%");
-
-        Integer minCallTotalTime = workStationMapper.minCallTotalTime(bean);
-        if (minCallTotalTime == null){
-            minCallTotalTime = 0;
-        }
-        bean.setMinCallTotalTime(minCallTotalTime);
-        List<DrugUserAnalysisResponseBean> minCallTotalTimeList = workStationMapper.minCallTotalTimeList(bean);
-
-        Integer minAvgCallTotalTime = workStationMapper.minAvgCallTotalTime(bean);
-        if (minAvgCallTotalTime == null){
-            minAvgCallTotalTime = 0;
-        }
-        bean.setMinAvgCallTotalTime(minAvgCallTotalTime);
-        List<DrugUserAnalysisResponseBean> minAvgCallTotalTimeList = workStationMapper.minAvgCallTotalTimeList(bean);
-
-        Integer minCallCount = workStationMapper.minCallCount(bean);
-        if (minCallCount == null){
-            minCallCount = 0;
-        }
-        bean.setMinCallCount(minCallCount);
-        List<DrugUserAnalysisResponseBean> minCallCountList = workStationMapper.minCallCountList(bean);
-
-        Integer minCallCoveredCount = workStationMapper.minCallCoveredCount(bean);
-        if (minCallCoveredCount == null){
-            minCallCoveredCount = 0;
-        }
-        bean.setMinCallCoveredCount(minCallCoveredCount);
-        List<DrugUserAnalysisResponseBean> minCallCoveredCountList = workStationMapper.minCallCoveredCountList(bean);
-
-        Integer minImCount = workStationMapper.minImCount(bean);
-        if (minImCount == null){
-            minImCount = 0;
-        }
-        bean.setMinImCount(minImCount);
-        List<DrugUserAnalysisResponseBean> minImCountList = workStationMapper.minImCountList(bean);
-
-        Integer minImCoveredCount = workStationMapper.minImCoveredCount(bean);
-        if (minImCoveredCount == null){
-            minImCoveredCount = 0;
-        }
-        bean.setMinImCoveredCount(minImCoveredCount);
-        List<DrugUserAnalysisResponseBean> minImCoveredCountList = workStationMapper.minImCoveredCountList(bean);
-
-        Integer minWechatCount = workStationMapper.minWechatCount(bean);
-        if (minWechatCount == null){
-            minWechatCount = 0;
-        }
-        bean.setMinWechatCount(minWechatCount);
-        List<DrugUserAnalysisResponseBean> minWechatCountList = workStationMapper.minWechatCountList(bean);
-
-        Integer minWechatCoveredCount = workStationMapper.minWechatCoveredCount(bean);
-        if (minWechatCoveredCount == null){
-            minWechatCoveredCount = 0;
-        }
-        bean.setMinWechatCoveredCount(minWechatCoveredCount);
-        List<DrugUserAnalysisResponseBean> minWechatCoveredCountList = workStationMapper.minWechatCoveredCountList(bean);
-
-        Integer minEmailCount = workStationMapper.minEmailCount(bean);
-        if (minEmailCount == null){
-            minEmailCount = 0;
-        }
-        bean.setMinEmailCount(minEmailCount);
-        List<DrugUserAnalysisResponseBean> minEmailCountList = workStationMapper.minEmailCountList(bean);
-
-
-        Integer minEmailCoveredCount = workStationMapper.minEmailCoveredCount(bean);
-        if (minEmailCoveredCount == null){
-            minEmailCoveredCount = 0;
-        }
-        bean.setMinEmailCoveredCount(minEmailCoveredCount);
-        List<DrugUserAnalysisResponseBean> minEmailCoveredCountList = workStationMapper.minEmailCoveredCountList(bean);
-
-
-        //脱落客户
-        List<DropCustomerListResponseBean> dropCustomerListResponseBeanList = new ArrayList<>();
-        //A级别
-        bean.setLevel("A");
-        DropCustomerListResponseBean dropACustomerListResponseBean = getDropCustomerListResponseBean(bean);
-        dropCustomerListResponseBeanList.add(dropACustomerListResponseBean);
-        //B级客户
-        bean.setLevel("B");
-        DropCustomerListResponseBean dropBCustomerListResponseBean = getDropCustomerListResponseBean(bean);
-        dropCustomerListResponseBeanList.add(dropBCustomerListResponseBean);
-
-        //C级客户
-        bean.setLevel("C");
-        DropCustomerListResponseBean dropCCustomerListResponseBean = getDropCustomerListResponseBean(bean);
-        dropCustomerListResponseBeanList.add(dropCCustomerListResponseBean);
-
-        //D级客户
-        bean.setLevel("D");
-        DropCustomerListResponseBean dropDCustomerListResponseBean = getDropCustomerListResponseBean(bean);
-        dropCustomerListResponseBeanList.add(dropDCustomerListResponseBean);
-
-        //其他级别
-        bean.setLevel("other");
-        DropCustomerListResponseBean dropOtherCustomerListResponseBean = getDropCustomerListResponseBean(bean);
-        dropCustomerListResponseBeanList.add(dropOtherCustomerListResponseBean);
-
-        Integer dateType = bean.getDateType();
-        if (dateType != null){
-            Integer targetCallSum = 0;
-            Integer targetWechatNum = 0;
-            Integer targetImSum = 0;
-            Integer targetEmailNum = 0;
-            if (dateType == DateTypeEnum.DAY.getValue()){
-                DayTargetResponseBean perDayTarget = getPerDayTarget(bean.getProductId());
-                targetCallSum = perDayTarget.getDayTargetCallSum();
-                targetWechatNum = perDayTarget.getDayTargetWechatNum();
-                targetImSum = perDayTarget.getDayTargetImSum();
-                targetEmailNum = perDayTarget.getDayTargetEmailNum();
-            }
-
-            if (dateType == DateTypeEnum.WEEK.getValue()){
-                WeekTargetResponseBean perWeekTarget = getPerWeekTarget(bean.getProductId());
-                targetCallSum = perWeekTarget.getWeekTargetCallSum();
-                targetWechatNum = perWeekTarget.getWeekTargetWechatNum();
-                targetImSum = perWeekTarget.getWeekTargetImSum();
-                targetEmailNum = perWeekTarget.getWeekTargetEmailNum();
-            }
-
-
-            if (dateType == DateTypeEnum.MONTH.getValue()){
-                MonthTargetResponseBean perMonthTarget = getMonthTarget(bean.getProductId());
-                targetCallSum = perMonthTarget.getMonthTargetCallSum();
-                targetWechatNum = perMonthTarget.getMonthTargetWechatNum();
-                targetImSum = perMonthTarget.getMonthTargetImSum();
-                targetEmailNum = perMonthTarget.getMonthTargetEmailNum();
-            }
-
-            if (dateType == DateTypeEnum.QUARTER.getValue()){
-                QuarterTargetResponseBean perQuarterTarget = getPerQuarterTarget(bean.getProductId());
-                targetCallSum = perQuarterTarget.getQuarterTargetCallSum();
-                targetWechatNum = perQuarterTarget.getQuarterTargetWechatNum();
-                targetImSum = perQuarterTarget.getQuarterTargetImSum();
-                targetEmailNum = perQuarterTarget.getQuarterTargetEmailNum();
-            }
-
-            bean.setCallReach(targetCallSum);
-            bean.setWechatReach(targetWechatNum);
-            bean.setImReach(targetImSum);
-            bean.setEmailReach(targetEmailNum);
-
-            List<String> callNoReachList = workStationMapper.callNoReach(bean);
-            List<String> wechatNoReachList = workStationMapper.wechatNoReach(bean);
-            List<String> imNoReachList = workStationMapper.imNoReach(bean);
-            List<String> emailNoReachList = workStationMapper.emailNoReach(bean);
-            drugUserAnalysisList.setCallNoReachList(callNoReachList);
-            drugUserAnalysisList.setWechatNoReachList(wechatNoReachList);
-            drugUserAnalysisList.setImNoReachList(imNoReachList);
-            drugUserAnalysisList.setEmailNoReachList(emailNoReachList);
-
+    public AnalysisResponseBean getAnalysis(WorkStationRequestBean bean){
+        AnalysisResponseBean analysis = new AnalysisResponseBean();
+        AnalysisResponseBean messageTime = workStationMapper.getMessageTime(bean);
+        if (messageTime != null){
+            analysis.setWechatTime(messageTime.getWechatTime());
+            analysis.setImTime(messageTime.getImTime());
+            analysis.setEmailTime(messageTime.getEmailTime());
         }
 
+        Integer callTime = workStationMapper.getCallTime(bean);
+        if (callTime == null){
+            callTime= 0;
+        }
+        analysis.setCallTime(callTime);
 
-        drugUserAnalysisList.setMinTotalCallTimeList(minCallTotalTimeList);
-        drugUserAnalysisList.setMinAvgCallTimeList(minAvgCallTotalTimeList);
-        drugUserAnalysisList.setMinTotalCallCountList(minCallCountList);
-        drugUserAnalysisList.setMinCallCoveredCountList(minCallCoveredCountList);
-        drugUserAnalysisList.setMinTotalImCountList(minImCountList);
-        drugUserAnalysisList.setMinImCoveredCountList(minImCoveredCountList);
-        drugUserAnalysisList.setMinTotalWechatCountList(minWechatCountList);
-        drugUserAnalysisList.setMinWechatCoveredCountList(minWechatCoveredCountList);
-        drugUserAnalysisList.setMinEmailCountList(minEmailCountList);
-        drugUserAnalysisList.setMinWechatCoveredCountList(minEmailCoveredCountList);
+        Integer meeingTime = workStationMapper.getMeeingTime(bean);
+        if (meeingTime == null){
+            meeingTime = 0;
+        }
+        analysis.setMeetingTime(meeingTime);
 
-        return drugUserAnalysisList;
-
+        return analysis;
     }
 
 
     /**
-     * 客户分析
+     * 坐席分析
      * @param bean
      * @return
      */
-    public DoctorAnalysisListResponseBean getDoctorAnalysisList(WorkStationRequestBean bean){
-        DoctorAnalysisListResponseBean doctorAnalysitList = new DoctorAnalysisListResponseBean();
-
-        DrugUserAnalysisListResponseBean drugUserAnalysisList = new DrugUserAnalysisListResponseBean();
-        DrugUser drugUser = drugUserRepository.findFirstById(bean.getDrugUserId());
-        String leaderPath = drugUser.getLeaderPath();
-        if (leaderPath == null) {
-            leaderPath = "";
-        }
-        bean.setLeaderPath(leaderPath + "%");
-
-        Integer minCallTotalTime = workStationMapper.minDoctorCallTotalTime(bean);
-        bean.setMinCallTotalTime(minCallTotalTime);
-        List<DoctorAnalysisResponseBean> minCallTotalTimeList = workStationMapper.minDoctorCallTotalTimeList(bean);
-
-        Integer minAvgCallTotalTime = workStationMapper.minDoctorAvgCallTotalTime(bean);
-        bean.setMinAvgCallTotalTime(minAvgCallTotalTime);
-        List<DoctorAnalysisResponseBean> minAvgCallTotalTimeList = workStationMapper.minDoctorAvgCallTotalTimeList(bean);
-
-        Integer minCallCount = workStationMapper.minDoctorCallCount(bean);
-        bean.setMinCallCount(minCallCount);
-        List<DoctorAnalysisResponseBean> minCallCountList = workStationMapper.minDoctorCallCountList(bean);
-
-        Integer minImCount = workStationMapper.minDoctorImCount(bean);
-        bean.setMinImCount(minImCount);
-        List<DoctorAnalysisResponseBean> minImCountList = workStationMapper.minDoctorImCountList(bean);
-
-
-        Integer minWechatCount = workStationMapper.minDoctorWechatCount(bean);
-        bean.setMinWechatCount(minWechatCount);
-        List<DoctorAnalysisResponseBean> minWechatCountList = workStationMapper.minDoctorWechatCountList(bean);
-
-
-        Integer minEmailCount = workStationMapper.minDoctorEmailCount(bean);
-        bean.setMinEmailCount(minEmailCount);
-        List<DoctorAnalysisResponseBean> minEmailCountList = workStationMapper.minDoctorEmailCountList(bean);
-
-        Integer minMeetingTime = workStationMapper.minDoctorMeetingTime(bean);
-        bean.setMinMeetingTime(minMeetingTime);
-        List<DoctorAnalysisResponseBean> minMeetingTimeList = workStationMapper.minDoctorMeetingTimeList(bean);
-
-
-        doctorAnalysitList.setMinTotalCallTimeList(minCallTotalTimeList);
-        doctorAnalysitList.setMinAvgCallTimeList(minAvgCallTotalTimeList);
-        doctorAnalysitList.setMinTotalCallCountList(minCallCountList);
-        doctorAnalysitList.setMinTotalImCountList(minImCountList);
-        doctorAnalysitList.setMinTotalWechatCountList(minWechatCountList);
-        doctorAnalysitList.setMinEmailCountList(minEmailCountList);
-        doctorAnalysitList.setMinMeetingTimeList(minMeetingTimeList);
-
-        return doctorAnalysitList;
-    }
+//    public DrugUserAnalysisListResponseBean getDrugUserAnalysisList(WorkStationRequestBean bean){
+//        DrugUserAnalysisListResponseBean drugUserAnalysisList = new DrugUserAnalysisListResponseBean();
+//        DrugUser drugUser = drugUserRepository.findFirstById(bean.getDrugUserId());
+//        String leaderPath = drugUser.getLeaderPath();
+//        if (leaderPath == null) {
+//            leaderPath = "";
+//        }
+//        bean.setLeaderPath(leaderPath + "%");
+//
+//        Integer minCallTotalTime = workStationMapper.minCallTotalTime(bean);
+//        if (minCallTotalTime == null){
+//            minCallTotalTime = 0;
+//        }
+//        bean.setMinCallTotalTime(minCallTotalTime);
+//        List<DrugUserAnalysisResponseBean> minCallTotalTimeList = workStationMapper.minCallTotalTimeList(bean);
+//
+//        Integer minAvgCallTotalTime = workStationMapper.minAvgCallTotalTime(bean);
+//        if (minAvgCallTotalTime == null){
+//            minAvgCallTotalTime = 0;
+//        }
+//        bean.setMinAvgCallTotalTime(minAvgCallTotalTime);
+//        List<DrugUserAnalysisResponseBean> minAvgCallTotalTimeList = workStationMapper.minAvgCallTotalTimeList(bean);
+//
+//        Integer minCallCount = workStationMapper.minCallCount(bean);
+//        if (minCallCount == null){
+//            minCallCount = 0;
+//        }
+//        bean.setMinCallCount(minCallCount);
+//        List<DrugUserAnalysisResponseBean> minCallCountList = workStationMapper.minCallCountList(bean);
+//
+//        Integer minCallCoveredCount = workStationMapper.minCallCoveredCount(bean);
+//        if (minCallCoveredCount == null){
+//            minCallCoveredCount = 0;
+//        }
+//        bean.setMinCallCoveredCount(minCallCoveredCount);
+//        List<DrugUserAnalysisResponseBean> minCallCoveredCountList = workStationMapper.minCallCoveredCountList(bean);
+//
+//        Integer minImCount = workStationMapper.minImCount(bean);
+//        if (minImCount == null){
+//            minImCount = 0;
+//        }
+//        bean.setMinImCount(minImCount);
+//        List<DrugUserAnalysisResponseBean> minImCountList = workStationMapper.minImCountList(bean);
+//
+//        Integer minImCoveredCount = workStationMapper.minImCoveredCount(bean);
+//        if (minImCoveredCount == null){
+//            minImCoveredCount = 0;
+//        }
+//        bean.setMinImCoveredCount(minImCoveredCount);
+//        List<DrugUserAnalysisResponseBean> minImCoveredCountList = workStationMapper.minImCoveredCountList(bean);
+//
+//        Integer minWechatCount = workStationMapper.minWechatCount(bean);
+//        if (minWechatCount == null){
+//            minWechatCount = 0;
+//        }
+//        bean.setMinWechatCount(minWechatCount);
+//        List<DrugUserAnalysisResponseBean> minWechatCountList = workStationMapper.minWechatCountList(bean);
+//
+//        Integer minWechatCoveredCount = workStationMapper.minWechatCoveredCount(bean);
+//        if (minWechatCoveredCount == null){
+//            minWechatCoveredCount = 0;
+//        }
+//        bean.setMinWechatCoveredCount(minWechatCoveredCount);
+//        List<DrugUserAnalysisResponseBean> minWechatCoveredCountList = workStationMapper.minWechatCoveredCountList(bean);
+//
+//        Integer minEmailCount = workStationMapper.minEmailCount(bean);
+//        if (minEmailCount == null){
+//            minEmailCount = 0;
+//        }
+//        bean.setMinEmailCount(minEmailCount);
+//        List<DrugUserAnalysisResponseBean> minEmailCountList = workStationMapper.minEmailCountList(bean);
+//
+//
+//        Integer minEmailCoveredCount = workStationMapper.minEmailCoveredCount(bean);
+//        if (minEmailCoveredCount == null){
+//            minEmailCoveredCount = 0;
+//        }
+//        bean.setMinEmailCoveredCount(minEmailCoveredCount);
+//        List<DrugUserAnalysisResponseBean> minEmailCoveredCountList = workStationMapper.minEmailCoveredCountList(bean);
+//
+//
+//        //脱落客户
+//        List<DropCustomerListResponseBean> dropCustomerListResponseBeanList = new ArrayList<>();
+//        //A级别
+//        bean.setLevel("A");
+//        DropCustomerListResponseBean dropACustomerListResponseBean = getDropCustomerListResponseBean(bean);
+//        dropCustomerListResponseBeanList.add(dropACustomerListResponseBean);
+//        //B级客户
+//        bean.setLevel("B");
+//        DropCustomerListResponseBean dropBCustomerListResponseBean = getDropCustomerListResponseBean(bean);
+//        dropCustomerListResponseBeanList.add(dropBCustomerListResponseBean);
+//
+//        //C级客户
+//        bean.setLevel("C");
+//        DropCustomerListResponseBean dropCCustomerListResponseBean = getDropCustomerListResponseBean(bean);
+//        dropCustomerListResponseBeanList.add(dropCCustomerListResponseBean);
+//
+//        //D级客户
+//        bean.setLevel("D");
+//        DropCustomerListResponseBean dropDCustomerListResponseBean = getDropCustomerListResponseBean(bean);
+//        dropCustomerListResponseBeanList.add(dropDCustomerListResponseBean);
+//
+//        //其他级别
+//        bean.setLevel("other");
+//        DropCustomerListResponseBean dropOtherCustomerListResponseBean = getDropCustomerListResponseBean(bean);
+//        dropCustomerListResponseBeanList.add(dropOtherCustomerListResponseBean);
+//
+//        Integer dateType = bean.getDateType();
+//        if (dateType != null){
+//            Integer targetCallSum = 0;
+//            Integer targetWechatNum = 0;
+//            Integer targetImSum = 0;
+//            Integer targetEmailNum = 0;
+//            if (dateType == DateTypeEnum.DAY.getValue()){
+//                DayTargetResponseBean perDayTarget = getPerDayTarget(bean.getProductId());
+//                targetCallSum = perDayTarget.getDayTargetCallSum();
+//                targetWechatNum = perDayTarget.getDayTargetWechatNum();
+//                targetImSum = perDayTarget.getDayTargetImSum();
+//                targetEmailNum = perDayTarget.getDayTargetEmailNum();
+//            }
+//
+//            if (dateType == DateTypeEnum.WEEK.getValue()){
+//                WeekTargetResponseBean perWeekTarget = getPerWeekTarget(bean.getProductId());
+//                targetCallSum = perWeekTarget.getWeekTargetCallSum();
+//                targetWechatNum = perWeekTarget.getWeekTargetWechatNum();
+//                targetImSum = perWeekTarget.getWeekTargetImSum();
+//                targetEmailNum = perWeekTarget.getWeekTargetEmailNum();
+//            }
+//
+//
+//            if (dateType == DateTypeEnum.MONTH.getValue()){
+//                MonthTargetResponseBean perMonthTarget = getMonthTarget(bean.getProductId());
+//                targetCallSum = perMonthTarget.getMonthTargetCallSum();
+//                targetWechatNum = perMonthTarget.getMonthTargetWechatNum();
+//                targetImSum = perMonthTarget.getMonthTargetImSum();
+//                targetEmailNum = perMonthTarget.getMonthTargetEmailNum();
+//            }
+//
+//            if (dateType == DateTypeEnum.QUARTER.getValue()){
+//                QuarterTargetResponseBean perQuarterTarget = getPerQuarterTarget(bean.getProductId());
+//                targetCallSum = perQuarterTarget.getQuarterTargetCallSum();
+//                targetWechatNum = perQuarterTarget.getQuarterTargetWechatNum();
+//                targetImSum = perQuarterTarget.getQuarterTargetImSum();
+//                targetEmailNum = perQuarterTarget.getQuarterTargetEmailNum();
+//            }
+//
+//            bean.setCallReach(targetCallSum);
+//            bean.setWechatReach(targetWechatNum);
+//            bean.setImReach(targetImSum);
+//            bean.setEmailReach(targetEmailNum);
+//
+//            List<String> callNoReachList = workStationMapper.callNoReach(bean);
+//            List<String> wechatNoReachList = workStationMapper.wechatNoReach(bean);
+//            List<String> imNoReachList = workStationMapper.imNoReach(bean);
+//            List<String> emailNoReachList = workStationMapper.emailNoReach(bean);
+//            drugUserAnalysisList.setCallNoReachList(callNoReachList);
+//            drugUserAnalysisList.setWechatNoReachList(wechatNoReachList);
+//            drugUserAnalysisList.setImNoReachList(imNoReachList);
+//            drugUserAnalysisList.setEmailNoReachList(emailNoReachList);
+//
+//        }
+//
+//
+//        drugUserAnalysisList.setMinTotalCallTimeList(minCallTotalTimeList);
+//        drugUserAnalysisList.setMinAvgCallTimeList(minAvgCallTotalTimeList);
+//        drugUserAnalysisList.setMinTotalCallCountList(minCallCountList);
+//        drugUserAnalysisList.setMinCallCoveredCountList(minCallCoveredCountList);
+//        drugUserAnalysisList.setMinTotalImCountList(minImCountList);
+//        drugUserAnalysisList.setMinImCoveredCountList(minImCoveredCountList);
+//        drugUserAnalysisList.setMinTotalWechatCountList(minWechatCountList);
+//        drugUserAnalysisList.setMinWechatCoveredCountList(minWechatCoveredCountList);
+//        drugUserAnalysisList.setMinEmailCountList(minEmailCountList);
+//        drugUserAnalysisList.setMinWechatCoveredCountList(minEmailCoveredCountList);
+//
+//        return drugUserAnalysisList;
+//
+//    }
+//
+//
+//    /**
+//     * 客户分析
+//     * @param bean
+//     * @return
+//     */
+//    public DoctorAnalysisListResponseBean getDoctorAnalysisList(WorkStationRequestBean bean){
+//        DoctorAnalysisListResponseBean doctorAnalysitList = new DoctorAnalysisListResponseBean();
+//
+//        DrugUserAnalysisListResponseBean drugUserAnalysisList = new DrugUserAnalysisListResponseBean();
+//        DrugUser drugUser = drugUserRepository.findFirstById(bean.getDrugUserId());
+//        String leaderPath = drugUser.getLeaderPath();
+//        if (leaderPath == null) {
+//            leaderPath = "";
+//        }
+//        bean.setLeaderPath(leaderPath + "%");
+//
+//        Integer minCallTotalTime = workStationMapper.minDoctorCallTotalTime(bean);
+//        bean.setMinCallTotalTime(minCallTotalTime);
+//        List<DoctorAnalysisResponseBean> minCallTotalTimeList = workStationMapper.minDoctorCallTotalTimeList(bean);
+//
+//        Integer minAvgCallTotalTime = workStationMapper.minDoctorAvgCallTotalTime(bean);
+//        bean.setMinAvgCallTotalTime(minAvgCallTotalTime);
+//        List<DoctorAnalysisResponseBean> minAvgCallTotalTimeList = workStationMapper.minDoctorAvgCallTotalTimeList(bean);
+//
+//        Integer minCallCount = workStationMapper.minDoctorCallCount(bean);
+//        bean.setMinCallCount(minCallCount);
+//        List<DoctorAnalysisResponseBean> minCallCountList = workStationMapper.minDoctorCallCountList(bean);
+//
+//        Integer minImCount = workStationMapper.minDoctorImCount(bean);
+//        bean.setMinImCount(minImCount);
+//        List<DoctorAnalysisResponseBean> minImCountList = workStationMapper.minDoctorImCountList(bean);
+//
+//
+//        Integer minWechatCount = workStationMapper.minDoctorWechatCount(bean);
+//        bean.setMinWechatCount(minWechatCount);
+//        List<DoctorAnalysisResponseBean> minWechatCountList = workStationMapper.minDoctorWechatCountList(bean);
+//
+//
+//        Integer minEmailCount = workStationMapper.minDoctorEmailCount(bean);
+//        bean.setMinEmailCount(minEmailCount);
+//        List<DoctorAnalysisResponseBean> minEmailCountList = workStationMapper.minDoctorEmailCountList(bean);
+//
+//        Integer minMeetingTime = workStationMapper.minDoctorMeetingTime(bean);
+//        bean.setMinMeetingTime(minMeetingTime);
+//        List<DoctorAnalysisResponseBean> minMeetingTimeList = workStationMapper.minDoctorMeetingTimeList(bean);
+//
+//
+//        doctorAnalysitList.setMinTotalCallTimeList(minCallTotalTimeList);
+//        doctorAnalysitList.setMinAvgCallTimeList(minAvgCallTotalTimeList);
+//        doctorAnalysitList.setMinTotalCallCountList(minCallCountList);
+//        doctorAnalysitList.setMinTotalImCountList(minImCountList);
+//        doctorAnalysitList.setMinTotalWechatCountList(minWechatCountList);
+//        doctorAnalysitList.setMinEmailCountList(minEmailCountList);
+//        doctorAnalysitList.setMinMeetingTimeList(minMeetingTimeList);
+//
+//        return doctorAnalysitList;
+//    }
 
 
 
