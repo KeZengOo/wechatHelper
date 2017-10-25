@@ -19,7 +19,7 @@ public class StringFormatUtil {
     public static String getTelephoneStr(String tel){
         String telephone = "";
         try {
-            BigDecimal bd = new BigDecimal("1.5712905821E10");
+            BigDecimal bd = new BigDecimal(tel);
             String str = bd.toPlainString();
             Long i = Long.parseLong(str);
             telephone = i + "";

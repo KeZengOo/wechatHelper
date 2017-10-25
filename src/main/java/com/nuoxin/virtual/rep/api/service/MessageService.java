@@ -164,7 +164,8 @@ public class MessageService extends BaseService {
                 }
 
 
-                String wechatTime = wechatMessageVo.getWechatTime();
+                Date wechatTimeDate = wechatMessageVo.getWechatTime();
+                String wechatTime = DateUtil.getDateTimeString(wechatTimeDate);
                 String wechatNickName = wechatMessageVo.getNickname();
                 String wechatNumber = wechatMessageVo.getWechatNumber();
                 String wechatMessageStatus = wechatMessageVo.getMessageStatus();

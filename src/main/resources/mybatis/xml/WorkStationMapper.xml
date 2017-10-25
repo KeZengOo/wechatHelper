@@ -2326,7 +2326,7 @@
     <select id="getMinWechatTimeList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.AnalysisResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
 
-        select t.drugUserName,t.num from (
+        select distinct  t.drugUserName,t.num from (
         select sum(ar.read_time) num,du.name drugUserName from activity_read ar
         inner join drug_user du
         on ar.drug_user_id=du.id
@@ -2360,7 +2360,7 @@
     <select id="getMinImTimeList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.AnalysisResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
 
-        select t.drugUserName,t.num from (
+        select distinct  t.drugUserName,t.num from (
         select sum(ar.read_time) num,du.name drugUserName from activity_read ar
         inner join drug_user du
         on ar.drug_user_id=du.id
@@ -2394,7 +2394,7 @@
     <select id="getMinEmailTimeList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.AnalysisResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
 
-        select t.drugUserName,t.num from (
+        select distinct  t.drugUserName,t.num from (
         select sum(ar.read_time) num,du.name drugUserName from activity_read ar
         inner join drug_user du
         on ar.drug_user_id=du.id
@@ -2460,7 +2460,7 @@
     <select id="getMinMeetingTimeList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.AnalysisResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
 
-        select t.num, t.drugUserName from (
+        select distinct t.num, t.drugUserName from (
             select sum(tmad.attend_sum_time) num, du.name drugUserName from t_meeting_attend_details tmad
             inner join t_meeting_data tma
             on tmad.meeting_id=tma.id
