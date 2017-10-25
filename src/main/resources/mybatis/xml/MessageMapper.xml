@@ -5,95 +5,70 @@
     <select id="getMessageStatistics"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean"
             resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.TodayStatisticsResponseBean">
+        select (
+        select count(distinct vm.doctor_id) from virtual_message vm
+        inner join doctor d
+        on vm.doctor_id=d.id
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
+        where vm.message_type=1
+        and vm.user_type=2
+        and du.leader_path like #{leaderPath}
+        and date_format(vm.message_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+        ) as wechatSum,
+        (
+        select count(distinct vm.id) from virtual_message vm
+        inner join doctor d
+        on vm.doctor_id=d.id
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
+        where vm.message_type=1
+        and vm.user_type=2
+        and du.leader_path like #{leaderPath}
+        and date_format(vm.message_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
 
-                select (select count(distinct vm.doctor_id)
-                from virtual_message vm
-                where vm.message_type=1
-                and vm.user_type=2
-                and date_format(vm.message_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
-                and vm.drug_user_id in (select id from drug_user where leader_path like #{leaderPath})
-                and vm.doctor_id in (select d.id from doctor d
-                inner join drug_user_doctor dud
-                on d.id=dud.doctor_id
-                inner join drug_user du
-                on dud.drug_user_id=du.id
-                                where 1=1
-                                <if test="productId !=null and productId !=0">
-                                    and dud.prod_id=#{productId}
-                                </if>
+        ) as wechatCount,
+        (
+        select count(distinct vm.doctor_id) from virtual_message vm
+        inner join doctor d
+        on vm.doctor_id=d.id
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
+        where vm.message_type=2
+        and vm.user_type=2
+        <if test="productId !=null and productId !=0">
+            and dud.prod_id=#{productId}
+            and vm.product_id=#{productId}
+        </if>
 
-                                and du.leader_path like #{leaderPath}
-                        )
-                ) as wechatSum,
-                (
-                select count(distinct vm.id)
-                from virtual_message vm
-                where vm.message_type=1
-                and vm.user_type=2
-                and date_format(vm.message_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
-                and vm.drug_user_id in (select id from drug_user where leader_path like #{leaderPath})
-                and vm.doctor_id in (select d.id from doctor d
-                                inner join drug_user_doctor dud
-                                on d.id=dud.doctor_id
-                                inner join drug_user du
-                                on dud.drug_user_id=du.id
-                                where 1=1
-                                <if test="productId !=null and productId !=0">
-                                    and dud.prod_id=#{productId}
-                                </if>
+        and du.leader_path like #{leaderPath}
+        and date_format(vm.message_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
 
-                                and du.leader_path like #{leaderPath}
-                        )
-                ) as wechatCount,
-                (
-                select count(distinct vm.doctor_id)
-                from virtual_message vm
-                where vm.message_type=2
-                and vm.user_type=2
-                <if test="productId !=null and productId !=0">
-                    and vm.product_id = #{productId}
-                </if>
+        ) as imSum,
+        (
+        select count(distinct vm.id) from virtual_message vm
+        inner join doctor d
+        on vm.doctor_id=d.id
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
+        where vm.message_type=2
+        and vm.user_type=2
+        <if test="productId !=null and productId !=0">
+            and dud.prod_id=#{productId}
+            and vm.product_id=#{productId}
+        </if>
 
-                and date_format(vm.message_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
-                and vm.drug_user_id in (select id from drug_user where leader_path like #{leaderPath})
-                and vm.doctor_id in (select d.id from doctor d
-                inner join drug_user_doctor dud
-                on d.id=dud.doctor_id
-                inner join drug_user du
-                on dud.drug_user_id=du.id
-                where 1=1
-                  <if test="productId !=null and productId !=0">
-                      and dud.prod_id=#{productId}
-                  </if>
-
-                  and du.leader_path like #{leaderPath}
-                        )
-
-                ) as imSum,
-                (
-                select count(distinct vm.id)
-                from virtual_message vm
-                where vm.message_type=2
-                and vm.user_type=2
-                <if test="productId != null and productId !=0">
-                    and vm.product_id = #{productId}
-                </if>
-
-                and date_format(vm.message_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
-                and vm.drug_user_id in (select id from drug_user where leader_path like #{leaderPath})
-                and vm.doctor_id in (select d.id from doctor d
-                                inner join drug_user_doctor dud
-                                on d.id=dud.doctor_id
-                                inner join drug_user du
-                                on dud.drug_user_id=du.id
-                                where 1=1
-                                <if test="productId != null and productId !=0">
-                                    and dud.prod_id=#{productId}
-                                </if>
-
-                                and du.leader_path like #{leaderPath}
-                        )
-                ) as imCount
+        and du.leader_path like #{leaderPath}
+        and date_format(vm.message_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+        ) as imCount
 
 
 
