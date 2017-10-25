@@ -115,11 +115,20 @@ public class QuestionnaireAnalysisService extends BaseService {
                 responseBean.setOptions(JSON.parseArray(responseBean.getOption(), OptionsRequestBean.class));
                 List<QuestionOptionsStatResponseBean> statList = map.get(responseBean.getId());
                 if(statList!=null && !statList.isEmpty()){
+                    Integer count = 0;
+                    for (QuestionOptionsStatResponseBean stat:statList) {
+                        count=count+stat.getNum();
+                    }
                     for (QuestionOptionsStatResponseBean stat:statList) {
                         if(responseBean.getAnswerNum()==0 || responseBean.getAnswerNum()==null){
                             stat.setPercentage(0f);
                         }else{
-                            stat.setPercentage(new BigDecimal(stat.getNum()/responseBean.getAnswerNum().doubleValue()).floatValue());
+                            if(count==0){
+                                stat.setPercentage(0f);
+                            }else{
+
+                                stat.setPercentage(new BigDecimal(stat.getNum()/count.doubleValue()).floatValue());
+                            }
                         }
                     }
                     responseBean.setOptionsStat(statList);

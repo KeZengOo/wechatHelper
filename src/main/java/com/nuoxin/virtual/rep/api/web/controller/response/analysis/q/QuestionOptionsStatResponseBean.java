@@ -30,7 +30,7 @@ public class QuestionOptionsStatResponseBean implements Serializable {
     }
 
     public Integer getNum() {
-        return num;
+        return num==null?0:num;
     }
 
     public void setNum(Integer num) {
