@@ -501,9 +501,9 @@
 
     </select>
 
-
+    <!-- 人数 -->
     <select id="emailMessageCount"  parameterType="com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean" resultType="java.lang.Integer">
-        select count(distinct vei.id)
+        select count(distinct vei.doctor_id)
         from virtual_email_info vei
         inner join doctor d
         on vei.doctor_id=d.id
