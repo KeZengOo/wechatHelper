@@ -174,10 +174,50 @@ public class WorkStationController extends BaseController{
 
 
 
-    @ApiOperation(value = "坐席分析统计接口", notes = "坐席分析统计接口")
-    @PostMapping("/drugUser/analysis")
+//    @ApiOperation(value = "坐席分析统计接口", notes = "坐席分析统计接口")
+//    @PostMapping("/drugUser/analysis")
+//    @ResponseBody
+//    public ResponseEntity<DefaultResponseBean<DrugUserAnalysisListResponseBean>>  getDrugUserAnalysisList(@RequestBody WorkStationRequestBean bean, HttpServletRequest request){
+//
+//        Long drugUserId = bean.getDrugUserId();
+//        if (drugUserId == null || drugUserId == 0){
+//            drugUserId = getLoginId(request);
+//        }
+//
+//        bean.setDrugUserId(drugUserId);
+//
+//        DrugUserAnalysisListResponseBean drugUserAnalysisList = workStationService.getDrugUserAnalysisList(bean);
+//        DefaultResponseBean<DrugUserAnalysisListResponseBean> responseBean = new DefaultResponseBean<>();
+//        responseBean.setData(drugUserAnalysisList);
+//        return ResponseEntity.ok(responseBean);
+//    }
+//
+//
+//    @ApiOperation(value = "客户分析统计接口", notes = "客户分析统计接口")
+//    @PostMapping("/doctor/analysis")
+//    @ResponseBody
+//    public ResponseEntity<DefaultResponseBean<DoctorAnalysisListResponseBean>>  getDoctorAnalysisList(@RequestBody WorkStationRequestBean bean, HttpServletRequest request){
+//
+//        Long drugUserId = bean.getDrugUserId();
+//        if (drugUserId == null || drugUserId == 0){
+//            drugUserId = getLoginId(request);
+//        }
+//
+//        bean.setDrugUserId(drugUserId);
+//
+//        DoctorAnalysisListResponseBean doctorAnalysisList = workStationService.getDoctorAnalysisList(bean);
+//        DefaultResponseBean<DoctorAnalysisListResponseBean> responseBean = new DefaultResponseBean<>();
+//        responseBean.setData(doctorAnalysisList);
+//        return ResponseEntity.ok(responseBean);
+//    }
+
+
+
+
+    @ApiOperation(value = "坐席分析或者客户分析接口", notes = "坐席分析或者客户分析接口")
+    @PostMapping("/analysis")
     @ResponseBody
-    public ResponseEntity<DefaultResponseBean<DrugUserAnalysisListResponseBean>>  getDrugUserAnalysisList(@RequestBody WorkStationRequestBean bean, HttpServletRequest request){
+    public ResponseEntity<DefaultResponseBean<AnalysisResponseBean>>  getDrugUserAnalysisList(@RequestBody WorkStationRequestBean bean, HttpServletRequest request){
 
         Long drugUserId = bean.getDrugUserId();
         if (drugUserId == null || drugUserId == 0){
@@ -186,28 +226,9 @@ public class WorkStationController extends BaseController{
 
         bean.setDrugUserId(drugUserId);
 
-        DrugUserAnalysisListResponseBean drugUserAnalysisList = workStationService.getDrugUserAnalysisList(bean);
-        DefaultResponseBean<DrugUserAnalysisListResponseBean> responseBean = new DefaultResponseBean<>();
-        responseBean.setData(drugUserAnalysisList);
-        return ResponseEntity.ok(responseBean);
-    }
-
-
-    @ApiOperation(value = "客户分析统计接口", notes = "客户分析统计接口")
-    @PostMapping("/doctor/analysis")
-    @ResponseBody
-    public ResponseEntity<DefaultResponseBean<DoctorAnalysisListResponseBean>>  getDoctorAnalysisList(@RequestBody WorkStationRequestBean bean, HttpServletRequest request){
-
-        Long drugUserId = bean.getDrugUserId();
-        if (drugUserId == null || drugUserId == 0){
-            drugUserId = getLoginId(request);
-        }
-
-        bean.setDrugUserId(drugUserId);
-
-        DoctorAnalysisListResponseBean doctorAnalysisList = workStationService.getDoctorAnalysisList(bean);
-        DefaultResponseBean<DoctorAnalysisListResponseBean> responseBean = new DefaultResponseBean<>();
-        responseBean.setData(doctorAnalysisList);
+        AnalysisResponseBean analysis = workStationService.getAnalysis(bean);
+        DefaultResponseBean<AnalysisResponseBean> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(analysis);
         return ResponseEntity.ok(responseBean);
     }
 

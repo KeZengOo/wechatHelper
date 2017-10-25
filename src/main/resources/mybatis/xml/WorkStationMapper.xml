@@ -4,14 +4,15 @@
 
     <select id="getTotalCustomerStatistic" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean"
             resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.CustomerSumResponseBean">
-        select count(1) as typeSum,dv.client_level as type from doctor d
+        select count(distinct dud.doctor_id) as typeSum,dv.client_level as type from doctor d
         inner join doctor_virtual dv
         on d.id=dv.doctor_id
         inner join drug_user_doctor dud
         on d.id = dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id=du.id
-        where du.leader_path like #{leaderPath}
+        where 1=1
+        and du.leader_path like #{leaderPath}
         and dud.prod_id=#{productId}
         group by dv.client_level
 
@@ -19,15 +20,15 @@
 
     <select id="getAddCustomerStatistic" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean"
             resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.CustomerSumResponseBean">
-        select count(1) as typeSum,dv.client_level as type from doctor d
+        select count(distinct dud.doctor_id) as typeSum,dv.client_level as type from doctor d
         inner join doctor_virtual dv
         on d.id=dv.doctor_id
         inner join drug_user_doctor dud
         on d.id = dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id=du.id
-        where
-        date_format(d.create_time,'%Y-%m')=date_format(now(),'%Y-%m')
+        where 1=1
+        and date_format(dud.modify_time,'%Y-%m')=date_format(now(),'%Y-%m')
         and du.leader_path like #{leaderPath}
         and dud.prod_id=#{productId}
         group by dv.client_level
@@ -37,18 +38,75 @@
     <select id="getCoverCustomerStatistic" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean"
             resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.CustomerSumResponseBean">
 
-        select count(1) as typeSum,dv.client_level as type from doctor d
+        select count(dud.doctor_id) as typeSum,dv.client_level as type from doctor d
         inner join (
         select distinct t.doctor_id from(
-        select distinct vm.doctor_id from virtual_message vm where vm.user_type=2 and vm.message_type=1 and date_format(vm.message_time,'%Y-%m')=date_format(now(),'%Y-%m')
-        union
+        <!--  select distinct vm.doctor_id from virtual_message vm where vm.user_type=2 and vm.message_type=1 and date_format(vm.message_time,'%Y-%m')=date_format(now(),'%Y-%m') -->
+        <!--
+        select distinct vm.doctor_id from virtual_message vm
+        inner join doctor d
+        on vm.doctor_id=d.id
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on du.id=dud.drug_user_id
+        where 1=1
+        and du.leader_path like #{leaderPath}
+        and vm.user_type=2 and vm.message_type=1
+        and date_format(vm.message_time,'%Y-%m')=date_format(now(),'%Y-%m')
+        group by vm.doctor_id
+        -->
+
+
+       <!-- 去掉了微信，短信，邮件，会议，只有电话和内容
+          union
         select distinct vm.doctor_id from virtual_message vm where vm.user_type=2 and vm.message_type=2 and vm.product_id=#{productId} and date_format(vm.message_time,'%Y-%m')=date_format(now(),'%Y-%m')
         union
         select distinct vei.doctor_id from virtual_email_info vei where date_format(vei.create_time,'%Y-%m')=date_format(now(),'%Y-%m') and vei.product_id=#{productId}
         union
-        select distinct tmad.doctor_id from t_meeting_attend_details tmad inner join t_meeting_data tma on tmad.meeting_id=tma.id where tma.product_id=#{productId} and date_format(tmad.attend_start_time,'%Y-%m')=date_format(now(),'%Y-%m')
+        select distinct tmad.doctor_id from t_meeting_attend_details tmad inner join t_meeting_data tma on tmad.meeting_id=tma.id where tma.product_id=#{productId} and date_format(tmad.attend_start_time,'%Y-%m')=date_format(now(),'%Y-%m') -->
+
+        select distinct vdci.virtual_doctor_id doctor_id from virtual_doctor_call_info vdci
+        inner join virtual_doctor_call_info_details vdcid
+        on vdci.id=vdcid.call_id
+        inner join doctor d
+        on vdci.virtual_doctor_id=d.id
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
+        where 1=1
+        and vdcid.status_name='answer'
+        and du.leader_path like #{leaderPath}
+        and dud.prod_id=#{productId}
+        and vdci.product_id=#{productId}
+        and date_format(vdci.create_time,'%Y-%m')=date_format(now(),'%Y-%m')
+        group by vdci.virtual_doctor_id
+
         union
-        select distinct ar.read_person_id from activity_read ar inner join t_content_product tcp on ar.data_id=tcp.content_id inner join activity_info ai on tcp.content_id=ai.id where tcp.product_id=#{productId} and date_format(ar.create_time,'%Y-%m')=date_format(now(),'%Y-%m')
+
+       <!-- select distinct ar.read_person_id from activity_read ar inner join t_content_product tcp on ar.data_id=tcp.content_id inner join activity_info ai on tcp.content_id=ai.id where tcp.product_id=#{productId} and date_format(ar.create_time,'%Y-%m')=date_format(now(),'%Y-%m') -->
+
+        select distinct  ar.read_person_id doctor_id from
+        activity_read ar
+        inner join t_content_product tcp
+        on ar.data_id=tcp.content_id
+        inner join activity_info ai
+        on tcp.content_id=ai.id
+        inner join doctor d
+        on ar.read_person_id=d.id
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
+        where du.leader_path like #{leaderPath}
+        and dud.prod_id=#{productId}
+        and tcp.product_id=#{productId}
+        and date_format(ar.create_time,'%Y-%m')=date_format(now(),'%Y-%m')
+
+        group by ar.read_person_id
+
+
         ) t ) a
         on d.id=a.doctor_id
         inner join doctor_virtual dv
@@ -64,97 +122,50 @@
 
     </select>
 
-
+    <!-- 连续一个月未跟进的，只算电话的 -->
     <select id="getOneMonthNoFollowCustomerList" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean"
             resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.OneMonthNoFollowCustomerResponseBean">
 
-
-
-      select distinct b.doctorId,b.doctorName,b.hospitalName,b.depart,b.doctorTel,b.level,b2.diff_days diffDays from (
+        select distinct b.doctorId,b.doctorName,b.hospitalName,b.depart,b.doctorTel,b.level,b2.diff_days diffDays from (
         select distinct d.id doctorId, d.name doctorName,d.hospital_name hospitalName,d.depart depart,d.telephone doctorTel,dv.client_level level
-        from doctor d
-        inner join doctor_virtual dv
-        on d.id=dv.doctor_id
-        inner join drug_user_doctor dud
-        on d.id=dud.doctor_id
-        inner join drug_user du
-        on dud.drug_user_id=du.id
-        where dud.prod_id=#{productId}
-        and du.leader_path like #{leaderPath}
-        ) b
-        inner join
-            (
-            select a.doctor_id,(to_days(now())-to_days(date_format(a.create_time,'%Y-%m-%d'))) as diff_days from (
-            select distinct t.doctor_id, max(t.create_time) as create_time from (
-            select distinct vm.doctor_id,max(vm.message_time) as create_time from virtual_message vm
-                inner join doctor d
-                on vm.doctor_id=d.id
+                from doctor d
+                inner join doctor_virtual dv
+                on d.id=dv.doctor_id
                 inner join drug_user_doctor dud
                 on d.id=dud.doctor_id
                 inner join drug_user du
-                on du.id=dud.drug_user_id
-                where du.leader_path like #{leaderPath}
-                and vm.user_type=2 and vm.message_type=1  group by vm.doctor_id
-            union
-            select distinct vm.doctor_id,max(vm.message_time) as create_time from virtual_message vm
-            inner join doctor d
-            on vm.doctor_id=d.id
-            inner join drug_user_doctor dud
-            on d.id=dud.doctor_id
-            inner join drug_user du
-            on dud.drug_user_id= du.id
-            where du.leader_path like #{leaderPath}
-            and dud.prod_id=#{productId}
-            and vm.user_type=2 and vm.message_type=2 and vm.product_id=#{productId}  group by vm.doctor_id
-            union
-            select distinct vei.doctor_id,max(vei.create_time) as create_time
-            from virtual_email_info vei
-            inner join doctor d
-            on vei.doctor_id=d.id
-            inner join drug_user_doctor dud
-            on d.id=dud.doctor_id
-            inner join drug_user du
-            on dud.drug_user_id=du.id
-            where dud.prod_id=#{productId}
-            and du.leader_path like #{leaderPath}
-            and vei.product_id=#{productId} group by vei.doctor_id
-            union
-            select distinct tmad.doctor_id,max(tmad.attend_end_time) as create_time
-            from t_meeting_attend_details tmad
-            inner join t_meeting_data tma
-            on tmad.meeting_id=tma.id
-            inner join doctor d
-            on tmad.doctor_id=d.id
-            inner join drug_user_doctor dud
-            on d.id=dud.doctor_id
-            inner join drug_user du
-            on dud.drug_user_id=du.id
-            where dud.prod_id=#{productId}
-            and du.leader_path like #{leaderPath}
-            and tma.product_id=#{productId}  group by tmad.doctor_id
-            union
-            select ar.read_person_id,max(ar.create_time) as create_time from
-            activity_read ar
-            inner join t_content_product tcp
-            on ar.data_id=tcp.content_id
-            inner join activity_info ai
-            on tcp.content_id=ai.id
-            inner join doctor d
-            on ar.read_person_id=d.id
-            inner join drug_user_doctor dud
-            on d.id=dud.doctor_id
-            inner join drug_user du
-            on dud.drug_user_id=du.id
-            where du.leader_path like #{leaderPath}
-            and dud.prod_id=#{productId}
-            and tcp.product_id=#{productId}  group by ar.read_person_id
-            ) t group by t.doctor_id
-             ) a where to_days(now())-to_days(date_format(a.create_time,'%Y-%m-%d')) >= 30
+                on dud.drug_user_id=du.id
+                where dud.prod_id=#{productId}
+                and du.leader_path like #{leaderPath}
+        ) b
+        inner join
+        (
+        select t.doctor_id,(to_days(now())-to_days(date_format(t.create_time,'%Y-%m-%d'))) as diff_days from (
+         select distinct vdci.virtual_doctor_id doctor_id,max(vdci.create_time) as create_time from virtual_doctor_call_info vdci
+                inner join virtual_doctor_call_info_details vdcid
+                on vdci.id=vdcid.call_id
+                inner join doctor d
+                on vdci.virtual_doctor_id=d.id
+                inner join drug_user_doctor dud
+                on d.id=dud.doctor_id
+                inner join drug_user du
+                on dud.drug_user_id=du.id
+                where 1=1
+                and vdcid.status_name='answer'
+                and du.leader_path like  #{leaderPath}
+                and dud.prod_id=#{productId}
+                and vdci.product_id=#{productId}
+
+                group by vdci.virtual_doctor_id
+        ) t where to_days(now())-to_days(date_format(t.create_time,'%Y-%m-%d')) >= 30
         ) b2
-        on b.doctorId=b2.doctor_id
-        group by b.level
-        order by b2.diff_days desc
-        limit #{page},#{pageSize}
+         on b.doctorId=b2.doctor_id
+         group by b.level
+         order by b2.diff_days desc
+         limit #{currentSize},#{pageSize}
+
+
+
 
 
 
@@ -166,93 +177,44 @@
 
 
 
+        select count(1) from (
+        select distinct b.doctorId,b.level,b2.diff_days diffDays from (
+                select distinct d.id doctorId, d.name doctorName,d.hospital_name hospitalName,d.depart depart,d.telephone doctorTel,dv.client_level level
+                        from doctor d
+                        inner join doctor_virtual dv
+                        on d.id=dv.doctor_id
+                        inner join drug_user_doctor dud
+                        on d.id=dud.doctor_id
+                        inner join drug_user du
+                        on dud.drug_user_id=du.id
+                        where dud.prod_id=#{productId}
+                        and du.leader_path like #{leaderPath}
+                ) b
+                inner join
+                (
+                select t.doctor_id,(to_days(now())-to_days(date_format(t.create_time,'%Y-%m-%d'))) as diff_days from (
+                 select distinct vdci.virtual_doctor_id doctor_id,max(vdci.create_time) as create_time from virtual_doctor_call_info vdci
+                        inner join virtual_doctor_call_info_details vdcid
+                        on vdci.id=vdcid.call_id
+                        inner join doctor d
+                        on vdci.virtual_doctor_id=d.id
+                        inner join drug_user_doctor dud
+                        on d.id=dud.doctor_id
+                        inner join drug_user du
+                        on dud.drug_user_id=du.id
+                        where 1=1
+                        and vdcid.status_name='answer'
+                        and du.leader_path like #{leaderPath}
+                        and dud.prod_id=#{productId}
+                        and vdci.product_id=#{productId}
 
+                        group by vdci.virtual_doctor_id
+                ) t where to_days(now())-to_days(date_format(t.create_time,'%Y-%m-%d')) >= 30
+                ) b2
+                 on b.doctorId=b2.doctor_id
+                 group by b.level
+        ) t
 
-      select count(1) from (
-       select count(b.doctorId) from (
-        select distinct d.id doctorId, d.name doctorName,d.hospital_name hospitalName,d.depart depart,d.telephone doctorTel,dv.client_level level
-        from doctor d
-        inner join doctor_virtual dv
-        on d.id=dv.doctor_id
-        inner join drug_user_doctor dud
-        on d.id=dud.doctor_id
-        inner join drug_user du
-        on dud.drug_user_id=du.id
-        where dud.prod_id=#{productId}
-        and du.leader_path like #{leaderPath}
-        ) b
-        inner join
-            (
-            select a.doctor_id,(to_days(now())-to_days(date_format(a.create_time,'%Y-%m-%d'))) as diff_days from (
-            select distinct t.doctor_id, max(t.create_time) as create_time from (
-            select distinct vm.doctor_id,max(vm.message_time) as create_time from virtual_message vm
-                inner join doctor d
-                on vm.doctor_id=d.id
-                inner join drug_user_doctor dud
-                on d.id=dud.doctor_id
-                inner join drug_user du
-                on du.id=dud.drug_user_id
-                where du.leader_path like #{leaderPath}
-                and vm.user_type=2 and vm.message_type=1  group by vm.doctor_id
-            union
-            select distinct vm.doctor_id,max(vm.message_time) as create_time from virtual_message vm
-            inner join doctor d
-            on vm.doctor_id=d.id
-            inner join drug_user_doctor dud
-            on d.id=dud.doctor_id
-            inner join drug_user du
-            on dud.drug_user_id= du.id
-            where du.leader_path like #{leaderPath}
-            and dud.prod_id=#{productId}
-            and vm.user_type=2 and vm.message_type=2 and vm.product_id=#{productId}  group by vm.doctor_id
-            union
-            select distinct vei.doctor_id,max(vei.create_time) as create_time
-            from virtual_email_info vei
-            inner join doctor d
-            on vei.doctor_id=d.id
-            inner join drug_user_doctor dud
-            on d.id=dud.doctor_id
-            inner join drug_user du
-            on dud.drug_user_id=du.id
-            where dud.prod_id=#{productId}
-            and du.leader_path like #{leaderPath}
-            and vei.product_id=#{productId} group by vei.doctor_id
-            union
-            select distinct tmad.doctor_id,max(tmad.attend_end_time) as create_time
-            from t_meeting_attend_details tmad
-            inner join t_meeting_data tma
-            on tmad.meeting_id=tma.id
-            inner join doctor d
-            on tmad.doctor_id=d.id
-            inner join drug_user_doctor dud
-            on d.id=dud.doctor_id
-            inner join drug_user du
-            on dud.drug_user_id=du.id
-            where dud.prod_id=#{productId}
-            and du.leader_path like #{leaderPath}
-            and tma.product_id=#{productId}  group by tmad.doctor_id
-            union
-            select ar.read_person_id,max(ar.create_time) as create_time from
-            activity_read ar
-            inner join t_content_product tcp
-            on ar.data_id=tcp.content_id
-            inner join activity_info ai
-            on tcp.content_id=ai.id
-            inner join doctor d
-            on ar.read_person_id=d.id
-            inner join drug_user_doctor dud
-            on d.id=dud.doctor_id
-            inner join drug_user du
-            on dud.drug_user_id=du.id
-            where du.leader_path like #{leaderPath}
-            and dud.prod_id=#{productId}
-            and tcp.product_id=#{productId}  group by ar.read_person_id
-            ) t group by t.doctor_id
-             ) a where to_days(now())-to_days(date_format(a.create_time,'%Y-%m-%d')) >= 30
-        ) b2
-        on b.doctorId=b2.doctor_id
-        group by b.level
-        ) b3
 
     </select>
 
@@ -1261,92 +1223,68 @@
     <select id="getDropCount" resultType="java.lang.Integer"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
 
-
-        select count(1) from
+        select count(distinct b.id) from
         (
         select d.id,dv.client_level from doctor d
-        inner join doctor_virtual dv
-        on d.id=dv.doctor_id
-        inner join drug_user_doctor dud
-        on d.id=dud.doctor_id
-        inner join drug_user du on
-        dud.drug_user_id=du.id
-        where 1=1
-        and dud.prod_id=#{productId}
-        and du.leader_path like #{leaderPath}
-        and dv.client_level=#{level}
+                inner join doctor_virtual dv
+                on d.id=dv.doctor_id
+                inner join drug_user_doctor dud
+                on d.id=dud.doctor_id
+                inner join drug_user du on
+                dud.drug_user_id=du.id
+                where 1=1
+                and dud.prod_id=#{productId}
+                and du.leader_path like #{leaderPath}
+                and dv.client_level=#{level}
         ) b
         inner join
 
         (
         select a.doctor_id,(to_days(now())-to_days(date_format(a.create_time,'%Y-%m-%d'))) as diff_days from (
-        select distinct t.doctor_id, max(t.create_time) as create_time from (
-        select distinct vm.doctor_id,max(vm.message_time) as create_time from virtual_message vm
-        inner join doctor d
-        on vm.doctor_id=d.id
-        inner join drug_user_doctor dud
-        on d.id=dud.doctor_id
-        inner join drug_user du
-        on du.id=dud.drug_user_id
-        where du.leader_path like #{leaderPath}
-        and vm.user_type=2 and vm.message_type=1  group by vm.doctor_id
-        union
-        select distinct vm.doctor_id,max(vm.message_time) as create_time from virtual_message vm
-        inner join doctor d
-        on vm.doctor_id=d.id
-        inner join drug_user_doctor dud
-        on d.id=dud.doctor_id
-        inner join drug_user du
-        on dud.drug_user_id= du.id
-        where du.leader_path like #{leaderPath}
-        and dud.prod_id=#{productId}
-        and vm.user_type=2 and vm.message_type=2 and vm.product_id=#{productId}  group by vm.doctor_id
-        union
-        select distinct vei.doctor_id,max(vei.create_time) as create_time
-        from virtual_email_info vei
-        inner join doctor d
-        on vei.doctor_id=d.id
-        inner join drug_user_doctor dud
-        on d.id=dud.doctor_id
-        inner join drug_user du
-        on dud.drug_user_id=du.id
-        where dud.prod_id=#{productId}
-        and du.leader_path like #{leaderPath}
-        and vei.product_id=#{productId} group by vei.doctor_id
-        union
-        select distinct tmad.doctor_id,max(tmad.attend_end_time) as create_time
-        from t_meeting_attend_details tmad
-        inner join t_meeting_data tma
-        on tmad.meeting_id=tma.id
-        inner join doctor d
-        on tmad.doctor_id=d.id
-        inner join drug_user_doctor dud
-        on d.id=dud.doctor_id
-        inner join drug_user du
-        on dud.drug_user_id=du.id
-        where dud.prod_id=#{productId}
-        and du.leader_path like #{leaderPath}
-        and tma.product_id=#{productId}  group by tmad.doctor_id
-        union
-        select ar.read_person_id,max(ar.create_time) as create_time from
-        activity_read ar
-        inner join t_content_product tcp
-        on ar.data_id=tcp.content_id
-        inner join activity_info ai
-        on tcp.content_id=ai.id
-        inner join doctor d
-        on ar.read_person_id=d.id
-        inner join drug_user_doctor dud
-        on d.id=dud.doctor_id
-        inner join drug_user du
-        on dud.drug_user_id=du.id
-        where du.leader_path like #{leaderPath}
-        and dud.prod_id=#{productId}
-        and tcp.product_id=#{productId}  group by ar.read_person_id
-        ) t group by t.doctor_id
+        select distinct t.doctor_id,max(t.create_time) as create_time from (
+        select distinct vdci.virtual_doctor_id doctor_id,max(vdci.create_time) as create_time from virtual_doctor_call_info vdci
+                inner join virtual_doctor_call_info_details vdcid
+                on vdci.id=vdcid.call_id
+                inner join doctor d
+                on vdci.virtual_doctor_id=d.id
+                inner join drug_user_doctor dud
+                on d.id=dud.doctor_id
+                inner join drug_user du
+                on dud.drug_user_id=du.id
+                where 1=1
+                and vdcid.status_name='answer'
+                and du.leader_path like #{leaderPath}
+                and dud.prod_id=#{productId}
+                and vdci.product_id=#{productId}
+                group by vdci.virtual_doctor_id
+
+                union
+
+
+                select distinct  ar.read_person_id doctor_id, max(ar.create_time) as create_time from
+                activity_read ar
+                inner join t_content_product tcp
+                on ar.data_id=tcp.content_id
+                inner join activity_info ai
+                on tcp.content_id=ai.id
+                inner join doctor d
+                on ar.read_person_id=d.id
+                inner join drug_user_doctor dud
+                on d.id=dud.doctor_id
+                inner join drug_user du
+                on dud.drug_user_id=du.id
+                where du.leader_path like #{leaderPath}
+                and dud.prod_id=#{productId}
+                and tcp.product_id=#{productId}
+
+                group by ar.read_person_id
+        ) t
         ) a where to_days(now())-to_days(date_format(a.create_time,'%Y-%m-%d')) >= #{levelDropCount}
         ) b2
+
         on b.id=b2.doctor_id
+
+
 
 
 
@@ -1357,9 +1295,7 @@
     <select id="maxDropCount" resultType="java.lang.Integer"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
 
-
-
-        select count(distinct b.doctorId) as maxDropcount from(
+ select count(distinct b.doctorId) as maxDropcount from(
         select distinct d.id doctorId,du.id drugUserId from doctor d
         inner join doctor_virtual dv
         on d.id=dv.doctor_id
@@ -1375,72 +1311,45 @@
 
         (
         select a.doctor_id,(to_days(now())-to_days(date_format(a.create_time,'%Y-%m-%d'))) as diff_days from (
-        select distinct t.doctor_id, max(t.create_time) as create_time from (
-        select distinct vm.doctor_id,max(vm.message_time) as create_time from virtual_message vm
-        inner join doctor d
-        on vm.doctor_id=d.id
-        inner join drug_user_doctor dud
-        on d.id=dud.doctor_id
-        inner join drug_user du
-        on du.id=dud.drug_user_id
-        where du.leader_path like #{leaderPath}
-        and vm.user_type=2 and vm.message_type=1  group by vm.doctor_id
-        union
-        select distinct vm.doctor_id,max(vm.message_time) as create_time from virtual_message vm
-        inner join doctor d
-        on vm.doctor_id=d.id
-        inner join drug_user_doctor dud
-        on d.id=dud.doctor_id
-        inner join drug_user du
-        on dud.drug_user_id= du.id
-        where du.leader_path like #{leaderPath}
-        and dud.prod_id=#{productId}
-        and vm.user_type=2 and vm.message_type=2 and vm.product_id=#{productId}  group by vm.doctor_id
-        union
-        select distinct vei.doctor_id,max(vei.create_time) as create_time
-        from virtual_email_info vei
-        inner join doctor d
-        on vei.doctor_id=d.id
-        inner join drug_user_doctor dud
-        on d.id=dud.doctor_id
-        inner join drug_user du
-        on dud.drug_user_id=du.id
-        where dud.prod_id=#{productId}
-        and du.leader_path like #{leaderPath}
-        and vei.product_id=#{productId} group by vei.doctor_id
-        union
-        select distinct tmad.doctor_id,max(tmad.attend_end_time) as create_time
-        from t_meeting_attend_details tmad
-        inner join t_meeting_data tma
-        on tmad.meeting_id=tma.id
-        inner join doctor d
-        on tmad.doctor_id=d.id
-        inner join drug_user_doctor dud
-        on d.id=dud.doctor_id
-        inner join drug_user du
-        on dud.drug_user_id=du.id
-        where dud.prod_id=#{productId}
-        and du.leader_path like #{leaderPath}
-        and tma.product_id=#{productId}  group by tmad.doctor_id
-        union
-        select ar.read_person_id,max(ar.create_time) as create_time from
-        activity_read ar
-        inner join t_content_product tcp
-        on ar.data_id=tcp.content_id
-        inner join activity_info ai
-        on tcp.content_id=ai.id
-        inner join doctor d
-        on ar.read_person_id=d.id
-        inner join drug_user_doctor dud
-        on d.id=dud.doctor_id
-        inner join drug_user du
-        on dud.drug_user_id=du.id
-        where du.leader_path like #{leaderPath}
-        and dud.prod_id=#{productId}
-        and tcp.product_id=#{productId}  group by ar.read_person_id
-        ) t group by t.doctor_id
-        ) a where to_days(now())-to_days(date_format(a.create_time,'%Y-%m-%d')) >= 0
+        select distinct t.doctor_id,max(t.create_time) as create_time from (
+        select distinct vdci.virtual_doctor_id doctor_id,max(vdci.create_time) as create_time from virtual_doctor_call_info vdci
+                inner join virtual_doctor_call_info_details vdcid
+                on vdci.id=vdcid.call_id
+                inner join doctor d
+                on vdci.virtual_doctor_id=d.id
+                inner join drug_user_doctor dud
+                on d.id=dud.doctor_id
+                inner join drug_user du
+                on dud.drug_user_id=du.id
+                where 1=1
+                and vdcid.status_name='answer'
+                and du.leader_path like #{leaderPath}
+                and dud.prod_id=#{productId}
+                and vdci.product_id=#{productId}
+                group by vdci.virtual_doctor_id
 
+                union
+
+
+                select distinct  ar.read_person_id doctor_id, max(ar.create_time) as create_time from
+                activity_read ar
+                inner join t_content_product tcp
+                on ar.data_id=tcp.content_id
+                inner join activity_info ai
+                on tcp.content_id=ai.id
+                inner join doctor d
+                on ar.read_person_id=d.id
+                inner join drug_user_doctor dud
+                on d.id=dud.doctor_id
+                inner join drug_user du
+                on dud.drug_user_id=du.id
+                where du.leader_path like #{leaderPath}
+                and dud.prod_id=#{productId}
+                and tcp.product_id=#{productId}
+
+                group by ar.read_person_id
+        ) t
+        ) a where to_days(now())-to_days(date_format(a.create_time,'%Y-%m-%d')) >= #{levelDropCount}
         ) b2
 
         on b.doctorId=b2.doctor_id
@@ -1472,71 +1381,45 @@
         inner join
 
         (
-        select a.doctor_id,(to_days(now())-to_days(date_format(a.create_time,'%Y-%m-%d'))) as diff_days from (
-        select distinct t.doctor_id, max(t.create_time) as create_time from (
-        select distinct vm.doctor_id,max(vm.message_time) as create_time from virtual_message vm
-        inner join doctor d
-        on vm.doctor_id=d.id
-        inner join drug_user_doctor dud
-        on d.id=dud.doctor_id
-        inner join drug_user du
-        on du.id=dud.drug_user_id
-        where du.leader_path like #{leaderPath}
-        and vm.user_type=2 and vm.message_type=1  group by vm.doctor_id
-        union
-        select distinct vm.doctor_id,max(vm.message_time) as create_time from virtual_message vm
-        inner join doctor d
-        on vm.doctor_id=d.id
-        inner join drug_user_doctor dud
-        on d.id=dud.doctor_id
-        inner join drug_user du
-        on dud.drug_user_id= du.id
-        where du.leader_path like #{leaderPath}
-        and dud.prod_id=#{productId}
-        and vm.user_type=2 and vm.message_type=2 and vm.product_id=#{productId}  group by vm.doctor_id
-        union
-        select distinct vei.doctor_id,max(vei.create_time) as create_time
-        from virtual_email_info vei
-        inner join doctor d
-        on vei.doctor_id=d.id
-        inner join drug_user_doctor dud
-        on d.id=dud.doctor_id
-        inner join drug_user du
-        on dud.drug_user_id=du.id
-        where dud.prod_id=#{productId}
-        and du.leader_path like #{leaderPath}
-        and vei.product_id=#{productId} group by vei.doctor_id
-        union
-        select distinct tmad.doctor_id,max(tmad.attend_end_time) as create_time
-        from t_meeting_attend_details tmad
-        inner join t_meeting_data tma
-        on tmad.meeting_id=tma.id
-        inner join doctor d
-        on tmad.doctor_id=d.id
-        inner join drug_user_doctor dud
-        on d.id=dud.doctor_id
-        inner join drug_user du
-        on dud.drug_user_id=du.id
-        where dud.prod_id=#{productId}
-        and du.leader_path like #{leaderPath}
-        and tma.product_id=#{productId} group by tmad.doctor_id
-        union
-        select ar.read_person_id,max(ar.create_time) as create_time from
-        activity_read ar
-        inner join t_content_product tcp
-        on ar.data_id=tcp.content_id
-        inner join activity_info ai
-        on tcp.content_id=ai.id
-        inner join doctor d
-        on ar.read_person_id=d.id
-        inner join drug_user_doctor dud
-        on d.id=dud.doctor_id
-        inner join drug_user du
-        on dud.drug_user_id=du.id
-        where du.leader_path like #{leaderPath}
-        and dud.prod_id=#{productId}
-        and tcp.product_id=#{productId} group by ar.read_person_id
-        ) t group by t.doctor_id
+         select a.doctor_id,(to_days(now())-to_days(date_format(a.create_time,'%Y-%m-%d'))) as diff_days from (
+        select distinct t.doctor_id,max(t.create_time) as create_time from (
+        select distinct vdci.virtual_doctor_id doctor_id,max(vdci.create_time) as create_time from virtual_doctor_call_info vdci
+                inner join virtual_doctor_call_info_details vdcid
+                on vdci.id=vdcid.call_id
+                inner join doctor d
+                on vdci.virtual_doctor_id=d.id
+                inner join drug_user_doctor dud
+                on d.id=dud.doctor_id
+                inner join drug_user du
+                on dud.drug_user_id=du.id
+                where 1=1
+                and vdcid.status_name='answer'
+                and du.leader_path like #{leaderPath}
+                and dud.prod_id=#{productId}
+                and vdci.product_id=#{productId}
+                group by vdci.virtual_doctor_id
+
+                union
+
+
+                select distinct  ar.read_person_id doctor_id, max(ar.create_time) as create_time from
+                activity_read ar
+                inner join t_content_product tcp
+                on ar.data_id=tcp.content_id
+                inner join activity_info ai
+                on tcp.content_id=ai.id
+                inner join doctor d
+                on ar.read_person_id=d.id
+                inner join drug_user_doctor dud
+                on d.id=dud.doctor_id
+                inner join drug_user du
+                on dud.drug_user_id=du.id
+                where du.leader_path like #{leaderPath}
+                and dud.prod_id=#{productId}
+                and tcp.product_id=#{productId}
+
+                group by ar.read_person_id
+        ) t
         ) a where to_days(now())-to_days(date_format(a.create_time,'%Y-%m-%d')) >= #{levelDropCount}
 
         ) b2
@@ -2162,5 +2045,191 @@
         ) t where t.num=#{minMeetingTime}
 
     </select>
+
+
+
+    <select id="getMessageTime" resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.AnalysisResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+
+        select
+                (
+                        select ifnull(sum(t.read_time),0) from (
+                        select distinct ar.id, ar.read_time,ar.share_type from activity_read ar
+                        inner join activity_info ai
+                        on ar.data_id=ai.id
+                        inner join t_content_product tcp
+                        on tcp.content_id=ai.id
+                        inner join product_line pl
+                        on tcp.product_id=pl.prod_id
+                        inner join doctor d
+                        on ar.read_person_id=d.id
+                        inner join drug_user_doctor dud
+                        on d.id=dud.doctor_id
+                        inner join drug_user du
+                        on dud.drug_user_id=du.id
+                        where pl.prod_id=#{productId}
+                        and dud.prod_id=#{productId}
+                        and du.leader_path like #{leaderPath}
+                        <if test="dateType !=null">
+                            <if test="dateType==1">
+                                and date_format(ar.create_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+                            </if>
+                            <if test="dateType==2">
+                                and WEEKOFYEAR(ar.create_time)=WEEKOFYEAR(NOW())
+                            </if>
+                            <if test="dateType==3">
+                                and MONTH(ar.create_time)=MONTH(NOW())
+                            </if>
+                            <if test="dateType==4">
+                                and QUARTER(ar.create_time)=QUARTER(NOW())
+                            </if>
+                        </if>
+                        ) t where t.share_type=1
+                ) as wechatTime
+        ,
+        (
+                select ifnull(sum(t.read_time),0) from (
+                        select distinct ar.id, ar.read_time,ar.share_type from activity_read ar
+                        inner join activity_info ai
+                        on ar.data_id=ai.id
+                        inner join t_content_product tcp
+                        on tcp.content_id=ai.id
+                        inner join product_line pl
+                        on tcp.product_id=pl.prod_id
+                        inner join doctor d
+                        on ar.read_person_id=d.id
+                        inner join drug_user_doctor dud
+                        on d.id=dud.doctor_id
+                        inner join drug_user du
+                        on dud.drug_user_id=du.id
+                        where pl.prod_id=#{productId}
+                        and dud.prod_id=#{productId}
+                        and du.leader_path like #{leaderPath}
+                        <if test="dateType !=null">
+                            <if test="dateType==1">
+                                and date_format(ar.create_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+                            </if>
+                            <if test="dateType==2">
+                                and WEEKOFYEAR(ar.create_time)=WEEKOFYEAR(NOW())
+                            </if>
+                            <if test="dateType==3">
+                                and MONTH(ar.create_time)=MONTH(NOW())
+                            </if>
+                            <if test="dateType==4">
+                                and QUARTER(ar.create_time)=QUARTER(NOW())
+                            </if>
+                        </if>
+                ) t where t.share_type=2
+        ) as imTime
+        ,
+                (
+                    select ifnull(sum(t.read_time),0) from (
+                    select distinct ar.id, ar.read_time,ar.share_type from activity_read ar
+                    inner join activity_info ai
+                    on ar.data_id=ai.id
+                    inner join t_content_product tcp
+                    on tcp.content_id=ai.id
+                    inner join product_line pl
+                    on tcp.product_id=pl.prod_id
+                    inner join doctor d
+                    on ar.read_person_id=d.id
+                    inner join drug_user_doctor dud
+                    on d.id=dud.doctor_id
+                    inner join drug_user du
+                    on dud.drug_user_id=du.id
+                    where pl.prod_id=#{productId}
+                    and dud.prod_id=#{productId}
+                    and du.leader_path like #{leaderPath}
+                    <if test="dateType !=null">
+                        <if test="dateType==1">
+                            and date_format(ar.create_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+                        </if>
+                        <if test="dateType==2">
+                            and WEEKOFYEAR(ar.create_time)=WEEKOFYEAR(NOW())
+                        </if>
+                        <if test="dateType==3">
+                            and MONTH(ar.create_time)=MONTH(NOW())
+                        </if>
+                        <if test="dateType==4">
+                            and QUARTER(ar.create_time)=QUARTER(NOW())
+                        </if>
+                    </if>
+                    ) t where t.share_type=3
+                ) as emailTime
+
+    </select>
+
+
+    <select id="getCallTime" resultType="java.lang.Integer" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+
+                select ifnull(sum(vdci.call_time),0) from virtual_doctor_call_info vdci
+                inner join virtual_doctor_call_info_details vdcid
+                on vdci.id=vdcid.call_id
+                inner join doctor d
+                on vdci.virtual_doctor_id=d.id
+                inner join drug_user_doctor dud
+                on d.id=dud.doctor_id
+                inner join drug_user du
+                on dud.drug_user_id=du.id
+                where 1=1
+                and vdcid.status_name='answer'
+                and du.leader_path like #{leaderPath}
+                and dud.prod_id=#{productId}
+                and vdci.product_id=#{productId}
+                <if test="dateType !=null">
+                    <if test="dateType==1">
+                        and date_format(vdci.create_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+                    </if>
+                    <if test="dateType==2">
+                        and WEEKOFYEAR(vdci.create_time)=WEEKOFYEAR(NOW())
+                    </if>
+                    <if test="dateType==3">
+                        and MONTH(vdci.create_time)=MONTH(NOW())
+                    </if>
+                    <if test="dateType==4">
+                        and QUARTER(vdci.create_time)=QUARTER(NOW())
+                    </if>
+                </if>
+
+
+    </select>
+
+
+
+    <select id="getMeeingTime" resultType="java.lang.Integer" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+
+        select ifnull(sum(tmad.attend_sum_time),0) from t_meeting_attend_details tmad
+        inner join t_meeting_data tma
+        on tmad.meeting_id=tma.id
+        inner join product_line pl
+        on tma.product_id=pl.prod_id
+        inner join doctor d
+        on d.id=tmad.doctor_id
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
+        where du.leader_path like #{leaderPath}
+        and dud.prod_id=#{productId}
+        and tma.product_id=#{productId}
+        <if test="dateType !=null">
+            <if test="dateType==1">
+                and date_format(tmad.attend_end_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+            </if>
+            <if test="dateType==2">
+                and WEEKOFYEAR(tmad.attend_end_time)=WEEKOFYEAR(NOW())
+            </if>
+            <if test="dateType==3">
+                and MONTH(tmad.attend_end_time)=MONTH(NOW())
+            </if>
+            <if test="dateType==4">
+                and QUARTER(tmad.attend_end_time)=QUARTER(NOW())
+            </if>
+        </if>
+
+
+    </select>
+
+
 
 </mapper>
