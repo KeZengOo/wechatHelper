@@ -60,11 +60,11 @@
     <select id="summationCalloutAvg" resultMap="trendResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TrendAnalysisRequestBean">
         select
-        DATE_FORMAT(dc.create_time,'%Y-%m-%d') date,FLOOR(sum(dc.call_time)/count(dc.id)) num,WEEK(dc.create_time,1)
+        DATE_FORMAT(dc.create_time,'%Y-%m-%d') date,FLOOR(sum(dc.call_time)/count(DISTINCT dc.id)) num,WEEK(dc.create_time,1)
         weeks,MONTH(dc.create_time) months,YEAR(dc.create_time) years,DAY(dc.create_time)
         days,FLOOR((date_format(dc.create_time,'%m')+2)/3) quarters
-        from virtual_doctor_call_info dc join drug_user_doctor dud on dud.doctor_id=dc.virtual_doctor_id join drug_user du on du.id=dc.virtual_drug_user_id WHERE
-        du.leader_path like #{leaderPath,jdbcType=VARCHAR} and dc.create_time BETWEEN #{startDate} AND #{endDate} AND dc.del_flag=0
+        from virtual_doctor_call_info dc join virtual_doctor_call_info_details v2 on dc.id=v2.call_id join drug_user_doctor dud on dud.doctor_id=dc.virtual_doctor_id join drug_user du on du.id=dc.virtual_drug_user_id WHERE
+        du.leader_path like #{leaderPath,jdbcType=VARCHAR} and dc.create_time BETWEEN #{startDate} AND #{endDate} AND dc.del_flag=0 and v2.status_name='answer'
         <!--<if test="drugUserId!=null and drugUserId!=0">-->
             <!--AND dc.virtual_drug_user_id = #{drugUserId}-->
         <!--</if>-->
@@ -89,11 +89,11 @@
     <select id="summationCalloutCount" resultMap="trendResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TrendAnalysisRequestBean">
         select
-        DATE_FORMAT(dc.create_time,'%Y-%m-%d') date,count(DISTINCT dc.virtual_doctor_id) num,count(dc.id)
+        DATE_FORMAT(dc.create_time,'%Y-%m-%d') date,count(DISTINCT dc.virtual_doctor_id) num,count(DISTINCT dc.id)
         countnum,WEEK(dc.create_time,1) weeks,MONTH(dc.create_time) months,YEAR(dc.create_time)
         years,DAY(dc.create_time) days,FLOOR((date_format(dc.create_time,'%m')+2)/3) quarters
-        from virtual_doctor_call_info dc join drug_user_doctor dud on dud.doctor_id=dc.virtual_doctor_id  join drug_user du on du.id=dc.virtual_drug_user_id WHERE
-        du.leader_path like #{leaderPath,jdbcType=VARCHAR} and dc.create_time BETWEEN #{startDate} AND #{endDate} AND dc.del_flag=0
+        from virtual_doctor_call_info dc join virtual_doctor_call_info_details v2 on dc.id=v2.call_id join drug_user_doctor dud on dud.doctor_id=dc.virtual_doctor_id  join drug_user du on du.id=dc.virtual_drug_user_id WHERE
+        du.leader_path like #{leaderPath,jdbcType=VARCHAR} and dc.create_time BETWEEN #{startDate} AND #{endDate} AND dc.del_flag=0 and v2.status_name='answer'
         <!--<if test="drugUserId!=null and drugUserId!=0">-->
             <!--AND dc.virtual_drug_user_id = #{drugUserId}-->
         <!--</if>-->
