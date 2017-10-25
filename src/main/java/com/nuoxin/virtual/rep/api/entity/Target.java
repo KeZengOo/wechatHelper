@@ -102,7 +102,7 @@ public class Target extends IdEntity{
 
 
     public Integer getMonthTelNum() {
-        return monthTelNum;
+        return monthTelNum==null?0:monthTelNum;
     }
 
     public void setMonthTelNum(Integer monthTelNum) {
@@ -110,7 +110,7 @@ public class Target extends IdEntity{
     }
 
     public Integer getMonthTelTime() {
-        return monthTelTime;
+        return monthTelTime==null?0:monthTelTime;
     }
 
     public void setMonthTelTime(Integer monthTelTime) {
@@ -118,7 +118,7 @@ public class Target extends IdEntity{
     }
 
     public Integer getMonthTelPerson() {
-        return monthTelPerson;
+        return monthTelPerson==null?0:monthTelPerson;
     }
 
     public void setMonthTelPerson(Integer monthTelPerson) {
@@ -126,7 +126,7 @@ public class Target extends IdEntity{
     }
 
     public Integer getMonthTelAvgTime() {
-        return monthTelAvgTime;
+        return monthTelAvgTime==null?0:monthTelAvgTime;
     }
 
     public void setMonthTelAvgTime(Integer monthTelAvgTime) {
@@ -134,7 +134,7 @@ public class Target extends IdEntity{
     }
 
     public Integer getMonthImNum() {
-        return monthImNum;
+        return monthImNum==null?0:monthImNum;
     }
 
     public void setMonthImNum(Integer monthImNum) {
@@ -142,7 +142,7 @@ public class Target extends IdEntity{
     }
 
     public Integer getMonthWechatNum() {
-        return monthWechatNum;
+        return monthWechatNum==null?0:monthWechatNum;
     }
 
     public void setMonthWechatNum(Integer monthWechatNum) {
@@ -150,7 +150,7 @@ public class Target extends IdEntity{
     }
 
     public Integer getMonthEmailNum() {
-        return monthEmailNum;
+        return monthEmailNum==null?0:monthEmailNum;
     }
 
     public void setMonthEmailNum(Integer monthEmailNum) {
@@ -158,7 +158,7 @@ public class Target extends IdEntity{
     }
 
     public Integer getMonthMeetingNum() {
-        return monthMeetingNum;
+        return monthMeetingNum==null?0:monthMeetingNum;
     }
 
     public void setMonthMeetingNum(Integer monthMeetingNum) {
@@ -166,7 +166,7 @@ public class Target extends IdEntity{
     }
 
     public Integer getMonthMeetingTime() {
-        return monthMeetingTime;
+        return monthMeetingTime==null?0:monthMeetingTime;
     }
 
     public void setMonthMeetingTime(Integer monthMeetingTime) {
@@ -175,7 +175,7 @@ public class Target extends IdEntity{
 
 
     public Integer getMonthMeetingPersonSum() {
-        return monthMeetingPersonSum;
+        return monthMeetingPersonSum==null?0:monthMeetingPersonSum;
     }
 
     public void setMonthMeetingPersonSum(Integer monthMeetingPersonSum) {
@@ -183,7 +183,7 @@ public class Target extends IdEntity{
     }
 
     public Integer getMonthMeetingPersonCount() {
-        return monthMeetingPersonCount;
+        return monthMeetingPersonCount==null?0:monthMeetingPersonCount;
     }
 
     public void setMonthMeetingPersonCount(Integer monthMeetingPersonCount) {
@@ -208,7 +208,7 @@ public class Target extends IdEntity{
 
 
     public Integer getMonthImCount() {
-        return monthImCount;
+        return monthImCount==null?0:monthImCount;
     }
 
     public void setMonthImCount(Integer monthImCount) {
@@ -216,7 +216,7 @@ public class Target extends IdEntity{
     }
 
     public Integer getMonthWechatCount() {
-        return monthWechatCount;
+        return monthWechatCount==null?0:monthWechatCount;
     }
 
     public void setMonthWechatCount(Integer monthWechatCount) {
@@ -224,7 +224,7 @@ public class Target extends IdEntity{
     }
 
     public Integer getMonthEmailCount() {
-        return monthEmailCount;
+        return monthEmailCount==null?0:monthEmailCount;
     }
 
     public void setMonthEmailCount(Integer monthEmailCount) {

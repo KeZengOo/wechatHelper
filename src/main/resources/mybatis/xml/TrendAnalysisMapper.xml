@@ -36,9 +36,9 @@
         drug_user_doctor dud on dud.doctor_id=dc.virtual_doctor_id AND dud.drug_user_id=dc.virtual_drug_user_id join
         drug_user du on du.id=dc.virtual_drug_user_id WHERE
         du.leader_path like #{leaderPath,jdbcType=VARCHAR} and dc.create_time BETWEEN #{startDate} AND #{endDate}
-        <if test="drugUserId!=null and drugUserId!=0">
-            AND dc.virtual_drug_user_id = #{drugUserId}
-        </if>
+        <!--<if test="drugUserId!=null and drugUserId!=0">-->
+            <!--AND dc.virtual_drug_user_id = #{drugUserId}-->
+        <!--</if>-->
         <if test="productId!=null and productId!=0">
             AND dc.product_id = #{productId}
         </if>
@@ -66,9 +66,9 @@
         from virtual_doctor_call_info dc join drug_user_doctor dud on dud.doctor_id=dc.virtual_doctor_id AND
         dud.drug_user_id=dc.virtual_drug_user_id join drug_user du on du.id=dc.virtual_drug_user_id WHERE
         du.leader_path like #{leaderPath,jdbcType=VARCHAR} and dc.create_time BETWEEN #{startDate} AND #{endDate}
-        <if test="drugUserId!=null and drugUserId!=0">
-            AND dc.virtual_drug_user_id = #{drugUserId}
-        </if>
+        <!--<if test="drugUserId!=null and drugUserId!=0">-->
+            <!--AND dc.virtual_drug_user_id = #{drugUserId}-->
+        <!--</if>-->
         <if test="productId!=null and productId!=0">
             AND dc.product_id = #{productId}
         </if>
@@ -96,9 +96,9 @@
         from virtual_doctor_call_info dc join drug_user_doctor dud on dud.doctor_id=dc.virtual_doctor_id AND
         dud.drug_user_id=dc.virtual_drug_user_id join drug_user du on du.id=dc.virtual_drug_user_id WHERE
         du.leader_path like #{leaderPath,jdbcType=VARCHAR} and dc.create_time BETWEEN #{startDate} AND #{endDate}
-        <if test="drugUserId!=null and drugUserId!=0">
-            AND dc.virtual_drug_user_id = #{drugUserId}
-        </if>
+        <!--<if test="drugUserId!=null and drugUserId!=0">-->
+            <!--AND dc.virtual_drug_user_id = #{drugUserId}-->
+        <!--</if>-->
         <if test="productId!=null and productId!=0">
             AND dc.product_id = #{productId}
         </if>
@@ -131,9 +131,9 @@
         <if test="productId!=null and productId!=0">
             AND vd.product_id=#{productId}
         </if>
-        <if test="drugUserId!=null and drugUserId!=0">
-            AND vd.drug_user_id = #{drugUserId}
-        </if>
+        <!--<if test="drugUserId!=null and drugUserId!=0">-->
+            <!--AND vd.drug_user_id = #{drugUserId}-->
+        <!--</if>-->
         UNION ALL
         select DISTINCT vm.doctor_id,vm.message_time create_time from virtual_message vm join drug_user_doctor dud on
         dud.doctor_id=vm.doctor_id AND dud.drug_user_id=vm.drug_user_id join drug_user d on
@@ -143,9 +143,9 @@
         <if test="productId!=null and productId!=0">
             AND vm.product_id=#{productId}
         </if>
-        <if test="drugUserId!=null and drugUserId!=0">
-            AND vm.drug_user_id = #{drugUserId}
-        </if>
+        <!--<if test="drugUserId!=null and drugUserId!=0">-->
+            <!--AND vm.drug_user_id = #{drugUserId}-->
+        <!--</if>-->
         UNION ALL
         select DISTINCT mad.doctor_id,mad.attend_start_time create_time from t_meeting_attend_details mad join
         drug_user_doctor dud on dud.doctor_id=mad.doctor_id join
@@ -155,9 +155,9 @@
         <if test="productId!=null and productId!=0">
             AND md.product_id=#{productId}
         </if>
-        <if test="drugUserId!=null and drugUserId!=0">
-            AND dud.drug_user_id = #{drugUserId}
-        </if>
+        <!--<if test="drugUserId!=null and drugUserId!=0">-->
+            <!--AND dud.drug_user_id = #{drugUserId}-->
+        <!--</if>-->
         UNION ALL
         select DISTINCT ei.doctor_id,ei.create_time from virtual_email_info ei join drug_user_doctor dud on
         dud.doctor_id=ei.doctor_id AND dud.drug_user_id=ei.drug_user_id join drug_user d on d.id=ei.drug_user_id
@@ -166,9 +166,9 @@
         <if test="productId!=null and productId!=0">
             AND ei.product_id=#{productId}
         </if>
-        <if test="drugUserId!=null and drugUserId!=0">
-            AND ei.drug_user_id = #{drugUserId}
-        </if>
+        <!--<if test="drugUserId!=null and drugUserId!=0">-->
+            <!--AND ei.drug_user_id = #{drugUserId}-->
+        <!--</if>-->
         ) t
         <if test="dateType!=null and dateType==1">
             group by DATE_FORMAT(t.create_time,'%Y-%m-%d')
@@ -194,9 +194,9 @@
         on dud.doctor_id=m.doctor_id AND dud.drug_user_id=m.drug_user_id join drug_user d on m.drug_user_id=d.id where
         m.message_time BETWEEN #{startDate} AND #{endDate} and d.leader_path like #{leaderPath,jdbcType=VARCHAR} and
         m.message_type=1
-        <if test="drugUserId!=null and drugUserId!=0">
-            AND m.drug_user_id = #{drugUserId}
-        </if>
+        <!--<if test="drugUserId!=null and drugUserId!=0">-->
+            <!--AND m.drug_user_id = #{drugUserId}-->
+        <!--</if>-->
         <if test="productId!=null and productId!=0">
             AND m.product_id = #{productId}
         </if>
@@ -225,9 +225,9 @@
         on dud.doctor_id=m.doctor_id AND dud.drug_user_id=m.drug_user_id join drug_user d on m.drug_user_id=d.id where
         m.message_time BETWEEN #{startDate} AND #{endDate} and d.leader_path like #{leaderPath,jdbcType=VARCHAR} and
         m.message_type=2
-        <if test="drugUserId!=null and drugUserId!=0">
-            AND m.drug_user_id = #{drugUserId}
-        </if>
+        <!--<if test="drugUserId!=null and drugUserId!=0">-->
+            <!--AND m.drug_user_id = #{drugUserId}-->
+        <!--</if>-->
         <if test="productId!=null and productId!=0">
             AND m.product_id = #{productId}
         </if>
@@ -256,9 +256,9 @@
         dud on dud.doctor_id=ei.doctor_id AND dud.drug_user_id=ei.drug_user_id join drug_user d on ei.drug_user_id=d.id
         where
         ei.create_time BETWEEN #{startDate} AND #{endDate} and d.leader_path like #{leaderPath,jdbcType=VARCHAR}
-        <if test="drugUserId!=null and drugUserId!=0">
-            AND ei.drug_user_id = #{drugUserId}
-        </if>
+        <!--<if test="drugUserId!=null and drugUserId!=0">-->
+            <!--AND ei.drug_user_id = #{drugUserId}-->
+        <!--</if>-->
         <if test="productId!=null and productId!=0">
             AND ei.product_id = #{productId}
         </if>

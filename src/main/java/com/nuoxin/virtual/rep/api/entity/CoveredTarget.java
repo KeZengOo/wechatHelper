@@ -39,7 +39,7 @@ public class CoveredTarget extends IdEntity{
     }
 
     public Integer getMonthCovered() {
-        return monthCovered;
+        return monthCovered==null?0:monthCovered;
     }
 
     public void setMonthCovered(Integer monthCovered) {

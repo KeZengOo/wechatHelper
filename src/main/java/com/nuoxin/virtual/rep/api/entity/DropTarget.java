@@ -37,7 +37,7 @@ public class DropTarget extends IdEntity{
     }
 
     public Integer getDropPriod() {
-        return dropPriod;
+        return dropPriod==null?0:dropPriod;
     }
 
     public void setDropPriod(Integer dropPriod) {

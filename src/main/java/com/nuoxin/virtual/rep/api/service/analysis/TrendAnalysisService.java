@@ -46,9 +46,9 @@ public class TrendAnalysisService extends BaseService {
             TrendResponseBean t = null;
             for (TrendResponseBean trend:responseBeans) {
                 t = this._getTrendResponseBean(list,bean.getDateType(),trend);
-                if(trend!=null){
-                    trend.setNum(trend.getNum());
-                    trend.setCount(trend.getCount());
+                if(t!=null){
+                    trend.setNum(t.getNum());
+                    trend.setCount(t.getCount());
                 }
             }
         }
@@ -76,9 +76,9 @@ public class TrendAnalysisService extends BaseService {
             TrendResponseBean t = null;
             for (TrendResponseBean trend:responseBeans) {
                 t = this._getTrendResponseBean(list,bean.getDateType(),trend);
-                if(trend!=null){
-                    trend.setNum(trend.getNum());
-                    trend.setCount(trend.getCount());
+                if(t!=null){
+                    trend.setNum(t.getNum());
+                    trend.setCount(t.getCount());
                 }
             }
         }
@@ -107,9 +107,9 @@ public class TrendAnalysisService extends BaseService {
             TrendResponseBean t = null;
             for (TrendResponseBean trend:responseBeans) {
                 t = this._getTrendResponseBean(list,bean.getDateType(),trend);
-                if(trend!=null){
-                    trend.setNum(trend.getNum());
-                    trend.setCount(trend.getCount());
+                if(t!=null){
+                    trend.setNum(t.getNum());
+                    trend.setCount(t.getCount());
                 }
             }
         }
@@ -204,25 +204,26 @@ public class TrendAnalysisService extends BaseService {
     }
 
     private TrendResponseBean _getTrendResponseBean(List<TrendResponseBean> list,Integer type,TrendResponseBean trend){
+        TrendResponseBean responseBean = new TrendResponseBean();
         if(list!=null && !list.isEmpty()){
             for (TrendResponseBean bean:list) {
-                trend.setNum(bean.getNum());
-                trend.setCount(bean.getCount());
+                responseBean.setNum(bean.getNum());
+                responseBean.setCount(bean.getCount());
                 if(type==1){
                     if(trend.getDate().equals(bean.getDate())){
-                        return trend;
+                        return responseBean;
                     }
                 }else if(type==2){
                     if(bean.getYear()==trend.getYear() && bean.getWeek()==trend.getWeek()){
-                        return trend;
+                        return responseBean;
                     }
                 }else if(type==3){
                     if(bean.getYear()==trend.getYear() && bean.getMonth()==trend.getMonth()){
-                        return trend;
+                        return responseBean;
                     }
                 }else if(type==4){
                     if(bean.getYear()==trend.getYear() && bean.getQuarter()==trend.getQuarter()){
-                        return trend;
+                        return responseBean;
                     }
                 }
             }
