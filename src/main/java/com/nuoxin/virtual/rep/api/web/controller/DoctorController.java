@@ -282,6 +282,9 @@ public class DoctorController extends BaseController {
             responseBean.setMessage("登录失效");
             return responseBean;
         }
+        if(bean.getDoctorId()!=null || bean.getDoctorId()==0){
+            return responseBean;
+        }
         bean.setDrugUserId(user.getId());
         responseBean.setData(contactPlanService.page(bean));
         return responseBean;

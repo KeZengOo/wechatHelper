@@ -131,6 +131,9 @@ public class DoctorCallController extends BaseController {
             responseBean.setMessage("登录失效");
             return responseBean;
         }
+        if(bean.getDoctorId()!=null || bean.getDoctorId()==0){
+            return responseBean;
+        }
         bean.setDrugUserId(user.getId());
         bean.setLeaderPath(user.getLeaderPath());
         responseBean.setData(doctorCallService.doctorHistoryPage(bean));
