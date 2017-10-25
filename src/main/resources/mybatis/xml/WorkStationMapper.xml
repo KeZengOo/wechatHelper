@@ -2231,5 +2231,266 @@
     </select>
 
 
+    <!-- 得到最短的微信，短信，邮件的阅读时长 -->
+    <select id="getMinMessageTime" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean"
+            resultType="java.util.Map">
+            select
+            (
+            select sum(ar.read_time) from activity_read ar
+            inner join drug_user du
+            on ar.drug_user_id=du.id
+            inner join t_content_product tcp
+            on ar.data_id=tcp.content_id
+            where 1=1
+            and ar.share_type=1
+            and tcp.product_id=#{productId}
+            and du.leader_path like #{leaderPath}
+
+            <if test="dateType !=null">
+                <if test="dateType==1">
+                    and date_format(ar.create_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+                </if>
+                <if test="dateType==2">
+                    and WEEKOFYEAR(ar.create_time)=WEEKOFYEAR(NOW())
+                </if>
+                <if test="dateType==3">
+                    and MONTH(ar.create_time)=MONTH(NOW())
+                </if>
+                <if test="dateType==4">
+                    and QUARTER(ar.create_time)=QUARTER(NOW())
+                </if>
+            </if>
+
+            group by ar.drug_user_id order by sum(ar.read_time) limit 1
+            ) as minWechatTime
+            ,
+            (
+
+            select sum(ar.read_time)  from activity_read ar
+            inner join drug_user du
+            on ar.drug_user_id=du.id
+            inner join t_content_product tcp
+            on ar.data_id=tcp.content_id
+            where 1=1
+            and ar.share_type=2
+            and tcp.product_id=#{productId}
+            and du.leader_path like #{leaderPath}
+            <if test="dateType !=null">
+                <if test="dateType==1">
+                    and date_format(ar.create_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+                </if>
+                <if test="dateType==2">
+                    and WEEKOFYEAR(ar.create_time)=WEEKOFYEAR(NOW())
+                </if>
+                <if test="dateType==3">
+                    and MONTH(ar.create_time)=MONTH(NOW())
+                </if>
+                <if test="dateType==4">
+                    and QUARTER(ar.create_time)=QUARTER(NOW())
+                </if>
+            </if>
+
+            group by ar.drug_user_id order by sum(ar.read_time) limit 1
+            ) as minImTime
+            ,
+            (
+            select sum(ar.read_time) from activity_read ar
+            inner join drug_user du
+            on ar.drug_user_id=du.id
+            inner join t_content_product tcp
+            on ar.data_id=tcp.content_id
+            where 1=1
+            and ar.share_type=3
+            and tcp.product_id=#{productId}
+            and du.leader_path like #{leaderPath}
+            <if test="dateType !=null">
+                <if test="dateType==1">
+                    and date_format(ar.create_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+                </if>
+                <if test="dateType==2">
+                    and WEEKOFYEAR(ar.create_time)=WEEKOFYEAR(NOW())
+                </if>
+                <if test="dateType==3">
+                    and MONTH(ar.create_time)=MONTH(NOW())
+                </if>
+                <if test="dateType==4">
+                    and QUARTER(ar.create_time)=QUARTER(NOW())
+                </if>
+            </if>
+            group by ar.drug_user_id order by sum(ar.read_time) limit 1
+            ) as minEmailTime
+
+    </select>
+
+    <!-- 最短的微信阅读时长销售列表 -->
+    <select id="getMinWechatTimeList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.AnalysisResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+
+        select t.drugUserName,t.num from (
+        select sum(ar.read_time) num,du.name drugUserName from activity_read ar
+        inner join drug_user du
+        on ar.drug_user_id=du.id
+        inner join t_content_product tcp
+        on ar.data_id=tcp.content_id
+        where 1=1
+        and ar.share_type=1
+        and tcp.product_id=#{productId}
+        and du.leader_path like #{leaderPath}
+        <if test="dateType !=null">
+            <if test="dateType==1">
+                and date_format(ar.create_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+            </if>
+            <if test="dateType==2">
+                and WEEKOFYEAR(ar.create_time)=WEEKOFYEAR(NOW())
+            </if>
+            <if test="dateType==3">
+                and MONTH(ar.create_time)=MONTH(NOW())
+            </if>
+            <if test="dateType==4">
+                and QUARTER(ar.create_time)=QUARTER(NOW())
+            </if>
+        </if>
+        group by ar.drug_user_id
+        ) t where t.num=#{minWechatTime}
+
+    </select>
+
+
+    <!-- 最短的短信阅读时长销售列表 -->
+    <select id="getMinImTimeList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.AnalysisResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+
+        select t.drugUserName,t.num from (
+        select sum(ar.read_time) num,du.name drugUserName from activity_read ar
+        inner join drug_user du
+        on ar.drug_user_id=du.id
+        inner join t_content_product tcp
+        on ar.data_id=tcp.content_id
+        where 1=1
+        and ar.share_type=2
+        and tcp.product_id=#{productId}
+        and du.leader_path like #{leaderPath}
+        <if test="dateType !=null">
+            <if test="dateType==1">
+                and date_format(ar.create_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+            </if>
+            <if test="dateType==2">
+                and WEEKOFYEAR(ar.create_time)=WEEKOFYEAR(NOW())
+            </if>
+            <if test="dateType==3">
+                and MONTH(ar.create_time)=MONTH(NOW())
+            </if>
+            <if test="dateType==4">
+                and QUARTER(ar.create_time)=QUARTER(NOW())
+            </if>
+        </if>
+        group by ar.drug_user_id
+        ) t where t.num=#{minImTime}
+
+    </select>
+
+
+    <!-- 最短的邮件阅读时长销售列表 -->
+    <select id="getMinEmailTimeList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.AnalysisResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+
+        select t.drugUserName,t.num from (
+        select sum(ar.read_time) num,du.name drugUserName from activity_read ar
+        inner join drug_user du
+        on ar.drug_user_id=du.id
+        inner join t_content_product tcp
+        on ar.data_id=tcp.content_id
+        where 1=1
+        and ar.share_type=3
+        and tcp.product_id=#{productId}
+        and du.leader_path like #{leaderPath}
+        <if test="dateType !=null">
+            <if test="dateType==1">
+                and date_format(ar.create_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+            </if>
+            <if test="dateType==2">
+                and WEEKOFYEAR(ar.create_time)=WEEKOFYEAR(NOW())
+            </if>
+            <if test="dateType==3">
+                and MONTH(ar.create_time)=MONTH(NOW())
+            </if>
+            <if test="dateType==4">
+                and QUARTER(ar.create_time)=QUARTER(NOW())
+            </if>
+        </if>
+        group by ar.drug_user_id
+        ) t where t.num=#{minEmailTime}
+
+    </select>
+
+    <!-- 最短的会议时间 -->
+    <select id="getMinMeetingTime" resultType="java.lang.Integer"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+        select sum(tmad.attend_sum_time) getMinMeetingTime from t_meeting_attend_details tmad
+        inner join t_meeting_data tma
+        on tmad.meeting_id=tma.id
+        inner join doctor d
+        on tmad.doctor_id=d.id
+        inner join drug_user_doctor dud
+        on d.id=dud.doctor_id
+        inner join drug_user du
+        on dud.drug_user_id=du.id
+        where tma.product_id=#{productId}
+        and dud.prod_id=#{productId}
+        and du.leader_path like #{leaderPath}
+        <if test="dateType !=null">
+            <if test="dateType==1">
+                and date_format(tmad.attend_end_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+            </if>
+            <if test="dateType==2">
+                and WEEKOFYEAR(tmad.attend_end_time)=WEEKOFYEAR(NOW())
+            </if>
+            <if test="dateType==3">
+                and MONTH(tmad.attend_end_time)=MONTH(NOW())
+            </if>
+            <if test="dateType==4">
+                and QUARTER(tmad.attend_end_time)=QUARTER(NOW())
+            </if>
+        </if>
+        group by du.id order by sum(tmad.attend_sum_time) limit 1
+
+    </select>
+
+
+    <select id="getMinMeetingTimeList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.AnalysisResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+
+        select t.num, t.drugUserName from (
+            select sum(tmad.attend_sum_time) num, du.name drugUserName from t_meeting_attend_details tmad
+            inner join t_meeting_data tma
+            on tmad.meeting_id=tma.id
+            inner join doctor d
+            on tmad.doctor_id=d.id
+            inner join drug_user_doctor dud
+            on d.id=dud.doctor_id
+            inner join drug_user du
+            on dud.drug_user_id=du.id
+            where tma.product_id=#{productId}
+            and dud.prod_id=#{productId}
+            and du.leader_path like #{leaderPath}
+            <if test="dateType !=null">
+                <if test="dateType==1">
+                    and date_format(tmad.attend_end_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+                </if>
+                <if test="dateType==2">
+                    and WEEKOFYEAR(tmad.attend_end_time)=WEEKOFYEAR(NOW())
+                </if>
+                <if test="dateType==3">
+                    and MONTH(tmad.attend_end_time)=MONTH(NOW())
+                </if>
+                <if test="dateType==4">
+                    and QUARTER(tmad.attend_end_time)=QUARTER(NOW())
+                </if>
+            </if>
+
+            group by du.id
+          ) t where t.num=#{getMinMeetingTime}
+
+    </select>
 
 </mapper>

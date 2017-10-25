@@ -56,7 +56,7 @@
     <select id="getCallInfoTimeStatistics" resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.TodayStatisticsResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
 
-            select ifnull(sum(vdci.call_time),0) as callTotalTime from virtual_doctor_call_info vdci
+            <!--select ifnull(sum(vdci.call_time),0) as callTotalTime from virtual_doctor_call_info vdci
             inner join virtual_doctor_call_info_details vdcid
             on vdci.id = vdcid.call_id
             inner join drug_user_doctor dud
@@ -74,7 +74,35 @@
             and du.leader_path like #{leaderPath}
             and vdcid.status_name='answer'
 
-            and date_format(vdci.create_time, '%Y-%m-%d')=date_format(NOW(), '%Y-%m-%d')
+            and date_format(vdci.create_time, '%Y-%m-%d')=date_format(NOW(), '%Y-%m-%d')-->
+
+
+
+
+
+        select ifnull(sum(t.call_time),0) callTotalTime  from (
+        select distinct vdci.id,vdci.call_time from virtual_doctor_call_info vdci
+        inner join virtual_doctor_call_info_details vdcid
+        on vdci.id = vdcid.call_id
+        inner join drug_user_doctor dud
+        on vdci.virtual_drug_user_id=dud.drug_user_id
+        inner join drug_user du
+        on du.id = dud.drug_user_id
+        inner join product_line pl
+        on dud.prod_id=pl.prod_id
+        where 1=1
+
+        and dud.prod_id=#{productId}
+        and vdci.product_id=#{productId}
+
+
+        and du.leader_path like #{leaderPath}
+        and vdcid.status_name='answer'
+
+        and date_format(vdci.create_time, '%Y-%m-%d')=date_format(NOW(), '%Y-%m-%d')
+
+        ) t
+
 
     </select>
 
