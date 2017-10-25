@@ -147,8 +147,8 @@
             AND vm.drug_user_id = #{drugUserId}
         </if>
         UNION ALL
-        select DISTINCT mad.doctor_id,mad.attend_start_time create_time from t_meeting_attend_details mad join join
-        drug_user_doctor dud on dud.doctor_id=mad.doctor_id AND dud.drug_user_id=mad.drug_user_id
+        select DISTINCT mad.doctor_id,mad.attend_start_time create_time from t_meeting_attend_details mad join
+        drug_user_doctor dud on dud.doctor_id=mad.doctor_id join
         t_meeting_data md on md.id=mad.meeting_id
         join drug_user d on d.id=mad.drug_user_id where d.leader_path like #{leaderPath,jdbcType=VARCHAR}
         AND mad.attend_start_time BETWEEN #{startDate} AND #{endDate}
@@ -156,7 +156,7 @@
             AND md.product_id=#{productId}
         </if>
         <if test="drugUserId!=null and drugUserId!=0">
-            AND mad.drug_user_id = #{drugUserId}
+            AND dud.drug_user_id = #{drugUserId}
         </if>
         UNION ALL
         select DISTINCT ei.doctor_id,ei.create_time from virtual_email_info ei join drug_user_doctor dud on
