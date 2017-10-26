@@ -58,7 +58,7 @@ public class TrendAnalysisController extends BaseController {
             responseBean.setMessage("登录失效");
             return responseBean;
         }
-        bean.setDrugUserId(user.getId());
+//        bean.setDrugUserId(user.getId());
         bean.setLeaderPath(user.getLeaderPath());
         responseBean.setData(trendAnalysisService.summationCallout(bean));
         return responseBean;
@@ -82,7 +82,7 @@ public class TrendAnalysisController extends BaseController {
             responseBean.setMessage("登录失效");
             return responseBean;
         }
-        bean.setDrugUserId(user.getId());
+//        bean.setDrugUserId(user.getId());
         bean.setLeaderPath(user.getLeaderPath());
         responseBean.setData(trendAnalysisService.summationCalloutAvg(bean));
         return responseBean;
@@ -106,7 +106,7 @@ public class TrendAnalysisController extends BaseController {
             responseBean.setMessage("登录失效");
             return responseBean;
         }
-        bean.setDrugUserId(user.getId());
+//        bean.setDrugUserId(user.getId());
         bean.setLeaderPath(user.getLeaderPath());
         responseBean.setData(trendAnalysisService.summationCalloutCount(bean));
         return responseBean;
@@ -130,7 +130,7 @@ public class TrendAnalysisController extends BaseController {
             responseBean.setMessage("登录失效");
             return responseBean;
         }
-        bean.setDrugUserId(user.getId());
+//        bean.setDrugUserId(user.getId());
         bean.setLeaderPath(user.getLeaderPath());
         responseBean.setData(trendAnalysisService.summationSession(bean));
         return responseBean;
@@ -153,7 +153,7 @@ public class TrendAnalysisController extends BaseController {
             responseBean.setMessage("登录失效");
             return responseBean;
         }
-        bean.setDrugUserId(user.getId());
+//        bean.setDrugUserId(user.getId());
         bean.setLeaderPath(user.getLeaderPath());
         responseBean.setData(trendAnalysisService.callOut(bean));
         return responseBean;
@@ -176,7 +176,7 @@ public class TrendAnalysisController extends BaseController {
             responseBean.setMessage("登录失效");
             return responseBean;
         }
-        bean.setDrugUserId(user.getId());
+//        bean.setDrugUserId(user.getId());
         bean.setLeaderPath(user.getLeaderPath());
         responseBean.setData(trendAnalysisService.session(bean));
         return responseBean;
