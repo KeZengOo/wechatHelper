@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Create by tiancun on 2017/10/17
@@ -68,8 +69,8 @@ public class DrugUserAnalysisListResponseBean implements Serializable{
     @ApiModelProperty(value = "最短的会议时长")
     private List<DrugUserAnalysisResponseBean> minMeetingTimeList;
 
-    @ApiModelProperty(value = "脱落客户最严重")
-    private List<DropCustomerListResponseBean> dropCustomerList;
+    @ApiModelProperty(value = "脱落客户最严重, 键值对，销售姓名-->脱落的客户数")
+    private Map<String,Integer> dropCustomerList;
 
     public List<DrugUserAnalysisResponseBean> getMinTotalCallTimeList() {
         return minTotalCallTimeList;
@@ -160,13 +161,7 @@ public class DrugUserAnalysisListResponseBean implements Serializable{
 //    }
 
 
-    public List<DropCustomerListResponseBean> getDropCustomerList() {
-        return dropCustomerList;
-    }
 
-    public void setDropCustomerList(List<DropCustomerListResponseBean> dropCustomerList) {
-        this.dropCustomerList = dropCustomerList;
-    }
 
 //    public List<DrugUserAnalysisResponseBean> getMinEmailCountList() {
 //        return minEmailCountList;
@@ -223,5 +218,14 @@ public class DrugUserAnalysisListResponseBean implements Serializable{
 
     public void setMinMeetingTimeList(List<DrugUserAnalysisResponseBean> minMeetingTimeList) {
         this.minMeetingTimeList = minMeetingTimeList;
+    }
+
+
+    public Map<String, Integer> getDropCustomerList() {
+        return dropCustomerList;
+    }
+
+    public void setDropCustomerList(Map<String, Integer> dropCustomerList) {
+        this.dropCustomerList = dropCustomerList;
     }
 }
