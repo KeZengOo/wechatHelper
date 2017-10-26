@@ -50,13 +50,27 @@
         UNION ALL
         select DISTINCT vm.doctor_id from virtual_message vm join doctor_virtual dv on
         dv.doctor_id=vm.doctor_id join drug_user d on d.id=vm.drug_user_id  join drug_user_doctor dud on dud.doctor_id=vm.doctor_id AND dud.drug_user_id=vm.drug_user_id where
-        d.leader_path like #{leaderPath,jdbcType=VARCHAR}
+        d.leader_path like #{leaderPath,jdbcType=VARCHAR} and vm.message_type=2
         AND vm.message_time BETWEEN #{startDate} AND #{endDate}
         <if test="productId!=null and productId!=0">
             AND vm.product_id=#{productId}
         </if>
         <!--<if test="drugUserId!=null and drugUserId!=0">-->
             <!--AND vm.drug_user_id = #{drugUserId}-->
+        <!--</if>-->
+        <if test="customLevel!=null and customLevel!=''">
+            AND dv.client_level = #{customLevel}
+        </if>
+        UNION ALL
+        select DISTINCT vm.doctor_id from virtual_message vm join doctor_virtual dv on
+        dv.doctor_id=vm.doctor_id join drug_user d on d.id=vm.drug_user_id  join drug_user_doctor dud on dud.doctor_id=vm.doctor_id AND dud.drug_user_id=vm.drug_user_id where
+        d.leader_path like #{leaderPath,jdbcType=VARCHAR}
+        AND vm.message_time BETWEEN #{startDate} AND #{endDate} and vm.message_type=1
+        <!--<if test="productId!=null and productId!=0">-->
+            <!--AND vm.product_id=#{productId}-->
+        <!--</if>-->
+        <!--<if test="drugUserId!=null and drugUserId!=0">-->
+        <!--AND vm.drug_user_id = #{drugUserId}-->
         <!--</if>-->
         <if test="customLevel!=null and customLevel!=''">
             AND dv.client_level = #{customLevel}
@@ -156,9 +170,9 @@
         select count(DISTINCT vm.doctor_id) coverNum from virtual_message vm join doctor do on do.id=vm.doctor_id join doctor_virtual dv on dv.doctor_id=vm.doctor_id join drug_user d on d.id=vm.drug_user_id where
         d.leader_path like #{leaderPath,jdbcType=VARCHAR} and vm.message_type=1
         AND vm.message_time BETWEEN #{startDate} AND #{endDate}
-        <if test="productId!=null and productId!=0">
-            AND vm.product_id=#{productId}
-        </if>
+        <!--<if test="productId!=null and productId!=0">-->
+            <!--AND vm.product_id=#{productId}-->
+        <!--</if>-->
         <!--<if test="drugUserId!=null and drugUserId!=0">-->
             <!--AND vm.drug_user_id = #{drugUserId}-->
         <!--</if>-->

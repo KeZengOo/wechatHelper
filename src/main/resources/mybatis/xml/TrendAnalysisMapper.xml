@@ -137,12 +137,24 @@
         dud.doctor_id=vm.doctor_id AND dud.drug_user_id=vm.drug_user_id join drug_user d on
         d.id=vm.drug_user_id where
         d.leader_path like #{leaderPath,jdbcType=VARCHAR}
-        AND vm.message_time BETWEEN #{startDate} AND #{endDate}
+        AND vm.message_time BETWEEN #{startDate} AND #{endDate} and vm.message_type=1
+        <!--<if test="productId!=null and productId!=0">-->
+            <!--AND vm.product_id=#{productId}-->
+        <!--</if>-->
+        <!--<if test="drugUserId!=null and drugUserId!=0">-->
+            <!--AND vm.drug_user_id = #{drugUserId}-->
+        <!--</if>-->
+        UNION ALL
+        select DISTINCT vm.doctor_id,vm.message_time create_time from virtual_message vm join drug_user_doctor dud on
+        dud.doctor_id=vm.doctor_id AND dud.drug_user_id=vm.drug_user_id join drug_user d on
+        d.id=vm.drug_user_id where
+        d.leader_path like #{leaderPath,jdbcType=VARCHAR}
+        AND vm.message_time BETWEEN #{startDate} AND #{endDate} and vm.message_type=2
         <if test="productId!=null and productId!=0">
             AND vm.product_id=#{productId}
         </if>
         <!--<if test="drugUserId!=null and drugUserId!=0">-->
-            <!--AND vm.drug_user_id = #{drugUserId}-->
+        <!--AND vm.drug_user_id = #{drugUserId}-->
         <!--</if>-->
         UNION ALL
         select DISTINCT mad.doctor_id,mad.attend_start_time create_time from t_meeting_attend_details mad join
@@ -195,9 +207,9 @@
         <!--<if test="drugUserId!=null and drugUserId!=0">-->
             <!--AND m.drug_user_id = #{drugUserId}-->
         <!--</if>-->
-        <if test="productId!=null and productId!=0">
-            AND m.product_id = #{productId}
-        </if>
+        <!--<if test="productId!=null and productId!=0">-->
+            <!--AND m.product_id = #{productId}-->
+        <!--</if>-->
         <if test="dateType!=null and dateType==1">
             group BY DATE_FORMAT(m.message_time,'%Y-%m-%d')
         </if>
@@ -310,9 +322,9 @@
         m.message_time BETWEEN #{startDate} AND #{endDate} and d.leader_path like #{leaderPath,jdbcType=VARCHAR} and
         m.message_type=1
 
-        <if test="productId!=null and productId!=0">
-            AND m.product_id = #{productId}
-        </if>
+        <!--<if test="productId!=null and productId!=0">-->
+            <!--AND m.product_id = #{productId}-->
+        <!--</if>-->
         group by DATE_FORMAT(m.message_time,'%k') order by m.message_time asc
 
     </select>

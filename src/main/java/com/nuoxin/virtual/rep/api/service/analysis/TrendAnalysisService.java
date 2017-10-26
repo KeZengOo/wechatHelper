@@ -214,15 +214,15 @@ public class TrendAnalysisService extends BaseService {
                         return responseBean;
                     }
                 }else if(type==2){
-                    if(bean.getYear()==trend.getYear() && bean.getWeek()==trend.getWeek()){
+                    if(bean.getYear().equals(trend.getYear()) && bean.getWeek().equals(trend.getWeek())){
                         return responseBean;
                     }
                 }else if(type==3){
-                    if(bean.getYear()==trend.getYear() && bean.getMonth()==trend.getMonth()){
+                    if(bean.getYear().equals(trend.getYear()) && bean.getMonth().equals(trend.getMonth())){
                         return responseBean;
                     }
                 }else if(type==4){
-                    if(bean.getYear()==trend.getYear() && bean.getQuarter()==trend.getQuarter()){
+                    if(bean.getYear().equals(trend.getYear()) && bean.getQuarter().equals(trend.getQuarter())){
                         return responseBean;
                     }
                 }
