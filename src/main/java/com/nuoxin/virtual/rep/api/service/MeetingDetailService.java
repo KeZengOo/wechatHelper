@@ -99,6 +99,12 @@ public class MeetingDetailService extends BaseService{
                 }
                 Doctor doctor = doctorRepository.findTopByMobile(telephone);
                 if (doctor != null){
+
+                    List<MeetingDetail> meetingDetailList = meetingDetailRepository.findByMeetingIdAndDoctorId(meetingId, doctor.getId());
+                    if (meetingDetailList != null && meetingDetailList.size() > 0){
+                        meetingDetailRepository.deleteAllByMeetingIdAndDoctorId(meetingId,doctor.getId());
+                    }
+
                     meetingDetail.setTelephone(telephone);
                     meetingDetail.setDoctorId(doctor.getId());
                     meetingDetail.setDoctorName(doctor.getName());

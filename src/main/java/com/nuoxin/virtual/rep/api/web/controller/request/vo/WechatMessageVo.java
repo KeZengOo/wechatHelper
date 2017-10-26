@@ -2,6 +2,8 @@ package com.nuoxin.virtual.rep.api.web.controller.request.vo;
 
 import com.nuoxin.virtual.rep.api.common.annotations.Excel;
 
+import java.util.Date;
+
 /**
  * 微信消息excel映射实体类
  * @author tiancun
@@ -11,8 +13,11 @@ public class WechatMessageVo {
     @Excel(name = "ID", width = 50)
     private String id;
 
+//    @Excel(name = "时间", width = 30)
+//    private String wechatTime;
+
     @Excel(name = "时间", width = 30)
-    private String wechatTime;
+    private Date wechatTime;
 
     @Excel(name = "联系人", width = 30)
     private String nickname;
@@ -44,13 +49,13 @@ public class WechatMessageVo {
         this.id = id;
     }
 
-    public String getWechatTime() {
-        return wechatTime;
-    }
-
-    public void setWechatTime(String wechatTime) {
-        this.wechatTime = wechatTime;
-    }
+//    public String getWechatTime() {
+//        return wechatTime;
+//    }
+//
+//    public void setWechatTime(String wechatTime) {
+//        this.wechatTime = wechatTime;
+//    }
 
     public String getNickname() {
         return nickname;
@@ -107,6 +112,15 @@ public class WechatMessageVo {
 
     public void setDoctorTelephone(String doctorTelephone) {
         this.doctorTelephone = doctorTelephone;
+    }
+
+
+    public Date getWechatTime() {
+        return wechatTime;
+    }
+
+    public void setWechatTime(Date wechatTime) {
+        this.wechatTime = wechatTime;
     }
 }
 
