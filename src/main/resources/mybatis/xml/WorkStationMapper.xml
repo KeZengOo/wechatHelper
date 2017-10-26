@@ -2866,6 +2866,22 @@
                         and du.leader_path like #{leaderPath}
                         and dud.prod_id=#{productId}
                         and vdci.product_id=#{productId}
+
+                        <if test="dateType !=null">
+                            <if test="dateType==1">
+                                and date_format(vdci.create_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+                            </if>
+                            <if test="dateType==2">
+                                and WEEKOFYEAR(vdci.create_time)=WEEKOFYEAR(NOW())
+                            </if>
+                            <if test="dateType==3">
+                                and MONTH(vdci.create_time)=MONTH(NOW())
+                            </if>
+                            <if test="dateType==4">
+                                and QUARTER(vdci.create_time)=QUARTER(NOW())
+                            </if>
+                        </if>
+
                         group by vdci.virtual_doctor_id
 
                         union
@@ -2885,7 +2901,25 @@
                         where du.leader_path like #{leaderPath}
                         and dud.prod_id=#{productId}
                         and tcp.product_id=#{productId}
-                        group by ar.read_person_id
+
+
+                        <if test="dateType !=null">
+                            <if test="dateType==1">
+                                and date_format(ar.create_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
+                            </if>
+                            <if test="dateType==2">
+                                and WEEKOFYEAR(ar.create_time)=WEEKOFYEAR(NOW())
+                            </if>
+                            <if test="dateType==3">
+                                and MONTH(ar.create_time)=MONTH(NOW())
+                            </if>
+                            <if test="dateType==4">
+                                and QUARTER(ar.create_time)=QUARTER(NOW())
+                            </if>
+                        </if>
+
+
+        group by ar.read_person_id
 
 
 
