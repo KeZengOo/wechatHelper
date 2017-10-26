@@ -20,10 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.management.Query;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 工作台相关
@@ -31,6 +28,8 @@ import java.util.Map;
  */
 @Service
 public class WorkStationService {
+
+    private List<String> doctorLevels = new ArrayList<>(Arrays.asList("A", "B", "C", "D", "other"));
 
     @Autowired
     private MeetingDetailMapper meetingDetailMapper;
@@ -59,10 +58,11 @@ public class WorkStationService {
 
     /**
      * 得到管理员下所有的坐席
+     *
      * @param drugUserId
      * @return
      */
-    public List<DrugUserResponseBean> getDrugUserList(Long drugUserId){
+    public List<DrugUserResponseBean> getDrugUserList(Long drugUserId) {
         List<DrugUserResponseBean> list = new ArrayList<>();
 
         DrugUser drugUser = drugUserRepository.findFirstById(drugUserId);
@@ -73,8 +73,8 @@ public class WorkStationService {
         leaderPath = leaderPath + "%";
 
         List<DrugUser> drugUsers = drugUserRepository.findByLeaderPathLike(leaderPath);
-        if (drugUsers != null && !drugUsers.isEmpty()){
-            for (DrugUser du:drugUsers){
+        if (drugUsers != null && !drugUsers.isEmpty()) {
+            for (DrugUser du : drugUsers) {
                 DrugUserResponseBean drugUserResponseBean = new DrugUserResponseBean();
                 drugUserResponseBean.setId(du.getId());
                 drugUserResponseBean.setName(du.getName());
@@ -88,10 +88,11 @@ public class WorkStationService {
 
     /**
      * 今日通话情况
+     *
      * @param bean
      * @return
      */
-    public TodayStatisticsResponseBean getTodayStatistic(WorkStationRequestBean bean){
+    public TodayStatisticsResponseBean getTodayStatistic(WorkStationRequestBean bean) {
         TodayStatisticsResponseBean todayStatisticsResponseBean = new TodayStatisticsResponseBean();
 
         DrugUser drugUser = drugUserRepository.findFirstById(bean.getDrugUserId());
@@ -103,22 +104,22 @@ public class WorkStationService {
 
         //会议的统计
         TodayStatisticsResponseBean meetingStatistic = meetingDetailMapper.getMeetingStatistic(bean);
-        if (null != meetingStatistic){
+        if (null != meetingStatistic) {
             Integer meetingCount = meetingStatistic.getMeetingCount();
-            if (meetingCount == null){
+            if (meetingCount == null) {
                 meetingCount = 0;
             }
             todayStatisticsResponseBean.setMeetingCount(meetingCount);
 
 
             Integer meetingTotalTime = meetingStatistic.getMeetingTotalTime();
-            if (meetingTotalTime == null){
+            if (meetingTotalTime == null) {
                 meetingTotalTime = 0;
             }
             todayStatisticsResponseBean.setMeetingTotalTime(meetingTotalTime);
 
             Integer meetingTotalPersonNum = meetingStatistic.getMeetingTotalPersonNum();
-            if (meetingTotalPersonNum == null){
+            if (meetingTotalPersonNum == null) {
                 meetingTotalPersonNum = 0;
             }
             todayStatisticsResponseBean.setMeetingTotalPersonNum(meetingTotalPersonNum);
@@ -156,31 +157,31 @@ public class WorkStationService {
 
         //多渠道会话统计
         TodayStatisticsResponseBean messageStatistics = messageMapper.getMessageStatistics(bean);
-        if (null != meetingStatistic){
+        if (null != meetingStatistic) {
 
             Integer wechatSum = meetingStatistic.getWechatSum();
-            if (wechatSum == null){
+            if (wechatSum == null) {
                 wechatSum = 0;
             }
             todayStatisticsResponseBean.setWechatSum(wechatSum);
 
 
             Integer wechatCount = meetingStatistic.getWechatCount();
-            if (wechatCount == null){
+            if (wechatCount == null) {
                 wechatCount = 0;
             }
             todayStatisticsResponseBean.setWechatCount(wechatCount);
 
 
             Integer imSum = meetingStatistic.getImSum();
-            if (imSum == null){
+            if (imSum == null) {
                 imSum = 0;
             }
             todayStatisticsResponseBean.setImSum(imSum);
 
 
             Integer imCount = meetingStatistic.getImCount();
-            if (imCount == null){
+            if (imCount == null) {
                 imCount = 0;
             }
             todayStatisticsResponseBean.setImCount(imCount);
@@ -188,13 +189,13 @@ public class WorkStationService {
 
         //今日邮件人数
         Integer todayEmailNum = emailMapper.getTodayEmailNum(bean);
-        if (todayEmailNum == null){
+        if (todayEmailNum == null) {
             todayEmailNum = 0;
         }
 
         //今日邮件人次
         Integer todayEmailCount = emailMapper.getTodayEmailCount(bean);
-        if (todayEmailCount == null){
+        if (todayEmailCount == null) {
             todayEmailCount = 0;
         }
 
@@ -206,16 +207,16 @@ public class WorkStationService {
 
         //呼出统计
         TodayStatisticsResponseBean callInfoStatistics = doctorCallInfoMapper.getCallInfoStatistics(bean);
-        if (null != callInfoStatistics){
+        if (null != callInfoStatistics) {
             Integer callCount = callInfoStatistics.getCallCount();
-            if (callCount == null){
+            if (callCount == null) {
                 callCount = 0;
             }
             todayStatisticsResponseBean.setCallCount(callCount);
 
 
             Integer callSum = callInfoStatistics.getCallSum();
-            if (callSum == null){
+            if (callSum == null) {
                 callSum = 0;
             }
             todayStatisticsResponseBean.setCallSum(callSum);
@@ -226,34 +227,33 @@ public class WorkStationService {
         todayStatisticsResponseBean.setTargetCallCount(perDayTargetCallCount);
 
         TodayStatisticsResponseBean callInfoTimeStatistics = doctorCallInfoMapper.getCallInfoTimeStatistics(bean);
-        if (null != callInfoStatistics){
+        if (null != callInfoStatistics) {
             Integer callTotalTime = callInfoTimeStatistics.getCallTotalTime();
-            if (callTotalTime == null){
+            if (callTotalTime == null) {
                 callTotalTime = 0;
             }
             todayStatisticsResponseBean.setCallTotalTime(callTotalTime);
         }
 
 
-
         //拜访客户数
         Integer meetingTotalPerson = todayStatisticsResponseBean.getMeetingTotalPersonNum();
-        if (meetingTotalPerson == null){
+        if (meetingTotalPerson == null) {
             meetingTotalPerson = 0;
         }
         Integer wechatSum = todayStatisticsResponseBean.getWechatSum();
-        if (wechatSum == null){
+        if (wechatSum == null) {
             wechatSum = 0;
         }
 
         Integer imSum = todayStatisticsResponseBean.getImSum();
-        if (imSum == null){
+        if (imSum == null) {
             imSum = 0;
         }
 
 
         Integer callSum = todayStatisticsResponseBean.getCallSum();
-        if (null == callSum){
+        if (null == callSum) {
             callSum = 0;
         }
         //拜访客户总人数
@@ -262,23 +262,23 @@ public class WorkStationService {
 
         //拜访客户总人次
         Integer meetingCount = todayStatisticsResponseBean.getMeetingCount();
-        if (null == meetingCount){
+        if (null == meetingCount) {
             meetingCount = 0;
         }
 
         Integer wechatCount = todayStatisticsResponseBean.getWechatCount();
-        if (null == wechatCount){
+        if (null == wechatCount) {
             wechatCount = 0;
         }
 
         Integer imCount = todayStatisticsResponseBean.getImCount();
-        if (imCount == null){
+        if (imCount == null) {
             imCount = 0;
         }
 
 
         Integer callCount = todayStatisticsResponseBean.getCallCount();
-        if (callCount == null){
+        if (callCount == null) {
             callCount = 0;
         }
 
@@ -287,9 +287,9 @@ public class WorkStationService {
 
         //拜访数没有会议的
         //Integer targetVisitCount = perDayTargetMeetingPersonCount + perDayTargetCallCount + perDayTargetWechatCount + perDayTargetImCount + perDayTargetEmailCount;
-        Integer targetVisitCount =  perDayTargetCallCount + perDayTargetWechatCount + perDayTargetImCount + perDayTargetEmailCount;
+        Integer targetVisitCount = perDayTargetCallCount + perDayTargetWechatCount + perDayTargetImCount + perDayTargetEmailCount;
         //Integer targetVisitSum = perDayTargetMeetingPersonSum + perDayTargetCallSum + perDayTargetWechatNum + perDayTargetImSum + perDayTargetEmailNum;
-        Integer targetVisitSum =  perDayTargetCallSum + perDayTargetWechatNum + perDayTargetImSum + perDayTargetEmailNum;
+        Integer targetVisitSum = perDayTargetCallSum + perDayTargetWechatNum + perDayTargetImSum + perDayTargetEmailNum;
         todayStatisticsResponseBean.setTargetVisitCount(targetVisitCount);
         todayStatisticsResponseBean.setTargetVisitSum(targetVisitSum);
         return todayStatisticsResponseBean;
@@ -298,10 +298,11 @@ public class WorkStationService {
 
     /**
      * 本月目标
+     *
      * @param bean
      * @return
      */
-    public MonthTargetStatisticResponseBean getMonthTargetStatistic(WorkStationRequestBean bean){
+    public MonthTargetStatisticResponseBean getMonthTargetStatistic(WorkStationRequestBean bean) {
 
         DrugUser drugUser = drugUserRepository.findFirstById(bean.getDrugUserId());
         String leaderPath = drugUser.getLeaderPath();
@@ -348,10 +349,11 @@ public class WorkStationService {
 
     /**
      * 客户总数统计
+     *
      * @param bean
      * @return
      */
-    public List<CustomerSumResponseBean> getTotalCustomerStatistic(WorkStationRequestBean bean){
+    public List<CustomerSumResponseBean> getTotalCustomerStatistic(WorkStationRequestBean bean) {
 
         DrugUser drugUser = drugUserRepository.findFirstById(bean.getDrugUserId());
         String leaderPath = drugUser.getLeaderPath();
@@ -367,10 +369,11 @@ public class WorkStationService {
 
     /**
      * 当月新增客户统计
+     *
      * @param bean
      * @return
      */
-    public List<CustomerSumResponseBean> getAddCustomerStatistic(WorkStationRequestBean bean){
+    public List<CustomerSumResponseBean> getAddCustomerStatistic(WorkStationRequestBean bean) {
 
         DrugUser drugUser = drugUserRepository.findFirstById(bean.getDrugUserId());
         String leaderPath = drugUser.getLeaderPath();
@@ -384,10 +387,11 @@ public class WorkStationService {
 
     /**
      * 当月覆盖客户总数统计
+     *
      * @param bean
      * @return
      */
-    public List<CustomerSumResponseBean> getCoverCustomerStatistic(WorkStationRequestBean bean){
+    public List<CustomerSumResponseBean> getCoverCustomerStatistic(WorkStationRequestBean bean) {
         DrugUser drugUser = drugUserRepository.findFirstById(bean.getDrugUserId());
         String leaderPath = drugUser.getLeaderPath();
         if (leaderPath == null) {
@@ -401,10 +405,11 @@ public class WorkStationService {
 
     /**
      * 连续一个月未跟进客户
+     *
      * @param bean
      * @return
      */
-    public PageResponseBean<OneMonthNoFollowCustomerResponseBean> getOneMonthNoFollowCustomers(WorkStationRequestBean bean){
+    public PageResponseBean<OneMonthNoFollowCustomerResponseBean> getOneMonthNoFollowCustomers(WorkStationRequestBean bean) {
         DrugUser drugUser = drugUserRepository.findFirstById(bean.getDrugUserId());
         String leaderPath = drugUser.getLeaderPath();
         if (leaderPath == null) {
@@ -416,10 +421,21 @@ public class WorkStationService {
         //bean.setPage(page  * pageSize);
         bean.setCurrentSize(page * pageSize);
 
+        DropTarget dropTarget = dropTargetRepository.findFirstByProductIdAndLevel(bean.getProductId(), bean.getLevel());
+        if (null != dropTarget) {
+
+            Integer dropPriod = dropTarget.getDropPriod();
+            if (dropPriod == null) {
+                dropPriod = 0;
+            }
+            bean.setLevelDropCount(dropPriod * 7);
+
+        }
+
         List<OneMonthNoFollowCustomerResponseBean> oneMonthNoFollowCustomerList = workStationMapper.getOneMonthNoFollowCustomerList(bean);
         //List<OneMonthNoFollowCustomerResponseBean> oneMonthNoFollowCustomerList = workStationMapper.getOneMonthNoFollowCustomerList(bean.getProductId(),bean.getLeaderPath(),bean.getPage(),bean.getPageSize());
         Integer count = workStationMapper.getOneMonthNoFollowCustomerListCount(bean);
-        if (count == null){
+        if (count == null) {
             count = 0;
         }
 
@@ -429,8 +445,7 @@ public class WorkStationService {
     }
 
 
-
-    public List<DrugUserInteractResponseBean> drugUserInteract(WorkStationRequestBean bean){
+    public List<DrugUserInteractResponseBean> drugUserInteract(WorkStationRequestBean bean) {
         DrugUser drugUser = drugUserRepository.findFirstById(bean.getDrugUserId());
         String leaderPath = drugUser.getLeaderPath();
         if (leaderPath == null) {
@@ -476,10 +491,11 @@ public class WorkStationService {
 
     /**
      * 坐席分析
+     *
      * @param bean
      * @return
      */
-    public DrugUserAnalysisListResponseBean getDrugUserAnalysisList(WorkStationRequestBean bean){
+    public DrugUserAnalysisListResponseBean getDrugUserAnalysisList(WorkStationRequestBean bean) {
         DrugUserAnalysisListResponseBean drugUserAnalysisList = new DrugUserAnalysisListResponseBean();
         DrugUser drugUser = drugUserRepository.findFirstById(bean.getDrugUserId());
         String leaderPath = drugUser.getLeaderPath();
@@ -489,21 +505,27 @@ public class WorkStationService {
         bean.setLeaderPath(leaderPath + "%");
 
         //最短的通话时长
-        Integer minCallTotalTime = workStationMapper.minCallTotalTime(bean);
-        if (minCallTotalTime == null){
-            minCallTotalTime = 0;
-        }
-        bean.setMinCallTotalTime(minCallTotalTime);
+//        Integer minCallTotalTime = workStationMapper.minCallTotalTime(bean);
+//        if (minCallTotalTime == null){
+//            minCallTotalTime = 0;
+//        }
+//        bean.setMinCallTotalTime(minCallTotalTime);
+
+        //总通话时长最短
         List<DrugUserAnalysisResponseBean> minCallTotalTimeList = workStationMapper.minCallTotalTimeList(bean);
+        List<DrugUserAnalysisResponseBean> subMinCallTotalTimeList = getSubMinList(minCallTotalTimeList);
 
 
         // 平均通话时长最短，按照次数
-        Integer minAvgCallTotalTime = workStationMapper.minAvgCallTotalTime(bean);
-        if (minAvgCallTotalTime == null){
-            minAvgCallTotalTime = 0;
-        }
-        bean.setMinAvgCallTotalTime(minAvgCallTotalTime);
+//        Integer minAvgCallTotalTime = workStationMapper.minAvgCallTotalTime(bean);
+//        if (minAvgCallTotalTime == null){
+//            minAvgCallTotalTime = 0;
+//        }
+//        bean.setMinAvgCallTotalTime(minAvgCallTotalTime);
+
+        //平均时长最短，按照次数
         List<DrugUserAnalysisResponseBean> minAvgCallTotalTimeList = workStationMapper.minAvgCallTotalTimeList(bean);
+        List<DrugUserAnalysisResponseBean> subMinAvgCallTotalTimeList = getSubMinList(minAvgCallTotalTimeList);
 
 
 //        Integer minCallCount = workStationMapper.minCallCount(bean);
@@ -514,14 +536,69 @@ public class WorkStationService {
 //        List<DrugUserAnalysisResponseBean> minCallCountList = workStationMapper.minCallCountList(bean);
 
         //电话覆盖数量最少的，人数
-        Integer minCallCoveredCount = workStationMapper.minCallCoveredCount(bean);
-        if (minCallCoveredCount == null){
-            minCallCoveredCount = 0;
-        }
-        bean.setMinCallCoveredCount(minCallCoveredCount);
+//        Integer minCallCoveredCount = workStationMapper.minCallCoveredCount(bean);
+//        if (minCallCoveredCount == null){
+//            minCallCoveredCount = 0;
+//        }
+//        bean.setMinCallCoveredCount(minCallCoveredCount);
+
+        //电话覆盖数量最少
         List<DrugUserAnalysisResponseBean> minCallCoveredCountList = workStationMapper.minCallCoveredCountList(bean);
+        List<DrugUserAnalysisResponseBean> subMinCallCoveredCountList = getSubMinList(minCallCoveredCountList);
 
 
+        //微信时长最少
+        List<DrugUserAnalysisResponseBean> minWechatTimeList = workStationMapper.minWechatTimeList(bean);
+        List<DrugUserAnalysisResponseBean> subMinWechatTimeList = getSubMinList(minWechatTimeList);
+
+        //短信时长最少
+        List<DrugUserAnalysisResponseBean> minImTimeList = workStationMapper.minImTimeList(bean);
+        List<DrugUserAnalysisResponseBean> subMinImTimeList = getSubMinList(minImTimeList);
+
+        //邮件时长最少
+        List<DrugUserAnalysisResponseBean> minEmailTimeList = workStationMapper.minEmailTimeList(bean);
+        List<DrugUserAnalysisResponseBean> subMinEmailTimeList = getSubMinList(minEmailTimeList);
+
+
+        //会议时长最短
+        List<DrugUserAnalysisResponseBean> minMeetingTimeList = workStationMapper.minMeetingTimeList(bean);
+        List<DrugUserAnalysisResponseBean> subMinMeetingTimeList = getSubMinList(minMeetingTimeList);
+
+
+        //脱落客户数
+        Map<String,Integer> map = new HashMap<>();
+        for (String doctorLevel : doctorLevels) {
+            bean.setLevel(doctorLevel);
+
+            DropTarget dropTarget = dropTargetRepository.findFirstByProductIdAndLevel(bean.getProductId(), doctorLevel);
+            if (null != dropTarget) {
+
+                Integer dropPriod = dropTarget.getDropPriod();
+                if (dropPriod == null) {
+                    dropPriod = 0;
+                }
+                bean.setLevelDropCount(dropPriod * 7);
+
+                List<DrugUserAnalysisResponseBean> dropLevelCustomerDrugUserList = workStationMapper.dropCustomerDrugUserList(bean);
+                if (null !=dropLevelCustomerDrugUserList && !dropLevelCustomerDrugUserList.isEmpty()){
+                    for (DrugUserAnalysisResponseBean drugUserAnalysis:dropLevelCustomerDrugUserList){
+                        String drugUserName = drugUserAnalysis.getDrugUserName();
+                        Integer num = drugUserAnalysis.getNum();
+                        Integer drugUserNum = map.get(drugUserName);
+                        if (drugUserNum == null){
+                            map.put(drugUserName,num);
+                        }else {
+                            map.put(drugUserName, num + map.get(drugUserName));
+                        }
+                    }
+                }
+           }
+
+
+
+
+
+        }
 
 
 //        Integer minImCount = workStationMapper.minImCount(bean);
@@ -650,10 +727,10 @@ public class WorkStationService {
 //        }
 
 
-        drugUserAnalysisList.setMinTotalCallTimeList(minCallTotalTimeList);
-        drugUserAnalysisList.setMinAvgCallTimeList(minAvgCallTotalTimeList);
+        drugUserAnalysisList.setMinTotalCallTimeList(subMinCallTotalTimeList);
+        drugUserAnalysisList.setMinAvgCallTimeList(subMinAvgCallTotalTimeList);
 //        drugUserAnalysisList.setMinTotalCallCountList(minCallCountList);
-        drugUserAnalysisList.setMinCallCoveredCountList(minCallCoveredCountList);
+        drugUserAnalysisList.setMinCallCoveredCountList(subMinCallCoveredCountList);
 //        drugUserAnalysisList.setMinTotalImCountList(minImCountList);
 //        drugUserAnalysisList.setMinImCoveredCountList(minImCoveredCountList);
 //        drugUserAnalysisList.setMinTotalWechatCountList(minWechatCountList);
@@ -661,6 +738,11 @@ public class WorkStationService {
 //        drugUserAnalysisList.setMinEmailCountList(minEmailCountList);
 //        drugUserAnalysisList.setMinWechatCoveredCountList(minEmailCoveredCountList);
 
+        drugUserAnalysisList.setMinWechatTimeList(subMinWechatTimeList);
+        drugUserAnalysisList.setMinImTimeList(subMinImTimeList);
+        drugUserAnalysisList.setMinEmailTimeList(subMinEmailTimeList);
+        drugUserAnalysisList.setMinMeetingTimeList(subMinMeetingTimeList);
+        drugUserAnalysisList.setDropCustomerList(map);
         return drugUserAnalysisList;
 
     }
@@ -668,10 +750,11 @@ public class WorkStationService {
 
     /**
      * 客户分析
+     *
      * @param bean
      * @return
      */
-    public DoctorAnalysisListResponseBean getDoctorAnalysisList(WorkStationRequestBean bean){
+    public DoctorAnalysisListResponseBean getDoctorAnalysisList(WorkStationRequestBean bean) {
         DoctorAnalysisListResponseBean doctorAnalysitList = new DoctorAnalysisListResponseBean();
 
         DrugUserAnalysisListResponseBean drugUserAnalysisList = new DrugUserAnalysisListResponseBean();
@@ -682,68 +765,106 @@ public class WorkStationService {
         }
         bean.setLeaderPath(leaderPath + "%");
 
-        Integer minCallTotalTime = workStationMapper.minDoctorCallTotalTime(bean);
-        bean.setMinCallTotalTime(minCallTotalTime);
+//        Integer minCallTotalTime = workStationMapper.minDoctorCallTotalTime(bean);
+//        bean.setMinCallTotalTime(minCallTotalTime);
+
+        //总通话时长最少
         List<DoctorAnalysisResponseBean> minCallTotalTimeList = workStationMapper.minDoctorCallTotalTimeList(bean);
+        List<DoctorAnalysisResponseBean> subMinCallTotalTimeList = getSubMinDoctorList(minCallTotalTimeList);
 
-        Integer minAvgCallTotalTime = workStationMapper.minDoctorAvgCallTotalTime(bean);
-        bean.setMinAvgCallTotalTime(minAvgCallTotalTime);
+
+//        Integer minAvgCallTotalTime = workStationMapper.minDoctorAvgCallTotalTime(bean);
+//        bean.setMinAvgCallTotalTime(minAvgCallTotalTime);
+
+        //平均通话时长最少，每次列表
         List<DoctorAnalysisResponseBean> minAvgCallTotalTimeList = workStationMapper.minDoctorAvgCallTotalTimeList(bean);
-
-        Integer minCallCount = workStationMapper.minDoctorCallCount(bean);
-        bean.setMinCallCount(minCallCount);
-        List<DoctorAnalysisResponseBean> minCallCountList = workStationMapper.minDoctorCallCountList(bean);
-
-        Integer minImCount = workStationMapper.minDoctorImCount(bean);
-        bean.setMinImCount(minImCount);
-        List<DoctorAnalysisResponseBean> minImCountList = workStationMapper.minDoctorImCountList(bean);
+        List<DoctorAnalysisResponseBean> subMinAvgCallTotalTimeList = getSubMinDoctorList(minAvgCallTotalTimeList);
 
 
-        Integer minWechatCount = workStationMapper.minDoctorWechatCount(bean);
-        bean.setMinWechatCount(minWechatCount);
-        List<DoctorAnalysisResponseBean> minWechatCountList = workStationMapper.minDoctorWechatCountList(bean);
+        //电话覆盖数量最少列表
+        List<DoctorAnalysisResponseBean> minDoctorCallCoveredCountList = workStationMapper.minDoctorCallCoveredCountList(bean);
+        List<DoctorAnalysisResponseBean> subMinDoctorCallCoveredCountList = getSubMinDoctorList(minDoctorCallCoveredCountList);
 
 
-        Integer minEmailCount = workStationMapper.minDoctorEmailCount(bean);
-        bean.setMinEmailCount(minEmailCount);
-        List<DoctorAnalysisResponseBean> minEmailCountList = workStationMapper.minDoctorEmailCountList(bean);
-
-        Integer minMeetingTime = workStationMapper.minDoctorMeetingTime(bean);
-        bean.setMinMeetingTime(minMeetingTime);
-        List<DoctorAnalysisResponseBean> minMeetingTimeList = workStationMapper.minDoctorMeetingTimeList(bean);
+        //微信阅读时长最少
+        List<DoctorAnalysisResponseBean> minDoctorWechatTimeList = workStationMapper.minDoctorWechatTimeList(bean);
+        List<DoctorAnalysisResponseBean> subMinDoctorWechatTimeList = getSubMinDoctorList(minDoctorWechatTimeList);
 
 
-        doctorAnalysitList.setMinTotalCallTimeList(minCallTotalTimeList);
-        doctorAnalysitList.setMinAvgCallTimeList(minAvgCallTotalTimeList);
-        doctorAnalysitList.setMinTotalCallCountList(minCallCountList);
-        doctorAnalysitList.setMinTotalImCountList(minImCountList);
-        doctorAnalysitList.setMinTotalWechatCountList(minWechatCountList);
-        doctorAnalysitList.setMinEmailCountList(minEmailCountList);
-        doctorAnalysitList.setMinMeetingTimeList(minMeetingTimeList);
+        //短信阅读时长最少
+        List<DoctorAnalysisResponseBean> minDoctorImTimeList = workStationMapper.minDoctorImTimeList(bean);
+        List<DoctorAnalysisResponseBean> subMinDoctorImTimeList = getSubMinDoctorList(minDoctorImTimeList);
 
+
+        //邮件阅读时长最少
+        List<DoctorAnalysisResponseBean> minDoctorEmailTimeList = workStationMapper.minDoctorEmailTimeList(bean);
+        List<DoctorAnalysisResponseBean> subMinDoctorEmailTimeList = getSubMinDoctorList(minDoctorEmailTimeList);
+
+        //会议时长最少
+        List<DoctorAnalysisResponseBean> minDoctorMeetingTimeList = workStationMapper.minDoctorMeetingTimeList(bean);
+        List<DoctorAnalysisResponseBean> subMinDoctorMeetingTimeList = getSubMinDoctorList(minDoctorMeetingTimeList);
+
+
+//        Integer minCallCount = workStationMapper.minDoctorCallCount(bean);
+//        bean.setMinCallCount(minCallCount);
+//        List<DoctorAnalysisResponseBean> minCallCountList = workStationMapper.minDoctorCallCountList(bean);
+//
+//        Integer minImCount = workStationMapper.minDoctorImCount(bean);
+//        bean.setMinImCount(minImCount);
+//        List<DoctorAnalysisResponseBean> minImCountList = workStationMapper.minDoctorImCountList(bean);
+//
+//
+//        Integer minWechatCount = workStationMapper.minDoctorWechatCount(bean);
+//        bean.setMinWechatCount(minWechatCount);
+//        List<DoctorAnalysisResponseBean> minWechatCountList = workStationMapper.minDoctorWechatCountList(bean);
+//
+//
+//        Integer minEmailCount = workStationMapper.minDoctorEmailCount(bean);
+//        bean.setMinEmailCount(minEmailCount);
+//        List<DoctorAnalysisResponseBean> minEmailCountList = workStationMapper.minDoctorEmailCountList(bean);
+//
+//        Integer minMeetingTime = workStationMapper.minDoctorMeetingTime(bean);
+//        bean.setMinMeetingTime(minMeetingTime);
+//        List<DoctorAnalysisResponseBean> minMeetingTimeList = workStationMapper.minDoctorMeetingTimeList(bean);
+
+
+//        doctorAnalysitList.setMinTotalCallTimeList(minCallTotalTimeList);
+//        doctorAnalysitList.setMinAvgCallTimeList(minAvgCallTotalTimeList);
+//        doctorAnalysitList.setMinTotalCallCountList(minCallCountList);
+//        doctorAnalysitList.setMinTotalImCountList(minImCountList);
+//        doctorAnalysitList.setMinTotalWechatCountList(minWechatCountList);
+//        doctorAnalysitList.setMinEmailCountList(minEmailCountList);
+//        doctorAnalysitList.setMinMeetingTimeList(minMeetingTimeList);
+
+        doctorAnalysitList.setMinTotalCallTimeList(subMinCallTotalTimeList);
+        doctorAnalysitList.setMinAvgCallTimeList(subMinAvgCallTotalTimeList);
+        doctorAnalysitList.setMinCallCoveredCountList(subMinDoctorCallCoveredCountList);
+        doctorAnalysitList.setMinWechatTimeList(subMinDoctorWechatTimeList);
+        doctorAnalysitList.setMinImTimeList(subMinDoctorImTimeList);
+        doctorAnalysitList.setMinEmailTimeList(subMinDoctorEmailTimeList);
+        doctorAnalysitList.setMinMeetingTimeList(subMinDoctorMeetingTimeList);
         return doctorAnalysitList;
     }
 
 
-
-    private DropCustomerListResponseBean getDropCustomerListResponseBean(WorkStationRequestBean bean){
+    private DropCustomerListResponseBean getDropCustomerListResponseBean(WorkStationRequestBean bean) {
         DropCustomerListResponseBean dropCustomerListResponseBean = new DropCustomerListResponseBean();
         Long productId = bean.getProductId();
         String level = bean.getLevel();
-        DropTarget dropTarget = dropTargetRepository.findFirstByProductIdAndLevel(productId,level);
-        if (null != dropTarget){
+        DropTarget dropTarget = dropTargetRepository.findFirstByProductIdAndLevel(productId, level);
+        if (null != dropTarget) {
             bean.setLevel(level);
             Integer dropPriod = dropTarget.getDropPriod();
-            if (dropPriod == null){
-                dropPriod=0;
+            if (dropPriod == null) {
+                dropPriod = 0;
             }
             bean.setLevelDropCount(dropPriod * 7);
             Integer dropCount = workStationMapper.getDropCount(bean);
-            if (dropCount == null){
+            if (dropCount == null) {
                 dropCount = 0;
             }
             Integer maxDropCount = workStationMapper.maxDropCount(bean);
-            if (maxDropCount == null){
+            if (maxDropCount == null) {
                 maxDropCount = 0;
             }
             bean.setMaxLevelDropCount(maxDropCount);
@@ -758,12 +879,12 @@ public class WorkStationService {
     }
 
 
-
     /**
      * 得到本月目标
+     *
      * @return
      */
-    private MonthTargetResponseBean getMonthTarget(Long productId){
+    private MonthTargetResponseBean getMonthTarget(Long productId) {
         MonthTargetResponseBean monthTarget = new MonthTargetResponseBean();
         Integer monthTargetWechatNum = 0;
         Integer monthTargetWechatCount = 0;
@@ -779,96 +900,96 @@ public class WorkStationService {
         Integer monthTargetMeetingPersonSum = 0;
         Integer monthTargetMeetingPersonCount = 0;
         List<Target> targets = targetRepository.findByProductIdOrderByLevel(productId);
-        if (targets != null && !targets.isEmpty()){
-            for (Target target:targets){
-                if (target != null){
+        if (targets != null && !targets.isEmpty()) {
+            for (Target target : targets) {
+                if (target != null) {
 
                     Integer monthWechatNum = target.getMonthWechatNum();
-                    if (monthWechatNum == null){
+                    if (monthWechatNum == null) {
                         monthWechatNum = 0;
                     }
                     monthTargetWechatNum += monthWechatNum;
 
 
                     Integer monthWechatCount = target.getMonthWechatCount();
-                    if (monthWechatCount == null){
+                    if (monthWechatCount == null) {
                         monthWechatCount = 0;
                     }
                     monthTargetWechatCount += monthWechatCount;
 
 
                     Integer monthImNum = target.getMonthImNum();
-                    if (monthImNum == null){
+                    if (monthImNum == null) {
                         monthImNum = 0;
                     }
                     monthTargetImSum += monthImNum;
 
 
                     Integer monthImCount = target.getMonthImCount();
-                    if (monthImCount == null){
+                    if (monthImCount == null) {
                         monthImCount = 0;
                     }
                     monthTargetImCount += monthImCount;
 
 
                     Integer monthEmailNum = target.getMonthEmailNum();
-                    if (monthEmailNum == null){
+                    if (monthEmailNum == null) {
                         monthEmailNum = 0;
                     }
                     monthTargetEmailNum += monthEmailNum;
 
 
                     Integer monthEmailCount = target.getMonthEmailCount();
-                    if (monthEmailCount == null){
+                    if (monthEmailCount == null) {
                         monthEmailCount = 0;
                     }
                     monthTargetEmailCount += monthEmailCount;
 
 
                     Integer monthTelPerson = target.getMonthTelPerson();
-                    if (monthTelPerson == null){
+                    if (monthTelPerson == null) {
                         monthTelPerson = 0;
                     }
                     monthTargetCallSum += monthTelPerson;
 
 
                     Integer monthTelNum = target.getMonthTelNum();
-                    if (monthTelNum == null){
+                    if (monthTelNum == null) {
                         monthTelNum = 0;
                     }
                     monthTargetCallCount += monthTelNum;
 
 
                     Integer monthTelTime = target.getMonthTelTime();
-                    if (monthTelTime == null){
+                    if (monthTelTime == null) {
                         monthTelTime = 0;
                     }
                     monthTargetCallTime += monthTelTime;
 
 
                     Integer monthMeetingNum = target.getMonthMeetingNum();
-                    if (monthMeetingNum == null){
+                    if (monthMeetingNum == null) {
                         monthMeetingNum = 0;
                     }
                     monthTargetMeetingSum += monthMeetingNum;
 
 
                     Integer monthMeetingTime = target.getMonthMeetingTime();
-                    if (monthMeetingTime == null){
+                    if (monthMeetingTime == null) {
                         monthMeetingTime = 0;
                     }
                     monthTargetMeetingTime += monthMeetingTime;
 
 
                     Integer monthMeetingPersonSum = target.getMonthMeetingPersonSum();
-                    if (monthMeetingPersonSum == null){
+                    if (monthMeetingPersonSum == null) {
                         monthMeetingPersonSum = 0;
                     }
                     monthTargetMeetingPersonSum += monthMeetingPersonSum;
 
 
                     Integer monthMeetingPersonCount = target.getMonthMeetingPersonCount();
-                    if (monthMeetingPersonCount == null){
+                    if (monthMeetingPersonCount == null) {
                         monthMeetingPersonCount = 0;
                     }
                     monthTargetMeetingPersonCount += monthMeetingPersonCount;
@@ -895,9 +1016,10 @@ public class WorkStationService {
 
     /**
      * 每天目标
+     *
      * @return
      */
-    private DayTargetResponseBean getPerDayTarget(Long productId){
+    private DayTargetResponseBean getPerDayTarget(Long productId) {
         DayTargetResponseBean dayTarget = new DayTargetResponseBean();
 
 
@@ -917,7 +1039,7 @@ public class WorkStationService {
 
         //当前月的天数
         Integer month = DateUtil.getCurrentMonthLastDay();
-        if (month == null || month == 0){
+        if (month == null || month == 0) {
             month = 1;
         }
 
@@ -938,21 +1060,19 @@ public class WorkStationService {
         Integer monthTargetMeetingPersonSum = monthTarget.getMonthTargetMeetingPersonSum();
         Integer monthTargetMeetingPersonCount = monthTarget.getMonthTargetMeetingPersonCount();
 
-        perDayTargetWechatNum = Math.round(monthTargetWechatNum/month);
-        perDayTargetWechatCount = Math.round(monthTargetWechatCount/month);
-        perDayTargetImSum = Math.round(monthTargetImSum/month);
-        perDayTargetImCount = Math.round(monthTargetImCount/month);
-        perDayTargetEmailNum = Math.round(monthTargetEmailNum/month);
-        perDayTargetEmailCount = Math.round(monthTargetEmailCount/month);
-        perDayTargetCallSum = Math.round(monthTargetCallSum/month);
-        perDayTargetCallCount = Math.round(monthTargetCallCount/month);
-        perDayTargetCallTime = Math.round(monthTargetCallTime/month);
-        perDayTargetMeetingSum = Math.round(monthTargetMeetingSum/month);
-        perDayTargetMeetingTime = Math.round(monthTargetMeetingTime/month);
-        perDayTargetMeetingPersonSum = Math.round(monthTargetMeetingPersonSum/month);
-        perDayTargetMeetingPersonCount = Math.round(monthTargetMeetingPersonCount/month);
-
-
+        perDayTargetWechatNum = Math.round(monthTargetWechatNum / month);
+        perDayTargetWechatCount = Math.round(monthTargetWechatCount / month);
+        perDayTargetImSum = Math.round(monthTargetImSum / month);
+        perDayTargetImCount = Math.round(monthTargetImCount / month);
+        perDayTargetEmailNum = Math.round(monthTargetEmailNum / month);
+        perDayTargetEmailCount = Math.round(monthTargetEmailCount / month);
+        perDayTargetCallSum = Math.round(monthTargetCallSum / month);
+        perDayTargetCallCount = Math.round(monthTargetCallCount / month);
+        perDayTargetCallTime = Math.round(monthTargetCallTime / month);
+        perDayTargetMeetingSum = Math.round(monthTargetMeetingSum / month);
+        perDayTargetMeetingTime = Math.round(monthTargetMeetingTime / month);
+        perDayTargetMeetingPersonSum = Math.round(monthTargetMeetingPersonSum / month);
+        perDayTargetMeetingPersonCount = Math.round(monthTargetMeetingPersonCount / month);
 
 
         dayTarget.setDayTargetWechatNum(perDayTargetWechatNum);
@@ -976,10 +1096,11 @@ public class WorkStationService {
 
     /**
      * 每周目标
-      * @param productId
+     *
+     * @param productId
      * @return
      */
-    private WeekTargetResponseBean getPerWeekTarget(Long productId){
+    private WeekTargetResponseBean getPerWeekTarget(Long productId) {
         WeekTargetResponseBean weekTarget = new WeekTargetResponseBean();
 
 
@@ -1016,20 +1137,19 @@ public class WorkStationService {
         Integer monthTargetMeetingPersonCount = monthTarget.getMonthTargetMeetingPersonCount();
 
 
-        perWeekTargetWechatNum = Math.round(monthTargetWechatNum/week);
-        perWeekTargetWechatCount = Math.round(monthTargetWechatCount/week);
-        perWeekTargetImSum = Math.round(monthTargetImSum/week);
-        perWeekTargetImCount = Math.round(monthTargetImCount/week);
-        perWeekTargetEmailNum = Math.round(monthTargetEmailNum/week);
-        perWeekTargetEmailCount = Math.round(monthTargetEmailCount/week);
-        perWeekTargetCallSum = Math.round(monthTargetCallSum/week);
-        perWeekTargetCallCount = Math.round(monthTargetCallCount/week);
-        perWeekTargetCallTime = Math.round(monthTargetCallTime/week);
-        perWeekTargetMeetingSum = Math.round(monthTargetMeetingSum/week);
-        perWeekTargetMeetingTime = Math.round(monthTargetMeetingTime/week);
-        perWeekTargetMeetingPersonSum = Math.round(monthTargetMeetingPersonSum/week);
-        perWeekTargetMeetingPersonCount = Math.round(monthTargetMeetingPersonCount/week);
-
+        perWeekTargetWechatNum = Math.round(monthTargetWechatNum / week);
+        perWeekTargetWechatCount = Math.round(monthTargetWechatCount / week);
+        perWeekTargetImSum = Math.round(monthTargetImSum / week);
+        perWeekTargetImCount = Math.round(monthTargetImCount / week);
+        perWeekTargetEmailNum = Math.round(monthTargetEmailNum / week);
+        perWeekTargetEmailCount = Math.round(monthTargetEmailCount / week);
+        perWeekTargetCallSum = Math.round(monthTargetCallSum / week);
+        perWeekTargetCallCount = Math.round(monthTargetCallCount / week);
+        perWeekTargetCallTime = Math.round(monthTargetCallTime / week);
+        perWeekTargetMeetingSum = Math.round(monthTargetMeetingSum / week);
+        perWeekTargetMeetingTime = Math.round(monthTargetMeetingTime / week);
+        perWeekTargetMeetingPersonSum = Math.round(monthTargetMeetingPersonSum / week);
+        perWeekTargetMeetingPersonCount = Math.round(monthTargetMeetingPersonCount / week);
 
 
         weekTarget.setWeekTargetWechatNum(perWeekTargetWechatNum);
@@ -1051,10 +1171,11 @@ public class WorkStationService {
 
     /**
      * 每个季度的目标
+     *
      * @param productId
      * @return
      */
-    private QuarterTargetResponseBean getPerQuarterTarget(Long productId){
+    private QuarterTargetResponseBean getPerQuarterTarget(Long productId) {
         QuarterTargetResponseBean quarterTarget = new QuarterTargetResponseBean();
 
 
@@ -1076,7 +1197,6 @@ public class WorkStationService {
         Integer month = 3;
 
 
-
         MonthTargetResponseBean monthTarget = getMonthTarget(productId);
         Integer monthTargetWechatNum = monthTarget.getMonthTargetWechatNum();
         Integer monthTargetWechatCount = monthTarget.getMonthTargetWechatCount();
@@ -1093,19 +1213,19 @@ public class WorkStationService {
         Integer monthTargetMeetingPersonCount = monthTarget.getMonthTargetMeetingPersonCount();
 
 
-        perQuarterTargetWechatNum = Math.round(monthTargetWechatNum*month);
-        perQuarterTargetWechatCount = Math.round(monthTargetWechatCount*month);
-        perQuarterTargetImSum = Math.round(monthTargetImSum*month);
-        perQuarterTargetImCount = Math.round(monthTargetImCount*month);
-        perQuarterTargetEmailNum = Math.round(monthTargetEmailNum*month);
-        perQuarterTargetEmailCount = Math.round(monthTargetEmailCount*month);
-        perQuarterTargetCallSum = Math.round(monthTargetCallSum*month);
-        perQuarterTargetCallCount = Math.round(monthTargetCallCount*month);
-        perQuarterTargetCallTime = Math.round(monthTargetCallTime*month);
-        perQuarterTargetMeetingSum = Math.round(monthTargetMeetingSum*month);
-        perQuarterTargetMeetingTime = Math.round(monthTargetMeetingTime*month);
-        perQuarterTargetMeetingPersonSum = Math.round(monthTargetMeetingPersonSum*month);
-        perQuarterTargetMeetingPersonCount = Math.round(monthTargetMeetingPersonCount*month);
+        perQuarterTargetWechatNum = Math.round(monthTargetWechatNum * month);
+        perQuarterTargetWechatCount = Math.round(monthTargetWechatCount * month);
+        perQuarterTargetImSum = Math.round(monthTargetImSum * month);
+        perQuarterTargetImCount = Math.round(monthTargetImCount * month);
+        perQuarterTargetEmailNum = Math.round(monthTargetEmailNum * month);
+        perQuarterTargetEmailCount = Math.round(monthTargetEmailCount * month);
+        perQuarterTargetCallSum = Math.round(monthTargetCallSum * month);
+        perQuarterTargetCallCount = Math.round(monthTargetCallCount * month);
+        perQuarterTargetCallTime = Math.round(monthTargetCallTime * month);
+        perQuarterTargetMeetingSum = Math.round(monthTargetMeetingSum * month);
+        perQuarterTargetMeetingTime = Math.round(monthTargetMeetingTime * month);
+        perQuarterTargetMeetingPersonSum = Math.round(monthTargetMeetingPersonSum * month);
+        perQuarterTargetMeetingPersonCount = Math.round(monthTargetMeetingPersonCount * month);
 
         quarterTarget.setQuarterTargetWechatNum(perQuarterTargetWechatNum);
         quarterTarget.setQuarterTargetWechatCount(perQuarterTargetWechatCount);
@@ -1123,6 +1243,96 @@ public class WorkStationService {
 
 
         return quarterTarget;
+    }
+
+
+    /**
+     * 截取出数量最少的销售list
+     *
+     * @param list 按照数量从小到大排序的
+     * @return
+     */
+    private List<DrugUserAnalysisResponseBean> getSubMinList(List<DrugUserAnalysisResponseBean> list) {
+
+        if (null == list || list.isEmpty()) {
+            return null;
+        }
+
+        int size = list.size();
+        if (size == 1) {
+            if (list.get(0).getNum() == null) {
+                list.get(0).setNum(0);
+            }
+            return list;
+        }
+
+
+        Integer num = list.get(0).getNum();
+        if (num == null) {
+            num = 0;
+        }
+
+        List<DrugUserAnalysisResponseBean> subList = new ArrayList<>();
+        for (DrugUserAnalysisResponseBean drugUserAnalysis : list) {
+            Integer analysisNum = drugUserAnalysis.getNum();
+            if (analysisNum == null) {
+                analysisNum = 0;
+            }
+            if (num != analysisNum) {
+                break;
+            }
+
+            subList.add(drugUserAnalysis);
+
+        }
+
+        return subList;
+
+    }
+
+
+    /**
+     * 截取出数量最少的销售list
+     *
+     * @param list 按照数量从小到大排序的
+     * @return
+     */
+    private List<DoctorAnalysisResponseBean> getSubMinDoctorList(List<DoctorAnalysisResponseBean> list) {
+
+        if (null == list || list.isEmpty()) {
+            return null;
+        }
+
+        int size = list.size();
+        if (size == 1) {
+            if (list.get(0).getNum() == null) {
+                list.get(0).setNum(0);
+            }
+            return list;
+        }
+
+
+        Integer num = list.get(0).getNum();
+        if (num == null) {
+            num = 0;
+        }
+
+        List<DoctorAnalysisResponseBean> subList = new ArrayList<>();
+        for (DoctorAnalysisResponseBean doctorAnalysis : list) {
+            Integer analysisNum = doctorAnalysis.getNum();
+            if (analysisNum == null) {
+                analysisNum = 0;
+            }
+            if (num != analysisNum) {
+                break;
+            }
+
+            subList.add(doctorAnalysis);
+
+        }
+
+        return subList;
+
     }
 
 

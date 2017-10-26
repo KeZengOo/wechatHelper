@@ -13,10 +13,10 @@ public class DoctorAnalysisResponseBean implements Serializable{
     private static final long serialVersionUID = -3728987692000460089L;
 
     @ApiModelProperty(value = "客户名称")
-    private String doctorName;
+    private String doctorName="";
 
     @ApiModelProperty(value = "返回的最大最小值")
-    private Integer num;
+    private Integer num=0;
 
 
     public String getDoctorName() {

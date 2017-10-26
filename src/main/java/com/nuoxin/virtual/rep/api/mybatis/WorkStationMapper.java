@@ -29,7 +29,7 @@ public interface WorkStationMapper {
      * 坐席分析
      */
     //总通话时间最短
-    Integer minCallTotalTime(WorkStationRequestBean bean);
+    //Integer minCallTotalTime(WorkStationRequestBean bean);
     List<DrugUserAnalysisResponseBean> minCallTotalTimeList(WorkStationRequestBean bean);
 
     //平均通话时间最短,按照次数
@@ -110,6 +110,10 @@ public interface WorkStationMapper {
     Integer minDoctorCallCount(WorkStationRequestBean bean);
     List<DoctorAnalysisResponseBean> minDoctorCallCountList(WorkStationRequestBean bean);
 
+    //电话覆盖数量最少
+    Integer minDoctorCallCoveredCount(WorkStationRequestBean bean);
+    List<DoctorAnalysisResponseBean> minDoctorCallCoveredCountList(WorkStationRequestBean bean);
+
 
     //总短信数量最少
     Integer minDoctorImCount(WorkStationRequestBean bean);
@@ -125,27 +129,59 @@ public interface WorkStationMapper {
     List<DoctorAnalysisResponseBean> minDoctorEmailCountList(WorkStationRequestBean bean);
 
     //会议时间最少
-    Integer minDoctorMeetingTime(WorkStationRequestBean bean);
+//    Integer minDoctorMeetingTime(WorkStationRequestBean bean);
+//    List<DoctorAnalysisResponseBean> minDoctorMeetingTimeList(WorkStationRequestBean bean);
+
+
+
+
+
+//    //短信、微信、邮件的阅读时长,单位为秒
+//    AnalysisResponseBean getMessageTime(WorkStationRequestBean bean);
+//
+//
+//    //电话时长,单位为秒
+//    Integer getCallTime(WorkStationRequestBean bean);
+//
+//
+//    //会议时长,单位为分钟
+//    Integer getMeeingTime(WorkStationRequestBean bean);
+//
+//
+//    //最短的微信，短信，邮件阅读时长
+//    Map<String,Integer> getMinMessageTime(WorkStationRequestBean bean);
+
+    //微信阅读时长最少列表
+    List<DrugUserAnalysisResponseBean> minWechatTimeList(WorkStationRequestBean bean);
+
+    //短信阅读时长最少列表
+    List<DrugUserAnalysisResponseBean> minImTimeList(WorkStationRequestBean bean);
+
+    //邮件阅读时长最少列表
+    List<DrugUserAnalysisResponseBean> minEmailTimeList(WorkStationRequestBean bean);
+
+
+    //会议时长最少列表
+    List<DrugUserAnalysisResponseBean> minMeetingTimeList(WorkStationRequestBean bean);
+
+    //脱落客户的销售列表
+    List<DrugUserAnalysisResponseBean> dropCustomerDrugUserList(WorkStationRequestBean bean);
+
+
+    //微信阅读时长最少列表
+    List<DoctorAnalysisResponseBean> minDoctorWechatTimeList(WorkStationRequestBean bean);
+
+    //短信阅读时长最少列表
+    List<DoctorAnalysisResponseBean> minDoctorImTimeList(WorkStationRequestBean bean);
+
+    //邮件阅读时长最少列表
+    List<DoctorAnalysisResponseBean> minDoctorEmailTimeList(WorkStationRequestBean bean);
+
+
+    //会议时长最少列表
     List<DoctorAnalysisResponseBean> minDoctorMeetingTimeList(WorkStationRequestBean bean);
 
 
-
-
-
-    //短信、微信、邮件的阅读时长,单位为秒
-    AnalysisResponseBean getMessageTime(WorkStationRequestBean bean);
-
-
-    //电话时长,单位为秒
-    Integer getCallTime(WorkStationRequestBean bean);
-
-
-    //会议时长,单位为分钟
-    Integer getMeeingTime(WorkStationRequestBean bean);
-
-
-    //最短的微信，短信，邮件阅读时长
-    Map<String,Integer> getMinMessageTime(WorkStationRequestBean bean);
 
 
 }

@@ -31,6 +31,17 @@ public class HcpController extends BaseController {
     private HcpService hcpService;
 
 
+    @ApiOperation(value = "主数据医生基本信息,主数据展示使用")
+    @GetMapping("/getMasterDataHcpBaseInfo/{id}")
+    public ResponseEntity<DefaultResponseBean<HcpBaseInfoResponseBean>> getMasterDataHcpBaseInfo(@PathVariable(value = "id") Long hcpId) {
+
+        HcpBaseInfoResponseBean hcpBaseInfo = hcpService.getMasterDataHcpBaseInfo(hcpId);
+        DefaultResponseBean<HcpBaseInfoResponseBean> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(hcpBaseInfo);
+        return ResponseEntity.ok(responseBean);
+    }
+
+
     @ApiOperation(value = "主数据医生基本信息")
     @GetMapping("/getHcpBaseInfo/{id}")
     public ResponseEntity<DefaultResponseBean<List<DoctorBasicInfoResponseBean>>> getHcpBaseInfo(@PathVariable(value = "id") Long hcpId) {

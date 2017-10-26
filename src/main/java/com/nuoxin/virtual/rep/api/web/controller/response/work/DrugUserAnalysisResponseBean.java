@@ -16,7 +16,7 @@ public class DrugUserAnalysisResponseBean implements Serializable{
     private String drugUserName="";
 
     @ApiModelProperty(value = "返回的最大最小值")
-    private String num="";
+    private Integer num = 0;
 
 
     public String getDrugUserName() {
@@ -27,11 +27,12 @@ public class DrugUserAnalysisResponseBean implements Serializable{
         this.drugUserName = drugUserName;
     }
 
-    public String getNum() {
+
+    public Integer getNum() {
         return num;
     }
 
-    public void setNum(String num) {
+    public void setNum(Integer num) {
         this.num = num;
     }
 }

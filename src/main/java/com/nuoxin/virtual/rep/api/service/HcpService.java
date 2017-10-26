@@ -89,96 +89,96 @@ public class HcpService extends BaseService {
     }
 
 
-//    /**
-//     * 医生的基本信息
-//     * @param id
-//     * @return
-//     */
-//    @Cacheable(value = "virtual_rep_api_hcp_service", key="'getHcpBaseInfo'+#id" )
-//    public HcpBaseInfoResponseBean getHcpBaseInfo(Long id){
-//        HcpBaseInfoResponseBean hcpBaseInfoResponseBean = new HcpBaseInfoResponseBean();
-//        Long hcpId = getMasterDataIdByHcpId(id);
-//
-//
-//        //第一个圈内容基本信息
-////        long hciId = 0;
-////        Hcp hcp = masterDataService.getHcpById(hcpId);
-////        if (null != hcp){
-////            hciId = hcp.getHciId();
-////            hcpBaseInfoResponseBean.setDoctorName(hcp.getName());
-////        }
-////
-////        Hci hci = masterDataService.getHciById(hciId);
-////        if (null != hci){
-////            String hospitalName = hci.getName();
-////            int hospitalLevel = hci.getMedicalGrade();
-////            hcpBaseInfoResponseBean.setHospitalName(hospitalName);
-////            String name = HospitalLevelEnum.getName(hospitalLevel);
-////            hcpBaseInfoResponseBean.setHospitalLevel(name);
-////        }
-//
-//
-//        Doctor doctor = doctorRepository.findFirstById(id);
-//        if (null != doctor){
-//            hcpBaseInfoResponseBean.setDoctorName(doctor.getName());
-//            hcpBaseInfoResponseBean.setHospitalName(doctor.getHospitalName());
-//            //hcpBaseInfoResponseBean.setHospitalLevel(doctor.getHospitalLevel());
-//        }
-//
-//
-//        //第二个圈
-//        Map<String, String> map = masterDataService.getMapHcpInfo(hcpId);
-//        if (null != map && map.size() > 0){
-//            //好大夫在线门诊量趋势图
-//            String inlineInquiryMapJsonStr = map.get("inline_inquiry_map");
-//
-//            //得到趋势图及好大夫的门诊总量
-//            //访问总量
-//            int inquirySum =0 ;
-//            Map<String, Object> inlineInquiryMap = getInlineInquiryMap(inlineInquiryMapJsonStr);
-//            if (inlineInquiryMap != null && inlineInquiryMap.size() > 0){
-//
-//                Object inlineInquirySumObj = inlineInquiryMap.get("inlineInquirySum");
-//                if (inlineInquirySumObj != null){
-//                    //好大夫门诊总量
-//                    int inlineInquirySum = Integer.parseInt(inlineInquirySumObj.toString());
-//                    inquirySum += inlineInquirySum;
-//                }
-//            }
-//
-//            //挂号网门诊量
-//            String guahao_inline_inquiry_numStr = map.get("guahao_inline_inquiry_num");
-//            if(null != guahao_inline_inquiry_numStr && !"".equals(guahao_inline_inquiry_numStr.trim()) && !"0".equals(guahao_inline_inquiry_numStr)) {
-//                int guahao_inline_inquiry_num = Integer.parseInt(guahao_inline_inquiry_numStr);
-//                inquirySum += guahao_inline_inquiry_num;
-//            }
-//            hcpBaseInfoResponseBean.setOutpatientVolume(inquirySum);
-//
-//            //预约量
-//            String reservationsCount = map.get("reservationsCount");
-//            if (null != reservationsCount && !"".equals(reservationsCount) && !"0".equals(reservationsCount)){
-//                hcpBaseInfoResponseBean.setOrderNum(Integer.parseInt(reservationsCount));
-//            }
-//
-//            //综合评分
-//            String recommendIndex = map.get("recommendIndex");
-//            if (null != recommendIndex && !"".equals(recommendIndex) && !"0".equals(recommendIndex)){
-//                hcpBaseInfoResponseBean.setComprehensiveScore(recommendIndex);
-//            }
-//        }
-//
-//
-//        //第三个圈，论文关键词
-//        List<DocKeywordResponseBean> docKeywordList = getDocKeywordList(hcpId);
-//        hcpBaseInfoResponseBean.setKeywordList(docKeywordList);
-//
-//        return hcpBaseInfoResponseBean;
-//
-//    }
+    /**
+     * 医生的基本信息,主数据医生显示的时候使用
+     * @param id
+     * @return
+     */
+    @Cacheable(value = "virtual_rep_api_master_data_hcp_service", key="'getHcpBaseInfo'+#id" )
+    public HcpBaseInfoResponseBean getMasterDataHcpBaseInfo(Long id){
+        HcpBaseInfoResponseBean hcpBaseInfoResponseBean = new HcpBaseInfoResponseBean();
+        Long hcpId = getMasterDataIdByHcpId(id);
+
+
+        //第一个圈内容基本信息
+        long hciId = 0;
+        Hcp hcp = masterDataService.getHcpById(hcpId);
+        if (null != hcp){
+            hciId = hcp.getHciId();
+            hcpBaseInfoResponseBean.setDoctorName(hcp.getName());
+        }
+
+        Hci hci = masterDataService.getHciById(hciId);
+        if (null != hci){
+            String hospitalName = hci.getName();
+            int hospitalLevel = hci.getMedicalGrade();
+            hcpBaseInfoResponseBean.setHospitalName(hospitalName);
+            String name = HospitalLevelEnum.getName(hospitalLevel);
+            hcpBaseInfoResponseBean.setHospitalLevel(name);
+        }
+
+
+        Doctor doctor = doctorRepository.findFirstById(id);
+        if (null != doctor){
+            hcpBaseInfoResponseBean.setDoctorName(doctor.getName());
+            hcpBaseInfoResponseBean.setHospitalName(doctor.getHospitalName());
+            //hcpBaseInfoResponseBean.setHospitalLevel(doctor.getHospitalLevel());
+        }
+
+
+        //第二个圈
+        Map<String, String> map = masterDataService.getMapHcpInfo(hcpId);
+        if (null != map && map.size() > 0){
+            //好大夫在线门诊量趋势图
+            String inlineInquiryMapJsonStr = map.get("inline_inquiry_map");
+
+            //得到趋势图及好大夫的门诊总量
+            //访问总量
+            int inquirySum =0 ;
+            Map<String, Object> inlineInquiryMap = getInlineInquiryMap(inlineInquiryMapJsonStr);
+            if (inlineInquiryMap != null && inlineInquiryMap.size() > 0){
+
+                Object inlineInquirySumObj = inlineInquiryMap.get("inlineInquirySum");
+                if (inlineInquirySumObj != null){
+                    //好大夫门诊总量
+                    int inlineInquirySum = Integer.parseInt(inlineInquirySumObj.toString());
+                    inquirySum += inlineInquirySum;
+                }
+            }
+
+            //挂号网门诊量
+            String guahao_inline_inquiry_numStr = map.get("guahao_inline_inquiry_num");
+            if(null != guahao_inline_inquiry_numStr && !"".equals(guahao_inline_inquiry_numStr.trim()) && !"0".equals(guahao_inline_inquiry_numStr)) {
+                int guahao_inline_inquiry_num = Integer.parseInt(guahao_inline_inquiry_numStr);
+                inquirySum += guahao_inline_inquiry_num;
+            }
+            hcpBaseInfoResponseBean.setOutpatientVolume(inquirySum);
+
+            //预约量
+            String reservationsCount = map.get("reservationsCount");
+            if (null != reservationsCount && !"".equals(reservationsCount) && !"0".equals(reservationsCount)){
+                hcpBaseInfoResponseBean.setOrderNum(Integer.parseInt(reservationsCount));
+            }
+
+            //综合评分
+            String recommendIndex = map.get("recommendIndex");
+            if (null != recommendIndex && !"".equals(recommendIndex) && !"0".equals(recommendIndex)){
+                hcpBaseInfoResponseBean.setComprehensiveScore(recommendIndex);
+            }
+        }
+
+
+        //第三个圈，论文关键词
+        List<DocKeywordResponseBean> docKeywordList = getDocKeywordList(hcpId);
+        hcpBaseInfoResponseBean.setKeywordList(docKeywordList);
+
+        return hcpBaseInfoResponseBean;
+
+    }
 
 
     /**
-     * 医生基本信息，重构
+     * 医生基本信息，重构，展示动态字段的时候使用
      * @param id
      * @return
      */
