@@ -137,6 +137,7 @@
                 on dud.drug_user_id=du.id
                 where dud.prod_id=#{productId}
                 and du.leader_path like #{leaderPath}
+                and dv.dv.client_level=#{level}
         ) b
         inner join
         (
@@ -160,7 +161,7 @@
         ) t where to_days(now())-to_days(date_format(t.create_time,'%Y-%m-%d')) >= 30
         ) b2
          on b.doctorId=b2.doctor_id
-         group by b.level
+         <!-- group by b.level -->
          order by b2.diff_days desc
          limit #{currentSize},#{pageSize}
 
@@ -189,6 +190,7 @@
                         on dud.drug_user_id=du.id
                         where dud.prod_id=#{productId}
                         and du.leader_path like #{leaderPath}
+                         and dv.dv.client_level=#{level}
                 ) b
                 inner join
                 (
@@ -212,7 +214,7 @@
                 ) t where to_days(now())-to_days(date_format(t.create_time,'%Y-%m-%d')) >= 30
                 ) b2
                  on b.doctorId=b2.doctor_id
-                 group by b.level
+                <!-- group by b.level -->
         ) t
 
 
