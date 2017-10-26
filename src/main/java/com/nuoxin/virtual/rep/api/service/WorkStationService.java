@@ -421,6 +421,17 @@ public class WorkStationService {
         //bean.setPage(page  * pageSize);
         bean.setCurrentSize(page * pageSize);
 
+        DropTarget dropTarget = dropTargetRepository.findFirstByProductIdAndLevel(bean.getProductId(), bean.getLevel());
+        if (null != dropTarget) {
+
+            Integer dropPriod = dropTarget.getDropPriod();
+            if (dropPriod == null) {
+                dropPriod = 0;
+            }
+            bean.setLevelDropCount(dropPriod * 7);
+
+        }
+
         List<OneMonthNoFollowCustomerResponseBean> oneMonthNoFollowCustomerList = workStationMapper.getOneMonthNoFollowCustomerList(bean);
         //List<OneMonthNoFollowCustomerResponseBean> oneMonthNoFollowCustomerList = workStationMapper.getOneMonthNoFollowCustomerList(bean.getProductId(),bean.getLeaderPath(),bean.getPage(),bean.getPageSize());
         Integer count = workStationMapper.getOneMonthNoFollowCustomerListCount(bean);

@@ -158,7 +158,7 @@
                 and vdci.product_id=#{productId}
 
                 group by vdci.virtual_doctor_id
-        ) t where to_days(now())-to_days(date_format(t.create_time,'%Y-%m-%d')) >= 30
+        ) t where to_days(now())-to_days(date_format(t.create_time,'%Y-%m-%d')) >= #{levelDropCount}
         ) b2
          on b.doctorId=b2.doctor_id
          <!-- group by b.level -->
@@ -211,7 +211,7 @@
                         and vdci.product_id=#{productId}
 
                         group by vdci.virtual_doctor_id
-                ) t where to_days(now())-to_days(date_format(t.create_time,'%Y-%m-%d')) >= 30
+                ) t where to_days(now())-to_days(date_format(t.create_time,'%Y-%m-%d')) >= #{levelDropCount}
                 ) b2
                  on b.doctorId=b2.doctor_id
                 <!-- group by b.level -->
