@@ -2845,7 +2845,7 @@
 
         select du.name drugUserName, count(distinct d.id) num from drug_user du
         inner join drug_user_doctor dud
-        on du.id=dud.drug_user_id=du.id
+        on du.id=dud.drug_user_id
         inner join doctor d
         on dud.doctor_id=d.id
         inner join doctor_virtual dv
@@ -3117,13 +3117,5 @@
 
 
     </select>
-
-
-
-
-
-
-
-
 
 </mapper>
