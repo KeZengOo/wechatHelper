@@ -134,7 +134,7 @@ public class EmailService {
             for (int i = 0,leng=doctorList.size(); i < leng; i++) {
                 Doctor doctor = doctorList.get(i);
                 if(doctor==null || StringUtils.isBlank(doctor.getEmail())){
-                    return "医生邮箱邮箱为空";
+                    return "医生邮箱为空";
                 }
                 MimeMessage mimeMessage = this._getMimeMessage(bean,doctor.getEmail());
                 mailSender.send(mimeMessage);
