@@ -402,7 +402,7 @@
 
     <select id="getEmailMessageList"  resultType="com.nuoxin.virtual.rep.api.web.controller.response.message.MessageResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean">
-        select vei.id,
+        select distinct vei.id,
         vei.doctor_id doctorId,
         (select name from doctor d where d.id =vei.doctor_id) nickname,
         vei.title,

@@ -157,30 +157,30 @@ public class WorkStationService {
 
         //多渠道会话统计
         TodayStatisticsResponseBean messageStatistics = messageMapper.getMessageStatistics(bean);
-        if (null != meetingStatistic) {
+        if (null != messageStatistics) {
 
-            Integer wechatSum = meetingStatistic.getWechatSum();
+            Integer wechatSum = messageStatistics.getWechatSum();
             if (wechatSum == null) {
                 wechatSum = 0;
             }
             todayStatisticsResponseBean.setWechatSum(wechatSum);
 
 
-            Integer wechatCount = meetingStatistic.getWechatCount();
+            Integer wechatCount = messageStatistics.getWechatCount();
             if (wechatCount == null) {
                 wechatCount = 0;
             }
             todayStatisticsResponseBean.setWechatCount(wechatCount);
 
 
-            Integer imSum = meetingStatistic.getImSum();
+            Integer imSum = messageStatistics.getImSum();
             if (imSum == null) {
                 imSum = 0;
             }
             todayStatisticsResponseBean.setImSum(imSum);
 
 
-            Integer imCount = meetingStatistic.getImCount();
+            Integer imCount = messageStatistics.getImCount();
             if (imCount == null) {
                 imCount = 0;
             }

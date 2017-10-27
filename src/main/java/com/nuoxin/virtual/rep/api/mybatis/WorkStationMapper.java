@@ -110,7 +110,7 @@ public interface WorkStationMapper {
     Integer minDoctorCallCount(WorkStationRequestBean bean);
     List<DoctorAnalysisResponseBean> minDoctorCallCountList(WorkStationRequestBean bean);
 
-    //电话覆盖数量最少
+    //电话次数数量最少
     Integer minDoctorCallCoveredCount(WorkStationRequestBean bean);
     List<DoctorAnalysisResponseBean> minDoctorCallCoveredCountList(WorkStationRequestBean bean);
 

@@ -1600,7 +1600,7 @@
 
 
 
-        select distinct d.name doctorName, ifnull(sum(vdci.call_time),0) from doctor d
+        select distinct d.name doctorName, ifnull(sum(vdci.call_time),0) num from doctor d
         inner join drug_user_doctor dud
         on d.id=dud.doctor_id
         inner join drug_user du
@@ -1873,11 +1873,11 @@
     </select>
 
 
-    <!-- 客户分析最少的电话覆盖人数列表 -->
+    <!-- 客户分析最少的电话次数数列表 -->
     <select id="minDoctorCallCoveredCountList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.DoctorAnalysisResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
 
-        select distinct d.name doctorName,ifnull(count(distinct vdci.virtual_doctor_id),0) num
+        select distinct d.name doctorName,ifnull(count(distinct vdci.id),0) num
         from doctor d
         inner join drug_user_doctor dud
         on d.id=dud.doctor_id
