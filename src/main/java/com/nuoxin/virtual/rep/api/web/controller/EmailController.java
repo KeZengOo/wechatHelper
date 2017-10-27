@@ -65,7 +65,7 @@ public class EmailController extends BaseController {
             }
         }catch (Exception e){
             responseBean.setCode(500);
-            responseBean.setMessage("邮箱发送失败");
+            responseBean.setMessage("邮件发送失败");
         }
         return responseBean;
     }
@@ -96,7 +96,7 @@ public class EmailController extends BaseController {
 //            }
         }catch (Exception e){
             responseBean.setCode(500);
-            responseBean.setMessage("邮箱发送失败");
+            responseBean.setMessage("邮件发送失败");
         }
         return responseBean;
     }
