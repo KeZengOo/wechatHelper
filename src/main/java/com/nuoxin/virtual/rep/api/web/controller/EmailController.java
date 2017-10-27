@@ -56,7 +56,17 @@ public class EmailController extends BaseController {
             return responseBean;
         }
         bean.setDrugUserId(user.getId());
-        responseBean.setData(emailService.commonEmailSendIds(bean));
+        responseBean.setData(true);
+        try{
+            String error = emailService.commonEmailSendId(bean);
+            if(StringUtils.isNotEmtity(error)){
+                responseBean.setCode(500);
+                responseBean.setMessage(error);
+            }
+        }catch (Exception e){
+            responseBean.setCode(500);
+            responseBean.setMessage("邮箱发送失败");
+        }
         return responseBean;
     }
 
@@ -77,7 +87,17 @@ public class EmailController extends BaseController {
             return responseBean;
         }
         bean.setDrugUserId(user.getId());
-        responseBean.setData(emailService.commonEmailSendTo(bean));
+        responseBean.setData(true);
+        try{
+            emailService.commonEmailSendTo(bean);
+//            if(StringUtils.isNotEmtity(error)){
+//                responseBean.setCode(500);
+//                responseBean.setMessage(error);
+//            }
+        }catch (Exception e){
+            responseBean.setCode(500);
+            responseBean.setMessage("邮箱发送失败");
+        }
         return responseBean;
     }
 

@@ -97,6 +97,9 @@ public class EmailService {
         if(doctorList!=null && !doctorList.isEmpty()){
             for (int i = 0,leng=doctorList.size(); i < leng; i++) {
                 Doctor doctor = doctorList.get(i);
+                if(doctor==null || StringUtils.isBlank(doctor.getEmail())){
+                    return false;
+                }
                 MimeMessage mimeMessage = this._getMimeMessage(bean,doctor.getEmail());
                 mailSender.send(mimeMessage);
                 //logger.info("common.id.send.message【{}】", JSON.toJSONString(mimeMessage));
@@ -114,6 +117,42 @@ public class EmailService {
             }
         }
         return true;
+    }
+
+    @Transactional(readOnly = false)
+    public String commonEmailSendId(EmailRequestBean bean) throws MessagingException {
+        String doctorIds = bean.getDoctorIds();
+        List<Long> ids = new ArrayList<>();
+        String[] doctorid = doctorIds.split(",");
+        for (String id:doctorid) {
+            if(StringUtils.isNotEmtity(id)){
+                ids.add(Long.valueOf(id));
+            }
+        }
+        List<Doctor> doctorList = doctorService.findByIdIn(ids);
+        if(doctorList!=null && !doctorList.isEmpty()){
+            for (int i = 0,leng=doctorList.size(); i < leng; i++) {
+                Doctor doctor = doctorList.get(i);
+                if(doctor==null || StringUtils.isBlank(doctor.getEmail())){
+                    return "医生邮箱邮箱为空";
+                }
+                MimeMessage mimeMessage = this._getMimeMessage(bean,doctor.getEmail());
+                mailSender.send(mimeMessage);
+                //logger.info("common.id.send.message【{}】", JSON.toJSONString(mimeMessage));
+
+                //保存邮件发送记录
+                Email entity = new Email();
+                entity.setContent(bean.getContent());
+                entity.setCreateTime(new Date());
+                entity.setDoctorId(doctor.getId());
+                entity.setDrugUserId(bean.getDrugUserId());
+                entity.setProductId(bean.getProductId());
+                entity.setTitle(bean.getTitle());
+                entity.setType(2);
+                emailRepository.save(entity);
+            }
+        }
+        return "";
     }
 
     @Transactional(readOnly = false)
