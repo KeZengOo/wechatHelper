@@ -69,6 +69,14 @@ public class DoctorCallService extends BaseService {
     @Value("${recording.file.path}")
     private String path;
 
+    public boolean checkoutSinToken(String sinToken){
+        DoctorCallInfo info = doctorCallInfoRepository.findBySinToken(sinToken);
+        if(info==null){
+            return true;
+        }
+        return false;
+    }
+
     public PageResponseBean<CallResponseBean> doctorPage(QueryRequestBean bean){
         Sort sort = new Sort(Sort.Direction.DESC, "createTime");
         PageRequest pagetable = super.getPage(bean,sort);

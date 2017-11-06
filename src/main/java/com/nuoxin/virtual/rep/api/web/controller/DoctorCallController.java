@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
+import com.nuoxin.virtual.rep.api.common.util.StringUtils;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.DoctorCallService;
 import com.nuoxin.virtual.rep.api.service.FollowUpTypeService;
@@ -33,7 +34,7 @@ import java.util.List;
 /**
  * Created by fenggang on 9/11/17.
  */
-@Api(value = "电话",description = "电话页面接口")
+@Api(value = "电话", description = "电话页面接口")
 @RestController
 @RequestMapping(value = "/call")
 public class DoctorCallController extends BaseController {
@@ -44,7 +45,7 @@ public class DoctorCallController extends BaseController {
     private FollowUpTypeService followUpTypeService;
 
     @RequestMapping("/callback")
-    public DefaultResponseBean<Object> callback(HttpServletRequest request, HttpServletResponse response){
+    public DefaultResponseBean<Object> callback(HttpServletRequest request, HttpServletResponse response) {
         DefaultResponseBean<Object> responseBean = new DefaultResponseBean<>();
         response.setContentType("text/html");
         response.setCharacterEncoding("gb2312");
@@ -52,23 +53,23 @@ public class DoctorCallController extends BaseController {
         BufferedReader br = null;
         StringBuilder sb = new StringBuilder();
         CallbackRequestBean bean = null;
-        try{
+        try {
             out = response.getWriter();
             request.getInputStream();
-            String line="";
-            br=new BufferedReader(new InputStreamReader(
+            String line = "";
+            br = new BufferedReader(new InputStreamReader(
                     request.getInputStream()));
-            while((line = br.readLine())!=null){
+            while ((line = br.readLine()) != null) {
                 sb.append(line);
-                logger.info("回调数据：【{}】",line);
+                logger.info("回调数据：【{}】", line);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-        }finally {
+        } finally {
             out.close();
         }
 
-        if(sb!=null&&sb.toString().trim().length()>0){
+        if (sb != null && sb.toString().trim().length() > 0) {
             try {
                 bean = JSON.parseObject(sb.toString(), CallbackRequestBean.class);
             } catch (Exception e) {
@@ -87,7 +88,7 @@ public class DoctorCallController extends BaseController {
 
     @ApiOperation(value = "获取销售信息", notes = "获取销售信息")
     @GetMapping("/druguser/info")
-    public DefaultResponseBean<LoginResponseBean> druguser(HttpServletRequest request, HttpServletResponse response){
+    public DefaultResponseBean<LoginResponseBean> druguser(HttpServletRequest request, HttpServletResponse response) {
         DefaultResponseBean<LoginResponseBean> responseBean = new DefaultResponseBean();
         DrugUser drugUser = this.getLoginUser(request);
         if (drugUser == null) {
@@ -106,10 +107,10 @@ public class DoctorCallController extends BaseController {
     @ApiOperation(value = "客户电话搜索列表", notes = "客户电话搜索列表")
     @PostMapping("/doctor/page")
     public DefaultResponseBean<PageResponseBean<CallResponseBean>> doctorPage(@RequestBody QueryRequestBean bean,
-                                                                              HttpServletRequest request, HttpServletResponse response){
+                                                                              HttpServletRequest request, HttpServletResponse response) {
         DefaultResponseBean responseBean = new DefaultResponseBean();
         DrugUser user = super.getLoginUser(request);
-        if(user==null){
+        if (user == null) {
             responseBean.setCode(300);
             responseBean.setMessage("登录失效");
             return responseBean;
@@ -123,15 +124,15 @@ public class DoctorCallController extends BaseController {
     @ApiOperation(value = "客户电话历史记录", notes = "客户电话历史记录")
     @PostMapping("/doctor/history/page")
     public DefaultResponseBean<PageResponseBean<CallHistoryResponseBean>> doctorHistoryPage(@RequestBody CallHistoryRequestBean bean,
-                                                                                            HttpServletRequest request, HttpServletResponse response){
+                                                                                            HttpServletRequest request, HttpServletResponse response) {
         DefaultResponseBean responseBean = new DefaultResponseBean();
         DrugUser user = super.getLoginUser(request);
-        if(user==null){
+        if (user == null) {
             responseBean.setCode(300);
             responseBean.setMessage("登录失效");
             return responseBean;
         }
-        if(bean.getDoctorId()!=null && bean.getDoctorId()==0){
+        if (bean.getDoctorId() != null && bean.getDoctorId() == 0) {
             return responseBean;
         }
         bean.setDrugUserId(user.getId());
@@ -142,7 +143,7 @@ public class DoctorCallController extends BaseController {
 
     @ApiOperation(value = "电话顶部统计", notes = "电话顶部统计")
     @PostMapping("/stat")
-    public DefaultResponseBean<CallStatResponseBean> stat(HttpServletRequest request, HttpServletResponse response){
+    public DefaultResponseBean<CallStatResponseBean> stat(HttpServletRequest request, HttpServletResponse response) {
         DefaultResponseBean responseBean = new DefaultResponseBean();
         responseBean.setData(doctorCallService.stat(super.getLoginId(request)));
         return responseBean;
@@ -151,14 +152,24 @@ public class DoctorCallController extends BaseController {
     @ApiOperation(value = "拨号保存电话记录", notes = "拨号保存电话记录")
     @PostMapping("/save")
     public DefaultResponseBean<CallRequestBean> save(@RequestBody CallRequestBean bean,
-                                    HttpServletRequest request, HttpServletResponse response){
+                                                     HttpServletRequest request, HttpServletResponse response) {
 
-        logger.info("{}接口请求数据【】{}",request.getServletPath(), JSON.toJSONString(bean));
+        logger.info("{}接口请求数据【】{}", request.getServletPath(), JSON.toJSONString(bean));
         DefaultResponseBean responseBean = new DefaultResponseBean();
         DrugUser user = super.getLoginUser(request);
-        if(user==null){
+        if (user == null) {
             responseBean.setCode(300);
             responseBean.setMessage("登录失效");
+            return responseBean;
+        }
+        if(!StringUtils.isNotEmtity(bean.getSinToken())){
+            responseBean.setCode(500);
+            responseBean.setMessage("sinToken不能为空");
+            return responseBean;
+        }
+        if(doctorCallService.checkoutSinToken(bean.getSinToken())){
+            responseBean.setCode(500);
+            responseBean.setMessage("sinToken不能重复");
             return responseBean;
         }
         bean.setDrugUserId(user.getId());
@@ -169,25 +180,25 @@ public class DoctorCallController extends BaseController {
     @ApiOperation(value = "拨号电话记录修改", notes = "拨号电话记录修改")
     @PostMapping("/update")
     public DefaultResponseBean<CallRequestBean> update(@RequestBody CallRequestBean bean,
-                                                     HttpServletRequest request, HttpServletResponse response){
+                                                       HttpServletRequest request, HttpServletResponse response) {
 
-        logger.info("{}接口请求数据【】{}",request.getServletPath(), JSON.toJSONString(bean));
+        logger.info("{}接口请求数据【】{}", request.getServletPath(), JSON.toJSONString(bean));
         DefaultResponseBean responseBean = new DefaultResponseBean();
         Long id = bean.getId();
-        if(id==null){
+        if (id == null) {
             responseBean.setCode(500);
             responseBean.setMessage("请求参数id不能为空");
             return responseBean;
         }
         DrugUser user = super.getLoginUser(request);
-        if(user==null){
+        if (user == null) {
             responseBean.setCode(300);
             responseBean.setMessage("登录失效");
             return responseBean;
         }
         bean.setDrugUserId(user.getId());
         bean = doctorCallService.update(bean);
-        if(bean.getId()==null){
+        if (bean.getId() == null) {
             responseBean.setCode(500);
             responseBean.setMessage("状态更新失败");
             return responseBean;
@@ -200,17 +211,17 @@ public class DoctorCallController extends BaseController {
     @ApiOperation(value = "挂断保存电话记录", notes = "挂断保存电话记录")
     @PostMapping("/stop/update")
     public DefaultResponseBean<Boolean> stopSave(@RequestBody CallInfoRequestBean bean,
-                                        HttpServletRequest request, HttpServletResponse response){
+                                                 HttpServletRequest request, HttpServletResponse response) {
 
-        logger.info("{}接口请求数据【】{}",request.getServletPath(), JSON.toJSONString(bean));
+        logger.info("{}接口请求数据【】{}", request.getServletPath(), JSON.toJSONString(bean));
         DefaultResponseBean responseBean = new DefaultResponseBean();
-        if(bean.getId()==null){
+        if (bean.getId() == null) {
             responseBean.setCode(500);
             responseBean.setMessage("请求参数id不能为空");
             return responseBean;
         }
         DrugUser user = super.getLoginUser(request);
-        if(user==null){
+        if (user == null) {
             responseBean.setCode(300);
             responseBean.setMessage("登录失效");
             return responseBean;
@@ -222,10 +233,10 @@ public class DoctorCallController extends BaseController {
 
     @ApiOperation(value = "获取跟进类型集合", notes = "获取跟进类型集合")
     @GetMapping("/type/list")
-    public DefaultResponseBean<List<FollowUpTypResponseBean>> typeList(HttpServletRequest request, HttpServletResponse response){
+    public DefaultResponseBean<List<FollowUpTypResponseBean>> typeList(HttpServletRequest request, HttpServletResponse response) {
         DefaultResponseBean responseBean = new DefaultResponseBean();
         DrugUser user = this.getLoginUser(request);
-        if(user==null){
+        if (user == null) {
             responseBean.setCode(300);
             responseBean.setMessage("登录失效");
             return responseBean;
