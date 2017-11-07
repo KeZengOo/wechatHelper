@@ -25,7 +25,7 @@ import java.time.LocalDate;
 import static springfox.documentation.schema.AlternateTypeRules.newRule;
 
 @SpringBootApplication
-@EnableDiscoveryClient
+//@EnableDiscoveryClient
 @EnableSwagger2
 @MapperScan(basePackages = "com.nuoxin.virtual.rep.api.mybatis")
 public class VirtualRepApiApplication {
@@ -65,7 +65,7 @@ public class VirtualRepApiApplication {
 
 
 	@Bean
-	@LoadBalanced
+	//@LoadBalanced
 	RestTemplate getRestTemplate(){
 
 		return new RestTemplate();
