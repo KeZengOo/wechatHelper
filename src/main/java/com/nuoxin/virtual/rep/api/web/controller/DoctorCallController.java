@@ -5,6 +5,7 @@ import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
 import com.nuoxin.virtual.rep.api.common.util.StringUtils;
+import com.nuoxin.virtual.rep.api.entity.DoctorCallInfo;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.DoctorCallService;
 import com.nuoxin.virtual.rep.api.service.FollowUpTypeService;
@@ -167,9 +168,9 @@ public class DoctorCallController extends BaseController {
             responseBean.setMessage("sinToken不能为空");
             return responseBean;
         }
-        if(doctorCallService.checkoutSinToken(bean.getSinToken())){
-            responseBean.setCode(500);
-            responseBean.setMessage("sinToken不能重复");
+        DoctorCallInfo info = doctorCallService.checkoutSinToken(bean.getSinToken());
+        if(info!=null){
+            responseBean.setData(info);
             return responseBean;
         }
         bean.setDrugUserId(user.getId());

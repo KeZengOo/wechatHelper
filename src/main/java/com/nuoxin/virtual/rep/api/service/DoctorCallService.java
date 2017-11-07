@@ -69,12 +69,12 @@ public class DoctorCallService extends BaseService {
     @Value("${recording.file.path}")
     private String path;
 
-    public boolean checkoutSinToken(String sinToken){
+    public DoctorCallInfo checkoutSinToken(String sinToken){
         DoctorCallInfo info = doctorCallInfoRepository.findBySinToken(sinToken);
         if(info==null){
-            return true;
+            return null;
         }
-        return false;
+        return info;
     }
 
     public PageResponseBean<CallResponseBean> doctorPage(QueryRequestBean bean){
