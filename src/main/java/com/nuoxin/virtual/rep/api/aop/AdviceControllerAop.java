@@ -12,7 +12,6 @@ import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
 
@@ -31,7 +30,7 @@ public class AdviceControllerAop {
      *
      * @param joinPoint
      */
-    private void doBefore(JoinPoint joinPoint) {
+    public void doBefore(JoinPoint joinPoint) {
         logger.debug("{} doBefore class-{} {}" +
                         " method-{} {}参数：{}", System.getProperty("path.separator"), joinPoint.getThis().toString(), System.getProperty("path.separator"),
                 joinPoint.getSignature().getName(), System.getProperty("path.separator"), joinPoint.getArgs());
@@ -47,7 +46,7 @@ public class AdviceControllerAop {
      * @return
      * @throws Throwable
      */
-    private Object doAround(ProceedingJoinPoint joinPoint) throws Throwable {
+    public Object doAround(ProceedingJoinPoint joinPoint) throws Throwable {
         logger.debug("{} doAround class-{} {}" +
                         " method-{} {}参数：{}", System.getProperty("path.separator"), joinPoint.getThis().toString(), System.getProperty("path.separator"),
                 joinPoint.getSignature().getName(), System.getProperty("path.separator"), joinPoint.getArgs());
@@ -63,7 +62,7 @@ public class AdviceControllerAop {
      *
      * @param joinPoint
      */
-    private void doAfter(JoinPoint joinPoint) {
+    public void doAfter(JoinPoint joinPoint) {
         logger.debug("{} doAfter class-{} {}" +
                         " method-{} {}参数：{}", System.getProperty("path.separator"), joinPoint.getThis().toString(), System.getProperty("path.separator"),
                 joinPoint.getSignature().getName(), System.getProperty("path.separator"), joinPoint.getArgs());
@@ -75,7 +74,7 @@ public class AdviceControllerAop {
      * @param joinPoint
      */
     @AfterReturning(pointcut="execution(* com.nuoxin.virtual.rep.api.service..*.*(..))", returning="retValue")
-    private void doReturn(JoinPoint joinPoint, Object retValue) {
+    public void doReturn(JoinPoint joinPoint, Object retValue) {
         logger.debug("{} doReturn class-{} {}" +
                         " method-{} {} 参数：{} {} 返回值：{}", System.getProperty("path.separator"), joinPoint.getThis().toString(), System.getProperty("path.separator"),
                 joinPoint.getSignature().getName(), System.getProperty("path.separator"), joinPoint.getArgs(), System.getProperty("path.separator"), JSON.toJSONString(retValue));
