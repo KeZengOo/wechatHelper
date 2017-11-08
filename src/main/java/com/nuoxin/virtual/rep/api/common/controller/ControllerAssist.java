@@ -5,6 +5,8 @@ import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.common.exception.FileFormatException;
 import com.nuoxin.virtual.rep.api.common.exception.NeedLoginException;
+import com.nuoxin.virtual.rep.api.web.intercept.CrossDomainFilter;
+import org.apache.log4j.LogManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
@@ -37,8 +39,7 @@ import java.util.Locale;
  */
 @ControllerAdvice
 public class ControllerAssist {
-
-	private Logger logger = LoggerFactory.getLogger(getClass());
+	private static final org.apache.log4j.Logger logger = LogManager.getLogger(ControllerAssist.class);
 
 	/**
 	 * 注册全局数据编辑器，若传递的数据为空字串 转成 null
@@ -63,14 +64,14 @@ public class ControllerAssist {
 	@ExceptionHandler(BusinessException.class)
 	@ResponseBody
 	public ResponseEntity<DefaultResponseBean<?>> handleBusinessException(BusinessException exception, HttpServletRequest request) {
-		logger.info("", exception);
+		logger.info("{}", exception);
 		return ResponseEntity.ok(DefaultResponseBean.clone(exception.getLabel(), exception.getCode(), exception.getMessage()));
 	}
 
 	@ExceptionHandler(NeedLoginException.class)
 	@ResponseBody
 	public ResponseEntity<DefaultResponseBean<?>> handleNeedLoginException(NeedLoginException exception, HttpServletRequest request) {
-		logger.info("", exception);
+		logger.info("{}", exception);
 		return ResponseEntity.ok(DefaultResponseBean.clone(ErrorEnum.LOGIN_NO.getMessage(), ErrorEnum.LOGIN_NO.getStatus(), exception.getMessage()));
 	}
 
@@ -85,7 +86,7 @@ public class ControllerAssist {
 	@ResponseBody
 	public ResponseEntity<DefaultResponseBean<?>> handleMethodArgumentNotValidException(MethodArgumentNotValidException exception,
                                                                                         HttpServletRequest request) {
-		logger.info("", exception);
+		logger.info("{}", exception);
 		ErrorEnum error = ErrorEnum.SYSTEM_REQUEST_PARAM_ERROR;
 		String message = error.getMessage();
 		BindingResult bindingResult = exception.getBindingResult();
@@ -113,7 +114,7 @@ public class ControllerAssist {
 		org.hibernate.exception.DataException.class, DataIntegrityViolationException.class })
 	@ResponseBody
 	public ResponseEntity<DefaultResponseBean<?>> handleSQLException(HttpServletRequest request, Exception exception, Locale locale) {
-		logger.info("", exception);
+		logger.info("{}", exception);
 		ErrorEnum error = ErrorEnum.ERROR;
 		return ResponseEntity.ok(DefaultResponseBean.clone(error.getMessage(), error.getStatus(), exception.getMessage()));
 	}
@@ -129,7 +130,7 @@ public class ControllerAssist {
 	@ResponseBody
 	public ResponseEntity<DefaultResponseBean<?>> handleFileFormatException(FileFormatException exception, HttpServletRequest request, Locale locale){
 
-		logger.error("文件格式错误。。。", exception.getMessage());
+		logger.info("文件格式错误。。。{}", exception);
 		ErrorEnum error = ErrorEnum.FILE_FORMAT_ERROR;
 
 		return ResponseEntity.ok(DefaultResponseBean.clone(error.getMessage(), error.getStatus(), exception.getMessage()));
@@ -152,7 +153,7 @@ public class ControllerAssist {
 	@ExceptionHandler({ RuntimeException.class })
 	@ResponseBody
 	public ResponseEntity<DefaultResponseBean<?>> handleAllException(HttpServletRequest request, Exception exception, Locale locale) {
-		logger.info("", exception);
+		logger.info("{}", exception);
 		ErrorEnum error = ErrorEnum.ERROR;
 		return ResponseEntity.ok(DefaultResponseBean.clone(error.getMessage(), error.getStatus(), exception.getMessage()));
 	}

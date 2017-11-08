@@ -1,4 +1,4 @@
-package com.nuoxin.virtual.rep.api.aop;
+package com.nuoxin.virtual.rep.api.web.intercept;
 
 import com.alibaba.fastjson.JSON;
 import com.nuoxin.virtual.rep.api.common.exception.NeedLoginException;

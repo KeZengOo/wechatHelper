@@ -31,6 +31,8 @@ import static springfox.documentation.schema.AlternateTypeRules.newRule;
 public class VirtualRepApiApplication {
 
 	public static void main(String[] args) {
+		System.setProperty("log.root","/Users/fenggang/Documents/workspace/uworks/virtual-rep-api");
+		System.setProperty("log.base","/Users/fenggang/Documents/workspace/uworks/virtual-rep-api");
 		SpringApplication.run(VirtualRepApiApplication.class, args);
 	}
 
