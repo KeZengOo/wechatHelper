@@ -343,6 +343,7 @@ public class DoctorCallService extends BaseService {
             for (DoctorCallInfoDetails d:detailsList) {
                 if(d.getStatusName()!=null && ("answer".equals(d.getStatusName()) || "incall".equals(d.getStatusName()))){
                     details = d;
+                    break;
                 }
             }
             if(details==null){
