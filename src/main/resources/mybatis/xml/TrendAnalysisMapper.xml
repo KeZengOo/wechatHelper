@@ -64,7 +64,7 @@
         weeks,MONTH(dc.create_time) months,YEAR(dc.create_time) years,DAY(dc.create_time)
         days,FLOOR((date_format(dc.create_time,'%m')+2)/3) quarters
         from virtual_doctor_call_info dc join virtual_doctor_call_info_details v2 on dc.id=v2.call_id join drug_user_doctor dud on dud.doctor_id=dc.virtual_doctor_id join drug_user du on du.id=dc.virtual_drug_user_id WHERE
-        du.leader_path like #{leaderPath,jdbcType=VARCHAR} and dc.create_time BETWEEN #{startDate} AND #{endDate} AND dc.del_flag=0 and v2.status_name='answer'
+        du.leader_path like #{leaderPath,jdbcType=VARCHAR} and dc.create_time BETWEEN #{startDate} AND #{endDate} AND dc.del_flag=0 and v2.status_name in ('answer','incall')
         <if test="drugUserId!=null and drugUserId!=0">
             AND dc.virtual_drug_user_id = #{drugUserId}
         </if>
@@ -93,7 +93,7 @@
         countnum,WEEK(dc.create_time,1) weeks,MONTH(dc.create_time) months,YEAR(dc.create_time)
         years,DAY(dc.create_time) days,FLOOR((date_format(dc.create_time,'%m')+2)/3) quarters
         from virtual_doctor_call_info dc join virtual_doctor_call_info_details v2 on dc.id=v2.call_id join drug_user_doctor dud on dud.doctor_id=dc.virtual_doctor_id  join drug_user du on du.id=dc.virtual_drug_user_id WHERE
-        du.leader_path like #{leaderPath,jdbcType=VARCHAR} and dc.create_time BETWEEN #{startDate} AND #{endDate} AND dc.del_flag=0 and v2.status_name='answer'
+        du.leader_path like #{leaderPath,jdbcType=VARCHAR} and dc.create_time BETWEEN #{startDate} AND #{endDate} AND dc.del_flag=0 and v2.status_name in ('answer','incall')
         <if test="drugUserId!=null and drugUserId!=0">
             AND dc.virtual_drug_user_id = #{drugUserId}
         </if>
@@ -292,7 +292,7 @@
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TrendAnalysisRequestBean">
         select COUNT(DISTINCT dc.sin_token) connects,DATE_FORMAT(dc.create_time,'%k') hours,dc.create_time from
         virtual_doctor_call_info dc join drug_user_doctor dud on dud.doctor_id=dc.virtual_doctor_id join virtual_doctor_call_info_details dcd on dcd.call_id=dc.id join
-        drug_user d on d.id=dc.virtual_drug_user_id where dcd.status_name='answer'
+        drug_user d on d.id=dc.virtual_drug_user_id where dcd.status_name in ('answer','incall')
         and dc.create_time BETWEEN #{startDate} AND #{endDate} and d.leader_path like #{leaderPath,jdbcType=VARCHAR}  AND dc.del_flag=0
 
         <if test="drugUserId!=null and drugUserId!=0">
