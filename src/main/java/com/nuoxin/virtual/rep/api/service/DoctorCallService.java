@@ -339,7 +339,15 @@ public class DoctorCallService extends BaseService {
         //获取状态详细信息
         List<DoctorCallInfoDetails> detailsList = doctorCallInfoDetailsRepository.findByCallIdOrderOrderByCreateTime(info.getId());
         if(detailsList!=null && !detailsList.isEmpty()){
-            DoctorCallInfoDetails details = detailsList.get(0);
+            DoctorCallInfoDetails details = null;
+            for (DoctorCallInfoDetails d:detailsList) {
+                if(d.getStatusName()!=null && ("answer".equals(d.getStatusName()) || "incall".equals(d.getStatusName()))){
+                    details = d;
+                }
+            }
+            if(details==null){
+                details = detailsList.get(0);
+            }
             info.setStatus(details.getStatus());
             info.setStatusName(details.getStatusName());
         }
