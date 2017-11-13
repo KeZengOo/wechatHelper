@@ -23,7 +23,8 @@
                 </if>
 
                 and du.leader_path like #{leaderPath}
-                and vdcid.status_name='answer'
+                <!-- and vdcid.status_name='answer' -->
+                and vdcid.status_name in ('answer','incall')
 
                 and date_format(vdci.create_time, '%Y-%m-%d')=date_format(NOW(), '%Y-%m-%d')
                 ) as callSum,
@@ -45,8 +46,8 @@
                 </if>
 
                 and du.leader_path like #{leaderPath}
-                and vdcid.status_name='answer'
-
+                <!-- and vdcid.status_name='answer' -->
+                and vdcid.status_name in ('answer','incall')
                 and date_format(vdci.create_time, '%Y-%m-%d')=date_format(NOW(), '%Y-%m-%d')
                 ) as callCount
 
@@ -97,8 +98,8 @@
 
 
         and du.leader_path like #{leaderPath}
-        and vdcid.status_name='answer'
-
+        <!-- and vdcid.status_name='answer'-->
+        and vdcid.status_name in ('answer','incall')
         and date_format(vdci.create_time, '%Y-%m-%d')=date_format(NOW(), '%Y-%m-%d')
 
         ) t
