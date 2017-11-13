@@ -154,7 +154,6 @@ public class DoctorCallController extends BaseController {
     @PostMapping("/save")
     public DefaultResponseBean<CallRequestBean> save(@RequestBody CallRequestBean bean,
                                                      HttpServletRequest request, HttpServletResponse response) {
-
         logger.info("{}接口请求数据【】{}", request.getServletPath(), JSON.toJSONString(bean));
         DefaultResponseBean responseBean = new DefaultResponseBean();
         DrugUser user = super.getLoginUser(request);
@@ -168,14 +167,16 @@ public class DoctorCallController extends BaseController {
             responseBean.setMessage("sinToken不能为空");
             return responseBean;
         }
-        DoctorCallInfo info = doctorCallService.checkoutSinToken(bean.getSinToken());
-        if(info!=null){
-            responseBean.setData(info);
+        synchronized (this){
+            DoctorCallInfo info = doctorCallService.checkoutSinToken(bean.getSinToken());
+            if(info!=null){
+                responseBean.setData(info);
+                return responseBean;
+            }
+            bean.setDrugUserId(user.getId());
+            responseBean.setData(doctorCallService.save(bean));
             return responseBean;
         }
-        bean.setDrugUserId(user.getId());
-        responseBean.setData(doctorCallService.save(bean));
-        return responseBean;
     }
 
     @ApiOperation(value = "拨号电话记录修改", notes = "拨号电话记录修改")
