@@ -111,7 +111,7 @@
         select count(DISTINCT vd.virtual_doctor_id) coverNum from virtual_doctor_call_info vd join virtual_doctor_call_info_details v2 on vd.id=v2.call_id join doctor_virtual dv on
         dv.doctor_id=vd.virtual_doctor_id join drug_user_doctor dud on dud.doctor_id=vd.virtual_doctor_id  join doctor do on do.id=vd.virtual_doctor_id join drug_user d on
         d.id=vd.virtual_drug_user_id where d.leader_path like #{leaderPath,jdbcType=VARCHAR}
-        AND vd.create_time BETWEEN #{startDate} AND #{endDate} AND vd.del_flag=0 and v2.status_name='answer'
+        AND vd.create_time BETWEEN #{startDate} AND #{endDate} AND vd.del_flag=0 and v2.status_name in ('answer','incall')
         <if test="productId!=null and productId!=0">
             AND vd.product_id=#{productId}
         </if>
@@ -131,7 +131,7 @@
         select count(vd.id) coverNum from virtual_doctor_call_info vd join virtual_doctor_call_info_details v2 on vd.id=v2.call_id join doctor_virtual dv on
         dv.doctor_id=vd.virtual_doctor_id join drug_user_doctor dud on dud.doctor_id=vd.virtual_doctor_id join doctor do on do.id=vd.virtual_doctor_id join drug_user d on
         d.id=vd.virtual_drug_user_id where d.leader_path like #{leaderPath,jdbcType=VARCHAR}
-        AND vd.create_time BETWEEN #{startDate} AND #{endDate} AND vd.del_flag=0 and v2.status_name='answer'
+        AND vd.create_time BETWEEN #{startDate} AND #{endDate} AND vd.del_flag=0 and v2.status_name in ('answer','incall')
         <if test="productId!=null and productId!=0">
             AND vd.product_id=#{productId}
         </if>
@@ -210,7 +210,7 @@
         select avg(vd.call_time) coverNum from virtual_doctor_call_info vd join virtual_doctor_call_info_details v2 on vd.id=v2.call_id join drug_user_doctor dud on dud.doctor_id=vd.virtual_doctor_id join doctor_virtual dv on
         dv.doctor_id=vd.virtual_doctor_id join doctor do on do.id=vd.virtual_doctor_id join drug_user d on
         d.id=vd.virtual_drug_user_id where d.leader_path like #{leaderPath,jdbcType=VARCHAR}
-        AND vd.create_time BETWEEN #{startDate} AND #{endDate}  AND vd.del_flag=0 and v2.status_name='answer'
+        AND vd.create_time BETWEEN #{startDate} AND #{endDate}  AND vd.del_flag=0 and v2.status_name in ('answer','incall')
 
         <if test="productId!=null and productId!=0">
             AND vd.product_id=#{productId}

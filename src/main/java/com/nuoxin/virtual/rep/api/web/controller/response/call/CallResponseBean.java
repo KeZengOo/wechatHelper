@@ -22,6 +22,8 @@ public class CallResponseBean implements Serializable {
     private String doctorMobile;
     @ApiModelProperty(value = "客户等级")
     private String clientLevel;
+    @ApiModelProperty(value = "来电类型")
+    private Integer type;
     @ApiModelProperty(value = "通话时间（时间戳）")
     private Long timeLong;
     @ApiModelProperty(value = "通话时间（yyyy-MM-dd HH:mm）")
@@ -34,6 +36,10 @@ public class CallResponseBean implements Serializable {
     private String drugUserName;
     @ApiModelProperty(value = "产品名称")
     private String productName;
+    @ApiModelProperty(value = "状态")
+    private Integer status;
+    @ApiModelProperty(value = "状态名称")
+    private String statusName;
 
     public Long getDoctorId() {
         return doctorId;
@@ -113,5 +119,29 @@ public class CallResponseBean implements Serializable {
 
     public void setProductName(String productName) {
         this.productName = productName;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public String getStatusName() {
+        return statusName;
+    }
+
+    public void setStatusName(String statusName) {
+        this.statusName = statusName;
     }
 }

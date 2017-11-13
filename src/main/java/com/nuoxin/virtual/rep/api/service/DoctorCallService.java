@@ -69,6 +69,14 @@ public class DoctorCallService extends BaseService {
     @Value("${recording.file.path}")
     private String path;
 
+    public DoctorCallInfo checkoutSinToken(String sinToken){
+        DoctorCallInfo info = doctorCallInfoRepository.findBySinToken(sinToken);
+        if(info==null){
+            return null;
+        }
+        return info;
+    }
+
     public PageResponseBean<CallResponseBean> doctorPage(QueryRequestBean bean){
         Sort sort = new Sort(Sort.Direction.DESC, "createTime");
         PageRequest pagetable = super.getPage(bean,sort);
@@ -220,7 +228,7 @@ public class DoctorCallService extends BaseService {
         if (map != null) {
             responseBean.setInCallAllNum(map.get("allNum").intValue());
             callTimes = map.get("callTimes");
-            num = doctorCallInfoRepository.statDrugUserIdsCount(drugUser.getLeaderPath()+"%", CallTypeEnum.CALL_TYPE_INCALL.getType());
+            num = doctorCallInfoRepository.statDrugUserIdsCallCount(drugUser.getLeaderPath()+"%", CallTypeEnum.CALL_TYPE_INCALL.getType(),"incall");
             if(callTimes!=null){
                 responseBean.setInCallAllTimes(callTimes);
             }
@@ -327,6 +335,24 @@ public class DoctorCallService extends BaseService {
         }
         info.setFollowUpType(bean.getType());
         info.setRemark(bean.getRemark());
+
+        //获取状态详细信息
+        List<DoctorCallInfoDetails> detailsList = doctorCallInfoDetailsRepository.findByCallIdOrderOrderByCreateTime(info.getId());
+        if(detailsList!=null && !detailsList.isEmpty()){
+            DoctorCallInfoDetails details = null;
+            for (DoctorCallInfoDetails d:detailsList) {
+                if(d.getStatusName()!=null && ("answer".equals(d.getStatusName()) || "incall".equals(d.getStatusName()))){
+                    details = d;
+                    break;
+                }
+            }
+            if(details==null){
+                details = detailsList.get(0);
+            }
+            info.setStatus(details.getStatus());
+            info.setStatusName(details.getStatusName());
+        }
+
         //保存通话信息
         doctorCallInfoRepository.saveAndFlush(info);
 
@@ -362,9 +388,12 @@ public class DoctorCallService extends BaseService {
         callBean.setDataUrl(info.getCallUrl());
         //callBean.setDoctorId(info.getDoctor().getId());
         //callBean.setQuestions();
+        callBean.setStatus(info.getStatus());
+        callBean.setStatusName(info.getStatusName());
         callBean.setRemark(info.getRemark());
         callBean.setTimeLong(info.getCreateTime().getTime());
         callBean.setTimes(info.getCallTime());
+        callBean.setType(info.getType());
         callBean.setFollowUpType(info.getFollowUpType());
         callBean.setTimeStr(DateUtil.getDateTimeString(info.getCreateTime()));
         if(timeLong!=null && timeLong.equals(callBean.getTimeLong())){
@@ -388,6 +417,7 @@ public class DoctorCallService extends BaseService {
             }else{
                 responseBean.setDoctorMobile(info.getMobile());
             }
+            responseBean.setType(info.getType());
             if(info.getDrugUser()!=null){
                 responseBean.setDrugUserName(info.getDrugUser().getName());
                 responseBean.setDrugUserId(info.getDrugUser().getId());
@@ -395,7 +425,8 @@ public class DoctorCallService extends BaseService {
             responseBean.setTimeStr(DateUtil.getDateTimeString(info.getCreateTime()));
             responseBean.setDrugUserId(info.getDrugUserId());
             responseBean.setProductId(info.getProductId());
-
+            responseBean.setStatus(info.getStatus());
+            responseBean.setStatusName(info.getStatusName());
         }
         return responseBean;
     }
