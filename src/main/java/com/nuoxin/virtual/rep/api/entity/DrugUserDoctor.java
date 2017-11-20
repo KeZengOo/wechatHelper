@@ -20,6 +20,8 @@ public class DrugUserDoctor extends IdEntity {
     private Long doctorId;
     @Column(name = "drug_user_id")
     private Long drugUserId;
+    @Column(name = "drug_user_name")
+    private String drugUserName;
     @Column(name = "prod_id")
     private Long productId;
     @Column(name = "modify_time")
@@ -55,5 +57,13 @@ public class DrugUserDoctor extends IdEntity {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public String getDrugUserName() {
+        return drugUserName;
+    }
+
+    public void setDrugUserName(String drugUserName) {
+        this.drugUserName = drugUserName;
     }
 }

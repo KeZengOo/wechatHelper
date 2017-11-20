@@ -248,6 +248,11 @@ public class DoctorService extends BaseService {
             dud.setDoctorId(doctor.getId());
             dud.setProductId(bean.getProductId());
             dud.setDrugUserId(bean.getDrugUserId());
+
+            DrugUser drugUser = drugUserService.findById(bean.getDrugUserId());
+            if(drugUser!=null){
+                dud.setDrugUserName(drugUser.getName());
+            }
             dud.setCreateTime(new Date());
             drugUserDoctorRepository.saveAndFlush(dud);
             doctorCallInfoRepository.updateDoctorIdAndDrugUserIdAndProductId(dud.getDoctorId(),dud.getDrugUserId(),dud.getProductId(),0);
@@ -321,6 +326,11 @@ public class DoctorService extends BaseService {
             dud.setDoctorId(doctor.getId());
             dud.setProductId(bean.getProductId());
             dud.setDrugUserId(bean.getDrugUserId());
+
+            DrugUser drugUser = drugUserService.findById(bean.getDrugUserId());
+            if(drugUser!=null){
+                dud.setDrugUserName(drugUser.getName());
+            }
             dud.setCreateTime(new Date());
             drugUserDoctorRepository.saveAndFlush(dud);
             doctorCallInfoRepository.updateDoctorIdAndDrugUserIdAndProductId(dud.getDoctorId(),dud.getDrugUserId(),dud.getProductId(),0);
@@ -525,6 +535,11 @@ public class DoctorService extends BaseService {
                 dud.setDoctorId(doctor.getId());
                 dud.setProductId(productId);
                 dud.setDrugUserId(user.getId());
+
+                DrugUser drugUser = drugUserService.findById(user.getId());
+                if(drugUser!=null){
+                    dud.setDrugUserName(drugUser.getName());
+                }
                 dud.setCreateTime(new Date());
                 drugUserDoctorRepository.saveAndFlush(dud);
                 doctorCallInfoRepository.updateDoctorIdAndDrugUserIdAndProductId(dud.getDoctorId(),dud.getDrugUserId(),dud.getProductId(),0);
@@ -610,6 +625,11 @@ public class DoctorService extends BaseService {
                 entity.setDrugUserId(bean.getNewDrugUserId());
                 entity.setProductId(pId.get(0));
                 entity.setDoctorId(id);
+
+                DrugUser drugUser = drugUserService.findById(bean.getNewDrugUserId());
+                if(drugUser!=null){
+                    entity.setDrugUserName(drugUser.getName());
+                }
                 drugUserDoctorRepository.saveAndFlush(entity);
                 doctorCallInfoRepository.updateDoctorIdAndDrugUserIdAndProductId(entity.getDoctorId(),entity.getDrugUserId(),entity.getProductId(),0);
             }
