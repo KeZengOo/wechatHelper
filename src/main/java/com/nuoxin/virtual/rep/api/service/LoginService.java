@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 /**
  * Created by fenggang on 9/11/17.
+ * @author fenggang
+ *
  */
 @Service
 public class LoginService {

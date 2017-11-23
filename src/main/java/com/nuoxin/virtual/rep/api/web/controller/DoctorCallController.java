@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.List;
@@ -50,12 +51,10 @@ public class DoctorCallController extends BaseController {
         DefaultResponseBean<Object> responseBean = new DefaultResponseBean<>();
         response.setContentType("text/html");
         response.setCharacterEncoding("gb2312");
-        PrintWriter out = null;
         BufferedReader br = null;
         StringBuilder sb = new StringBuilder();
         CallbackRequestBean bean = null;
         try {
-            out = response.getWriter();
             request.getInputStream();
             String line = "";
             br = new BufferedReader(new InputStreamReader(
@@ -67,7 +66,13 @@ public class DoctorCallController extends BaseController {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            out.close();
+            if(br!=null){
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
         if (sb != null && sb.toString().trim().length() > 0) {

@@ -135,9 +135,4 @@ public class DoctorDynamicFieldService {
         return list;
     }
 
-
-
-
-
-
 }
