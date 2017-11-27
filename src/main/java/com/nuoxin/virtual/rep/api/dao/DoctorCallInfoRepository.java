@@ -1,6 +1,7 @@
 package com.nuoxin.virtual.rep.api.dao;
 
 import com.nuoxin.virtual.rep.api.entity.DoctorCallInfo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -37,5 +38,9 @@ public interface DoctorCallInfoRepository extends JpaRepository<DoctorCallInfo,L
     @Modifying
     @Query("update DoctorCallInfo d set d.delFlag=:flag where d.doctor.id=:doctorId and d.drugUser.id=:drugUserId and d.productId=:productId")
     void updateDoctorIdAndDrugUserIdAndProductId(@Param("doctorId") Long doctorId,@Param("drugUserId") Long drugUserId,@Param("productId") Long productId,@Param("flag") Integer flag);
+
+    @Modifying
+    @Query("update DoctorCallInfo d set d.callUrl=:url,d.json=:json where d.id=:id")
+    void updateUrl(@Param("url") String url,@Param("json") String json,@Param("id") Long id);
 
 }

@@ -560,7 +560,7 @@ public class DoctorCallService extends BaseService {
                                 }
                             }
                             info.setJson(JSON.toJSONString(bl));
-                            doctorCallInfoRepository.saveAndFlush(info);
+                            doctorCallInfoRepository.updateUrl(info.getCallUrl(),info.getJson(),info.getId());
                         }
                     }
                 }
