@@ -69,6 +69,9 @@ public class DoctorCallService extends BaseService {
     @Value("${recording.file.path}")
     private String path;
 
+    @Value("${audio.download.url}")
+    private String url;
+
     public DoctorCallInfo checkoutSinToken(String sinToken){
         DoctorCallInfo info = doctorCallInfoRepository.findBySinToken(sinToken);
         if(info==null){
@@ -541,6 +544,21 @@ public class DoctorCallService extends BaseService {
                     for (CallbackListRequestBean bl : list) {
                         DoctorCallInfo info = doctorCallInfoRepository.findBySinToken(bl.getCallid());
                         if(info!=null){
+                            if(StringUtils.isNotEmtity(bl.getRecordUrl())){
+                                //TODO 保存录音文件
+                                try {
+                                    this.downLoadFromUrl(url+bl.getRecordUrl(),info.getSinToken()+".wav",path);
+                                    File file = new File(path+info.getSinToken()+".wav");
+                                    //WavToMp3Util.execute(file,path+info.getSinToken()+".mp3");
+                                    //file = new File(path+info.getSinToken()+".mp3");
+                                    String url = ossService.uploadFile(file);
+                                    info.setCallUrl(url);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
                             info.setJson(JSON.toJSONString(bl));
                             doctorCallInfoRepository.saveAndFlush(info);
                         }
