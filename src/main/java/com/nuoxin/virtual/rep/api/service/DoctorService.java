@@ -1,6 +1,7 @@
 package com.nuoxin.virtual.rep.api.service;
 
 import com.nuoxin.virtual.rep.api.common.bean.DoctorExcel;
+import com.nuoxin.virtual.rep.api.common.bean.DoctorVo;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
@@ -473,7 +474,7 @@ public class DoctorService extends BaseService {
                     }
                 }
             }
-            if (doctor.getMobile() != null) {
+            if (doctor!=null && doctor.getDoctorVirtual() != null ) {
                 virtual = doctor.getDoctorVirtual();
             }
             doctor.setCity(excel.getCity());
