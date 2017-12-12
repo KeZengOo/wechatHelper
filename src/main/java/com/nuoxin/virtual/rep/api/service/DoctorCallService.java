@@ -324,7 +324,7 @@ public class DoctorCallService extends BaseService {
             try {
                 this.downLoadFromUrl("",info.getSinToken()+".wav",path);
                 File file = new File(path+info.getSinToken()+".wav");
-                //WavToMp3Util.execute(file,path+info.getSinToken()+".mp3");
+                //WavTowavUtil.execute(file,path+info.getSinToken()+".mp3");
                 //file = new File(path+info.getSinToken()+".mp3");
                 String url = ossService.uploadFile(file);
                 info.setCallUrl(url);
@@ -492,32 +492,32 @@ public class DoctorCallService extends BaseService {
 
     public void file(){
         try{
-            downLoadFromUrl("http://106.75.91.226/16?file=/app/clpms/record/20170925/aaafc53bb1c14851b656bbb116b6674c.wav",
-                    "aaaaa.wav","C:\\Users\\27168\\Desktop\\");
-            File file = new File("C:\\Users\\27168\\Desktop\\aaaaa.wav");
-            File file1 = new File("C:\\Users\\27168\\Desktop\\aaaaa.mp3");
+            downLoadFromUrl("http://106.75.91.226/16?file=/app/clpms/record/20171211/103_nxclcc_8001_13799438628_20171211185149_1512989509171.wav",
+                    "aaaaa.wav","/Users/fenggang/Downloads/");
+            File file = new File("/Users/fenggang/Downloads/aaaaa.mp3");
+            File file1 = new File("/Users/fenggang/Downloads/aaaaa.mp3");
             if(file1==null){
                 file1.createNewFile();
             }
 
-            WavToMp3Util.execute(file,"C:\\Users\\27168\\Desktop\\aaaaa.mp3");
+            WavToMp3Util.execute(file,"/Users/fenggang/Downloads/aaaaa.wav");
 
             Main main = new mp3.Main();
-            main.convertWAVToMP3("/Users/fenggang/Downloads/aaaaa");
-            File mp3File = new File( "/Users/fenggang/Downloads/aaaaa.mp3");
+            main.convertWAVToMP3("/Users/fenggang/Downloads/aaaaa/");
+            File mp3File = new File( "/Users/fenggang/Downloads/aaaaa.wav");
             if (mp3File.length() == 0) {
                 int retryTimes = 0;
                 while (true) {
                     Thread.sleep(2000);
-                    mp3File = new File("/Users/fenggang/Downloads/aaaaa.mp3");
+                    mp3File = new File("/Users/fenggang/Downloads/aaaaa.wav");
                     if (mp3File.length() > 0 || retryTimes == 50) break;
                     retryTimes++;
                     System.out.println("=============tts retry " + retryTimes + " times.");
                 }
                 if (mp3File.length() == 0) {
                     try {
-                        System.out.println("/Users/fenggang/Downloads/aaaaa.mp3 .mp3 file create failed..");
-                        throw new Exception("/Users/fenggang/Downloads/aaaaa.mp3  .mp3 file create failed..");
+                        System.out.println("/Users/fenggang/Downloads/aaaaa.wav .mp3 file create failed..");
+                        throw new Exception("/Users/fenggang/Downloads/aaaaa.wav  .mp3 file create failed..");
                     } catch (Exception e) {
                         // do nothing
                         System.out.println(e.getMessage());
@@ -533,6 +533,15 @@ public class DoctorCallService extends BaseService {
             // TODO: handle exception
             e.printStackTrace();
         }
+    }
+
+    public String uploadUrl() throws Exception{
+        this.downLoadFromUrl("http://106.75.91.226/16?file=/app/clpms/record/20171211/103_nxclcc_8001_13799438628_20171211185149_1512989509171.wav","test.wav",path);
+        File file = new File(path+"test.wav");
+//        WavToMp3Util.execute(file,path+"test.mp3");
+//        file = new File(path+"test.mp3");
+        String url = ossService.uploadFile(file);
+        return url;
     }
 
     @Transactional(readOnly = false)

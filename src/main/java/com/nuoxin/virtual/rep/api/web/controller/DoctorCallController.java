@@ -252,4 +252,18 @@ public class DoctorCallController extends BaseController {
         return responseBean;
     }
 
+    @ApiOperation(value = "uploadUrl", notes = "")
+    @GetMapping("/uploadUrl")
+    public DefaultResponseBean<String> uploadUrl(HttpServletRequest request, HttpServletResponse response){
+        DefaultResponseBean responseBean = new DefaultResponseBean();
+        try{
+            String url = doctorCallService.uploadUrl();
+            responseBean.setData(url);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return responseBean;
+    }
+
 }
