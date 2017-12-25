@@ -239,6 +239,7 @@ public class TargetAnalysisService {
     }
 
     public List<FollowUpTypeStatBean> followUpType(TargetAnalysisRequestBean bean){
+        bean.checkDate();
         List<FollowUpTypeStatBean> responseList = new ArrayList<>();
         List<Map<String,Object>> followUpTypeSumList = targetAnalysisMapper.followUpType(bean);
         Map<Long,FollowUpTypeStatBean> followUpTypeStatBeanMap = new HashMap<>();
@@ -247,7 +248,7 @@ public class TargetAnalysisService {
             for (Map<String,Object> map:followUpTypeSumList) {
                 Object obj = map.get("follow_up_type");
                 Long followUpTypeId = 0l;
-                if(StringUtils.isNotEmtity(obj+"")){
+                if(obj!=null && !"".equals(obj.toString())){
                     followUpTypeId = Long.valueOf(obj+"");
                 }
                 if(followUpTypeId==0){
