@@ -83,15 +83,15 @@ public class DoctorDynamicFieldService {
         Boolean flag = false;
         DoctorDynamicField doctorDynamicField = new DoctorDynamicField();
         Long id = bean.getId();
-        DoctorDynamicField dynamicFieldRepositoryOne = doctorDynamicFieldRepository.getOne(id);
+        //DoctorDynamicField dynamicFieldRepositoryOne = doctorDynamicFieldRepository.findById(id);
         doctorDynamicField.setId(id);
         doctorDynamicField.setName(bean.getName());
         doctorDynamicField.setValue(bean.getValue());
         doctorDynamicField.setType(bean.getType());
         doctorDynamicField.setClassification(bean.getClassification());
         doctorDynamicField.setUpdateTime(new Date());
-        doctorDynamicField.setCreateTime(dynamicFieldRepositoryOne.getCreateTime());
-
+        //doctorDynamicField.setCreateTime(dynamicFieldRepositoryOne.getCreateTime());
+        doctorDynamicField.setCreateTime(new Date());
         doctorDynamicFieldRepository.saveAndFlush(doctorDynamicField);
 
         flag = true;

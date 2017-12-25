@@ -1,16 +1,15 @@
 package com.nuoxin.virtual.rep.api;
 
-import bean.Departments;
-import bean.Dept;
+
 import com.nuoxin.virtual.rep.api.common.util.StringUtils;
 import com.nuoxin.virtual.rep.api.dao.DoctorRepository;
 import com.nuoxin.virtual.rep.api.entity.Doctor;
 import com.nuoxin.virtual.rep.api.service.MasterDataService;
 import com.nuoxin.virtual.rep.api.utils.excel.ExcelUtils;
+import com.nuoxin.virtual.rep.api.web.controller.response.vo.Dept;
 import com.nuoxin.virtual.rep.api.web.controller.response.vo.Doc;
 import com.nuoxin.virtual.rep.api.web.controller.response.vo.Hci;
 import com.nuoxin.virtual.rep.api.web.controller.response.vo.Hcp;
-import control.MatchDept;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -95,25 +94,25 @@ public class DoctorCheckTest {
     }
 
 //    @Test
-    public void deptTest() {
-
-        List<Doctor> list = doctorRepository.findAll();
-        ArrayList<Map<String, Object>> listMap = new ArrayList<>();
-        for (Doctor doctor : list) {
-            MatchDept matchDept = new MatchDept();
-            if (StringUtils.isBlank(doctor.getDepartment())) {
-                continue;
-            }
-            //matchDept.matchList(arrayList);//参数为list<Dept>,返回list<Department>
-            Dept dept = new Dept();
-            dept.setId(111);
-            dept.setValue(doctor.getDepartment());
-            Departments Departments = matchDept.matchOne(dept);//参数为Dept,返回Department
-            doctor.setDepartment(Departments.getParent());
-            doctorRepository.saveAndFlush(doctor);
-        }
-
-    }
+//    public void deptTest() {
+//
+//        List<Doctor> list = doctorRepository.findAll();
+//        ArrayList<Map<String, Object>> listMap = new ArrayList<>();
+//        for (Doctor doctor : list) {
+//            MatchDept matchDept = new MatchDept();
+//            if (StringUtils.isBlank(doctor.getDepartment())) {
+//                continue;
+//            }
+//            //matchDept.matchList(arrayList);//参数为list<Dept>,返回list<Department>
+//            Dept dept = new Dept();
+//            dept.setId(111);
+//            dept.setValue(doctor.getDepartment());
+//            Departments Departments = matchDept.matchOne(dept);//参数为Dept,返回Department
+//            doctor.setDepartment(Departments.getParent());
+//            doctorRepository.saveAndFlush(doctor);
+//        }
+//
+//    }
 
 //    @Test
     public void mdmTest() {
