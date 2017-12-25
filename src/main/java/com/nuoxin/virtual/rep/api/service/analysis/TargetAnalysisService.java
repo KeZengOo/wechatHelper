@@ -242,40 +242,47 @@ public class TargetAnalysisService {
         bean.checkDate();
         List<FollowUpTypeStatBean> responseList = new ArrayList<>();
         List<Map<String,Object>> followUpTypeSumList = targetAnalysisMapper.followUpType(bean);
+        Integer numALl = 0;
         Map<Long,FollowUpTypeStatBean> followUpTypeStatBeanMap = new HashMap<>();
         if(followUpTypeSumList!=null && !followUpTypeSumList.isEmpty()){
             Map<Long,FollowUpType> followUpTypeMap = followUpTypeService.findByAllMap();
             for (Map<String,Object> map:followUpTypeSumList) {
                 Object obj = map.get("follow_up_type");
-                Long followUpTypeId = 0l;
                 if(obj!=null && !"".equals(obj.toString())){
-                    followUpTypeId = Long.valueOf(obj+"");
-                }
-                if(followUpTypeId==0){
-                    int count = Integer.valueOf(map.get("countNum")+"");
-                    FollowUpTypeStatBean statBean = followUpTypeStatBeanMap.get(followUpTypeId);
-                    if(statBean==null){
-                        statBean = new FollowUpTypeStatBean();
+                    String[] objs = obj.toString().split(",");
+                    for (String str:objs) {
+                        Long followUpTypeId = 0l;
+                        followUpTypeId = Long.valueOf(str+"");
+                        if(followUpTypeId==0){
+                            int count = Integer.valueOf(map.get("countNum")+"");
+                            FollowUpTypeStatBean statBean = followUpTypeStatBeanMap.get(followUpTypeId);
+                            if(statBean==null){
+                                statBean = new FollowUpTypeStatBean();
+                            }
+                            statBean.setNum(count);
+                            numALl=numALl+statBean.getNum();
+                            followUpTypeStatBeanMap.put(followUpTypeId,statBean);
+                        }else{
+                            FollowUpType followUpType = followUpTypeMap.get(followUpTypeId);
+                            int count = Integer.valueOf(map.get("countNum")+"");
+                            FollowUpTypeStatBean statBean = followUpTypeStatBeanMap.get(followUpTypeId);
+                            if(statBean==null){
+                                statBean = new FollowUpTypeStatBean();
+                            }
+                            statBean.setNum(count);
+                            numALl=numALl+statBean.getNum();
+                            statBean.setTitle(followUpType.getType());
+                            followUpTypeStatBeanMap.put(followUpTypeId,statBean);
+                        }
                     }
-                    statBean.setNum(count);
-                    followUpTypeStatBeanMap.put(followUpTypeId,statBean);
-                }else{
-                    FollowUpType followUpType = followUpTypeMap.get(followUpTypeId);
-                    int count = Integer.valueOf(map.get("countNum")+"");
-                    FollowUpTypeStatBean statBean = followUpTypeStatBeanMap.get(followUpTypeId);
-                    if(statBean==null){
-                        statBean = new FollowUpTypeStatBean();
-                    }
-                    statBean.setNum(count);
-                    statBean.setTitle(followUpType.getType());
-                    followUpTypeStatBeanMap.put(followUpTypeId,statBean);
+
                 }
+
             }
 
-            Integer numALl = 0;
             for (Long followUpTypeId:followUpTypeStatBeanMap.keySet()) {
                 FollowUpTypeStatBean statBean = followUpTypeStatBeanMap.get(followUpTypeId);
-                numALl=numALl+statBean.getNum();
+
                 statBean.setNumAll(numALl);
                 responseList.add(statBean);
             }
