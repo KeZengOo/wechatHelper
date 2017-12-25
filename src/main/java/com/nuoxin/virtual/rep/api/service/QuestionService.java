@@ -8,14 +8,12 @@ import com.nuoxin.virtual.rep.api.common.util.StringUtils;
 import com.nuoxin.virtual.rep.api.dao.DoctorQuestionnaireRepository;
 import com.nuoxin.virtual.rep.api.dao.QuestionRepository;
 import com.nuoxin.virtual.rep.api.dao.QuestionnaireRepository;
-import com.nuoxin.virtual.rep.api.entity.DoctorQuestionnaire;
-import com.nuoxin.virtual.rep.api.entity.DrugUser;
-import com.nuoxin.virtual.rep.api.entity.Question;
-import com.nuoxin.virtual.rep.api.entity.Questionnaire;
+import com.nuoxin.virtual.rep.api.entity.*;
 import com.nuoxin.virtual.rep.api.web.controller.request.question.OptionsRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.question.QuestionQueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.question.QuestionRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.question.QuestionnaireRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorDetailsResponseBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -44,6 +42,8 @@ public class QuestionService extends BaseService {
     private QuestionnaireRepository questionnaireRepository;
     @Autowired
     private DoctorQuestionnaireRepository doctorQuestionnaireRepository;
+    @Autowired
+    private DoctorService doctorService;
 
     @Transactional(readOnly = false)
     @CacheEvict(value = "virtual_rep_api_question",allEntries = true)
@@ -176,15 +176,18 @@ public class QuestionService extends BaseService {
         PageResponseBean<QuestionnaireRequestBean> responseBean = new PageResponseBean<QuestionnaireRequestBean>(page);
         List<Questionnaire> list = page.getContent();
         if(list!=null && !list.isEmpty()){
+            DoctorDetailsResponseBean doctor = doctorService.findByMobile(bean.getMobile());
             List<QuestionnaireRequestBean> requestBeans = new ArrayList<>();
             for (Questionnaire questionnaire:list) {
                 QuestionnaireRequestBean questionnaireRequestBean = this._getQuestionnaire(questionnaire);
                 List<QuestionRequestBean> questionRequestBeanList = questionnaireRequestBean.getQuestions();
                 if(questionRequestBeanList!=null && !questionRequestBeanList.isEmpty()){
                     for (QuestionRequestBean questionRequestBean :questionRequestBeanList) {
-                        List<DoctorQuestionnaire> doctorQuestionnaireList = doctorQuestionnaireRepository.findByQuestionIdAndQuestionnaireId(questionRequestBean.getId(),user.getId());
-                        if(doctorQuestionnaireList!=null && !doctorQuestionnaireList.isEmpty()){
-                            questionRequestBean.setAnswer(doctorQuestionnaireList.get(0).getAnswer());
+                        if(doctor!=null){
+                            List<DoctorQuestionnaire> doctorQuestionnaireList = doctorQuestionnaireRepository.findByQuestionIdAndQuestionnaireId(questionRequestBean.getId(),user.getId(),doctor.getDoctorId());
+                            if(doctorQuestionnaireList!=null && !doctorQuestionnaireList.isEmpty()){
+                                questionRequestBean.setAnswer(doctorQuestionnaireList.get(0).getAnswer());
+                            }
                         }
                     }
                     questionnaireRequestBean.setQuestions(questionRequestBeanList);

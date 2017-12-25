@@ -16,6 +16,6 @@ public interface DoctorQuestionnaireRepository extends JpaRepository<DoctorQuest
 
     List<DoctorQuestionnaire> findByCallId(Long callId);
 
-    @Query("select d from DoctorQuestionnaire d where d.doctorId=:doctorId and d.questionId=:questionId order by d.createTime desc")
-    List<DoctorQuestionnaire> findByQuestionIdAndQuestionnaireId(@Param("questionId") Long questionId, @Param("doctorId") Long doctorId);
+    @Query("select d from DoctorQuestionnaire d where d.doctorId=:doctorId and d.questionId=:questionId and d.drugUserId=:drugUserId order by d.createTime desc")
+    List<DoctorQuestionnaire> findByQuestionIdAndQuestionnaireId(@Param("questionId") Long questionId, @Param("drugUserId") Long drugUserId, @Param("doctorId") Long doctorId);
 }

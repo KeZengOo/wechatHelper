@@ -282,6 +282,11 @@ public class DoctorCallController extends BaseController {
             responseBean.setMessage("登录失效");
             return responseBean;
         }
+        if (StringUtils.isBlank(bean.getMobile())) {
+            responseBean.setCode(300);
+            responseBean.setMessage("电话号码不能为空");
+            return responseBean;
+        }
         responseBean.setData(questionService.pageAnswer(bean,user));
         return responseBean;
     }
