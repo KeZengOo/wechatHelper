@@ -157,7 +157,7 @@ public class DoctorController extends BaseController {
                                               HttpServletRequest request, HttpServletResponse response){
         DefaultResponseBean responseBean = new DefaultResponseBean();
         ExcelUtils<DoctorExcel> excelUtils = new ExcelUtils<>(new DoctorExcel());
-        String productId = "136";//request.getParameter("productId");
+        String productId = request.getParameter("productId");
         if(!StringUtils.isNotEmtity(productId)){
             responseBean.setCode(500);
             responseBean.setMessage("产品不能为空");

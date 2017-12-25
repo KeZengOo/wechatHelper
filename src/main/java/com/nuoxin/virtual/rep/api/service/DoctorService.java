@@ -282,6 +282,8 @@ public class DoctorService extends BaseService {
 //        BeanUtils.copyProperties(bean,doctor);
         doctor.setCity(bean.getCity());
         //doctor.setClientLevel(bean.getClientLevel());
+
+        //TODO 获取医院id
         doctor.setDepartment(bean.getDepartment());
         doctor.setDoctorLevel(bean.getDoctorLevel());
         //doctor.setHospitalLevel(bean.getHospitalLevel());
