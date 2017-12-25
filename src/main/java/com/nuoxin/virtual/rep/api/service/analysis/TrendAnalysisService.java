@@ -241,7 +241,7 @@ public class TrendAnalysisService extends BaseService {
     public List<TrendStatResponseBean> callOut(TrendAnalysisRequestBean bean) {
         //TODO 获取时间
         bean.checkDate();
-        int count = this._computationsDateNum(DateUtil.getDateFromStr(bean.getStartDate()),DateUtil.getDateFromStr(bean.getEndDate()));
+        int count = this._computationsDateNum(DateUtil.getDateFromStr(bean.getStartDate()), DateUtil.getDateFromStr(bean.getEndDate()));
 //        bean.setEndDate(bean.getDate() + " 23:59:59");
 //        bean.setStartDate(bean.getDate() + " 00:00:00");
         List<TrendStatResponseBean> responseBeans = new ArrayList<>();
@@ -253,14 +253,14 @@ public class TrendAnalysisService extends BaseService {
             if (connect != null && !connect.isEmpty()) {
                 for (TrendStatResponseBean stat : connect) {
                     if (stat.getHour() != null && stat.getHour().intValue() == i) {
-                        responseBean.setConnect(stat.getConnect()/count);
+                        responseBean.setConnect(stat.getConnect() / count);
                     }
                 }
             }
             if (callout != null && !callout.isEmpty()) {
                 for (TrendStatResponseBean stat : callout) {
                     if (stat.getHour() != null && stat.getHour().intValue() == i) {
-                        responseBean.setCallout(stat.getCallout()/count);
+                        responseBean.setCallout(stat.getCallout() / count);
                     }
                 }
             }
@@ -285,7 +285,7 @@ public class TrendAnalysisService extends BaseService {
     public List<TrendStatResponseBean> session(TrendAnalysisRequestBean bean) {
         //TODO 获取时间
         bean.checkDate();
-        int count = this._computationsDateNum(DateUtil.getDateFromStr(bean.getStartDate()),DateUtil.getDateFromStr(bean.getEndDate()));
+        int count = this._computationsDateNum(DateUtil.getDateFromStr(bean.getStartDate()), DateUtil.getDateFromStr(bean.getEndDate()));
 //        bean.setEndDate(bean.getDate() + " 23:59:59");
 //        bean.setStartDate(bean.getDate() + " 00:00:00");
         List<TrendStatResponseBean> responseBeans = new ArrayList<>();
@@ -298,24 +298,24 @@ public class TrendAnalysisService extends BaseService {
             if (wechat != null && !wechat.isEmpty()) {
                 for (TrendStatResponseBean stat : wechat) {
                     if (stat.getHour() != null && stat.getHour().intValue() == i) {
-                        responseBean.setWechat(stat.getWechat()/count);
-                        responseBean.setWechatCount(stat.getWechatCount()/count);
+                        responseBean.setWechat(stat.getWechat() / count);
+                        responseBean.setWechatCount(stat.getWechatCount() / count);
                     }
                 }
             }
             if (sms != null && !sms.isEmpty()) {
                 for (TrendStatResponseBean stat : sms) {
                     if (stat.getHour() != null && stat.getHour().intValue() == i) {
-                        responseBean.setSms(stat.getSms()/count);
-                        responseBean.setSmsCount(stat.getSmsCount()/count);
+                        responseBean.setSms(stat.getSms() / count);
+                        responseBean.setSmsCount(stat.getSmsCount() / count);
                     }
                 }
             }
             if (email != null && !email.isEmpty()) {
                 for (TrendStatResponseBean stat : email) {
                     if (stat.getHour() != null && stat.getHour().intValue() == i) {
-                        responseBean.setEmail(stat.getEmail()/count);
-                        responseBean.setEmailCount(stat.getEmailCount()/count);
+                        responseBean.setEmail(stat.getEmail() / count);
+                        responseBean.setEmailCount(stat.getEmailCount() / count);
                     }
                 }
             }
@@ -343,24 +343,20 @@ public class TrendAnalysisService extends BaseService {
 
         int year1 = cal1.get(Calendar.YEAR);
         int year2 = cal2.get(Calendar.YEAR);
-        if (year1 != year2)   //同一年
-        {
+        if (year1 != year2) {
             int timeDistance = 0;
             for (int i = year1; i < year2; i++) {
-                if (i % 4 == 0 && i % 100 != 0 || i % 400 == 0)    //闰年
-                {
+                if (i % 4 == 0 && i % 100 != 0 || i % 400 == 0) {
                     timeDistance += 366;
-                } else    //不是闰年
-                {
+                } else {
                     timeDistance += 365;
                 }
             }
 
-            return timeDistance + (day2 - day1);
-        } else    //不同年
-        {
+            return timeDistance + 1 + (day2 - day1);
+        } else {
             System.out.println("判断day2 - day1 : " + (day2 - day1));
-            return day2 - day1;
+            return day2 + 1 - day1;
         }
     }
 
