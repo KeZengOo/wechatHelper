@@ -5,6 +5,7 @@ import com.nuoxin.virtual.rep.api.web.controller.response.analysis.ta.MettingTar
 import com.nuoxin.virtual.rep.api.web.controller.response.analysis.ta.TargetResponseBean;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by fenggang on 10/12/17.
@@ -46,4 +47,6 @@ public interface TargetAnalysisMapper {
     TargetResponseBean customTelSum(TargetAnalysisRequestBean bean);
 
     TargetResponseBean customTelAvg(TargetAnalysisRequestBean bean);
+
+    List<Map<String,Object>> followUpType(TargetAnalysisRequestBean bean);
 }

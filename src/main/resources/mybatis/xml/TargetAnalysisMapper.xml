@@ -226,4 +226,18 @@
         </if>
     </select>
 
+    <select id="followUpType" resultType="java.util.Map" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TargetAnalysisRequestBean">
+        select vd.follow_up_type,count(DISTINCT vd.virtual_doctor_id) countNum from virtual_doctor_call_info vd join doctor d on d.id=vd.virtual_doctor_id join doctor_virtual dv on dv.doctor_id=vd.virtual_doctor_id join drug_user_doctor dud on dud.doctor_id=vd.virtual_doctor_id join drug_user du on du.id=dud.drug_user_id
+        where du.leader_path like #{leaderPath,jdbcType=VARCHAR}
+        AND vd.create_time BETWEEN #{startDate} AND #{endDate}
+
+        <if test="customLevel!=null and customLevel!=''">
+            AND dv.client_level = #{customLevel}
+        </if>
+
+        <if test="productId!=null and productId!=0">
+            AND vd.product_id=#{productId}
+        </if>
+         group by vd.follow_up_type
+    </select>
 </mapper>

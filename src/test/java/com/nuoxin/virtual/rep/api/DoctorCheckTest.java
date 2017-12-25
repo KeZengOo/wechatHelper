@@ -47,7 +47,7 @@ public class DoctorCheckTest {
     @Autowired
     private MasterDataService masterDataService;
 
-    @Test
+//    @Test
     public void check() {
         List<Doctor> list = doctorRepository.findAll();
         ArrayList<Map<String, Object>> listMap = new ArrayList<>();
@@ -94,7 +94,7 @@ public class DoctorCheckTest {
         }
     }
 
-    @Test
+//    @Test
     public void deptTest() {
 
         List<Doctor> list = doctorRepository.findAll();
@@ -115,7 +115,7 @@ public class DoctorCheckTest {
 
     }
 
-    @Test
+//    @Test
     public void mdmTest() {
         // 驱动程序名
         String driver = "com.mysql.jdbc.Driver";

@@ -1,22 +1,26 @@
 package com.nuoxin.virtual.rep.api.service.analysis;
 
+import com.nuoxin.virtual.rep.api.common.util.StringUtils;
 import com.nuoxin.virtual.rep.api.dao.TargetRepository;
 import com.nuoxin.virtual.rep.api.entity.CoveredTarget;
+import com.nuoxin.virtual.rep.api.entity.FollowUpType;
 import com.nuoxin.virtual.rep.api.entity.Target;
 import com.nuoxin.virtual.rep.api.mybatis.TargetAnalysisMapper;
 import com.nuoxin.virtual.rep.api.service.CoveredTargetService;
+import com.nuoxin.virtual.rep.api.service.FollowUpTypeService;
 import com.nuoxin.virtual.rep.api.service.TargetService;
 import com.nuoxin.virtual.rep.api.web.controller.request.analysis.TargetAnalysisRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.analysis.ta.FollowUpTypeStatBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.analysis.ta.MettingTargetResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.analysis.ta.TargetResponseBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.math.BigDecimal;
-import java.util.Calendar;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by fenggang on 10/12/17.
@@ -34,6 +38,9 @@ public class TargetAnalysisService {
 
     @Autowired
     private TargetAnalysisMapper targetAnalysisMapper;
+
+    @Autowired
+    private FollowUpTypeService followUpTypeService;
 
     /***
      * 汇总目标及覆盖量
@@ -229,5 +236,52 @@ public class TargetAnalysisService {
             return  targetNum*3;
         }
         return 0;
+    }
+
+    public List<FollowUpTypeStatBean> followUpType(TargetAnalysisRequestBean bean){
+        List<FollowUpTypeStatBean> responseList = new ArrayList<>();
+        List<Map<String,Object>> followUpTypeSumList = targetAnalysisMapper.followUpType(bean);
+        Map<Long,FollowUpTypeStatBean> followUpTypeStatBeanMap = new HashMap<>();
+        if(followUpTypeSumList!=null && !followUpTypeSumList.isEmpty()){
+            Map<Long,FollowUpType> followUpTypeMap = followUpTypeService.findByAllMap();
+            for (Map<String,Object> map:followUpTypeSumList) {
+                Object obj = map.get("follow_up_type");
+                Long followUpTypeId = 0l;
+                if(StringUtils.isNotEmtity(obj+"")){
+                    followUpTypeId = Long.valueOf(obj+"");
+                }
+                if(followUpTypeId==0){
+                    int count = Integer.valueOf(map.get("countNum")+"");
+                    FollowUpTypeStatBean statBean = followUpTypeStatBeanMap.get(followUpTypeId);
+                    if(statBean==null){
+                        statBean = new FollowUpTypeStatBean();
+                    }
+                    statBean.setNum(count);
+                    followUpTypeStatBeanMap.put(followUpTypeId,statBean);
+                }else{
+                    FollowUpType followUpType = followUpTypeMap.get(followUpTypeId);
+                    int count = Integer.valueOf(map.get("countNum")+"");
+                    FollowUpTypeStatBean statBean = followUpTypeStatBeanMap.get(followUpTypeId);
+                    if(statBean==null){
+                        statBean = new FollowUpTypeStatBean();
+                    }
+                    statBean.setNum(count);
+                    statBean.setTitle(followUpType.getType());
+                    followUpTypeStatBeanMap.put(followUpTypeId,statBean);
+                }
+            }
+
+            Integer numALl = 0;
+            for (Long followUpTypeId:followUpTypeStatBeanMap.keySet()) {
+                FollowUpTypeStatBean statBean = followUpTypeStatBeanMap.get(followUpTypeId);
+                numALl=numALl+statBean.getNum();
+                statBean.setNumAll(numALl);
+                responseList.add(statBean);
+            }
+
+            responseList.forEach(x->x.setNumAll(responseList.get(responseList.size()-1).getNumAll()));
+        }
+
+        return responseList;
     }
 }

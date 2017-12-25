@@ -7,6 +7,7 @@ import com.nuoxin.virtual.rep.api.common.util.StringUtils;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.analysis.TargetAnalysisService;
 import com.nuoxin.virtual.rep.api.web.controller.request.analysis.TargetAnalysisRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.analysis.ta.FollowUpTypeStatBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.analysis.ta.MettingTargetResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.analysis.ta.TargetResponseBean;
 import io.swagger.annotations.Api;
@@ -252,4 +253,30 @@ public class TargetAnalysisController extends BaseController{
         return responseBean;
     }
 
+    @ApiOperation(value = "跟进类型接口", notes = "跟进类型接口")
+    @PostMapping("/followuptype")
+    public DefaultResponseBean<List<FollowUpTypeStatBean>> followUpType(@RequestBody TargetAnalysisRequestBean bean,
+                                                                        HttpServletRequest request, HttpServletResponse response) {
+        logger.info("{}-接口的请求参数【{}】",request.getServletPath(), JSON.toJSONString(bean));
+        DefaultResponseBean<List<FollowUpTypeStatBean>> responseBean = new DefaultResponseBean();
+        String error = super.checkoutDate(bean);
+        if(StringUtils.isNotEmtity(error)){
+            responseBean.setCode(500);
+            responseBean.setMessage(error);
+            return responseBean;
+        }
+        DrugUser user = super.getLoginUser(request);
+        if(user==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
+        }
+        if(bean.getDrugUserId()==null){
+            bean.setDrugUserId(user.getId());
+        }
+
+        bean.setLeaderPath(user.getLeaderPath());
+        responseBean.setData(targetAnalysisService.followUpType(bean));
+        return responseBean;
+    }
 }

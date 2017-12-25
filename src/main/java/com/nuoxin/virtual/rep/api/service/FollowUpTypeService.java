@@ -15,9 +15,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by fenggang on 10/17/17.
@@ -133,6 +131,17 @@ public class FollowUpTypeService extends BaseService {
 
         return list;
 
+    }
+
+    public Map<Long,FollowUpType> findByAllMap(){
+        Map<Long,FollowUpType> map = new HashMap<>();
+        List<FollowUpType> list = followUpTypeRepository.findAll();
+        if(list!=null && !list.isEmpty()){
+            for (FollowUpType followUpType : list) {
+                map.put(followUpType.getId(),followUpType);
+            }
+        }
+        return map;
     }
 
 }
