@@ -37,9 +37,9 @@ import java.util.Map;
  * @author fenggang
  * @date 12/14/17
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@ActiveProfiles("dev")
+//@RunWith(SpringRunner.class)
+//@SpringBootTest
+//@ActiveProfiles("dev")
 public class DoctorCheckTest {
 
     @Autowired

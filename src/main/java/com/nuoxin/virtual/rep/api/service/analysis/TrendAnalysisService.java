@@ -239,8 +239,9 @@ public class TrendAnalysisService extends BaseService {
      */
     public List<TrendStatResponseBean> callOut(TrendAnalysisRequestBean bean) {
         //TODO 获取时间
-        bean.setEndDate(bean.getDate() + " 23:59:59");
-        bean.setStartDate(bean.getDate() + " 00:00:00");
+        bean.checkDate();
+//        bean.setEndDate(bean.getDate() + " 23:59:59");
+//        bean.setStartDate(bean.getDate() + " 00:00:00");
         List<TrendStatResponseBean> responseBeans = new ArrayList<>();
         List<TrendStatResponseBean> connect = trendAnalysisMapper.callOut(bean);
         List<TrendStatResponseBean> callout = trendAnalysisMapper.callOutCount(bean);
@@ -281,8 +282,9 @@ public class TrendAnalysisService extends BaseService {
      */
     public List<TrendStatResponseBean> session(TrendAnalysisRequestBean bean) {
         //TODO 获取时间
-        bean.setEndDate(bean.getDate() + " 23:59:59");
-        bean.setStartDate(bean.getDate() + " 00:00:00");
+        bean.checkDate();
+//        bean.setEndDate(bean.getDate() + " 23:59:59");
+//        bean.setStartDate(bean.getDate() + " 00:00:00");
         List<TrendStatResponseBean> responseBeans = new ArrayList<>();
         List<TrendStatResponseBean> wechat = trendAnalysisMapper.sessionType1(bean);
         List<TrendStatResponseBean> sms = trendAnalysisMapper.sessionType2(bean);
