@@ -8,10 +8,7 @@ import com.nuoxin.virtual.rep.api.common.util.WavToMp3Util;
 import com.nuoxin.virtual.rep.api.dao.DoctorCallInfoDetailsRepository;
 import com.nuoxin.virtual.rep.api.dao.DoctorCallInfoRepository;
 import com.nuoxin.virtual.rep.api.dao.DoctorRepository;
-import com.nuoxin.virtual.rep.api.entity.DoctorCallInfo;
-import com.nuoxin.virtual.rep.api.entity.DoctorCallInfoDetails;
-import com.nuoxin.virtual.rep.api.entity.DoctorQuestionnaire;
-import com.nuoxin.virtual.rep.api.entity.DrugUser;
+import com.nuoxin.virtual.rep.api.entity.*;
 import com.nuoxin.virtual.rep.api.enums.CallTypeEnum;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.CallbackListRequestBean;
@@ -154,9 +151,13 @@ public class DoctorCallService extends BaseService {
                     if(StringUtils.isNotEmtity(name)){
                         callResponseBean.setProductName(name);
                     }else{
-                        name = productLineService.findById(info.getProductId()).getName();
-                        map.put(info.getProductId(),name);
-                        callResponseBean.setProductName(name);
+                        ProductLine productLine = productLineService.findById(info.getProductId());
+                        if(productLine!=null){
+
+                            name = productLine.getName();
+                            map.put(info.getProductId(),name);
+                            callResponseBean.setProductName(name);
+                        }
                     }
                 }
                 responseBeans.add(callResponseBean);
