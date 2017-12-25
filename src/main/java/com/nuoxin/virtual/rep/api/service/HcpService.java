@@ -15,6 +15,8 @@ import com.nuoxin.virtual.rep.api.enums.MagazineTypeEnum;
 import com.nuoxin.virtual.rep.api.mybatis.DynamicFieldMapper;
 import com.nuoxin.virtual.rep.api.utils.CollectionUtil;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
+import com.nuoxin.virtual.rep.api.web.controller.request.hcp.HcpBasicFieldRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.hcp.HcpBasicUpdateRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.hcp.HcpRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorBasicInfoResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.hcp.*;
@@ -23,6 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
@@ -188,6 +192,48 @@ public class HcpService extends BaseService {
 
         return doctorBasicInfo;
     }
+
+
+    /**
+     * 修改医生的基本信息
+     * @param bean
+     * @return
+     */
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    public Boolean updateHcpBaseInfo(HcpBasicUpdateRequestBean  bean){
+        Boolean flag = false;
+        Long doctorId = bean.getDoctorId();
+        Integer classification = bean.getClassification();
+        Long drugUserId = bean.getDrugUserId();
+
+        dynamicFieldMapper.deleteAllByDoctorIdAndClassification(doctorId, classification);
+
+        List<HcpBasicFieldRequestBean> list = bean.getList();
+
+        if (list !=null && !list.isEmpty()){
+            for (HcpBasicFieldRequestBean hcpBasicFieldRequestBean:list){
+                hcpBasicFieldRequestBean.setDoctorId(doctorId);
+                dynamicFieldMapper.insertHcpBasicField(hcpBasicFieldRequestBean);
+
+
+                //插入搜索历史
+                Long id = hcpBasicFieldRequestBean.getId();
+                hcpBasicFieldRequestBean.setDdfvId(id);
+
+                hcpBasicFieldRequestBean.setDrugUserId(drugUserId);
+                dynamicFieldMapper.insertHcpBasicFieldHistory(hcpBasicFieldRequestBean);
+            }
+
+
+        }
+
+
+        flag = true;
+        return flag;
+    }
+
+
+
 
 
 

@@ -23,9 +23,8 @@ public class HcpBasicUpdateRequestBean implements Serializable{
     private Integer classification;
 
 
-
     @ApiModelProperty(value = "医生更新的字段")
-    private List<HcpBasicUpdateRequestBean> list;
+    private List<HcpBasicFieldRequestBean> list;
 
 
 
@@ -54,11 +53,12 @@ public class HcpBasicUpdateRequestBean implements Serializable{
         this.classification = classification;
     }
 
-    public List<HcpBasicUpdateRequestBean> getList() {
+
+    public List<HcpBasicFieldRequestBean> getList() {
         return list;
     }
 
-    public void setList(List<HcpBasicUpdateRequestBean> list) {
+    public void setList(List<HcpBasicFieldRequestBean> list) {
         this.list = list;
     }
 }

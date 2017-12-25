@@ -12,8 +12,17 @@ import java.io.Serializable;
 public class HcpBasicFieldRequestBean implements Serializable{
     private static final long serialVersionUID = 4655248582939056676L;
 
-    @ApiModelProperty(value = "每个字段的id")
+
+
+    @ApiModelProperty(value = "id")
     private Long id;
+
+    @ApiModelProperty(value = "每个字段的id")
+    private Long fieldId;
+
+    @ApiModelProperty(value = "前端不用传")
+    private Long ddfvId;
+
 
     @ApiModelProperty(value = "字段的名称")
     private String key;
@@ -24,6 +33,11 @@ public class HcpBasicFieldRequestBean implements Serializable{
     @ApiModelProperty(value = "正确错误的使用的字段")
     private String correct;
 
+    @ApiModelProperty(value = "前端不用传")
+    private Long doctorId;
+
+    @ApiModelProperty(value = "前端不用传")
+    private Long drugUserId;
 
     public Long getId() {
         return id;
@@ -32,6 +46,7 @@ public class HcpBasicFieldRequestBean implements Serializable{
     public void setId(Long id) {
         this.id = id;
     }
+
 
     public String getKey() {
         return key;
@@ -55,5 +70,38 @@ public class HcpBasicFieldRequestBean implements Serializable{
 
     public void setCorrect(String correct) {
         this.correct = correct;
+    }
+
+    public Long getDoctorId() {
+        return doctorId;
+    }
+
+    public void setDoctorId(Long doctorId) {
+        this.doctorId = doctorId;
+    }
+
+    public Long getDrugUserId() {
+        return drugUserId;
+    }
+
+    public void setDrugUserId(Long drugUserId) {
+        this.drugUserId = drugUserId;
+    }
+
+    public Long getFieldId() {
+        return fieldId;
+    }
+
+    public void setFieldId(Long fieldId) {
+        this.fieldId = fieldId;
+    }
+
+
+    public Long getDdfvId() {
+        return ddfvId;
+    }
+
+    public void setDdfvId(Long ddfvId) {
+        this.ddfvId = ddfvId;
     }
 }

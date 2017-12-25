@@ -5,6 +5,7 @@ import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.HcpService;
+import com.nuoxin.virtual.rep.api.web.controller.request.hcp.HcpBasicUpdateRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.hcp.HcpRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorBasicInfoResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.hcp.*;
@@ -52,6 +53,22 @@ public class HcpController extends BaseController {
         responseBean.setData(hcpBaseInfo);
         return ResponseEntity.ok(responseBean);
     }
+
+
+    @ApiOperation(value = "修改主数据医生基本信息")
+    @PostMapping("/updateHcpBasicInfo")
+    public ResponseEntity<DefaultResponseBean<Boolean>> getHcpBaseInfo(@RequestBody HcpBasicUpdateRequestBean bean, HttpServletRequest request) {
+
+
+        Long drugUserId = getLoginId(request);
+        bean.setDrugUserId(drugUserId);
+        Boolean flag = hcpService.updateHcpBaseInfo(bean);
+        DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(flag);
+        return ResponseEntity.ok(responseBean);
+    }
+
+
 
 
 
