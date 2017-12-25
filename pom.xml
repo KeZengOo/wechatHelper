@@ -253,6 +253,11 @@
 			<artifactId>wav2mp3</artifactId>
 			<version>1.0.2</version>
 		</dependency>
+		<dependency>
+			<groupId>com.matchDept</groupId>
+			<artifactId>matchDept</artifactId>
+			<version>1.0.2</version>
+		</dependency>
 
 	</dependencies>
 
