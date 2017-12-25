@@ -4,7 +4,7 @@
 
     <select id="getDoctorBasicInfo" parameterType="java.lang.Long"
             resultType="com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorBasicInfoResponseBean">
-        select distinct vddf.type,vddf.field_name field,vddf.field_value fieldValue, vddfv.dynamic_field_value value,vddf.classification from
+        select distinct vddf.type,vddf.id fieldId,vddf.field_name field,vddf.field_value fieldValue, vddfv.dynamic_field_value value,vddfv.id ddfvId, vddf.classification from
         virtual_doctor_dynamic_field vddf
         inner join virtual_doctor_dynamic_field_value vddfv
         on vddf.id=vddfv.dynamic_field_id
@@ -28,8 +28,8 @@
     </insert>
 
     <insert id="insertHcpBasicFieldHistory" useGeneratedKeys="true" keyProperty="id" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.hcp.HcpBasicFieldRequestBean">
-        insert into virtual_doctor_dynamic_field_value_history(ddfv_id,doctor_id,drug_user_id, dynamic_field_id, dynamic_field_name,dynamic_field_value)
-        values (#{ddfvId},#{doctorId},#{drugUserId}, #{fieldId}, #{key}, #{value})
+        insert into virtual_doctor_dynamic_field_value_history(ddfv_id,doctor_id,drug_user_id, dynamic_field_id, dynamic_field_name,dynamic_field_value, correct)
+        values (#{ddfvId},#{doctorId},#{drugUserId}, #{fieldId}, #{key}, #{value}, #{correct})
     </insert>
 
 

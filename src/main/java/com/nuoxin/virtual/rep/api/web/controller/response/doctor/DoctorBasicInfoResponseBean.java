@@ -12,6 +12,12 @@ import java.io.Serializable;
 public class DoctorBasicInfoResponseBean implements Serializable{
     private static final long serialVersionUID = 5527300879361408851L;
 
+    @ApiModelProperty(value = "动态字段的值")
+    private Long ddfvId;
+
+    @ApiModelProperty(value = "字段id")
+    private String fieldId;
+
     @ApiModelProperty(value = "字段名称")
     private String field;
 
@@ -67,5 +73,23 @@ public class DoctorBasicInfoResponseBean implements Serializable{
 
     public void setFieldValue(String fieldValue) {
         this.fieldValue = fieldValue;
+    }
+
+
+    public Long getDdfvId() {
+        return ddfvId;
+    }
+
+    public void setDdfvId(Long ddfvId) {
+        this.ddfvId = ddfvId;
+    }
+
+
+    public String getFieldId() {
+        return fieldId;
+    }
+
+    public void setFieldId(String fieldId) {
+        this.fieldId = fieldId;
     }
 }
