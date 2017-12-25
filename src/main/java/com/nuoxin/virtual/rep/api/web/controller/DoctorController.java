@@ -178,7 +178,14 @@ public class DoctorController extends BaseController {
             responseBean.setMessage("导入数据为空");
             return responseBean;
         }
-        doctorService.saves(list,Long.valueOf(productId),getLoginUser(request));
+        try {
+            doctorService.saves(list,Long.valueOf(productId),getLoginUser(request));
+        } catch (Exception e) {
+            e.printStackTrace();
+            responseBean.setCode(500);
+            responseBean.setMessage(e.getMessage());
+            return responseBean;
+        }
         return responseBean;
     }
 

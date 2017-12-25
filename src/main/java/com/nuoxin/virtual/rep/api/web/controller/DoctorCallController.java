@@ -9,11 +9,14 @@ import com.nuoxin.virtual.rep.api.entity.DoctorCallInfo;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.DoctorCallService;
 import com.nuoxin.virtual.rep.api.service.FollowUpTypeService;
+import com.nuoxin.virtual.rep.api.service.QuestionService;
 import com.nuoxin.virtual.rep.api.web.controller.request.CallbackRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.CallHistoryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.CallInfoRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.CallRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.question.QuestionQueryRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.question.QuestionnaireRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserCallDetaiBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.FollowUpTypResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.LoginResponseBean;
@@ -45,6 +48,8 @@ public class DoctorCallController extends BaseController {
     private DoctorCallService doctorCallService;
     @Autowired
     private FollowUpTypeService followUpTypeService;
+    @Autowired
+    private QuestionService questionService;
 
     @RequestMapping("/callback")
     public DefaultResponseBean<Object> callback(HttpServletRequest request, HttpServletResponse response) {
@@ -263,6 +268,26 @@ public class DoctorCallController extends BaseController {
             e.printStackTrace();
         }
 
+        return responseBean;
+    }
+
+    @PostMapping("/question/page")
+    @ApiOperation(value = "问卷列表", notes = "问卷列表")
+    public DefaultResponseBean<PageResponseBean<QuestionnaireRequestBean>> page(@RequestBody QuestionQueryRequestBean bean,
+                                                                                HttpServletRequest request, HttpServletResponse response){
+        DefaultResponseBean responseBean = new DefaultResponseBean();
+        DrugUser user = this.getLoginUser(request);
+        if (user == null) {
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
+        }
+        if (StringUtils.isBlank(bean.getMobile())) {
+            responseBean.setCode(300);
+            responseBean.setMessage("电话号码不能为空");
+            return responseBean;
+        }
+        responseBean.setData(questionService.pageAnswer(bean,user));
         return responseBean;
     }
 

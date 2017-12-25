@@ -450,7 +450,7 @@ public class DoctorService extends BaseService {
 
     @Transactional(readOnly = false)
     @CacheEvict(value = "virtual_rep_api_doctor", allEntries = true)
-    public Boolean saves(List<DoctorExcel> list, Long productId, DrugUser user) {
+    public Boolean saves(List<DoctorExcel> list, Long productId, DrugUser user) throws Exception {
         List<String> mobiles = new ArrayList<>();
         for (int i = 0, leng = list.size(); i < leng; i++) {
             DoctorExcel excel = list.get(i);
@@ -467,6 +467,13 @@ public class DoctorService extends BaseService {
         List<Doctor> savelist = new ArrayList<>();
         for (int i = 0, leng = list.size(); i < leng; i++) {
             DoctorExcel excel = list.get(i);
+            if(StringUtils.isBlank(excel.getDrugUserEmail())){
+                throw new Exception("第（"+i+1+"）行销售邮箱为空");
+            }
+            user = drugUserService.findByEmail(excel.getDrugUserEmail());
+            if(user==null){
+                throw new Exception("第（"+i+1+"）行销售不存在");
+            }
             Doctor doctor = new Doctor();
             DoctorVirtual virtual = new DoctorVirtual();
             if (doctors != null && !doctors.isEmpty() && StringUtils.isNotEmtity(excel.getMobile())) {
