@@ -13,5 +13,24 @@
 
 
 
+    <delete id="deleteAllByDoctorIdAndClassification">
+
+        delete from virtual_doctor_dynamic_field_value where doctor_id=#{doctorId}
+        and dynamic_field_id in
+        (select id from virtual_doctor_dynamic_field where classification=#{classification})
+
+    </delete>
+
+
+    <insert id="insertHcpBasicField" useGeneratedKeys="true" keyProperty="id" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.hcp.HcpBasicFieldRequestBean">
+        insert into virtual_doctor_dynamic_field_value(doctor_id, dynamic_field_id, dynamic_field_name,dynamic_field_value)
+        values (#{doctorId}, #{fieldId}, #{key}, #{value})
+    </insert>
+
+    <insert id="insertHcpBasicFieldHistory" useGeneratedKeys="true" keyProperty="id" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.hcp.HcpBasicFieldRequestBean">
+        insert into virtual_doctor_dynamic_field_value_history(ddfv_id,doctor_id,drug_user_id, dynamic_field_id, dynamic_field_name,dynamic_field_value)
+        values (#{ddfvId},#{doctorId},#{drugUserId}, #{fieldId}, #{key}, #{value})
+    </insert>
+
 
 </mapper>
