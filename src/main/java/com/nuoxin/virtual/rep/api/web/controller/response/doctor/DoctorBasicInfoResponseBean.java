@@ -34,6 +34,7 @@ public class DoctorBasicInfoResponseBean implements Serializable{
     private Integer classification;
 
 
+
     public String getValue() {
         return value;
     }
