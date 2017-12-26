@@ -5,6 +5,7 @@ import com.nuoxin.virtual.rep.api.web.controller.response.customer.DoctorDymamic
 import com.nuoxin.virtual.rep.api.web.controller.response.customer.DoctorDynamicFieldResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorBasicInfoResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpBasicInfoHistoryResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpDynamicRequestBean;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -21,10 +22,10 @@ public interface DynamicFieldMapper {
 
     /**
      * 每个字段修改的历史
-     * @param id
+     * @param bean
      * @return
      */
-    List<HcpBasicInfoHistoryResponseBean> getHcpBasicInfoHistoryList(@Param(value = "id") Long id);
+    List<HcpBasicInfoHistoryResponseBean> getHcpBasicInfoHistoryList(HcpDynamicRequestBean bean);
     /**
      * 查询出每个动态字段填入的值
      * @param doctorId

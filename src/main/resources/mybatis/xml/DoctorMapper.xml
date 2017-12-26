@@ -33,6 +33,53 @@
     <update id="updateFixedField">
 
         update doctor set name=#{name}, mobile=#{telephone}, depart = #{depart}, hospital_name = #{hospital}
+
+        where id = #{doctorId}
+
+
+        update doctor
+        <set>
+
+            <if test="name !=null and name !=''">
+                name = #{name},
+            </if>
+
+            <if test="mobile !=null and mobile !=''">
+                name = #{mobile},
+            </if>
+
+            <if test="depart !=null and depart !=''">
+                name = #{depart},
+            </if>
+
+            <if test="hospital_name !=null and hospital_name !=''">
+                name = #{hospital}
+            </if>
+
+
+        </set>
+
+        where id = #{doctor}
+
+
+
+    </update>
+
+
+    <update id="updateFixedName" parameterType="com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpDynamicRequestBean">
+        update doctor set name = #{name} where id=#{doctorId}
+    </update>
+
+    <update id="updateFixedTelephone" parameterType="com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpDynamicRequestBean">
+        update doctor set telephone = #{telephone} where id=#{doctorId}
+    </update>
+
+    <update id="updateFixedDepart" parameterType="com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpDynamicRequestBean">
+        update doctor set depart = #{depart} where id=#{doctorId}
+    </update>
+
+    <update id="updateFixedHospital" parameterType="com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpDynamicRequestBean">
+        update doctor set hospital_name = #{hospital} where id=#{doctorId}
     </update>
 
 

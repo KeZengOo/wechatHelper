@@ -2,6 +2,7 @@ package com.nuoxin.virtual.rep.api.mybatis;
 
 import com.nuoxin.virtual.rep.api.common.util.MyMapper;
 import com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpDynamicRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.work.CustomerSumResponseBean;
 import org.springframework.data.repository.query.Param;
 
@@ -33,4 +34,16 @@ public interface DoctorMapper{
     void updateFixedField(@Param(value = "doctorId") Long doctorId,@Param(value = "name") String name,
                 @Param(value = "telephone") String telephone,@Param(value = "depart") String depart,
                 @Param(value = "hospital") String hospital);
+
+
+
+    void updateFixedName(HcpDynamicRequestBean bean);
+
+    void updateFixedTelephone(HcpDynamicRequestBean bean);
+
+
+    void updateFixedDepart(HcpDynamicRequestBean bean);
+
+    void updateFixedHospital(HcpDynamicRequestBean bean);
+
 }
