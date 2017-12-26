@@ -29,4 +29,11 @@
 
     </select>
 
+
+    <update id="updateFixedField">
+
+        update doctor set name=#{name}, mobile=#{telephone}, depart = #{depart}, hospital_name = #{hospital}
+    </update>
+
+
 </mapper>

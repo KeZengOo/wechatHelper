@@ -1,9 +1,11 @@
 package com.nuoxin.virtual.rep.api.web.controller.response.doctor;
 
+import com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpBasicInfoHistoryResponseBean;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Create by tiancun on 2017/10/19
@@ -16,7 +18,7 @@ public class DoctorBasicInfoResponseBean implements Serializable{
     private Long ddfvId;
 
     @ApiModelProperty(value = "字段id")
-    private String fieldId;
+    private Long fieldId;
 
     @ApiModelProperty(value = "字段名称")
     private String field;
@@ -32,6 +34,12 @@ public class DoctorBasicInfoResponseBean implements Serializable{
 
     @ApiModelProperty(value = "分类，例如1是基本信息，2医生的处方信息")
     private Integer classification;
+
+    @ApiModelProperty(value = "标识，1是普通字段，0是需要特殊处理的字段")
+    private Integer flag;
+
+    @ApiModelProperty(value = "字段修改历史")
+    private List<HcpBasicInfoHistoryResponseBean> list;
 
 
 
@@ -86,11 +94,29 @@ public class DoctorBasicInfoResponseBean implements Serializable{
     }
 
 
-    public String getFieldId() {
+    public Long getFieldId() {
         return fieldId;
     }
 
-    public void setFieldId(String fieldId) {
+    public void setFieldId(Long fieldId) {
         this.fieldId = fieldId;
+    }
+
+
+    public List<HcpBasicInfoHistoryResponseBean> getList() {
+        return list;
+    }
+
+    public void setList(List<HcpBasicInfoHistoryResponseBean> list) {
+        this.list = list;
+    }
+
+
+    public Integer getFlag() {
+        return flag;
+    }
+
+    public void setFlag(Integer flag) {
+        this.flag = flag;
     }
 }

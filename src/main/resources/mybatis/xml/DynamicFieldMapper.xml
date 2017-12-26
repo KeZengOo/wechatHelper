@@ -2,8 +2,33 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.nuoxin.virtual.rep.api.mybatis.DynamicFieldMapper">
 
+
+    <select id="getList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.customer.DoctorDynamicFieldResponseBean">
+        select vddf.id, vddf.field_name name, vddf.alias, vddf.type, vddf.field_value value, vddf.classification
+        from virtual_doctor_dynamic_field vddf where vddf.flag = 1
+    </select>
+
+
+    <!--
     <select id="getDoctorBasicInfo" parameterType="java.lang.Long"
             resultType="com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorBasicInfoResponseBean">
+
+        select distinct vddf.type,vddf.id fieldId,vddf.field_name field,vddf.field_value fieldValue, vddfv.dynamic_field_value value,vddfv.id ddfvId, vddf.classification from
+        virtual_doctor_dynamic_field vddf
+        inner join virtual_doctor_dynamic_field_value vddfv
+        on vddf.id=vddfv.dynamic_field_id
+        where vddfv.doctor_id=#{doctorId}
+
+
+
+
+    </select>
+    -->
+
+
+    <select id="getDoctorBasicInfo" parameterType="java.lang.Long"
+            resultType="com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorBasicInfoResponseBean">
+
         <!--
         select distinct vddf.type,vddf.id fieldId,vddf.field_name field,vddf.field_value fieldValue, vddfv.dynamic_field_value value,vddfv.id ddfvId, vddf.classification from
         virtual_doctor_dynamic_field vddf
@@ -12,19 +37,64 @@
         where vddfv.doctor_id=#{doctorId}
         -->
 
+        select vddf.type, vddf.id fieldId, vddf.field_name field,
+        vddf.field_value fieldValue,
+        vddf.classification,
+        vddf.flag
+        from virtual_doctor_dynamic_field vddf order by vddf.flag,vddf.classification
 
-        select * from (
-        select distinct vddf.type,vddf.id fieldId,vddf.field_name field,vddf.field_value fieldValue, vddfv.dynamic_field_value value,vddfv.id ddfvId, vddf.classification from
-        virtual_doctor_dynamic_field vddf
-        inner join virtual_doctor_dynamic_field_value vddfv
-        on vddf.id=vddfv.dynamic_field_id
-        where vddfv.doctor_id=#{doctorId}
-        union
-        select 1 type,vddfv.dynamic_field_id fieldId, vddfv.dynamic_field_name filed, null fieldValue ,vddfv.dynamic_field_value value,vddfv.id ddfvId,0 classification
-        from virtual_doctor_dynamic_field_value vddfv
-        where vddfv.dynamic_field_id=0 and vddfv.doctor_id=#{doctorId}
-        ) t order by t.classification
 
+
+
+    </select>
+
+
+    <select id="getHcpBasicInfoHistoryList" parameterType="java.lang.Long"
+            resultType="com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpBasicInfoHistoryResponseBean">
+
+        select h.dynamic_field_name fieldName, h.dynamic_field_value filedValue,(select name from drug_user where id=h.drug_user_id) drugUserName,
+        h.correct,
+        h.old_dynamic_field_name oldFieldName,
+        h.old_dynamic_field_value oldFieldValue,
+        date_format(h.update_time,'%Y-%m-%d %H:%i:%s') updateTime
+        from virtual_doctor_dynamic_field_value_history h where h.ddfv_id=#{id}
+        and h.drug_user_id in (
+        select id from drug_user du where du.leader_path like (select concat(leader_path,'%') from drug_user where id=h.drug_user_id)
+        )
+    </select>
+
+
+
+    <select id="getDoctorBasicInfoValue"
+            resultType="com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorBasicInfoResponseBean">
+
+        select vddfv.dynamic_field_value value,vddfv.id ddfvId from virtual_doctor_dynamic_field_value vddfv
+        where vddfv.doctor_id=#{doctorId} and vddfv.dynamic_field_id=#{fieldId} limit 1
+
+
+    </select>
+
+
+
+
+    <select id="getFixedField" resultType="com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorBasicInfoResponseBean">
+
+        select vddf.type, vddf.id fieldId, vddf.field_name field,
+        vddf.field_value fieldValue,
+        vddf.classification,
+        vddf.flag
+        from virtual_doctor_dynamic_field where flag=0
+
+    </select>
+
+
+    <select id="getFieldByDoctorIdAndClassification" resultType="com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorBasicInfoResponseBean">
+
+        select distinct vddfv.dynamic_field_id fieldId, vddfv.dynamic_field_name field, vddfv.dynamic_field_value value from virtual_doctor_dynamic_field_value vddfv
+        inner join virtual_doctor_dynamic_field vddf
+        on vddfv.dynamic_field_id=vddf.id
+        where vddf.classification=#{classification}
+        and vddfv.doctor_id=#{doctorId}
 
     </select>
 
