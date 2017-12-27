@@ -85,7 +85,7 @@
         vddf.field_value fieldValue,
         vddf.classification,
         vddf.flag
-        from virtual_doctor_dynamic_field where flag=0
+        from virtual_doctor_dynamic_field vddf where flag=0
 
     </select>
 
