@@ -200,6 +200,9 @@ public class DoctorService extends BaseService {
             virtual.setDrugUserIds(this.assembleLeaderPath(bean.getLeaderPath(), bean.getDrugUserId()));
         } else {
             virtual = doctor.getDoctorVirtual();
+            if(virtual==null){
+                virtual = new DoctorVirtual();
+            }
             virtual.setDrugUserIds(this.assembleLeaderPath(this.assembleLeaderPath(virtual.getDrugUserIds(), bean.getDrugUserId()), bean.getDrugUserId()));
         }
 //        BeanUtils.copyProperties(bean,doctor);
@@ -277,6 +280,9 @@ public class DoctorService extends BaseService {
             virtual.setDrugUserIds(this.assembleLeaderPath(bean.getLeaderPath(), bean.getDrugUserId()));
         } else {
             virtual = doctor.getDoctorVirtual();
+            if(virtual==null){
+                virtual = new DoctorVirtual();
+            }
             virtual.setDrugUserIds(this.assembleLeaderPath(this.assembleLeaderPath(virtual.getDrugUserIds(), bean.getDrugUserId()), bean.getDrugUserId()));
         }
 //        BeanUtils.copyProperties(bean,doctor);
@@ -559,6 +565,7 @@ public class DoctorService extends BaseService {
         doctorRepository.updateVirtualDoctorId();
 
         //TODO 添加关系到关系表
+
         return true;
     }
 
