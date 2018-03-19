@@ -12,6 +12,7 @@ import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.ProductLine;
 import com.nuoxin.virtual.rep.api.enums.HospitalLevelEnum;
 import com.nuoxin.virtual.rep.api.enums.MagazineTypeEnum;
+import com.nuoxin.virtual.rep.api.mybatis.DoctorMapper;
 import com.nuoxin.virtual.rep.api.mybatis.DynamicFieldMapper;
 import com.nuoxin.virtual.rep.api.utils.CollectionUtil;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
@@ -57,6 +58,9 @@ public class HcpService extends BaseService {
 
     @Autowired
     private DynamicFieldMapper dynamicFieldMapper;
+
+    @Autowired
+    private DoctorMapper doctorMapper;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -188,9 +192,61 @@ public class HcpService extends BaseService {
      */
     public List<DoctorBasicInfoResponseBean> getHcpBaseInfo(Long id){
 
-        List<DoctorBasicInfoResponseBean> doctorBasicInfo = dynamicFieldMapper.getDoctorBasicInfo(id);
+        List<DoctorBasicInfoResponseBean> doctorBasicInfoList = dynamicFieldMapper.getDoctorBasicInfo(id);
 
-        return doctorBasicInfo;
+        if (doctorBasicInfoList !=null && !doctorBasicInfoList.isEmpty()){
+            for (DoctorBasicInfoResponseBean doctorBasicInfoResponseBean:doctorBasicInfoList){
+                DoctorBasicInfoResponseBean doctorBasicInfoValue = dynamicFieldMapper.getDoctorBasicInfoValue(id, doctorBasicInfoResponseBean.getFieldId());
+                if (doctorBasicInfoValue != null){
+                    doctorBasicInfoResponseBean.setDdfvId(doctorBasicInfoValue.getDdfvId());
+                    doctorBasicInfoResponseBean.setValue(doctorBasicInfoValue.getValue());
+                    //Long ddfvId = doctorBasicInfoValue.getDdfvId();
+                    //if (ddfvId !=null && ddfvId !=0){
+                    HcpDynamicRequestBean h = new HcpDynamicRequestBean();
+                    h.setDoctorId(id);
+                    h.setName(doctorBasicInfoResponseBean.getField());
+                        List<HcpBasicInfoHistoryResponseBean> hcpBasicInfoHistoryList = dynamicFieldMapper.getHcpBasicInfoHistoryList(h);
+                        if (hcpBasicInfoHistoryList != null && !hcpBasicInfoHistoryList.isEmpty()) {
+                            doctorBasicInfoResponseBean.setList(hcpBasicInfoHistoryList);
+                        }
+                    //}
+                }
+
+            }
+
+        }
+
+
+        Doctor doctor = doctorRepository.findFirstById(id);
+        if (doctor != null){
+            //填充上固定的四个字段
+            if (doctorBasicInfoList != null && !doctorBasicInfoList.isEmpty()){
+                for (DoctorBasicInfoResponseBean doctorBasicInfoResponseBean:doctorBasicInfoList){
+                    String field = doctorBasicInfoResponseBean.getField();
+                    if (!StringUtils.isEmpty(field)){
+                        if (field.equals("姓名")){
+                            doctorBasicInfoResponseBean.setValue(doctor.getName());
+                        }
+
+                        if (field.equals("电话")){
+                            doctorBasicInfoResponseBean.setValue(doctor.getMobile());
+                        }
+
+                        if (field.equals("科室")){
+                            doctorBasicInfoResponseBean.setValue(doctor.getDepartment());
+                        }
+
+                        if (field.equals("医院")){
+                            doctorBasicInfoResponseBean.setValue(doctor.getHospitalName());
+                        }
+
+                    }
+                }
+            }
+        }
+
+
+        return doctorBasicInfoList;
     }
 
 
@@ -206,9 +262,85 @@ public class HcpService extends BaseService {
         Integer classification = bean.getClassification();
         Long drugUserId = bean.getDrugUserId();
 
+        //删除之前先拿到要删除的字段
+        List<DoctorBasicInfoResponseBean> beforeDeleteList =  dynamicFieldMapper.getFieldByDoctorIdAndClassification(doctorId, classification);
+
+
+
         dynamicFieldMapper.deleteAllByDoctorIdAndClassification(doctorId, classification);
 
         List<HcpBasicFieldRequestBean> list = bean.getList();
+
+
+        //同时修改医生表中的四个字段
+        if (classification !=null && classification == 1){
+            if (list != null && !list.isEmpty()){
+                for (HcpBasicFieldRequestBean hcpBasicFieldRequestBean:list){
+                    String key = hcpBasicFieldRequestBean.getKey();
+                    if (!StringUtils.isEmpty(key)){
+                        String name = "";
+                        String telephone = "";
+                        String depart = "";
+                        String hospital = "";
+                        if (key.equals("姓名")){
+                            name = hcpBasicFieldRequestBean.getValue();
+                            HcpDynamicRequestBean b = new HcpDynamicRequestBean();
+                            b.setDoctorId(doctorId);
+                            b.setName(name);
+                            doctorMapper.updateFixedName(b);
+
+
+
+
+                        }
+
+                        if (key.equals("电话")){
+                            telephone = hcpBasicFieldRequestBean.getValue();
+                            if (!StringUtils.isEmpty(telephone)){
+                                HcpDynamicRequestBean b = new HcpDynamicRequestBean();
+                                b.setDoctorId(doctorId);
+                                b.setTelephone(telephone);
+
+                                doctorMapper.updateFixedTelephone(b);
+                            }
+
+                        }
+
+                        if (key.equals("科室")){
+                            depart = hcpBasicFieldRequestBean.getValue();
+
+                            HcpDynamicRequestBean b = new HcpDynamicRequestBean();
+                            b.setDoctorId(doctorId);
+                            b.setDepart(depart);
+
+                            doctorMapper.updateFixedDepart(b);
+                        }
+
+                        if (key.equals("医院")){
+                            hospital = hcpBasicFieldRequestBean.getValue();
+
+                            HcpDynamicRequestBean b = new HcpDynamicRequestBean();
+                            b.setDoctorId(doctorId);
+                            b.setHospital(hospital);
+
+                            doctorMapper.updateFixedHospital(b);
+                        }
+
+
+                        //更新医生表中的四个字段
+//                        if (!StringUtils.isEmpty(name) && !StringUtils.isEmpty(telephone) && !StringUtils.isEmpty(depart) && !StringUtils.isEmpty(hospital)){
+//                            doctorMapper.updateFixedField(doctorId,name,telephone,depart,hospital);
+//                        }
+
+                    }
+                }
+            }
+        }
+
+
+
+
+
 
         if (list !=null && !list.isEmpty()){
             for (HcpBasicFieldRequestBean hcpBasicFieldRequestBean:list){
@@ -217,15 +349,71 @@ public class HcpService extends BaseService {
 
 
                 //插入搜索历史
-                Long id = hcpBasicFieldRequestBean.getId();
-                hcpBasicFieldRequestBean.setDdfvId(id);
 
-                hcpBasicFieldRequestBean.setDrugUserId(drugUserId);
-                dynamicFieldMapper.insertHcpBasicFieldHistory(hcpBasicFieldRequestBean);
+
+
+
+
+
+
+
+
+
+                //插入搜索历史
+                Long id = hcpBasicFieldRequestBean.getId();
+                if (id !=null && id !=0){
+                    hcpBasicFieldRequestBean.setDdfvId(id);
+                    hcpBasicFieldRequestBean.setDrugUserId(drugUserId);
+                    if (beforeDeleteList != null && !beforeDeleteList.isEmpty()){
+                        for (DoctorBasicInfoResponseBean doctorBasic:beforeDeleteList){
+                            if (hcpBasicFieldRequestBean.getKey().equals(doctorBasic.getField())){
+
+                                String oldValue = doctorBasic.getValue();
+                                String value = hcpBasicFieldRequestBean.getValue();
+
+
+                                hcpBasicFieldRequestBean.setOldKey(doctorBasic.getField());
+                                hcpBasicFieldRequestBean.setOldFieldId(doctorBasic.getFieldId());
+                                hcpBasicFieldRequestBean.setOldValue(oldValue);
+
+                                if (hcpBasicFieldRequestBean !=null){
+                                    String correct = hcpBasicFieldRequestBean.getCorrect();
+                                    if (!StringUtils.isEmpty(correct) && !correct.equals("正确")){
+                                        if (!StringUtils.isEmpty(oldValue) && oldValue.equals(value)){
+                                            hcpBasicFieldRequestBean.setValue("");
+                                        }
+
+                                        String key = hcpBasicFieldRequestBean.getKey();
+                                        if (!StringUtils.isEmpty(key)){
+                                            if (key.equals("姓名") || key.equals("电话") || key.equals("科室") || key.equals("医院")){
+                                                dynamicFieldMapper.insertHcpBasicFieldHistory(hcpBasicFieldRequestBean);
+                                            }
+                                        }
+
+                                    }
+
+
+
+
+                                }
+
+                            }
+                        }
+                    }
+
+
+
+                }
+
+
+
             }
 
 
         }
+
+
+
 
 
         flag = true;

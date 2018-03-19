@@ -4,6 +4,7 @@ import com.nuoxin.virtual.rep.api.dao.DoctorDynamicFieldRepository;
 import com.nuoxin.virtual.rep.api.dao.DoctorDynamicFieldValueRepository;
 import com.nuoxin.virtual.rep.api.entity.DoctorDynamicField;
 import com.nuoxin.virtual.rep.api.entity.DoctorDynamicFieldValue;
+import com.nuoxin.virtual.rep.api.mybatis.DynamicFieldMapper;
 import com.nuoxin.virtual.rep.api.web.controller.request.customer.DoctorDynamicFieldRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.customer.DoctorDynamicFieldResponseBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,9 @@ public class DoctorDynamicFieldService {
 
     @Autowired
     private DoctorDynamicFieldValueRepository doctorDynamicFieldValueRepository;
+
+    @Autowired
+    private DynamicFieldMapper dynamicFieldMapper;
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public Boolean add(List<DoctorDynamicFieldRequestBean> list){
@@ -101,38 +105,47 @@ public class DoctorDynamicFieldService {
 
 
 
+//    public List<DoctorDynamicFieldResponseBean> getList(){
+//
+//        Specification<DoctorDynamicField> specification = new Specification<DoctorDynamicField>() {
+//            @Override
+//            public Predicate toPredicate(Root<DoctorDynamicField> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+//
+//                return null;
+//            }
+//        };
+//
+//        List<DoctorDynamicField> doctorDynamicFieldList = doctorDynamicFieldRepository.findAll(specification);
+//
+//        List<DoctorDynamicFieldResponseBean> list = new ArrayList<>();
+//        if (null != doctorDynamicFieldList && !doctorDynamicFieldList.isEmpty()){
+//            for (DoctorDynamicField doctorDynamicField:doctorDynamicFieldList){
+//
+//                if (null != doctorDynamicField){
+//                    DoctorDynamicFieldResponseBean doctorDynamicFieldResponseBean = new DoctorDynamicFieldResponseBean();
+//                    doctorDynamicFieldResponseBean.setId(doctorDynamicField.getId());
+//                    doctorDynamicFieldResponseBean.setAlias(doctorDynamicField.getAlias());
+//                    doctorDynamicFieldResponseBean.setName(doctorDynamicField.getName());
+//                    doctorDynamicFieldResponseBean.setType(doctorDynamicField.getType());
+//                    doctorDynamicFieldResponseBean.setValue(doctorDynamicField.getValue());
+//                    doctorDynamicFieldResponseBean.setClassification(doctorDynamicField.getClassification());
+//                    list.add(doctorDynamicFieldResponseBean);
+//                }
+//
+//            }
+//
+//        }
+//
+//        return list;
+//    }
+
+
     public List<DoctorDynamicFieldResponseBean> getList(){
 
-        Specification<DoctorDynamicField> specification = new Specification<DoctorDynamicField>() {
-            @Override
-            public Predicate toPredicate(Root<DoctorDynamicField> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
-
-                return null;
-            }
-        };
-
-        List<DoctorDynamicField> doctorDynamicFieldList = doctorDynamicFieldRepository.findAll(specification);
-
-        List<DoctorDynamicFieldResponseBean> list = new ArrayList<>();
-        if (null != doctorDynamicFieldList && !doctorDynamicFieldList.isEmpty()){
-            for (DoctorDynamicField doctorDynamicField:doctorDynamicFieldList){
-
-                if (null != doctorDynamicField){
-                    DoctorDynamicFieldResponseBean doctorDynamicFieldResponseBean = new DoctorDynamicFieldResponseBean();
-                    doctorDynamicFieldResponseBean.setId(doctorDynamicField.getId());
-                    doctorDynamicFieldResponseBean.setAlias(doctorDynamicField.getAlias());
-                    doctorDynamicFieldResponseBean.setName(doctorDynamicField.getName());
-                    doctorDynamicFieldResponseBean.setType(doctorDynamicField.getType());
-                    doctorDynamicFieldResponseBean.setValue(doctorDynamicField.getValue());
-                    doctorDynamicFieldResponseBean.setClassification(doctorDynamicField.getClassification());
-                    list.add(doctorDynamicFieldResponseBean);
-                }
-
-            }
-
-        }
+        List<DoctorDynamicFieldResponseBean> list = dynamicFieldMapper.getList();
 
         return list;
     }
+
 
 }
