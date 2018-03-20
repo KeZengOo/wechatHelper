@@ -18,6 +18,7 @@ public interface QuestionRepository extends JpaRepository<Question,Long>,JpaSpec
     @Query("update Question q set q.delFlag=1  where q.questionnaireId=:questionnaireId")
     void deleteByQuestionnaireId(@Param("questionnaireId") Long questionnaireId);
 
+    @Query("update Question q set q.delFlag=0  where q.questionnaireId=:questionnaireId")
     List<Question> findByQuestionnaireId(Long questionnaireId);
 
 }
