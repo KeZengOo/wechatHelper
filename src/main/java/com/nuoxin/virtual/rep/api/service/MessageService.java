@@ -119,7 +119,7 @@ public class MessageService extends BaseService {
      * @return
      */
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public boolean importExcel(MultipartFile file) {
+    public boolean importExcel(MultipartFile file, DrugUser drugUser) {
         boolean success = false;
         InputStream inputStream = null;
         try {
@@ -134,9 +134,30 @@ public class MessageService extends BaseService {
 
         String originalFilename = file.getOriginalFilename();
 
+        if (StringUtils.isEmpty(originalFilename)){
+            throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "文件名称不能为空");
+        }
+
+
         if (!originalFilename.endsWith(RegularUtils.EXTENSION_XLS) && !originalFilename.endsWith(RegularUtils.EXTENSION_XLSX)) {
             throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
         }
+
+
+        String fileName = originalFilename.substring(0,originalFilename.lastIndexOf("."));
+
+        String[] strings = fileName.split("-");
+        if (strings == null || strings.length < 2){
+            throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "文件命名不合法，文件名应该以-分割，包含医生的手机号");
+        }
+
+        String doctorTelephone = strings[strings.length -1];
+
+        boolean matcher = RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, doctorTelephone);
+        if (!matcher){
+            throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "手机号输入有误，请检查是否是文本格式");
+        }
+
 
 
         List<Message> list = new ArrayList<>();
@@ -171,20 +192,20 @@ public class MessageService extends BaseService {
                 String wechatMessageStatus = wechatMessageVo.getMessageStatus();
                 String wechatMessageType = wechatMessageVo.getMessageType();
                 String message = wechatMessageVo.getMessage();
-                String drugUserTelephone = wechatMessageVo.getDrugUserTelephone();
-                String doctorTelephone = wechatMessageVo.getDoctorTelephone();
+//                String drugUserTelephone = wechatMessageVo.getDrugUserTelephone();
+//                String doctorTelephone = wechatMessageVo.getDoctorTelephone();
 
-                drugUserTelephone = StringFormatUtil.getTelephoneStr(drugUserTelephone);
-                boolean matcher = RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, drugUserTelephone);
-                if (!matcher){
-                    throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "手机号输入有误，请检查是否是文本格式");
-                }
-                doctorTelephone = StringFormatUtil.getTelephoneStr(doctorTelephone);
-
-                boolean matcher2 = RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, doctorTelephone);
-                if (!matcher2){
-                    throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "手机号输入有误，请检查是否是文本格式");
-                }
+//                drugUserTelephone = StringFormatUtil.getTelephoneStr(drugUserTelephone);
+//                boolean matcher = RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, drugUserTelephone);
+//                if (!matcher){
+//                    throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "手机号输入有误，请检查是否是文本格式");
+//                }
+//                doctorTelephone = StringFormatUtil.getTelephoneStr(doctorTelephone);
+//
+//                boolean matcher2 = RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, doctorTelephone);
+//                if (!matcher2){
+//                    throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "手机号输入有误，请检查是否是文本格式");
+//                }
 
                 //判断数据库中是否存在该条数据
                 Message findMessage = messageRepository.findTopByMessageTypeAndWechatNumberAndMessageTimeOrderByMessageTimeDesc(MessageTypeEnum.WECHAT.getMessageType(), wechatNumber, wechatTime);
@@ -198,10 +219,10 @@ public class MessageService extends BaseService {
                 String nickname = "";
                 String telephone = "";
                 Long userId = 0L;
-                DrugUser drugUser = drugUserRepository.findFirstByMobile(drugUserTelephone);
-                if (drugUser == null) {
-                    throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
-                }
+//                DrugUser drugUser = drugUserRepository.findFirstByMobile(drugUserTelephone);
+//                if (drugUser == null) {
+//                    throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
+//                }
 
                 Doctor doctor = doctorRepository.findTopByMobile(doctorTelephone);
                 if (doctor == null) {
