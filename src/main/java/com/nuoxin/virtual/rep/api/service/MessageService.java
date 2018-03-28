@@ -143,8 +143,11 @@ public class MessageService extends BaseService {
             throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
         }
 
+        String fileName = originalFilename.substring(0,originalFilename.lastIndexOf("."));
 
-        boolean matcher = RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, originalFilename);
+
+
+        boolean matcher = RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, fileName);
         if (!matcher){
             throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "文件名称输入不合法，请以医生的手机号命名");
         }
@@ -157,7 +160,7 @@ public class MessageService extends BaseService {
 //            throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "文件命名不合法，文件名应该以-分割，包含医生的手机号");
 //        }
 
-        String doctorTelephone = originalFilename;
+        String doctorTelephone = fileName;
 
         boolean matche = RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, doctorTelephone);
         if (!matche){
