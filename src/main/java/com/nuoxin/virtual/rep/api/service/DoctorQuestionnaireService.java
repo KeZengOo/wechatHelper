@@ -24,6 +24,11 @@ public class DoctorQuestionnaireService {
     @Autowired
     private QuestionService questionService;
 
+    /**
+     * 根据电话callid获取问卷
+     * @param callId
+     * @return
+     */
     public List<QuestionnaireRequestBean> findByCallId(Long callId){
         List<QuestionnaireRequestBean> requestBeanList = new ArrayList<>();
         List<Long> ids = new ArrayList<>();
@@ -57,6 +62,10 @@ public class DoctorQuestionnaireService {
         return requestBeanList;
     }
 
+    /**
+     * 保存医生问卷
+     * @param list
+     */
     @Transactional(readOnly = false)
     public void save(List<DoctorQuestionnaire> list){
         doctorQuestionnaireRepository.save(list);

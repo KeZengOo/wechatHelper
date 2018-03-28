@@ -77,6 +77,11 @@ public class DoctorCallService extends BaseService {
         return info;
     }
 
+    /**
+     * 获取已打电话列表
+     * @param bean
+     * @return
+     */
     public PageResponseBean<CallResponseBean> doctorPage(QueryRequestBean bean){
         Sort sort = new Sort(Sort.Direction.DESC, "createTime");
         PageRequest pagetable = super.getPage(bean,sort);
@@ -167,6 +172,11 @@ public class DoctorCallService extends BaseService {
         return responseBean;
     }
 
+    /**
+     * 获取电话历史
+     * @param bean
+     * @return
+     */
     public PageResponseBean<CallHistoryResponseBean> doctorHistoryPage(CallHistoryRequestBean bean){
         Sort sort = new Sort(Sort.Direction.DESC, "createTime");
         if(bean.getTimeLong()!=null && bean.getTimeLong()!=0){
@@ -209,6 +219,12 @@ public class DoctorCallService extends BaseService {
         return responseBean;
     }
 
+    /**
+     * 获取企业用户打电话汇总信息
+     *
+     * @param drugUserId
+     * @return
+     */
     public CallStatResponseBean stat(Long drugUserId){
         DrugUser drugUser = drugUserService.findById(drugUserId);
         CallStatResponseBean responseBean = new CallStatResponseBean();

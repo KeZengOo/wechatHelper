@@ -28,6 +28,12 @@ public class SercurityService {
 	@Autowired
 	SessionMemUtils memUtils;
 
+	/**
+	 * 保存session
+	 * @param request
+	 * @param response
+	 * @param user
+	 */
 	public void saveSession(HttpServletRequest request, HttpServletResponse response, DrugUser user) {
 
 //		Cookie[] cookies = request.getCookies();
@@ -55,6 +61,11 @@ public class SercurityService {
 
 	}
 
+	/**
+	 * 清除 session
+	 * @param request
+	 * @throws NeedLoginException
+	 */
 	public void cleanSession(HttpServletRequest request) throws NeedLoginException {
 
 		String sessionId = getSessionId(request);
@@ -96,6 +107,11 @@ public class SercurityService {
 
 	}
 
+	/**
+	 * 刷新 session
+	 * @param sessionId
+	 * @param response
+	 */
 	public void flushCookie(String sessionId, HttpServletResponse response) {
 
 		Cookie cookie = new Cookie(SessionConfig.DEFAULT_SESSION_COOKIE_NAME, sessionId);

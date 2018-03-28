@@ -33,15 +33,29 @@ public class DrugUserService {
     @Autowired
     private ProductLineService productLineService;
 
+    /**
+     * 根据邮箱查询企业用户
+     * @param email
+     * @return
+     */
     public DrugUser findByEmail(String email){
         return drugUserRepository.findFirstByEmail(email);
     }
 
+    /**
+     * 根据id查询企业用户
+     * @param drugUserId
+     * @return
+     */
     @Cacheable(value="virtual_app_web_druguser",key = "'_findById_'+#drugUserId")
     public DrugUser findById(Long drugUserId){
         return drugUserRepository.findOne(drugUserId);
     }
 
+    /**
+     * 修改企业用户密码
+     * @param bean
+     */
     @Transactional(readOnly = false)
     public void updatePawd(UpdatePwdRequestBean bean){
         DrugUser user = this.findByEmail(bean.getEmail());
@@ -52,10 +66,21 @@ public class DrugUserService {
         }
     }
 
+    /**
+     * 获取leaderpath下面关联productId的企业用户
+     * @param leaderPath
+     * @param productId
+     * @return
+     */
     public List<DrugUserResponseBean> relationDrugUser(String leaderPath,Long productId){
         return drugUserMapper.relationDrugUser(leaderPath,productId);
     }
 
+    /**
+     * 获取doctor集合
+     * @param bean
+     * @return
+     */
     public List<DoctorResponseBean> doctorPage(QueryRequestBean bean){
         return drugUserMapper.doctorPage(bean);
     }
@@ -64,6 +89,11 @@ public class DrugUserService {
         return drugUserMapper.doctorPageCount(bean);
     }
 
+    /**
+     * 根据id获取product key word
+     * @param drugUserId
+     * @return
+     */
     @Cacheable(value="virtual_app_web_druguser",key = "'_findByProductKeyWord_'+#drugUserId")
     public List<ProductLine> findByProductKeyWord(Long drugUserId){
         List<ProductLine> result = new ArrayList<>();

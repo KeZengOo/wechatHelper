@@ -16,6 +16,11 @@ public class RoleUserService {
     @Autowired
     private RoleUserRepository roleUserRepository;
 
+    /**
+     * 获取企业用户权限
+     * @param drugUserId
+     * @return
+     */
     public Long checkVirtualRole(Long drugUserId){
         List<RoleUser> list = roleUserRepository.findByUserId(drugUserId);
         if(list!=null && !list.isEmpty()){

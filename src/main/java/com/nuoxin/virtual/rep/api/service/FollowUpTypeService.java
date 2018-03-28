@@ -31,6 +31,11 @@ public class FollowUpTypeService extends BaseService {
     @Autowired
     private ProductLineService productLineService;
 
+    /**
+     * 根据leaderpath获取跟进类型
+     * @param leaderPath
+     * @return
+     */
     public List<FollowUpTypResponseBean> list(String leaderPath){
         List<Long> ids = productLineService.getProductIds(leaderPath);
         if(ids!=null && !ids.isEmpty()){
@@ -39,6 +44,11 @@ public class FollowUpTypeService extends BaseService {
         return null;
     }
 
+    /**
+     * 根据id获取根据类型
+     * @param ids
+     * @return
+     */
     public List<FollowUpTypResponseBean> list(List<Long> ids){
         List<FollowUpTypResponseBean> responseBeans = new ArrayList<>();
         List<FollowUpType> list = followUpTypeRepository.findByProductIdIn(ids);
