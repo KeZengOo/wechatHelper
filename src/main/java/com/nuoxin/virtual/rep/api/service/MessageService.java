@@ -144,17 +144,23 @@ public class MessageService extends BaseService {
         }
 
 
-        String fileName = originalFilename.substring(0,originalFilename.lastIndexOf("."));
-
-        String[] strings = fileName.split("-");
-        if (strings == null || strings.length < 2){
-            throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "文件命名不合法，文件名应该以-分割，包含医生的手机号");
+        boolean matcher = RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, originalFilename);
+        if (!matcher){
+            throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "文件名称输入不合法，请以医生的手机号命名");
         }
 
-        String doctorTelephone = strings[strings.length -1];
 
-        boolean matcher = RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, doctorTelephone);
-        if (!matcher){
+//        String fileName = originalFilename.substring(0,originalFilename.lastIndexOf("."));
+//
+//        String[] strings = fileName.split("-");
+//        if (strings == null || strings.length < 2){
+//            throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "文件命名不合法，文件名应该以-分割，包含医生的手机号");
+//        }
+
+        String doctorTelephone = originalFilename;
+
+        boolean matche = RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, doctorTelephone);
+        if (!matche){
             throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "手机号输入有误，请检查是否是文本格式");
         }
 
