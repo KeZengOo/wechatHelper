@@ -34,11 +34,11 @@ public class WechatMessageVo {
     @Excel(name = "消息", width = 1000)
     private String message;
 
-    @Excel(name = "销售代表手机号", width = 20)
-    private String drugUserTelephone;
-
-    @Excel(name = "医生手机号", width = 20)
-    private String doctorTelephone;
+//    @Excel(name = "销售代表手机号", width = 20)
+//    private String drugUserTelephone;
+//
+//    @Excel(name = "医生手机号", width = 20)
+//    private String doctorTelephone;
 
 
     public String getId() {
@@ -98,21 +98,23 @@ public class WechatMessageVo {
     }
 
 
-    public String getDrugUserTelephone() {
-        return drugUserTelephone;
-    }
+//    public String getDrugUserTelephone() {
+//        return drugUserTelephone;
+//    }
+//
+//    public void setDrugUserTelephone(String drugUserTelephone) {
+//        this.drugUserTelephone = drugUserTelephone;
+//    }
+//
+//    public String getDoctorTelephone() {
+//        return doctorTelephone;
+//    }
+//
+//    public void setDoctorTelephone(String doctorTelephone) {
+//        this.doctorTelephone = doctorTelephone;
+//    }
 
-    public void setDrugUserTelephone(String drugUserTelephone) {
-        this.drugUserTelephone = drugUserTelephone;
-    }
 
-    public String getDoctorTelephone() {
-        return doctorTelephone;
-    }
-
-    public void setDoctorTelephone(String doctorTelephone) {
-        this.doctorTelephone = doctorTelephone;
-    }
 
 
     public Date getWechatTime() {

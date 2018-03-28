@@ -4,6 +4,7 @@ package com.nuoxin.virtual.rep.api.web.controller;
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
+import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.MessageService;
 import com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.message.MessageLinkmanResponseBean;
@@ -39,9 +40,11 @@ public class MessageController extends BaseController {
     @ApiOperation(value = "微信消息导入接口", notes = "微信消息导入接口")
     @PostMapping("/wechat/importExcel")
     @ResponseBody
-    public ResponseEntity<DefaultResponseBean<Boolean>> importExcel(MultipartFile file){
+    public ResponseEntity<DefaultResponseBean<Boolean>> importExcel(MultipartFile file, org.apache.catalina.servlet4preview.http.HttpServletRequest request){
 
-        boolean b = messageService.importExcel(file);
+        DrugUser user = getLoginUser(request);
+
+        boolean b = messageService.importExcel(file,user);
 
         DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
         responseBean.setData(b);
