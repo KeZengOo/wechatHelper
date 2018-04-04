@@ -14,6 +14,11 @@ public interface TargetAnalysisMapper {
 
     Integer summation(TargetAnalysisRequestBean bean);
 
+    /**
+     * 获取目标会议信息
+     * @param bean
+     * @return
+     */
     MettingTargetResponseBean meeting(TargetAnalysisRequestBean bean);
 
     /**

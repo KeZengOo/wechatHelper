@@ -67,6 +67,11 @@ public class DoctorService extends BaseService {
     @Autowired
     private ProductLineService productLineService;
 
+    /**
+     * 获取doctor详情
+     * @param id
+     * @return
+     */
     @Cacheable(value = "virtual_rep_api_doctor", key = "'_details_'+#id")
     public DoctorDetailsResponseBean details(Long id) {
         DoctorDetailsResponseBean responseBean = new DoctorDetailsResponseBean();
@@ -88,11 +93,22 @@ public class DoctorService extends BaseService {
         return responseBean;
     }
 
+    /**
+     * 获取简单的doctor信息
+     * @param id
+     * @return
+     */
     @Cacheable(value = "virtual_rep_api_doctor", key = "'_details_'+#id")
     public Doctor findById(Long id) {
         return doctorRepository.findOne(id);
     }
 
+    /**
+     * 根据电话获取doctor信息
+     *
+     * @param mobile
+     * @return
+     */
     @Cacheable(value = "virtual_rep_api_doctor", key = "'_mobile_'+#mobile")
     public DoctorDetailsResponseBean findByMobile(String mobile) {
 
@@ -117,18 +133,39 @@ public class DoctorService extends BaseService {
         return responseBean;
     }
 
+    /**
+     * 根据id获取doctor信息
+     * @param ids
+     * @return
+     */
     public List<Doctor> findByIdIn(Collection<Long> ids) {
         return doctorRepository.findByIdIn(ids);
     }
 
+
+    /**
+     * 根据mobiles获取doctor信息
+     * @param mobiles
+     * @return
+     */
     public List<Doctor> findByMobileIn(Collection<String> mobiles) {
         return doctorRepository.findByMobileIn(mobiles);
     }
 
+    /**
+     * 根据邮件获取doctor信息
+     * @param emails
+     * @return
+     */
     public List<Doctor> findByEmailIn(Collection<String> emails) {
         return doctorRepository.findByEmailIn(emails);
     }
 
+    /**
+     * 查询该企业用户下面关联的doctor
+     * @param bean
+     * @return
+     */
     @Cacheable(value = "virtual_rep_api_doctor", key = "'_page_'+#bean")
     public PageResponseBean<DoctorResponseBean> page(QueryRequestBean bean) {
 //        PageRequest pageable = super.getPage(bean);
@@ -178,6 +215,12 @@ public class DoctorService extends BaseService {
         return responseBean;
     }
 
+    /**
+     * 获取该企业用户doctor汇总信息
+     * @param drugUserId
+     * @param leaderPath
+     * @return
+     */
     @Cacheable(value = "virtual_rep_api_doctor", key = "'_stat_'+#drugUserId")
     public DoctorStatResponseBean stat(Long drugUserId, String leaderPath) {
         DoctorStatResponseBean responseBean = new DoctorStatResponseBean();
@@ -190,6 +233,11 @@ public class DoctorService extends BaseService {
         return responseBean;
     }
 
+    /**
+     * 保存doctor
+     * @param bean
+     * @return
+     */
     @Transactional(readOnly = false)
     @CacheEvict(value = "virtual_rep_api_doctor", allEntries = true)
     public Boolean save(DoctorRequestBean bean) {
@@ -270,6 +318,11 @@ public class DoctorService extends BaseService {
         return true;
     }
 
+    /**
+     * 修改doctor
+     * @param bean
+     * @return
+     */
     @Transactional(readOnly = false)
     @CacheEvict(value = "virtual_rep_api_doctor", allEntries = true)
     public Boolean update(DoctorUpdateRequestBean bean) {
@@ -359,6 +412,11 @@ public class DoctorService extends BaseService {
 //        return true;
 //    }
 
+    /**
+     * 导入doctorexcel
+     * @param list
+     * @return
+     */
     @Transactional(readOnly = false)
     @CacheEvict(value = "virtual_rep_api_doctor", allEntries = true)
     public Boolean saves(List<DoctorExcel> list) {
@@ -454,6 +512,11 @@ public class DoctorService extends BaseService {
         return true;
     }
 
+    /**
+     * 导入doctorexcel
+     * @param list
+     * @return
+     */
     @Transactional(readOnly = false)
     @CacheEvict(value = "virtual_rep_api_doctor", allEntries = true)
     public Boolean saves(List<DoctorExcel> list, Long productId, DrugUser user) throws Exception {
@@ -569,6 +632,12 @@ public class DoctorService extends BaseService {
         return true;
     }
 
+    /**
+     * 删除企业用户doctor关系
+     *
+     * @param bean
+     * @return
+     */
     @Transactional(readOnly = false)
     public boolean delete(RelationRequestBean bean) {
         List<Long> ids = bean.getIds();
@@ -617,6 +686,12 @@ public class DoctorService extends BaseService {
         return true;
     }
 
+    /**
+     * 修改企业用户doctor关系
+     *
+     * @param bean
+     * @return
+     */
     @Transactional(readOnly = false)
     public boolean relation(RelationRequestBean bean) {
         List<Long> pId = bean.getpIds();

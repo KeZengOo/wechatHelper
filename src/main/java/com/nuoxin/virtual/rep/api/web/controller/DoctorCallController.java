@@ -51,6 +51,12 @@ public class DoctorCallController extends BaseController {
     @Autowired
     private QuestionService questionService;
 
+    /**
+     * 打电话获取录音文件回调接口
+     * @param request
+     * @param response
+     * @return
+     */
     @RequestMapping("/callback")
     public DefaultResponseBean<Object> callback(HttpServletRequest request, HttpServletResponse response) {
         DefaultResponseBean<Object> responseBean = new DefaultResponseBean<>();

@@ -10,12 +10,24 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 /**
+ * 药企用户mapper
  * Created by fenggang on 10/18/17.
  */
 public interface DrugUserMapper extends MyMapper<DrugUser> {
 
+    /**
+     * 根据条件查询医生
+     * @param bean
+     * @return
+     */
     List<DoctorResponseBean> doctorPage(QueryRequestBean bean);
     Integer doctorPageCount(QueryRequestBean bean);
 
+    /**
+     * 根据leaderpath查询下属销售
+     * @param leaderPath
+     * @param productId
+     * @return
+     */
     List<DrugUserResponseBean> relationDrugUser(@Param("leaderPath") String leaderPath,@Param("productId") Long productId);
 }

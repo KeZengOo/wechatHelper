@@ -45,6 +45,11 @@ public class QuestionService extends BaseService {
     @Autowired
     private DoctorService doctorService;
 
+    /**
+     * 保存 问卷
+     * @param bean
+     * @return
+     */
     @Transactional(readOnly = false)
     @CacheEvict(value = "virtual_rep_api_question",allEntries = true)
     public Boolean save(QuestionnaireRequestBean bean){
@@ -73,6 +78,12 @@ public class QuestionService extends BaseService {
         return true;
     }
 
+
+    /**
+     * 修改问卷
+     * @param bean
+     * @return
+     */
     @Transactional(readOnly = false)
     @CacheEvict(value = "virtual_rep_api_question",allEntries = true)
     public Boolean update(QuestionnaireRequestBean bean){
@@ -103,12 +114,22 @@ public class QuestionService extends BaseService {
         return true;
     }
 
+    /**
+     * 获取问卷
+     * @param id
+     * @return
+     */
     @Cacheable(value = "virtual_rep_api_question", key="'_details_'+#id" )
     public QuestionnaireRequestBean findById(Long id){
         Questionnaire questionnaire = questionnaireRepository.findOne(id);
         return this._getQuestionnaire(questionnaire);
     }
 
+    /**
+     * 删除问卷
+     * @param id
+     * @return
+     */
     @Transactional(readOnly = false)
     @CacheEvict(value = "virtual_rep_api_question",allEntries = true)
     public Boolean delete(Long id){
@@ -117,6 +138,11 @@ public class QuestionService extends BaseService {
         return true;
     }
 
+    /**
+     * 获取问卷列表
+     * @param bean
+     * @return
+     */
     @Cacheable(value = "virtual_rep_api_question", key="'_page_'+#bean" )
     public PageResponseBean<QuestionnaireRequestBean> page(QuestionQueryRequestBean bean){
         Sort sort = new Sort(Sort.Direction.DESC, "createTime");
@@ -151,6 +177,13 @@ public class QuestionService extends BaseService {
         }
         return responseBean;
     }
+
+    /**
+     * 获取问卷
+     * @param bean
+     * @param user
+     * @return
+     */
     public PageResponseBean<QuestionnaireRequestBean> pageAnswer(QuestionQueryRequestBean bean,DrugUser user){
         Sort sort = new Sort(Sort.Direction.DESC, "createTime");
         PageRequest pageable = super.getPage(bean,sort);

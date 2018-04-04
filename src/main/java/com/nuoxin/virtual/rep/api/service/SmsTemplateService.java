@@ -27,6 +27,10 @@ public class SmsTemplateService {
         return smsTemplateRepository.findOne(id);
     }
 
+    /**
+     * 获取短信发送模板
+     * @return
+     */
     public List<SmsTemplateResponseBean> findByAll(){
         List<SmsTemplateResponseBean> responseBeans = new ArrayList<>();
         List<SmsTemplate> list = smsTemplateRepository.findAll();

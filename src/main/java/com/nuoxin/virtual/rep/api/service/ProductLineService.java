@@ -24,6 +24,11 @@ public class ProductLineService {
     @Autowired
     private DrugUserRepository drugUserRepository;
 
+    /**
+     * 获取产品
+     * @param productId
+     * @return
+     */
     @Cacheable(value = "virtual_app_web_product", key = "'_'+#productId")
     public ProductLine findById(Long productId){
         ProductLine productLine = new ProductLine();
@@ -31,12 +36,21 @@ public class ProductLineService {
         return productLineMapper.selectOne(productLine);
     }
 
+    /**
+     * 获取产品id集合
+     * @param leaderPath
+     * @return
+     */
     @Cacheable(value = "virtual_app_web_product", key = "'_ids_'+#leaderPath")
     public List<Long> getProductIds(String leaderPath){
         return productLineMapper.getProductIds(leaderPath);
     }
 
-
+    /**
+     * 获取产品集合
+     * @param drugUserId
+     * @return
+     */
     public List<ProductResponseBean> getList(Long drugUserId){
         DrugUser drugUser = drugUserRepository.findFirstById(drugUserId);
         String leaderPath = drugUser.getLeaderPath();

@@ -118,6 +118,11 @@ public class SmsSendService {
 
     }
 
+    /**
+     * 获取要发送短信的手机号
+     * @param bean
+     * @return
+     */
     public List<String> send(SmsSendRequestBean bean) {
         List<String> result = new ArrayList<>();
         DrugUser drugUser = drugUserService.findById(bean.getDrugUserId());

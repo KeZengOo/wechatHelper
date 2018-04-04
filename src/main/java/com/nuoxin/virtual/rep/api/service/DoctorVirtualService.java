@@ -22,11 +22,21 @@ public class DoctorVirtualService extends BaseService {
     @Autowired
     private DoctorVirtualRepository doctorVirtualRepository;
 
+    /**
+     * 获取doctor关联virtual
+     * @param doctorId
+     * @return
+     */
     @Cacheable(value = "virtual_rep_api_doctor_virtual", key = "'_findByDoctorId_'+#doctorId")
     public DoctorVirtual findByDoctorId(Long doctorId){
         return doctorVirtualRepository.findByDoctorId(doctorId);
     }
 
+    /**
+     * 保存doctor关联virtual
+     * @param doctorVirtual
+     * @return
+     */
     @Transactional(readOnly = false)
     public DoctorVirtual save(DoctorVirtual doctorVirtual){
         return doctorVirtualRepository.saveAndFlush(doctorVirtual);

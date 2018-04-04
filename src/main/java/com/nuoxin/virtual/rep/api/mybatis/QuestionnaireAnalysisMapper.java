@@ -18,6 +18,11 @@ import java.util.List;
  */
 public interface QuestionnaireAnalysisMapper extends MyMapper<DoctorQuestionnaire> {
 
+    /**
+     * 获取问卷列表
+     * @param bean
+     * @return
+     */
     List<QuestionnaireResponseBean> list(QuestionnaireAnalysisRequestBean bean);
 
     /**
