@@ -21,7 +21,7 @@ public class DoctorExcel implements Serializable {
     private String area;
     @Excel(name = "医院名称",width=500)
     private String hospitalName;
-    @Excel(name = "医生姓名",width=100)
+    @Excel(name = "医生名称",width=100)
     private String doctorName;
     @Excel(name = "客户级别",width=100)
     private String sex;
