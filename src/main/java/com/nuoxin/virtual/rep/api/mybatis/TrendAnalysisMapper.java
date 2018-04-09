@@ -67,5 +67,11 @@ public interface TrendAnalysisMapper {
      * @return
      */
     List<TrendStatResponseBean> sessionType2(TrendAnalysisRequestBean bean);
+    /**
+     * 邮件数
+     *
+     * @param bean
+     * @return
+     */
     List<TrendStatResponseBean> sessionType3(TrendAnalysisRequestBean bean);
 }

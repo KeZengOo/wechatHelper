@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
+ * 跟进类型
  * Created by fenggang on 9/18/17.
  */
 public interface FollowUpTypeRepository extends JpaRepository<FollowUpType,Long>,JpaSpecificationExecutor<FollowUpType> {

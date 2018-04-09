@@ -13,6 +13,10 @@ import org.springframework.data.repository.query.Param;
  */
 public interface QuestionnaireRepository extends JpaRepository<Questionnaire,Long>,JpaSpecificationExecutor<Questionnaire> {
 
+    /**
+     * 修改试卷删除状态
+     * @param id
+     */
     @Modifying
     @Query("update Questionnaire q set q.delFlag=1  where q.id=:id")
     void updateDelFlag(@Param("id") Long id);

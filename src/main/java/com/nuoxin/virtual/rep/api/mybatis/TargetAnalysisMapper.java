@@ -12,6 +12,11 @@ import java.util.Map;
  */
 public interface TargetAnalysisMapper {
 
+    /**
+     * 目标医生数
+     * @param bean
+     * @return
+     */
     Integer summation(TargetAnalysisRequestBean bean);
 
     /**
@@ -49,9 +54,24 @@ public interface TargetAnalysisMapper {
      */
     TargetResponseBean customWechat(TargetAnalysisRequestBean bean);
 
+    /**
+     * 目标覆盖电话总时长
+     * @param bean
+     * @return
+     */
     TargetResponseBean customTelSum(TargetAnalysisRequestBean bean);
 
+    /**
+     * 目标覆盖电话平均时长
+     * @param bean
+     * @return
+     */
     TargetResponseBean customTelAvg(TargetAnalysisRequestBean bean);
 
+    /**
+     * 目标跟进类型
+     * @param bean
+     * @return
+     */
     List<Map<String,Object>> followUpType(TargetAnalysisRequestBean bean);
 }

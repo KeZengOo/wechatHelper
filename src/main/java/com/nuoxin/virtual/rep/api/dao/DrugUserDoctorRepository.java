@@ -16,6 +16,11 @@ import java.util.Map;
  */
 public interface DrugUserDoctorRepository extends JpaRepository<DrugUserDoctor,Long>,JpaSpecificationExecutor<DrugUserDoctor> {
 
+    /**
+     * 根据条件删除销售医生关系
+     * @param doctorId
+     * @param drugUserId
+     */
     @Modifying
     void deleteByDoctorIdAndDrugUserId(Long doctorId,Long drugUserId);
     @Modifying
