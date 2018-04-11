@@ -87,32 +87,32 @@ public class AdviceControllerAop {
      * @param joinPoint
      * @param ex
      */
-    @AfterThrowing(throwing="ex",pointcut="execution(* com.nuoxin.virtual.rep.api.service..*.*(..))")
-    public void doThrowing(JoinPoint joinPoint, Throwable ex) {
-        ex.printStackTrace();
-        if(ex instanceof NeedLoginException){
-        }else{
-            try {
-                StringBuffer sb = new StringBuffer("<html><body><h3><b>异常日志</b></h3><p>类:");
-                sb.append(joinPoint.getThis().toString());
-                sb.append("</p><p>方法:");
-                sb.append(joinPoint.getSignature().getName());
-                sb.append("</p><p>参数:");
-                sb.append(JSON.toJSONString(joinPoint.getArgs()));
-                sb.append("</p><div>");
-                sb.append(ex);
-                sb.append("</div></body></html>");
-                String subiect = "";
-                if(ex.getMessage()!=null){
-                    subiect = ex.getMessage().substring(0,ex.getMessage().length()>10?10:ex.getMessage().length())+"-虚拟代表接口错误日志-" + DateUtil.getDateStr(DateUtil.DATE_FORMAT_YMR);
-                }else{
-                    subiect = "虚拟代表接口错误日志-" + DateUtil.getDateStr(DateUtil.DATE_FORMAT_YMR);
-                }
-                EmailUtil.htmlMail(new String[]{"gang.feng@naxions.com", "cun.tian@naxions.com"},subiect,sb.toString());
-            } catch (Exception e) {
-                e.printStackTrace();
-                logger.error("失败原因【{}】" , e.getMessage(), e);
-            }
-        }
-    }
+//    @AfterThrowing(throwing="ex",pointcut="execution(* com.nuoxin.virtual.rep.api.service..*.*(..))")
+//    public void doThrowing(JoinPoint joinPoint, Throwable ex) {
+//        ex.printStackTrace();
+//        if(ex instanceof NeedLoginException){
+//        }else{
+//            try {
+//                StringBuffer sb = new StringBuffer("<html><body><h3><b>异常日志</b></h3><p>类:");
+//                sb.append(joinPoint.getThis().toString());
+//                sb.append("</p><p>方法:");
+//                sb.append(joinPoint.getSignature().getName());
+//                sb.append("</p><p>参数:");
+//                sb.append(JSON.toJSONString(joinPoint.getArgs()));
+//                sb.append("</p><div>");
+//                sb.append(ex);
+//                sb.append("</div></body></html>");
+//                String subiect = "";
+//                if(ex.getMessage()!=null){
+//                    subiect = ex.getMessage().substring(0,ex.getMessage().length()>10?10:ex.getMessage().length())+"-虚拟代表接口错误日志-" + DateUtil.getDateStr(DateUtil.DATE_FORMAT_YMR);
+//                }else{
+//                    subiect = "虚拟代表接口错误日志-" + DateUtil.getDateStr(DateUtil.DATE_FORMAT_YMR);
+//                }
+//                EmailUtil.htmlMail(new String[]{"gang.feng@naxions.com", "cun.tian@naxions.com"},subiect,sb.toString());
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                logger.error("失败原因【{}】" , e.getMessage(), e);
+//            }
+//        }
+//    }
 }

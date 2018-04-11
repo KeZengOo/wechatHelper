@@ -23,10 +23,9 @@ public interface QuestionRepository extends JpaRepository<Question,Long>,JpaSpec
     void deleteByQuestionnaireId(@Param("questionnaireId") Long questionnaireId);
 
     /**
-     * 修改试题删除状态
+     * 根据问卷id查询问题
      * @param questionnaireId
      */
-    @Query("update Question q set q.delFlag=0  where q.questionnaireId=:questionnaireId")
     List<Question> findByQuestionnaireId(Long questionnaireId);
 
 }
