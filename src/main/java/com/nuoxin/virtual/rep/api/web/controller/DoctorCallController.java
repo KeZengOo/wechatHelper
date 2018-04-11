@@ -52,7 +52,7 @@ public class DoctorCallController extends BaseController {
     private QuestionService questionService;
 
     /**
-     * 打电话获取录音文件回调接口
+     * 打电话获取录音文件回调接口,现在荣联那边每5分钟调用一次
      * @param request
      * @param response
      * @return
