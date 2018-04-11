@@ -5,13 +5,12 @@ import com.nuoxin.virtual.rep.api.common.bean.DoctorVo;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
+import com.nuoxin.virtual.rep.api.common.exception.FileFormatException;
 import com.nuoxin.virtual.rep.api.common.service.BaseService;
 import com.nuoxin.virtual.rep.api.common.util.StringUtils;
-import com.nuoxin.virtual.rep.api.dao.DoctorCallInfoRepository;
-import com.nuoxin.virtual.rep.api.dao.DoctorRepository;
-import com.nuoxin.virtual.rep.api.dao.DoctorVirtualRepository;
-import com.nuoxin.virtual.rep.api.dao.DrugUserDoctorRepository;
+import com.nuoxin.virtual.rep.api.dao.*;
 import com.nuoxin.virtual.rep.api.entity.*;
+import com.nuoxin.virtual.rep.api.utils.RegularUtils;
 import com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.doctor.DoctorRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.doctor.DoctorUpdateRequestBean;
@@ -63,6 +62,9 @@ public class DoctorService extends BaseService {
     private DoctorDynamicFieldValueService DoctorDynamicFieldValueService;
     @Autowired
     private DoctorCallInfoRepository doctorCallInfoRepository;
+
+    @Autowired
+    private DoctorTelephoneRepository doctorTelephoneRepository;
 
     @Autowired
     private ProductLineService productLineService;
@@ -246,6 +248,8 @@ public class DoctorService extends BaseService {
         if (doctor == null) {
             doctor = new Doctor();
             virtual.setDrugUserIds(this.assembleLeaderPath(bean.getLeaderPath(), bean.getDrugUserId()));
+
+
         } else {
             virtual = doctor.getDoctorVirtual();
             if(virtual==null){
@@ -283,10 +287,34 @@ public class DoctorService extends BaseService {
 //            doctor.setEappId(vo.getId());
 //        }
 
+
+
+        //新增医生的多个手机号
+        boolean flag = false;
+        Long id = doctor.getId();
+        if (id == null || id == 0L){
+            flag = true;
+        }
+
+
         doctor = doctorRepository.saveAndFlush(doctor);
+
         if (doctor.getId() == null) {
             throw new BusinessException(ErrorEnum.ERROR.getStatus(), "医生添加失败");
         }
+
+        if (flag){
+            //添加医生的多个手机号
+            DoctorTelephone doctorTelephone = new DoctorTelephone();
+            doctorTelephone.setDoctorId(doctor.getId());
+            doctorTelephone.setTelephone(doctor.getMobile());
+            doctorTelephone.setCreateTime(new Date());
+            doctorTelephone.setUpdateTime(new Date());
+            doctorTelephoneRepository.save(doctorTelephone);
+        }
+
+
+
         virtual.setDoctorId(doctor.getId());
         virtual.setClientLevel(bean.getClientLevel());
         virtual.setHospitalLevel(bean.getHospitalLevel());
@@ -523,8 +551,21 @@ public class DoctorService extends BaseService {
         List<String> mobiles = new ArrayList<>();
         for (int i = 0, leng = list.size(); i < leng; i++) {
             DoctorExcel excel = list.get(i);
-            if (StringUtils.isNotEmtity(excel.getMobile())) {
-                mobiles.add(excel.getMobile());
+            int errorLine = i+2;
+            String mobile = excel.getMobile();
+            if (StringUtils.isEmpty(mobile)){
+                throw new Exception("第（"+ errorLine +"）行医生手机号为空");
+            }
+
+            boolean matche = RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, mobile);
+            if (!matche){
+                throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "第("+ errorLine +")行医生手机号输入不合法，请检查是否是文本格式");
+            }
+
+
+
+            if (StringUtils.isNotEmtity(mobile)) {
+                mobiles.add(mobile);
             }
         }
         List<Doctor> doctors = new ArrayList<>();
@@ -604,7 +645,28 @@ public class DoctorService extends BaseService {
 //          if (vo != null) {
 //              doctor.setEappId(vo.getId());
 //          }
-            doctorRepository.saveAndFlush(doctor);
+
+            //新增医生的多个手机号
+            boolean flag = false;
+            Long id = doctor.getId();
+            if (id == null || id == 0L){
+                flag = true;
+            }
+            Doctor saveAndFlush = doctorRepository.saveAndFlush(doctor);
+
+            if (flag){
+                if (saveAndFlush !=null){
+                    doctorTelephoneRepository.deleteAllByDoctorId(saveAndFlush.getId());
+                    DoctorTelephone doctorTelephone = new DoctorTelephone();
+                    doctorTelephone.setDoctorId(saveAndFlush.getId());
+                    doctorTelephone.setTelephone(saveAndFlush.getMobile());
+                    doctorTelephone.setCreateTime(new Date());
+                    doctorTelephone.setUpdateTime(new Date());
+                    doctorTelephoneRepository.save(doctorTelephone);
+                }
+            }
+
+
             virtual.setDoctorId(doctor.getId());
             doctorVirtualService.save(virtual);
             //TODO 添加关系到关系表
