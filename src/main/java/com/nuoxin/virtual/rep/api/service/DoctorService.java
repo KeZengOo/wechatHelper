@@ -290,10 +290,10 @@ public class DoctorService extends BaseService {
 
 
         //新增医生的多个手机号
-        boolean flag = false;
+        boolean f = false;
         Long id = doctor.getId();
         if (id == null || id == 0L){
-            flag = true;
+            f = true;
         }
 
 
@@ -303,7 +303,7 @@ public class DoctorService extends BaseService {
             throw new BusinessException(ErrorEnum.ERROR.getStatus(), "医生添加失败");
         }
 
-        if (flag){
+        if (f){
             //添加医生的多个手机号
             DoctorTelephone doctorTelephone = new DoctorTelephone();
             doctorTelephone.setDoctorId(doctor.getId());
