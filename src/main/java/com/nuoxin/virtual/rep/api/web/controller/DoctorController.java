@@ -184,6 +184,7 @@ public class DoctorController extends BaseController {
             e.printStackTrace();
             responseBean.setCode(500);
             responseBean.setMessage(e.getMessage());
+            responseBean.setDescription(e.getMessage());
             return responseBean;
         }
         return responseBean;
