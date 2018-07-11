@@ -48,34 +48,20 @@ import java.util.*;
 @Service
 public class MessageService extends BaseService {
 
-
-    //excel从哪行开始读取，这里excel标题占两行
-    private static final Integer beginReadRow = 2;
-
     private static final String DRUG_USER_NICKNAME = "我";
-
     private static final String filePath = "exceltemplate/wechatMessage.xls";
-
     private static final String filename = "wechatMessage.xls";
 
     @Autowired
     private MessageRepository messageRepository;
-
     @Autowired
     private DrugUserRepository drugUserRepository;
-
     @Autowired
     private DoctorRepository doctorRepository;
-
-    @Autowired
-    private DoctorService doctorService;
-
     @Autowired
     private MessageMapper messageMapper;
 
-
     public void downloadExcel(HttpServletResponse response) {
-
         response.setHeader("content-Type", "application/vnd.ms-excel");
         // 下载文件的默认名称
         response.setHeader("Content-Disposition", "attachment;filename=" + filename);
@@ -108,13 +94,10 @@ public class MessageService extends BaseService {
                 }
             }
         }
-
     }
-
 
     /**
      * 导入微信聊天消息
-     *
      * @param file 消息的excel文件
      * @return
      */
@@ -124,7 +107,6 @@ public class MessageService extends BaseService {
         InputStream inputStream = null;
         try {
             inputStream = file.getInputStream();
-
         } catch (IOException e) {
             logger.error("得到上传文件的输入流失败。。" + e);
             logger.error("得到上传文件的输入流失败。。" + e.getMessage());
@@ -133,47 +115,30 @@ public class MessageService extends BaseService {
         }
 
         String originalFilename = file.getOriginalFilename();
-
         if (StringUtils.isEmpty(originalFilename)){
             throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "文件名称不能为空");
         }
-
-
+        
         if (!originalFilename.endsWith(RegularUtils.EXTENSION_XLS) && !originalFilename.endsWith(RegularUtils.EXTENSION_XLSX)) {
             throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
         }
 
         String fileName = originalFilename.substring(0,originalFilename.lastIndexOf("."));
-
-
-
         boolean matcher = RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, fileName);
         if (!matcher){
             throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "文件名称输入不合法，请以医生的手机号命名");
         }
 
-
-//        String fileName = originalFilename.substring(0,originalFilename.lastIndexOf("."));
-//
-//        String[] strings = fileName.split("-");
-//        if (strings == null || strings.length < 2){
-//            throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "文件命名不合法，文件名应该以-分割，包含医生的手机号");
-//        }
-
         String doctorTelephone = fileName;
-
         boolean matche = RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, doctorTelephone);
         if (!matche){
             throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "手机号输入有误，请检查是否是文本格式");
         }
 
-
-
         List<Message> list = new ArrayList<>();
         ExcelUtils<WechatMessageVo> excelUtils = new ExcelUtils<>(new WechatMessageVo());
 
         List<WechatMessageVo> wechatMessageVos = null;
-
         try {
             wechatMessageVos = excelUtils.readFromFile(null, inputStream);
         } catch (Exception e) {
@@ -193,7 +158,6 @@ public class MessageService extends BaseService {
                     continue;
                 }
 
-
                 Date wechatTimeDate = wechatMessageVo.getWechatTime();
                 String wechatTime = DateUtil.getDateTimeString(wechatTimeDate);
                 String wechatNickName = wechatMessageVo.getNickname();
@@ -201,25 +165,10 @@ public class MessageService extends BaseService {
                 String wechatMessageStatus = wechatMessageVo.getMessageStatus();
                 String wechatMessageType = wechatMessageVo.getMessageType();
                 String message = wechatMessageVo.getMessage();
-//                String drugUserTelephone = wechatMessageVo.getDrugUserTelephone();
-//                String doctorTelephone = wechatMessageVo.getDoctorTelephone();
-
-//                drugUserTelephone = StringFormatUtil.getTelephoneStr(drugUserTelephone);
-//                boolean matcher = RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, drugUserTelephone);
-//                if (!matcher){
-//                    throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "手机号输入有误，请检查是否是文本格式");
-//                }
-//                doctorTelephone = StringFormatUtil.getTelephoneStr(doctorTelephone);
-//
-//                boolean matcher2 = RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, doctorTelephone);
-//                if (!matcher2){
-//                    throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "手机号输入有误，请检查是否是文本格式");
-//                }
 
                 //判断数据库中是否存在该条数据
                 Message findMessage = messageRepository.findTopByMessageTypeAndWechatNumberAndMessageTimeOrderByMessageTimeDesc(MessageTypeEnum.WECHAT.getMessageType(), wechatNumber, wechatTime);
                 if (findMessage != null){
-
                     //数据库存在该条数据
                     continue;
                 }
@@ -228,16 +177,11 @@ public class MessageService extends BaseService {
                 String nickname = "";
                 String telephone = "";
                 Long userId = 0L;
-//                DrugUser drugUser = drugUserRepository.findFirstByMobile(drugUserTelephone);
-//                if (drugUser == null) {
-//                    throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
-//                }
 
                 Doctor doctor = doctorRepository.findTopByMobile(doctorTelephone);
                 if (doctor == null) {
                     throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
                 }
-
 
                 Long drugUserId = drugUser.getId();
                 Long doctorId = doctor.getId();
@@ -250,17 +194,12 @@ public class MessageService extends BaseService {
                     nickname = drugUser.getName();
                     telephone = drugUser.getMobile();
                     userId = drugUserId;
-
-
                 } else if (wechatNickName != null && !DRUG_USER_NICKNAME.equals(wechatNickName)) {
                     userType = UserTypeEnum.DOCTOR.getUserType();
                     nickname = doctor.getName();
                     telephone = doctor.getMobile();
                     userId = doctorId;
-
-
                 }
-
 
                 Message wechatMessage = new Message();
                 wechatMessage.setUserId(userId);
@@ -277,7 +216,6 @@ public class MessageService extends BaseService {
                 wechatMessage.setMessageTime(wechatTime);
                 wechatMessage.setCreateTime(new Date());
                 list.add(wechatMessage);
-
             }
         }
 
@@ -287,76 +225,6 @@ public class MessageService extends BaseService {
         success = true;
         return success;
     }
-
-
-    //JPA的写法
-//    public PageResponseBean<MessageResponseBean> getMessageList(MessageRequestBean bean) {
-//
-//        //Pageable pageable = super.getPage(bean);
-//
-//        Specification<Message> specification = new Specification<Message>() {
-//            @Override
-//            public Predicate toPredicate(Root<Message> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
-//
-//                List<Predicate> predicates = new ArrayList<>();
-//                predicates.add(criteriaBuilder.equal(root.get("drugUserId").as(Long.class), bean.getDrugUserId()));
-//                predicates.add(criteriaBuilder.equal(root.get("doctorId").as(Long.class), bean.getDoctorId()));
-//                predicates.add(criteriaBuilder.equal(root.get("messageType").as(Integer.class), bean.getMessageType()));
-//
-//                String startTime = bean.getStartTime();
-//                String endTime = bean.getEndTime();
-//                if (!StringUtils.isEmpty(startTime) && !StringUtils.isEmpty(endTime)) {
-//                    startTime = startTime + " 00:00:00";
-//                    endTime = endTime + " 00:00:00";
-//                    Date endDate = DateUtil.getDateFromStr(endTime);
-//                    Date date = DateUtil.addDay(endDate, 1);
-//                    endTime = DateUtil.getDateTimeString(date);
-//                    predicates.add(criteriaBuilder.between(root.get("messageTime").as(String.class), startTime, endTime));
-//                }
-//
-//                criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.and(predicates.toArray(new Predicate[0]))));
-//                return criteriaQuery.getRestriction();
-//
-//            }
-//        };
-//
-//        Sort.Order order = new Sort.Order(Sort.Direction.DESC, "messageTime");
-//        Sort sort = new Sort(order);
-//        Pageable pageable = new PageRequest(bean.getPage(), bean.getPageSize(), sort);
-//
-//        Page<Message> page = messageRepository.findAll(specification, pageable);
-//        PageResponseBean<MessageResponseBean> messagePage = new PageResponseBean<>(page);
-//        List<MessageResponseBean> list = new ArrayList<>();
-//        List<Message> content = page.getContent();
-//        if (null != content && content.size() > 0) {
-//
-//            for (Message message : content) {
-//                MessageResponseBean messageResponseBean = new MessageResponseBean();
-//                messageResponseBean.setId(message.getId());
-//                messageResponseBean.setUserId(message.getUserId());
-//                messageResponseBean.setUserType(message.getUserType());
-//                messageResponseBean.setNickname(message.getNickname());
-//                messageResponseBean.setWechatNumber(message.getWechatNumber());
-//                messageResponseBean.setTelephone(message.getTelephone());
-//                messageResponseBean.setWechatMessageStatus(message.getWechatMessageStatus());
-//                messageResponseBean.setMessage(message.getMessage());
-//                messageResponseBean.setWechatMessageType(message.getWechatMessageType());
-//                messageResponseBean.setMessageType(message.getMessageType());
-//                messageResponseBean.setMessageTime(message.getMessageTime());
-//
-//                list.add(messageResponseBean);
-//            }
-//
-//        }
-//
-//        messagePage.setContent(list);
-//
-//        return messagePage;
-//    }
-
-
-
-
 
     //mybatis的写法
     public PageResponseBean<MessageResponseBean> getMessageList(MessageRequestBean bean) {
@@ -384,9 +252,7 @@ public class MessageService extends BaseService {
                 messageList = messageMapper.getEmailMessageList(bean);
                 messageListCount = messageMapper.getEmailMessageListCount(bean);
             }
-
         }
-
 
         if (messageListCount ==null){
             messageListCount = 0;
@@ -396,22 +262,13 @@ public class MessageService extends BaseService {
         return pageResponseBean;
     }
 
-
     /**
      * 今日会话统计
-     *
      * @param bean
      * @return
      */
     public Map<String, Integer> getMessageCountList(MessageRequestBean bean) {
-//        String drugUserIdStr ="%,"+  drugUserId + ",%";
         Map<String, Integer> map = new HashMap<>();
-//
-//        Integer wechatCount = messageRepository.messageCount(drugUserId, drugUserIdStr, MessageTypeEnum.WECHAT.getMessageType());
-//
-//        Integer imCount = messageRepository.messageCount(drugUserId, drugUserIdStr, MessageTypeEnum.IM.getMessageType());
-
-
         DrugUser drugUser = drugUserRepository.findFirstById(bean.getDrugUserId());
         String leaderPath = drugUser.getLeaderPath();
         if (leaderPath == null){
@@ -433,59 +290,8 @@ public class MessageService extends BaseService {
         return map;
     }
 
-
-    /**
-     * 微信消息联系人(JPA)
-     *
-     * @return
-     */
-//    public PageResponseBean<MessageLinkmanResponseBean> getMessageLinkmanList(MessageRequestBean bean) {
-//
-//        Long drugUserId = bean.getDrugUserId();
-////        DrugUser drugUser = drugUserRepository.findFirstById(drugUserId);
-////        if (drugUser == null){
-////            throw new BusinessException();
-////        }
-//
-//
-//
-//        String drugUserIdStr ="%," + drugUserId + ",%";
-//        int page = bean.getPage();
-//        int pageSize = bean.getPageSize();
-//        Integer messageListCount = messageRepository.getMessageListCount(drugUserId, drugUserIdStr);
-//        List<Message> messageList = messageRepository.getMessageList(drugUserId, drugUserIdStr, page * pageSize, pageSize);
-//        if (messageListCount == null) {
-//            messageListCount = 0;
-//        }
-//
-//        List<MessageLinkmanResponseBean> list = new ArrayList<>();
-//        if (messageList != null && messageList.size() > 0) {
-//
-//            for (Message message : messageList) {
-//
-//                MessageLinkmanResponseBean messageLinkmanResponseBean = new MessageLinkmanResponseBean();
-//                messageLinkmanResponseBean.setDoctorId(message.getUserId());
-//                messageLinkmanResponseBean.setMessageType(message.getMessageType());
-//                messageLinkmanResponseBean.setLastMessage(message.getMessage());
-//                messageLinkmanResponseBean.setNickname(message.getNickname());
-//                String messageTime = message.getMessageTime();
-//                messageTime = messageTime.substring(0, messageTime.length() - 2);
-//                messageLinkmanResponseBean.setLastTime(messageTime);
-//
-//                list.add(messageLinkmanResponseBean);
-//            }
-//
-//        }
-//
-//        PageResponseBean<MessageLinkmanResponseBean> pageResponseBean = new PageResponseBean<>(bean, messageListCount, list);
-//
-//
-//        return pageResponseBean;
-//    }
-
     /**
      * 微信消息联系人(mybatis)
-     *
      * @return
      */
     public PageResponseBean<MessageLinkmanResponseBean> getMessageLinkmanList(MessageRequestBean bean) {
@@ -507,7 +313,6 @@ public class MessageService extends BaseService {
                     if (messageType == MessageTypeEnum.WECHAT.getMessageType() || messageType == MessageTypeEnum.IM.getMessageType()){
                         String lastMessage = messageMapper.getLastMessage(messageType, messageLinkmanResponseBean.getDoctorId(), messageLinkmanResponseBean.getLastTime());
                         messageLinkmanResponseBean.setLastMessage(lastMessage);
-
                     }
 
                     if (messageType == MessageTypeEnum.EMAIL.getMessageType()){
@@ -515,10 +320,7 @@ public class MessageService extends BaseService {
                         messageLinkmanResponseBean.setLastMessage(lastEmailMessage);
                     }
                 }
-
-
             }
-
         }
 
         Integer messageLinkmanListCount = messageMapper.getMessageLinkmanListCount(bean);
@@ -528,7 +330,6 @@ public class MessageService extends BaseService {
     }
 
     public void test() {
-
         List<Message> messageList = messageRepository.test();
         System.out.println(messageList.size());
         System.out.println(messageList);
