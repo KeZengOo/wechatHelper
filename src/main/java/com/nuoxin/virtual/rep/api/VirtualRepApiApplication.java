@@ -30,9 +30,14 @@ import static springfox.documentation.schema.AlternateTypeRules.newRule;
 @EnableSwagger2
 @MapperScan(basePackages = "com.nuoxin.virtual.rep.api.mybatis")
 public class VirtualRepApiApplication {
-
-	public static void main(String[] args) {
-		SpringApplication.run(VirtualRepApiApplication.class, args);
+	
+	@Autowired
+	private TypeResolver typeResolver;
+	
+	@Bean
+	//@LoadBalanced
+	public RestTemplate getRestTemplate(){
+		return new RestTemplate();
 	}
 
 	/**
@@ -55,20 +60,15 @@ public class VirtualRepApiApplication {
 				.useDefaultResponseMessages(false);
 		return docket;
 	}
-
+	
+	public static void main(String[] args) {
+		SpringApplication.run(VirtualRepApiApplication.class, args);
+	}
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	private ApiInfo apiInfo() {
-		return new ApiInfo("系统接口", "virtual-rep-api  系统接口", "0.0.1",
-				"", "", "", "");
+		return new ApiInfo("系统接口", "virtual-rep-api  系统接口", "0.0.1", "", "", "", "");
 	}
 
-	@Autowired
-	private TypeResolver typeResolver;
-
-
-	@Bean
-	//@LoadBalanced
-	RestTemplate getRestTemplate(){
-
-		return new RestTemplate();
-	}
 }

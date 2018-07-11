@@ -1,8 +1,24 @@
 package com.nuoxin.virtual.rep.api.web.controller;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.alibaba.fastjson.JSON;
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
+import com.nuoxin.virtual.rep.api.common.bean.ResponseObj;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
 import com.nuoxin.virtual.rep.api.common.util.StringUtils;
 import com.nuoxin.virtual.rep.api.entity.DoctorCallInfo;
@@ -23,18 +39,9 @@ import com.nuoxin.virtual.rep.api.web.controller.response.LoginResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.call.CallHistoryResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.call.CallResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.call.CallStatResponseBean;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.util.List;
 
 /**
  * Created by fenggang on 9/11/17.
@@ -57,6 +64,7 @@ public class DoctorCallController extends BaseController {
      * @param response
      * @return
      */
+    @Deprecated
     @RequestMapping("/callback")
     public DefaultResponseBean<Object> callback(HttpServletRequest request, HttpServletResponse response) {
         DefaultResponseBean<Object> responseBean = new DefaultResponseBean<>();
@@ -168,28 +176,33 @@ public class DoctorCallController extends BaseController {
 
     @ApiOperation(value = "拨号保存电话记录", notes = "拨号保存电话记录")
     @PostMapping("/save")
-    public DefaultResponseBean<CallRequestBean> save(@RequestBody CallRequestBean bean,
-                                                     HttpServletRequest request, HttpServletResponse response) {
-        logger.info("{}接口请求数据【】{}", request.getServletPath(), JSON.toJSONString(bean));
-        DefaultResponseBean responseBean = new DefaultResponseBean();
+	public ResponseObj save(@RequestBody CallRequestBean bean, HttpServletRequest request, HttpServletResponse response) {
+        logger.info("{}接口请求数据{}", request.getServletPath(), JSON.toJSONString(bean));
+        ResponseObj responseBean = new ResponseObj();
+
         DrugUser user = super.getLoginUser(request);
         if (user == null) {
             responseBean.setCode(300);
             responseBean.setMessage("登录失效");
             return responseBean;
         }
+        
         if(!StringUtils.isNotEmtity(bean.getSinToken())){
             responseBean.setCode(500);
             responseBean.setMessage("sinToken不能为空");
             return responseBean;
         }
+        
+        bean.setDrugUserId(user.getId());
+        super.convertCallStatus(bean);
+        
         synchronized (this){
-            DoctorCallInfo info = doctorCallService.checkoutSinToken(bean.getSinToken());
-            if(info!=null){
-                responseBean.setData(info);
-                return responseBean;
-            }
-            bean.setDrugUserId(user.getId());
+        	DoctorCallInfo info = doctorCallService.checkoutSinToken(bean.getSinToken());
+        	if(info!=null){
+        		responseBean.setData(info);
+        		return responseBean;
+        	}
+        	
             responseBean.setData(doctorCallService.save(bean));
             return responseBean;
         }
@@ -197,24 +210,27 @@ public class DoctorCallController extends BaseController {
 
     @ApiOperation(value = "拨号电话记录修改", notes = "拨号电话记录修改")
     @PostMapping("/update")
-    public DefaultResponseBean<CallRequestBean> update(@RequestBody CallRequestBean bean,
-                                                       HttpServletRequest request, HttpServletResponse response) {
-
-        logger.info("{}接口请求数据【】{}", request.getServletPath(), JSON.toJSONString(bean));
-        DefaultResponseBean responseBean = new DefaultResponseBean();
+	public ResponseObj update(@RequestBody CallRequestBean bean, HttpServletRequest request, HttpServletResponse response) {
+        logger.info("{}接口请求数据{}", request.getServletPath(), JSON.toJSONString(bean));
+        ResponseObj responseBean = new ResponseObj();
+        
         Long id = bean.getId();
         if (id == null) {
             responseBean.setCode(500);
             responseBean.setMessage("请求参数id不能为空");
             return responseBean;
         }
+        
         DrugUser user = super.getLoginUser(request);
         if (user == null) {
             responseBean.setCode(300);
             responseBean.setMessage("登录失效");
             return responseBean;
         }
+        
+        super.convertCallStatus(bean);
         bean.setDrugUserId(user.getId());
+        
         bean = doctorCallService.update(bean);
         if (bean.getId() == null) {
             responseBean.setCode(500);

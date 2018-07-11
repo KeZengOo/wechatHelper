@@ -1,15 +1,45 @@
 package com.nuoxin.virtual.rep.api.service;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.alibaba.fastjson.JSON;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
+import com.nuoxin.virtual.rep.api.common.constant.FileConstant;
 import com.nuoxin.virtual.rep.api.common.service.BaseService;
 import com.nuoxin.virtual.rep.api.common.util.StringUtils;
 import com.nuoxin.virtual.rep.api.common.util.WavToMp3Util;
 import com.nuoxin.virtual.rep.api.dao.DoctorCallInfoDetailsRepository;
 import com.nuoxin.virtual.rep.api.dao.DoctorCallInfoRepository;
 import com.nuoxin.virtual.rep.api.dao.DoctorRepository;
-import com.nuoxin.virtual.rep.api.entity.*;
+import com.nuoxin.virtual.rep.api.entity.Doctor;
+import com.nuoxin.virtual.rep.api.entity.DoctorCallInfo;
+import com.nuoxin.virtual.rep.api.entity.DoctorCallInfoDetails;
+import com.nuoxin.virtual.rep.api.entity.DoctorQuestionnaire;
+import com.nuoxin.virtual.rep.api.entity.DrugUser;
+import com.nuoxin.virtual.rep.api.entity.ProductLine;
 import com.nuoxin.virtual.rep.api.enums.CallTypeEnum;
+import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.CallbackListRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.CallbackRequestBean;
@@ -22,25 +52,8 @@ import com.nuoxin.virtual.rep.api.web.controller.request.question.QuestionnaireR
 import com.nuoxin.virtual.rep.api.web.controller.response.call.CallHistoryResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.call.CallResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.call.CallStatResponseBean;
-import mp3.Main;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import springfox.documentation.spring.web.json.Json;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.*;
+import mp3.Main;
 
 /**
  * Created by fenggang on 9/13/17.
@@ -49,6 +62,11 @@ import java.util.*;
 @Transactional(readOnly = true)
 public class DoctorCallService extends BaseService {
 
+	@Value("${recording.file.path}")
+    private String path;
+    @Value("${audio.download.url}")
+    private String url;
+	
     @Autowired
     private DoctorQuestionnaireService doctorQuestionnaireService;
     @Autowired
@@ -63,12 +81,15 @@ public class DoctorCallService extends BaseService {
     private ProductLineService productLineService;
     @Autowired
     private OssService ossService;
-    @Value("${recording.file.path}")
-    private String path;
+    
+    @Resource
+    private FileService fileService;
 
-    @Value("${audio.download.url}")
-    private String url;
-
+    /**
+     * 根据 sinToken(callId) 获取 DoctorCallInfo 信息
+     * @param sinToken(callId)
+     * @return 成功返回 DoctorCallInfo 对象,否则返回 null
+     */
     public DoctorCallInfo checkoutSinToken(String sinToken){
         DoctorCallInfo info = doctorCallInfoRepository.findBySinToken(sinToken);
         if(info==null){
@@ -221,50 +242,62 @@ public class DoctorCallService extends BaseService {
 
     /**
      * 获取企业用户打电话汇总信息
-     *
      * @param drugUserId
      * @return
      */
     public CallStatResponseBean stat(Long drugUserId){
-        DrugUser drugUser = drugUserService.findById(drugUserId);
-        CallStatResponseBean responseBean = new CallStatResponseBean();
-        Map<String,Long> map = doctorCallInfoRepository.statDrugUserIds(drugUser.getLeaderPath()+"%", CallTypeEnum.CALL_TYPE_CALLOUT.getType());
-        Long callTimes = null;
-        Long num = null;
-        if(map!=null){
-            responseBean.setCallOutAllNum(map.get("allNum").intValue());
-            callTimes = map.get("callTimes");
-            num = doctorCallInfoRepository.statDrugUserIdsCount(drugUser.getLeaderPath()+"%", CallTypeEnum.CALL_TYPE_CALLOUT.getType());
-            if(callTimes!=null){
-                responseBean.setCallOutAllTimes(callTimes);
-            }
-            if(num!=null){
-                responseBean.setCallOutNum(num.intValue());
-            }
+    	Long callTimes = null;
+    	Long num = null;
+    	CallStatResponseBean responseBean = new CallStatResponseBean();
 
-
-        }
-        map = doctorCallInfoRepository.statDrugUserIds(drugUser.getLeaderPath()+"%", CallTypeEnum.CALL_TYPE_INCALL.getType());
-        if (map != null) {
-            responseBean.setInCallAllNum(map.get("allNum").intValue());
-            callTimes = map.get("callTimes");
-            num = doctorCallInfoRepository.statDrugUserIdsCallCount(drugUser.getLeaderPath()+"%", CallTypeEnum.CALL_TYPE_INCALL.getType(),"incall");
-            if(callTimes!=null){
-                responseBean.setInCallAllTimes(callTimes);
-            }
-            if(num!=null){
-                responseBean.setInCallNum(num.intValue());
-            }
-
-
-        }
+    	DrugUser drugUser = drugUserService.findById(drugUserId);
+    	if(drugUser == null) {
+    		return responseBean;
+    	}
+    	
+        String leaderPath = drugUser.getLeaderPath()+"%";
+        Map<String, Long> map = doctorCallInfoRepository.statDrugUserIds(leaderPath, CallTypeEnum.CALL_TYPE_CALLOUT.getType());
+		if (map != null) {
+			callTimes = map.get("callTimes");
+			if (callTimes != null) {
+				responseBean.setCallOutAllTimes(callTimes);
+			}
+			
+			num = doctorCallInfoRepository.statDrugUserIdsCount(leaderPath, CallTypeEnum.CALL_TYPE_CALLOUT.getType());
+			if (num != null) {
+				responseBean.setCallOutNum(num.intValue());
+			}
+			
+			responseBean.setCallOutAllNum(map.get("allNum").intValue());
+		}
+        
+		map = doctorCallInfoRepository.statDrugUserIds(leaderPath, CallTypeEnum.CALL_TYPE_INCALL.getType());
+		if (map != null) {
+			callTimes = map.get("callTimes");
+			if (callTimes != null) {
+				responseBean.setInCallAllTimes(callTimes);
+			}
+			
+			num = doctorCallInfoRepository.statDrugUserIdsCallCount(leaderPath, CallTypeEnum.CALL_TYPE_INCALL.getType(),
+					"incall");
+			if (num != null) {
+				responseBean.setInCallNum(num.intValue());
+			}
+			
+			responseBean.setInCallAllNum(map.get("allNum").intValue());
+		}
+		
         return responseBean;
     }
 
+    /**
+     * 保存打电话记录
+     * @param bean CallRequestBean 对象
+     * @return 返回 CallRequestBean 对象
+     */
     @Transactional(readOnly = false)
     public CallRequestBean save(CallRequestBean bean){
         DoctorCallInfo info = new DoctorCallInfo();
-        info.setDoctor(doctorRepository.findTopByMobile(bean.getMobile()));
         info.setSinToken(bean.getSinToken());
         info.setStatus(bean.getStatus());
         info.setStatusName(bean.getStatusName());
@@ -272,135 +305,152 @@ public class DoctorCallService extends BaseService {
         info.setType(bean.getType());
         info.setDrugUserId(bean.getDrugUserId());
         info.setProductId(bean.getProductId());
-        info.setDrugUser(drugUserService.findById(bean.getDrugUserId()));
+        
+        Doctor doctor = doctorRepository.findTopByMobile(bean.getMobile());
+        info.setDoctor(doctor);
+        
+        DrugUser drugUser = drugUserService.findById(bean.getDrugUserId());
+        info.setDrugUser(drugUser);
         doctorCallInfoRepository.saveAndFlush(info);
-        bean.setId(info.getId());
+        
+        Long infoId = info.getId();
+        bean.setId(infoId);
+        
         DoctorCallInfoDetails infoDetails = new DoctorCallInfoDetails();
-        infoDetails.setCallId(info.getId());
+        infoDetails.setCallId(infoId);
         infoDetails.setStatus(info.getStatus());
         infoDetails.setStatusName(info.getStatusName());
         infoDetails.setCreateTime(new Date());
         doctorCallInfoDetailsRepository.save(infoDetails);
+        
         return bean;
     }
 
+    /**
+     * 修改打电话记录
+     * @param bean CallRequestBean 对象
+     * @return 返回 CallRequestBean 对象
+     */
     @Transactional(readOnly = false)
     public CallRequestBean update(CallRequestBean bean){
-        DoctorCallInfo info = doctorCallInfoRepository.findOne(bean.getId());
-        if(info==null){
-            bean.setId(null);
-            return bean;
-        }
-        info.setSinToken(bean.getSinToken());
-        info.setStatus(bean.getStatus());
-        info.setStatusName(bean.getStatusName());
-        info.setMobile(bean.getMobile());
-        info.setType(bean.getType());
-        if(info.getCallTime()==null){
-            if(bean.getTimes()!=null && bean.getTimes()>0l){
-                info.setCallTime(bean.getTimes());
-            }
-        }
-        if(StringUtils.isNotEmtity(bean.getUrl())){
-            //TODO 保存录音文件
-            try {
-                this.downLoadFromUrl("",info.getSinToken()+".wav",path);
-                File file = new File(path+info.getSinToken()+".wav");
-                //WavToMp3Util.execute(file,path+info.getSinToken()+".mp3");
-                //file = new File(path+info.getSinToken()+".mp3");
-                String url = ossService.uploadFile(file);
-                info.setCallUrl(url);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }else{
-            info.setCallUrl(bean.getUrl());
-        }
-        doctorCallInfoRepository.saveAndFlush(info);
-        DoctorCallInfoDetails infoDetails = new DoctorCallInfoDetails();
-        infoDetails.setCallId(info.getId());
-        infoDetails.setStatus(info.getStatus());
-        infoDetails.setStatusName(info.getStatusName());
-        infoDetails.setCreateTime(new Date());
-        doctorCallInfoDetailsRepository.save(infoDetails);
-        return bean;
-    }
+		DoctorCallInfo info = doctorCallInfoRepository.findOne(bean.getId());
+		if (info == null) {
+			bean.setId(null);
+			return bean;
+		}
+
+		info.setSinToken(bean.getSinToken());
+		info.setStatus(bean.getStatus());
+		info.setStatusName(bean.getStatusName());
+		info.setMobile(bean.getMobile());
+		info.setType(bean.getType());
+
+		if (info.getCallTime() == null) {
+			if (bean.getTimes() != null && bean.getTimes() > 0l) {
+				info.setCallTime(bean.getTimes());
+			}
+		}
+
+		String url = bean.getUrl();
+		if (StringUtils.isNotEmtity(url)) {
+			this.downLoadFile(info);
+		} else {
+			info.setCallUrl(url);
+		}
+		
+		doctorCallInfoRepository.saveAndFlush(info);
+		
+		DoctorCallInfoDetails infoDetails = new DoctorCallInfoDetails();
+		infoDetails.setCallId(info.getId());
+		infoDetails.setStatus(info.getStatus());
+		infoDetails.setStatusName(info.getStatusName());
+		infoDetails.setCreateTime(new Date());
+		doctorCallInfoDetailsRepository.save(infoDetails);
+		
+		return bean;
+	}
 
     @Transactional(readOnly = false)
     public Boolean stopUpdate(CallInfoRequestBean bean){
-        DoctorCallInfo info = doctorCallInfoRepository.findOne(bean.getId());
-        if(info==null){
-            return false;
-        }
-        info.setCallTime(bean.getTimes());
-        info.setProductId(bean.getProductId());
-        if(StringUtils.isNotEmtity(bean.getUrl())){
-            //TODO 保存录音文件
-            try {
-                this.downLoadFromUrl("",info.getSinToken()+".wav",path);
-                File file = new File(path+info.getSinToken()+".wav");
-                //WavTowavUtil.execute(file,path+info.getSinToken()+".mp3");
-                //file = new File(path+info.getSinToken()+".mp3");
-                String url = ossService.uploadFile(file);
-                info.setCallUrl(url);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }else{
-            info.setCallUrl(bean.getUrl());
-        }
-        info.setFollowUpType(bean.getType());
-        info.setRemark(bean.getRemark());
+		DoctorCallInfo info = doctorCallInfoRepository.findOne(bean.getId());
+		if (info == null) {
+			return false;
+		}
+		
+		info.setCallTime(bean.getTimes());
+		info.setProductId(bean.getProductId());
+		if (StringUtils.isNotEmtity(bean.getUrl())) {
+			this.downLoadFile(info);
+		} else {
+			info.setCallUrl(bean.getUrl());
+		}
+		
+		info.setFollowUpType(bean.getType());
+		info.setRemark(bean.getRemark());
 
-        //获取状态详细信息
-        List<DoctorCallInfoDetails> detailsList = doctorCallInfoDetailsRepository.findByCallIdOrderOrderByCreateTime(info.getId());
-        if(detailsList!=null && !detailsList.isEmpty()){
-            DoctorCallInfoDetails details = null;
-            for (DoctorCallInfoDetails d:detailsList) {
-                if(d.getStatusName()!=null && ("answer".equals(d.getStatusName()) || "incall".equals(d.getStatusName()))){
-                    details = d;
-                    break;
-                }
-            }
-            if(details==null){
-                details = detailsList.get(0);
-            }
-            info.setStatus(details.getStatus());
-            info.setStatusName(details.getStatusName());
-        }
+		// 获取状态详细信息
+		List<DoctorCallInfoDetails> detailsList = doctorCallInfoDetailsRepository
+				.findByCallIdOrderOrderByCreateTime(info.getId());
+		if (CollectionsUtil.isNotEmptyList(detailsList)) {
+			DoctorCallInfoDetails details = null;
+			for (DoctorCallInfoDetails d : detailsList) {
+				if (d.getStatusName() != null && ("answer".equals(d.getStatusName()) || "incall".equals(d.getStatusName()))) {
+					details = d;
+					break;
+				}
+			}
+			
+			if (details == null) {
+				details = detailsList.get(0);
+			}
+			
+			info.setStatus(details.getStatus());
+			info.setStatusName(details.getStatusName());
+		}
 
-        //保存通话信息
-        doctorCallInfoRepository.saveAndFlush(info);
+		// 保存通话信息
+		doctorCallInfoRepository.saveAndFlush(info);
 
-        //保存问卷信息
-        List<DoctorQuestionnaire> saveList = new ArrayList<>();
-        List<QuestionnaireRequestBean> list = bean.getQuestions();
-        if(list!=null && !list.isEmpty()){
-            for (QuestionnaireRequestBean arb:list) {
-                List<QuestionRequestBean> qs = arb.getQuestions();
-                if(qs!=null && !qs.isEmpty()){
-                    for (QuestionRequestBean qrb:qs) {
-                        DoctorQuestionnaire dq = new DoctorQuestionnaire();
-                        dq.setAnswer(qrb.getAnswer());
-                        dq.setCreateTime(new Date());
-                        dq.setDoctorId(info.getDoctor()==null?0l:info.getDoctor().getId());
-                        dq.setDrugUserId(bean.getDrugUserId());
-                        dq.setQuestionnaireId(arb.getId());
-                        dq.setQuestionId(qrb.getId());
-                        dq.setCallId(info.getId());
-                        saveList.add(dq);
-                    }
-                }
-            }
-        }
-        if(saveList!=null && !saveList.isEmpty()){
-            doctorQuestionnaireService.save(saveList);
-        }
+		// 保存问卷信息
+		List<DoctorQuestionnaire> saveList = new ArrayList<>();
+		List<QuestionnaireRequestBean> list = bean.getQuestions();
+		
+		if (list != null && !list.isEmpty()) {
+			for (QuestionnaireRequestBean arb : list) {
+				List<QuestionRequestBean> qs = arb.getQuestions();
+				if (qs != null && !qs.isEmpty()) {
+					for (QuestionRequestBean qrb : qs) {
+						DoctorQuestionnaire dq = new DoctorQuestionnaire();
+						dq.setAnswer(qrb.getAnswer());
+						dq.setCreateTime(new Date());
+						dq.setDoctorId(info.getDoctor() == null ? 0l : info.getDoctor().getId());
+						dq.setDrugUserId(bean.getDrugUserId());
+						dq.setQuestionnaireId(arb.getId());
+						dq.setQuestionId(qrb.getId());
+						dq.setCallId(info.getId());
+						saveList.add(dq);
+					}
+				}
+			}
+		}
+		
+		if (CollectionsUtil.isNotEmptyList(saveList)) {
+			doctorQuestionnaireService.save(saveList);
+		}
+		
         return true;
+     }
+    
+    private void downLoadFile(DoctorCallInfo info) {
+    	try {
+			String fileName = info.getSinToken() + FileConstant.AUDIO_SUFFIX;
+			fileService.downLoadFromUrl("", fileName, path);
+			File file = new File(path + fileName);
+			String url = ossService.uploadFile(file);
+			info.setCallUrl(url);
+		} catch (Exception e) {
+			logger.error("上传文件异常", e);
+		}
     }
 
     private CallHistoryResponseBean _getCallHistoryResponseBean(DoctorCallInfo info,Long timeLong){
@@ -451,71 +501,11 @@ public class DoctorCallService extends BaseService {
         return responseBean;
     }
 
-    /**
-     * 从网络Url中下载文件
-     * @param urlStr
-     * @param fileName
-     * @param savePath
-     * @throws IOException
-     */
-    private void  downLoadFromUrl(String urlStr,String fileName,String savePath) throws IOException{
-        URL url = new URL(urlStr);
-        HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-        //设置超时间为3秒
-        conn.setConnectTimeout(60*60*1000);
-        //防止屏蔽程序抓取而返回403错误
-        conn.setRequestProperty("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)");
-
-        //得到输入流
-        InputStream inputStream = conn.getInputStream();
-        //获取自己数组
-        byte[] getData = readInputStream(inputStream);
-
-        //文件保存位置
-        File saveDir = new File(savePath);
-        if(!saveDir.exists()){
-            saveDir.mkdir();
-        }
-        File file = new File(saveDir+File.separator+fileName);
-        FileOutputStream fos = new FileOutputStream(file);
-        fos.write(getData);
-        if(fos!=null){
-            fos.close();
-        }
-        if(inputStream!=null){
-            inputStream.close();
-        }
-
-        System.out.println("info:"+url+" download success");
-
-    }
-
-    /**
-     * 从输入流中获取字节数组
-     * @param inputStream
-     * @return
-     * @throws IOException
-     */
-    private byte[] readInputStream(InputStream inputStream) throws IOException {
-        byte[] buffer = new byte[1024];
-        int len = 0;
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        while((len = inputStream.read(buffer)) != -1) {
-            bos.write(buffer, 0, len);
-        }
-        bos.close();
-        return bos.toByteArray();
-    }
-
     public void file(){
         try{
-            downLoadFromUrl("http://106.75.91.226/16?file=/app/clpms/record/20171211/103_nxclcc_8001_13799438628_20171211185149_1512989509171.wav",
+            fileService.downLoadFromUrl("http://106.75.91.226/16?file=/app/clpms/record/20171211/103_nxclcc_8001_13799438628_20171211185149_1512989509171.wav",
                     "aaaaa.wav","/Users/fenggang/Downloads/");
             File file = new File("/Users/fenggang/Downloads/aaaaa.mp3");
-            File file1 = new File("/Users/fenggang/Downloads/aaaaa.mp3");
-            if(file1==null){
-                file1.createNewFile();
-            }
 
             WavToMp3Util.execute(file,"/Users/fenggang/Downloads/aaaaa.wav");
 
@@ -541,26 +531,19 @@ public class DoctorCallService extends BaseService {
                     }
                 }
             }
-            //WavToMp3Util.execute(file,"/Users/fenggang/Downloads/aaaaa.mp3");
-
-
-            //String url = ossService.uploadFile(file);
-            //System.out.println(url);
         }catch (Exception e) {
-            // TODO: handle exception
             e.printStackTrace();
         }
     }
 
     public String uploadUrl() throws Exception{
-        this.downLoadFromUrl("http://106.75.91.226/16?file=/app/clpms/record/20171211/103_nxclcc_8001_13799438628_20171211185149_1512989509171.wav","test.wav",path);
+        fileService.downLoadFromUrl("http://106.75.91.226/16?file=/app/clpms/record/20171211/103_nxclcc_8001_13799438628_20171211185149_1512989509171.wav","test.wav",path);
         File file = new File(path+"test.wav");
-//        WavToMp3Util.execute(file,path+"test.mp3");
-//        file = new File(path+"test.mp3");
         String url = ossService.uploadFile(file);
         return url;
     }
 
+    @Deprecated
     @Transactional(readOnly = false)
     public void callback(CallbackRequestBean bean){
         if(bean!=null){
@@ -573,14 +556,12 @@ public class DoctorCallService extends BaseService {
                             if(StringUtils.isNotEmtity(bl.getRecordUrl())){
                                 //TODO 保存录音文件
                                 try {
-                                    this.downLoadFromUrl(url+bl.getRecordUrl(),info.getSinToken()+".wav",path);
+                                    fileService.downLoadFromUrl(url+bl.getRecordUrl(),info.getSinToken()+".wav",path);
                                     File file = new File(path+info.getSinToken()+".wav");
                                     //WavToMp3Util.execute(file,path+info.getSinToken()+".mp3");
                                     //file = new File(path+info.getSinToken()+".mp3");
                                     String url = ossService.uploadFile(file);
                                     info.setCallUrl(url);
-                                } catch (IOException e) {
-                                    e.printStackTrace();
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
