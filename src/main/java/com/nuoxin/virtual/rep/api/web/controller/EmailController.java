@@ -58,7 +58,7 @@ public class EmailController extends BaseController {
         bean.setDrugUserId(user.getId());
         responseBean.setData(true);
         try{
-            String error = emailService.commonEmailSendId(bean);
+            String error = emailService.commonEmailSendIds(bean);
             if(StringUtils.isNotEmtity(error)){
                 responseBean.setCode(500);
                 responseBean.setMessage(error);
