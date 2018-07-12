@@ -11,7 +11,6 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -27,23 +26,20 @@ public class ProductController extends BaseController{
     @Autowired
     private ProductLineService productLineService;
 
-
     @ApiOperation(value = "产品列表接口", notes = "产品列表接口")
     @PostMapping("/getList")
     @ResponseBody
-    public ResponseEntity<DefaultResponseBean<List<ProductResponseBean>>> getList(@RequestParam(value = "drugUserId", required = false) Long drugUserId, HttpServletRequest request){
+	public ResponseEntity<DefaultResponseBean<List<ProductResponseBean>>> getList(
+			@RequestParam(value = "drugUserId", required = false) Long drugUserId, HttpServletRequest request) {
         if (drugUserId == null || drugUserId == 0){
             drugUserId = getLoginId(request);
         }
 
-        List<ProductResponseBean> list = productLineService.getList(drugUserId);
-
         DefaultResponseBean<List<ProductResponseBean>> responseBean = new DefaultResponseBean<>();
+        List<ProductResponseBean> list = productLineService.getList(drugUserId);
         responseBean.setData(list);
 
         return ResponseEntity.ok(responseBean);
-
     }
-
 
 }

@@ -1,14 +1,29 @@
 package com.nuoxin.virtual.rep.api.service;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.service.BaseService;
 import com.nuoxin.virtual.rep.api.dao.DoctorRepository;
-import com.nuoxin.virtual.rep.api.dao.DrugUserRepository;
 import com.nuoxin.virtual.rep.api.entity.Doctor;
-import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.ProductLine;
 import com.nuoxin.virtual.rep.api.enums.HospitalLevelEnum;
 import com.nuoxin.virtual.rep.api.enums.MagazineTypeEnum;
@@ -20,18 +35,29 @@ import com.nuoxin.virtual.rep.api.web.controller.request.hcp.HcpBasicFieldReques
 import com.nuoxin.virtual.rep.api.web.controller.request.hcp.HcpBasicUpdateRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.hcp.HcpRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorBasicInfoResponseBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.hcp.*;
-import com.nuoxin.virtual.rep.api.web.controller.response.vo.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
-import org.springframework.web.client.RestTemplate;
-
-import java.util.*;
+import com.nuoxin.virtual.rep.api.web.controller.response.hcp.DocKeywordResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpBaseInfoResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpBasicInfoHistoryResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpCoAuthorResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpCoMagazineResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpDialogResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpDocResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpDynamicRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpPentagonResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpResearchInfoResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpSocietyResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.hcp.KeywordListResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.hcp.KeywordResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.vo.ConsultDetail;
+import com.nuoxin.virtual.rep.api.web.controller.response.vo.Doc;
+import com.nuoxin.virtual.rep.api.web.controller.response.vo.DocKeyWord;
+import com.nuoxin.virtual.rep.api.web.controller.response.vo.Hci;
+import com.nuoxin.virtual.rep.api.web.controller.response.vo.Hcp;
+import com.nuoxin.virtual.rep.api.web.controller.response.vo.HcpCoAuthor;
+import com.nuoxin.virtual.rep.api.web.controller.response.vo.HcpCoMagazine;
+import com.nuoxin.virtual.rep.api.web.controller.response.vo.HcpResearchInfo;
+import com.nuoxin.virtual.rep.api.web.controller.response.vo.KeyWordDoc;
+import com.nuoxin.virtual.rep.api.web.controller.response.vo.Magazine;
 
 /**
  * Created by tiancun on 17/8/2.
@@ -40,46 +66,23 @@ import java.util.*;
 @Service
 public class HcpService extends BaseService {
 
-    @Autowired
-    private MasterDataService masterDataService;
+	@Value("${data.center.prefix.url}")
+	private String prefixUrl;
 
+	@Autowired
+    private MasterDataService masterDataService;
     @Autowired
     private DrugUserService drugUserService;
-//
-//    @Autowired
-//    private DoctorMapper doctorMapper;
-
-    @Autowired
-    private DrugUserRepository drugUserRepository;
-
     @Autowired
     private DoctorRepository doctorRepository;
-
-
     @Autowired
     private DynamicFieldMapper dynamicFieldMapper;
-
     @Autowired
     private DoctorMapper doctorMapper;
-
-    @Autowired
-    private RestTemplate restTemplate;
-
-    @Value("${data.center.prefix.url}")
-    private String prefixUrl;
-
-
 
     private Long getMasterDataIdByHcpId(Long hcpId){
         Long id = 0L;
         Doctor doctor = doctorRepository.findFirstById(hcpId);
-//        if (null != doctor){
-//            Long masterDataId = doctor.getMasterDateId();
-//            if (masterDataId != null && masterDataId > 0){
-//                id = masterDataId;
-//            }
-//
-//        }
 
         //改成查营销的数据库了
         if (null != doctor){
@@ -89,13 +92,10 @@ public class HcpService extends BaseService {
             if (null != hcp){
                 id = hcp.getId();
             }
-
         }
-
 
         return id;
     }
-
 
     /**
      * 医生的基本信息,主数据医生显示的时候使用
@@ -106,7 +106,6 @@ public class HcpService extends BaseService {
     public HcpBaseInfoResponseBean getMasterDataHcpBaseInfo(Long id){
         HcpBaseInfoResponseBean hcpBaseInfoResponseBean = new HcpBaseInfoResponseBean();
         Long hcpId = getMasterDataIdByHcpId(id);
-
 
         //第一个圈内容基本信息
         long hciId = 0;
@@ -125,14 +124,12 @@ public class HcpService extends BaseService {
             hcpBaseInfoResponseBean.setHospitalLevel(name);
         }
 
-
         Doctor doctor = doctorRepository.findFirstById(id);
         if (null != doctor){
             hcpBaseInfoResponseBean.setDoctorName(doctor.getName());
             hcpBaseInfoResponseBean.setHospitalName(doctor.getHospitalName());
             //hcpBaseInfoResponseBean.setHospitalLevel(doctor.getHospitalLevel());
         }
-
 
         //第二个圈
         Map<String, String> map = masterDataService.getMapHcpInfo(hcpId);
@@ -145,7 +142,6 @@ public class HcpService extends BaseService {
             int inquirySum =0 ;
             Map<String, Object> inlineInquiryMap = getInlineInquiryMap(inlineInquiryMapJsonStr);
             if (inlineInquiryMap != null && inlineInquiryMap.size() > 0){
-
                 Object inlineInquirySumObj = inlineInquiryMap.get("inlineInquirySum");
                 if (inlineInquirySumObj != null){
                     //好大夫门诊总量
@@ -175,15 +171,12 @@ public class HcpService extends BaseService {
             }
         }
 
-
         //第三个圈，论文关键词
         List<DocKeywordResponseBean> docKeywordList = getDocKeywordList(hcpId);
         hcpBaseInfoResponseBean.setKeywordList(docKeywordList);
 
         return hcpBaseInfoResponseBean;
-
     }
-
 
     /**
      * 医生基本信息，重构，展示动态字段的时候使用
@@ -191,31 +184,23 @@ public class HcpService extends BaseService {
      * @return
      */
     public List<DoctorBasicInfoResponseBean> getHcpBaseInfo(Long id){
-
         List<DoctorBasicInfoResponseBean> doctorBasicInfoList = dynamicFieldMapper.getDoctorBasicInfo(id);
-
         if (doctorBasicInfoList !=null && !doctorBasicInfoList.isEmpty()){
             for (DoctorBasicInfoResponseBean doctorBasicInfoResponseBean:doctorBasicInfoList){
                 DoctorBasicInfoResponseBean doctorBasicInfoValue = dynamicFieldMapper.getDoctorBasicInfoValue(id, doctorBasicInfoResponseBean.getFieldId());
                 if (doctorBasicInfoValue != null){
                     doctorBasicInfoResponseBean.setDdfvId(doctorBasicInfoValue.getDdfvId());
                     doctorBasicInfoResponseBean.setValue(doctorBasicInfoValue.getValue());
-                    //Long ddfvId = doctorBasicInfoValue.getDdfvId();
-                    //if (ddfvId !=null && ddfvId !=0){
                     HcpDynamicRequestBean h = new HcpDynamicRequestBean();
                     h.setDoctorId(id);
                     h.setName(doctorBasicInfoResponseBean.getField());
-                        List<HcpBasicInfoHistoryResponseBean> hcpBasicInfoHistoryList = dynamicFieldMapper.getHcpBasicInfoHistoryList(h);
-                        if (hcpBasicInfoHistoryList != null && !hcpBasicInfoHistoryList.isEmpty()) {
-                            doctorBasicInfoResponseBean.setList(hcpBasicInfoHistoryList);
-                        }
-                    //}
+                    List<HcpBasicInfoHistoryResponseBean> hcpBasicInfoHistoryList = dynamicFieldMapper.getHcpBasicInfoHistoryList(h);
+                    if (hcpBasicInfoHistoryList != null && !hcpBasicInfoHistoryList.isEmpty()) {
+                        doctorBasicInfoResponseBean.setList(hcpBasicInfoHistoryList);
+                    }
                 }
-
             }
-
         }
-
 
         Doctor doctor = doctorRepository.findFirstById(id);
         if (doctor != null){
@@ -239,16 +224,13 @@ public class HcpService extends BaseService {
                         if (field.equals("医院")){
                             doctorBasicInfoResponseBean.setValue(doctor.getHospitalName());
                         }
-
                     }
                 }
             }
         }
 
-
         return doctorBasicInfoList;
     }
-
 
     /**
      * 修改医生的基本信息
@@ -265,13 +247,9 @@ public class HcpService extends BaseService {
         //删除之前先拿到要删除的字段
         List<DoctorBasicInfoResponseBean> beforeDeleteList =  dynamicFieldMapper.getFieldByDoctorIdAndClassification(doctorId, classification);
 
-
-
         dynamicFieldMapper.deleteAllByDoctorIdAndClassification(doctorId, classification);
 
         List<HcpBasicFieldRequestBean> list = bean.getList();
-
-
         //同时修改医生表中的四个字段
         if (classification !=null && classification == 1){
             if (list != null && !list.isEmpty()){
@@ -288,10 +266,6 @@ public class HcpService extends BaseService {
                             b.setDoctorId(doctorId);
                             b.setName(name);
                             doctorMapper.updateFixedName(b);
-
-
-
-
                         }
 
                         if (key.equals("电话")){
@@ -300,64 +274,34 @@ public class HcpService extends BaseService {
                                 HcpDynamicRequestBean b = new HcpDynamicRequestBean();
                                 b.setDoctorId(doctorId);
                                 b.setTelephone(telephone);
-
                                 doctorMapper.updateFixedTelephone(b);
                             }
-
                         }
 
                         if (key.equals("科室")){
                             depart = hcpBasicFieldRequestBean.getValue();
-
                             HcpDynamicRequestBean b = new HcpDynamicRequestBean();
                             b.setDoctorId(doctorId);
                             b.setDepart(depart);
-
                             doctorMapper.updateFixedDepart(b);
                         }
 
                         if (key.equals("医院")){
                             hospital = hcpBasicFieldRequestBean.getValue();
-
                             HcpDynamicRequestBean b = new HcpDynamicRequestBean();
                             b.setDoctorId(doctorId);
                             b.setHospital(hospital);
-
                             doctorMapper.updateFixedHospital(b);
                         }
-
-
-                        //更新医生表中的四个字段
-//                        if (!StringUtils.isEmpty(name) && !StringUtils.isEmpty(telephone) && !StringUtils.isEmpty(depart) && !StringUtils.isEmpty(hospital)){
-//                            doctorMapper.updateFixedField(doctorId,name,telephone,depart,hospital);
-//                        }
-
                     }
                 }
             }
         }
 
-
-
-
-
-
         if (list !=null && !list.isEmpty()){
             for (HcpBasicFieldRequestBean hcpBasicFieldRequestBean:list){
                 hcpBasicFieldRequestBean.setDoctorId(doctorId);
                 dynamicFieldMapper.insertHcpBasicField(hcpBasicFieldRequestBean);
-
-
-                //插入搜索历史
-
-
-
-
-
-
-
-
-
 
                 //插入搜索历史
                 Long id = hcpBasicFieldRequestBean.getId();
@@ -367,10 +311,8 @@ public class HcpService extends BaseService {
                     if (beforeDeleteList != null && !beforeDeleteList.isEmpty()){
                         for (DoctorBasicInfoResponseBean doctorBasic:beforeDeleteList){
                             if (hcpBasicFieldRequestBean.getKey().equals(doctorBasic.getField())){
-
                                 String oldValue = doctorBasic.getValue();
                                 String value = hcpBasicFieldRequestBean.getValue();
-
 
                                 hcpBasicFieldRequestBean.setOldKey(doctorBasic.getField());
                                 hcpBasicFieldRequestBean.setOldFieldId(doctorBasic.getFieldId());
@@ -389,41 +331,18 @@ public class HcpService extends BaseService {
                                                 dynamicFieldMapper.insertHcpBasicFieldHistory(hcpBasicFieldRequestBean);
                                             }
                                         }
-
                                     }
-
-
-
-
                                 }
-
                             }
                         }
                     }
-
-
-
                 }
-
-
-
             }
-
-
         }
-
-
-
-
 
         flag = true;
         return flag;
     }
-
-
-
-
-
 
     /**
      * 根据主数据医生id得到社会影响力
@@ -435,10 +354,7 @@ public class HcpService extends BaseService {
         HcpSocietyResponseBean hcpSocietyResponseBean = new HcpSocietyResponseBean();
 
         //改成查营销的数据库了
-        //Doctor doctor = doctorRepository.findFirstById(hcpId);
         hcpId = getMasterDataIdByHcpId(hcpId);
-
-
 
         Map<String, String> map = masterDataService.getMapHcpInfo(hcpId);
         if (map != null && map.size() > 0){
@@ -465,7 +381,6 @@ public class HcpService extends BaseService {
             int inquirySum =0 ;
             Map<String, Object> inlineInquiryMap = getInlineInquiryMap(inlineInquiryMapJsonStr);
             if (inlineInquiryMap != null && inlineInquiryMap.size() > 0){
-
                 Object inlineInquirySumObj = inlineInquiryMap.get("inlineInquirySum");
                 if (inlineInquirySumObj != null){
                     //好大夫门诊总量
@@ -478,7 +393,6 @@ public class HcpService extends BaseService {
                     TreeMap<Integer,Integer> treeMap = (TreeMap) inlineInquiryMap.get("outpatientVolumeMap");
                     //取最新的4年
                     TreeMap<Integer, Integer> integerIntegerTreeMap = subTreeMap(treeMap, 4);
-
                     hcpSocietyResponseBean.setOutpatientVolumeMap(integerIntegerTreeMap);
                 }
             }
@@ -502,12 +416,10 @@ public class HcpService extends BaseService {
             if (null != recommendIndex && !"".equals(recommendIndex) && !"0".equals(recommendIndex)){
                 hcpSocietyResponseBean.setComprehensiveScore(recommendIndex);
             }
-
         }
 
         return hcpSocietyResponseBean;
     }
-
 
     /**
      * 分页得到医生的对话信息
@@ -516,44 +428,26 @@ public class HcpService extends BaseService {
      */
     @Cacheable(value = "virtual_rep_api_hcp_service", key="'getDialogList'+#bean" )
     public PageResponseBean<HcpDialogResponseBean> getDialogList(HcpRequestBean bean){
-
         Long hcpId = bean.getHcpId();
 
         //改成查营销的数据了
-        //Doctor doctor = doctorRepository.findFirstById(hcpId);
         hcpId = getMasterDataIdByHcpId(hcpId);
-
-
 
         Integer page = bean.getPage() + 1;
         Integer pageSize = bean.getPageSize();
-
         Long drugUserId = bean.getDrugUserId();
-        //改成从营销数据库中查询
-//        DrugUser firstById = drugUserRepository.findFirstById(drugUserId);
-//        Long eappId = 0L;
-//        if (firstById != null){
-//            eappId = firstById.getEappId();
-//        }
 
         //得到的关键词
         String allkeyword = "";
         Map<String, String> keys = getKeys(drugUserId);
-
-
-        /*if (null != keys && keys.size() > 0){
-            allkeyword = keys.get("allkeyword");
-        }*/
 
         if (null != keys && keys.size() > 0){
             allkeyword = keys.get("allkeyword");
         }
         //有关键词的对话
         List<ConsultDetail> consultDetailListByKey = masterDataService.getConsultDetailListByKey(hcpId, allkeyword);
-
         //所有的对话
         List<ConsultDetail> consultDetailList = masterDataService.getConsultDetailListByKey(hcpId, null);
-
         //排序有关键词的先放到上面
         List<ConsultDetail> sortconsultDetailList = getSortConsultDetailListByKey(consultDetailListByKey,consultDetailList);
         int total = 0;
@@ -580,12 +474,9 @@ public class HcpService extends BaseService {
             }
         }
 
-
         PageResponseBean<HcpDialogResponseBean> pageResponseBean = new PageResponseBean<>(bean, total, list );
         return pageResponseBean;
-
     }
-
 
     /**
      * 对话中关键词统计
@@ -598,21 +489,9 @@ public class HcpService extends BaseService {
         Long hcpId = bean.getHcpId();
 
         hcpId = getMasterDataIdByHcpId(hcpId);
-
-
         Long drugUserId = bean.getDrugUserId();
 
-//        DrugUser firstById = drugUserRepository.findFirstById(drugUserId);
-//        Long eappId = 0L;
-//        if (firstById != null){
-//            eappId = firstById.getEappId();
-//        }
-
         String allkeyword = "";
-        /*Map<String, String> keys = getKeys(eappId);
-        if (null != keys && keys.size() > 0){
-            allkeyword = keys.get("allkeyword");
-        }*/
 
         Map<String, String> keys = getKeys(drugUserId);
         if (null != keys && keys.size() > 0){
@@ -638,8 +517,7 @@ public class HcpService extends BaseService {
         //竞品关键词统计数量
         if (null !=ckeywordList && ckeywordList.size() > 0){
             for (String ck:ckeywordList){
-
-                int ckCount = 0;
+               int ckCount = 0;
                for (ConsultDetail consultDetail:consultDetailListByKey){
                    String content = consultDetail.getContent();
                    if (!StringUtils.isEmpty(content)){
@@ -647,13 +525,13 @@ public class HcpService extends BaseService {
                        ckCount += subCount;
                    }
                }
+               
                 KeywordResponseBean ckBean = new KeywordResponseBean();
                 ckBean.setKeyword(ck);
                 ckBean.setCount(ckCount);
                 ckList.add(ckBean);
             }
         }
-
 
         //产品关键词统计数量
         if (null !=pkeywordList && pkeywordList.size() > 0){
@@ -687,7 +565,6 @@ public class HcpService extends BaseService {
        return keywordListResponseBean;
     }
 
-
     /**
      * 得到医生的五角(雷达)图
      * @param hcpId
@@ -698,13 +575,10 @@ public class HcpService extends BaseService {
         HcpPentagonResponseBean hcpPentagonResponseBean = new HcpPentagonResponseBean();
 
         //改成查营销的数据库了
-        //Doctor doctor = doctorRepository.findFirstById(hcpId);
         hcpId = getMasterDataIdByHcpId(hcpId);
-
 
         HcpResearchInfo hcpResearchInfo = masterDataService.getHcpResearchInfo(hcpId);
         if (hcpResearchInfo != null){
-
             //论文总数
             int totalDocNum = hcpResearchInfo.getTotalDocNum();
             //论文引用总数
@@ -734,13 +608,10 @@ public class HcpService extends BaseService {
                 if (null != hcp_G_index && !"".equals(hcp_G_index.trim()) && !"0".equals(hcp_G_index)){
                     hcpPentagonResponseBean.setG_index(hcp_G_index);
                 }
-
             }
-
         }
 
         return hcpPentagonResponseBean;
-
     }
 
     /**
@@ -753,33 +624,16 @@ public class HcpService extends BaseService {
         HcpResearchInfoResponseBean hcpResearchInfoResponseBean = new HcpResearchInfoResponseBean();
 
         //改成查营销的数据库了
-        //Doctor doctor = doctorRepository.findFirstById(hcpId);
         hcpId = getMasterDataIdByHcpId(hcpId);
-
-
-        //论文关键词
-//        List<DocKeywordResponseBean> docKeywordList = new ArrayList<>();
-//        List<DocKeyWord> docKeyWordList = masterDataService.getDocKeyWordList(hcpId);
-//        if (docKeyWordList != null && docKeyWordList.size() > 0){
-//            for (DocKeyWord docKeyWord:docKeyWordList){
-//                DocKeywordResponseBean docKeywordResponseBean = new DocKeywordResponseBean();
-//                docKeywordResponseBean.setCount(docKeyWord.getCount());
-//                docKeywordResponseBean.setKeyword(docKeyWord.getKeyword());
-//                docKeywordList.add(docKeywordResponseBean);
-//            }
-//        }
 
         //论文关键词
         List<DocKeywordResponseBean> docKeywordList = getDocKeywordList(hcpId);
-
-
         hcpResearchInfoResponseBean.setDocKeywordList(docKeywordList);
 
         HcpResearchInfo hcpResearchInfo = masterDataService.getHcpResearchInfo(hcpId);
         List<HcpCoAuthorResponseBean> hcpCoAuthorList = new ArrayList<>();
         List<HcpCoMagazineResponseBean> hcpCoMagazineList = new ArrayList<>();
         if (null != hcpResearchInfo){
-
             //合作作者
             List<HcpCoAuthor> coAuthorList = hcpResearchInfo.getCoAuthorList();
             if (coAuthorList != null && coAuthorList.size() > 0){
@@ -790,7 +644,6 @@ public class HcpService extends BaseService {
                         hcpCoAuthorResponseBean.setCoNum(hcpCoAuthor.getCoNum());
                         hcpCoAuthorList.add(hcpCoAuthorResponseBean);
                     }
-
                 }
 
                 //按照数量从大到小排序
@@ -814,14 +667,10 @@ public class HcpService extends BaseService {
                 Collections.sort(hcpCoMagazineList);
                 hcpResearchInfoResponseBean.setHcpCoMagazineList(hcpCoMagazineList);
             }
-
         }
 
-
         return hcpResearchInfoResponseBean;
-
     }
-
 
     /**
      * 得到医生的论文列表
@@ -836,13 +685,7 @@ public class HcpService extends BaseService {
         Integer page = bean.getPage() + 1;
         Integer pageSize = bean.getPageSize();
 
-
         Long drugUserId = bean.getDrugUserId();
-//        DrugUser firstById = drugUserRepository.findFirstById(drugUserId);
-//        Long eappId = 0L;
-//        if (firstById != null){
-//            eappId = firstById.getEappId();
-//        }
 
         HcpResearchInfo hcpResearchInfo = masterDataService.getHcpResearchInfo(hcpId);
         List<Doc> docList = new ArrayList<>();
@@ -853,20 +696,6 @@ public class HcpService extends BaseService {
                 docList = docs;
             }
         }
-
-        /**
-         * 得到后台配置的更关键词
-         */
-        //得到的关键词
-//        String allkeyword = "";
-//        String ckeyword = "";
-//        String pkeyword = "";
-//        Map<String, String> keys = getKeys(eappId);
-//        if (null != keys && keys.size() > 0){
-//            allkeyword = keys.get("allkeyword");
-//            ckeyword = keys.get("ckeyword");
-//            pkeyword = keys.get("pkeyword");
-//        }
 
         //查询营销的
         String allkeyword = "";
@@ -879,8 +708,6 @@ public class HcpService extends BaseService {
             pkeyword = keys.get("pkeyword");
         }
 
-
-
         //有关键词的论文
         KeyWordDoc hcpDocListByKeys = masterDataService.getHcpDocListByKeys(hcpId, allkeyword, page, pageSize);
         if (null != hcpDocListByKeys){
@@ -888,9 +715,7 @@ public class HcpService extends BaseService {
             if (null != list && list.size() > 0){
                 keyDocList = list;
             }
-
         }
-
 
         //排序有关键词的先放到上面
         List<Doc> sortDocList = getSortDocByKey(keyDocList, docList);
@@ -925,14 +750,12 @@ public class HcpService extends BaseService {
             totalCount = hcpDocResponseBeanList.size();
         }
 
-
         //论文是全部获取，在List中分页
         List<HcpDocResponseBean> listPage = CollectionUtil.getListPage(hcpDocResponseBeanList, page, pageSize);
         PageResponseBean<HcpDocResponseBean> hcpDocResponseBeanPage = new PageResponseBean<>(bean, totalCount, listPage);
 
         return hcpDocResponseBeanPage;
     }
-
 
     /**
      * 得到论文趋势图
@@ -941,9 +764,7 @@ public class HcpService extends BaseService {
      */
     @Cacheable(value = "dashboard_api_hcp_service", key="'getHcpDocTrend'+#hcpId" )
     public TreeMap<Integer, Integer> getHcpDocTrend(Long hcpId){
-
         hcpId = getMasterDataIdByHcpId(hcpId);
-
         HcpResearchInfo hcpResearchInfo = masterDataService.getHcpResearchInfo(hcpId);
         //截取时间后的论文
         List<Doc> newHcpDocList = new ArrayList<>();
@@ -964,12 +785,9 @@ public class HcpService extends BaseService {
             }
         }
 
-
-
         //得到每一年论文的数量
         TreeMap<Integer, Integer> treeMap = new TreeMap<>();
         if (newHcpDocList != null && newHcpDocList.size() > 0) {
-
             for (Doc doc : newHcpDocList) {
                 Integer magazineNo = Integer.parseInt(doc.getMagazineNo());
                 if (treeMap.containsKey(magazineNo)) {
@@ -980,9 +798,7 @@ public class HcpService extends BaseService {
             }
         }
 
-
         TreeMap<Integer, Integer> subTreeMap = subTreeMap(treeMap,4);
-
         return subTreeMap;
     }
 
@@ -993,9 +809,6 @@ public class HcpService extends BaseService {
      */
     @Cacheable(value = "dashboard_api_hcp_service", key="'getDocKeywordList'+#hcpId" )
     public List<DocKeywordResponseBean> getDocKeywordList(Long hcpId){
-        //此处不用加
-        //hcpId = getMasterDataIdByHcpId(hcpId);
-
         List<DocKeywordResponseBean> docKeywordList = new ArrayList<>();
         List<DocKeyWord> docKeyWordList = masterDataService.getDocKeyWordList(hcpId);
         if (docKeyWordList != null && docKeyWordList.size() > 0){
@@ -1010,76 +823,6 @@ public class HcpService extends BaseService {
         return docKeywordList;
     }
 
-
-
-    /**
-     * 得到后台配置的关键词，valus以字符串返回
-     * @param drugUser
-     * @return
-     */
-    /**
-     * 暂时没有实现
-     * @param drugUserId
-     * @return
-     */
-//    private Map<String,String> getKeys(Long drugUserId){
-//        Map<String,String> map = new HashMap<>();
-//        String url = prefixUrl + "/hcp/getProductKeys/{id}";
-//        DefaultResponseBean<HcpSocietyResponseBean> responseBean = restTemplate.getForObject(url, DefaultResponseBean.class, drugUserId);
-//        JSONObject json = (JSONObject) JSONObject.toJSON(responseBean);
-//        if (null != json){
-//            int code = (int) json.get("code");
-//            if (code == 200){
-//                map = (Map<String, String>) json.get("data");
-//            }
-//        }
-//
-//
-//        return map;
-//    }
-//
-//    private Map<String,List<String>> getKeysList(Long drugUserId){
-//
-//        Map<String,List<String>> map = new HashMap<>();
-//
-//        List<String> ckeywordList = new ArrayList<>();
-//        List<String> pkeyworkList = new ArrayList<>();
-//
-//        Map<String, String> keys = getKeys(drugUserId);
-//        String pkeyword = keys.get("pkeyword");
-//        if (!StringUtils.isEmpty(pkeyword)){
-//            String[] split = pkeyword.split(",");
-//            if (null != split && split.length > 0){
-//                for (String pkey:split){
-//                    pkeyworkList.add(pkey);
-//                }
-//            }
-//        }
-//
-//        String ckeyword = keys.get("ckeyword");
-//        if (!StringUtils.isEmpty(ckeyword)){
-//            String[] split = ckeyword.split(",");
-//            if (null != split && split.length > 0){
-//                for (String ckey:split){
-//                    ckeywordList.add(ckey);
-//                }
-//            }
-//        }
-//
-//        map.put("ckeywordList",ckeywordList);
-//        map.put("pkeywordList",pkeyworkList);
-//
-//        return map;
-//
-//    }
-
-
-    /**
-     * 得到后台配置的关键词，value以list返回
-     * @param drugUser
-     * @return
-     */
-
     /**
      * 查询营销数据中的，得到产品关键词
      * @param drugUserId
@@ -1087,8 +830,6 @@ public class HcpService extends BaseService {
      */
     private Map<String,String> getKeys(Long drugUserId){
         Map<String,String> map = new HashMap<>();
-
-
         List<ProductLine> productKeyWordList = drugUserService.findByProductKeyWord(drugUserId);
         if(null != productKeyWordList && productKeyWordList.size() > 0){
             StringBuilder ckeyWordStr = new StringBuilder("");
@@ -1118,19 +859,15 @@ public class HcpService extends BaseService {
                         }
                     }
                 }
-
-
             }
+            
             map.put("ckeyword",ckeyWordStr.toString());
             map.put("pkeyword",pkeyWordStr.toString());
             map.put("allkeyword",allkeyWordStr.toString());
-
         }
 
         return map;
     }
-
-
 
     /**
      * 得到后台配置的关键词，value以list返回
@@ -1139,13 +876,11 @@ public class HcpService extends BaseService {
      */
     private Map<String,List<String>> getKeysList(Long drugUserId){
         Map<String,List<String>> map = new HashMap<>();
-
         List<String> ckeywordList = new ArrayList<>();
         List<String> pkeyworkList = new ArrayList<>();
 
         List<ProductLine> productKeyWordList = drugUserService.findByProductKeyWord(drugUserId);
         if(null != productKeyWordList && productKeyWordList.size() > 0){
-            StringBuilder allkeyWordStr = new StringBuilder("");
             for (ProductLine productLine:productKeyWordList){
                 //竞品关键词
                 String ckeyWord = productLine.getCkeyWord();
@@ -1168,22 +903,16 @@ public class HcpService extends BaseService {
                         }
                     }
                 }
-
-
             }
+            
             map.put("ckeywordList",ckeywordList);
             map.put("pkeywordList",pkeyworkList);
-
-
         }
-
 
         return map;
     }
 
-
     /**
-     *
      * @param map
      * @param n
      * @return
@@ -1193,18 +922,11 @@ public class HcpService extends BaseService {
             return null;
         }
 
-
         TreeMap<Integer, Integer> subMap = null;
         if (map != null && map.size() > 0) {
             subMap = new TreeMap<>();
             int size = map.size();
             if (size > n) {
-                // 此方法不可行，时间有可能不是连续的
-                // Integer lastKey = map.lastKey();
-                // for(int i = 0; i< 4; i++){
-                // subMap.put(lastKey - i, map.get(lastKey - i));
-                // }
-
                 Set<Integer> set = map.keySet();
                 Iterator<Integer> it = set.iterator();
                 TreeSet<Integer> ts = new TreeSet<Integer>();
@@ -1223,7 +945,6 @@ public class HcpService extends BaseService {
                     subMap.put(next, map.get(next));
                     i++;
                 }
-
             } else if (size == n) {
                 subMap = map;
             } else if (size < n) {
@@ -1238,7 +959,6 @@ public class HcpService extends BaseService {
 
         return subMap;
     }
-
 
     // 根据期刊和类型得到时间
     private String getThesisNo(String magazineNo, String type) {
@@ -1259,7 +979,6 @@ public class HcpService extends BaseService {
                 } catch (Exception e) {
                     no = 1;
                 }
-
             }
         }
         if (magazineNos != null && magazineNos.length == 1){
@@ -1273,28 +992,20 @@ public class HcpService extends BaseService {
 
         if (type.equals(MagazineTypeEnum.HALF_MONTH.getName())) {
             value = MagazineTypeEnum.HALF_MONTH.getValue();
-
         } else if (type.equals(MagazineTypeEnum.DOUBLE_MONTH.getName())) {
             value = MagazineTypeEnum.DOUBLE_MONTH.getValue();
-
         } else if (type.equals(MagazineTypeEnum.MONTH.getName())) {
             value = MagazineTypeEnum.MONTH.getValue();
-
         } else if (type.equals(MagazineTypeEnum.TEN.getName())) {
             value = MagazineTypeEnum.TEN.getValue();
-
         } else if (type.equals(MagazineTypeEnum.WEEK.getName())) {
             value = MagazineTypeEnum.WEEK.getValue();
-
         } else if (type.equals(MagazineTypeEnum.SEASON.getName())) {
             value = MagazineTypeEnum.SEASON.getValue();
-
         } else if (type.equals(MagazineTypeEnum.WEEK2.getName())) {
             value = MagazineTypeEnum.WEEK2.getValue();
-
         } else if (type.equals(MagazineTypeEnum.YEAR.getName())) {
             value = MagazineTypeEnum.YEAR.getValue();
-
         } else if (type.equals(MagazineTypeEnum.HALF_YEAR.getName())) {
             value = MagazineTypeEnum.HALF_YEAR.getValue();
         }
@@ -1312,7 +1023,6 @@ public class HcpService extends BaseService {
         String thesisNo = yearStr + "/" + month;
         return thesisNo;
     }
-
 
     /**
      * 排序，有关键词的先放到上面
@@ -1342,7 +1052,6 @@ public class HcpService extends BaseService {
                         docIter.remove();
                     }
                 }
-
             }
         }
 
@@ -1352,60 +1061,6 @@ public class HcpService extends BaseService {
         }
 
         return  docList;
-
-    }
-
-
-    /**
-     * List中分页医生的对话信息
-     * @param sortconsultDetailList
-     * @param page
-     * @param pageSize
-     * @return
-     */
-    private List<Object> getListPage(List<? extends Object> sortconsultDetailList,Integer page, Integer pageSize){
-        List<Object> list = new ArrayList<>();
-        if (sortconsultDetailList == null && sortconsultDetailList.size() == 0){
-            return list;
-        }
-
-        int totalCount = sortconsultDetailList.size();
-        int pageCount = 0;
-        int m = totalCount % pageSize;
-        if (m > 0){
-            pageCount = totalCount/pageSize+1;
-        } else{
-            pageCount = totalCount/pageSize;
-        }
-
-        if (page > totalCount){
-            return list;
-        }
-
-        if (page == pageCount){
-            List<? extends Object> subList = sortconsultDetailList.subList((page-1) * pageSize,totalCount);
-            list.addAll(subList);
-        }else{
-            List<? extends Object> subList = sortconsultDetailList.subList((page-1) * pageSize, pageSize * page);
-            list.addAll(subList);
-        }
-
-//        if (m == 0){
-//            List<ConsultDetail> subList = sortconsultDetailList.subList((page-1) * pageSize,pageSize * (page));
-//            list.addAll(subList);
-//        }else{
-//            if (page == pageCount){
-//                List<ConsultDetail> subList = sortconsultDetailList.subList((page-1) * pageSize,totalCount);
-//                list.addAll(subList);
-//            }else{
-//                List<ConsultDetail> subList = sortconsultDetailList.subList((page-1) * pageSize,pageSize * (page));
-//                list.addAll(subList);
-//            }
-//
-//
-//        }
-
-        return list;
     }
 
     /**
@@ -1442,21 +1097,6 @@ public class HcpService extends BaseService {
             list.addAll(subList);
         }
 
-//        if (m == 0){
-//            List<ConsultDetail> subList = sortconsultDetailList.subList((page-1) * pageSize,pageSize * (page));
-//            list.addAll(subList);
-//        }else{
-//            if (page == pageCount){
-//                List<ConsultDetail> subList = sortconsultDetailList.subList((page-1) * pageSize,totalCount);
-//                list.addAll(subList);
-//            }else{
-//                List<ConsultDetail> subList = sortconsultDetailList.subList((page-1) * pageSize,pageSize * (page));
-//                list.addAll(subList);
-//            }
-//
-//
-//        }
-
         return list;
     }
 
@@ -1467,7 +1107,6 @@ public class HcpService extends BaseService {
      * @return
      */
     private List<ConsultDetail> getSortConsultDetailListByKey(List<ConsultDetail> consultDetailListByKey,List<ConsultDetail> consultDetailList){
-
         if (null != consultDetailListByKey && consultDetailListByKey.size() > 0){
             //先移除掉有关键词的对话
             for(ConsultDetail consultDetail:consultDetailListByKey){
@@ -1483,16 +1122,13 @@ public class HcpService extends BaseService {
                 }
             }
 
-
             //再把有关键词的放到最上面
             for (int i = 0; i < consultDetailListByKey.size(); i++){
                 consultDetailList.add(i,consultDetailListByKey.get(i) );
             }
-
         }
 
         return consultDetailList;
-
     }
 
     /**
@@ -1517,7 +1153,6 @@ public class HcpService extends BaseService {
                     map.put("inlineInquirySum", inlineInquirySum);
                     map.put("outpatientVolumeMap", outpatientVolumeMap);
                 }
-
             }
         } catch (Exception e) {
             throw e;
@@ -1525,34 +1160,6 @@ public class HcpService extends BaseService {
 
         return map;
     }
-
-
-    /**
-     * 根据主数据医院名称和和医生名称得到营销那边医生
-     * @param list 主数据医院名称包括别名
-     * @param hcpName 主数据医生名称
-     * @return
-     */
-//    private DoctorResponseBean getDoctorByHciNameAndHcpName(List<HciAlias> list, String hcpName, String leaderPath){
-//        if (null == list || list.size() == 0){
-//            return null;
-//        }
-//
-//        DoctorResponseBean doctorResponseBean = null;
-//
-//        for (HciAlias hciAlias:list){
-//            if (null != hciAlias){
-//                String alias = hciAlias.getAlias();
-//                doctorResponseBean = doctorMapper.selectDoctorByHciNameAndHcpName(alias, hcpName, leaderPath);
-//                if (null != doctorResponseBean){
-//                    break;
-//                }
-//
-//            }
-//        }
-//
-//        return doctorResponseBean;
-//    }
 
     /**
      * String字符串中某个关键词的统计次数
@@ -1569,33 +1176,5 @@ public class HcpService extends BaseService {
         }
         return count;
     }
-
-
-    /**
-     * 得到医生的药企，多个以逗号分割
-     * @param name
-     * @param hciName
-     * @param leaderPath
-     * @return
-     */
-//    public String getDrugName(String name, String hciName,String leaderPath, Long drugUserId){
-//        String drugName = "";
-//        StringBuffer sb = new StringBuffer("");
-//        List<String> drugNames = doctorMapper.getDrugName(name, hciName, leaderPath, drugUserId);
-//        if (null != drugNames && drugNames.size() > 0){
-//            for (int i = 0; i< drugNames.size(); i++){
-//                if (i == drugNames.size()-1){
-//                    sb.append(drugNames.get(i));
-//                }else{
-//                    sb.append(drugNames.get(i));
-//                    sb.append(",");
-//                }
-//            }
-//        }
-//        drugName = sb.toString();
-//
-//        return drugName;
-//    }
-
 
 }
