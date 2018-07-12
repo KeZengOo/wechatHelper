@@ -40,24 +40,33 @@ public class CallBackController extends BaseController {
     @ApiOperation(value = "回调接口方法", notes = "回调接口方法")
     @RequestMapping("/7moor")
     public ResponseObj callback(HttpServletRequest request, HttpServletResponse response) {
-		Map<String, String> map = new HashMap<>();
+		Map<String, String> paramsMap = this.getParamsMap(request);
+    	
+		ResponseObj responseObj = new ResponseObj();
+		responseObj.setData(paramsMap);
+		logger.info("map:{}", JSONObject.toJSONString(paramsMap));
+		
+    	callBackService.callBack(paramsMap);
+    	return responseObj;
+    }
+    
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    private Map<String, String> getParamsMap (HttpServletRequest request) {
+    	Map<String, String> paramsMap = new HashMap<>();
 		Enumeration<String> paramNames = request.getParameterNames();
 		while (paramNames != null && paramNames.hasMoreElements()) {
 			String parameter = paramNames.nextElement();
 			String[] parameterValues = request.getParameterValues(parameter);
 			if (parameterValues.length == 1) {
 				String parameterValue = parameterValues[0];
-				map.put(parameter, parameterValue);
+				paramsMap.put(parameter, parameterValue);
 				logger.info("{}={}", parameter, parameterValue);
 			}
 		}
-    	
-		ResponseObj responseObj = new ResponseObj();
-		responseObj.setData(map);
-		logger.info("map:{}", JSONObject.toJSONString(map));
 		
-    	callBackService.callBack(map);
-    	return responseObj;
+		return paramsMap;
+		
     }
 
 }

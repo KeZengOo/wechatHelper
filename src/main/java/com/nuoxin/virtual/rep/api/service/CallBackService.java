@@ -54,6 +54,7 @@ public class CallBackService {
 					info.setCallUrl(url);
 				}
 
+				// 7moor 状态-> 转成老的状态
 				if ("dealing".equalsIgnoreCase(statusName)) {
 					statusName = "answer";
 				} else if ("notDeal".equalsIgnoreCase(statusName)) {
