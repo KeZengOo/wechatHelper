@@ -31,6 +31,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -163,15 +166,26 @@ public class DoctorController extends BaseController {
             responseBean.setMessage("产品不能为空");
             return responseBean;
         }
+        
+        InputStream inputStream = null;
         List<DoctorExcel> list = new ArrayList<>();
         try{
-            list = excelUtils.readFromFile(null,file.getInputStream());
+			list = excelUtils.readFromFile(null, inputStream);
         }catch (Exception e){
+        	logger.error("Exception", e);
             e.printStackTrace();
             responseBean.setCode(500);
             responseBean.setMessage("excel解析失败");
             responseBean.setDescription(e.getMessage());
             return responseBean;
+        } finally {
+        	if(inputStream != null) {
+        		try {
+					inputStream.close();
+				} catch (IOException e) {
+					logger.error("IOException", e);
+				}
+        	}
         }
         if(list==null || list.isEmpty()){
             responseBean.setCode(500);

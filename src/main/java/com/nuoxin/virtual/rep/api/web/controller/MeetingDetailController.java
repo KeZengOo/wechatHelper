@@ -25,13 +25,11 @@ public class MeetingDetailController extends BaseController{
     @PostMapping("/import")
     @ResponseBody
     public ResponseEntity<DefaultResponseBean<Boolean>> importExcel(MultipartFile file, @RequestParam(value = "meetingId", required = true) Long meetingId){
-
         boolean flag = meetingDetailService.importExcel(meetingId, file);
 
         DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
         responseBean.setData(flag);
         return ResponseEntity.ok(responseBean);
-
     }
 
 }

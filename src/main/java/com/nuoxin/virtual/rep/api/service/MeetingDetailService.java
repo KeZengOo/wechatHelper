@@ -33,7 +33,6 @@ public class MeetingDetailService extends BaseService{
 
     @Autowired
     private DoctorRepository doctorRepository;
-
     @Autowired
     private MeetingDetailRepository meetingDetailRepository;
 
@@ -45,34 +44,31 @@ public class MeetingDetailService extends BaseService{
      */
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public boolean importExcel(Long meetingId, MultipartFile file){
-
         boolean flag = false;
-        InputStream inputStream = null;
-        try {
-            inputStream = file.getInputStream();
-
-        } catch (IOException e) {
-            logger.error("得到上传文件的输入流失败。。" + e);
-            logger.error("得到上传文件的输入流失败。。" + e.getMessage());
-            e.printStackTrace();
-            throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
-        }
-
         String originalFilename = file.getOriginalFilename();
 
         if (!originalFilename.endsWith(RegularUtils.EXTENSION_XLS) && !originalFilename.endsWith(RegularUtils.EXTENSION_XLSX)) {
             throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
         }
 
-        ExcelUtils<MeetingDetailVo> excelUtils = new ExcelUtils<>(new MeetingDetailVo());
-        List<MeetingDetailVo> meetingDetailVos = null;
-        try {
-            meetingDetailVos = excelUtils.readFromFile(null, inputStream);
-        } catch (Exception e) {
-            logger.error("读取上传的excel文件失败。。", e.getMessage());
-            e.printStackTrace();
-            throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
-        }
+		List<MeetingDetailVo> meetingDetailVos = null;
+		InputStream inputStream = null;
+		ExcelUtils<MeetingDetailVo> excelUtils = new ExcelUtils<>(new MeetingDetailVo());
+		try {
+			inputStream = file.getInputStream();
+			meetingDetailVos = excelUtils.readFromFile(null, inputStream);
+		} catch (Exception e) {
+			logger.error("读取上传的excel文件失败。。", e);
+			throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
+		} finally {
+			if(inputStream != null) {
+        		try {
+					inputStream.close();
+				} catch (IOException e) {
+					logger.error("IOException", e);
+				}
+        	}
+		}
 
         if (null == meetingDetailVos || meetingDetailVos.size() <= 0) {
             return false;
@@ -97,9 +93,9 @@ public class MeetingDetailService extends BaseService{
                 if (!matcher){
                     throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "手机号输入有误，请检查是否是文本格式");
                 }
+                
                 Doctor doctor = doctorRepository.findTopByMobile(telephone);
                 if (doctor != null){
-
                     List<MeetingDetail> meetingDetailList = meetingDetailRepository.findByMeetingIdAndDoctorId(meetingId, doctor.getId());
                     if (meetingDetailList != null && meetingDetailList.size() > 0){
                         meetingDetailRepository.deleteAllByMeetingIdAndDoctorId(meetingId,doctor.getId());
@@ -117,12 +113,12 @@ public class MeetingDetailService extends BaseService{
 
                 meetingDetails.add(meetingDetail);
             }
-
         }
 
         if (null != meetingDetails && !meetingDetails.isEmpty()){
             meetingDetailRepository.save(meetingDetails);
         }
+        
         flag = true;
         return flag;
     }

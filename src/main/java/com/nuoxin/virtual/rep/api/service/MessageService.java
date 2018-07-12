@@ -104,16 +104,7 @@ public class MessageService extends BaseService {
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public boolean importExcel(MultipartFile file, DrugUser drugUser) {
         boolean success = false;
-        InputStream inputStream = null;
-        try {
-            inputStream = file.getInputStream();
-        } catch (IOException e) {
-            logger.error("得到上传文件的输入流失败。。" + e);
-            logger.error("得到上传文件的输入流失败。。" + e.getMessage());
-            e.printStackTrace();
-            throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
-        }
-
+        
         String originalFilename = file.getOriginalFilename();
         if (StringUtils.isEmpty(originalFilename)){
             throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "文件名称不能为空");
@@ -136,15 +127,24 @@ public class MessageService extends BaseService {
         }
 
         List<Message> list = new ArrayList<>();
-        ExcelUtils<WechatMessageVo> excelUtils = new ExcelUtils<>(new WechatMessageVo());
 
+        ExcelUtils<WechatMessageVo> excelUtils = new ExcelUtils<>(new WechatMessageVo());
         List<WechatMessageVo> wechatMessageVos = null;
+        InputStream inputStream = null;
         try {
+        	inputStream = file.getInputStream();
             wechatMessageVos = excelUtils.readFromFile(null, inputStream);
         } catch (Exception e) {
-            logger.error("读取上传的excel文件失败。。", e.getMessage());
-            e.printStackTrace();
+            logger.error("读取上传的excel文件失败。。", e);
             throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
+        } finally {
+        	if(inputStream != null) {
+        		try {
+					inputStream.close();
+				} catch (IOException e) {
+					logger.error("IOException", e);
+				}
+        	}
         }
 
         if (null == wechatMessageVos || wechatMessageVos.size() <= 0) {
@@ -167,7 +167,8 @@ public class MessageService extends BaseService {
                 String message = wechatMessageVo.getMessage();
 
                 //判断数据库中是否存在该条数据
-                Message findMessage = messageRepository.findTopByMessageTypeAndWechatNumberAndMessageTimeOrderByMessageTimeDesc(MessageTypeEnum.WECHAT.getMessageType(), wechatNumber, wechatTime);
+				Message findMessage = messageRepository.findTopByMessageTypeAndWechatNumberAndMessageTimeOrderByMessageTimeDesc(
+						MessageTypeEnum.WECHAT.getMessageType(), wechatNumber, wechatTime);
                 if (findMessage != null){
                     //数据库存在该条数据
                     continue;

@@ -1,6 +1,19 @@
 package com.nuoxin.virtual.rep.api.service;
 
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BaseException;
@@ -12,7 +25,6 @@ import com.nuoxin.virtual.rep.api.dao.MeetingRepository;
 import com.nuoxin.virtual.rep.api.dao.ProductLineRepository;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.Meeting;
-
 import com.nuoxin.virtual.rep.api.entity.ProductLine;
 import com.nuoxin.virtual.rep.api.mybatis.MeetingMapper;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
@@ -20,28 +32,7 @@ import com.nuoxin.virtual.rep.api.utils.ExcelUtils;
 import com.nuoxin.virtual.rep.api.utils.RegularUtils;
 import com.nuoxin.virtual.rep.api.web.controller.request.meeting.MeetingRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.vo.MeetingVo;
-
 import com.nuoxin.virtual.rep.api.web.controller.response.meeting.MeetingResponseBean;
-
-import com.nuoxin.virtual.rep.api.web.controller.response.message.MessageResponseBean;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
-
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.swing.*;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 /**
  * 会议相关
@@ -52,57 +43,47 @@ public class MeetingService extends BaseService {
 
     @Autowired
     private MeetingRepository meetingRepository;
-
     @Autowired
     private MeetingDetailRepository meetingDetailRepository;
-
     @Autowired
     private DrugUserRepository drugUserRepository;
-
     @Autowired
     private ProductLineRepository productLineRepository;
-
     @Autowired
     private MeetingMapper meetingMapper;
 
-
     /**
      * 导入会议记录
-     *
      * @param file 会议的excel文件
      * @return
      */
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public boolean importExcel(MultipartFile file, Long productId) {
-
         boolean flag = false;
-        InputStream inputStream = null;
-        try {
-            inputStream = file.getInputStream();
-
-        } catch (IOException e) {
-            logger.error("得到上传文件的输入流失败。。" + e);
-            logger.error("得到上传文件的输入流失败。。" + e.getMessage());
-            e.printStackTrace();
-            throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
-        }
-
+        
         String originalFilename = file.getOriginalFilename();
-
-        if (!originalFilename.endsWith(RegularUtils.EXTENSION_XLS) && !originalFilename.endsWith(RegularUtils.EXTENSION_XLSX)) {
+		if (!originalFilename.endsWith(RegularUtils.EXTENSION_XLS) && !originalFilename.endsWith(RegularUtils.EXTENSION_XLSX)) {
             throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
         }
-
-        ExcelUtils<MeetingVo> excelUtils = new ExcelUtils<>(new MeetingVo());
 
         List<MeetingVo> meetingVos = null;
-
+        InputStream inputStream = null;
+        ExcelUtils<MeetingVo> excelUtils = new ExcelUtils<>(new MeetingVo());
+        
         try {
+        	inputStream = file.getInputStream();
             meetingVos = excelUtils.readFromFile(null, inputStream);
         } catch (Exception e) {
-            logger.error("读取上传的excel文件失败。。", e.getMessage());
-            e.printStackTrace();
+            logger.error("读取上传的excel文件失败。。", e);
             throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
+        } finally {
+        	if(inputStream != null) {
+        		try {
+					inputStream.close();
+				} catch (IOException e) {
+					logger.error("IOException", e);
+				}
+        	}
         }
 
         if (null == meetingVos || meetingVos.size() <= 0) {
@@ -117,6 +98,7 @@ public class MeetingService extends BaseService {
                 meeting.setSpeaker(meetingVo.getSpeaker());
                 meeting.setMeetingStartTime(DateUtil.getDateTimeString(meetingVo.getMeetingStartTime()));
                 meeting.setMeetingEndTime(DateUtil.getDateTimeString(meetingVo.getMeetingEndTime()));
+             
                 ProductLine productLine = productLineRepository.getOne(productId);
                 if (productLine != null){
                     meeting.setProductId(productId);
@@ -133,96 +115,16 @@ public class MeetingService extends BaseService {
 
         flag = true;
         return flag;
-
     }
 
-    //jpa写法
-//    public PageResponseBean<MeetingResponseBean> getList(MeetingRequestBean bean){
-//
-//
-//        Specification<Meeting> specification = new Specification<Meeting>() {
-//            @Override
-//            public Predicate toPredicate(Root<Meeting> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
-//
-//                List<Predicate> predicates = new ArrayList<>();
-//                predicates.add(criteriaBuilder.equal(root.get("productId").as(Long.class), bean.getProductId()));
-//                if (!StringUtils.isEmpty(bean.getTitle())){
-//                    predicates.add(criteriaBuilder.like(root.get("title").as(String.class), "%" + bean.getTitle() + "%"));
-//                }
-//
-//                if (!StringUtils.isEmpty(bean.getSpeaker())){
-//                    predicates.add(criteriaBuilder.like(root.get("speaker").as(String.class), "%" + bean.getSpeaker() + "%"));
-//                }
-//
-//                String meetingStartTime = bean.getMeetingStartTime();
-//                String meetingEndTime = bean.getMeetingEndTime();
-//                if (!StringUtils.isEmpty(meetingStartTime)){
-//                    predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("meetingStartTime").as(String.class),meetingStartTime));
-//                }
-//
-//                if (!StringUtils.isEmpty(meetingEndTime)){
-//                    predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("meetingEndTime").as(String.class),meetingEndTime));
-//
-//                }
-//
-//                if (!StringUtils.isEmpty(bean.getProductName())){
-//                    predicates.add(criteriaBuilder.like(root.get("productName").as(String.class), "%" + bean.getProductName() + "%"));
-//
-//                }
-//
-//                if (!StringUtils.isEmpty(meetingStartTime) && !StringUtils.isEmpty(meetingEndTime)){
-//                    int compareTo = meetingStartTime.compareTo(meetingEndTime);
-//                    if (compareTo > 0){
-//                        throw new BaseException("开始时间不能比结束时间大");
-//                    }
-//                }
-//
-//
-//                criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.and(predicates.toArray(new Predicate[0]))));
-//                return criteriaQuery.getRestriction();
-//
-//            }
-//        };
-//
-//        Sort.Order order = new Sort.Order(Sort.Direction.DESC, "updateTime");
-//        Sort sort = new Sort(order);
-//        Pageable pageable = new PageRequest(bean.getPage(), bean.getPageSize(), sort);
-//
-//        Page<Meeting> page = meetingRepository.findAll(specification, pageable);
-//        PageResponseBean<MeetingResponseBean> meetingPage = new PageResponseBean<>(page);
-//        List<MeetingResponseBean> meetingList = new ArrayList<>();
-//        List<Meeting> content = page.getContent();
-//        if (null != content && !content.isEmpty()){
-//            for (Meeting meeting:content){
-//                if (null != meeting){
-//                    MeetingResponseBean meetingResponseBean = new MeetingResponseBean();
-//                    meetingResponseBean.setId(meeting.getId());
-//                    meetingResponseBean.setTitle(meeting.getTitle());
-//                    meetingResponseBean.setSpeaker(meeting.getSpeaker());
-//                    meetingResponseBean.setMeetingStartTime(meeting.getMeetingStartTime());
-//                    meetingResponseBean.setMeetingEndTime(meeting.getMeetingEndTime());
-//                    meetingResponseBean.setProductId(meeting.getProductId());
-//                    meetingResponseBean.setProductName(meeting.getProductName());
-//                    meetingList.add(meetingResponseBean);
-//                }
-//            }
-//        }
-//
-//        meetingPage.setContent(meetingList);
-//
-//        return meetingPage;
-//    }
-
-
-    //mybatis写法
     public PageResponseBean<MeetingResponseBean> getList(MeetingRequestBean bean) {
-
         DrugUser drugUser = drugUserRepository.findFirstById(bean.getDrugUserId());
         String leaderPath = drugUser.getLeaderPath();
         if (leaderPath == null) {
             leaderPath = "";
         }
         bean.setLeaderPath(leaderPath + "%");
+        
         String title = bean.getTitle();
         if (!StringUtils.isEmpty(title)) {
             bean.setTitle("%" + title + "%");
@@ -240,7 +142,6 @@ public class MeetingService extends BaseService {
 
         Integer page = bean.getPage();
         Integer pageSize = bean.getPageSize();
-        //bean.setPage(page  * pageSize);
         bean.setCurrentSize(page  * pageSize);
 
         String meetingStartTime = bean.getMeetingStartTime();
@@ -252,10 +153,8 @@ public class MeetingService extends BaseService {
             }
         }
 
-
         List<MeetingResponseBean> list = meetingMapper.getList(bean);
         Integer listCount = meetingMapper.getListCount(bean);
-
         PageResponseBean<MeetingResponseBean> pageResponseBean = new PageResponseBean<>(bean, listCount, list);
 
         return pageResponseBean;
