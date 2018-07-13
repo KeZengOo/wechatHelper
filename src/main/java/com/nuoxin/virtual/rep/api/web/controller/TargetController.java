@@ -36,23 +36,17 @@ public class TargetController extends BaseController{
 
     @Autowired
     private FollowUpTypeService followUpTypeService;
-
     @Autowired
     private CoveredTargetService coveredTargetService;
-
     @Autowired
     private TargetService targetService;
-
     @Autowired
     private DropTargetService dropTargetService;
-
 
     @ApiOperation(value = "新增或者修改跟进类型接口", notes = "新增或者修改跟进类型接口")
     @PostMapping("/addOrUpdateFollowUp")
     @ResponseBody
     public ResponseEntity<DefaultResponseBean<Boolean>>  getOneMonthNoFollowCustomers(@RequestBody List<FollowUpSetRequestBean> list, HttpServletRequest request){
-
-
         Boolean flag = followUpTypeService.addFollowUp(list);
         DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
         responseBean.setData(flag);
@@ -60,105 +54,74 @@ public class TargetController extends BaseController{
 
     }
 
-
     @ApiOperation(value = "跟进类型列表接口", notes = "跟进类型列表接口")
     @PostMapping("/getFollowUpList")
     @ResponseBody
     public ResponseEntity<DefaultResponseBean<List<FollowUpResponseBean>>>  getFollowUpList(@RequestBody FollowUpSetRequestBean bean, HttpServletRequest request){
-
-
         List<FollowUpResponseBean> followUpList = followUpTypeService.getFollowUpList(bean);
         DefaultResponseBean<List<FollowUpResponseBean>> responseBean = new DefaultResponseBean<>();
         responseBean.setData(followUpList);
         return ResponseEntity.ok(responseBean);
-
     }
-
-
 
     @ApiOperation(value = "新增或者修改月覆盖目标接口", notes = "新增或者修改月覆盖目标接口")
     @PostMapping("/addOrUpdateMonthCover")
     @ResponseBody
     public ResponseEntity<DefaultResponseBean<Boolean>>  addOrUpdateMonthCover(@RequestBody List<MonthCoverTargetSetRequestBean> list, HttpServletRequest request){
-
-
         Boolean flag = coveredTargetService.add(list);
         DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
         responseBean.setData(flag);
         return ResponseEntity.ok(responseBean);
-
     }
-
 
     @ApiOperation(value = "月覆盖目标列表接口", notes = "月覆盖目标列表接口")
     @GetMapping("/monthCoverList/{id}")
     @ResponseBody
     public ResponseEntity<DefaultResponseBean<List<MonthCoverTargetResponseBean>>>  getFollowUpList(@PathVariable(value = "id") Long productId, HttpServletRequest request){
-
-
         List<MonthCoverTargetResponseBean> monthTargetList = coveredTargetService.getMonthTargetList(productId);
         DefaultResponseBean<List<MonthCoverTargetResponseBean>> responseBean = new DefaultResponseBean<>();
         responseBean.setData(monthTargetList);
         return ResponseEntity.ok(responseBean);
-
     }
-
 
     @ApiOperation(value = "脱落客户新增接口", notes = "脱落客户新增接口接口")
     @PostMapping("/addDropTarget")
     @ResponseBody
     public ResponseEntity<DefaultResponseBean<Boolean>>  addDropTarget(@RequestBody List<DropTargetRequestBean> list, HttpServletRequest request){
-
-
         Boolean flag = dropTargetService.add(list);
         DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
         responseBean.setData(flag);
         return ResponseEntity.ok(responseBean);
-
     }
-
 
     @ApiOperation(value = "脱落客户列表接口", notes = "脱落客户列表接口")
     @GetMapping("/getDropTargetList/{id}")
     @ResponseBody
     public ResponseEntity<DefaultResponseBean<List<DropTargetResponseBean>>>  getDropTargetList(@PathVariable(value = "id") Long productId, HttpServletRequest request){
-
-
         List<DropTargetResponseBean> dropTargetList = dropTargetService.getDropTargetList(productId);
         DefaultResponseBean<List<DropTargetResponseBean>> responseBean = new DefaultResponseBean<>();
         responseBean.setData(dropTargetList);
         return ResponseEntity.ok(responseBean);
-
     }
-
-
 
     @ApiOperation(value = "新增或者修改月工作量目标接口", notes = "新增或者修改月工作量目标接口")
     @PostMapping("/addOrUpdateMonthWorkMonth")
     @ResponseBody
     public ResponseEntity<DefaultResponseBean<Boolean>>  addOrUpdateMonthWorkMonth(@RequestBody MonthWorkTargetSetRequestBean bean, HttpServletRequest request){
-
-
         Boolean flag = targetService.add(bean);
         DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
         responseBean.setData(flag);
         return ResponseEntity.ok(responseBean);
-
     }
-
 
     @ApiOperation(value = "月工作量目标列表接口", notes = "月工作量目标列表接口")
     @GetMapping("/getMonthWorkTargetList/{id}")
     @ResponseBody
     public ResponseEntity<DefaultResponseBean<List<MonthWorkTargetResponseBean>>>  getMonthWorkTargetList(@PathVariable(value = "id") Long productId, HttpServletRequest request){
-
-
         List<MonthWorkTargetResponseBean> targetList = targetService.getMonthWorkTargetList(productId);
         DefaultResponseBean<List<MonthWorkTargetResponseBean>> responseBean = new DefaultResponseBean<>();
         responseBean.setData(targetList);
         return ResponseEntity.ok(responseBean);
-
     }
-
 
 }

@@ -20,29 +20,24 @@ import org.apache.log4j.Logger;
  * 这个Filter在{@link App}中引入.
  */
 public class CrossDomainFilter implements Filter {
+	
     private static final Logger LOG = LogManager.getLogger(CrossDomainFilter.class);
 
     private volatile boolean allowCrossDomain = true;
 
     @Override
     public void init(FilterConfig config) throws ServletException {
-        //allowCrossDomain = Boolean.valueOf(config.getInitParameter("allowCrossDomain"));
     }
 
     @Override
     public void doFilter(ServletRequest rq, ServletResponse rs,
                          FilterChain filterChain) throws IOException, ServletException {
-
         HttpServletRequest request = (HttpServletRequest) rq;
         HttpServletResponse response = (HttpServletResponse) rs;
-//        if (response.getContentType() == null || response.getContentType().isEmpty()) {
-//            response.setContentType("application/json");
-//        }
 
         // 设置允许跨域访问
         //LOG.info("Request Orign = {}", request.getHeader("Origin"));
         if (allowCrossDomain) {
-            //LOG.info("允许客户端跨域访问");
             // 重要：clientIp不能为*，否则session无法传递到服务器端.
             response.addHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
             response.addHeader("Access-Control-Allow-Credentials", "true");
@@ -59,7 +54,7 @@ public class CrossDomainFilter implements Filter {
                 response.addHeader("Access-Control-Allow-Headers",
                         "X-Requested-With, Origin, Content-Type, Cookie, X-Access-Token");
             }
-            // response.addCookie(new Cookie("test-random-time", System.currentTimeMillis() + ""));
+            
             filterChain.doFilter(request, response);
         }
     }

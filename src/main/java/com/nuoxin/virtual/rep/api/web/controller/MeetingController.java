@@ -16,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- *
  * Create by tiancun on 2017/10/11
  */
 @Api(value = "会议相关接口")
@@ -26,7 +25,6 @@ public class MeetingController extends BaseController{
 
     @Autowired
     private MeetingService meetingService;
-
 
     @ApiOperation(value = "会议导入接口", notes = "会议导入接口")
     @PostMapping("/import")

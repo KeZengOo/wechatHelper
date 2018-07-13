@@ -1,28 +1,33 @@
 package com.nuoxin.virtual.rep.api.web.controller;
 
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.alibaba.fastjson.JSON;
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
 import com.nuoxin.virtual.rep.api.common.util.StringUtils;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
-import com.nuoxin.virtual.rep.api.entity.Questionnaire;
 import com.nuoxin.virtual.rep.api.service.analysis.QuestionnaireAnalysisService;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.analysis.QuestionnaireAnalysisRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.analysis.q.QuestionStatResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.analysis.q.QuestionnaireStatResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.question.QuestionnaireResponseBean;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Date;
-import java.util.List;
 
 /**
  * Created by fenggang on 10/11/17.
@@ -32,7 +37,7 @@ import java.util.List;
 @RequestMapping(value = "/questionnaire/analysis")
 public class QuestionnaireAnalysisController extends BaseController {
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(QuestionnaireAnalysisController.class);
 
     @Autowired
     private QuestionnaireAnalysisService questionnaireAnalysisService;
@@ -48,12 +53,14 @@ public class QuestionnaireAnalysisController extends BaseController {
             responseBean.setMessage("时间选择错误");
             return responseBean;
         }
+        
         DrugUser user = super.getLoginUser(request);
         if(user==null){
             responseBean.setCode(300);
             responseBean.setMessage("登录失效");
             return responseBean;
         }
+        
         bean.setDrugUserId(user.getId());
         bean.setLeaderPath(user.getLeaderPath());
         responseBean.setData(questionnaireAnalysisService.summation(bean));
@@ -71,12 +78,14 @@ public class QuestionnaireAnalysisController extends BaseController {
             responseBean.setMessage("时间选择错误");
             return responseBean;
         }
+        
         DrugUser user = super.getLoginUser(request);
         if(user==null){
             responseBean.setCode(300);
             responseBean.setMessage("登录失效");
             return responseBean;
         }
+        
         bean.setDrugUserId(user.getId());
         bean.setLeaderPath(user.getLeaderPath());
         responseBean.setData(questionnaireAnalysisService.list(bean));
@@ -94,12 +103,14 @@ public class QuestionnaireAnalysisController extends BaseController {
             responseBean.setMessage("时间选择错误");
             return responseBean;
         }
+        
         DrugUser user = super.getLoginUser(request);
         if(user==null){
             responseBean.setCode(300);
             responseBean.setMessage("登录失效");
             return responseBean;
         }
+        
         bean.setDrugUserId(user.getId());
         bean.setLeaderPath(user.getLeaderPath());
         responseBean.setData(questionnaireAnalysisService.details(bean));
@@ -108,7 +119,6 @@ public class QuestionnaireAnalysisController extends BaseController {
 
     /**
      * 检查传入进来的时间是否符合时间格式
-     *
      * @return
      */
     private boolean _checkoutDate(QuestionnaireAnalysisRequestBean bean) {
@@ -118,6 +128,7 @@ public class QuestionnaireAnalysisController extends BaseController {
             startDate = "2017-10-01";
             return false;
         }
+        
         if (!StringUtils.isNotEmtity(endDate)) {
             endDate = DateUtil.gettDateStrFromSpecialDate(new Date(), DateUtil.DATE_FORMAT_YMD);
             return false;

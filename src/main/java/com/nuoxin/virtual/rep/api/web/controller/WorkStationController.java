@@ -28,22 +28,16 @@ public class WorkStationController extends BaseController{
     @Autowired
     private WorkStationService workStationService;
 
-
     @ApiOperation(value = "管理员下所有的坐席", notes = "管理员下所有的坐席")
     @PostMapping("/getDrugUserList")
     @ResponseBody
     public ResponseEntity<DefaultResponseBean<List<DrugUserResponseBean>>>  getDrugUserList(HttpServletRequest request){
         Long drugUserId = getLoginId(request);
-
         List<DrugUserResponseBean> drugUserList = workStationService.getDrugUserList(drugUserId);
         DefaultResponseBean<List<DrugUserResponseBean>> responseBean = new DefaultResponseBean<>();
         responseBean.setData(drugUserList);
         return ResponseEntity.ok(responseBean);
-
-
     }
-
-
 
     @ApiOperation(value = "今日统计接口", notes = "今日统计接口")
     @PostMapping("/today/statistics")
@@ -59,10 +53,7 @@ public class WorkStationController extends BaseController{
         DefaultResponseBean<TodayStatisticsResponseBean> responseBean = new DefaultResponseBean<>();
         responseBean.setData(todayStatistic);
         return ResponseEntity.ok(responseBean);
-
-
     }
-
 
     @ApiOperation(value = "本月目标接口", notes = "本月目标接口")
     @PostMapping("/month/target/statistics")
@@ -78,10 +69,7 @@ public class WorkStationController extends BaseController{
         DefaultResponseBean<MonthTargetStatisticResponseBean> responseBean = new DefaultResponseBean<>();
         responseBean.setData(monthTargetStatistic);
         return ResponseEntity.ok(responseBean);
-
-
     }
-
 
     @ApiOperation(value = "客户总数统计接口", notes = "客户统计接口")
     @PostMapping("/total/customer/statistic")
@@ -97,9 +85,7 @@ public class WorkStationController extends BaseController{
         DefaultResponseBean<List<CustomerSumResponseBean>> responseBean = new DefaultResponseBean<>();
         responseBean.setData(totalCustomerStatistic);
         return ResponseEntity.ok(responseBean);
-
     }
-
 
     @ApiOperation(value = "当月新增客户统计接口", notes = "当月新增客户统计接口")
     @PostMapping("/add/customer/statistic")
@@ -115,9 +101,7 @@ public class WorkStationController extends BaseController{
         DefaultResponseBean<List<CustomerSumResponseBean>> responseBean = new DefaultResponseBean<>();
         responseBean.setData(totalCustomerStatistic);
         return ResponseEntity.ok(responseBean);
-
     }
-
 
     @ApiOperation(value = "当月覆盖客户统计接口", notes = "当月覆盖客户统计接口")
     @PostMapping("/cover/customer/statistic")
@@ -136,7 +120,6 @@ public class WorkStationController extends BaseController{
 
     }
 
-
     @ApiOperation(value = "连续一个月无跟进接口", notes = "连续一个月无跟进接口")
     @PostMapping("/oneMonth/noFollow")
     @ResponseBody
@@ -151,9 +134,7 @@ public class WorkStationController extends BaseController{
         DefaultResponseBean<PageResponseBean<OneMonthNoFollowCustomerResponseBean>> responseBean = new DefaultResponseBean<>();
         responseBean.setData(oneMonthNoFollowCustomers);
         return ResponseEntity.ok(responseBean);
-
     }
-
 
     @ApiOperation(value = "销售互动前5名接口", notes = "销售互动前5名接口")
     @PostMapping("/drugUserInteract")
@@ -169,16 +150,12 @@ public class WorkStationController extends BaseController{
         DefaultResponseBean<List<DrugUserInteractResponseBean>> responseBean = new DefaultResponseBean<>();
         responseBean.setData(drugUserInteractResponseBeans);
         return ResponseEntity.ok(responseBean);
-
     }
-
-
 
     @ApiOperation(value = "坐席分析统计接口", notes = "坐席分析统计接口")
     @PostMapping("/drugUser/analysis")
     @ResponseBody
     public ResponseEntity<DefaultResponseBean<DrugUserAnalysisListResponseBean>>  getDrugUserAnalysisList(@RequestBody WorkStationRequestBean bean, HttpServletRequest request){
-
         Long drugUserId = bean.getDrugUserId();
         if (drugUserId == null || drugUserId == 0){
             drugUserId = getLoginId(request);
@@ -192,12 +169,10 @@ public class WorkStationController extends BaseController{
         return ResponseEntity.ok(responseBean);
     }
 
-
     @ApiOperation(value = "客户分析统计接口", notes = "客户分析统计接口")
     @PostMapping("/doctor/analysis")
     @ResponseBody
     public ResponseEntity<DefaultResponseBean<DoctorAnalysisListResponseBean>>  getDoctorAnalysisList(@RequestBody WorkStationRequestBean bean, HttpServletRequest request){
-
         Long drugUserId = bean.getDrugUserId();
         if (drugUserId == null || drugUserId == 0){
             drugUserId = getLoginId(request);
@@ -210,29 +185,5 @@ public class WorkStationController extends BaseController{
         responseBean.setData(doctorAnalysisList);
         return ResponseEntity.ok(responseBean);
     }
-
-
-
-
-//    @ApiOperation(value = "坐席分析或者客户分析接口", notes = "坐席分析或者客户分析接口")
-//    @PostMapping("/analysis")
-//    @ResponseBody
-//    public ResponseEntity<DefaultResponseBean<AnalysisResponseBean>>  getDrugUserAnalysisList(@RequestBody WorkStationRequestBean bean, HttpServletRequest request){
-//
-//        Long drugUserId = bean.getDrugUserId();
-//        if (drugUserId == null || drugUserId == 0){
-//            drugUserId = getLoginId(request);
-//        }
-//
-//        bean.setDrugUserId(drugUserId);
-//
-//        AnalysisResponseBean analysis = workStationService.getAnalysis(bean);
-//        DefaultResponseBean<AnalysisResponseBean> responseBean = new DefaultResponseBean<>();
-//        responseBean.setData(analysis);
-//        return ResponseEntity.ok(responseBean);
-//    }
-
-
-
 
 }

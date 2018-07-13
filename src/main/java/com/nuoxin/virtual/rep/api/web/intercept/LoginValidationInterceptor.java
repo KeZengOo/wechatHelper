@@ -23,7 +23,8 @@ import java.util.List;
 @Component
 public class LoginValidationInterceptor extends HandlerInterceptorAdapter {
 
-	private Logger logger = LoggerFactory.getLogger(getClass());
+	private static final Logger logger = LoggerFactory.getLogger(LoginValidationInterceptor.class);
+	
 	@Autowired
 	SercurityService sercurityService;
 
@@ -46,9 +47,11 @@ public class LoginValidationInterceptor extends HandlerInterceptorAdapter {
 		if(request.getMethod().equals("OPTIONS")){
 			return true;
 		}
+		
 		if(request.getServletPath().equals("/error")){
 			throw new BusinessException(ErrorEnum.ERROR);
 		}
+		
 		logger.info("接口【{}】请求开始登录验证",request.getServletPath());
 		sercurityService.sessionValidation(request);
 		DrugUser user = sercurityService.getDrugUser(request);

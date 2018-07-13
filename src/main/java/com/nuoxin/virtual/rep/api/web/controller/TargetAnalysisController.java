@@ -32,7 +32,7 @@ import java.util.List;
 @RequestMapping(value = "/target/analysis")
 public class TargetAnalysisController extends BaseController{
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(TargetAnalysisController.class);
 
     @Autowired
     private TargetAnalysisService targetAnalysisService;
@@ -49,12 +49,14 @@ public class TargetAnalysisController extends BaseController{
             responseBean.setMessage(error);
             return responseBean;
         }
+        
         DrugUser user = super.getLoginUser(request);
         if(user==null){
             responseBean.setCode(300);
             responseBean.setMessage("登录失效");
             return responseBean;
         }
+        
         if(bean.getDrugUserId()==null){
             bean.setDrugUserId(user.getId());
         }
@@ -76,12 +78,14 @@ public class TargetAnalysisController extends BaseController{
             responseBean.setMessage(error);
             return responseBean;
         }
+        
         DrugUser user = super.getLoginUser(request);
         if(user==null){
             responseBean.setCode(300);
             responseBean.setMessage("登录失效");
             return responseBean;
         }
+        
         if(bean.getDrugUserId()==null){
             bean.setDrugUserId(user.getId());
         }
@@ -103,12 +107,14 @@ public class TargetAnalysisController extends BaseController{
             responseBean.setMessage(error);
             return responseBean;
         }
+        
         DrugUser user = super.getLoginUser(request);
         if(user==null){
             responseBean.setCode(300);
             responseBean.setMessage("登录失效");
             return responseBean;
         }
+        
         if(bean.getDrugUserId()==null){
             bean.setDrugUserId(user.getId());
         }
@@ -130,12 +136,14 @@ public class TargetAnalysisController extends BaseController{
             responseBean.setMessage(error);
             return responseBean;
         }
+        
         DrugUser user = super.getLoginUser(request);
         if(user==null){
             responseBean.setCode(300);
             responseBean.setMessage("登录失效");
             return responseBean;
         }
+        
         if(bean.getDrugUserId()==null){
             bean.setDrugUserId(user.getId());
         }
@@ -157,12 +165,14 @@ public class TargetAnalysisController extends BaseController{
             responseBean.setMessage(error);
             return responseBean;
         }
+        
         DrugUser user = super.getLoginUser(request);
         if(user==null){
             responseBean.setCode(300);
             responseBean.setMessage("登录失效");
             return responseBean;
         }
+        
         if(bean.getDrugUserId()==null){
             bean.setDrugUserId(user.getId());
         }
@@ -184,12 +194,14 @@ public class TargetAnalysisController extends BaseController{
             responseBean.setMessage(error);
             return responseBean;
         }
+        
         DrugUser user = super.getLoginUser(request);
         if(user==null){
             responseBean.setCode(300);
             responseBean.setMessage("登录失效");
             return responseBean;
         }
+        
         if(bean.getDrugUserId()==null){
             bean.setDrugUserId(user.getId());
         }
@@ -211,12 +223,14 @@ public class TargetAnalysisController extends BaseController{
             responseBean.setMessage(error);
             return responseBean;
         }
+        
         DrugUser user = super.getLoginUser(request);
         if(user==null){
             responseBean.setCode(300);
             responseBean.setMessage("登录失效");
             return responseBean;
         }
+        
         if(bean.getDrugUserId()==null){
             bean.setDrugUserId(user.getId());
         }
@@ -238,12 +252,14 @@ public class TargetAnalysisController extends BaseController{
             responseBean.setMessage(error);
             return responseBean;
         }
+        
         DrugUser user = super.getLoginUser(request);
         if(user==null){
             responseBean.setCode(300);
             responseBean.setMessage("登录失效");
             return responseBean;
         }
+        
         if(bean.getDrugUserId()==null){
             bean.setDrugUserId(user.getId());
         }
@@ -265,12 +281,14 @@ public class TargetAnalysisController extends BaseController{
             responseBean.setMessage(error);
             return responseBean;
         }
+        
         DrugUser user = super.getLoginUser(request);
         if(user==null){
             responseBean.setCode(300);
             responseBean.setMessage("登录失效");
             return responseBean;
         }
+        
         if(bean.getDrugUserId()==null){
             bean.setDrugUserId(user.getId());
         }

@@ -1,11 +1,28 @@
 package com.nuoxin.virtual.rep.api.web.controller;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.bean.DoctorExcel;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
 import com.nuoxin.virtual.rep.api.common.util.StringUtils;
-import com.nuoxin.virtual.rep.api.entity.ContactPlan;
 import com.nuoxin.virtual.rep.api.entity.Doctor;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.ContactPlanService;
@@ -23,19 +40,9 @@ import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorDetailsResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorStatResponseBean;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by fenggang on 9/11/17.
@@ -64,6 +71,7 @@ public class DoctorController extends BaseController {
         responseBean.setData(bean);
         return responseBean;
     }
+    
     @ApiOperation(value = "根据产品获取医生信息", notes = "根据产品获取医生信息")
     @GetMapping("/details/{doctorId}/{productId}")
     public DefaultResponseBean<DoctorDetailsResponseBean> doctorProductDetails(@PathVariable Long doctorId,@PathVariable Long productId,
@@ -187,11 +195,13 @@ public class DoctorController extends BaseController {
 				}
         	}
         }
+        
         if(list==null || list.isEmpty()){
             responseBean.setCode(500);
             responseBean.setMessage("导入数据为空");
             return responseBean;
         }
+        
         try {
             doctorService.saves(list,Long.valueOf(productId),getLoginUser(request));
         } catch (Exception e) {
@@ -367,27 +377,4 @@ public class DoctorController extends BaseController {
         return responseBean;
     }
 
-//    @ApiOperation(value = "dra医生excle导入", notes = "dra医生excle导入")
-//    @PostMapping("/dra")
-//    public DefaultResponseBean<Boolean> dra(MultipartFile file,
-//                                              HttpServletRequest request, HttpServletResponse response){
-//        DefaultResponseBean responseBean = new DefaultResponseBean();
-//        ExcelUtils<DraTable> excelUtils = new ExcelUtils<>(new DraTable());
-//        List<DraTable> list = new ArrayList<>();
-//        try{
-//            list = excelUtils.readFromFile(null,file.getInputStream());
-//        }catch (Exception e){
-//            responseBean.setCode(500);
-//            responseBean.setMessage("excel解析失败");
-//            responseBean.setDescription(e.getMessage());
-//            return responseBean;
-//        }
-//        if(list==null || list.isEmpty()){
-//            responseBean.setCode(500);
-//            responseBean.setMessage("导入数据为空");
-//            return responseBean;
-//        }
-//        doctorService.save(list);
-//        return responseBean;
-//    }
 }

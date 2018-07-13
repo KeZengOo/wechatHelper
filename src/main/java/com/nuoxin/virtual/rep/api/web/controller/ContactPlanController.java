@@ -26,7 +26,6 @@ public class ContactPlanController extends BaseController{
     @Autowired
     private ContactPlanService contactPlanService;
 
-
     @ApiOperation(value = "联系计划列表接口", notes = "联系计划列表接口")
     @PostMapping("/page")
     @ResponseBody
@@ -35,13 +34,13 @@ public class ContactPlanController extends BaseController{
         if (drugUserId == null || drugUserId == 0){
             drugUserId = getLoginId(request);
         }
+        
         bean.setDrugUserId(drugUserId);
         PageResponseBean<ContactPlanResponseBean> page = contactPlanService.page(bean);
         DefaultResponseBean<PageResponseBean<ContactPlanResponseBean>> responseBean = new DefaultResponseBean<>();
         responseBean.setData(page);
         return ResponseEntity.ok(responseBean);
     }
-
 
     @ApiOperation(value = "新增或者修改联系计划列表接口", notes = "新增或者修改联系计划列表接口")
     @PostMapping("/save")
