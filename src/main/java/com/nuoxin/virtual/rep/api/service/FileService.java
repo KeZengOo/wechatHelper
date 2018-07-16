@@ -22,7 +22,19 @@ public class FileService {
 	
 	private static final Logger logger = LoggerFactory.getLogger(FileService.class);
 	
-	public void downLoadFromUrl(String urlStr, String fileName, String savePath)  {
+	public void processFile(String urlStr, String fileName, String savePath) {
+		byte[] binaryArr = this.downLoadFromUrl(urlStr, fileName, savePath);
+		if (binaryArr == null || binaryArr.length == 0) {
+			logger.warn("得到的二进制数组为 null 或 长度为 0");
+			return;
+		}
+		
+		this.saveFile(savePath, fileName, binaryArr);
+	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	public byte[] downLoadFromUrl(String urlStr, String fileName, String savePath)  {
 		HttpURLConnection con = null;
 		try {
 			URL url = new URL(urlStr);
@@ -32,7 +44,7 @@ public class FileService {
 		}
 		
 		if (con == null) {
-			return;
+			return new byte[0];
 		}
 		
 		// 设置超时间为10秒
@@ -40,13 +52,7 @@ public class FileService {
 		// 防止屏蔽程序抓取而返回403错误
 		con.setRequestProperty("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)");
 		
-		byte[] binaryArr = this.getBinaryArr(con);
-		if (binaryArr == null || binaryArr.length == 0) {
-			logger.warn("得到的二进制数组为 null 或 长度为 0");
-			return;
-		}
-		
-		this.saveFile(savePath, fileName, binaryArr);
+		return this.getBinaryArr(con);
 	}
 	
 	private byte[] getBinaryArr(HttpURLConnection con) {
@@ -103,6 +109,7 @@ public class FileService {
 		try {
 			fos = new FileOutputStream(file);
 			fos.write(binaryArr);
+			fos.flush();
 		} catch (FileNotFoundException e) {
 			logger.error("FileNotFoundException", e);
 		} catch (IOException e) {

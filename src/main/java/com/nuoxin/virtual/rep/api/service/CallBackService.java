@@ -41,32 +41,37 @@ public class CallBackService {
 	 * @param map
 	 */
 	public void callBack(Map<String, String> map) {
-		if (CollectionsUtil.isNotEmptyMap(map)) {
-			String callId = map.get("CallID");
-			String statusName = map.get("State");
-			
-			DoctorCallInfo info = callInfoDao.findBySinToken(callId);
-			if (info != null) {
-				String recordUrl = map.get("RecordFile");
-				if (StringUtils.isNotEmtity(recordUrl)) {
-					fileService.downLoadFromUrl(recordUrl, callId + FileConstant.AUDIO_SUFFIX, path);
-					String url = ossService.uploadFile(new File(path + info.getSinToken() + FileConstant.AUDIO_SUFFIX));
-					info.setCallUrl(url);
-				}
-
-				// 7moor 状态-> 转成老的状态
-				if ("dealing".equalsIgnoreCase(statusName)) {
-					statusName = "answer";
-				} else if ("notDeal".equalsIgnoreCase(statusName)) {
-					statusName = "incall";
-				}
-
-				String callUrl = info.getCallUrl();
-				Long id = info.getId();
-				logger.info("callUrl:{},statusName:{},id:{}", callUrl, statusName, id);
-				callInfoDao.updateUrlRefactor(callUrl, statusName, id);
-			}
+		if(CollectionsUtil.isEmptyMap(map)) {
+			return;
 		}
+		
+		String callId = map.get("CallSheetID");
+		String statusName = map.get("State");
+		String recordUrl = map.get("RecordFile");
+		
+		DoctorCallInfo info = callInfoDao.findBySinToken(callId);
+		if(info == null) {
+			return;
+		}
+		
+		if (StringUtils.isNotEmtity(recordUrl)) {
+			fileService.processFile(recordUrl, callId + FileConstant.AUDIO_SUFFIX, path);
+			String url = ossService.uploadFile(new File(path + info.getSinToken() + FileConstant.AUDIO_SUFFIX));
+			info.setCallUrl(url);
+		}
+
+		// 7moor 状态-> 转成老的状态
+		if ("dealing".equalsIgnoreCase(statusName)) {
+			statusName = "answer";
+		} else if ("notDeal".equalsIgnoreCase(statusName)) {
+			statusName = "incall";
+		}
+
+		String callUrl = info.getCallUrl();
+		Long id = info.getId();
+		callInfoDao.updateUrlRefactor(callUrl, statusName, id);
+		
+		logger.info("callUrl:{},statusName:{},id:{}", callUrl, statusName, id);
 	}
 
 }

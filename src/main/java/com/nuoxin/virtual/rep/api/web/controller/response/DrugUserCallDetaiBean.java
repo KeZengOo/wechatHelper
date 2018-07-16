@@ -28,6 +28,8 @@ public class DrugUserCallDetaiBean implements Serializable {
     private String logingroups;
     @ApiModelProperty(value = "登录使用的url")
     private String url;
+    @ApiModelProperty(value = "登录模式，Local")
+    private String loginmode;
 
     public String getOperator() {
         return operator;
