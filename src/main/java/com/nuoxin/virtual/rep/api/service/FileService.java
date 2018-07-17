@@ -22,6 +22,12 @@ public class FileService {
 	
 	private static final Logger logger = LoggerFactory.getLogger(FileService.class);
 	
+	/**
+	 * 文件处理业务
+	 * @param urlStr 下载源 URL
+	 * @param fileName 文件名
+	 * @param savePath 路径
+	 */
 	public void processFile(String urlStr, String fileName, String savePath) {
 		byte[] binaryArr = this.downLoadFromUrl(urlStr, fileName, savePath);
 		if (binaryArr == null || binaryArr.length == 0) {
@@ -32,8 +38,13 @@ public class FileService {
 		this.saveFile(savePath, fileName, binaryArr);
 	}
 	
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
+	/**
+	 * 下载文件
+	 * @param urlStr 下载源 URL
+	 * @param fileName 文件名
+	 * @param savePath 路径
+	 * @return 成功返回文件二进制数组,否则返回空数组
+	 */
 	public byte[] downLoadFromUrl(String urlStr, String fileName, String savePath)  {
 		HttpURLConnection con = null;
 		try {
@@ -54,6 +65,8 @@ public class FileService {
 		
 		return this.getBinaryArr(con);
 	}
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	private byte[] getBinaryArr(HttpURLConnection con) {
 		byte[] binaryArr = null;
@@ -98,6 +111,12 @@ public class FileService {
 		return bos.toByteArray();
 	}
 	
+	/**
+	 * 保存文件
+	 * @param savePath 路径
+	 * @param fileName 文件名
+	 * @param binaryArr 二进制数组
+	 */
 	private void saveFile(String savePath, String fileName, byte[] binaryArr) {
 		File saveDir = new File(savePath);
 		if (!saveDir.exists()) {

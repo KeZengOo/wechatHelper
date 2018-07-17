@@ -14,10 +14,10 @@ import com.nuoxin.virtual.rep.api.common.constant.FileConstant;
 import com.nuoxin.virtual.rep.api.common.util.StringUtils;
 import com.nuoxin.virtual.rep.api.dao.DoctorCallInfoRepository;
 import com.nuoxin.virtual.rep.api.entity.DoctorCallInfo;
-import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 
 /**
- * 回调类
+ * 回调Service类
+ * @author xiekaiyu
  */
 @Service
 public class CallBackService {
@@ -41,37 +41,33 @@ public class CallBackService {
 	 * @param map
 	 */
 	public void callBack(Map<String, String> map) {
-		if(CollectionsUtil.isEmptyMap(map)) {
-			return;
-		}
-		
-		String callId = map.get("CallSheetID");
+		String sinToken = map.get("CallSheetID");
 		String statusName = map.get("State");
 		String recordUrl = map.get("RecordFile");
+		if (StringUtils.isBlank(recordUrl) || StringUtils.isBlank(recordUrl) || StringUtils.isBlank(recordUrl)) {
+			logger.error("CallSheetID,State,RecordFile 为空!");
+			return ;
+		}
 		
-		DoctorCallInfo info = callInfoDao.findBySinToken(callId);
+		DoctorCallInfo info = callInfoDao.findBySinToken(sinToken);
 		if(info == null) {
+			logger.error("无法获取 DoctorCallInfo 信息 callId:{}", sinToken);
 			return;
 		}
 		
-		if (StringUtils.isNotEmtity(recordUrl)) {
-			fileService.processFile(recordUrl, callId + FileConstant.AUDIO_SUFFIX, path);
-			String url = ossService.uploadFile(new File(path + info.getSinToken() + FileConstant.AUDIO_SUFFIX));
-			info.setCallUrl(url);
-		}
-
+		fileService.processFile(recordUrl, sinToken + FileConstant.AUDIO_SUFFIX, path);
+		String callOssUrl = ossService.uploadFile(new File(path + info.getSinToken() + FileConstant.AUDIO_SUFFIX));
+		Long id = info.getId();
+		
 		// 7moor 状态-> 转成老的状态
 		if ("dealing".equalsIgnoreCase(statusName)) {
 			statusName = "answer";
 		} else if ("notDeal".equalsIgnoreCase(statusName)) {
 			statusName = "incall";
 		}
-
-		String callUrl = info.getCallUrl();
-		Long id = info.getId();
-		callInfoDao.updateUrlRefactor(callUrl, statusName, id);
 		
-		logger.info("callUrl:{},statusName:{},id:{}", callUrl, statusName, id);
+		callInfoDao.updateUrlRefactor(callOssUrl, statusName, id);
+		logger.info("callUrl:{},statusName:{},id:{}", callOssUrl, statusName, id);
 	}
 
 }
