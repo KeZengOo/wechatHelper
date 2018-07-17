@@ -47,8 +47,6 @@ public class CallBackController extends BaseController {
     @RequestMapping("/7moor")
     public ResponseObj callback(HttpServletRequest request, HttpServletResponse response) {
 		Map<String, String> paramsMap = this.getParamsMap(request);
-		logger.warn("7moor request params:{}", JSONObject.toJSONString(paramsMap));
-		
 		if (CollectionsUtil.isNotEmptyMap(paramsMap)) {
 			executorService.execute(() -> {
 				try {
