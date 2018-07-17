@@ -47,9 +47,6 @@ public class CallBackController extends BaseController {
     @RequestMapping("/7moor")
     public ResponseObj callback(HttpServletRequest request, HttpServletResponse response) {
 		Map<String, String> paramsMap = this.getParamsMap(request);
-    	
-		ResponseObj responseObj = new ResponseObj();
-		responseObj.setData(paramsMap);
 		logger.warn("7moor request params:{}", JSONObject.toJSONString(paramsMap));
 		
 		if (CollectionsUtil.isNotEmptyMap(paramsMap)) {
@@ -65,6 +62,10 @@ public class CallBackController extends BaseController {
 			logger.error("7moor request params is blank!");
 		}
 		
+		ResponseObj responseObj = new ResponseObj();
+		responseObj.setData("callback successed");
+		responseObj.setMessage("callback successed");
+		responseObj.setDescription("callback successed");
     	return responseObj;
     }
     

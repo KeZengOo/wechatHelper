@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,7 @@ import com.nuoxin.virtual.rep.api.entity.DoctorCallInfo;
  * 回调Service类
  * @author xiekaiyu
  */
+@Transactional
 @Service
 public class CallBackService {
 
@@ -43,9 +45,11 @@ public class CallBackService {
 	public void callBack(Map<String, String> map) {
 		String sinToken = map.get("CallSheetID");
 		String statusName = map.get("State");
-		String recordUrl = map.get("RecordFile");
-		if (StringUtils.isBlank(recordUrl) || StringUtils.isBlank(recordUrl) || StringUtils.isBlank(recordUrl)) {
-			logger.error("CallSheetID,State,RecordFile 为空!");
+		String recordFile = map.get("RecordFile");
+		String fileServer = map.get("FileServer");
+		if (StringUtils.isBlank(recordFile) || StringUtils.isBlank(recordFile) || StringUtils.isBlank(recordFile)
+				|| StringUtils.isBlank(fileServer)) {
+			logger.error("CallSheetID,State,RecordFile,FileServer 为空!");
 			return ;
 		}
 		
@@ -55,7 +59,9 @@ public class CallBackService {
 			return;
 		}
 		
-		fileService.processFile(recordUrl, sinToken + FileConstant.AUDIO_SUFFIX, path);
+		String sevenMoorfileUrl = fileServer.concat("/").concat(recordFile);
+		
+		fileService.processFile(sevenMoorfileUrl, sinToken + FileConstant.AUDIO_SUFFIX, path);
 		String callOssUrl = ossService.uploadFile(new File(path + info.getSinToken() + FileConstant.AUDIO_SUFFIX));
 		Long id = info.getId();
 		
@@ -66,8 +72,17 @@ public class CallBackService {
 			statusName = "incall";
 		}
 		
-		callInfoDao.updateUrlRefactor(callOssUrl, statusName, id);
+		// 这里走了个补偿.即:当上传至阿里失败时写入 7moor 链接
+		if(StringUtils.isBlank(callOssUrl)) {
+			callOssUrl = sevenMoorfileUrl;
+		}
+		
+		this.updateUrl(callOssUrl, statusName, id);
 		logger.info("callUrl:{},statusName:{},id:{}", callOssUrl, statusName, id);
 	}
 
+	@Transactional
+	private void updateUrl(String callOssUrl, String statusName, Long id) {
+		callInfoDao.updateUrlRefactor(callOssUrl, statusName, id);
+	}
 }

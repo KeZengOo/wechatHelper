@@ -14,8 +14,6 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by fenggang on 7/28/17.
@@ -26,21 +24,7 @@ public class LoginValidationInterceptor extends HandlerInterceptorAdapter {
 	private static final Logger logger = LoggerFactory.getLogger(LoginValidationInterceptor.class);
 	
 	@Autowired
-	SercurityService sercurityService;
-
-	private static final List<String> noLoginResources = new ArrayList<String>() {
-		private static final long serialVersionUID = 1L;
-		{
-			// 相关资源不需要登录
-			add("/swagger-ui.html");
-			add("/configuration");
-			add("/swagger-resources");
-			add("/api-docs");
-			add("/v2/api-docs");
-			add("/login");
-			add("/logout");
-		}
-	};
+	private SercurityService sercurityService;
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
