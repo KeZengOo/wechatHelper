@@ -31,7 +31,7 @@ public class FileService {
 	public void processFile(String urlStr, String fileName, String savePath) {
 		byte[] binaryArr = this.downLoadFromUrl(urlStr, fileName, savePath);
 		if (binaryArr == null || binaryArr.length == 0) {
-			logger.warn("得到的二进制数组为 null 或 长度为 0");
+			logger.warn("得到的二进制数组为 null 或 长度为 0,无法保存文件!");
 			return;
 		}
 		
@@ -58,8 +58,8 @@ public class FileService {
 			return new byte[0];
 		}
 		
-		// 设置超时间为10秒
-		con.setConnectTimeout(10000);
+		// 设置超时间为60秒
+		con.setConnectTimeout(60000);
 		// 防止屏蔽程序抓取而返回403错误
 		con.setRequestProperty("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)");
 		

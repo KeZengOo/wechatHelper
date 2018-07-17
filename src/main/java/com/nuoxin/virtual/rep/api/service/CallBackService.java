@@ -45,23 +45,15 @@ public class CallBackService {
 	public void callBack(Map<String, String> map) {
 		String sinToken = map.get("CallSheetID");
 		String statusName = map.get("State");
-		String recordFile = map.get("RecordFile");
-		String fileServer = map.get("FileServer");
-		if (StringUtils.isBlank(recordFile) || StringUtils.isBlank(recordFile) || StringUtils.isBlank(recordFile)
-				|| StringUtils.isBlank(fileServer)) {
-			logger.error("CallSheetID,State,RecordFile,FileServer 为空!");
-			return ;
-		}
+		String monitorFilenameUrl = map.get("MonitorFilename");
 		
 		DoctorCallInfo info = callInfoDao.findBySinToken(sinToken);
 		if(info == null) {
 			logger.error("无法获取 DoctorCallInfo 信息 callId:{}", sinToken);
 			return;
 		}
-		
-		String sevenMoorfileUrl = fileServer.concat("/").concat(recordFile);
-		
-		fileService.processFile(sevenMoorfileUrl, sinToken + FileConstant.AUDIO_SUFFIX, path);
+
+		fileService.processFile(monitorFilenameUrl, sinToken + FileConstant.AUDIO_SUFFIX, path);
 		String callOssUrl = ossService.uploadFile(new File(path + info.getSinToken() + FileConstant.AUDIO_SUFFIX));
 		Long id = info.getId();
 		
@@ -74,7 +66,7 @@ public class CallBackService {
 		
 		// 这里走了个补偿.即:当上传至阿里失败时写入 7moor 链接
 		if(StringUtils.isBlank(callOssUrl)) {
-			callOssUrl = sevenMoorfileUrl;
+			callOssUrl = monitorFilenameUrl;
 		}
 		
 		this.updateUrl(callOssUrl, statusName, id);
