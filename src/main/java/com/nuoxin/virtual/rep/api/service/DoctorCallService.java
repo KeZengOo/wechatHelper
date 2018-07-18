@@ -7,8 +7,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import javax.annotation.Resource;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -86,8 +84,6 @@ public class DoctorCallService extends BaseService {
     
     @Resource
     private FileService fileService;
-    
-    private ExecutorService executorService = Executors.newFixedThreadPool(50);
 
     /**
      * 根据 sinToken(callId) 获取 DoctorCallInfo 信息
@@ -383,13 +379,6 @@ public class DoctorCallService extends BaseService {
 		
 		info.setCallTime(bean.getTimes());
 		info.setProductId(bean.getProductId());
-		if (StringUtils.isNotEmtity(bean.getUrl())) {
-			info.setCallUrl(bean.getUrl());
-			executorService.execute(()->{
-				this.downLoadFile(info);
-			});
-		}
-		
 		info.setFollowUpType(bean.getType());
 		info.setRemark(bean.getRemark());
 
@@ -449,7 +438,7 @@ public class DoctorCallService extends BaseService {
     private void downLoadFile(DoctorCallInfo info) {
     	try {
 			String fileName = info.getSinToken() + FileConstant.AUDIO_SUFFIX;
-			fileService.downLoadFromUrl(info.getCallUrl(), fileName, path);
+			fileService.downLoadFromUrl("", fileName, path);
 			File file = new File(path + fileName);
 			String url = ossService.uploadFile(file);
 			info.setCallUrl(url);

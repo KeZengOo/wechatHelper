@@ -49,12 +49,14 @@ public class CallBackController extends BaseController {
 		Map<String, String> paramsMap = this.getParamsMap(request);
 		if (CollectionsUtil.isNotEmptyMap(paramsMap)) {
 			executorService.execute(() -> {
+				logger.info("执行 7moor 回调方法...");
 				try {
 					callBackService.callBack(paramsMap);
 				} catch (Exception e) {
 					logger.error("7moor 信息异步文件处理及入库失败:{}", JSONObject.toJSONString(paramsMap), e);
 					// 后期追加补偿机制代码 TODO
 				}
+				logger.info("执行 7moor 回调方法完成!");
 			});
 		} else {
 			logger.error("7moor request params is blank!");
