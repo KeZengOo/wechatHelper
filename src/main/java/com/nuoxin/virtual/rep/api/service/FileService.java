@@ -40,7 +40,7 @@ public class FileService {
 	}
 	
 	/**
-	 * 下载文件
+	 * 下载文件获取二进制(在 catch 语句块中加入重试)
 	 * @param urlStr 下载源 URL
 	 * @param fileName 文件名
 	 * @param savePath 路径
@@ -55,12 +55,12 @@ public class FileService {
 		} catch (IOException e) {
 			logger.error("IOException", e);
 			try {
-				Thread.sleep(5000);
+				Thread.sleep(10000);
 				con = url.openConnection();
 			} catch (InterruptedException e1) {
-				logger.error("InterruptedException", e);
+				logger.error("InterruptedException", e1);
 			} catch (IOException e1) {
-				logger.error("IOException", e);
+				logger.error("IOException", e1);
 			}
 		}
 		
@@ -79,6 +79,11 @@ public class FileService {
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
+	/**
+	 *根据URLConnection获取二进制流 (在 catch 语句块中加入重试)
+	 * @param con URLConnection 对象
+	 * @return 成功返回byte数组,否则返回空数组
+	 */
 	private byte[] getBinaryArr(URLConnection con) {
 		byte[] binaryArr = null;
 		InputStream inputStream = null;
@@ -88,6 +93,16 @@ public class FileService {
 			binaryArr = readInputStream(inputStream);
 		} catch (IOException e) {
 			logger.error("IOException", e);
+			try {
+				Thread.sleep(10000);
+				inputStream = con.getInputStream();
+			} catch (InterruptedException e1) {
+				logger.error("InterruptedException", e1);
+			} catch (IOException e1) {
+				logger.error("IOException", e1);
+			}
+			
+			binaryArr = readInputStream(inputStream);
 		} finally {
 			if (inputStream != null) {
 				try {
@@ -101,6 +116,11 @@ public class FileService {
 		return binaryArr;
 	}
 
+	/**
+	 * 将流转换为byt数组
+	 * @param inputStream
+	 * @return 成功返回byte数组
+	 */
 	private byte[] readInputStream(InputStream inputStream) {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream(4096);
 		try {

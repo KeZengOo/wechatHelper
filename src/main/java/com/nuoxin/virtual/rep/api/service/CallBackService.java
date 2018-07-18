@@ -43,8 +43,12 @@ public class CallBackService {
 	 * @param map
 	 */
 	public void callBack(Map<String, String> map) {
+		this.pause();
+		// 与数据库对应的字段 sin_token(callId)
 		String sinToken = map.get("CallSheetID");
+		// 与数据库对应的字段 status_name
 		String statusName = map.get("State");
+		// 电话录音下载地址
 		String monitorFilenameUrl = map.get("MonitorFilename");
 		
 		DoctorCallInfo info = callInfoDao.findBySinToken(sinToken);
@@ -76,5 +80,16 @@ public class CallBackService {
 	@Transactional
 	private void updateUrl(String callOssUrl, String statusName, Long id) {
 		callInfoDao.updateUrlRefactor(callOssUrl, statusName, id);
+	}
+	
+	/**
+	 * 线程暂停70秒
+	 */
+	private void pause () {
+		try {
+			Thread.sleep(70000);
+		} catch (InterruptedException e) {
+			logger.error("InterruptedException", e);
+		}
 	}
 }
