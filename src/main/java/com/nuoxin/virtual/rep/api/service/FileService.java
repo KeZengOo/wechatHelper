@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,15 +47,25 @@ public class FileService {
 	 * @return 成功返回文件二进制数组,否则返回空数组
 	 */
 	public byte[] downLoadFromUrl(String urlStr, String fileName, String savePath)  {
-		HttpURLConnection con = null;
+		URLConnection con = null;
+		URL url = null;
 		try {
-			URL url = new URL(urlStr);
-			con = (HttpURLConnection) url.openConnection();
+			url = new URL(urlStr);
+			con = url.openConnection();
 		} catch (IOException e) {
 			logger.error("IOException", e);
+			try {
+				Thread.sleep(5000);
+				con = url.openConnection();
+			} catch (InterruptedException e1) {
+				logger.error("InterruptedException", e);
+			} catch (IOException e1) {
+				logger.error("IOException", e);
+			}
 		}
 		
 		if (con == null) {
+			logger.warn("URLConnection is null !");
 			return new byte[0];
 		}
 		
@@ -68,7 +79,7 @@ public class FileService {
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	private byte[] getBinaryArr(HttpURLConnection con) {
+	private byte[] getBinaryArr(URLConnection con) {
 		byte[] binaryArr = null;
 		InputStream inputStream = null;
 		
