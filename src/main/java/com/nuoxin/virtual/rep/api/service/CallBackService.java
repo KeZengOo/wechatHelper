@@ -42,18 +42,18 @@ public class CallBackService {
 	 * 参考链接 https://developer.7moor.com/event/
 	 * @param map
 	 */
-	public void callBack(Map<String, String> map) {
+	public void callBack(Map<String, String> paramsMap) {
 		this.pause();
 		// 与数据库对应的字段 sin_token(callId)
-		String sinToken = map.get("CallSheetID");
+		String sinToken = paramsMap.get("CallSheetID");
 		// 与数据库对应的字段 status_name
-		String statusName = map.get("State");
+		String statusName = paramsMap.get("State");
 		// 电话录音下载地址
-		String monitorFilenameUrl = map.get("MonitorFilename");
+		String monitorFilenameUrl = paramsMap.get("MonitorFilename");
 		
 		DoctorCallInfo info = callInfoDao.findBySinToken(sinToken);
 		if(info == null) {
-			logger.error("无法获取 DoctorCallInfo 信息 callId:{}", sinToken);
+			logger.error("无法获取 DoctorCallInfo 信息 callId:{},paramsMap:{}", sinToken, paramsMap);
 			return;
 		}
 

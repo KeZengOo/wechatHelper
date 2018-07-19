@@ -381,6 +381,7 @@ public class DoctorCallService extends BaseService {
 		info.setProductId(bean.getProductId());
 		info.setFollowUpType(bean.getType());
 		info.setRemark(bean.getRemark());
+		info.setCallUrl(bean.getUrl());
 
 		// 获取状态详细信息
 		List<DoctorCallInfoDetails> detailsList = doctorCallInfoDetailsRepository

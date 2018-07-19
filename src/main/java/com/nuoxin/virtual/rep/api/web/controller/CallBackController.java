@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -48,16 +49,7 @@ public class CallBackController extends BaseController {
     public ResponseObj callback(HttpServletRequest request, HttpServletResponse response) {
 		Map<String, String> paramsMap = this.getParamsMap(request);
 		if (CollectionsUtil.isNotEmptyMap(paramsMap)) {
-			executorService.execute(() -> {
-				logger.info("执行 7moor 回调方法...");
-				try {
-					callBackService.callBack(paramsMap);
-				} catch (Exception e) {
-					logger.error("7moor 信息异步文件处理及入库失败:{}", JSONObject.toJSONString(paramsMap), e);
-					// 后期追加补偿机制代码 TODO
-				}
-				logger.info("执行 7moor 回调方法完成!");
-			});
+			this.executeByThreadPool(paramsMap);
 		} else {
 			logger.error("7moor request params is blank!");
 		}
@@ -85,7 +77,24 @@ public class CallBackController extends BaseController {
 		}
 		
 		return paramsMap;
-		
+    }
+    
+    private void executeByThreadPool (Map<String, String> paramsMap) {
+    	executorService.execute(() -> {
+			logger.info("执行 7moor 回调方法...");
+			try {
+				callBackService.callBack(paramsMap);
+			} catch (Exception e) {
+				logger.error("7moor 信息异步文件处理及入库失败:{}", JSONObject.toJSONString(paramsMap), e);
+				// 后期追加补偿机制代码 TODO
+			}
+			logger.info("执行 7moor 回调方法完成!");
+		});
+    }
+    
+    @PreDestroy
+    private void preDestory() {
+    	executorService.shutdownNow();
     }
 
 }
