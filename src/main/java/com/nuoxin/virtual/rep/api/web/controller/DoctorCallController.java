@@ -59,6 +59,8 @@ public class DoctorCallController extends BaseController {
     private QuestionService questionService;
 
     /**
+     * 因为换了供应商,因此标记为废弃
+     * marked by Kaiyu Xie
      * 打电话获取录音文件回调接口,现在荣联那边每5分钟调用一次
      * @param request
      * @param response
@@ -279,6 +281,11 @@ public class DoctorCallController extends BaseController {
         return responseBean;
     }
 
+    /**
+     *  根据前端反馈,没有被用到因此标记为废弃
+     *  marked by Kaiyu Xie
+     */
+    @Deprecated
     @ApiOperation(value = "uploadUrl", notes = "")
     @GetMapping("/uploadUrl")
     public DefaultResponseBean<String> uploadUrl(HttpServletRequest request, HttpServletResponse response){

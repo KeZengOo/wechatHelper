@@ -33,7 +33,7 @@ public interface DoctorCallInfoRepository extends JpaRepository<DoctorCallInfo,L
     Integer findByCreateTimeCount(@Param("date") Date date,@Param("doctorId") Long doctorId);
 
     /**
-     * 根据销售查询呼出呼入电话数
+     * 根据销售查询呼出/呼入电话记录
      * @param drugUserIds
      * @param type
      * @return
@@ -42,7 +42,7 @@ public interface DoctorCallInfoRepository extends JpaRepository<DoctorCallInfo,L
     Map<String,Long> statDrugUserIds(@Param("drugUserIds") String drugUserIds,@Param("type") Integer type);
 
     /**
-     * 根据销售查询呼出呼入接通电话数
+     * 根据销售查询呼出/呼入接通电话数
      * @param drugUserIds
      * @param type
      * @return
@@ -52,7 +52,7 @@ public interface DoctorCallInfoRepository extends JpaRepository<DoctorCallInfo,L
     Long statDrugUserIdsCount(@Param("drugUserIds") String drugUserIds,@Param("type") Integer type);
 
     /**
-     * 根据销售查询呼出呼入接通状态电话数
+     * 根据销售查询呼出/呼入接通状态电话条数
      * @param drugUserIds
      * @param type
      * @param statusName

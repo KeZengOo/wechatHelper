@@ -84,6 +84,46 @@ public class DoctorCallService extends BaseService {
     
     @Resource
     private FileService fileService;
+    
+    @Deprecated
+    public String uploadUrl() throws Exception{
+        fileService.downLoadFromUrl("http://106.75.91.226/16?file=/app/clpms/record/20171211/103_nxclcc_8001_13799438628_20171211185149_1512989509171.wav","test.wav",path);
+        File file = new File(path+"test.wav");
+        String url = ossService.uploadFile(file);
+        return url;
+    }
+
+    @Deprecated
+    @Transactional(readOnly = false)
+    public void callback(CallbackRequestBean bean){
+        if(bean!=null){
+            if(bean.getCount()>0){
+                List<CallbackListRequestBean> list = bean.getRecordList();
+                if(list!=null && !list.isEmpty()){
+                    for (CallbackListRequestBean bl : list) {
+                        DoctorCallInfo info = doctorCallInfoRepository.findBySinToken(bl.getCallid());
+                        if(info!=null){
+                            if(StringUtils.isNotEmtity(bl.getRecordUrl())){
+                                //TODO 保存录音文件
+                                try {
+                                    fileService.downLoadFromUrl(url+bl.getRecordUrl(),info.getSinToken()+".wav",path);
+                                    File file = new File(path+info.getSinToken()+".wav");
+                                    //WavToMp3Util.execute(file,path+info.getSinToken()+".mp3");
+                                    //file = new File(path+info.getSinToken()+".mp3");
+                                    String url = ossService.uploadFile(file);
+                                    info.setCallUrl(url);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            info.setJson(JSON.toJSONString(bl));
+                            doctorCallInfoRepository.updateUrl(info.getCallUrl(),info.getJson(),info.getId());
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * 根据 sinToken(callId) 获取 DoctorCallInfo 信息
@@ -246,8 +286,6 @@ public class DoctorCallService extends BaseService {
      * @return
      */
     public CallStatResponseBean stat(Long drugUserId){
-    	Long callTimes = null;
-    	Long num = null;
     	CallStatResponseBean responseBean = new CallStatResponseBean();
 
     	DrugUser drugUser = drugUserService.findById(drugUserId);
@@ -256,36 +294,8 @@ public class DoctorCallService extends BaseService {
     	}
     	
         String leaderPath = drugUser.getLeaderPath()+"%";
-        Map<String, Long> map = doctorCallInfoRepository.statDrugUserIds(leaderPath, CallTypeEnum.CALL_TYPE_CALLOUT.getType());
-		if (map != null) {
-			callTimes = map.get("callTimes");
-			if (callTimes != null) {
-				responseBean.setCallOutAllTimes(callTimes);
-			}
-			
-			num = doctorCallInfoRepository.statDrugUserIdsCount(leaderPath, CallTypeEnum.CALL_TYPE_CALLOUT.getType());
-			if (num != null) {
-				responseBean.setCallOutNum(num.intValue());
-			}
-			
-			responseBean.setCallOutAllNum(map.get("allNum").intValue());
-		}
-        
-		map = doctorCallInfoRepository.statDrugUserIds(leaderPath, CallTypeEnum.CALL_TYPE_INCALL.getType());
-		if (map != null) {
-			callTimes = map.get("callTimes");
-			if (callTimes != null) {
-				responseBean.setInCallAllTimes(callTimes);
-			}
-			
-			num = doctorCallInfoRepository.statDrugUserIdsCallCount(leaderPath, CallTypeEnum.CALL_TYPE_INCALL.getType(),
-					"incall");
-			if (num != null) {
-				responseBean.setInCallNum(num.intValue());
-			}
-			
-			responseBean.setInCallAllNum(map.get("allNum").intValue());
-		}
+        this.setOutNum(leaderPath, responseBean);
+        this.setInNum(leaderPath, responseBean);
 		
         return responseBean;
     }
@@ -351,13 +361,6 @@ public class DoctorCallService extends BaseService {
 			}
 		}
 
-		String url = bean.getUrl();
-		if (StringUtils.isNotEmtity(url)) {
-			this.downLoadFile(info);
-		} else {
-			info.setCallUrl(url);
-		}
-		
 		doctorCallInfoRepository.saveAndFlush(info);
 		
 		DoctorCallInfoDetails infoDetails = new DoctorCallInfoDetails();
@@ -436,6 +439,68 @@ public class DoctorCallService extends BaseService {
         return true;
      }
     
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    /**
+     * 统计呼出
+     * @param leaderPath
+     * @param responseBean
+     */
+	private void setOutNum(String leaderPath, CallStatResponseBean responseBean) {
+		Long outNum = doctorCallInfoRepository.statDrugUserIdsCount(leaderPath, CallTypeEnum.CALL_TYPE_CALLOUT.getType());
+		if (outNum == null) {
+			outNum = 0L;
+		}
+		responseBean.setCallOutNum(outNum.intValue());
+
+		if (outNum > 0) {
+			Map<String, Long> outMap = doctorCallInfoRepository.statDrugUserIds(leaderPath,
+					CallTypeEnum.CALL_TYPE_CALLOUT.getType());
+			if (outMap != null) {
+				Long callTimes = outMap.get("callTimes");
+				if (callTimes != null) {
+					responseBean.setCallOutAllTimes(callTimes);
+				}
+
+				Long outNumTemp = outMap.get("allNum");
+				if (outNumTemp != null) {
+					responseBean.setCallOutAllNum(outNumTemp.intValue());
+				}
+			}
+		}
+	}
+	
+	/**
+	 * 统计呼入
+	 * @param leaderPath
+	 * @param responseBean
+	 */
+	private void setInNum(String leaderPath, CallStatResponseBean responseBean) {
+		Long inNum = doctorCallInfoRepository.statDrugUserIdsCallCount(leaderPath, CallTypeEnum.CALL_TYPE_INCALL.getType(),
+				"incall");
+		if (inNum == null) {
+			inNum = 0L;
+		}
+		responseBean.setInCallNum(inNum.intValue());
+
+		if (inNum > 0) {
+			Map<String, Long> inMap = doctorCallInfoRepository.statDrugUserIds(leaderPath,
+					CallTypeEnum.CALL_TYPE_INCALL.getType());
+			if (inMap != null) {
+				Long callTimes = inMap.get("callTimes");
+				if (callTimes != null) {
+					responseBean.setInCallAllTimes(callTimes);
+				}
+
+				Long inNumTemp = inMap.get("allNum");
+				if (inNumTemp != null) {
+					responseBean.setInCallAllNum(inNumTemp.intValue());
+				}
+			}
+		}
+	}
+
+    @Deprecated
     private void downLoadFile(DoctorCallInfo info) {
     	try {
 			String fileName = info.getSinToken() + FileConstant.MP3_SUFFIX;
@@ -495,78 +560,5 @@ public class DoctorCallService extends BaseService {
         }
         return responseBean;
     }
-
-    public void file(){
-        try{
-            fileService.downLoadFromUrl("http://106.75.91.226/16?file=/app/clpms/record/20171211/103_nxclcc_8001_13799438628_20171211185149_1512989509171.wav",
-                    "aaaaa.wav","/Users/fenggang/Downloads/");
-            File file = new File("/Users/fenggang/Downloads/aaaaa.mp3");
-
-            WavToMp3Util.execute(file,"/Users/fenggang/Downloads/aaaaa.wav");
-
-            Main main = new mp3.Main();
-            main.convertWAVToMP3("/Users/fenggang/Downloads/aaaaa/");
-            File mp3File = new File( "/Users/fenggang/Downloads/aaaaa.wav");
-            if (mp3File.length() == 0) {
-                int retryTimes = 0;
-                while (true) {
-                    Thread.sleep(2000);
-                    mp3File = new File("/Users/fenggang/Downloads/aaaaa.wav");
-                    if (mp3File.length() > 0 || retryTimes == 50) break;
-                    retryTimes++;
-                    System.out.println("=============tts retry " + retryTimes + " times.");
-                }
-                if (mp3File.length() == 0) {
-                    try {
-                        System.out.println("/Users/fenggang/Downloads/aaaaa.wav .mp3 file create failed..");
-                        throw new Exception("/Users/fenggang/Downloads/aaaaa.wav  .mp3 file create failed..");
-                    } catch (Exception e) {
-                        // do nothing
-                        System.out.println(e.getMessage());
-                    }
-                }
-            }
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public String uploadUrl() throws Exception{
-        fileService.downLoadFromUrl("http://106.75.91.226/16?file=/app/clpms/record/20171211/103_nxclcc_8001_13799438628_20171211185149_1512989509171.wav","test.wav",path);
-        File file = new File(path+"test.wav");
-        String url = ossService.uploadFile(file);
-        return url;
-    }
-
-    @Deprecated
-    @Transactional(readOnly = false)
-    public void callback(CallbackRequestBean bean){
-        if(bean!=null){
-            if(bean.getCount()>0){
-                List<CallbackListRequestBean> list = bean.getRecordList();
-                if(list!=null && !list.isEmpty()){
-                    for (CallbackListRequestBean bl : list) {
-                        DoctorCallInfo info = doctorCallInfoRepository.findBySinToken(bl.getCallid());
-                        if(info!=null){
-                            if(StringUtils.isNotEmtity(bl.getRecordUrl())){
-                                //TODO 保存录音文件
-                                try {
-                                    fileService.downLoadFromUrl(url+bl.getRecordUrl(),info.getSinToken()+".wav",path);
-                                    File file = new File(path+info.getSinToken()+".wav");
-                                    //WavToMp3Util.execute(file,path+info.getSinToken()+".mp3");
-                                    //file = new File(path+info.getSinToken()+".mp3");
-                                    String url = ossService.uploadFile(file);
-                                    info.setCallUrl(url);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            info.setJson(JSON.toJSONString(bl));
-                            doctorCallInfoRepository.updateUrl(info.getCallUrl(),info.getJson(),info.getId());
-                        }
-                    }
-                }
-            }
-        }
-    }
+   
 }
