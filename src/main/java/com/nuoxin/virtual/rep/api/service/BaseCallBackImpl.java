@@ -73,10 +73,11 @@ public abstract class BaseCallBackImpl implements CallBackService {
 	 * @return 成功返回 OSS URL,否则返回 null
 	 */
 	private String processFile(String url, String sinToken) {
-		fileService.processLocalFile(url, sinToken + FileConstant.AUDIO_SUFFIX, path);
-		String fullFileName = path + sinToken + FileConstant.AUDIO_SUFFIX;
-		String callOssUrl = ossService.uploadFile(new File(fullFileName));
-		return callOssUrl;
+		String fileName = sinToken.concat(FileConstant.MP3_SUFFIX);
+		fileService.processLocalFile(url, fileName, path);
+		
+		String fullFileName = path.concat(fileName);
+		return ossService.uploadFile(new File(fullFileName));
 	}
 	
 	/**

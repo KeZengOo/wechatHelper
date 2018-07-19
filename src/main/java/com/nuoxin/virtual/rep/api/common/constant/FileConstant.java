@@ -6,7 +6,12 @@ package com.nuoxin.virtual.rep.api.common.constant;
  */
 public interface FileConstant {
 	/**
-	 * 音频文件尾缀
+	 * MP3文件尾缀
 	 */
-	String AUDIO_SUFFIX = ".mp3";
+	String MP3_SUFFIX = ".mp3";
+	
+	/**
+	 * WAV文件尾缀
+	 */
+	String WAV_SUFFIX = ".wav";
 }

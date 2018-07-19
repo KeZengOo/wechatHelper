@@ -438,7 +438,7 @@ public class DoctorCallService extends BaseService {
     
     private void downLoadFile(DoctorCallInfo info) {
     	try {
-			String fileName = info.getSinToken() + FileConstant.AUDIO_SUFFIX;
+			String fileName = info.getSinToken() + FileConstant.MP3_SUFFIX;
 			fileService.downLoadFromUrl("", fileName, path);
 			File file = new File(path + fileName);
 			String url = ossService.uploadFile(file);
