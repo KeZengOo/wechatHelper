@@ -32,10 +32,10 @@ public class CallBackController extends BaseController {
 	
 	private static final Logger logger = LoggerFactory.getLogger(CallBackController.class);
 
-    @Resource
+	private ExecutorService executorService = Executors.newFixedThreadPool(50);
+
+	@Resource(name = "sevenMoor")
     private CallBackService callBackService;
-    
-    private ExecutorService executorService = Executors.newFixedThreadPool(50);
 
     /**
      * 七陌回调入口方法

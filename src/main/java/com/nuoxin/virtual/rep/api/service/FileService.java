@@ -29,7 +29,7 @@ public class FileService {
 	 * @param fileName 文件名
 	 * @param savePath 路径
 	 */
-	public void processFile(String urlStr, String fileName, String savePath) {
+	public void processLocalFile(String urlStr, String fileName, String savePath) {
 		byte[] binaryArr = this.downLoadFromUrl(urlStr, fileName, savePath);
 		if (binaryArr == null || binaryArr.length == 0) {
 			logger.warn("得到的二进制数组为 null 或 长度为 0,无法保存文件!");
