@@ -107,4 +107,13 @@
 
     </select>
 
+    <!-- 测试的 -->
+    <select id="getCallInfoList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.call.CallInfoResponseBean">
+          select id,sin_token sinToken,info_json infoJson from virtual_doctor_call_info where call_time > 0 and ( call_url is null or call_url='') order by create_time desc
+    </select>
+
+    <update id="updateCallUrl">
+        update virtual_doctor_call_info set call_url=#{callUrl} where id = #{id}
+    </update>
+
 </mapper>
