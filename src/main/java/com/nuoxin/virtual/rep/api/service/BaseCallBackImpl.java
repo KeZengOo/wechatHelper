@@ -39,7 +39,7 @@ public abstract class BaseCallBackImpl implements CallBackService {
 	 * @param statusName
 	 * @param downLoadUrl
 	 */
-	void processCallBack(String sinToken, String statusName, String downLoadUrl) {
+	protected void processCallBack(String sinToken, String statusName, String downLoadUrl) {
 		DoctorCallInfo info = this.getDoctorCallInfoBySinToken(sinToken);
 		if(info == null) {
 			logger.error("无法获取 DoctorCallInfo 信息 sinToken:{}", sinToken);
