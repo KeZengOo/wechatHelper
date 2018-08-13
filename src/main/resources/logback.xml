@@ -4,7 +4,7 @@
 	debug:当此属性设置为true时，将打印出logback内部日志信息，实时查看logback运行状态。默认值为false。 -->
 <configuration scan="true" scanPeriod="60 seconds" debug="false">
 	<!--定义日志文件的存储地址 勿在 LogBack 的配置中使用相对路径 -->
-	<property name="LOG_HOME" value="/home/virtual_rep/log" />
+	<property name="LOG_HOME" value="../virtual-rep-api/" />
 	
 	<!-- 控制台输出 -->
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -16,10 +16,10 @@
 	
 	<!-- 每天生成日志文件,文件大小超过50则新生成一个文件，同时将旧文件按${LOG_HOME}/logs/aa.%d{yyyy-MM-dd}.%i.log.zip格式压缩，文件保存30天 -->
 	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${LOG_HOME}/virtual_rep/virtual.log</file> <!-- 日志名称 -->
+		<file>${LOG_HOME}/log/virtual.log</file> <!-- 日志名称 -->
 		<rollingPolicy
 			class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-			<fileNamePattern>${LOG_HOME}/virtual_rep/virtual.%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+			<fileNamePattern>${LOG_HOME}/log/virtual.%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
 			<maxFileSize>10MB</maxFileSize>  <!-- 日志文件过大会使的编辑器打开非常慢，因此设置日志最大50MB -->
 			<maxHistory>30</maxHistory>  <!-- 保存30天 -->
 			<totalSizeCap>10GB</totalSizeCap>  <!-- 总日志大小 -->
