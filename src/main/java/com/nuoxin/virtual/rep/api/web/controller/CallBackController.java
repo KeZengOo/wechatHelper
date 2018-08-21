@@ -2,6 +2,7 @@ package com.nuoxin.virtual.rep.api.web.controller;
 
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -11,8 +12,13 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.call.Call7mmorRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.call.Call7mmorResponseBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -60,6 +66,29 @@ public class CallBackController extends BaseController {
 		responseObj.setDescription("callback successed");
     	return responseObj;
     }
+
+
+
+	@ApiOperation(value = "查询通话记录", notes = "查询通话记录")
+	@GetMapping("/call/list")
+	public ResponseEntity<DefaultResponseBean<List<Call7mmorResponseBean>>> getCallList(Call7mmorRequestBean bean) {
+
+        List<Call7mmorResponseBean> callList = callBackService.getCallList(bean);
+        DefaultResponseBean responseBean = new DefaultResponseBean();
+        responseBean.setData(callList);
+        return ResponseEntity.ok(responseBean);
+    }
+
+    @ApiOperation(value = "录音文件重新上传", notes = "录音文件重新上传")
+    @GetMapping("/call/url/repeat")
+    public ResponseEntity<DefaultResponseBean<Boolean>> repeatUploadFile(Call7mmorRequestBean bean) {
+
+        callBackService.repeatUploadFile(bean);
+        DefaultResponseBean responseBean = new DefaultResponseBean();
+        responseBean.setData(true);
+        return ResponseEntity.ok(responseBean);
+    }
+
     
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     

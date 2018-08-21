@@ -72,7 +72,7 @@ public abstract class BaseCallBackImpl implements CallBackService {
 	 * @param sinToken 通讯唯一标识
 	 * @return 成功返回 OSS URL,否则返回 null
 	 */
-	private String processFile(String url, String sinToken) {
+	public String processFile(String url, String sinToken) {
 		String fileName = sinToken.concat(FileConstant.MP3_SUFFIX);
 		fileService.processLocalFile(url, fileName, path);
 		

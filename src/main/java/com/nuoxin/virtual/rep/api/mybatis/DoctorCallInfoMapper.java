@@ -30,4 +30,18 @@ public interface DoctorCallInfoMapper {
      * @param id
      */
     void updateCallUrl(@Param(value = "callUrl") String callUrl, @Param(value = "id") Long id);
+
+    /**
+     * 根据sinToken查询录音url
+     * @param sinToken
+     * @return
+     */
+    String getCallUrlBySigToken(@Param(value = "sigToken") String sinToken);
+
+    /**
+     * 根据sigToken更新录音url
+     * @param callUrl
+     * @param signToken
+     */
+    void updateCallUrlBySigToken(@Param(value = "callUrl") String callUrl, @Param(value = "sinToken") String signToken);
 }

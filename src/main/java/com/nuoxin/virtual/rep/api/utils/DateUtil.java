@@ -29,7 +29,7 @@ public final class DateUtil {
 
     public static final DateFormat DATE_FORMAT_YMR = new SimpleDateFormat("yyyy-MM-dd");
 
-    public static final DateFormat DATE_FORMAT_TIME = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+    public static final DateFormat DATE_FORMAT_TIME = new SimpleDateFormat("yyyyMMddHHmmss");
 
     public static final DateFormat DATE_FORMAT_YM = new SimpleDateFormat("yyyy-MM");
 

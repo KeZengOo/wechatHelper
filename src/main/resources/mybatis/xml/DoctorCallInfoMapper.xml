@@ -116,4 +116,13 @@
         update virtual_doctor_call_info set call_url=#{callUrl} where id = #{id}
     </update>
 
+
+    <select id="getCallUrlBySigToken" resultType="java.lang.String">
+        select call_url from virtual_doctor_call_info where sin_token = #{sigToken}
+    </select>
+
+    <update id="updateCallUrlBySigToken">
+        update virtual_doctor_call_info set call_url = #{callUrl} where sin_token = #{sinToken}
+    </update>
+
 </mapper>
