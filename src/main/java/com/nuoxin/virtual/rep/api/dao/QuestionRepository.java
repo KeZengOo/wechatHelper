@@ -14,10 +14,18 @@ import java.util.List;
  */
 public interface QuestionRepository extends JpaRepository<Question,Long>,JpaSpecificationExecutor<Question> {
 
+    /**
+     * 修改试题删除状态
+     * @param questionnaireId
+     */
     @Modifying
-    @Query("delete from Question q where q.questionnaireId=:questionnaireId")
+    @Query("update Question q set q.delFlag=1  where q.questionnaireId=:questionnaireId")
     void deleteByQuestionnaireId(@Param("questionnaireId") Long questionnaireId);
 
+    /**
+     * 根据问卷id查询问题
+     * @param questionnaireId
+     */
     List<Question> findByQuestionnaireId(Long questionnaireId);
 
 }

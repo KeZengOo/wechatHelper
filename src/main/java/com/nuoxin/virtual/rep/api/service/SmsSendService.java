@@ -38,25 +38,20 @@ import java.util.regex.Matcher;
 @Service
 public class SmsSendService {
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
+	private static final Logger logger = LoggerFactory.getLogger(SmsSendService.class);
+    
     @Autowired
     private CloudAccount account;
-    @Autowired
-    private AliyunConfig aliyunConfig;
     @Autowired
     private DrugUserService drugUserService;
     @Autowired
     private DoctorService doctorService;
     @Autowired
     private SmsTemplateService smsTemplateService;
-
     @Autowired
     private DoctorRepository doctorRepository;
-
     @Autowired
     private MessageRepository messageRepository;
-
-    private static final String regex = "(\\${.*})";
 
     /**
      * 发送短信
@@ -115,15 +110,20 @@ public class SmsSendService {
         }else{
             //client.close();
         }
-
     }
 
+    /**
+     * 获取要发送短信的手机号
+     * @param bean
+     * @return
+     */
     public List<String> send(SmsSendRequestBean bean) {
         List<String> result = new ArrayList<>();
         DrugUser drugUser = drugUserService.findById(bean.getDrugUserId());
         if (drugUser == null){
             throw new BusinessException();
         }
+        
         SmsTemplate smsTemplate = smsTemplateService.fingById(bean.getTemplateId());
         List<SmsMassageBean> sendList =  new ArrayList<>();
         List<String> list = new ArrayList<>();
@@ -134,6 +134,7 @@ public class SmsSendService {
                 list.add(m);
             }
         }
+        
         Map<String,Object> baseMap = new HashMap<>();
         //TODO 判断是否包含初始化参数
         List<TemplateMapRequestBean> listMaps = bean.getMaps();
@@ -151,10 +152,7 @@ public class SmsSendService {
                 map.put("doctor",doctor.getName());
                 map.put("druguser",drugUser.getName());
                 map.put("drug",drugUser.getDrugName());
-
                 map.put("customer",doctor.getName());
-
-//                map.putAll(baseMap);
 
                 for (String key:baseMap.keySet()){
                     map.put(key,baseMap.get(key));
@@ -168,6 +166,7 @@ public class SmsSendService {
                 smsBean.setMessage(smsTemplate.getMessage());
                 smsBean.setTopic(smsTemplate.getTopic());
                 smsBean.setSignName(smsTemplate.getSigName());
+                smsBean.setProductId(smsTemplate.getProductId());
                 sendList.add(smsBean);
             }
         }
@@ -176,10 +175,8 @@ public class SmsSendService {
             for (SmsMassageBean sms:sendList) {
                 try {
                     this.sendSms(sms);
-
                     //将信息保存到数据库
                     saveSms(drugUser,sms);
-
                 } catch (Exception e) {
                     result.add("手机号【"+sms.getMobiles().get(0)+"】短信发送失败：");
                     logger.debug("手机号【{}】短信发送失败：",sms.getMobiles().get(0),e);
@@ -187,6 +184,7 @@ public class SmsSendService {
                 }
             }
         }
+        
         return result;
     }
 
@@ -204,8 +202,6 @@ public class SmsSendService {
             return;
         }
 
-
-
         List<String> mobiles =  sms.getMobiles();
         if (null != mobiles && mobiles.size() > 0){
             for (String mobile:mobiles){
@@ -218,6 +214,8 @@ public class SmsSendService {
                     message.setDrugUserId(drugUser.getId());
                     message.setDoctorId(doctor.getId());
                     message.setTelephone(doctor.getMobile());
+
+                    Long productId = sms.getProductId();
                     //模板消息，需要自己组装
                     String imessage = sms.getMessage();
                     Map<String, Object> map = sms.getMap();
@@ -232,25 +230,15 @@ public class SmsSendService {
                             imessage = imessage.replace(key, value.toString());
                         }
                     }
+                    message.setProductId(productId);
                     message.setMessage(imessage);
                     message.setMessageType(MessageTypeEnum.IM.getMessageType());
                     message.setMessageTime(DateUtil.getDateTimeString(new Date()));
                     message.setCreateTime(new Date());
                     messageRepository.save(message);
                 }
-
             }
-
         }
-
-    }
-
-    public static void main(String[] args) {
-        String imessage = "内容尊敬的{customer}，欢123迎您{customer}使用阿里大鱼短信服务${hh}，阿里大鱼将为{aa}您提供便捷的通信服务！";
-
-        String imessage2 = imessage.replace("{customer}","tiancun");
-        System.out.println(imessage2);
-
     }
 
 }

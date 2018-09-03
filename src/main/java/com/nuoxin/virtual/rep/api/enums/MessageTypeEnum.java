@@ -7,7 +7,8 @@ package com.nuoxin.virtual.rep.api.enums;
 public enum MessageTypeEnum {
 
     WECHAT(1,"微信"),
-    IM(2,"短信");
+    IM(2,"短信"),
+    EMAIL(3,"短信");
 
     private Integer messageType;
 

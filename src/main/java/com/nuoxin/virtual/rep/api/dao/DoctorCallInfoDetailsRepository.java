@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -15,5 +16,11 @@ import java.util.Map;
  */
 public interface DoctorCallInfoDetailsRepository extends JpaRepository<DoctorCallInfoDetails,Long>,JpaSpecificationExecutor<DoctorCallInfoDetails> {
 
-
+    /**
+     * 根据通话标识查询通话状态记录
+     * @param callId
+     * @return
+     */
+    @Query("select d from DoctorCallInfoDetails d where d.callId=:callId and d.statusName<>'after' order by createTime desc")
+    List<DoctorCallInfoDetails> findByCallIdOrderOrderByCreateTime(@Param("callId") Long callId);
 }

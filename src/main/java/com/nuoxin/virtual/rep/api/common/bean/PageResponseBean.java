@@ -79,7 +79,7 @@ public class PageResponseBean<T> implements Serializable {
         this.totalPages = 0;
       }
 
-      this.number = bean.getPage();
+      this.number = bean.getPage()+1;
       this.size = bean.getPageSize();
       if (list == null){
         this.numberOfElements = 0;
@@ -87,12 +87,12 @@ public class PageResponseBean<T> implements Serializable {
         this.numberOfElements = list.size();
       }
 
-      if(bean.getPage()==totalPages){
+      if(bean.getPage()==(totalPages-1)){
         this.last=true;
       }else{
         this.last=false;
       }
-      if(bean.getPage()==1){
+      if(bean.getPage()==0){
         this.first=true;
       }else{
         this.first=false;

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.MeetingMapper">
+
+    <select id="getList" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.meeting.MeetingRequestBean"
+            resultType="com.nuoxin.virtual.rep.api.web.controller.response.meeting.MeetingResponseBean">
+        select distinct
+        tma.id,
+        tma.title,
+        tma.speaker,
+        date_format(tma.start_time,'%Y-%m-%d %H:%i:%s') meetingStartTime,
+        date_format(tma.end_time,'%Y-%m-%d %H:%i:%s') meetingEndTime,
+        tma.product_id productId,
+        tma.product_name productName
+        from t_meeting_data tma
+        inner join product_line pl
+        on tma.product_id = pl.prod_id
+        inner join product_user pu
+        on pl.prod_id=pu.prod_id
+        inner join drug_user du
+        on pu.user_id= du.id
+        where du.leader_path like #{leaderPath}
+        <if test="productId !=null and productId!=0">
+            and tma.product_id=#{productId}
+        </if>
+        <if test="title != null and title !=''">
+            and tma.title like #{title}
+        </if>
+
+        <if test="productName != null and productName !=''">
+            and tma.product_name like #{productName}
+        </if>
+
+        <if test="meetingStartTime != null and meetingStartTime !=''">
+            and tma.start_time &gt;= #{meetingStartTime}
+        </if>
+
+        <if test="meetingEndTime != null and meetingEndTime !=''">
+            and tma.end_time &lt;= #{meetingEndTime}
+        </if>
+
+        <if test="speaker !=null and speaker!=''">
+            and tma.speaker like #{speaker}
+        </if>
+
+        order by tma.create_time desc
+        limit #{currentSize},#{pageSize}
+    </select>
+
+    <select id="getListCount" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.meeting.MeetingRequestBean"
+            resultType="java.lang.Integer">
+        select count(distinct tma.id)
+        from t_meeting_data tma
+        inner join product_line pl
+        on tma.product_id = pl.prod_id
+        inner join product_user pu
+        on pl.prod_id=pu.prod_id
+        inner join drug_user du
+        on pu.user_id= du.id
+        where du.leader_path like #{leaderPath}
+        <if test="productId !=null and productId!=0">
+            and tma.product_id=#{productId}
+        </if>
+
+        <if test="title != null and title !=''">
+            and tma.title like #{title}
+        </if>
+
+        <if test="productName != null and productName !=''">
+            and tma.product_name like #{productName}
+        </if>
+
+        <if test="meetingStartTime != null and meetingStartTime !=''">
+            and tma.start_time &gt;= #{meetingStartTime}
+        </if>
+
+        <if test="meetingEndTime != null and meetingEndTime !=''">
+            and tma.end_time &lt;= #{meetingEndTime}
+        </if>
+
+        <if test="speaker !=null and speaker!=''">
+            and tma.speaker like #{speaker}
+        </if>
+
+    </select>
+</mapper>

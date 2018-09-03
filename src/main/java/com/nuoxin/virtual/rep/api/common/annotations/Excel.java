@@ -16,7 +16,7 @@ public @interface Excel {
     String name() default "";
 
     //宽度
-    int width() default 20;
+    int width() default 30;
 
     //忽略该字段
     boolean skip() default false;

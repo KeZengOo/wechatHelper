@@ -23,29 +23,25 @@ import java.util.Enumeration;
 @Component
 public class WebLogAop {
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+	private static final Logger logger = LoggerFactory.getLogger(WebLogAop.class);
 
-    ThreadLocal<Long> startTime = new ThreadLocal<>();
+    private ThreadLocal<Long> startTime = new ThreadLocal<>();
 
     @Pointcut("execution(public * com.nuoxin.virtual.rep.api.web.controller..*.*(..))")
-    //@Pointcut("execution(public * com.tiancun.web.controller.*Controller.*(..))")
     public void webLog(){
 
     }
 
     @Before("webLog()")
     public void doBefore(JoinPoint joinPoint) throws Throwable{
-
         //请求开始时间
         startTime.set(System.currentTimeMillis());
-
 
         //接收请求记录下请求内容
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = attributes.getRequest();
 
         //记录下请求的内容
-        //{} slf4j比log4j强悍的地方，占位符
         logger.info("URL: {}", request.getRequestURL());
         logger.info("URI: {}", request.getRequestURI());
         logger.info("http_method: {}", request.getMethod());
@@ -55,20 +51,16 @@ public class WebLogAop {
             String args = parameterNames.nextElement();
             logger.info("args={}, value={}", args, request.getParameter(args));
         }
-
     }
-
 
     @AfterReturning(returning = "ret", pointcut = "webLog()")
     public void doAfter(Object ret) throws Throwable{
-
         //处理完请求，返回内容
         logger.info("response:" + JSON.toJSONString(ret));
         long endTime = System.currentTimeMillis();
         long start = startTime.get();
-        //logger.info("spend time {}s", ((endTime - start)/1000) );
         logger.info("spend time {}ms", ((endTime - start)) );
+        startTime.remove();
     }
-
 
 }

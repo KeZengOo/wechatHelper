@@ -22,13 +22,15 @@ public class CallRequestBean implements Serializable {
     private String statusName;
     @ApiModelProperty(value = "状态(1-成功接通，0-未成功)")
     private Integer status;
-    @ApiModelProperty(value = "类型")
+    @ApiModelProperty(value = "类型(1,呼出,2-呼出)")
     private Integer type;
     @ApiModelProperty(value = "通话时长")
     private Long times;
     @ApiModelProperty(value = "录音文件url")
     private String url;
 
+    @ApiModelProperty(value = "产品id")
+    private Long productId;
     private Long drugUserId;
 
     public String getMobile() {
@@ -101,5 +103,13 @@ public class CallRequestBean implements Serializable {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 }

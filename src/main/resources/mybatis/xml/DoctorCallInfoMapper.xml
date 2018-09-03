@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.DoctorCallInfoMapper">
+
+    <select id="getCallInfoStatistics" resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.TodayStatisticsResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+
+              select (
+                select count(distinct vdci.virtual_doctor_id)
+                from virtual_doctor_call_info vdci
+                inner join virtual_doctor_call_info_details vdcid
+                on vdci.id = vdcid.call_id
+                inner join drug_user_doctor dud
+                on vdci.virtual_drug_user_id=dud.drug_user_id
+                inner join drug_user du
+                on du.id = dud.drug_user_id
+                inner join product_line pl
+                on dud.prod_id=pl.prod_id
+                where 1=1
+                <if test="productId != null and productId !=0">
+                    and dud.prod_id=#{productId}
+                    and vdci.product_id = #{productId}
+                </if>
+
+                and du.leader_path like #{leaderPath}
+                <!-- and vdcid.status_name='answer' -->
+                and vdcid.status_name in ('answer','incall')
+
+                and date_format(vdci.create_time, '%Y-%m-%d')=date_format(NOW(), '%Y-%m-%d')
+                ) as callSum,
+                (
+                select count(distinct vdci.id)
+                from virtual_doctor_call_info vdci
+                inner join virtual_doctor_call_info_details vdcid
+                on vdci.id = vdcid.call_id
+                inner join drug_user_doctor dud
+                on vdci.virtual_drug_user_id=dud.drug_user_id
+                inner join drug_user du
+                on du.id = dud.drug_user_id
+                inner join product_line pl
+                on dud.prod_id=pl.prod_id
+                where 1=1
+                <if test="productId!=null and productId !=0">
+                    and dud.prod_id=#{productId}
+                    and vdci.product_id = #{productId}
+                </if>
+
+                and du.leader_path like #{leaderPath}
+                <!-- and vdcid.status_name='answer' -->
+                and vdcid.status_name in ('answer','incall')
+                and date_format(vdci.create_time, '%Y-%m-%d')=date_format(NOW(), '%Y-%m-%d')
+                ) as callCount
+
+    </select>
+
+
+    <select id="getCallInfoTimeStatistics" resultType="com.nuoxin.virtual.rep.api.web.controller.response.work.TodayStatisticsResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean">
+
+            <!--select ifnull(sum(vdci.call_time),0) as callTotalTime from virtual_doctor_call_info vdci
+            inner join virtual_doctor_call_info_details vdcid
+            on vdci.id = vdcid.call_id
+            inner join drug_user_doctor dud
+            on vdci.virtual_drug_user_id=dud.drug_user_id
+            inner join drug_user du
+            on du.id = dud.drug_user_id
+            inner join product_line pl
+            on dud.prod_id=pl.prod_id
+            where 1=1
+            <if test="productId !=null and productId !=0">
+                and dud.prod_id=#{productId}
+                and vdci.product_id=#{productId}
+            </if>
+
+            and du.leader_path like #{leaderPath}
+            and vdcid.status_name='answer'
+
+            and date_format(vdci.create_time, '%Y-%m-%d')=date_format(NOW(), '%Y-%m-%d')-->
+
+
+
+
+
+        select ifnull(sum(t.call_time),0) callTotalTime  from (
+        select distinct vdci.id,vdci.call_time from virtual_doctor_call_info vdci
+        inner join virtual_doctor_call_info_details vdcid
+        on vdci.id = vdcid.call_id
+        inner join drug_user_doctor dud
+        on vdci.virtual_drug_user_id=dud.drug_user_id
+        inner join drug_user du
+        on du.id = dud.drug_user_id
+        inner join product_line pl
+        on dud.prod_id=pl.prod_id
+        where 1=1
+
+        and dud.prod_id=#{productId}
+        and vdci.product_id=#{productId}
+
+
+        and du.leader_path like #{leaderPath}
+        <!-- and vdcid.status_name='answer'-->
+        and vdcid.status_name in ('answer','incall')
+        and date_format(vdci.create_time, '%Y-%m-%d')=date_format(NOW(), '%Y-%m-%d')
+
+        ) t
+
+
+    </select>
+
+    <!-- 测试的 -->
+    <select id="getCallInfoList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.call.CallInfoResponseBean">
+          select id,sin_token sinToken,info_json infoJson from virtual_doctor_call_info where call_time > 0 and ( call_url is null or call_url='') order by create_time desc
+    </select>
+
+    <update id="updateCallUrl">
+        update virtual_doctor_call_info set call_url=#{callUrl} where id = #{id}
+    </update>
+
+
+    <select id="getCallUrlBySigToken" resultType="java.lang.String">
+        select call_url from virtual_doctor_call_info where sin_token = #{sigToken}
+    </select>
+
+    <update id="updateCallUrlBySigToken">
+        update virtual_doctor_call_info set call_url = #{callUrl} where sin_token = #{sinToken}
+    </update>
+
+</mapper>

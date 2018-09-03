@@ -27,8 +27,15 @@ public class QueryRequestBean extends PageRequestBean {
     private String department;
     @ApiModelProperty(value = "医生级别")
     private String doctorLevel;
+    @ApiModelProperty(value = "代表名称")
+    private String drugUserName;
+    @ApiModelProperty(value = "产品id")
+    private Long productId;
 
+    @ApiModelProperty(value = "不用传")
     private Long drugUserId;
+    @ApiModelProperty(value = "不用传")
+    private String leaderPath;
 
     public String getMobile() {
         return mobile;
@@ -105,6 +112,34 @@ public class QueryRequestBean extends PageRequestBean {
     @Override
     public String toString() {
         return mobile +  year + month + day + name + hospital +  department +
-                doctorLevel +  drugUserId + super.toString();
+                doctorLevel +  drugUserId + drugUserName + super.toString();
+    }
+
+    public String getLeaderPath() {
+        return leaderPath;
+    }
+
+    public void setLeaderPath(String leaderPath) {
+        this.leaderPath = leaderPath;
+    }
+
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    public String getDrugUserName() {
+        return drugUserName;
+    }
+
+    public void setDrugUserName(String drugUserName) {
+        this.drugUserName = drugUserName;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 }

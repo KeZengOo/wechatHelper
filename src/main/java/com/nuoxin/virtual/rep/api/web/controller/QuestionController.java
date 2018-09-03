@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Created by fenggang on 9/11/17.
  */
-@Api(value = "",description = "问卷接口")
+@Api(value = "问卷",description = "问卷接口")
 @RestController
 @RequestMapping(value = "/question")
 public class QuestionController extends BaseController {

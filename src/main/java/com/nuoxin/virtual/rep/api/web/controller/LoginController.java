@@ -17,7 +17,6 @@ import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.PostConstruct;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -46,13 +45,20 @@ public class LoginController extends BaseController {
     public DefaultResponseBean<LoginResponseBean> login(@RequestBody LoginRequestBean bean,
                                      HttpServletRequest request, HttpServletResponse response){
         System.out.println(bean.getPassword());
+        DefaultResponseBean<LoginResponseBean> responseBean = new DefaultResponseBean<>();
         DrugUser drugUser = loginService.login(bean);
+        if(drugUser.getRoleId()==null){
+            responseBean.setCode(550);
+            responseBean.setMessage("权限不足");
+            return responseBean;
+        }
+
         sercurityService.saveSession(request,response,drugUser);
         LoginResponseBean result = new LoginResponseBean();
         result.setName(drugUser.getName());
         result.setEmail(drugUser.getEmail());
         result.setCallBean(JSON.parseObject(drugUser.getCallInfo(), DrugUserCallDetaiBean.class));
-        DefaultResponseBean<LoginResponseBean> responseBean = new DefaultResponseBean<>();
+        result.setRoleId(drugUser.getRoleId());
         responseBean.setData(result);
         return responseBean;
     }
@@ -76,6 +82,7 @@ public class LoginController extends BaseController {
             responseBean.setMessage("账号不存在");
             return responseBean;
         }
+        
         responseBean.setMessage("验证码发送成功");
         responseBean.setData(emailService.sendEmailCode(drugUser));
         return responseBean;
@@ -91,17 +98,20 @@ public class LoginController extends BaseController {
             responseBean.setMessage("验证码失效");
             return responseBean;
         }
+        
         Object val = memUtils.get(obj.toString());
         if(val==null){
             responseBean.setCode(500);
             responseBean.setMessage("验证码失效");
             return responseBean;
         }
+        
         if(!code.equals(val.toString())){
             responseBean.setCode(500);
             responseBean.setMessage("验证码错误");
             return responseBean;
         }
+        
         responseBean.setMessage("验证成功");
         return responseBean;
     }
@@ -123,29 +133,32 @@ public class LoginController extends BaseController {
             responseBean.setMessage("邮箱错误");
             return responseBean;
         }
+        
         Object code = memUtils.get(bean.getEmail());
         if(code==null || "".equals(code)){
             responseBean.setCode(500);
             responseBean.setMessage("验证码过期");
             return responseBean;
         }
+        
         if(!code.toString().equals(bean.getCode())){
             responseBean.setCode(500);
             responseBean.setMessage("验证码错误");
             return responseBean;
         }
+        
         //校验密码格式
         if(!Pattern.matches("^[0-9a-zA-Z]{6,20}", bean.getPassword())){
             responseBean.setCode(500);
             responseBean.setMessage("请输入6-20位英文、数字组合");
             return responseBean;
         }
+        
         drugUserService.updatePawd(bean);
         responseBean.setMessage("修改密码成功");
         memUtils.deleteKey(bean.getEmail());
         memUtils.deleteKey(bean.getToken());
         return responseBean;
     }
-
 
 }

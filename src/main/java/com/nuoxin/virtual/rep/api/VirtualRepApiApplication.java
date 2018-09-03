@@ -2,12 +2,14 @@ package com.nuoxin.virtual.rep.api;
 
 import com.fasterxml.classmate.TypeResolver;
 import io.swagger.annotations.Api;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.async.DeferredResult;
@@ -24,12 +26,18 @@ import java.time.LocalDate;
 import static springfox.documentation.schema.AlternateTypeRules.newRule;
 
 @SpringBootApplication
-@EnableDiscoveryClient
+//@EnableDiscoveryClient
 @EnableSwagger2
+@MapperScan(basePackages = "com.nuoxin.virtual.rep.api.mybatis")
 public class VirtualRepApiApplication {
-
-	public static void main(String[] args) {
-		SpringApplication.run(VirtualRepApiApplication.class, args);
+	
+	@Autowired
+	private TypeResolver typeResolver;
+	
+	@Bean
+	//@LoadBalanced
+	public RestTemplate getRestTemplate(){
+		return new RestTemplate();
 	}
 
 	/**
@@ -37,7 +45,7 @@ public class VirtualRepApiApplication {
 	 */
 	@Bean
 	public Docket generateApi() {
-		Docket docket = new Docket(DocumentationType.SWAGGER_2).apiInfo(apiInfo()).select()
+		Docket docket = new Docket( DocumentationType.SWAGGER_2).apiInfo(apiInfo()).select()
 				.apis(RequestHandlerSelectors.withClassAnnotation(Api.class))
 				.paths(PathSelectors.any()).build().pathMapping("/")
 				.directModelSubstitute(LocalDate.class, String.class)
@@ -52,20 +60,15 @@ public class VirtualRepApiApplication {
 				.useDefaultResponseMessages(false);
 		return docket;
 	}
-
+	
+	public static void main(String[] args) {
+		SpringApplication.run(VirtualRepApiApplication.class, args);
+	}
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	private ApiInfo apiInfo() {
-		return new ApiInfo("系统接口", "virtual-rep-api  系统接口", "0.0.1",
-				"", "", "", "");
+		return new ApiInfo("系统接口", "virtual-rep-api  系统接口", "0.0.1", "", "", "", "");
 	}
 
-	@Autowired
-	private TypeResolver typeResolver;
-
-
-	@Bean
-	@LoadBalanced
-	RestTemplate getRestTemplate(){
-
-		return new RestTemplate();
-	}
 }

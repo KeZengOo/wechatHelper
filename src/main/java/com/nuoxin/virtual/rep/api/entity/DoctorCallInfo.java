@@ -18,7 +18,8 @@ public class DoctorCallInfo extends IdEntity {
     private Long doctorId;
     @Column(name = "type")
     private Integer type;
-    @Column(name = "virtual_drug_user_id")
+//    @Column(name = "")
+    @Transient
     private Long drugUserId;
     @Column(name = "sin_token")
     private String sinToken;
@@ -40,10 +41,19 @@ public class DoctorCallInfo extends IdEntity {
     private String mobile;
     @Column(name = "info_json")
     private String json;
+    @Column(name = "product_id")
+    private Long productId;
+    @Column(name = "del_flag")
+    private Integer delFlag = 0;
+    @Column(name = "follow_up_type")
+    private String followUpType;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH},fetch = FetchType.LAZY)
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH},fetch = FetchType.EAGER)
     @JoinColumn(name = "virtual_doctor_id")
     private Doctor doctor;
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH},fetch = FetchType.EAGER)
+    @JoinColumn(name = "virtual_drug_user_id")
+    private DrugUser drugUser;
 
     public Long getDoctorId() {
         return doctorId;
@@ -54,6 +64,9 @@ public class DoctorCallInfo extends IdEntity {
     }
 
     public Long getDrugUserId() {
+        if(drugUser!=null){
+            return drugUser.getId();
+        }
         return drugUserId;
     }
 
@@ -155,5 +168,37 @@ public class DoctorCallInfo extends IdEntity {
 
     public void setJson(String json) {
         this.json = json;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
+    }
+
+    public Integer getDelFlag() {
+        return delFlag;
+    }
+
+    public void setDelFlag(Integer delFlag) {
+        this.delFlag = delFlag;
+    }
+
+    public String getFollowUpType() {
+        return followUpType;
+    }
+
+    public void setFollowUpType(String followUpType) {
+        this.followUpType = followUpType;
+    }
+
+    public DrugUser getDrugUser() {
+        return drugUser;
+    }
+
+    public void setDrugUser(DrugUser drugUser) {
+        this.drugUser = drugUser;
     }
 }

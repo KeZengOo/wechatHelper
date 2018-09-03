@@ -15,6 +15,10 @@ public class QuestionQueryRequestBean extends PageRequestBean{
 
     @ApiModelProperty(value = "查询内容")
     private String query;
+    @ApiModelProperty(value = "产品id")
+    private Long productId;
+    @ApiModelProperty(value = "手机号")
+    private String mobile;
 
     private Long drugUserId;
 
@@ -32,6 +36,22 @@ public class QuestionQueryRequestBean extends PageRequestBean{
 
     public void setDrugUserId(Long drugUserId) {
         this.drugUserId = drugUserId;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
     }
 
     @Override

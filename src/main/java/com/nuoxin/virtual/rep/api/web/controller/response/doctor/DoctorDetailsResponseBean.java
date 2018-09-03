@@ -1,10 +1,12 @@
 package com.nuoxin.virtual.rep.api.web.controller.response.doctor;
 
+import com.nuoxin.virtual.rep.api.web.controller.response.customer.DoctorDymamicFieldValueResponseBean;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.Column;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by fenggang on 9/12/17.
@@ -38,6 +40,11 @@ public class DoctorDetailsResponseBean implements Serializable {
     private String doctorLevel;
     @ApiModelProperty(value = "客户等级")
     private String clientLevel;
+    @ApiModelProperty(value = "产品id")
+    private Long productId;
+
+    @ApiModelProperty(value = "动态字段")
+    private List<DoctorDymamicFieldValueResponseBean> list;
 
     public Long getEappId() {
         return eappId;
@@ -141,5 +148,21 @@ public class DoctorDetailsResponseBean implements Serializable {
 
     public void setClientLevel(String clientLevel) {
         this.clientLevel = clientLevel;
+    }
+
+    public List<DoctorDymamicFieldValueResponseBean> getList() {
+        return list;
+    }
+
+    public void setList(List<DoctorDymamicFieldValueResponseBean> list) {
+        this.list = list;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 }

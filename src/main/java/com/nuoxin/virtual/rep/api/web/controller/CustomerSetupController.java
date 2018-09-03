@@ -25,26 +25,10 @@ public class CustomerSetupController {
 
     @Autowired
     private DoctorDynamicFieldValueService doctorDynamicFieldValueService;
-
     @Autowired
     private DoctorDynamicFieldService doctorDynamicFieldService;
 
-//
-//    @ApiOperation(value = "添加动态新增的字段的值")
-//    @PostMapping("/addValues")
-//    //public ResponseEntity<DefaultResponseBean<Boolean>> add(@RequestBody DoctorDynamicFieldValueRequestBean bean) {
-//    public ResponseEntity<DefaultResponseBean<Boolean>> add(@RequestBody List<DoctorDynamicFieldValueRequestBean> list) {
-//        DoctorDynamicFieldValueRequestBean bean = new DoctorDynamicFieldValueRequestBean();
-//        //bean.setDoctorId(doctorId);
-//        //bean.setMap(map);
-//        boolean flag = doctorDynamicFieldValueService.add(bean);
-//        DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
-//        responseBean.setData(flag);
-//        return ResponseEntity.ok(responseBean);
-//    }
-
-
-    @ApiOperation(value = "添加动态新增的字段")
+    @ApiOperation(value = "添加动态新增的字段", notes = "添加动态新增的字段")
     @PostMapping("/addField")
     @ResponseBody
     public ResponseEntity<DefaultResponseBean<Boolean>> addField(@RequestBody List<DoctorDynamicFieldRequestBean> list) {
@@ -55,26 +39,40 @@ public class CustomerSetupController {
         return ResponseEntity.ok(responseBean);
     }
 
+    @ApiOperation(value = "删除动态字段接口", notes = "删除动态字段接口")
+    @GetMapping("/deleteField/{id}")
+    @ResponseBody
+    public ResponseEntity<DefaultResponseBean<Boolean>> deleteField(@PathVariable(value = "id") Long id) {
+        Boolean flag = doctorDynamicFieldService.delete(id);
+        DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(flag);
+        return ResponseEntity.ok(responseBean);
+    }
 
+    @ApiOperation(value = "修改动态新增的字段", notes = "修改动态新增的字段")
+    @PostMapping("/updateField")
+    @ResponseBody
+    public ResponseEntity<DefaultResponseBean<Boolean>> addField(@RequestBody DoctorDynamicFieldRequestBean bean) {
+        Boolean flag = doctorDynamicFieldService.update(bean);
+        DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(flag);
+        return ResponseEntity.ok(responseBean);
+    }
 
     @ApiOperation(value = "获取所有动态新增的字段")
     @GetMapping("/getFields")
     @ResponseBody
     public ResponseEntity<DefaultResponseBean<List<DoctorDynamicFieldResponseBean>>> getFields() {
-
         List<DoctorDynamicFieldResponseBean> list = doctorDynamicFieldService.getList();
         DefaultResponseBean<List<DoctorDynamicFieldResponseBean>> responseBean = new DefaultResponseBean<>();
         responseBean.setData(list);
         return ResponseEntity.ok(responseBean);
     }
 
-
-
     @ApiOperation(value = "获取某个医生动态添加的字段的值")
     @GetMapping("/getFieldValues/{id}")
     @ResponseBody
     public ResponseEntity<DefaultResponseBean<List<DoctorDymamicFieldValueResponseBean>>> getDoctorDymamicFieldValueList(@PathVariable(value = "id") Long id) {
-
         List<DoctorDymamicFieldValueResponseBean> list = doctorDynamicFieldValueService.getDoctorDymamicFieldValueList(id);
         DefaultResponseBean<List<DoctorDymamicFieldValueResponseBean>> responseBean = new DefaultResponseBean<>();
         responseBean.setData(list);

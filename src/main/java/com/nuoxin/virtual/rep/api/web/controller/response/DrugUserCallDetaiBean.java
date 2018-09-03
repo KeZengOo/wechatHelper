@@ -1,14 +1,15 @@
 package com.nuoxin.virtual.rep.api.web.controller.response;
 
-import io.swagger.annotations.Api;
+import java.io.Serializable;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
-import java.io.Serializable;
+import lombok.Data;
 
 /**
  * Created by fenggang on 9/26/17.
  */
+@Data
 @ApiModel
 public class DrugUserCallDetaiBean implements Serializable {
 
@@ -28,60 +29,7 @@ public class DrugUserCallDetaiBean implements Serializable {
     private String logingroups;
     @ApiModelProperty(value = "登录使用的url")
     private String url;
-
-    public String getOperator() {
-        return operator;
-    }
-
-    public void setOperator(String operator) {
-        this.operator = operator;
-    }
-
-    public String getPwd() {
-        return pwd;
-    }
-
-    public void setPwd(String pwd) {
-        this.pwd = pwd;
-    }
-
-    public Integer getCompanyid() {
-        return companyid;
-    }
-
-    public void setCompanyid(Integer companyid) {
-        this.companyid = companyid;
-    }
-
-    public Integer getLogintype() {
-        return logintype;
-    }
-
-    public void setLogintype(Integer logintype) {
-        this.logintype = logintype;
-    }
-
-    public Integer getAuto() {
-        return auto;
-    }
-
-    public void setAuto(Integer auto) {
-        this.auto = auto;
-    }
-
-    public String getLogingroups() {
-        return logingroups;
-    }
-
-    public void setLogingroups(String logingroups) {
-        this.logingroups = logingroups;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
+    @ApiModelProperty(value = "登录模式，Local")
+    private String loginmode;
+    
 }

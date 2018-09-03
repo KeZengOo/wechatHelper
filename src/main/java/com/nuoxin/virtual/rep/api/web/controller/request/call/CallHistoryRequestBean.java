@@ -17,7 +17,10 @@ public class CallHistoryRequestBean extends PageRequestBean {
     @ApiModelProperty(value = "医生id")
     private Long doctorId;
 
+    @ApiModelProperty(value = "不用传")
     private Long drugUserId;
+    @ApiModelProperty(value = "不用传")
+    private String leaderPath;
 
     public Long getDrugUserId() {
         return drugUserId;
@@ -41,5 +44,13 @@ public class CallHistoryRequestBean extends PageRequestBean {
 
     public void setDoctorId(Long doctorId) {
         this.doctorId = doctorId;
+    }
+
+    public String getLeaderPath() {
+        return leaderPath;
+    }
+
+    public void setLeaderPath(String leaderPath) {
+        this.leaderPath = leaderPath;
     }
 }

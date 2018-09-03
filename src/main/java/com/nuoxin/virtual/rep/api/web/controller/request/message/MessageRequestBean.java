@@ -46,6 +46,13 @@ public class MessageRequestBean extends PageRequestBean implements Serializable{
     private String endTime;
 
 
+    @ApiModelProperty(value = "产品id")
+    private Long productId;
+
+    @ApiModelProperty(value = "前端不用传")
+    private String leaderPath;
+
+
     public Long getId() {
         return id;
     }
@@ -133,5 +140,23 @@ public class MessageRequestBean extends PageRequestBean implements Serializable{
 
     public void setEndTime(String endTime) {
         this.endTime = endTime;
+    }
+
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
+    }
+
+
+    public String getLeaderPath() {
+        return leaderPath;
+    }
+
+    public void setLeaderPath(String leaderPath) {
+        this.leaderPath = leaderPath;
     }
 }

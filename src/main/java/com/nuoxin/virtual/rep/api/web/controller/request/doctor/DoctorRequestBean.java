@@ -36,8 +36,16 @@ public class DoctorRequestBean implements Serializable {
     private String doctorLevel;
     @ApiModelProperty(value = "教授")
     private String professor;
+    @ApiModelProperty(value = "产品id")
+    private Long productId;
 
+    @ApiModelProperty(value = "不用传")
     private Long drugUserId;
+    @ApiModelProperty(value = "不用传")
+    private String leaderPath;
+
+    @ApiModelProperty(value = "分类，目前1基本信息，2医生的处方信息，3之前拜访记录，4分析")
+    private Integer classification;
 
     @ApiModelProperty(value = "动态添加的字段")
     List<DoctorDynamicFieldValueRequestBean> list;
@@ -144,5 +152,29 @@ public class DoctorRequestBean implements Serializable {
 
     public void setList(List<DoctorDynamicFieldValueRequestBean> list) {
         this.list = list;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
+    }
+
+    public String getLeaderPath() {
+        return leaderPath;
+    }
+
+    public void setLeaderPath(String leaderPath) {
+        this.leaderPath = leaderPath;
+    }
+
+    public Integer getClassification() {
+        return classification;
+    }
+
+    public void setClassification(Integer classification) {
+        this.classification = classification;
     }
 }

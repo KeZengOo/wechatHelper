@@ -13,6 +13,7 @@ import java.util.List;
 @ApiModel
 public class CallInfoRequestBean implements Serializable {
 
+    private static final long serialVersionUID = 1763341680447469446L;
     @ApiModelProperty(value = "id")
     private Long id;
     @ApiModelProperty(value = "问卷信息")
@@ -23,7 +24,12 @@ public class CallInfoRequestBean implements Serializable {
     private String url;
     @ApiModelProperty(value = "通话时长")
     private Long times;
+    @ApiModelProperty(value = "跟进类型")
+    private String type;
+    @ApiModelProperty(value = "产品id")
+    private Long productId;
 
+    @ApiModelProperty(value = "不用传")
     private Long drugUserId;
 
     public Long getId() {
@@ -72,5 +78,21 @@ public class CallInfoRequestBean implements Serializable {
 
     public void setTimes(Long times) {
         this.times = times;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 }

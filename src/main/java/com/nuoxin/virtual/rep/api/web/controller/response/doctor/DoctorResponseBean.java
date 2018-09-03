@@ -14,6 +14,10 @@ public class DoctorResponseBean implements Serializable {
     private static final long serialVersionUID = 9122147743030730987L;
     @ApiModelProperty(value = "id")
     private Long doctorId;
+    @ApiModelProperty(value = "产品id")
+    private Long productId;
+    @ApiModelProperty(value = "产品名称")
+    private String productName;
     @ApiModelProperty(value = "姓名")
     private String doctorName;
     @ApiModelProperty(value = "电话")
@@ -30,6 +34,10 @@ public class DoctorResponseBean implements Serializable {
     private String city;
     @ApiModelProperty(value = "科室")
     private String department;
+    @ApiModelProperty(value = "代表名称")
+    private String drugUserName;
+    @ApiModelProperty(value = "代表id")
+    private Long drugUserId;
 
     public Long getDoctorId() {
         return doctorId;
@@ -100,5 +108,37 @@ public class DoctorResponseBean implements Serializable {
 
     public void setHospitalLevel(String hospitalLevel) {
         this.hospitalLevel = hospitalLevel;
+    }
+
+    public String getDrugUserName() {
+        return drugUserName;
+    }
+
+    public void setDrugUserName(String drugUserName) {
+        this.drugUserName = drugUserName;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
+    }
+
+    public Long getDrugUserId() {
+        return drugUserId;
+    }
+
+    public void setDrugUserId(Long drugUserId) {
+        this.drugUserId = drugUserId;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 }

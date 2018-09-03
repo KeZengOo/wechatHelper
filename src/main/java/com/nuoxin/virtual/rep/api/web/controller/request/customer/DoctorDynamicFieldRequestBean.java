@@ -12,12 +12,11 @@ import java.io.Serializable;
 public class DoctorDynamicFieldRequestBean implements Serializable{
     private static final long serialVersionUID = 4172100860423852688L;
 
+    @ApiModelProperty(value = "id")
+    private Long id;
 
     @ApiModelProperty(value = "字段名称")
     private String name;
-
-//    @ApiModelProperty(value = "字段别名或者英文名称")
-//    private String alias;
 
 
     @ApiModelProperty(value = "字段类型，1是文本，2是下拉框")
@@ -25,6 +24,9 @@ public class DoctorDynamicFieldRequestBean implements Serializable{
 
     @ApiModelProperty(value = "下拉框的值")
     private String value;
+
+    @ApiModelProperty(value = "分类，目前1基本信息，2医生的处方信息，3之前拜访记录，4分析")
+    private Integer classification;
 
 
     public String getName() {
@@ -35,13 +37,6 @@ public class DoctorDynamicFieldRequestBean implements Serializable{
         this.name = name;
     }
 
-//    public String getAlias() {
-//        return alias;
-//    }
-//
-//    public void setAlias(String alias) {
-//        this.alias = alias;
-//    }
 
     public Integer getType() {
         return type;
@@ -57,5 +52,23 @@ public class DoctorDynamicFieldRequestBean implements Serializable{
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+
+    public Integer getClassification() {
+        return classification;
+    }
+
+    public void setClassification(Integer classification) {
+        this.classification = classification;
+    }
+
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

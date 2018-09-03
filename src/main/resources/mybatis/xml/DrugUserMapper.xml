@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.DrugUserMapper">
+
+    <resultMap id="doctorResponseBean"
+               type="com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorResponseBean">
+        <result column="name" property="doctorName" jdbcType="VARCHAR"/>
+        <!--<result column="email" property="" jdbcType=""/>-->
+        <!--<result column="hospital_id" property="" jdbcType=""/>-->
+        <result column="hospital_name" property="hospitalName" jdbcType="VARCHAR"/>
+        <result column="provice" property="province" jdbcType="VARCHAR"/>
+        <result column="city" property="city" jdbcType="VARCHAR"/>
+        <result column="depart" property="department" jdbcType="VARCHAR"/>
+        <result column="telephone" property="doctorMobile" jdbcType="VARCHAR"/>
+        <!--<result column="positions" property="" jdbcType=""/>-->
+        <!--<result column="create_time" property="" jdbcType=""/>-->
+        <result column="product_name" property="productName" jdbcType="VARCHAR"/>
+        <result column="doctor_id" property="doctorId" jdbcType="BIGINT"/>
+        <result column="hospital_level" property="hospitalLevel" jdbcType="VARCHAR"/>
+        <result column="client_level" property="clientLevel" jdbcType="VARCHAR"/>
+        <result column="product_id" property="productId" jdbcType="BIGINT"/>
+        <result column="drug_user_name" property="drugUserName" jdbcType="VARCHAR"/>
+        <result column="drug_user_id" property="drugUserId" jdbcType="BIGINT"/>
+    </resultMap>
+
+    <select id="doctorPage" resultMap="doctorResponseBean"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean">
+        select
+        d.id,d.name,d.email,d.hospital_id,d.hospital_name,d.provice,d.city,d.depart,d.telephone,d.positions,d.create_time,d.status,dv.doctor_id,dv.hospital_level,dv.client_level,dv.master_data_id,du.name
+        drug_user_name,dud.prod_id product_id,dud.drug_user_id,pl.prod_name product_name from drug_user_doctor dud join doctor d on d.id=dud.doctor_id join
+        drug_user du on du.id=dud.drug_user_id join doctor_virtual dv on dv.doctor_id=dud.doctor_id join product_line pl on pl.prod_id=dud.prod_id where du.leader_path
+        like #{leaderPath,jdbcType=VARCHAR}
+        <if test="name!=null and name!=''">
+
+            and d.name like #{name,jdbcType=VARCHAR}
+        </if>
+        <if test="drugUserName!=null and drugUserName!=''">
+
+            and du.name like #{drugUserName,jdbcType=VARCHAR}
+        </if>
+        <if test="mobile!=null and mobile!=''">
+
+            and d.telephone like #{mobile,jdbcType=VARCHAR}
+        </if>
+        <if test="department!=null and department!=''">
+
+            and d.depart like #{department,jdbcType=VARCHAR}
+        </if>
+        <if test="doctorLevel!=null and doctorLevel!=''">
+
+            and d.positions like #{doctorLevel,jdbcType=VARCHAR}
+        </if>
+        <if test="hospital!=null and hospital!=''">
+
+            and d.hospital_name like #{hospital,jdbcType=VARCHAR}
+        </if>
+        <if test="productId!=null and productId!=0">
+
+            and dud.prod_id like #{productId,jdbcType=BIGINT}
+        </if>
+        LIMIT ${currentSize},${pageSize}
+    </select>
+    <select id="doctorPageCount" resultType="java.lang.Integer"
+            parameterType="com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean">
+        select count(1) num from drug_user_doctor dud join doctor d on d.id=dud.doctor_id join
+        drug_user du on du.id=dud.drug_user_id join doctor_virtual dv on dv.doctor_id=dud.doctor_id where du.leader_path
+        like #{leaderPath,jdbcType=VARCHAR}
+        <if test="name!=null and name!=''">
+
+            and d.name like #{name,jdbcType=VARCHAR}
+        </if>
+        <if test="drugUserName!=null and drugUserName!=''">
+
+            and du.name like #{drugUserName,jdbcType=VARCHAR}
+        </if>
+        <if test="mobile!=null and mobile!=''">
+
+            and d.telephone like #{mobile,jdbcType=VARCHAR}
+        </if>
+        <if test="department!=null and department!=''">
+
+            and d.depart like #{department,jdbcType=VARCHAR}
+        </if>
+        <if test="doctorLevel!=null and doctorLevel!=''">
+
+            and d.positions like #{doctorLevel,jdbcType=VARCHAR}
+        </if>
+        <if test="hospital!=null and hospital!=''">
+
+            and d.hospital_name like #{hospital,jdbcType=VARCHAR}
+        </if>
+        <if test="productId!=null and productId!=0">
+
+            and dud.prod_id like #{productId,jdbcType=BIGINT}
+        </if>
+    </select>
+
+    <resultMap id="drugUserResponseBean" type="com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="relationDrugUser" resultMap="drugUserResponseBean">
+      select du.id,du.name from product_user pu join drug_user du on pu.user_id=du.id where du.leader_path like #{leaderPath,jdbcType=VARCHAR} and pu.prod_id = #{productId} group by du.id
+
+    </select>
+</mapper>

@@ -21,6 +21,7 @@ public class SmsTemplate extends IdEntity {
     private Long drugId;
     private Date createTime;
     private String name;
+    private Long productId;
 
     private String maps;
 
@@ -86,5 +87,13 @@ public class SmsTemplate extends IdEntity {
 
     public void setMaps(String maps) {
         this.maps = maps;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 }

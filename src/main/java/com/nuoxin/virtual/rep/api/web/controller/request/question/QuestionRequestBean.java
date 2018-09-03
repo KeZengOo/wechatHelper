@@ -22,7 +22,7 @@ public class QuestionRequestBean implements Serializable {
     private List<OptionsRequestBean> options;
     @ApiModelProperty(value = "答案")
     private String answer;
-    @ApiModelProperty(value = "类型")
+    @ApiModelProperty(value = "类型(0-选项，1-问答)")
     private Integer type;
 
     public String getTitle() {

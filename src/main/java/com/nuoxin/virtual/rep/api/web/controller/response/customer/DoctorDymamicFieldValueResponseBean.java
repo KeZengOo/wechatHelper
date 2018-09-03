@@ -13,20 +13,22 @@ import java.io.Serializable;
 public class DoctorDymamicFieldValueResponseBean implements Serializable{
     private static final long serialVersionUID = 6656422391172399317L;
 
+    @ApiModelProperty(value = "动态字段的id")
+    private Long id;
+
     @ApiModelProperty(value = "字段名称")
-    private String fieldName;
+    private String name;
 
     @ApiModelProperty(value = "字段的值")
     private String fieldValue;
 
+    @ApiModelProperty(value = "字段类型")
+    private Integer type;
 
-    public String getFieldName() {
-        return fieldName;
-    }
+    @ApiModelProperty(value = "下拉框类型字段的值，多个以英文逗号分开")
+    private String value;
 
-    public void setFieldName(String fieldName) {
-        this.fieldName = fieldName;
-    }
+
 
     public String getFieldValue() {
         return fieldValue;
@@ -34,5 +36,37 @@ public class DoctorDymamicFieldValueResponseBean implements Serializable{
 
     public void setFieldValue(String fieldValue) {
         this.fieldValue = fieldValue;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

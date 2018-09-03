@@ -1,25 +1,31 @@
 package com.nuoxin.virtual.rep.api.web.controller;
 
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
-import com.nuoxin.virtual.rep.api.entity.SmsTemplate;
 import com.nuoxin.virtual.rep.api.service.SmsSendService;
 import com.nuoxin.virtual.rep.api.service.SmsTemplateService;
 import com.nuoxin.virtual.rep.api.web.controller.request.SmsSendRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.SmsTemplateResponseBean;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.List;
 
 /**
  * Created by fenggang on 9/18/17.
  */
-@Api(value = "",description = "短信接口")
+@Api(value = "短信发送",description = "短信接口")
 @RestController
 @RequestMapping(value = "/sms")
 public class SmsSendController extends BaseController {

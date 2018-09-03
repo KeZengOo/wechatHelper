@@ -27,6 +27,9 @@ public class MessageLinkmanResponseBean implements Serializable{
     @ApiModelProperty(value = "最后一次聊天信息")
     private String lastMessage;
 
+    @ApiModelProperty(value = "产品id，微信不能分产品，产品id为null")
+    private Long productId;
+
 
     public Long getDoctorId() {
         return doctorId;
@@ -67,5 +70,13 @@ public class MessageLinkmanResponseBean implements Serializable{
 
     public void setMessageType(Integer messageType) {
         this.messageType = messageType;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 }

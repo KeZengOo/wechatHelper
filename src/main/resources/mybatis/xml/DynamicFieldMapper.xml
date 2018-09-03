@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.DynamicFieldMapper">
+
+
+    <select id="getList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.customer.DoctorDynamicFieldResponseBean">
+        select vddf.id, vddf.field_name name, vddf.alias, vddf.type, vddf.field_value value, vddf.classification
+        from virtual_doctor_dynamic_field vddf where vddf.flag = 1
+    </select>
+
+
+    <!--
+    <select id="getDoctorBasicInfo" parameterType="java.lang.Long"
+            resultType="com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorBasicInfoResponseBean">
+
+        select distinct vddf.type,vddf.id fieldId,vddf.field_name field,vddf.field_value fieldValue, vddfv.dynamic_field_value value,vddfv.id ddfvId, vddf.classification from
+        virtual_doctor_dynamic_field vddf
+        inner join virtual_doctor_dynamic_field_value vddfv
+        on vddf.id=vddfv.dynamic_field_id
+        where vddfv.doctor_id=#{doctorId}
+
+
+
+
+    </select>
+    -->
+
+
+    <select id="getDoctorBasicInfo" parameterType="java.lang.Long"
+            resultType="com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorBasicInfoResponseBean">
+
+        <!--
+        select distinct vddf.type,vddf.id fieldId,vddf.field_name field,vddf.field_value fieldValue, vddfv.dynamic_field_value value,vddfv.id ddfvId, vddf.classification from
+        virtual_doctor_dynamic_field vddf
+        inner join virtual_doctor_dynamic_field_value vddfv
+        on vddf.id=vddfv.dynamic_field_id
+        where vddfv.doctor_id=#{doctorId}
+        -->
+
+        select vddf.type, vddf.id fieldId, vddf.field_name field,
+        vddf.field_value fieldValue,
+        vddf.classification,
+        vddf.flag
+        from virtual_doctor_dynamic_field vddf order by vddf.flag,vddf.classification
+
+
+
+
+    </select>
+
+
+    <select id="getHcpBasicInfoHistoryList" parameterType="com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpDynamicRequestBean"
+            resultType="com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpBasicInfoHistoryResponseBean">
+
+        select h.dynamic_field_name fieldName, h.dynamic_field_value fieldValue,(select name from drug_user where id=h.drug_user_id) drugUserName,
+        h.correct,
+        h.old_dynamic_field_name oldFieldName,
+        h.old_dynamic_field_value oldFieldValue,
+        date_format(h.update_time,'%Y-%m-%d %H:%i:%s') updateTime
+        from virtual_doctor_dynamic_field_value_history h where h.doctor_id=#{doctorId} and h.dynamic_field_name = #{name}
+        and h.drug_user_id in (
+        select id from drug_user du where du.leader_path like (select concat(leader_path,'%') from drug_user where id=h.drug_user_id)
+        )
+
+        order by h.update_time desc
+    </select>
+
+
+
+    <select id="getDoctorBasicInfoValue"
+            resultType="com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorBasicInfoResponseBean">
+
+        select vddfv.dynamic_field_value value,vddfv.id ddfvId from virtual_doctor_dynamic_field_value vddfv
+        where vddfv.doctor_id=#{doctorId} and vddfv.dynamic_field_id=#{fieldId} limit 1
+
+
+    </select>
+
+
+
+
+    <select id="getFixedField" resultType="com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorBasicInfoResponseBean">
+
+        select vddf.type, vddf.id fieldId, vddf.field_name field,
+        vddf.field_value fieldValue,
+        vddf.classification,
+        vddf.flag
+        from virtual_doctor_dynamic_field vddf where flag=0
+
+    </select>
+
+
+    <select id="getFieldByDoctorIdAndClassification" resultType="com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorBasicInfoResponseBean">
+
+        select distinct vddfv.dynamic_field_id fieldId, vddfv.dynamic_field_name field, vddfv.dynamic_field_value value from virtual_doctor_dynamic_field_value vddfv
+        inner join virtual_doctor_dynamic_field vddf
+        on vddfv.dynamic_field_id=vddf.id
+        where vddf.classification=#{classification}
+        and vddfv.doctor_id=#{doctorId}
+
+    </select>
+
+
+
+    <delete id="deleteAllByDoctorIdAndClassification">
+
+        delete from virtual_doctor_dynamic_field_value where doctor_id=#{doctorId}
+        and dynamic_field_id in
+        (select id from virtual_doctor_dynamic_field where classification=#{classification})
+
+    </delete>
+
+
+    <insert id="insertHcpBasicField" useGeneratedKeys="true" keyProperty="id" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.hcp.HcpBasicFieldRequestBean">
+        insert into virtual_doctor_dynamic_field_value(doctor_id, dynamic_field_id, dynamic_field_name,dynamic_field_value)
+        values (#{doctorId}, #{fieldId}, #{key}, #{value})
+    </insert>
+
+    <insert id="insertHcpBasicFieldHistory" useGeneratedKeys="true" keyProperty="id" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.hcp.HcpBasicFieldRequestBean">
+        insert into virtual_doctor_dynamic_field_value_history(ddfv_id,doctor_id,drug_user_id, dynamic_field_id, dynamic_field_name,dynamic_field_value,old_dynamic_field_id, old_dynamic_field_name,old_dynamic_field_value, correct)
+        values (#{ddfvId},#{doctorId},#{drugUserId}, #{fieldId}, #{key}, #{value},#{oldFieldId}, #{oldKey}, #{oldValue}, #{correct})
+    </insert>
+
+
+</mapper>

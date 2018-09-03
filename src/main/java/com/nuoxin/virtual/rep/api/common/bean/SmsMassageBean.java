@@ -16,6 +16,7 @@ public class SmsMassageBean implements Serializable {
     private Map<String,Object> map;
     private String signName;
     private List<String> mobiles;
+    private Long productId;
 
     public String getTemplateCode() {
         return templateCode;
@@ -63,5 +64,13 @@ public class SmsMassageBean implements Serializable {
 
     public void setMobiles(List<String> mobiles) {
         this.mobiles = mobiles;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 }

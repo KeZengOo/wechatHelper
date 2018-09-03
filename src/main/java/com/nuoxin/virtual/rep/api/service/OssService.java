@@ -132,9 +132,8 @@ public class OssService {
 			String md5 = BinaryUtil.toBase64String(BinaryUtil.calculateMd5(fileContent));
 			meta.setHeader("Content-MD5",md5);
 			meta.setContentType(fileType);
-			if("wav".equals(suffixName)){
+			if("wav".equalsIgnoreCase(suffixName) || "mp3".equalsIgnoreCase(suffixName)){
 				meta.setContentType("audio/x-ms-wax");
-
 			}
 			uploadOSSClient.putObject(aliyunConfig.getBucketName(), filePathName, new ByteArrayInputStream(fileContent), meta);
 			String path = aliyunConfig.getDownloadEndpoint() + FileUtils.getFileSeparator() + filePathName;

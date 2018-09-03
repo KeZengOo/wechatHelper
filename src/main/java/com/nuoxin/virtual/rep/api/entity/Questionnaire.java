@@ -22,6 +22,10 @@ public class Questionnaire extends IdEntity {
     private Long createId;
     @Column(name = "create_time")
     private Date createTime;
+    @Column(name = "product_id")
+    private Long productId;
+    @Column(name = "del_flag")
+    private Integer delFlag = 0;
 
     public String getTitle() {
         return title;
@@ -45,5 +49,21 @@ public class Questionnaire extends IdEntity {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
+    }
+
+    public Integer getDelFlag() {
+        return delFlag;
+    }
+
+    public void setDelFlag(Integer delFlag) {
+        this.delFlag = delFlag;
     }
 }

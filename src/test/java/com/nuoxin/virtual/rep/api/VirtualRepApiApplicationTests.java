@@ -20,7 +20,6 @@ public class VirtualRepApiApplicationTests {
 
 	@Test
 	public void contextLoads() {
-		doctorCallService.file();
 	}
 
 }
