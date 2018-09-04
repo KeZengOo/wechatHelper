@@ -37,6 +37,9 @@ public class PageRequestBean implements Serializable {
 	}
 
 	public int getPageSize() {
+		if(pageSize == 0) {
+			pageSize = 10;
+		}
 		return pageSize;
 	}
 
@@ -45,6 +48,14 @@ public class PageRequestBean implements Serializable {
 	}
 
 	public Integer getCurrentSize() {
+		if(page < 1) {
+			page = 1;
+		}
+		
+		if(pageSize == 0) {
+			pageSize=10;
+		}
+		this.currentSize = (this.page - 1) * this.pageSize;
 		return currentSize;
 	}
 

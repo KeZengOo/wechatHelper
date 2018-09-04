@@ -30,4 +30,18 @@
         select pl.prod_id from product_line pl join product_user pu on pu.prod_id=pl.prod_id join drug_user du on du.id=pu.user_id where du.leader_path like #{0,jdbcType=VARCHAR} group by pl.prod_id
     </select>
 
+	<!-- 以下是 v2.5 使用到的 -->
+	
+    <select id="getListByDrugUserId" resultType="com.nuoxin.virtual.rep.api.web.controller.response.product.ProductResponseBean">
+        SELECT 
+        	DISTINCT  pl.prod_id productId, pl.prod_name productName 
+        FROM product_line pl 
+        JOIN product_user pu 
+            ON pu.prod_id=pl.prod_id 
+            AND pu.user_id IN 
+            <foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+ 				#{virtualDrugUserId}
+			</foreach>
+            
+    </select>
 </mapper>

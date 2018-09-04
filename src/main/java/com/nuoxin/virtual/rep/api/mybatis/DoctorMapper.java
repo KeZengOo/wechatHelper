@@ -1,12 +1,13 @@
 package com.nuoxin.virtual.rep.api.mybatis;
 
-import com.nuoxin.virtual.rep.api.common.util.MyMapper;
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
 import com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.doctor.CustomerFollowListBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpDynamicRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.work.CustomerSumResponseBean;
-import org.springframework.data.repository.query.Param;
-
-import java.util.List;
 
 /**
  * Create by tiancun on 2017/10/12
@@ -46,4 +47,13 @@ public interface DoctorMapper{
 
     void updateFixedHospital(HcpDynamicRequestBean bean);
 
+    int getDoctorsCount(@Param(value = "virtualDrugUserIds") List<Long> virtualDrugUserIds,
+    															   @Param(value = "doctorIds") List<Long> doctorIds, 
+    		                                                       @Param(value = "currentSize")int currentSize, 
+    		                                                       @Param(value = "pageSize")int pageSize);
+    
+    List<CustomerFollowListBean> getDoctors(@Param(value = "virtualDrugUserIds") List<Long> virtualDrugUserIds,
+    		@Param(value = "doctorIds") List<Long> doctorIds, 
+    		@Param(value = "currentSize")int currentSize, 
+    		@Param(value = "pageSize")int pageSize);
 }

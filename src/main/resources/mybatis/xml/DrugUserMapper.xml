@@ -104,4 +104,16 @@
       select du.id,du.name from product_user pu join drug_user du on pu.user_id=du.id where du.leader_path like #{leaderPath,jdbcType=VARCHAR} and pu.prod_id = #{productId} group by du.id
 
     </select>
+    
+    <!-- 以下是 v2.5 使用到的 -->
+    
+    <!-- 模糊查询不走索引 -->
+    <select id="getSubordinatesByLeaderPath" resultMap="drugUserResponseBean">
+    	SELECT id,name FROM drug_user WHERE leader_path like #{leaderPath,jdbcType=VARCHAR}
+    </select>
+    
+    <select id="getSubordinateIdsByLeaderPath" resultType="java.lang.Long">
+    	SELECT id FROM drug_user WHERE leader_path like #{leaderPath,jdbcType=VARCHAR}
+    </select>
+    
 </mapper>

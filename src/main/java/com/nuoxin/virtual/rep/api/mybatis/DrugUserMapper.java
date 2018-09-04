@@ -24,10 +24,25 @@ public interface DrugUserMapper extends MyMapper<DrugUser> {
     Integer doctorPageCount(QueryRequestBean bean);
 
     /**
-     * 根据leaderpath查询下属销售
+     * 根据leaderpath, productId查询下属销售
      * @param leaderPath
      * @param productId
      * @return
      */
     List<DrugUserResponseBean> relationDrugUser(@Param("leaderPath") String leaderPath,@Param("productId") Long productId);
+
+    /**
+     * 根据 leaderPath 查询下属销售
+     * @param leaderPath
+     * @return 有结果返回 List<DrugUserResponseBean>,否则返回[] 
+     */
+	List<DrugUserResponseBean> getSubordinatesByLeaderPath(@Param("leaderPath") String leaderPath);
+	
+	/**
+     * 根据 leaderPath 获取所有下属(直接&间接) virtualDrugUserIds
+     * @param leaderPath
+     * @return 有结果返回 List<Long>,否则返回[] 
+     */
+	List<Long> getSubordinateIdsByLeaderPath(@Param("leaderPath") String leaderPath);
+    
 }

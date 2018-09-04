@@ -14,7 +14,7 @@ import io.swagger.annotations.ApiOperation;
 @Api(value = "产品设置相关接口")
 @RequestMapping(value = "/product/conf")
 @RestController
-public class ProductConfController {
+public class ProductConfigController {
 	
 	@ApiOperation(value = "产品信息列表接口", notes = "产品信息列表接口")
 	@RequestMapping(value = "/list", method = { RequestMethod.GET })
@@ -24,7 +24,7 @@ public class ProductConfController {
 	}
 	
 	@ApiOperation(value = "添加产品信息接口", notes = "添加产品信息接口")
-	@RequestMapping(value = "/list", method = { RequestMethod.GET })
+	@RequestMapping(value = "/add", method = { RequestMethod.GET })
 	@ResponseBody
 	public ResponseEntity<DefaultResponseBean<Boolean>> add() {
 		return null;

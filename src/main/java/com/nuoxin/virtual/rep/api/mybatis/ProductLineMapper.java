@@ -2,13 +2,13 @@ package com.nuoxin.virtual.rep.api.mybatis;
 
 
 
-import com.nuoxin.virtual.rep.api.common.util.MyMapper;
-import com.nuoxin.virtual.rep.api.entity.ProductLine;
-import com.nuoxin.virtual.rep.api.web.controller.request.product.ProductRequestBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.product.ProductResponseBean;
+import java.util.List;
+
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
+import com.nuoxin.virtual.rep.api.common.util.MyMapper;
+import com.nuoxin.virtual.rep.api.entity.ProductLine;
+import com.nuoxin.virtual.rep.api.web.controller.response.product.ProductResponseBean;
 
 /**
  * 获取产品mapper
@@ -37,4 +37,6 @@ public interface ProductLineMapper extends MyMapper<ProductLine> {
      * @return
      */
     List<ProductResponseBean> getList(@Param(value = "leaderPath") String leaderPath);
+    
+	List<ProductResponseBean> getListByDrugUserId(@Param(value = "virtualDrugUserIds") List<Long> virtualDrugUserIds);
 }

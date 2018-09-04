@@ -1,34 +1,23 @@
 package com.nuoxin.virtual.rep.api.web.controller.response;
 
+import java.io.Serializable;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
-import java.io.Serializable;
+import lombok.Data;
 
 /**
  * Created by fenggang on 10/18/17.
  */
 @ApiModel
+@Data
 public class DrugUserResponseBean implements Serializable {
 
-    @ApiModelProperty(value = "id")
+	private static final long serialVersionUID = -8927315455674282592L;
+
+	@ApiModelProperty(value = "代表ID")
     private Long id;
-    @ApiModelProperty(value = "名称")
+    @ApiModelProperty(value = "代表名称")
     private String name;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 }
