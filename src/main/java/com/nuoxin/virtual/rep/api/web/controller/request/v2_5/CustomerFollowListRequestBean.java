@@ -9,6 +9,10 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * 首页查询请求类 
+ * @author xiekaiyu
+ */
 @ApiModel
 @EqualsAndHashCode(callSuper=false)
 @Data

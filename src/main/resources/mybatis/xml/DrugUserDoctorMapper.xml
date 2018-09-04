@@ -24,6 +24,8 @@
 			</if>
 	</select>
 	
+	<!-- 以下是 v2.5 用到 -->
+	
 	<select id="getDoctorIdsByVirtualDrugUserIds"  resultType="java.lang.Long">
 		SELECT 
 			DISTINCT doctor_id 
@@ -52,7 +54,10 @@
 			ON d.id=temp.doctor_id 
 		) temp2
 		ON d.id = temp2.id
-		WHERE d.name LIKE "%"#{search,jdbcType=VARCHAR}"%" OR d.telephone=#{search,jdbcType=VARCHAR} OR d.depart=#{search,jdbcType=VARCHAR}
+		WHERE 
+			d.name LIKE "%"#{search,jdbcType=VARCHAR}"%" 
+			OR d.telephone=#{search,jdbcType=VARCHAR} 
+			OR d.depart=#{search,jdbcType=VARCHAR}
 	</select>
 	
 </mapper>

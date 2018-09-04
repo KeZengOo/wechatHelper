@@ -112,6 +112,7 @@
     	SELECT id,name FROM drug_user WHERE leader_path like #{leaderPath,jdbcType=VARCHAR}
     </select>
     
+    <!-- 模糊查询不走索引 -->
     <select id="getSubordinateIdsByLeaderPath" resultType="java.lang.Long">
     	SELECT id FROM drug_user WHERE leader_path like #{leaderPath,jdbcType=VARCHAR}
     </select>

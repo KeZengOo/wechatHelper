@@ -59,6 +59,7 @@ public class CustomerFollowUpController {
 			return this.getLoginErrorResponse();
 		} 
 		
+		// 设置 当前用户的 drugUserId 及 leaderPath
 		indexRequest.setVirtualDrugUserId(user.getId());
 		indexRequest.setLeaderPath(user.getLeaderPath());
 		
@@ -132,6 +133,8 @@ public class CustomerFollowUpController {
 		// TODO
 		return null;
 	}
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	@SuppressWarnings("unchecked")
 	@ApiOperation(value = "根据 leaderPath 获取所有下属医药代表信息", notes = "根据 leaderPath 获取所有下属医药代表信息")
