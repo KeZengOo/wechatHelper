@@ -30,6 +30,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import shaded.org.apache.commons.lang3.StringUtils;
 
+/**
+ * 客户跟进-首页 Controller 类
+ * @author xiekaiyu
+ */
 @Api(value = "客户跟进首页相关接口")
 @RequestMapping(value = "/customer/followup/index")
 @RestController
@@ -129,13 +133,11 @@ public class CustomerFollowUpController {
 		return null;
 	}
 	
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
 	@SuppressWarnings("unchecked")
-	@ApiOperation(value = "根据 leaderPath 获取所有医药代表信息", notes = "根据 leaderPath 获取所有医药代表信息")
+	@ApiOperation(value = "根据 leaderPath 获取所有下属医药代表信息", notes = "根据 leaderPath 获取所有下属医药代表信息")
 	@RequestMapping(value = "/drug_users/get", method = { RequestMethod.GET })
 	@ResponseBody
-	public DefaultResponseBean<List<DrugUserResponseBean>> getAllDrugUsers(HttpServletRequest request) {
+	public DefaultResponseBean<List<DrugUserResponseBean>> getSubordinates(HttpServletRequest request) {
 		DrugUser user = this.getDrugUser(request);
 		if(user == null) {
 			return this.getLoginErrorResponse();
@@ -165,6 +167,11 @@ public class CustomerFollowUpController {
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
+	/**
+	 * 从会话变量中获取 DrugUser 信息 
+	 * @param request
+	 * @return 成功返回 DrugUser 对象,否则返回 null
+	 */
 	private DrugUser getDrugUser(HttpServletRequest request) {
 		return sercurityService.getDrugUser(request);
 	}

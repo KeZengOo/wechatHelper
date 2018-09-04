@@ -1,6 +1,6 @@
 package com.nuoxin.virtual.rep.api.service.v2_5.impl;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -32,29 +32,31 @@ public class DrugUserServiceImpl implements DrugUserService{
 	public List<DrugUserResponseBean> getSubordinates(String leaderPath) {
 		List<DrugUserResponseBean> list = drugUserMapper.getSubordinatesByLeaderPath(leaderPath);
 		if(CollectionsUtil.isNotEmptyList(list)) {
-			DrugUserResponseBean headElement = new DrugUserResponseBean();
-			headElement.setId(-1L);
-			headElement.setName("全部");
-			list.add(0, headElement);
+			list = new ArrayList<>(1);
 		}
+		
+		DrugUserResponseBean headElement = new DrugUserResponseBean();
+		headElement.setId(-1L);
+		headElement.setName("全部");
+		list.add(0, headElement);
+		
 		return list;
 	}
 
 	@Override
 	public List<ProductResponseBean> getProductsByDrugUserId(String leaderPath) {
-		List<ProductResponseBean> list = Collections.emptyList();
-		
+		List<ProductResponseBean> list;
 		List<Long> virtualDrugUserIds = drugUserMapper.getSubordinateIdsByLeaderPath(leaderPath);
 		if(CollectionsUtil.isNotEmptyList(virtualDrugUserIds)) {
 			list = productLineMapper.getListByDrugUserId(virtualDrugUserIds);
+		} else {
+			list = new ArrayList<>(1);
 		}
 		
-		if(CollectionsUtil.isNotEmptyList(list)) {
-			ProductResponseBean headElement = new ProductResponseBean();
-			headElement.setProductId(-1L);
-			headElement.setProductName("全部");
-			list.add(0, headElement);
-		}
+		ProductResponseBean headElement = new ProductResponseBean();
+		headElement.setProductId(-1L);
+		headElement.setProductName("全部");
+		list.add(0, headElement);
 		
 		return list;
 	}
