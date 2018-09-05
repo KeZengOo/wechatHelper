@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
@@ -54,7 +53,6 @@ public class CustomerFollowUpController extends BaseController {
 			return this.getLoginErrorResponse();
 		} 
 		
-		// 设置 当前用户的 drugUserId 及 leaderPath
 		indexRequest.setVirtualDrugUserId(user.getId());
 		indexRequest.setLeaderPath(user.getLeaderPath());
 		
@@ -125,8 +123,6 @@ public class CustomerFollowUpController extends BaseController {
 		// TODO
 		return null;
 	}
-	
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	@SuppressWarnings("unchecked")
 	@ApiOperation(value = "根据 leaderPath 获取所有下属医药代表信息", notes = "根据 leaderPath 获取所有下属医药代表信息")
