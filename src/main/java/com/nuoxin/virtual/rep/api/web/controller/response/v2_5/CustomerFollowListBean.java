@@ -31,10 +31,12 @@ public class CustomerFollowListBean implements Serializable {
     @ApiModelProperty(value = "医生所在科室")
     private String department;
     
-    @ApiModelProperty(value = "打电话状态")
+    @ApiModelProperty(value = "打电话状态名")
     private String callStatusName;
-    @ApiModelProperty(value = "上次拜访时间")
+    @ApiModelProperty(value = "上次电话拜访时间")
     private Date visitTime;
+    @ApiModelProperty(value = "拜访结果")
+    private String visitResult;    
     
     @ApiModelProperty(value = "是否添加微信:0.未添加,1.已添加")
     private byte isHasWeChat;
