@@ -151,21 +151,6 @@
 			)
 		) tmp ON d.id = tmp.doctorId 
 		
-		<!-- 左连接 drug_user_doctor_quota 表获取指标信息 如:是否添加微信,下次拜访时间 -->
-		LEFT JOIN drug_user_doctor_quota q
-  		ON q.drug_user_id IN 
-	  		<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
-	   			#{virtualDrugUserId}
-	  		</foreach>
-		AND q.doctor_id=d.id
-		
-		<if test="doctorIds != null">
-			WHERE d.id IN 
-			<foreach collection="doctorIds" item="doctorId" open="(" close=")" separator=",">
-	   			#{doctorId}
-	  		</foreach>
-		</if>
-		
 		ORDER BY visitTime DESC
 		
   		<!-- OTHER ORDER BY TODO  -->

@@ -35,13 +35,13 @@ public class CustomerFollowListBean implements Serializable {
     private String callStatusName;
     @ApiModelProperty(value = "上次电话拜访时间")
     private Date visitTime;
+    @ApiModelProperty(value = "距离上次拜访时间间隔,单位:分钟. -1表示未拜访")
+    private long lastVisitTimeInterval;
     @ApiModelProperty(value = "拜访结果")
     private String visitResult;    
     
     @ApiModelProperty(value = "是否添加微信:0.未添加,1.已添加")
     private byte isHasWeChat;
-    @ApiModelProperty(value = "距离上次拜访时间间隔,单位:分钟. -1表示未拜访")
-    private long lastVisitTimeInterval;
     @ApiModelProperty(value = "下次拜访时间")
     private Date nextVisitTime;
    
