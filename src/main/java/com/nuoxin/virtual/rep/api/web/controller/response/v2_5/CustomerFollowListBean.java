@@ -1,4 +1,4 @@
-package com.nuoxin.virtual.rep.api.web.controller.response.doctor;
+package com.nuoxin.virtual.rep.api.web.controller.response.v2_5;
 
 import java.io.Serializable;
 import java.util.Date;

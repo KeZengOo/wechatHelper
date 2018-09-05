@@ -5,8 +5,8 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
 import com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.doctor.CustomerFollowListBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpDynamicRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CustomerFollowListBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.work.CustomerSumResponseBean;
 
 /**

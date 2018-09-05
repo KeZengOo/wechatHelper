@@ -1,5 +1,6 @@
 package com.nuoxin.virtual.rep.api.service.v2_5.impl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -17,12 +18,12 @@ import com.nuoxin.virtual.rep.api.mybatis.ProductLineMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.CustomerFollowUpService;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.CustomerFollowListRequestBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.doctor.CustomerFollowListBean;
-
-import shaded.org.apache.commons.lang3.StringUtils;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CustomerFollowListBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.TableHeader;
 
 @Service
 public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
+	private static List<TableHeader> tableHeaders = new ArrayList<>(15);
 	
 	@Resource
 	private DrugUserMapper drugUserMapper;
@@ -32,7 +33,22 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	private DrugUserDoctorMapper drugUserDoctorMapper;
 	@Resource
 	private DoctorMapper doctorMapper;
+	
+	static {
+		TableHeader header = new TableHeader();
+		header.setLabel("客户姓名");
+		header.setName("doctorName");
 
+		TableHeader header2 = new TableHeader();
+		header2.setLabel("手机号");
+		header2.setName("doctorMobile");
+
+		tableHeaders.add(header);
+		tableHeaders.add(header2);
+		
+		// TODO 补全
+	}
+	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public PageResponseBean<List<CustomerFollowListBean>> list(CustomerFollowListRequestBean request) {
@@ -51,7 +67,8 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 			count = 0;
 			pageResponseBean = new PageResponseBean(request, count, Collections.emptyList());
 		}
-
+		pageResponseBean.setTableHeaders(tableHeaders);
+		
 		return pageResponseBean;
 	}
 	
@@ -74,7 +91,8 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 			int count = 0;
 			pageResponseBean = new PageResponseBean(request, count, Collections.emptyList());
 		}
-
+		pageResponseBean.setTableHeaders(tableHeaders);
+		
 		return pageResponseBean;
 	}
 	
@@ -92,6 +110,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 			int count = 0;
 			pageResponseBean = new PageResponseBean(request, count, Collections.emptyList());
 		}
+		pageResponseBean.setTableHeaders(tableHeaders);
 		
 		return pageResponseBean;
 	}
@@ -136,6 +155,8 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 						doctor.setLastVisitTimeInterval(-1);
 					}
 				});
+				
+				// TODO 补全其它信息,如:产品相关信息,自定义信息
 			}
 		}
 		

@@ -4,7 +4,8 @@ import java.util.List;
 
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.CustomerFollowListRequestBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.doctor.CustomerFollowListBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CustomerFollowListBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.TableHeader;
 
 /**
  * @author xiekaiyu

@@ -101,7 +101,7 @@
   		) temp ON  d.id=temp.doctor_id
 	</select>
 	
-	<select id="getDoctors" resultType="com.nuoxin.virtual.rep.api.web.controller.response.doctor.CustomerFollowListBean">
+	<select id="getDoctors" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CustomerFollowListBean">
 		<!-- 根据 virtualDrugUserIds 获取对应医生基本信息 -->
 		SELECT 
 			d.id AS doctorId, d.name AS doctorName, d.telephone AS doctorMobile, 

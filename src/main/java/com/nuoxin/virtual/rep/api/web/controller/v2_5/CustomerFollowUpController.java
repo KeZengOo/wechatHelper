@@ -20,8 +20,8 @@ import com.nuoxin.virtual.rep.api.service.v2_5.DrugUserService;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.CustomerFollowListRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.doctor.CustomerFollowListBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.product.ProductResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CustomerFollowListBean;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
