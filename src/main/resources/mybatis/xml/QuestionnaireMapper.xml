@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.QuestionnaireMapper">
+	
+	<!-- 获取问卷标题 -->
+	<select id="getTitle" resultType="java.lang.String">
+		SELECT title FROM virtual_questionnaire WHERE id=#{id} AND del_flag = 0
+		<if test="productId != null">
+			AND product_id = #{productId}
+		</if>
+	</select>
+	
+	<!-- 获取最近一次做题记录 -->
+	<select id="getLastQuestionnaireRecord" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VirtualQuestionnaireRecordResponse">
+		SELECT 
+			vq.id,vq.title,vq.options,vq.type,
+			vdq.answer 
+		FROM virtual_doctor_questionnaire vdq 
+		JOIN virtual_question vq 
+			ON vdq.virtual_question_id=vq.id 
+			AND vq.del_flag=0
+		WHERE vdq.call_id IN(
+			SELECT 
+				max(call_id) 
+			FROM virtual_doctor_questionnaire 
+			WHERE 
+				virtual_drug_user_id = #{virtualDrugUserId} 
+				AND virtual_doctor_id=#{virtualDoctorId}
+				AND virtual_questionnaire_id=#{virtualQuestionnaireId}
+		)
+	</select>
+	
+	<!-- 保存问卷作答 -->	
+	<insert id="saveQuestionnaire">
+		INSERT INTO virtual_doctor_questionnaire
+		 (virtual_doctor_id, virtual_drug_user_id, virtual_questionnaire_id, call_id, virtual_question_id, answer, create_time)
+		VALUES 
+		<foreach collection ="questions" item="question" separator =",">
+        	(#{virtualDoctorId}, #{virtualDrugUserId}, #{virtualQuestionnaireId}, #{callId}, #{question.virtualQuestionId}, #{question.answer}, NOW())
+    	</foreach >
+	</insert> 
+	
+</mapper>

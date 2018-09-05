@@ -14,10 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
-import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.util.mem.SessionMemUtils;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
-import com.nuoxin.virtual.rep.api.service.SercurityService;
 import com.nuoxin.virtual.rep.api.service.v2_5.CustomerFollowUpService;
 import com.nuoxin.virtual.rep.api.service.v2_5.DrugUserService;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
@@ -37,10 +35,8 @@ import shaded.org.apache.commons.lang3.StringUtils;
 @Api(value = "客户跟进首页相关接口")
 @RequestMapping(value = "/customer/followup/index")
 @RestController
-public class CustomerFollowUpController {
+public class CustomerFollowUpController extends BaseController {
 	
-	@Resource
-	private SercurityService sercurityService;
 	@Resource
 	private SessionMemUtils memUtils;
 	@Resource(name="drugUserServiceImpl")
@@ -51,7 +47,6 @@ public class CustomerFollowUpController {
 	@SuppressWarnings("unchecked")
 	@ApiOperation(value = "列表", notes = "列表")
 	@RequestMapping(value = "/list", method = { RequestMethod.POST })
-	@ResponseBody
 	public DefaultResponseBean<PageResponseBean<List<CustomerFollowListBean>>> list(HttpServletRequest request,
 			@RequestBody CustomerFollowListRequestBean indexRequest) {
 		DrugUser user = this.getDrugUser(request);
@@ -73,7 +68,6 @@ public class CustomerFollowUpController {
 	@SuppressWarnings("unchecked")
 	@ApiOperation(value = "搜索接口", notes = "搜索接口")
 	@RequestMapping(value = "/search", method = { RequestMethod.POST })
-	@ResponseBody
 	public DefaultResponseBean<PageResponseBean<List<CustomerFollowListBean>>> search(
 			@RequestBody CustomerFollowListRequestBean indexRequest, HttpServletRequest request) {
 		DrugUser user = this.getDrugUser(request);
@@ -99,7 +93,6 @@ public class CustomerFollowUpController {
 	@SuppressWarnings("unchecked")
 	@ApiOperation(value = "筛选接口", notes = "筛选接口")
 	@RequestMapping(value = "/screen", method = { RequestMethod.POST })
-	@ResponseBody
 	public DefaultResponseBean<PageResponseBean<List<CustomerFollowListBean>>> screen(
 			@RequestBody CustomerFollowListRequestBean indexRequest, HttpServletRequest request) {
 		DrugUser user = this.getDrugUser(request);
@@ -128,7 +121,6 @@ public class CustomerFollowUpController {
 	
 	@ApiOperation(value = "更多筛选接口", notes = "更多筛选接口")
 	@RequestMapping(value = "/search/more", method = { RequestMethod.POST })
-	@ResponseBody
 	public ResponseEntity<DefaultResponseBean<Boolean>> searchMore(@RequestBody Object object) {
 		// TODO
 		return null;
@@ -139,7 +131,6 @@ public class CustomerFollowUpController {
 	@SuppressWarnings("unchecked")
 	@ApiOperation(value = "根据 leaderPath 获取所有下属医药代表信息", notes = "根据 leaderPath 获取所有下属医药代表信息")
 	@RequestMapping(value = "/drug_users/get", method = { RequestMethod.GET })
-	@ResponseBody
 	public DefaultResponseBean<List<DrugUserResponseBean>> getSubordinates(HttpServletRequest request) {
 		DrugUser user = this.getDrugUser(request);
 		if(user == null) {
@@ -155,7 +146,6 @@ public class CustomerFollowUpController {
 	@SuppressWarnings("unchecked")
 	@ApiOperation(value = "根据 leaderPath 获取所有产品线信息", notes = "根据 leaderPath 获取所有产品线信息")
 	@RequestMapping(value = "/product_lines/get", method = { RequestMethod.GET })
-	@ResponseBody
 	public DefaultResponseBean<List<ProductResponseBean>> getAllProductLines(HttpServletRequest request) {
 		DrugUser user = this.getDrugUser(request);
 		if(user == null) {
@@ -165,37 +155,6 @@ public class CustomerFollowUpController {
 		DefaultResponseBean<List<ProductResponseBean>> responseBean = new DefaultResponseBean<>();
 		List<ProductResponseBean> list = drugUserService.getProductsByDrugUserId(user.getLeaderPath());
 		responseBean.setData(list);
-		return responseBean;
-	}
-	
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	/**
-	 * 从会话变量中获取 DrugUser 信息 
-	 * @param request
-	 * @return 成功返回 DrugUser 对象,否则返回 null
-	 */
-	private DrugUser getDrugUser(HttpServletRequest request) {
-		return sercurityService.getDrugUser(request);
-	}
-	
-	@SuppressWarnings("rawtypes")
-	private DefaultResponseBean getLoginErrorResponse() {
-		DefaultResponseBean responseBean = new DefaultResponseBean<>();
-		ErrorEnum loginError = ErrorEnum.LOGIN_NO;
-		responseBean.setCode(loginError.getStatus());
-		responseBean.setMessage(loginError.getMessage());
-		responseBean.setDescription(loginError.getMessage());
-		return responseBean;
-	}
-	
-	@SuppressWarnings("rawtypes")
-	private DefaultResponseBean getParamsErrorResponse(String msg) {
-		DefaultResponseBean responseBean = new DefaultResponseBean<>();
-		ErrorEnum loginError = ErrorEnum.SYSTEM_REQUEST_PARAM_ERROR;
-		responseBean.setCode(loginError.getStatus());
-		responseBean.setMessage(msg);
-		responseBean.setDescription(msg);
 		return responseBean;
 	}
 
