@@ -2,30 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorMapper">
 
-	<select id="screen" resultType="java.lang.Long">
-		SELECT 
-			doctor_id 
-		FROM 
-			drug_user_doctor 
-		WHERE
-		    1=1
-		    <if test="productLineIds != null">
-	            AND prod_id IN 
-				<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
-                  #{productLineId}
-  				</foreach> 
-			</if>
-			
-			<if test="virtualDrugUserIds !=null">
-			    AND drug_user_id IN  
-				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
-                    #{virtualDrugUserId}
-  				</foreach> 
-			</if>
-	</select>
-	
 	<!-- 以下是 v2.5 用到 -->
-	
 	<select id="getDoctorIdsByVirtualDrugUserIds"  resultType="java.lang.Long">
 		SELECT 
 			DISTINCT doctor_id 
@@ -58,6 +35,28 @@
 			d.name LIKE "%"#{search,jdbcType=VARCHAR}"%" 
 			OR d.telephone=#{search,jdbcType=VARCHAR} 
 			OR d.depart=#{search,jdbcType=VARCHAR}
+	</select>
+	
+	<select id="screen" resultType="java.lang.Long">
+		SELECT 
+			doctor_id 
+		FROM 
+			drug_user_doctor 
+		WHERE
+		    1=1
+		    <if test="productLineIds != null">
+	            AND prod_id IN 
+				<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+                  #{productLineId}
+  				</foreach> 
+			</if>
+			
+			<if test="virtualDrugUserIds !=null">
+			    AND drug_user_id IN  
+				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+                    #{virtualDrugUserId}
+  				</foreach> 
+			</if>
 	</select>
 	
 </mapper>

@@ -84,87 +84,91 @@
 
 	<!-- 以下是虚拟工作台 v2.5 后用到的 -->
 	
+	<!-- 计算 virtualDrugUserIds 对应医生总数 -->
 	<select id="getDoctorsCount" resultType="java.lang.Integer">
 		SELECT 
-			count(*)
-		FROM doctor d LEFT JOIN (
-			SELECT 
-				virtual_doctor_id AS doctorId,status_name AS callStatusName,create_time AS visitTime 
-			FROM 
-				virtual_doctor_call_info 
-			WHERE id IN (
-				SELECT 
-					max(id) 
-				FROM 
-					virtual_doctor_call_info v 
-				WHERE 
-					v.virtual_doctor_id IN 
-					<foreach collection="doctorIds" item="doctorId" open="(" close=")" separator=",">
-   						#{doctorId}
-  					</foreach>  
-					AND v.virtual_drug_user_id IN 
-					<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
-   						#{virtualDrugUserId}
-  					</foreach>
-				GROUP BY virtual_doctor_id
-			)
-		) tmp
-		ON d.id = tmp.doctorId 
-		WHERE d.id IN  
-		<foreach collection="doctorIds" item="doctorId" open="(" close=")" separator=",">
-   			#{doctorId}
-  		</foreach>  
+			count(d.id)
+		FROM doctor d 
+		JOIN (
+			<!-- 根据 virtualDrugUserIds 获取对应的 doctorIds -->
+	  		SELECT 
+				DISTINCT doctor_id 
+			FROM drug_user_doctor 
+			WHERE is_available=1 AND drug_user_id IN
+			<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+	   			#{virtualDrugUserId}
+	  		</foreach> 
+  		) temp ON  d.id=temp.doctor_id
 	</select>
 	
 	<select id="getDoctors" resultType="com.nuoxin.virtual.rep.api.web.controller.response.doctor.CustomerFollowListBean">
+		<!-- 根据 virtualDrugUserIds 获取对应医生基本信息 -->
 		SELECT 
-			d.id AS doctorId, d.name AS doctorName, d.telephone AS doctorMobile, d. sex AS gender, d.depart AS department, d.hospital_name AS hospitalName, 
+			d.id AS doctorId, d.name AS doctorName, d.telephone AS doctorMobile, 
+			d. sex AS gender, d.depart AS department, d.hospital_name AS hospitalName, 
 			tmp.visitTime, tmp.callStatusName,
 			q.is_has_wechat AS isHasWeChat,q.next_visit_time AS nextVisitTime
 		FROM doctor d 
 		
+		<!-- doctorIds 为 null 意味着直接根据virtualDrugUserIds 查询 -->
+		<if test="doctorIds == null">
+			JOIN (
+				<!-- 根据 virtualDrugUserIds 获取对应的 doctorIds -->
+		  		SELECT 
+					DISTINCT doctor_id 
+				FROM drug_user_doctor 
+				WHERE is_available=1 AND drug_user_id IN
+				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+		   			#{virtualDrugUserId}
+		  		</foreach> 
+	  		) temp  ON  d.id=temp.doctor_id
+		</if>
+		
+		<!-- 左连接 virtual_doctor_call_info 表获取电话拜访信息 -->
 		LEFT JOIN (
 			SELECT 
 				virtual_doctor_id AS doctorId,status_name AS callStatusName,create_time AS visitTime 
 			FROM 
 				virtual_doctor_call_info 
 			WHERE id IN (
+				<!-- 按 virtual_doctor_id 分组, virtual_doctor_call_info.id 最大的即为最新的拜访 -->
 				SELECT 
 					max(id) 
 				FROM 
 					virtual_doctor_call_info v 
 				WHERE 
-					v.virtual_doctor_id IN 
-					<foreach collection="doctorIds" item="doctorId" open="(" close=")" separator=",">
-   						#{doctorId}
-  					</foreach>  
-					AND v.virtual_drug_user_id IN 
+					 v.virtual_drug_user_id IN 
 					<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
    						#{virtualDrugUserId}
   					</foreach>
+  					<if test="doctorIds != null">
+  						AND virtual_doctor_id iN 
+  						<foreach collection="doctorIds" item="doctorId" open="(" close=")" separator=",">
+				   			#{doctorId}
+				  		</foreach>
+  					</if>
 				GROUP BY virtual_doctor_id
 			)
-		) tmp
-		ON d.id = tmp.doctorId 
+		) tmp ON d.id = tmp.doctorId 
 		
+		<!-- 左连接 drug_user_doctor_quota 表获取指标信息 如:是否添加微信,下次拜访时间 -->
 		LEFT JOIN drug_user_doctor_quota q
-		ON q.doctor_id IN 
-			<foreach collection="doctorIds" item="doctorId" open="(" close=")" separator=",">
-	   			#{doctorId}
-	  		</foreach>  
-  		AND q.drug_user_id IN 
+  		ON q.drug_user_id IN 
 	  		<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
 	   			#{virtualDrugUserId}
 	  		</foreach>
 		AND q.doctor_id=d.id
 		
-		WHERE d.id IN  
-		<foreach collection="doctorIds" item="doctorId" open="(" close=")" separator=",">
-   			#{doctorId}
-  		</foreach>  
+		<if test="doctorIds != null">
+			WHERE d.id IN 
+			<foreach collection="doctorIds" item="doctorId" open="(" close=")" separator=",">
+	   			#{doctorId}
+	  		</foreach>
+		</if>
+		
 		ORDER BY visitTime DESC
 		
-  		<!-- ORDER BY TODO  -->
+  		<!-- OTHER ORDER BY TODO  -->
   		
 		LIMIT #{currentSize},#{pageSize}
 	</select>
