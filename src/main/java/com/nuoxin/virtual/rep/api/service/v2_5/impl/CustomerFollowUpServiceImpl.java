@@ -1,6 +1,7 @@
 package com.nuoxin.virtual.rep.api.service.v2_5.impl;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -126,11 +127,13 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 					pageRequestBean.getPageSize());
 			if (CollectionsUtil.isNotEmptyList(list)) {
 				list.forEach(doctor -> {
-					String visitTime = doctor.getVisitTime();
-					if (StringUtils.isNotBlank(visitTime)) {
-						visitTime = visitTime.replace(".0", "");
-						doctor.setVisitTime(visitTime);
-						doctor.setDoctorId("H".concat(doctor.getDoctorId()));
+					Date visitTime = doctor.getVisitTime();
+					if (visitTime != null) {
+						long lastVisitTimeInterval = System.currentTimeMillis() - visitTime.getTime();
+						lastVisitTimeInterval = lastVisitTimeInterval / 60000;
+						doctor.setLastVisitTimeInterval(lastVisitTimeInterval);
+					} else {
+						doctor.setLastVisitTimeInterval(-1);
 					}
 				});
 			}

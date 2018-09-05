@@ -1,6 +1,7 @@
 package com.nuoxin.virtual.rep.api.web.controller.response.doctor;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -32,12 +33,14 @@ public class CustomerFollowListBean implements Serializable {
     
     @ApiModelProperty(value = "打电话状态")
     private String callStatusName;
-    @ApiModelProperty(value = "拜访时间")
-    private String visitTime;
-    @ApiModelProperty(value = "下次拜访时间")
-    private String nextVisitTime;
+    @ApiModelProperty(value = "上次拜访时间")
+    private Date visitTime;
     
     @ApiModelProperty(value = "是否添加微信:0.未添加,1.已添加")
     private byte isHasWeChat;
+    @ApiModelProperty(value = "距离上次拜访时间间隔,单位:分钟. -1表示未拜访")
+    private long lastVisitTimeInterval;
+    @ApiModelProperty(value = "下次拜访时间")
+    private Date nextVisitTime;
    
 }
