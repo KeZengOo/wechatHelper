@@ -124,7 +124,7 @@
 		</if>
 		
 		<!-- 左连接 virtual_doctor_call_info 表获取电话拜访信息 -->
-		LEFT JOIN (
+		JOIN (
 			SELECT 
 				id AS callId, virtual_doctor_id AS doctorId, create_time AS visitTime 
 			FROM 

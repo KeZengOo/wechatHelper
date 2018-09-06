@@ -1,4 +1,4 @@
-package com.nuoxin.virtual.rep.api.web.controller.request.v2_5;
+package com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup;
 
 import java.util.List;
 
@@ -16,7 +16,7 @@ import lombok.EqualsAndHashCode;
 @ApiModel
 @EqualsAndHashCode(callSuper=false)
 @Data
-public class CustomerFollowListRequestBean extends PageRequestBean {
+public class ScreenRequestBean extends PageRequestBean {
 
 	private static final long serialVersionUID = 8545014227620171255L;
 	
@@ -25,25 +25,10 @@ public class CustomerFollowListRequestBean extends PageRequestBean {
 	 */
 	@ApiModelProperty(value="虚拟代表ids")
 	private List<Long> virtualDrugUserIds;
-	
 	/**
 	 * 产品线 id
 	 */
 	@ApiModelProperty(value="产品线ids")
 	private List<Integer> productLineIds;
-	
-	/**
-	 * 虚拟代表 id
-	 */
-	@ApiModelProperty(value="虚拟代表id")
-	private Long virtualDrugUserId;
-	
-	/**
-	 * 搜索值
-	 */
-	@ApiModelProperty(value="搜索值")
-	private String search;
-	
-	private String leaderPath;
 	
 }

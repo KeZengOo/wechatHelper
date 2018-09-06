@@ -18,7 +18,9 @@ import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.v2_5.CustomerFollowUpService;
 import com.nuoxin.virtual.rep.api.service.v2_5.DrugUserService;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
-import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.CustomerFollowListRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.ListRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.ScreenRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.SearchRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.product.ProductResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CustomerFollowListBean;
@@ -47,17 +49,14 @@ public class CustomerFollowUpController extends BaseController {
 	@ApiOperation(value = "列表", notes = "列表")
 	@RequestMapping(value = "/list", method = { RequestMethod.POST })
 	public DefaultResponseBean<PageResponseBean<List<CustomerFollowListBean>>> list(HttpServletRequest request,
-			@RequestBody CustomerFollowListRequestBean indexRequest) {
+			@RequestBody ListRequestBean indexRequest) {
 		DrugUser user = this.getDrugUser(request);
 		if(user == null) {
 			return this.getLoginErrorResponse();
 		} 
 		
-		indexRequest.setVirtualDrugUserId(user.getId());
-		indexRequest.setLeaderPath(user.getLeaderPath());
-		
 		DefaultResponseBean<PageResponseBean<List<CustomerFollowListBean>>> responseBean = new DefaultResponseBean<>();
-		PageResponseBean<List<CustomerFollowListBean>> pageResponse = customerFollowService.list(indexRequest);
+		PageResponseBean<List<CustomerFollowListBean>> pageResponse = customerFollowService.list(indexRequest, user.getLeaderPath());
 		responseBean.setData(pageResponse);
 		
 		return responseBean;
@@ -67,23 +66,19 @@ public class CustomerFollowUpController extends BaseController {
 	@ApiOperation(value = "搜索接口", notes = "搜索接口")
 	@RequestMapping(value = "/search", method = { RequestMethod.POST })
 	public DefaultResponseBean<PageResponseBean<List<CustomerFollowListBean>>> search(
-			@RequestBody CustomerFollowListRequestBean indexRequest, HttpServletRequest request) {
+			@RequestBody SearchRequestBean searchRequest, HttpServletRequest request) {
 		DrugUser user = this.getDrugUser(request);
 		if(user == null) {
 			return this.getLoginErrorResponse();
 		} 
 		
-		String search = indexRequest.getSearch();
+		String search = searchRequest.getSearch();
 		if (StringUtils.isBlank(search)) {
 			return this.getParamsErrorResponse("search is null");
 		}
 		
-		indexRequest.setSearch(search);
-		indexRequest.setVirtualDrugUserId(user.getId());
-		indexRequest.setLeaderPath(user.getLeaderPath());
-		
 		DefaultResponseBean<PageResponseBean<List<CustomerFollowListBean>>> responseBean = new DefaultResponseBean<>();
-		PageResponseBean<List<CustomerFollowListBean>> pageResponse = customerFollowService.search(indexRequest);
+		PageResponseBean<List<CustomerFollowListBean>> pageResponse = customerFollowService.search(searchRequest,user.getLeaderPath());
 		responseBean.setData(pageResponse);
 		return responseBean;
 	}
@@ -92,27 +87,25 @@ public class CustomerFollowUpController extends BaseController {
 	@ApiOperation(value = "筛选接口", notes = "筛选接口")
 	@RequestMapping(value = "/screen", method = { RequestMethod.POST })
 	public DefaultResponseBean<PageResponseBean<List<CustomerFollowListBean>>> screen(
-			@RequestBody CustomerFollowListRequestBean indexRequest, HttpServletRequest request) {
+			@RequestBody ScreenRequestBean screenRequest, HttpServletRequest request) {
 		DrugUser user = this.getDrugUser(request);
 		if(user == null) {
 			return this.getLoginErrorResponse();
 		} 
 		
-		List<Long> virtualDrugUserIds = indexRequest.getVirtualDrugUserIds();
+		List<Long> virtualDrugUserIds = screenRequest.getVirtualDrugUserIds();
 		if (CollectionsUtil.isEmptyList(virtualDrugUserIds)) {
 			return this.getParamsErrorResponse("virtualDrugUserIds is null");
 		}
 		
-		List<Integer> productLineIds = indexRequest.getProductLineIds();
+		List<Integer> productLineIds = screenRequest.getProductLineIds();
 		if (CollectionsUtil.isEmptyList(productLineIds)) {
 			return this.getParamsErrorResponse("productLineIds is null");
 		}
 		
-		indexRequest.setVirtualDrugUserId(user.getId());
-		indexRequest.setLeaderPath(user.getLeaderPath());
 		
 		DefaultResponseBean<PageResponseBean<List<CustomerFollowListBean>>> responseBean = new DefaultResponseBean<>();
-		PageResponseBean<List<CustomerFollowListBean>> pageResponse = customerFollowService.screen(indexRequest);
+		PageResponseBean<List<CustomerFollowListBean>> pageResponse = customerFollowService.screen(screenRequest);
 		responseBean.setData(pageResponse);
 		return responseBean;
 	}

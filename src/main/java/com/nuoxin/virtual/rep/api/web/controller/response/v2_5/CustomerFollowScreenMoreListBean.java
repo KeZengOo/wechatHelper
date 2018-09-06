@@ -3,7 +3,7 @@ package com.nuoxin.virtual.rep.api.web.controller.response.v2_5;
 import java.io.Serializable;
 
 import com.nuoxin.virtual.rep.api.common.bean.PageRequestBean;
-import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.CustomerFollowListRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.ListRequestBean;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

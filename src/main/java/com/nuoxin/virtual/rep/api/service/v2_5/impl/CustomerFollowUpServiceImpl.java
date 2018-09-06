@@ -17,7 +17,9 @@ import com.nuoxin.virtual.rep.api.mybatis.DrugUserMapper;
 import com.nuoxin.virtual.rep.api.mybatis.ProductLineMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.CustomerFollowUpService;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
-import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.CustomerFollowListRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.ListRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.ScreenRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.SearchRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CustomerFollowListBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.TableHeader;
 
@@ -51,12 +53,12 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public PageResponseBean<List<CustomerFollowListBean>> list(CustomerFollowListRequestBean request) {
+	public PageResponseBean<List<CustomerFollowListBean>> list(ListRequestBean request, String leaderPath) {
 		PageResponseBean pageResponseBean = null;
 		int count = 0;
 		
 		// 获取所有下属(直接&间接) virtualDrugUserIds
-		List<Long> virtualDrugUserIds = this.getSubordinateIds(request.getLeaderPath());
+		List<Long> virtualDrugUserIds = this.getSubordinateIds(leaderPath);
 		if (CollectionsUtil.isNotEmptyList(virtualDrugUserIds)) {
 			count = this.getDoctorsCount(virtualDrugUserIds);
 			pageResponseBean = this.getDoctorsList(count, null, virtualDrugUserIds, request);
@@ -74,11 +76,11 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public PageResponseBean<List<CustomerFollowListBean>> search(CustomerFollowListRequestBean request) {
+	public PageResponseBean<List<CustomerFollowListBean>> search(SearchRequestBean request, String leaderPath) {
 		PageResponseBean pageResponseBean = null;
 		
 		// 获取所有下属(直接&间接) virtualDrugUserIds
-		List<Long> virtualDrugUserIds = this.getSubordinateIds(request.getLeaderPath());
+		List<Long> virtualDrugUserIds = this.getSubordinateIds(leaderPath);
 		if (CollectionsUtil.isNotEmptyList(virtualDrugUserIds)) {
 			// 根据 搜索内容,virtualDrugUserIds 获取对应的 doctorIds
 			List<Long> doctorIds = drugUserDoctorMapper.search(request.getSearch(), virtualDrugUserIds);
@@ -98,7 +100,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public PageResponseBean<List<CustomerFollowListBean>> screen(CustomerFollowListRequestBean request) {
+	public PageResponseBean<List<CustomerFollowListBean>> screen(ScreenRequestBean request) {
 		PageResponseBean pageResponseBean = null;
 		
 		List<Long> doctorIds = drugUserDoctorMapper.screen(request.getVirtualDrugUserIds(), request.getProductLineIds());
