@@ -64,16 +64,11 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 			}
 		} 
 		
-		// 补偿
-		if (pageResponseBean == null) {
-			count = 0;
-			pageResponseBean = new PageResponseBean(request, count, Collections.emptyList());
-		}
-		pageResponseBean.setTableHeaders(tableHeaders);
+		this.compensate(request, pageResponseBean);
 		
 		return pageResponseBean;
 	}
-	
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public PageResponseBean<List<CustomerFollowListBean>> search(SearchRequestBean request, String leaderPath) {
@@ -91,11 +86,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 			}
 		} 
 		
-		if (pageResponseBean == null) {
-			count = 0;
-			pageResponseBean = new PageResponseBean(request, count, Collections.emptyList());
-		}
-		pageResponseBean.setTableHeaders(tableHeaders);
+		this.compensate(request, pageResponseBean);
 		
 		return pageResponseBean;
 	}
@@ -114,11 +105,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 			pageResponseBean = this.getDoctorsList(count, list, request);
 		}
 		
-		if (pageResponseBean == null) {
-			count = 0;
-			pageResponseBean = new PageResponseBean(request, count, Collections.emptyList());
-		}
-		pageResponseBean.setTableHeaders(tableHeaders);
+		this.compensate(request, pageResponseBean);
 		
 		return pageResponseBean;
 	}
@@ -155,6 +142,19 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		}
 
 		return new PageResponseBean(pageRequestBean, count, list);
+	}
+	
+	/**
+	 * 补偿
+	 * @param pageResponseBean
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private void compensate(PageRequestBean request, PageResponseBean pageResponseBean) {
+		if (pageResponseBean == null) {
+			int count = 0;
+			pageResponseBean = new PageResponseBean(request, count, Collections.emptyList());
+		}
+		pageResponseBean.setTableHeaders(tableHeaders);
 	}
 	
 }

@@ -98,6 +98,8 @@
 			<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
 	   			#{virtualDrugUserId}
 	  		</foreach> 
+	  		
+	  		<!-- 根据产品线 ID 筛选 -->
 	  		<if test="productLineIds != null">
 	            AND prod_id IN 
 				<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
@@ -106,6 +108,7 @@
 			</if>
   		) temp ON  d.id=temp.doctor_id
   		
+  		<!-- 搜索 -->
   		<if test="search != null">
   			WHERE 
 			d.name LIKE "%"#{search,jdbcType=VARCHAR}"%" 
@@ -131,6 +134,8 @@
 				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
 		   			#{virtualDrugUserId}
 		  		</foreach> 
+		  	
+		  	<!-- 根据产品线 ID 筛选 -->
 		  	<if test="productLineIds != null">
 	            AND prod_id IN 
 				<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
@@ -138,6 +143,8 @@
   				</foreach> 
 			</if>
 	  	) temp  ON  d.id=temp.doctor_id
+	  	
+	  	<!-- 搜索 -->
 	  	<if test="search != null">
   			AND (
   				d.name LIKE "%"#{search,jdbcType=VARCHAR}"%" 
