@@ -106,8 +106,7 @@
 		SELECT 
 			d.id AS doctorId, d.name AS doctorName, d.telephone AS doctorMobile, 
 			d. sex AS gender, d.depart AS department, d.hospital_name AS hospitalName, 
-			tmp.visitTime, tmp.callStatusName,
-			q.is_has_wechat AS isHasWeChat,q.next_visit_time AS nextVisitTime
+			telVisit.visitTime
 		FROM doctor d 
 		
 		<!-- doctorIds 为 null 意味着直接根据virtualDrugUserIds 查询 -->
@@ -127,7 +126,7 @@
 		<!-- 左连接 virtual_doctor_call_info 表获取电话拜访信息 -->
 		LEFT JOIN (
 			SELECT 
-				virtual_doctor_id AS doctorId,status_name AS callStatusName,create_time AS visitTime 
+				id AS callId, virtual_doctor_id AS doctorId, create_time AS visitTime 
 			FROM 
 				virtual_doctor_call_info 
 			WHERE id IN (
@@ -149,7 +148,7 @@
   					</if>
 				GROUP BY virtual_doctor_id
 			)
-		) tmp ON d.id = tmp.doctorId 
+		) telVisit ON d.id = telVisit.doctorId 
 		
 		ORDER BY visitTime DESC
 		

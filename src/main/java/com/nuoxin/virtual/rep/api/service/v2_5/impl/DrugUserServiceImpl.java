@@ -31,7 +31,7 @@ public class DrugUserServiceImpl implements DrugUserService{
 	@Override
 	public List<DrugUserResponseBean> getSubordinates(String leaderPath) {
 		List<DrugUserResponseBean> list = drugUserMapper.getSubordinatesByLeaderPath(leaderPath);
-		if(CollectionsUtil.isNotEmptyList(list)) {
+		if(CollectionsUtil.isEmptyList(list)) {
 			list = new ArrayList<>(1);
 		}
 		

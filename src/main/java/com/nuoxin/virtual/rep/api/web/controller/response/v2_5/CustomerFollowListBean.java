@@ -31,8 +31,6 @@ public class CustomerFollowListBean implements Serializable {
     @ApiModelProperty(value = "医生所在科室")
     private String department;
     
-    @ApiModelProperty(value = "打电话状态名")
-    private String callStatusName;
     @ApiModelProperty(value = "上次电话拜访时间")
     private Date visitTime;
     @ApiModelProperty(value = "距离上次拜访时间间隔,单位:分钟. -1表示未拜访")
