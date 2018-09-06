@@ -8,7 +8,6 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import com.nuoxin.virtual.rep.api.mybatis.DoctorMapper;
-import com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorMapper;
 import com.nuoxin.virtual.rep.api.mybatis.DrugUserMapper;
 import com.nuoxin.virtual.rep.api.mybatis.ProductLineMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.DrugUserService;
@@ -23,8 +22,6 @@ public class DrugUserServiceImpl implements DrugUserService{
 	private DrugUserMapper drugUserMapper;
 	@Resource
 	private ProductLineMapper productLineMapper;
-	@Resource
-	private DrugUserDoctorMapper drugUserDoctorMapper;
 	@Resource
 	private DoctorMapper doctorMapper;
 

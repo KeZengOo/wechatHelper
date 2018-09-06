@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorQuateMapper">
+
+	<insert id="replaceRelationShipInfo">
+		REPLACE INTO drug_user_doctor_quate 
+		(drug_user_id,doctor_id,product_id, is_has_drug,is_target,is_has_ae)
+		VALUE (#{virtualDrugUserId}, #{doctorId}, #{productLineId}, #{isHasDrug}, #{isTarget}, #{isHasAe})
+	</insert>
+	
+	<insert id="backRelationShipInfo">
+		INSERT INTO drug_user_doctor_quate_log 
+		(drug_user_id,doctor_id,product_id, is_has_drug,is_target,is_has_ae)
+		
+		SELECT drug_user_id,doctor_id,product_id, is_has_drug,is_target,is_has_ae 
+		FROM drug_user_doctor_quate
+		WHERE  
+			drug_user_id = #{virtualDrugUserId} 
+			AND doctor_id =  #{doctorId} 
+			AND product_id = #{productLineId}
+	</insert>		
+</mapper>

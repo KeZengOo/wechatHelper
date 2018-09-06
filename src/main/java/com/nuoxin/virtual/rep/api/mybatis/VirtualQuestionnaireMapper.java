@@ -11,7 +11,7 @@ import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VirtualQuestionna
  * 虚拟代表问卷 Mapper
  * @author xiekaiyu
  */
-public interface QuestionnaireMapper {
+public interface VirtualQuestionnaireMapper {
 
 	/**
 	 * 根据问卷ID, 产品线ID获取问卷标题
