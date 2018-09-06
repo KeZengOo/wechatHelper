@@ -53,8 +53,9 @@ public class VirtualQuestionnaireController extends BaseController {
 		return responseBean;
 	}
 	
+	@Deprecated
 	@SuppressWarnings("unchecked")
-	@ApiOperation(value = "保存问卷作答结果", notes = "保存问卷作答结果")
+	@ApiOperation(value = "保存问卷作答结果(废弃)", notes = "保存问卷作答结果(废弃)")
 	@RequestMapping(value = "/questionnaire_record/save", method = { RequestMethod.POST })
 	public DefaultResponseBean<Integer> saveQuestionnaire(@RequestBody SaveVirtualQuestionnaireRecordRequestBean saveRequest,
 			HttpServletRequest request) {
