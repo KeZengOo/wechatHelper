@@ -60,8 +60,11 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		// 获取所有下属(直接&间接) virtualDrugUserIds
 		List<Long> virtualDrugUserIds = this.getSubordinateIds(leaderPath);
 		if (CollectionsUtil.isNotEmptyList(virtualDrugUserIds)) {
-			count = this.getDoctorsCount(virtualDrugUserIds);
-			pageResponseBean = this.getDoctorsList(count, null, virtualDrugUserIds, request);
+			count = doctorMapper.getListCount(virtualDrugUserIds, null, null);
+			if(count > 0) {
+				List<CustomerFollowListBean> list = doctorMapper.getList(virtualDrugUserIds, request.getCurrentSize(), request.getPageSize(), null, null);
+				pageResponseBean = this.getDoctorsList(count, list, request);
+			}
 		} 
 		
 		// 补偿
@@ -78,19 +81,21 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	@Override
 	public PageResponseBean<List<CustomerFollowListBean>> search(SearchRequestBean request, String leaderPath) {
 		PageResponseBean pageResponseBean = null;
+		int count = 0;
 		
 		// 获取所有下属(直接&间接) virtualDrugUserIds
 		List<Long> virtualDrugUserIds = this.getSubordinateIds(leaderPath);
 		if (CollectionsUtil.isNotEmptyList(virtualDrugUserIds)) {
-			// 根据 搜索内容,virtualDrugUserIds 获取对应的 doctorIds
-			List<Long> doctorIds = drugUserDoctorMapper.search(request.getSearch(), virtualDrugUserIds);
-			if (CollectionsUtil.isNotEmptyList(doctorIds)) {
-				pageResponseBean = this.getDoctorsList(doctorIds.size(), doctorIds, virtualDrugUserIds, request);
+			String search = request.getSearch();
+			count = doctorMapper.getListCount(virtualDrugUserIds, search, null);
+			if(count > 0) {
+				List<CustomerFollowListBean> list = doctorMapper.getList(virtualDrugUserIds, request.getCurrentSize(), request.getPageSize(), search, null);
+				pageResponseBean = this.getDoctorsList(count, list, request);
 			}
 		} 
 		
 		if (pageResponseBean == null) {
-			int count = 0;
+			count = 0;
 			pageResponseBean = new PageResponseBean(request, count, Collections.emptyList());
 		}
 		pageResponseBean.setTableHeaders(tableHeaders);
@@ -103,13 +108,17 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	public PageResponseBean<List<CustomerFollowListBean>> screen(ScreenRequestBean request) {
 		PageResponseBean pageResponseBean = null;
 		
-		List<Long> doctorIds = drugUserDoctorMapper.screen(request.getVirtualDrugUserIds(), request.getProductLineIds());
-		if (CollectionsUtil.isNotEmptyList(doctorIds)) {
-			pageResponseBean = this.getDoctorsList(doctorIds.size(), doctorIds, request.getVirtualDrugUserIds(), request);
-		} 
+		List<Long> virtualDrugUserIds = request.getVirtualDrugUserIds();
+		List<Integer> productLineIds = request.getProductLineIds();
+		int count = doctorMapper.getListCount(virtualDrugUserIds, null, productLineIds);
+		if(count > 0 ) {
+			List<CustomerFollowListBean> list = doctorMapper.getList(virtualDrugUserIds, request.getCurrentSize(),
+					request.getPageSize(), null, productLineIds);
+			pageResponseBean = this.getDoctorsList(count, list, request);
+		}
 		
 		if (pageResponseBean == null) {
-			int count = 0;
+			count = 0;
 			pageResponseBean = new PageResponseBean(request, count, Collections.emptyList());
 		}
 		pageResponseBean.setTableHeaders(tableHeaders);
@@ -128,45 +137,27 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		return drugUserMapper.getSubordinateIdsByLeaderPath(leaderPath);
 	}
 	
-	private int getDoctorsCount(List<Long> virtualDrugUserIds) {
-		return doctorMapper.getDoctorsCount(virtualDrugUserIds);
-	}
-	/**
-	 * 根据 doctorIds,virtualDrugUserIds及分页参数获取列表信息
-	 * @param doctorIds
-	 * @param virtualDrugUserIds
-	 * @param pageRequestBean
-	 * @return PageResponseBean<List<CustomerFollowListBean>>
-	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private PageResponseBean<List<CustomerFollowListBean>> getDoctorsList(int count, List<Long> doctorIds, List<Long> virtualDrugUserIds,
+	private PageResponseBean<List<CustomerFollowListBean>> getDoctorsList(int count, List<CustomerFollowListBean> list,
 			PageRequestBean pageRequestBean) {
-
-		List<CustomerFollowListBean> list = null;
-		if (count > 0) {
-			list = doctorMapper.getDoctors(doctorIds, virtualDrugUserIds, pageRequestBean.getCurrentSize(),
-					pageRequestBean.getPageSize());
-			if (CollectionsUtil.isNotEmptyList(list)) {
-				list.forEach(doctor -> {
-					Date visitTime = doctor.getVisitTime();
-					if (visitTime != null) {
-						long lastVisitTimeInterval = System.currentTimeMillis() - visitTime.getTime();
-						lastVisitTimeInterval = lastVisitTimeInterval / 60000;
-						doctor.setLastVisitTimeInterval(lastVisitTimeInterval);
-					} else {
-						doctor.setLastVisitTimeInterval(-1);
-					}
-				});
-				
-				// TODO 补全其它信息,如:产品相关信息,自定义信息
-			}
+		if (CollectionsUtil.isNotEmptyList(list)) {
+			list.forEach(doctor -> {
+				Date visitTime = doctor.getVisitTime();
+				if (visitTime != null) {
+					long lastVisitTimeInterval = System.currentTimeMillis() - visitTime.getTime();
+					lastVisitTimeInterval = lastVisitTimeInterval / 60000;
+					doctor.setLastVisitTimeInterval(lastVisitTimeInterval);
+				} else {
+					doctor.setLastVisitTimeInterval(-1);
+				}
+			});
 		}
-		
-		if(CollectionsUtil.isEmptyList(list)) {
+
+		if (CollectionsUtil.isEmptyList(list)) {
 			list = Collections.emptyList();
 		}
 
 		return new PageResponseBean(pageRequestBean, count, list);
 	}
-
+	
 }

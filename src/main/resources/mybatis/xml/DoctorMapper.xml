@@ -85,7 +85,7 @@
 	<!-- 以下是虚拟工作台 v2.5 后用到的 -->
 	
 	<!-- 计算 virtualDrugUserIds 对应医生总数 -->
-	<select id="getDoctorsCount" resultType="java.lang.Integer">
+	<select id="getListCount" resultType="java.lang.Integer">
 		SELECT 
 			count(d.id)
 		FROM doctor d 
@@ -98,63 +98,63 @@
 			<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
 	   			#{virtualDrugUserId}
 	  		</foreach> 
+	  		<if test="productLineIds != null">
+	            AND prod_id IN 
+				<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+                  #{productLineId}
+  				</foreach> 
+			</if>
   		) temp ON  d.id=temp.doctor_id
+  		
+  		<if test="search != null">
+  			WHERE 
+			d.name LIKE "%"#{search,jdbcType=VARCHAR}"%" 
+			OR d.telephone=#{search,jdbcType=VARCHAR} 
+			OR d.depart=#{search,jdbcType=VARCHAR}
+  		</if>
+  		
 	</select>
 	
-	<select id="getDoctors" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CustomerFollowListBean">
+	<select id="getList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CustomerFollowListBean">
 		<!-- 根据 virtualDrugUserIds 获取对应医生基本信息 -->
 		SELECT 
 			d.id AS doctorId, d.name AS doctorName, d.telephone AS doctorMobile, 
-			d. sex AS gender, d.depart AS department, d.hospital_name AS hospitalName, 
-			telVisit.visitTime
+			d. sex AS gender, d.depart AS department, d.hospital_name AS hospitalName,
+			tel_visit.create_time AS visitTime
 		FROM doctor d 
-		
-		<!-- doctorIds 为 null 意味着直接根据virtualDrugUserIds 查询 -->
-		<if test="doctorIds == null">
-			JOIN (
-				<!-- 根据 virtualDrugUserIds 获取对应的 doctorIds -->
-		  		SELECT 
-					DISTINCT doctor_id 
-				FROM drug_user_doctor 
-				WHERE is_available=1 AND drug_user_id IN
+		JOIN (
+			<!-- 根据 virtualDrugUserIds 获取对应的 doctorIds -->
+			SELECT 
+				DISTINCT doctor_id 
+			FROM drug_user_doctor 
+			WHERE is_available=1 AND drug_user_id IN
 				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
 		   			#{virtualDrugUserId}
 		  		</foreach> 
-	  		) temp  ON  d.id=temp.doctor_id
-		</if>
+		  	<if test="productLineIds != null">
+	            AND prod_id IN 
+				<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+                  #{productLineId}
+  				</foreach> 
+			</if>
+	  	) temp  ON  d.id=temp.doctor_id
+	  	<if test="search != null">
+  			AND (
+  				d.name LIKE "%"#{search,jdbcType=VARCHAR}"%" 
+				OR d.telephone=#{search,jdbcType=VARCHAR} 
+				OR d.depart=#{search,jdbcType=VARCHAR}
+			)
+  		</if>
 		
 		<!-- 左连接 virtual_doctor_call_info 表获取电话拜访信息 -->
-		JOIN (
-			SELECT 
-				id AS callId, virtual_doctor_id AS doctorId, create_time AS visitTime 
-			FROM 
-				virtual_doctor_call_info 
-			WHERE id IN (
-				<!-- 按 virtual_doctor_id 分组, virtual_doctor_call_info.id 最大的即为最新的拜访 -->
-				SELECT 
-					max(id) 
-				FROM 
-					virtual_doctor_call_info v 
-				WHERE 
-					 v.virtual_drug_user_id IN 
-					<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
-   						#{virtualDrugUserId}
-  					</foreach>
-  					<if test="doctorIds != null">
-  						AND virtual_doctor_id iN 
-  						<foreach collection="doctorIds" item="doctorId" open="(" close=")" separator=",">
-				   			#{doctorId}
-				  		</foreach>
-  					</if>
-				GROUP BY virtual_doctor_id
-			)
-		) telVisit ON d.id = telVisit.doctorId 
+		LEFT JOIN (
+			SELECT virtual_doctor_id,create_time FROM virtual_doctor_call_info WHERE id IN (
+				SELECT MAX(id) FROM virtual_doctor_call_info GROUP BY virtual_doctor_id
+			) 
+		) tel_visit ON tel_visit.virtual_doctor_id=d.id
 		
-		ORDER BY visitTime DESC
-		
-  		<!-- OTHER ORDER BY TODO  -->
-  		
+		GROUP BY d.id
+		ORDER BY visitTime DESC <!-- OTHER ORDER BY TODO  -->
 		LIMIT #{currentSize},#{pageSize}
 	</select>
-
 </mapper>

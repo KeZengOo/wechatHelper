@@ -46,11 +46,16 @@ public interface DoctorMapper{
     void updateFixedDepart(HcpDynamicRequestBean bean);
 
     void updateFixedHospital(HcpDynamicRequestBean bean);
-
-	int getDoctorsCount(@Param(value = "virtualDrugUserIds") List<Long> virtualDrugUserIds);
     
-    List<CustomerFollowListBean> getDoctors(@Param(value = "doctorIds") List<Long> doctorIds,
-    		@Param(value = "virtualDrugUserIds") List<Long> virtualDrugUserIds,
-    		@Param(value = "currentSize")int currentSize, 
-    		@Param(value = "pageSize")int pageSize);
+    ////// 以下是 v2.5 使用到的
+
+    int getListCount(@Param(value = "virtualDrugUserIds") List<Long> virtualDrugUserIds,
+    		                  @Param(value = "search")  String search,
+    		                  @Param(value = "productLineIds") List<Integer> productLineIds);
+    
+    List<CustomerFollowListBean> getList(@Param(value = "virtualDrugUserIds") List<Long> virtualDrugUserIds,
+    		                                                    @Param(value = "currentSize")int currentSize, 
+    		                                                    @Param(value = "pageSize")int pageSize, 
+    		                                                    @Param(value = "search")String search,
+    		                                                    @Param(value = "productLineIds") List<Integer> productLineIds);
 }
