@@ -33,14 +33,14 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorlCallInfoS
 	@Transactional(value = TxType.REQUIRED, rollbackOn = Exception.class)
 	@Override
 	public boolean saveCallInfo(SaveCallInfoRequest saveRequest) {
+		this.updateRelationShip(saveRequest);
+
 		long callId = this.doSaveCallInfo(saveRequest);
 		int effectNum = 0;
 		if (callId > 0) {
 			effectNum = this.doSaveVirtualQuestionnaireRecord(saveRequest, callId);
 		}
 		
-		this.updateRelationShip(saveRequest);
-
 		if (effectNum > 0) {
 			return true;
 		}
