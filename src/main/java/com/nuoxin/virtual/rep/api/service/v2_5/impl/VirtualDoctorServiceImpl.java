@@ -37,23 +37,6 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService{
 	private DrugUserDoctorQuateMapper drugUserDoctorQuateMapper;
 	
 	@Override
-	public VirtualDoctorBasicResponse getVirtualDoctorBasic(Long virtualDoctorId) {
-		VirtualDoctorBasicResponse virtualDoctorBasic = new VirtualDoctorBasicResponse();
-		VirtualDoctorDO virtualDoctorDO = virtualDoctorMapper.getVirtualDoctor(virtualDoctorId);
-		
-		HospitalProvinceBean hospitalBean = null;
-		if (virtualDoctorDO != null) {
-			String hospitalName = virtualDoctorDO.getHospitalName();
-			hospitalBean = hospitalMapper.getHospital(hospitalName);
-		}
-		
-		virtualDoctorBasic.setVirtualDoctor(virtualDoctorDO);
-		virtualDoctorBasic.setHospital(hospitalBean);
-		
-		return virtualDoctorBasic;
-	}
-
-	@Override
 	@Transactional(value = TxType.REQUIRED, rollbackOn = Exception.class)
 	public boolean saveVirtualDoctor(SaveVirtualDoctorRequest request, DrugUser user) {
 		int hospitalId = this.getHospiTalId(request);
@@ -69,6 +52,22 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService{
 		}
 		
 		return false;
+	}
+	
+	@Override
+	public VirtualDoctorBasicResponse getVirtualDoctorBasic(Long virtualDoctorId) {
+		HospitalProvinceBean hospitalBean = null;
+		VirtualDoctorDO virtualDoctorDO = virtualDoctorMapper.getVirtualDoctor(virtualDoctorId);
+		if (virtualDoctorDO != null) {
+			String hospitalName = virtualDoctorDO.getHospitalName();
+			hospitalBean = hospitalMapper.getHospital(hospitalName);
+		}
+		
+		VirtualDoctorBasicResponse virtualDoctorBasic = new VirtualDoctorBasicResponse();
+		virtualDoctorBasic.setVirtualDoctor(virtualDoctorDO);
+		virtualDoctorBasic.setHospital(hospitalBean);
+		
+		return virtualDoctorBasic;
 	}
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -126,6 +125,11 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService{
 		return params.get(0).getId();
 	}
 	
+	/**
+	 * 保存客户医生扩展信息
+	 * @param request
+	 * @param virtualDoctorId
+	 */
 	private void saveVirtualDoctorMend(SaveVirtualDoctorRequest request, long virtualDoctorId) {
 		List<VirtualDoctorMendParams> list = new ArrayList<>(1);
 		
