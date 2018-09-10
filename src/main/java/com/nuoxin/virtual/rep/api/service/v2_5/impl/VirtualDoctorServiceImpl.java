@@ -13,22 +13,45 @@ import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorParams;
 import com.nuoxin.virtual.rep.api.entity.v2_5.HospitalProvinceBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.UpdateVirtualDrugUserDoctorRelationship;
+import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorBasicResponse;
+import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorDO;
+import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorMendParams;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorParams;
 import com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorMapper;
 import com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorQuateMapper;
+import com.nuoxin.virtual.rep.api.mybatis.HospitalMapper;
 import com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualDoctorService;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.SaveVirtualDoctorRequest;
 
 @Service
 public class VirtualDoctorServiceImpl implements VirtualDoctorService{
-
+	
+	@Resource
+	private HospitalMapper hospitalMapper;
 	@Resource
 	private VirtualDoctorMapper virtualDoctorMapper;
 	@Resource
 	private DrugUserDoctorMapper drugUserDoctorMapper;
 	@Resource
 	private DrugUserDoctorQuateMapper drugUserDoctorQuateMapper;
+	
+	@Override
+	public VirtualDoctorBasicResponse getVirtualDoctorBasic(Long virtualDoctorId) {
+		VirtualDoctorBasicResponse virtualDoctorBasic = new VirtualDoctorBasicResponse();
+		VirtualDoctorDO virtualDoctorDO = virtualDoctorMapper.getVirtualDoctor(virtualDoctorId);
+		
+		HospitalProvinceBean hospitalBean = null;
+		if (virtualDoctorDO != null) {
+			String hospitalName = virtualDoctorDO.getHospitalName();
+			hospitalBean = hospitalMapper.getHospital(hospitalName);
+		}
+		
+		virtualDoctorBasic.setVirtualDoctor(virtualDoctorDO);
+		virtualDoctorBasic.setHospital(hospitalBean);
+		
+		return virtualDoctorBasic;
+	}
 
 	@Override
 	@Transactional(value = TxType.REQUIRED, rollbackOn = Exception.class)
@@ -37,6 +60,7 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService{
 		if (hospitalId > 0) {
 			long virtualDoctorId = this.saveVirtualDoctor(request, hospitalId);
 			if (virtualDoctorId > 0) {
+				this.saveVirtualDoctorMend(request, virtualDoctorId);
 				this.saveDrugUserDoctor(request, virtualDoctorId, user);
 				this.saveDrugUserDoctorQuate(request, virtualDoctorId, user);
 				
@@ -56,7 +80,7 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService{
 	private int getHospiTalId (SaveVirtualDoctorRequest request) {
 		int hospitalId;
 		
-		HospitalProvinceBean hospitalProvince = virtualDoctorMapper.getHospital(request.getName());
+		HospitalProvinceBean hospitalProvince = hospitalMapper.getHospital(request.getName());
 		if(hospitalProvince != null) {
 			request.setProvince(hospitalProvince.getProvince());
 			request.setCity(hospitalProvince.getCity());
@@ -67,7 +91,7 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService{
 			hospitalProvince.setProvince(request.getProvince());
 			hospitalProvince.setLevel(request.getHciLevel());
 			hospitalProvince.setName(request.getHospital());
-			virtualDoctorMapper.saveHospital(hospitalProvince);
+			hospitalMapper.saveHospital(hospitalProvince);
 			hospitalId = hospitalProvince.getId();
 		}
 		
@@ -100,6 +124,19 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService{
 		virtualDoctorMapper.saveVirtualDoctors(params);
 		
 		return params.get(0).getId();
+	}
+	
+	private void saveVirtualDoctorMend(SaveVirtualDoctorRequest request, long virtualDoctorId) {
+		List<VirtualDoctorMendParams> list = new ArrayList<>(1);
+		
+		VirtualDoctorMendParams param = new VirtualDoctorMendParams();
+		param.setVirtualDoctorId(virtualDoctorId);
+		param.setAddress(request.getAddress());
+		param.setFixedPhone(request.getFixedPhone());
+		param.setWechat(request.getWechat());
+		
+		list.add(param);
+		virtualDoctorMapper.saveVirtualDoctorMends(list);
 	}
 	
 	/**

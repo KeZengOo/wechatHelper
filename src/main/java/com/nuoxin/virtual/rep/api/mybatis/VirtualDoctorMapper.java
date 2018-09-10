@@ -2,9 +2,8 @@ package com.nuoxin.virtual.rep.api.mybatis;
 
 import java.util.List;
 
-import org.apache.ibatis.annotations.Param;
-
-import com.nuoxin.virtual.rep.api.entity.v2_5.HospitalProvinceBean;
+import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorDO;
+import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorMendParams;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorParams;
 
 /**
@@ -14,24 +13,24 @@ import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorParams;
 public interface VirtualDoctorMapper {
 	
 	/**
-	 * 根据医院名获取医院信息
-	 * @param name
+	 * 根据 virtualDoctorId 获取医生信息
+	 * @param virtualDoctorId
 	 * @return
 	 */
-	HospitalProvinceBean getHospital(String name);
-	
-	/**
-	 * 保存医院信息
-	 * @param hospitals
-	 * @return 返回主键值
-	 */
-	int saveHospital(HospitalProvinceBean hospitalProvince);
+	VirtualDoctorDO getVirtualDoctor(Long virtualDoctorId);
 
 	/**
-	 * 添加客户医生(们)
+	 * 批量添加客户医生
 	 * @param saveRequest
 	 * @return 返回影响条数
 	 */
 	int saveVirtualDoctors(List<VirtualDoctorParams> list);
+	
+	/**
+	 * 批量添加客户医生扩展信息
+	 * @param list
+	 * @return
+	 */
+	int saveVirtualDoctorMends(List<VirtualDoctorMendParams> list);
 
 }

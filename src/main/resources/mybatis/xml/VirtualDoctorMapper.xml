@@ -2,23 +2,24 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorMapper">
 
-	<!-- 以后拆出去 -->
-	<select id="getHospital" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.HospitalProvinceBean">
+	<select id="getVirtualDoctor" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorDO">
 		SELECT 
-			id,province,city 
-		FROM hospital 
-		WHERE name=#{name} ORDER BY id DESC LIMIT 1
+			name,
+			hospital_name AS hospitalName,
+			(CASE sex WHEN '男' THEN '0'  ELSE '1' END) AS gender,
+			telephone AS mobile,
+			positions AS title,
+			depart,
+			email,
+			m.wechat,
+			m.address,
+			m.fixed_phone AS fixedPhone
+		FROM doctor d
+		LEFT JOIN doctor_mend m
+		ON m.virtual_doctor_id = d.id
+		WHERE d.id = #{virtualDoctorId}
 	</select>
 	
-	<!-- 以后拆出去 -->
-	<insert id="saveHospital" keyProperty="id" useGeneratedKeys="true">
-		INSERT INTO hospital 
-			(name, province, city, level)
-		VALUES  
-			(#{name}, #{province}, #{city}, #{level})
-	</insert>
-	
-	<!-- 保存问卷作答 -->	
 	<insert id="saveVirtualDoctors"  keyProperty="id" useGeneratedKeys="true">
 		INSERT INTO doctor
 		 (name, sex, telephone, drug_user_email, depart, 
@@ -27,6 +28,15 @@
 		<foreach collection ="list" item="item" separator =",">
         	(#{item.name}, #{item.gender}, #{item.mobile}, #{item.email}, #{item.depart}, 
         	#{item.title}, #{item.hospital}, #{item.hospitalId}, #{item.province}, #{item.city}, NOW())
+    	</foreach >
+	</insert> 
+	
+	<insert id="saveVirtualDoctorMends" >
+		INSERT INTO doctor_mend
+		 (wechat, address, fixed_phone, virtual_doctor_id)
+		VALUES 
+		<foreach collection ="list" item="item" separator =",">
+        	(#{item.wechat}, #{item.address}, #{item.fixedPhone}, #{item.virtualDoctorId}) 
     	</foreach >
 	</insert> 
 	

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.HospitalMapper">
+
+	<select id="getHospital" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.HospitalProvinceBean">
+		SELECT 
+			id, name, province, city, level 
+		FROM hospital 
+		WHERE name=#{name} ORDER BY id DESC LIMIT 1
+	</select>
+	
+	<insert id="saveHospital" keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO hospital 
+			(name, province, city, level)
+		VALUES  
+			(#{name}, #{province}, #{city}, #{level})
+	</insert>
+	
+</mapper>

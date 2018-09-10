@@ -1,6 +1,7 @@
 package com.nuoxin.virtual.rep.api.service.v2_5;
 
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
+import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorBasicResponse;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.SaveVirtualDoctorRequest;
 
 public interface VirtualDoctorService {
@@ -12,5 +13,12 @@ public interface VirtualDoctorService {
 	 * @return 成功返回true 否则返回 false
 	 */
 	boolean saveVirtualDoctor(SaveVirtualDoctorRequest request, DrugUser user);
+	
+	/**
+	 * 获取客户医生基本信息
+	 * @param virtualDoctorId  医生ID
+	 * @return
+	 */
+	VirtualDoctorBasicResponse getVirtualDoctorBasic(Long virtualDoctorId);
 
 }
