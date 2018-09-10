@@ -34,12 +34,12 @@ public interface VirtualQuestionnaireMapper {
 			                                                @Param(value = "virtualQuestionnaireId")Long virtualQuestionnaireId);
 	/**
 	 * 保存问卷作答
-	 * @param virtualDoctorId
-	 * @param virtualDrugUserId
-	 * @param virtualQuestionaireId
-	 * @param callId
-	 * @param questions
-	 * @return
+	 * @param virtualDoctorId 医生ID
+	 * @param virtualDrugUserId 虚拟代表ID
+	 * @param virtualQuestionaireId 问卷ID
+	 * @param callId 电话拜访 ID
+	 * @param questions 问题作答
+	 * @return 返回影响条数
 	 */
 	int saveQuestionnaire(@Param(value = "virtualDoctorId") Long virtualDoctorId,
 			                          @Param(value = "virtualDrugUserId") Long virtualDrugUserId,

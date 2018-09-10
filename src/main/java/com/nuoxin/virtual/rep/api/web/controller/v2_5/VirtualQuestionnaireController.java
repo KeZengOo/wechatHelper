@@ -36,10 +36,11 @@ public class VirtualQuestionnaireController extends BaseController {
 	@SuppressWarnings("unchecked")
 	@ApiOperation(value = "获取最近一次问卷做题结果", notes = "获取最近一次问卷做题结果")
 	@RequestMapping(value = "/last_questionnaire_record/get", method = { RequestMethod.GET })
-	public DefaultResponseBean<List<VirtualQuestionnaireRecordResponse>> list(@ApiParam(value="虚拟代表ID")@RequestParam(value="virtual_drug_user_id") Long virtualDrugUserId, 
+	public DefaultResponseBean<List<VirtualQuestionnaireRecordResponse>> list(
+			                                                        @ApiParam(value="虚拟代表ID")@RequestParam(value="virtual_drug_user_id") Long virtualDrugUserId, 
 																	@ApiParam(value="医生ID")@RequestParam(value="doctor_id") Long virtualDoctorId, 
 																	@ApiParam(value="问卷ID") @RequestParam(value="virtual_questionnaire_id") Long virtualQuestionnaireId,
-			HttpServletRequest request) {
+			                                                        HttpServletRequest request) {
 		DrugUser user = this.getDrugUser(request);
 		if (user == null) {
 			return this.getLoginErrorResponse();
@@ -53,21 +54,4 @@ public class VirtualQuestionnaireController extends BaseController {
 		return responseBean;
 	}
 	
-	@Deprecated
-	@SuppressWarnings("unchecked")
-	@ApiOperation(value = "保存问卷作答结果(废弃)", notes = "保存问卷作答结果(废弃)")
-	@RequestMapping(value = "/questionnaire_record/save", method = { RequestMethod.POST })
-	public DefaultResponseBean<Integer> saveQuestionnaire(@RequestBody SaveVirtualQuestionnaireRecordRequestBean saveRequest,
-			HttpServletRequest request) {
-		DrugUser user = this.getDrugUser(request);
-		if (user == null) {
-			return this.getLoginErrorResponse();
-		}
-
-		DefaultResponseBean<Integer> responseBean = new DefaultResponseBean<>();
-		int effectNum = questionnaireService.saveQuestionnaire(saveRequest);
-		responseBean.setData(effectNum);
-
-		return responseBean;
-	}
 }
