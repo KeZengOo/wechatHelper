@@ -1,4 +1,4 @@
-package com.nuoxin.virtual.rep.api.web.controller.request.v2_5;
+package com.nuoxin.virtual.rep.api.web.controller.request.v2_5.questionnaire;
 
 import java.util.ArrayList;
 import java.util.List;

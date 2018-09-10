@@ -2,7 +2,7 @@ package com.nuoxin.virtual.rep.api.service.v2_5;
 
 import java.util.List;
 
-import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.SaveVirtualQuestionnaireRecordRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.questionnaire.SaveVirtualQuestionnaireRecordRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VirtualQuestionnaireRecordResponse;
 
 /**

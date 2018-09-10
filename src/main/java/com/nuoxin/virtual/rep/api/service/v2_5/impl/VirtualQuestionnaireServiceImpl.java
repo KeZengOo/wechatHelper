@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.nuoxin.virtual.rep.api.mybatis.VirtualQuestionnaireMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualQuestionnaireService;
-import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.SaveVirtualQuestionnaireRecordRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.questionnaire.SaveVirtualQuestionnaireRecordRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VirtualQuestionnaireRecordResponse;
 
 /**

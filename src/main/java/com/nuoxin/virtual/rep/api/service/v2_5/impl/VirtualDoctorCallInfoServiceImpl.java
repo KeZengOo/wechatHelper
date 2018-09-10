@@ -13,8 +13,8 @@ import com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorQuateMapper;
 import com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorCallInfoMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualDoctorlCallInfoService;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualQuestionnaireService;
-import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.SaveVirtualQuestionnaireRecordRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.SaveCallInfoRequest;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.questionnaire.SaveVirtualQuestionnaireRecordRequestBean;
 
 /**
  * 电话拜访实现类

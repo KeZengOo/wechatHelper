@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorMapper">
+
+	<!--  -->
+	<select id="getHospital" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.HospitalProvinceBean">
+		SELECT 
+			id,province,city 
+		FROM hospital 
+		WHERE name=#{name} ORDER BY id DESC LIMIT 1
+	</select>
+	
+	<!--  -->
+	<insert id="saveHospital" keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO hospital 
+			(name, province, city, level)
+		VALUES  
+			(#{name}, #{province}, #{city}, #{level})
+	</insert>
+	
+	<!-- 保存问卷作答 -->	
+	<insert id="saveVirtualDoctors">
+		INSERT INTO doctor
+		 (name, sex, telephone, drug_user_email, depart, 
+		  positions, hospital_name, hospital_id, provice, city, create_time)
+		VALUES 
+		<foreach collection ="virtualDoctors" item="virtualDoctor" separator =",">
+        	(#{virtualDoctor.name}, #{virtualDoctor.gender}, #{virtualDoctor.mobile}, #{virtualDoctor.email}, #{virtualDoctor.depart}, 
+        	#{virtualDoctor.title}, #{virtualDoctor.hospital}, #{virtualDoctor.hospitalId}, #{virtualDoctor.province}, #{virtualDoctor.city}, NOW())
+    	</foreach >
+	</insert> 
+	
+</mapper>
