@@ -1,5 +1,8 @@
 package com.nuoxin.virtual.rep.api.service.v2_5.impl;
 
+import java.util.Collections;
+import java.util.List;
+
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
@@ -7,12 +10,15 @@ import javax.transaction.Transactional.TxType;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
+import com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.UpdateVirtualDrugUserDoctorRelationship;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoParams;
 import com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorQuateMapper;
 import com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorCallInfoMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualDoctorlCallInfoService;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualQuestionnaireService;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.CallInfoListRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.SaveCallInfoRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.questionnaire.SaveVirtualQuestionnaireRecordRequestBean;
 
@@ -45,6 +51,26 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorlCallInfoS
 		}
 
 		return false;
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+	public PageResponseBean<List<CallVisitBean>> getCallVisitList(CallInfoListRequest request) {
+		Long virtualDrugUserId = request.getVirtualDrugUserId();
+		Long virtualDoctorId = request.getVirtualDoctorId();
+		int count = callInfoMapper.getCallVisitCount(virtualDrugUserId, virtualDoctorId);
+		
+		PageResponseBean<List<CallVisitBean>> pageResponse = null;
+		if (count > 0) {
+			List<CallVisitBean> list = callInfoMapper.getCallVisitList(virtualDrugUserId, virtualDoctorId,
+					request.getCurrentSize(), request.getPageSize());
+			
+			pageResponse = new PageResponseBean(request, count, list);
+		} else {
+			pageResponse = new PageResponseBean(request, 0, Collections.emptyList());
+		}
+		
+		return pageResponse;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

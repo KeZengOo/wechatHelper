@@ -13,6 +13,25 @@
 		(#{sinToken}, #{virtualDrugUserId}, #{virtualDoctorId}, #{doctorQuestionnaireId}, #{productId},
 		#{mobile}, #{type}, #{visitResult}, #{attitude}, #{nextVisitTime}, #{remark}, NOW())
 	</insert>
+	
+	<select id="getCallVisitCount" resultType="java.lang.Integer">
+		SELECT 
+			count(*)
+		FROM virtual_doctor_call_info
+		WHERE 
+			virtual_doctor_id=#{virtualDoctorId}
+			AND virtual_drug_user_id=#{virtualDrugUserId}
+	</select>
+	
+	<select id="getCallVisitList" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitBean">
+		SELECT 
+			call_time AS callTime, status_name AS statueName, call_url AS callUrl, attitude, remark, create_time AS createTime 
+		FROM virtual_doctor_call_info
+		WHERE 
+			virtual_doctor_id=#{virtualDoctorId}
+			AND virtual_drug_user_id=#{virtualDrugUserId}
+		LIMIT #{currentSize}, #{pageSize}
+	</select>
 
 </mapper>
 
