@@ -24,7 +24,8 @@ import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.TableHeader;
 
 @Service
 public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
-	private static List<TableHeader> tableHeaders = new ArrayList<>(15);
+	
+	private static final List<TableHeader> tableHeaders = new ArrayList<>(15);
 	
 	@Resource
 	private DrugUserMapper drugUserMapper;

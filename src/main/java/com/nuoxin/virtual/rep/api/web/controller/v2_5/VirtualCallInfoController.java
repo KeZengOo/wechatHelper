@@ -33,7 +33,8 @@ public class VirtualCallInfoController extends BaseController{
 	@SuppressWarnings("unchecked")
 	@ApiOperation(value = "保存电话拜访信息", notes = "保存电话拜访信息")
 	@RequestMapping(value = "/save", method = { RequestMethod.POST })
-	public DefaultResponseBean<Boolean> save(HttpServletRequest request, @RequestBody @Valid  SaveCallInfoRequest saveRequest, 
+	public DefaultResponseBean<Boolean> save(HttpServletRequest request, 
+			                                                             @RequestBody @Valid  SaveCallInfoRequest saveRequest, 
 			                                                             BindingResult bindingResult) {
 		DrugUser user = this.getDrugUser(request);
 		if(user == null) {
