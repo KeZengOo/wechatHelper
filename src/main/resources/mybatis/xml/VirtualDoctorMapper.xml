@@ -22,7 +22,7 @@
 	
 	<insert id="saveVirtualDoctors"  keyProperty="id" useGeneratedKeys="true">
 		INSERT INTO doctor
-		 (name, sex, telephone, drug_user_email, depart, 
+		 (name, sex, telephone, email, depart, 
 		  positions, hospital_name, hospital_id, provice, city, create_time)
 		VALUES 
 		<foreach collection ="list" item="item" separator =",">

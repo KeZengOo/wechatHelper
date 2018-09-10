@@ -80,7 +80,7 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService{
 	private int getHospiTalId (SaveVirtualDoctorRequest request) {
 		int hospitalId;
 		
-		HospitalProvinceBean hospitalProvince = hospitalMapper.getHospital(request.getName());
+		HospitalProvinceBean hospitalProvince = hospitalMapper.getHospital(request.getHospital());
 		if(hospitalProvince != null) {
 			request.setProvince(hospitalProvince.getProvince());
 			request.setCity(hospitalProvince.getCity());
