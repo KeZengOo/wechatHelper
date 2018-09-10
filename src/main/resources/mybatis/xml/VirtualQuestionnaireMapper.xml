@@ -37,7 +37,7 @@
 		 (virtual_doctor_id, virtual_drug_user_id, virtual_questionnaire_id, 
 		 call_id, virtual_question_id, answer, create_time)
 		VALUES 
-		<foreach collection ="list" item="item" separator =",">
+		<foreach collection ="questions" item="item" separator =",">
         	(#{item.virtualDoctorId}, #{item.virtualDrugUserId}, #{item.virtualQuestionnaireId}, #{item.callId}, 
         	#{item.virtualQuestionId}, #{item.answer}, NOW())
     	</foreach >

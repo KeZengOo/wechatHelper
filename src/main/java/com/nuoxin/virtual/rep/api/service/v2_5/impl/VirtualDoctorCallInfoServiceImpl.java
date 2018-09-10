@@ -33,8 +33,6 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorlCallInfoS
 	@Transactional(value = TxType.REQUIRED, rollbackOn = Exception.class)
 	@Override
 	public boolean saveCallInfo(SaveCallInfoRequest saveRequest) {
-		this.updateRelationShip(saveRequest);
-
 		long callId = this.doSaveCallInfo(saveRequest);
 		int effectNum = 0;
 		if (callId > 0) {
@@ -42,6 +40,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorlCallInfoS
 		}
 		
 		if (effectNum > 0) {
+			this.updateRelationShip(saveRequest);
 			return true;
 		}
 
@@ -113,7 +112,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorlCallInfoS
 		relationShipParams.setIsHasAe(saveRequest.getIsHasAe());
 		
 		// 备份关系
-		drugUserDoctorQuateMapper.backRelationShipInfo(relationShipParams);
+		drugUserDoctorQuateMapper.backupRelationShipInfo(relationShipParams);
 		// 变更关系
 		drugUserDoctorQuateMapper.replaceRelationShipInfo(relationShipParams);
 	}

@@ -19,7 +19,7 @@
 		</foreach>
 	</insert>
 	
-	<insert id="backRelationShipInfo">
+	<insert id="backupRelationShipInfo">
 		INSERT INTO drug_user_doctor_quate_log 
 		(drug_user_id,doctor_id,product_id, is_has_drug,is_target,is_has_ae)
 		

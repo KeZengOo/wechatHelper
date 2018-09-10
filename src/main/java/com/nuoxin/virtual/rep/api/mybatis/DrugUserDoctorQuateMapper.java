@@ -29,6 +29,6 @@ public interface DrugUserDoctorQuateMapper {
 	 * @param params
 	 * @return 返回影响条数
 	 */
-	int backRelationShipInfo(UpdateVirtualDrugUserDoctorRelationship params);
+	int backupRelationShipInfo(UpdateVirtualDrugUserDoctorRelationship params);
 }
 
