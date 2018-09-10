@@ -4,10 +4,11 @@ import lombok.Data;
 
 @Data
 public class UpdateVirtualDrugUserDoctorRelationship {
-	private Long virtualDrugUserId;
-	private Long doctorId;
-	private Integer productLineId;
-	private Integer isHasDrug;
-	private Integer isHasAe;
-	private Integer isTarget;
+	private long virtualDrugUserId;
+	private long doctorId;
+	private int productLineId;
+	private int isHasDrug;
+	private int isHasAe;
+	private int isTarget;
+	private int isRecruit;
 }

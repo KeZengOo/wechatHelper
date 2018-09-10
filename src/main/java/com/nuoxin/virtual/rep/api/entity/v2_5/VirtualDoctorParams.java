@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class VirtualDoctorParams {
+	private long id;
 	private String name;
 	private Integer gender;
 	private String mobile;

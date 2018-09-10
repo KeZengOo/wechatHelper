@@ -14,7 +14,7 @@ import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorParams;
 public interface VirtualDoctorMapper {
 	
 	/**
-	 * 根据医院名获取
+	 * 根据医院名获取医院信息
 	 * @param name
 	 * @return
 	 */
@@ -28,10 +28,10 @@ public interface VirtualDoctorMapper {
 	int saveHospital(HospitalProvinceBean hospitalProvince);
 
 	/**
-	 * 添加单个客户医生
+	 * 添加客户医生(们)
 	 * @param saveRequest
 	 * @return 返回影响条数
 	 */
-	int saveVirtualDoctors(@Param(value = "virtualDoctors") List<VirtualDoctorParams> virtualDoctors);
+	int saveVirtualDoctors(List<VirtualDoctorParams> list);
 
 }

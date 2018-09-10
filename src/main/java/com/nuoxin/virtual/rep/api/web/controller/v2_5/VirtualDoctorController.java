@@ -18,7 +18,11 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.SaveVirtual
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
-@Api(value = "医生相关接口")
+/**
+ * 医生 Controller 类
+ * @author xiekaiyu
+ */
+@Api(value = "客户医生相关接口")
 @RequestMapping(value = "/doctors")
 @RestController
 public class VirtualDoctorController extends BaseController {
@@ -27,21 +31,22 @@ public class VirtualDoctorController extends BaseController {
 	private VirtualDoctorService virtualDoctorService;
 
 	@SuppressWarnings("unchecked")
-	@ApiOperation(value = "添加医生(客户)信息", notes = "添加医生(客户)信息")
-	@RequestMapping(value = "/save", method = { RequestMethod.POST })
-	public DefaultResponseBean<Boolean> save(HttpServletRequest request, @RequestBody @Valid  SaveVirtualDoctorRequest saveRequest, 
-			                                                             BindingResult bindingResult) {
+	@ApiOperation(value = "添加单个客户医生信息", notes = "添加单个客户医生信息")
+	@RequestMapping(value = "/single/save", method = { RequestMethod.POST })
+	public DefaultResponseBean<Boolean> singleSave(HttpServletRequest request,
+			@RequestBody @Valid SaveVirtualDoctorRequest saveRequest, BindingResult bindingResult) {
 		DrugUser user = this.getDrugUser(request);
-		if(user == null) {
+		if (user == null) {
 			return super.getLoginErrorResponse();
-		} 
-		
-		if(bindingResult.hasErrors()){
+		}
+
+		// 参数校验
+		if (bindingResult.hasErrors()) {
 			return super.getParamsErrorResponse(bindingResult.getFieldError().getDefaultMessage());
-        }
-		
-		boolean flag = virtualDoctorService.saveVirtualDoctor(saveRequest);
-		
+		}
+
+		boolean flag = virtualDoctorService.saveVirtualDoctor(saveRequest, user);
+
 		DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<Boolean>();
 		responseBean.setData(flag);
 		return responseBean;

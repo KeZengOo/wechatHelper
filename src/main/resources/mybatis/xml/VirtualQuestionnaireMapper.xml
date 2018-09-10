@@ -32,14 +32,14 @@
 	</select>
 	
 	<!-- 保存问卷作答 -->	
-	<insert id="saveQuestionnaire">
+	<insert id="saveQuestionnaire" parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorParams">
 		INSERT INTO virtual_doctor_questionnaire
 		 (virtual_doctor_id, virtual_drug_user_id, virtual_questionnaire_id, 
 		 call_id, virtual_question_id, answer, create_time)
 		VALUES 
-		<foreach collection ="questions" item="question" separator =",">
-        	(#{question.virtualDoctorId}, #{question.virtualDrugUserId}, #{question.virtualQuestionnaireId}, #{question.callId}, 
-        	#{question.virtualQuestionId}, #{question.answer}, NOW())
+		<foreach collection ="list" item="item" separator =",">
+        	(#{item.virtualDoctorId}, #{item.virtualDrugUserId}, #{item.virtualQuestionnaireId}, #{item.callId}, 
+        	#{item.virtualQuestionId}, #{item.answer}, NOW())
     	</foreach >
 	</insert> 
 	
