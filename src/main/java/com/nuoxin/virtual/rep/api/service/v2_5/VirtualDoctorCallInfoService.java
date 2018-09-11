@@ -11,7 +11,7 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.SaveCallI
  * 电话拜访业务接口类
  * @author xiekaiyu
  */
-public interface VirtualDoctorlCallInfoService {
+public interface VirtualDoctorCallInfoService {
 	
 	/**
 	 * 保存电话拜访结果,有RERUIRED事务

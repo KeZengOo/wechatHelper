@@ -16,7 +16,7 @@ import com.nuoxin.virtual.rep.api.entity.v2_5.UpdateVirtualDrugUserDoctorRelatio
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoParams;
 import com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorQuateMapper;
 import com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorCallInfoMapper;
-import com.nuoxin.virtual.rep.api.service.v2_5.VirtualDoctorlCallInfoService;
+import com.nuoxin.virtual.rep.api.service.v2_5.VirtualDoctorCallInfoService;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualQuestionnaireService;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.CallInfoListRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.SaveCallInfoRequest;
@@ -27,7 +27,7 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.questionnaire.Save
  * @author xiekaiyu
  */
 @Service
-public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorlCallInfoService {
+public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoService {
 
 	@Resource
 	private VirtualQuestionnaireService questionnaireService;
@@ -66,7 +66,9 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorlCallInfoS
 					request.getCurrentSize(), request.getPageSize());
 			
 			pageResponse = new PageResponseBean(request, count, list);
-		} else {
+		} 
+		
+		if (pageResponse == null) {
 			pageResponse = new PageResponseBean(request, 0, Collections.emptyList());
 		}
 		

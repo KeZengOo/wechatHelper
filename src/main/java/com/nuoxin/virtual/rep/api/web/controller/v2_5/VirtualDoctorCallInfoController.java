@@ -16,7 +16,7 @@ import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitBean;
-import com.nuoxin.virtual.rep.api.service.v2_5.VirtualDoctorlCallInfoService;
+import com.nuoxin.virtual.rep.api.service.v2_5.VirtualDoctorCallInfoService;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.CallInfoListRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.SaveCallInfoRequest;
 
@@ -30,10 +30,10 @@ import io.swagger.annotations.ApiOperation;
 @Api(value = "电话拜访相关接口")
 @RequestMapping(value = "/call/info")
 @RestController
-public class VirtualCallInfoController extends BaseController{
+public class VirtualDoctorCallInfoController extends BaseController{
 	
 	@Resource
-	private VirtualDoctorlCallInfoService callInfoService;
+	private VirtualDoctorCallInfoService callInfoService;
 	
 	@SuppressWarnings("unchecked")
 	@ApiOperation(value = "获取电话拜访列表信息", notes = "获取电话拜访列表信息")
