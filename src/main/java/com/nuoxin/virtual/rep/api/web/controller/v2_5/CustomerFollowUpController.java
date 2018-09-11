@@ -55,8 +55,10 @@ public class CustomerFollowUpController extends BaseController {
 			return this.getLoginErrorResponse();
 		} 
 		
+		// 从会话变量中获取 leaderPath
+		String leaderPath = user.getLeaderPath();
 		DefaultResponseBean<PageResponseBean<List<CustomerFollowListBean>>> responseBean = new DefaultResponseBean<>();
-		PageResponseBean<List<CustomerFollowListBean>> pageResponse = customerFollowService.list(indexRequest, user.getLeaderPath());
+		PageResponseBean<List<CustomerFollowListBean>> pageResponse = customerFollowService.list(indexRequest, leaderPath);
 		responseBean.setData(pageResponse);
 		
 		return responseBean;

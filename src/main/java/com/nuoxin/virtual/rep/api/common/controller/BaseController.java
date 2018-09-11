@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.common.util.StringUtils;
@@ -92,6 +93,17 @@ public class BaseController {
 				bean.setStatusName("incall");
 			}
 		}
+	}
+	
+	@SuppressWarnings("rawtypes")
+	protected DefaultResponseBean getLoginErrorResponse() {
+		DefaultResponseBean responseBean = new DefaultResponseBean<>();
+		ErrorEnum loginError = ErrorEnum.LOGIN_NO;
+		responseBean.setCode(loginError.getStatus());
+		responseBean.setMessage(loginError.getMessage());
+		responseBean.setDescription(loginError.getMessage());
+		
+		return responseBean;
 	}
 
 }
