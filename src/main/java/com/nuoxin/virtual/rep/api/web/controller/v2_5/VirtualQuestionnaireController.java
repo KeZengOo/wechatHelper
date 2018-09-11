@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualQuestionnaireService;
-import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.questionnaire.SaveVirtualQuestionnaireRecordRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VirtualQuestionnaireRecordResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VirtualQuestionnaireResponse;
 
