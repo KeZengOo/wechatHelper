@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiOperation;
  * 会议 Controller 类
  * @author xiekaiyu
  */
-@Api(value = "会议接口")
+@Api(value = "V2.5会议接口")
 @RequestMapping(value = "/meeting/info")
 @RestController
 public class VirtualDoctorMeetingController extends BaseController{

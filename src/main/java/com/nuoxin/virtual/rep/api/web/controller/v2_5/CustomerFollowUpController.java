@@ -33,7 +33,7 @@ import shaded.org.apache.commons.lang3.StringUtils;
  * 客户跟进-首页 Controller 类
  * @author xiekaiyu
  */
-@Api(value = "客户跟进首页相关接口")
+@Api(value = "V2.5客户跟进首页相关接口")
 @RequestMapping(value = "/customer/followup/index")
 @RestController
 public class CustomerFollowUpController extends BaseController {

@@ -5,7 +5,6 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,7 +24,7 @@ import io.swagger.annotations.ApiParam;
  * 虚拟代表问卷 Controller 类
  * @author xiekaiyu
  */
-@Api(value = "虚拟代表问卷相关接口")
+@Api(value = "V2.5虚拟代表问卷相关接口")
 @RequestMapping(value = "/questionnaire")
 @RestController
 public class VirtualQuestionnaireController extends BaseController {

@@ -11,7 +11,7 @@ import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
-@Api(value = "产品设置相关接口")
+@Api(value = "V2.5产品设置相关接口")
 @RequestMapping(value = "/product/conf")
 @RestController
 public class ProductConfigController {

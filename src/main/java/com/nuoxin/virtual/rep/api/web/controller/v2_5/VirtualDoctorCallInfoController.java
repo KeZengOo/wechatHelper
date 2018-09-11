@@ -27,7 +27,7 @@ import io.swagger.annotations.ApiOperation;
  * 电话拜访 Controller 类
  * @author xiekaiyu
  */
-@Api(value = "电话拜访相关接口")
+@Api(value = "V2.5电话拜访相关接口")
 @RequestMapping(value = "/call/info")
 @RestController
 public class VirtualDoctorCallInfoController extends BaseController{
