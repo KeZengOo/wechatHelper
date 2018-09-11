@@ -15,6 +15,7 @@ import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualQuestionnaireService;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.questionnaire.SaveVirtualQuestionnaireRecordRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VirtualQuestionnaireRecordResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VirtualQuestionnaireResponse;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -49,6 +50,28 @@ public class VirtualQuestionnaireController extends BaseController {
 		List<VirtualQuestionnaireRecordResponse> list = questionnaireService.getLastQuestionnaireRecord(virtualDrugUserId,
 				virtualDoctorId, virtualQuestionnaireId);
 		responseBean.setData(list);
+		
+		return responseBean;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@ApiOperation(value = "根据产品线ID获取问卷信息", notes = "根据产品线ID获取问卷信息")
+	@RequestMapping(value = "/questionaires/get", method = { RequestMethod.GET })
+	public DefaultResponseBean<List<VirtualQuestionnaireResponse>> getQuestionnaireByProductLineId(
+																	@ApiParam(value="产品线ID") @RequestParam(value="product_line_id") Long productLineId,
+			                                                        HttpServletRequest request) {
+		DrugUser user = this.getDrugUser(request);
+		if (user == null) {
+			return this.getLoginErrorResponse();
+		}
+		
+		if (productLineId == null) {
+			return super.getParamsErrorResponse("product_line_id is null");
+		}
+
+		DefaultResponseBean<List<VirtualQuestionnaireResponse>> responseBean = new DefaultResponseBean<List<VirtualQuestionnaireResponse>>();
+		List<VirtualQuestionnaireResponse> questionnaires = questionnaireService.getQuestionnaireByProductLineId(productLineId);
+		responseBean.setData(questionnaires);
 		
 		return responseBean;
 	}

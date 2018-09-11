@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Param;
 
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.questionnaire.VirtualQuestionRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VirtualQuestionnaireRecordResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VirtualQuestionnaireResponse;
 
 /**
  * 虚拟代表问卷 Mapper
@@ -19,8 +20,7 @@ public interface VirtualQuestionnaireMapper {
 	 * @param productId 产品线ID
 	 * @return 成功返回标题
 	 */
-	@Deprecated
-	String getTitle(@Param(value = "id")Long id, @Param(value = "productId")Long productId);
+	List<VirtualQuestionnaireResponse> getQuestionnaire(@Param(value = "productLineId")Long productLineId);
 	
 	/**
 	 * 根据虚拟代表ID,医生ID,虚拟代表问卷ID获取最近一次作答

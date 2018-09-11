@@ -3,11 +3,13 @@
 <mapper namespace="com.nuoxin.virtual.rep.api.mybatis.VirtualQuestionnaireMapper">
 	
 	<!-- 获取问卷标题 -->
-	<select id="getTitle" resultType="java.lang.String">
-		SELECT title FROM virtual_questionnaire WHERE id=#{id} AND del_flag = 0
-		<if test="productId != null">
-			AND product_id = #{productId}
-		</if>
+	<select id="getQuestionnaire" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VirtualQuestionnaireResponse">
+		SELECT 
+			id, title 
+		FROM virtual_questionnaire 
+		WHERE 
+			del_flag = 0
+			AND	product_id = #{productLineId}
 	</select>
 	
 	<!-- 获取最近一次做题记录 -->

@@ -13,7 +13,7 @@ public class VirtualQuestionnaireRecordResponse {
 	@ApiModelProperty(value = "题干")
 	private String title;
 	@ApiModelProperty(value = "选项")
-	private String options;
+	private Object options;
 	@ApiModelProperty(value = "题型")
 	private Byte type;
 	@ApiModelProperty(value = "用户作答")

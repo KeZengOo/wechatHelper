@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.questionnaire.SaveVirtualQuestionnaireRecordRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VirtualQuestionnaireRecordResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VirtualQuestionnaireResponse;
 
 /**
  * 虚拟代表问卷业务接口
@@ -27,4 +28,11 @@ public interface VirtualQuestionnaireService {
 	 * @return 返回影响条数
 	 */
 	int saveQuestionnaire(SaveVirtualQuestionnaireRecordRequestBean request);
+	
+	/**
+	 * 根据 产品线 ID 获取问卷基本信息 
+	 * @param productLineId
+	 * @return
+	 */
+	List<VirtualQuestionnaireResponse>getQuestionnaireByProductLineId(Long productLineId);
 }
