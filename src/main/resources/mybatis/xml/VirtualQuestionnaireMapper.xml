@@ -40,7 +40,7 @@
 		 call_id, virtual_question_id, answer, create_time)
 		VALUES 
 		<foreach collection ="questions" item="item" separator =",">
-        	(#{item.virtualDoctorId}, #{item.virtualDrugUserId}, #{item.virtualQuestionnaireId}, #{item.callId}, 
+        	(#{virtualDoctorId}, #{virtualDrugUserId}, #{virtualQuestionnaireId}, #{callId}, 
         	#{item.virtualQuestionId}, #{item.answer}, NOW())
     	</foreach >
 	</insert> 

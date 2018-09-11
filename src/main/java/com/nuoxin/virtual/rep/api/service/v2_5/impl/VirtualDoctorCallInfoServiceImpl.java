@@ -16,6 +16,7 @@ import com.nuoxin.virtual.rep.api.entity.v2_5.UpdateVirtualDrugUserDoctorRelatio
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoParams;
 import com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorQuateMapper;
 import com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorCallInfoMapper;
+import com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorCallInfoMendMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualDoctorCallInfoService;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualQuestionnaireService;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.CallInfoListRequest;
@@ -33,6 +34,8 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	private VirtualQuestionnaireService questionnaireService;
 	@Resource
 	private VirtualDoctorCallInfoMapper callInfoMapper;
+	@Resource
+	VirtualDoctorCallInfoMendMapper callInfoMendMapper;
 	@Resource
 	private DrugUserDoctorQuateMapper drugUserDoctorQuateMapper;
 
@@ -77,8 +80,9 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	
 	/**
-	 * 保存电话拜访信息
+	 * 保存电话拜访信息写入 virtual_doctor_call_info,virtual_doctor_call_info_mend
 	 * @param saveRequest
 	 * @return 返回 callId
 	 */
@@ -90,12 +94,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		callVisitParams.setProductId(saveRequest.getProductId());
 		callVisitParams.setType(saveRequest.getType());
 		callVisitParams.setMobile(saveRequest.getMobile());
-
-		String visitResult = JSONObject.toJSONString(saveRequest.getVisitResult());
-		callVisitParams.setVisitResult(visitResult);
-		callVisitParams.setAttitude(saveRequest.getAttitude());
 		callVisitParams.setDoctorQuestionnaireId(saveRequest.getVirtualQuestionaireId());
-		callVisitParams.setNextVisitTime(saveRequest.getNextVisitTime());
 		callVisitParams.setRemark(saveRequest.getRemark());
 		
 		callInfoMapper.saveVirtualDoctorCallInfo(callVisitParams);
@@ -103,6 +102,14 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		Long calld = callVisitParams.getCallId();
 		if (calld == null) {
 			calld = 0L;
+		}
+		
+		if (calld > 0L) {
+			String visitResult = JSONObject.toJSONString(saveRequest.getVisitResult());
+			callVisitParams.setVisitResult(visitResult);
+			callVisitParams.setAttitude(saveRequest.getAttitude());
+			callVisitParams.setNextVisitTime(saveRequest.getNextVisitTime());
+			callInfoMendMapper.saveVirtualDoctorCallInfoMend(callVisitParams);
 		}
 
 		return calld;
