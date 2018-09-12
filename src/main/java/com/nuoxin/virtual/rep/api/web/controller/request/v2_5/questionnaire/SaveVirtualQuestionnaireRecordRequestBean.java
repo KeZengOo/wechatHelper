@@ -16,7 +16,7 @@ public class SaveVirtualQuestionnaireRecordRequestBean {
 	@ApiModelProperty(value = "虚拟代表 ID")
 	private Long virtualDrugUserId;
 	@ApiModelProperty(value = "问卷ID")
-	private Long virtualQuestionaireId;
+	private Integer virtualQuestionaireId;
 	@ApiModelProperty(value = "电话 ID")
 	private Long callId;
 	

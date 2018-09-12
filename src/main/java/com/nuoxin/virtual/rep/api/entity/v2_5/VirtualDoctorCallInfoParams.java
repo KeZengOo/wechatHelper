@@ -4,17 +4,19 @@ import lombok.Data;
 
 @Data
 public class VirtualDoctorCallInfoParams{
-	private Long callId;
+	private long callId;
 	private String sinToken;
-	private Long virtualDrugUserId;
+	private long virtualDrugUserId;
 	private Long virtualDoctorId;
-	private Long doctorQuestionnaireId;
+	private Integer doctorQuestionnaireId;
 	private Integer productId;
 	
 	private String mobile;
-	private Integer type;
-	private String visitResult;
-	private Integer attitude;
+	private int type;
+	private String visitResult="";
+	private int attitude=0;
 	private String nextVisitTime;
 	private String remark;
+	private int status;
+	private String statusName;
 }

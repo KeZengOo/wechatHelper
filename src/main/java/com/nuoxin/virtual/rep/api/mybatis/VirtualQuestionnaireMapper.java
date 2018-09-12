@@ -43,7 +43,7 @@ public interface VirtualQuestionnaireMapper {
 	 */
 	int saveQuestionnaire(@Param(value = "virtualDoctorId") Long virtualDoctorId,
 			                          @Param(value = "virtualDrugUserId") Long virtualDrugUserId,
-			                          @Param(value = "virtualQuestionnaireId") Long virtualQuestionnaireId, 
+			                          @Param(value = "virtualQuestionnaireId") Integer virtualQuestionnaireId, 
 			                          @Param(value = "callId") Long callId,
 			                          @Param(value = "questions") List<VirtualQuestionRequestBean> questions);
 }

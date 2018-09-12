@@ -11,4 +11,5 @@ public class UpdateVirtualDrugUserDoctorRelationship {
 	private int isHasAe;
 	private int isTarget;
 	private int isRecruit;
+	private int isBreakOff;
 }

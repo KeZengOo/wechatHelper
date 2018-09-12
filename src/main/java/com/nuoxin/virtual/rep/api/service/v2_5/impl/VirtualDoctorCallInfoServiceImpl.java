@@ -19,6 +19,7 @@ import com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorCallInfoMapper;
 import com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorCallInfoMendMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualDoctorCallInfoService;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualQuestionnaireService;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.BaseCallInfoRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.CallInfoListRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.SaveCallInfoRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.SaveCallInfoUnConnectedRequest;
@@ -36,7 +37,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	@Resource
 	private VirtualDoctorCallInfoMapper callInfoMapper;
 	@Resource
-	VirtualDoctorCallInfoMendMapper callInfoMendMapper;
+	private VirtualDoctorCallInfoMendMapper callInfoMendMapper;
 	@Resource
 	private DrugUserDoctorQuateMapper drugUserDoctorQuateMapper;
 
@@ -50,7 +51,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		}
 		
 		if (effectNum > 0) {
-			this.updateRelationShip(saveRequest);
+			this.changeRelationShip(saveRequest);
 			return true;
 		}
 
@@ -60,7 +61,18 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	@Transactional(value = TxType.REQUIRED, rollbackOn = Exception.class)
 	@Override
 	public boolean unconnectedsaveCallInfo(SaveCallInfoUnConnectedRequest saveRequest) {
-		// TODO
+		if("emptynumber".equals(saveRequest.getStatuaName())) {
+			saveRequest.setIsBreakOff(1);
+		} else {
+			saveRequest.setIsBreakOff(0);
+		}
+		
+		long callId = this.doSaveCallInfo(saveRequest);
+		if(callId > 0) {
+			this.changeRelationShip(saveRequest);
+			return true;
+		}
+		
 		return false;
 	}
 	
@@ -87,42 +99,27 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	
 	/**
-	 * 保存电话拜访信息写入 virtual_doctor_call_info,virtual_doctor_call_info_mend
+	 * 保存电话拜访信息及扩展信息<br>
+	 * 写入 virtual_doctor_call_info,virtual_doctor_call_info_mend 表
 	 * @param saveRequest
 	 * @return 返回 callId
 	 */
-	private long doSaveCallInfo(SaveCallInfoRequest saveRequest) {
-		VirtualDoctorCallInfoParams callVisitParams = new VirtualDoctorCallInfoParams();
-		callVisitParams.setSinToken(saveRequest.getSinToken());
-		callVisitParams.setVirtualDoctorId(saveRequest.getVirtualDoctorId());
-		callVisitParams.setVirtualDrugUserId(saveRequest.getVirtualDrugUserId());
-		callVisitParams.setProductId(saveRequest.getProductId());
-		callVisitParams.setType(saveRequest.getType());
-		callVisitParams.setMobile(saveRequest.getMobile());
-		callVisitParams.setDoctorQuestionnaireId(saveRequest.getVirtualQuestionaireId());
-		callVisitParams.setRemark(saveRequest.getRemark());
-		
+	private long doSaveCallInfo(BaseCallInfoRequest saveRequest) {
+		VirtualDoctorCallInfoParams callVisitParams = this.getVirtualDoctorCallInfoParams(saveRequest);
+		// 写入 virtual_doctor_call_info 表
 		callInfoMapper.saveVirtualDoctorCallInfo(callVisitParams);
 
-		Long calld = callVisitParams.getCallId();
-		if (calld == null) {
-			calld = 0L;
-		}
-		
+		long calld = callVisitParams.getCallId();
 		if (calld > 0L) {
-			String visitResult = JSONObject.toJSONString(saveRequest.getVisitResult());
-			callVisitParams.setVisitResult(visitResult);
-			callVisitParams.setAttitude(saveRequest.getAttitude());
-			callVisitParams.setNextVisitTime(saveRequest.getNextVisitTime());
+			// 写入 virtual_doctor_call_info_mend 表
 			callInfoMendMapper.saveVirtualDoctorCallInfoMend(callVisitParams);
 		}
 
 		return calld;
 	}
-
+	
 	/**
 	 * 保存 问卷做题结果
 	 * @param saveRequest
@@ -144,20 +141,63 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	 * 变更虚拟代表关联的医生关系信息:是否有药,是否是目标客户,是否有AE
 	 * @param saveRequest
 	 */
-	private void updateRelationShip(SaveCallInfoRequest saveRequest) {
+	private void changeRelationShip(BaseCallInfoRequest request) {
 		UpdateVirtualDrugUserDoctorRelationship relationShipParams = new UpdateVirtualDrugUserDoctorRelationship();
 		
-		relationShipParams.setVirtualDrugUserId(saveRequest.getVirtualDrugUserId());
-		relationShipParams.setDoctorId(saveRequest.getVirtualDoctorId());
-		relationShipParams.setProductLineId(saveRequest.getProductId());
-		relationShipParams.setIsHasDrug(saveRequest.getIsHasDrug());
-		relationShipParams.setIsTarget(saveRequest.getIsTarget());
-		relationShipParams.setIsHasAe(saveRequest.getIsHasAe());
+		relationShipParams.setVirtualDrugUserId(request.getVirtualDrugUserId());
+		relationShipParams.setDoctorId(request.getVirtualDoctorId());
+		relationShipParams.setProductLineId(request.getProductId());
+		
+		if (request instanceof SaveCallInfoRequest) {
+			SaveCallInfoRequest saveRequest = (SaveCallInfoRequest)request;
+			relationShipParams.setIsHasDrug(saveRequest.getIsHasDrug());
+			relationShipParams.setIsTarget(saveRequest.getIsTarget());
+			relationShipParams.setIsHasAe(saveRequest.getIsHasAe());
+		} else if (request instanceof SaveCallInfoUnConnectedRequest) {
+			SaveCallInfoUnConnectedRequest saveRequest = (SaveCallInfoUnConnectedRequest)request;
+			relationShipParams.setIsBreakOff(saveRequest.getIsBreakOff());
+		}
 		
 		// 备份关系
 		drugUserDoctorQuateMapper.backupRelationShipInfo(relationShipParams);
 		// 变更关系
 		drugUserDoctorQuateMapper.replaceRelationShipInfo(relationShipParams);
+	}
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	private VirtualDoctorCallInfoParams getVirtualDoctorCallInfoParams (BaseCallInfoRequest saveRequest) {
+		VirtualDoctorCallInfoParams callVisitParams = new VirtualDoctorCallInfoParams();
+		callVisitParams.setSinToken(saveRequest.getSinToken());
+		callVisitParams.setVirtualDoctorId(saveRequest.getVirtualDoctorId());
+		callVisitParams.setVirtualDrugUserId(saveRequest.getVirtualDrugUserId());
+		callVisitParams.setProductId(saveRequest.getProductId());
+		callVisitParams.setMobile(saveRequest.getMobile());
+		// 只能是1 或者 2在前面的参数校验中加了限制
+		callVisitParams.setType(saveRequest.getType());
+		callVisitParams.setRemark(saveRequest.getRemark());
+		callVisitParams.setStatus(saveRequest.getStatus());
+		callVisitParams.setStatusName(saveRequest.getStatuaName());
+		callVisitParams.setNextVisitTime(saveRequest.getNextVisitTime());
+		
+		Integer virtualQuestinairedId = null;
+		if (saveRequest instanceof SaveCallInfoRequest) {
+			SaveCallInfoRequest saveCallInfoRequest = (SaveCallInfoRequest) saveRequest;
+		
+			String visitResult = JSONObject.toJSONString(saveCallInfoRequest.getVisitResult());
+			callVisitParams.setVisitResult(visitResult);
+			callVisitParams.setAttitude(saveCallInfoRequest.getAttitude());
+
+			virtualQuestinairedId = saveCallInfoRequest.getVirtualQuestionaireId();
+		} else { 
+			virtualQuestinairedId = 0;
+		}
+		if (virtualQuestinairedId == null) {
+			virtualQuestinairedId = 0;
+		}
+		callVisitParams.setDoctorQuestionnaireId(virtualQuestinairedId);
+		
+		return callVisitParams;
 	}
 
 }
