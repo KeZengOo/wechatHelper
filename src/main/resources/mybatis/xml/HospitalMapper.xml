@@ -9,6 +9,13 @@
 		WHERE name=#{name} ORDER BY id DESC LIMIT 1
 	</select>
 	
+	<select id="getHospitals" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.HospitalProvinceBean">
+		SELECT 
+			id, name, province, city, level 
+		FROM hospital 
+		WHERE name LIKE "%"#{name}"%" LIMIT 10
+	</select>
+	
 	<insert id="saveHospital" keyProperty="id" useGeneratedKeys="true">
 		INSERT INTO hospital 
 			(name, province, city, level)

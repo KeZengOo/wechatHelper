@@ -70,6 +70,11 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService{
 		return virtualDoctorBasic;
 	}
 	
+	@Override
+	public List<HospitalProvinceBean> getHospitals(String hospitalName) {
+		return hospitalMapper.getHospitals(hospitalName);
+	}
+	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/**
@@ -187,5 +192,5 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService{
 		list.add(param);
 		drugUserDoctorQuateMapper.saveDrugUserDoctorQuates(list);
 	}
-	
+
 }

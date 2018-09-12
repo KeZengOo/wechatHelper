@@ -1,6 +1,9 @@
 package com.nuoxin.virtual.rep.api.service.v2_5;
 
+import java.util.List;
+
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
+import com.nuoxin.virtual.rep.api.entity.v2_5.HospitalProvinceBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorBasicResponse;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.SaveVirtualDoctorRequest;
 
@@ -20,5 +23,12 @@ public interface VirtualDoctorService {
 	 * @return 返回 VirtualDoctorBasicResponse 对象
 	 */
 	VirtualDoctorBasicResponse getVirtualDoctorBasic(Long virtualDoctorId);
+	
+	/**
+	 * 根据医院名模糊匹配
+	 * @param hospitalName
+	 * @return
+	 */
+	List<HospitalProvinceBean> getHospitals(String hospitalName);
 
 }

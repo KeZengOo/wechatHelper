@@ -1,5 +1,7 @@
 package com.nuoxin.virtual.rep.api.web.controller.v2_5;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -13,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
-import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorBasicResponse;
+import com.nuoxin.virtual.rep.api.entity.v2_5.HospitalProvinceBean;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualDoctorService;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.SaveVirtualDoctorRequest;
 
@@ -34,7 +36,7 @@ public class VirtualDoctorController extends NewBaseController {
 	private VirtualDoctorService virtualDoctorService;
 	
 	@SuppressWarnings("unchecked")
-	@ApiOperation(value = "添加单个客户医生信息", notes = "添加单个客户医生信息")
+	@ApiOperation(value = "添加单个客户医生信息")
 	@RequestMapping(value = "/single/save", method = { RequestMethod.POST })
 	public DefaultResponseBean<Boolean> singleSave(HttpServletRequest request,
 			@RequestBody @Valid SaveVirtualDoctorRequest saveRequest, BindingResult bindingResult) {
@@ -52,6 +54,23 @@ public class VirtualDoctorController extends NewBaseController {
 
 		DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<Boolean>();
 		responseBean.setData(flag);
+		return responseBean;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@ApiOperation(value = "根据医院名模糊匹配")
+	@RequestMapping(value = "/hospitals/get", method = { RequestMethod.GET })
+	public DefaultResponseBean<List<HospitalProvinceBean>> getHospitals(HttpServletRequest request,
+			@ApiParam(value = "控件中输入的医院名") @RequestParam(value = "hospital_name") String hospitalName) {
+		DrugUser user = this.getDrugUser(request);
+		if (user == null) {
+			return super.getLoginErrorResponse();
+		}
+
+		List<HospitalProvinceBean> list = virtualDoctorService.getHospitals(hospitalName);
+		DefaultResponseBean<List<HospitalProvinceBean>> responseBean = new DefaultResponseBean<List<HospitalProvinceBean>>();
+		responseBean.setData(list);
+		
 		return responseBean;
 	}
 }
