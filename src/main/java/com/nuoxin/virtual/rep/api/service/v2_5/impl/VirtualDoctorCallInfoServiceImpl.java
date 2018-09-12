@@ -21,6 +21,7 @@ import com.nuoxin.virtual.rep.api.service.v2_5.VirtualDoctorCallInfoService;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualQuestionnaireService;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.CallInfoListRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.SaveCallInfoRequest;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.SaveCallInfoUnConnectedRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.questionnaire.SaveVirtualQuestionnaireRecordRequestBean;
 
 /**
@@ -41,7 +42,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 
 	@Transactional(value = TxType.REQUIRED, rollbackOn = Exception.class)
 	@Override
-	public boolean saveCallInfo(SaveCallInfoRequest saveRequest) {
+	public boolean connectedsaveCallInfo(SaveCallInfoRequest saveRequest) {
 		long callId = this.doSaveCallInfo(saveRequest);
 		int effectNum = 0;
 		if (callId > 0) {
@@ -53,6 +54,13 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 			return true;
 		}
 
+		return false;
+	}
+	
+	@Transactional(value = TxType.REQUIRED, rollbackOn = Exception.class)
+	@Override
+	public boolean unconnectedsaveCallInfo(SaveCallInfoUnConnectedRequest saveRequest) {
+		// TODO
 		return false;
 	}
 	
@@ -151,5 +159,5 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		// 变更关系
 		drugUserDoctorQuateMapper.replaceRelationShipInfo(relationShipParams);
 	}
-	
+
 }

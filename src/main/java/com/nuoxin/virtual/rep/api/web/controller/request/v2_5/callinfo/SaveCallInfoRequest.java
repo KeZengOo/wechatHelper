@@ -11,7 +11,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-@ApiModel(value = "保存电话拜访信息")
+@ApiModel(value = "保存电话接通拜访信息")
 @Data
 public class SaveCallInfoRequest {
 	
@@ -25,6 +25,7 @@ public class SaveCallInfoRequest {
 	@NotNull(message="virtualDoctorId is null")
 	@ApiModelProperty(value = "医生ID")
 	private Long virtualDoctorId;
+	@NotNull(message="mobile is null")
 	@ApiModelProperty(value = "医生手机号")
 	private String mobile;
 	@ApiModelProperty(value = "呼叫类型 1.呼出,2.呼入")
