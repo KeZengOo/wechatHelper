@@ -84,7 +84,7 @@ public class CustomerFollowUpDetailController extends NewBaseController {
 	
 	@SuppressWarnings("unchecked")
 	@ApiOperation(value = "获取单个客户医生信息(基本信息)")
-	@RequestMapping(value = "/single/get", method = { RequestMethod.GET })
+	@RequestMapping(value = "/doctor/single/get", method = { RequestMethod.GET })
 	public DefaultResponseBean<VirtualDoctorBasicResponse> singleGet(
 			@ApiParam("医生ID") @RequestParam(value = "doctor_id") Long virtualDoctorId, HttpServletRequest request) {
 		DrugUser user = this.getDrugUser(request);
