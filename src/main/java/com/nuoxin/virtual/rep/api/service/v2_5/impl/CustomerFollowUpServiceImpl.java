@@ -39,18 +39,58 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	private DoctorMapper doctorMapper;
 	
 	static {
-		TableHeader header = new TableHeader();
-		header.setLabel("客户姓名");
-		header.setName("doctorName");
-
-		TableHeader header2 = new TableHeader();
-		header2.setLabel("手机号");
-		header2.setName("doctorMobile");
-
-		tableHeaders.add(header);
-		tableHeaders.add(header2);
+		TableHeader id = new TableHeader();
+		id.setLabel("ID");
+		id.setName("doctorId");
 		
-		// TODO 补全 @谢开宇
+		TableHeader doctorName = new TableHeader();
+		doctorName.setLabel("客户姓名");
+		doctorName.setName("doctorName");
+
+		TableHeader mobile = new TableHeader();
+		mobile.setLabel("手机号");
+		mobile.setName("doctorMobile");
+		
+		TableHeader gender = new TableHeader();
+		gender.setLabel("性别");
+		gender.setName("gender");
+		
+		TableHeader department = new TableHeader();
+		department.setLabel("科室");
+		department.setName("department");
+		
+		TableHeader isHasWeChat = new TableHeader();
+		isHasWeChat.setLabel("是否添加微信");
+		isHasWeChat.setName("isHasWeChat");
+		
+		TableHeader hospitalName = new TableHeader();
+		hospitalName.setLabel("医院");
+		hospitalName.setName("hospitalName");
+		
+		TableHeader visitTime = new TableHeader();
+		visitTime.setLabel("上次拜访时间");
+		visitTime.setName("visitTime");
+		
+		TableHeader visitResult = new TableHeader();
+		visitResult.setLabel("拜访结果");
+		visitResult.setName("visitResult");
+		
+		TableHeader nextVisitTime = new TableHeader();
+		nextVisitTime.setLabel("下次拜访时间");
+		nextVisitTime.setName("nextVisitTime");
+
+		tableHeaders.add(id);
+		tableHeaders.add(doctorName);
+		tableHeaders.add(mobile);
+		tableHeaders.add(gender);
+		tableHeaders.add(department);
+		tableHeaders.add(isHasWeChat);
+		tableHeaders.add(hospitalName);
+		tableHeaders.add(visitTime);
+		tableHeaders.add(visitResult);
+		tableHeaders.add(nextVisitTime);
+		
+		// TODO 补全 @田存
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })

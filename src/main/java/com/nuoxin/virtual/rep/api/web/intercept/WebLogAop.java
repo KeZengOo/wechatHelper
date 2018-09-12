@@ -1,6 +1,8 @@
 package com.nuoxin.virtual.rep.api.web.intercept;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -13,7 +15,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Enumeration;
 
 /**
  * web接口统一日志输出
@@ -34,23 +35,14 @@ public class WebLogAop {
 
     @Before("webLog()")
     public void doBefore(JoinPoint joinPoint) throws Throwable{
-        //请求开始时间
-        startTime.set(System.currentTimeMillis());
-
-        //接收请求记录下请求内容
-        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        HttpServletRequest request = attributes.getRequest();
-
-        //记录下请求的内容
-        logger.info("URL: {}", request.getRequestURL());
-        logger.info("URI: {}", request.getRequestURI());
-        logger.info("http_method: {}", request.getMethod());
-        logger.info("IP: {}", request.getRemoteAddr());
-        Enumeration<String> parameterNames = request.getParameterNames();
-        while (parameterNames.hasMoreElements()){
-            String args = parameterNames.nextElement();
-            logger.info("args={}, value={}", args, request.getParameter(args));
-        }
+		HttpServletRequest request = this.getRequest();
+		
+        String url = request.getRequestURL().toString();
+        String uri = request.getRequestURI();
+        String method = request.getMethod();
+        String remoteIp = request.getRemoteAddr();
+        
+		logger.info("\n access_ip:{} \n http_method:{} \n URL: {} \n URI:{}", remoteIp, method, url, uri);
     }
 
     @AfterReturning(returning = "ret", pointcut = "webLog()")
@@ -59,8 +51,16 @@ public class WebLogAop {
         logger.info("response:" + JSON.toJSONString(ret));
         long endTime = System.currentTimeMillis();
         long start = startTime.get();
-        logger.info("spend time {}ms", ((endTime - start)) );
+        
+        logger.warn("spend time {}ms", ((endTime - start)) );
         startTime.remove();
     }
+    
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+	private HttpServletRequest getRequest() {
+		ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+		return attributes.getRequest();
+	}
 
 }
