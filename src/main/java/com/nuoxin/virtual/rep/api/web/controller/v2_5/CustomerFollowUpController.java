@@ -46,7 +46,7 @@ public class CustomerFollowUpController extends NewBaseController {
 	private CustomerFollowUpService customerFollowService;
 	
 	@SuppressWarnings("unchecked")
-	@ApiOperation(value = "客户医生拜访列表信息", notes = "客户医生拜访列表信息")
+	@ApiOperation(value = "客户医生拜访列表信息")
 	@RequestMapping(value = "/list", method = { RequestMethod.POST })
 	public DefaultResponseBean<PageResponseBean<List<CustomerFollowListBean>>> list(HttpServletRequest request,
 			@RequestBody ListRequestBean indexRequest) {
@@ -65,7 +65,7 @@ public class CustomerFollowUpController extends NewBaseController {
 	}
 	
 	@SuppressWarnings("unchecked")
-	@ApiOperation(value = "搜索接口", notes = "搜索接口")
+	@ApiOperation(value = "搜索接口")
 	@RequestMapping(value = "/search", method = { RequestMethod.POST })
 	public DefaultResponseBean<PageResponseBean<List<CustomerFollowListBean>>> search(HttpServletRequest request,
 			@RequestBody SearchRequestBean searchRequest) {
@@ -86,7 +86,7 @@ public class CustomerFollowUpController extends NewBaseController {
 	}
 	
 	@SuppressWarnings("unchecked")
-	@ApiOperation(value = "筛选接口", notes = "筛选接口")
+	@ApiOperation(value = "筛选接口")
 	@RequestMapping(value = "/screen", method = { RequestMethod.POST })
 	public DefaultResponseBean<PageResponseBean<List<CustomerFollowListBean>>> screen(
 			@RequestBody ScreenRequestBean screenRequest, HttpServletRequest request) {
@@ -112,7 +112,7 @@ public class CustomerFollowUpController extends NewBaseController {
 		return responseBean;
 	}
 	
-	@ApiOperation(value = "更多筛选接口", notes = "更多筛选接口")
+	@ApiOperation(value = "更多筛选接口")
 	@RequestMapping(value = "/search/more", method = { RequestMethod.POST })
 	public ResponseEntity<DefaultResponseBean<Boolean>> searchMore(@RequestBody Object object) {
 		// TODO @田存
@@ -122,7 +122,7 @@ public class CustomerFollowUpController extends NewBaseController {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	@SuppressWarnings("unchecked")
-	@ApiOperation(value = "获取所有下属医药代表信息(医药代表)", notes = "根据获取所有下属医药代表信息(医药代表)")
+	@ApiOperation(value = "获取所有下属医药代表信息(医药代表)")
 	@RequestMapping(value = "/drug_users/get", method = { RequestMethod.GET })
 	public DefaultResponseBean<List<DrugUserResponseBean>> getSubordinates(HttpServletRequest request) {
 		DrugUser user = super.getDrugUser(request);
@@ -138,7 +138,7 @@ public class CustomerFollowUpController extends NewBaseController {
 	}
 	
 	@SuppressWarnings("unchecked")
-	@ApiOperation(value = "根据获取所有产品线信息", notes = "根据获取所有产品线信息(产品)")
+	@ApiOperation(value = "根据获取所有产品线信息(产品)")
 	@RequestMapping(value = "/product_lines/get", method = { RequestMethod.GET })
 	public DefaultResponseBean<List<ProductResponseBean>> getAllProductLines(HttpServletRequest request) {
 		DrugUser user = super.getDrugUser(request);
