@@ -34,16 +34,18 @@ public class WebLogAop {
     }
 
     @Before("webLog()")
-    public void doBefore(JoinPoint joinPoint) throws Throwable{
+	public void doBefore(JoinPoint joinPoint) throws Throwable {
 		HttpServletRequest request = this.getRequest();
-		
-        String url = request.getRequestURL().toString();
-        String uri = request.getRequestURI();
-        String method = request.getMethod();
-        String remoteIp = request.getRemoteAddr();
-        
+
+		String url = request.getRequestURL().toString();
+		String uri = request.getRequestURI();
+		String method = request.getMethod();
+		String remoteIp = request.getRemoteAddr();
+
 		logger.info("\n access_ip:{} \n http_method:{} \n URL: {} \n URI:{}", remoteIp, method, url, uri);
-    }
+
+		startTime.set(System.currentTimeMillis());
+	}
 
     @AfterReturning(returning = "ret", pointcut = "webLog()")
     public void doAfter(Object ret) throws Throwable{
