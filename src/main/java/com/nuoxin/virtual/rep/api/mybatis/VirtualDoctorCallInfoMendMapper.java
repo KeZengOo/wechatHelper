@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
-import com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitBean;
+import com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitMendBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoParams;
 
 /**
@@ -13,13 +13,19 @@ import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoParams;
  */
 public interface VirtualDoctorCallInfoMendMapper {
 	
+	/**
+	 * 保存扩展信息
+	 * @param params
+	 * @return
+	 */
 	int saveVirtualDoctorCallInfoMend(VirtualDoctorCallInfoParams params);
 	
-	int getCallVisitCount(@Param(value = "virtualDrugUserId") Long virtualDrugUserId,
-			@Param(value = "virtualDoctorId") Long virtualDoctorId);
-	
-	List<CallVisitBean> getCallVisitList(@Param(value = "virtualDrugUserId") Long virtualDrugUserId,
-			@Param(value = "virtualDoctorId") Long virtualDoctorId, @Param(value = "currentSize") Integer currentSize,
-			@Param(value = "pageSize") Integer pageSize);
+	/**
+	 * 根据 callIds 获取扩展信息
+	 * @param callIds
+	 * @param virtualDoctorId
+	 * @return
+	 */
+	List<CallVisitMendBean> getCallVisitMendList(@Param(value = "callIds") List<Long> callIds);
 }
 

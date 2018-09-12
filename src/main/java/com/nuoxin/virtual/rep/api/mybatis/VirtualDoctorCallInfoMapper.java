@@ -12,14 +12,33 @@ import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoParams;
  * @author xiekaiyu
  */
 public interface VirtualDoctorCallInfoMapper {
-	
-	int saveVirtualDoctorCallInfo(VirtualDoctorCallInfoParams params);
-	
-	int getCallVisitCount(@Param(value = "virtualDrugUserId") Long virtualDrugUserId,
+
+	/**
+	 * 根据过滤条件计算数据总数
+	 * @param virtualDrugUserIds
+	 * @param virtualDoctorId
+	 * @return 返回记录总条数
+	 */
+	int getCallVisitCount(@Param(value = "virtualDrugUserIds") List<Long> virtualDrugUserIds,
 			@Param(value = "virtualDoctorId") Long virtualDoctorId);
-	
-	List<CallVisitBean> getCallVisitList(@Param(value = "virtualDrugUserId") Long virtualDrugUserId,
+
+	/**
+	 * 根据过滤条件获取拜访列表信息
+	 * @param virtualDrugUserIds
+	 * @param virtualDoctorId
+	 * @param currentSize
+	 * @param pageSize
+	 * @return
+	 */
+	List<CallVisitBean> getCallVisitList(@Param(value = "virtualDrugUserIds") List<Long> virtualDrugUserIds,
 			@Param(value = "virtualDoctorId") Long virtualDoctorId, @Param(value = "currentSize") Integer currentSize,
 			@Param(value = "pageSize") Integer pageSize);
+	
+	/**
+	 * 保存电话拜访信息
+	 * @param params
+	 * @return
+	 */
+	int saveVirtualDoctorCallInfo(VirtualDoctorCallInfoParams params);
 }
 

@@ -46,8 +46,9 @@ public class VirtualDoctorCallInfoController extends NewBaseController{
 			return super.getLoginErrorResponse();
 		} 
 		
+		String leaderPath = user.getLeaderPath();
+		PageResponseBean<List<CallVisitBean>> result = callInfoService.getCallVisitList(listRequest, leaderPath);
 		DefaultResponseBean<PageResponseBean<List<CallVisitBean>>> responseBean = new DefaultResponseBean<PageResponseBean<List<CallVisitBean>>>();
-		PageResponseBean<List<CallVisitBean>> result = callInfoService.getCallVisitList(listRequest);
 		responseBean.setData(result);
 		
 		return responseBean;

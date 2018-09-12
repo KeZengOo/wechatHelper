@@ -15,6 +15,13 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.SaveCallI
 public interface VirtualDoctorCallInfoService {
 	
 	/**
+	 * 获取电话拜访列表
+	 * @param request
+	 * @return
+	 */
+	PageResponseBean<List<CallVisitBean>> getCallVisitList(CallInfoListRequest request, String leaderPath);
+	
+	/**
 	 * 保存电话接通拜访结果,有RERUIRED事务
 	 * @param saveRequest
 	 * @return 成功返回 true ,否则返回 false
@@ -28,10 +35,4 @@ public interface VirtualDoctorCallInfoService {
 	 */
 	boolean unconnectedsaveCallInfo(SaveCallInfoUnConnectedRequest saveRequest);
 	
-	/**
-	 * 获取电话拜访列表
-	 * @param request
-	 * @return
-	 */
-	PageResponseBean<List<CallVisitBean>> getCallVisitList(CallInfoListRequest request);
 }

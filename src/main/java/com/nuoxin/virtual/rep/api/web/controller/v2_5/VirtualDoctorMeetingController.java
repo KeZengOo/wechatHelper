@@ -46,8 +46,8 @@ public class VirtualDoctorMeetingController extends NewBaseController{
 			return super.getParamsErrorResponse("virtualDoctorId is null");
 		}
 		
-		DefaultResponseBean<PageResponseBean<List<MeetingBean>>> responseBean = new DefaultResponseBean<PageResponseBean<List<MeetingBean>>>();
 		PageResponseBean<List<MeetingBean>> result = meetingService.getMeetingList(listRequest);
+		DefaultResponseBean<PageResponseBean<List<MeetingBean>>> responseBean = new DefaultResponseBean<PageResponseBean<List<MeetingBean>>>();
 		responseBean.setData(result);
 		
 		return responseBean;

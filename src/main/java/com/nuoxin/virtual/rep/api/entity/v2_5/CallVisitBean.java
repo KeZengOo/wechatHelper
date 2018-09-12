@@ -11,7 +11,8 @@ import lombok.Data;
 @ApiModel("电话拜访 Bean")
 @Data
 public class CallVisitBean {
-	
+	@ApiModelProperty(value = "callId")
+	private Long callId;
 	@ApiModelProperty(value = "通话时长")
 	private Integer callTime;
 	@ApiModelProperty(value = "通话状态")

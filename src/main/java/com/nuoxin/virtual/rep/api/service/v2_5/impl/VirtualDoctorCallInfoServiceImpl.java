@@ -1,7 +1,10 @@
 package com.nuoxin.virtual.rep.api.service.v2_5.impl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
@@ -12,13 +15,16 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSONObject;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitBean;
+import com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitMendBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.UpdateVirtualDrugUserDoctorRelationship;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoParams;
 import com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorQuateMapper;
+import com.nuoxin.virtual.rep.api.mybatis.DrugUserMapper;
 import com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorCallInfoMapper;
 import com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorCallInfoMendMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualDoctorCallInfoService;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualQuestionnaireService;
+import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.BaseCallInfoRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.CallInfoListRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.SaveCallInfoRequest;
@@ -40,6 +46,55 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	private VirtualDoctorCallInfoMendMapper callInfoMendMapper;
 	@Resource
 	private DrugUserDoctorQuateMapper drugUserDoctorQuateMapper;
+	@Resource
+	private DrugUserMapper drugUserMapper;
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+	public PageResponseBean<List<CallVisitBean>> getCallVisitList(CallInfoListRequest request, String leaderPath) {
+		PageResponseBean<List<CallVisitBean>> pageResponse = null;
+
+		Long virtualDoctorId = request.getVirtualDoctorId();
+		List<Long> virtualDrugUserIds = this.getSubordinateIds(leaderPath);
+		if(CollectionsUtil.isNotEmptyList(virtualDrugUserIds)) {
+			int count = callInfoMapper.getCallVisitCount(virtualDrugUserIds, virtualDoctorId);
+			if (count > 0) {
+				int currentSize = request.getCurrentSize();
+				int pageSize = request.getPageSize();
+				List<CallVisitBean> list = callInfoMapper.getCallVisitList(virtualDrugUserIds, virtualDoctorId, currentSize, pageSize);
+				if (CollectionsUtil.isNotEmptyList(list)) {
+					List<Long> callIds = new ArrayList<>(list.size());
+					list.forEach(visitBean ->{
+						callIds.add(visitBean.getCallId());
+					});
+					
+					// 补充 VirtualDoctorCallInfoMend 信息
+					List<CallVisitMendBean> callInfoMends = callInfoMendMapper.getCallVisitMendList(callIds);
+					if (CollectionsUtil.isNotEmptyList(callInfoMends)) {
+						ConcurrentMap<Long, CallVisitMendBean> map = new ConcurrentHashMap<>(callInfoMends.size());
+						callInfoMends.forEach(mend -> {
+							map.putIfAbsent(mend.getCallId(), mend);
+						});
+
+						list.forEach(visit -> {
+							Long callId = visit.getCallId();
+							CallVisitMendBean mend = map.get(callId);
+							if (mend != null) {
+								visit.setAttitude(mend.getAttitude());
+							}
+						});
+					}
+				}
+				pageResponse = new PageResponseBean(request, count, list);
+			} 
+		}
+		
+		if (pageResponse == null) {
+			pageResponse = new PageResponseBean(request, 0, Collections.emptyList());
+		}
+		
+		return pageResponse;
+	}
 
 	@Transactional(value = TxType.REQUIRED, rollbackOn = Exception.class)
 	@Override
@@ -76,28 +131,6 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		return false;
 	}
 	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@Override
-	public PageResponseBean<List<CallVisitBean>> getCallVisitList(CallInfoListRequest request) {
-		Long virtualDrugUserId = request.getVirtualDrugUserId();
-		Long virtualDoctorId = request.getVirtualDoctorId();
-		int count = callInfoMapper.getCallVisitCount(virtualDrugUserId, virtualDoctorId);
-		
-		PageResponseBean<List<CallVisitBean>> pageResponse = null;
-		if (count > 0) {
-			List<CallVisitBean> list = callInfoMapper.getCallVisitList(virtualDrugUserId, virtualDoctorId,
-					request.getCurrentSize(), request.getPageSize());
-			
-			pageResponse = new PageResponseBean(request, count, list);
-		} 
-		
-		if (pageResponse == null) {
-			pageResponse = new PageResponseBean(request, 0, Collections.emptyList());
-		}
-		
-		return pageResponse;
-	}
-
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/**
@@ -198,6 +231,15 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		callVisitParams.setDoctorQuestionnaireId(virtualQuestinairedId);
 		
 		return callVisitParams;
+	}
+	
+	/**
+	 * 获取所有下属(直接&间接) virtualDrugUserIds
+	 * @param leaderPath 领导路径
+	 * @return List<Long>
+	 */
+	private List<Long> getSubordinateIds(String leaderPath) {
+		return drugUserMapper.getSubordinateIdsByLeaderPath(leaderPath);
 	}
 
 }
