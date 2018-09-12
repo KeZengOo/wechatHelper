@@ -8,4 +8,6 @@ public class VirtualDoctorMendParams {
 	private String wechat;
 	private String address;
 	private String fixedPhone;
+	private String secondaryMobile;
+	private String thirdaryMobile;
 }
