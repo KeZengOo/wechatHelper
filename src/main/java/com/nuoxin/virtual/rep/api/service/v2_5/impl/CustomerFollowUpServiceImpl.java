@@ -22,6 +22,10 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.SearchReq
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CustomerFollowListBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.TableHeader;
 
+/**
+ * 客户跟进实现类
+ * @author xiekaiyu
+ */
 @Service
 public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	
@@ -46,22 +50,26 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		tableHeaders.add(header);
 		tableHeaders.add(header2);
 		
-		// TODO 补全
+		// TODO 补全 @谢开宇
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public PageResponseBean<List<CustomerFollowListBean>> list(ListRequestBean request, String leaderPath) {
-		PageResponseBean pageResponseBean = null;
 		int count = 0;
+		PageResponseBean pageResponseBean = null;
 		
 		// 获取所有下属(直接&间接) virtualDrugUserIds
 		List<Long> virtualDrugUserIds = this.getSubordinateIds(leaderPath);
 		if (CollectionsUtil.isNotEmptyList(virtualDrugUserIds)) {
 			count = doctorMapper.getListCount(virtualDrugUserIds, null, null);
 			if(count > 0) {
-				List<CustomerFollowListBean> list = doctorMapper.getList(virtualDrugUserIds, request.getCurrentSize(), request.getPageSize(), null, null);
+				int currentSize = request.getCurrentSize();
+				int pageSize = request.getPageSize();
+				List<CustomerFollowListBean> list = doctorMapper.getList(virtualDrugUserIds, currentSize, pageSize, null, null);
 				pageResponseBean = this.getDoctorsList(count, list, request);
+				
+				// TODO 补充对应的产品信息 @田存
 			}
 		} 
 		
@@ -82,7 +90,9 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 			String search = request.getSearch();
 			count = doctorMapper.getListCount(virtualDrugUserIds, search, null);
 			if(count > 0) {
-				List<CustomerFollowListBean> list = doctorMapper.getList(virtualDrugUserIds, request.getCurrentSize(), request.getPageSize(), search, null);
+				int currentSize = request.getCurrentSize();
+				int pageSize = request.getPageSize();
+				List<CustomerFollowListBean> list = doctorMapper.getList(virtualDrugUserIds, currentSize, pageSize, search, null);
 				pageResponseBean = this.getDoctorsList(count, list, request);
 			}
 		} 
@@ -101,8 +111,10 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		List<Integer> productLineIds = request.getProductLineIds();
 		int count = doctorMapper.getListCount(virtualDrugUserIds, null, productLineIds);
 		if(count > 0 ) {
-			List<CustomerFollowListBean> list = doctorMapper.getList(virtualDrugUserIds, request.getCurrentSize(),
-					request.getPageSize(), null, productLineIds);
+			int currentSize = request.getCurrentSize();
+			int pageSize = request.getPageSize();
+			List<CustomerFollowListBean> list = doctorMapper.getList(virtualDrugUserIds, currentSize, pageSize, null,
+					productLineIds);
 			pageResponseBean = this.getDoctorsList(count, list, request);
 		}
 		
@@ -122,6 +134,13 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		return drugUserMapper.getSubordinateIdsByLeaderPath(leaderPath);
 	}
 	
+	/**
+	 * 医生列表信息处理(重要)
+	 * @param count int
+	 * @param list List<CustomerFollowListBean>
+	 * @param pageRequestBean
+	 * @return PageResponseBean<List<CustomerFollowListBean>>
+	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private PageResponseBean<List<CustomerFollowListBean>> getDoctorsList(int count, List<CustomerFollowListBean> list,
 			PageRequestBean pageRequestBean) {
@@ -146,7 +165,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	}
 	
 	/**
-	 * 补偿
+	 * PageResponseBean 为null 时的补偿
 	 * @param pageResponseBean
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })

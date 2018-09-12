@@ -6,15 +6,19 @@ import javax.servlet.http.HttpServletRequest;
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
-import com.nuoxin.virtual.rep.api.service.SercurityService;
+import com.nuoxin.virtual.rep.api.service.SecurityService;
 
-public class BaseController {
+/**
+ * 新的 BaseController
+ * @author xiekaiyu
+ */
+public class NewBaseController {
 	
 	@Resource
-	private SercurityService sercurityService;
+	private SecurityService sercurityService;
 	
 	/**
-	 * 从会话变量中获取 DrugUser 信息 
+	 * 根据 request 从会话变量中获取 DrugUser 信息 
 	 * @param request
 	 * @return 成功返回 DrugUser 对象,否则返回 null
 	 */
@@ -22,6 +26,10 @@ public class BaseController {
 		return sercurityService.getDrugUser(request);
 	}
 	
+	/**
+	 * 登录错误信息
+	 * @return
+	 */
 	@SuppressWarnings("rawtypes")
 	protected DefaultResponseBean getLoginErrorResponse() {
 		DefaultResponseBean responseBean = new DefaultResponseBean<>();
@@ -32,6 +40,11 @@ public class BaseController {
 		return responseBean;
 	}
 	
+	/**
+	 * 返回带有错误信息
+	 * @param msg
+	 * @return
+	 */
 	@SuppressWarnings("rawtypes")
 	protected DefaultResponseBean getParamsErrorResponse(String msg) {
 		DefaultResponseBean responseBean = new DefaultResponseBean<>();
@@ -41,4 +54,5 @@ public class BaseController {
 		responseBean.setDescription(msg);
 		return responseBean;
 	}
+	
 }

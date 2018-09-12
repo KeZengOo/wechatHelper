@@ -84,13 +84,13 @@
 
 	<!-- 以下是虚拟工作台 v2.5 后用到的 -->
 	
-	<!-- 计算 virtualDrugUserIds 对应医生总数 -->
+	<!-- 根据过滤条件获取医生总条数 -->
 	<select id="getListCount" resultType="java.lang.Integer">
 		SELECT 
 			count(d.id)
 		FROM doctor d 
 		JOIN (
-			<!-- 根据 virtualDrugUserIds 获取对应的 doctorIds -->
+			<!-- 根据 virtualDrugUserIds 获取对应去重后的 doctorIds -->
 	  		SELECT 
 				DISTINCT doctor_id 
 			FROM drug_user_doctor 
@@ -108,7 +108,7 @@
 			</if>
   		) temp ON  d.id=temp.doctor_id
   		
-  		<!-- 搜索 -->
+  		<!-- 搜索:d.name 模糊匹配,d.telephone 及 d.depart 精确匹配 -->
   		<if test="search != null">
   			WHERE 
 			d.name LIKE "%"#{search,jdbcType=VARCHAR}"%" 
@@ -118,6 +118,7 @@
   		
 	</select>
 	
+	<!-- 根据过滤条件获取医生拜访列表信息(不含对应的产品信息) -->
 	<select id="getList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CustomerFollowListBean">
 		<!-- 根据 virtualDrugUserIds 获取对应医生基本信息 -->
 		SELECT 

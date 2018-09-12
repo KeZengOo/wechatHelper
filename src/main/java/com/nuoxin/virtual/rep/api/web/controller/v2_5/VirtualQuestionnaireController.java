@@ -27,7 +27,7 @@ import io.swagger.annotations.ApiParam;
 @Api(value = "V2.5虚拟代表问卷相关接口")
 @RequestMapping(value = "/questionnaire")
 @RestController
-public class VirtualQuestionnaireController extends BaseController {
+public class VirtualQuestionnaireController extends NewBaseController {
 	
 	@Resource
 	private VirtualQuestionnaireService questionnaireService;

@@ -28,7 +28,7 @@ import io.swagger.annotations.ApiParam;
 @Api(value = "V2.5客户医生相关接口")
 @RequestMapping(value = "/doctors")
 @RestController
-public class VirtualDoctorController extends BaseController {
+public class VirtualDoctorController extends NewBaseController {
 	
 	@Resource
 	private VirtualDoctorService virtualDoctorService;

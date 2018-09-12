@@ -8,7 +8,7 @@ import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.DrugUserService;
 import com.nuoxin.virtual.rep.api.service.EmailService;
 import com.nuoxin.virtual.rep.api.service.LoginService;
-import com.nuoxin.virtual.rep.api.service.SercurityService;
+import com.nuoxin.virtual.rep.api.service.SecurityService;
 import com.nuoxin.virtual.rep.api.web.controller.request.LoginRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.UpdatePwdRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserCallDetaiBean;
@@ -34,7 +34,7 @@ public class LoginController extends BaseController {
 	@Autowired
 	private LoginService loginService;
 	@Autowired
-	private SercurityService sercurityService;
+	private SecurityService sercurityService;
 	@Autowired
 	private DrugUserService drugUserService;
 	@Autowired

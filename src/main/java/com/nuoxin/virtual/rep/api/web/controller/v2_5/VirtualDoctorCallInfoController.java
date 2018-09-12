@@ -31,7 +31,7 @@ import io.swagger.annotations.ApiOperation;
 @Api(value = "V2.5电话拜访相关接口")
 @RequestMapping(value = "/call/info")
 @RestController
-public class VirtualDoctorCallInfoController extends BaseController{
+public class VirtualDoctorCallInfoController extends NewBaseController{
 	
 	@Resource
 	private VirtualDoctorCallInfoService callInfoService;

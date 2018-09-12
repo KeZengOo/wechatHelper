@@ -15,6 +15,10 @@ import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.product.ProductResponseBean;
 
+/**
+ * 虚拟代表业务实现类
+ * @author xiekaiyu
+ */
 @Service
 public class DrugUserServiceImpl implements DrugUserService{
 	

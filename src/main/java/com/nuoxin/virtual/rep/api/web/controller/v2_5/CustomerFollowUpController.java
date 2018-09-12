@@ -36,7 +36,7 @@ import shaded.org.apache.commons.lang3.StringUtils;
 @Api(value = "V2.5客户跟进首页相关接口")
 @RequestMapping(value = "/customer/followup/index")
 @RestController
-public class CustomerFollowUpController extends BaseController {
+public class CustomerFollowUpController extends NewBaseController {
 	
 	@Resource
 	private SessionMemUtils memUtils;
@@ -46,19 +46,19 @@ public class CustomerFollowUpController extends BaseController {
 	private CustomerFollowUpService customerFollowService;
 	
 	@SuppressWarnings("unchecked")
-	@ApiOperation(value = "列表", notes = "列表")
+	@ApiOperation(value = "客户医生拜访列表信息", notes = "客户医生拜访列表信息")
 	@RequestMapping(value = "/list", method = { RequestMethod.POST })
 	public DefaultResponseBean<PageResponseBean<List<CustomerFollowListBean>>> list(HttpServletRequest request,
 			@RequestBody ListRequestBean indexRequest) {
-		DrugUser user = this.getDrugUser(request);
+		DrugUser user = super.getDrugUser(request);
 		if(user == null) {
-			return this.getLoginErrorResponse();
+			return super.getLoginErrorResponse();
 		} 
 		
 		// 从会话变量中获取 leaderPath
 		String leaderPath = user.getLeaderPath();
-		DefaultResponseBean<PageResponseBean<List<CustomerFollowListBean>>> responseBean = new DefaultResponseBean<>();
 		PageResponseBean<List<CustomerFollowListBean>> pageResponse = customerFollowService.list(indexRequest, leaderPath);
+		DefaultResponseBean<PageResponseBean<List<CustomerFollowListBean>>> responseBean = new DefaultResponseBean<>();
 		responseBean.setData(pageResponse);
 		
 		return responseBean;
@@ -67,20 +67,20 @@ public class CustomerFollowUpController extends BaseController {
 	@SuppressWarnings("unchecked")
 	@ApiOperation(value = "搜索接口", notes = "搜索接口")
 	@RequestMapping(value = "/search", method = { RequestMethod.POST })
-	public DefaultResponseBean<PageResponseBean<List<CustomerFollowListBean>>> search(
-			@RequestBody SearchRequestBean searchRequest, HttpServletRequest request) {
-		DrugUser user = this.getDrugUser(request);
+	public DefaultResponseBean<PageResponseBean<List<CustomerFollowListBean>>> search(HttpServletRequest request,
+			@RequestBody SearchRequestBean searchRequest) {
+		DrugUser user = super.getDrugUser(request);
 		if(user == null) {
-			return this.getLoginErrorResponse();
+			return super.getLoginErrorResponse();
 		} 
 		
 		String search = searchRequest.getSearch();
-		if (StringUtils.isBlank(search)) {
-			return this.getParamsErrorResponse("search is null");
+		if(StringUtils.isBlank(search)) {
+			return super.getParamsErrorResponse("search is blank");
 		}
-		
-		DefaultResponseBean<PageResponseBean<List<CustomerFollowListBean>>> responseBean = new DefaultResponseBean<>();
+
 		PageResponseBean<List<CustomerFollowListBean>> pageResponse = customerFollowService.search(searchRequest,user.getLeaderPath());
+		DefaultResponseBean<PageResponseBean<List<CustomerFollowListBean>>> responseBean = new DefaultResponseBean<>();
 		responseBean.setData(pageResponse);
 		return responseBean;
 	}
@@ -90,32 +90,32 @@ public class CustomerFollowUpController extends BaseController {
 	@RequestMapping(value = "/screen", method = { RequestMethod.POST })
 	public DefaultResponseBean<PageResponseBean<List<CustomerFollowListBean>>> screen(
 			@RequestBody ScreenRequestBean screenRequest, HttpServletRequest request) {
-		DrugUser user = this.getDrugUser(request);
+		DrugUser user = super.getDrugUser(request);
 		if(user == null) {
-			return this.getLoginErrorResponse();
+			return super.getLoginErrorResponse();
 		} 
 		
 		List<Long> virtualDrugUserIds = screenRequest.getVirtualDrugUserIds();
 		if (CollectionsUtil.isEmptyList(virtualDrugUserIds)) {
-			return this.getParamsErrorResponse("virtualDrugUserIds is null");
+			return super.getParamsErrorResponse("virtualDrugUserIds is empty list");
 		}
 		
 		List<Integer> productLineIds = screenRequest.getProductLineIds();
 		if (CollectionsUtil.isEmptyList(productLineIds)) {
-			return this.getParamsErrorResponse("productLineIds is null");
+			return super.getParamsErrorResponse("productLineIds is empty list");
 		}
 		
-		
-		DefaultResponseBean<PageResponseBean<List<CustomerFollowListBean>>> responseBean = new DefaultResponseBean<>();
 		PageResponseBean<List<CustomerFollowListBean>> pageResponse = customerFollowService.screen(screenRequest);
+		DefaultResponseBean<PageResponseBean<List<CustomerFollowListBean>>> responseBean = new DefaultResponseBean<>();
 		responseBean.setData(pageResponse);
+		
 		return responseBean;
 	}
 	
 	@ApiOperation(value = "更多筛选接口", notes = "更多筛选接口")
 	@RequestMapping(value = "/search/more", method = { RequestMethod.POST })
 	public ResponseEntity<DefaultResponseBean<Boolean>> searchMore(@RequestBody Object object) {
-		// TODO
+		// TODO @田存
 		return null;
 	}
 	
@@ -125,14 +125,15 @@ public class CustomerFollowUpController extends BaseController {
 	@ApiOperation(value = "根据 leaderPath 获取所有下属医药代表信息", notes = "根据 leaderPath 获取所有下属医药代表信息")
 	@RequestMapping(value = "/drug_users/get", method = { RequestMethod.GET })
 	public DefaultResponseBean<List<DrugUserResponseBean>> getSubordinates(HttpServletRequest request) {
-		DrugUser user = this.getDrugUser(request);
+		DrugUser user = super.getDrugUser(request);
 		if(user == null) {
-			return this.getLoginErrorResponse();
+			return super.getLoginErrorResponse();
 		} 
 		
-		DefaultResponseBean<List<DrugUserResponseBean>> responseBean = new DefaultResponseBean<>();
 		List<DrugUserResponseBean> list = drugUserService.getSubordinates(user.getLeaderPath());
+		DefaultResponseBean<List<DrugUserResponseBean>> responseBean = new DefaultResponseBean<>();
 		responseBean.setData(list);
+		
 		return responseBean;
 	}
 	
@@ -140,14 +141,15 @@ public class CustomerFollowUpController extends BaseController {
 	@ApiOperation(value = "根据 leaderPath 获取所有产品线信息", notes = "根据 leaderPath 获取所有产品线信息")
 	@RequestMapping(value = "/product_lines/get", method = { RequestMethod.GET })
 	public DefaultResponseBean<List<ProductResponseBean>> getAllProductLines(HttpServletRequest request) {
-		DrugUser user = this.getDrugUser(request);
+		DrugUser user = super.getDrugUser(request);
 		if(user == null) {
-			return this.getLoginErrorResponse();
+			return super.getLoginErrorResponse();
 		} 
 		
-		DefaultResponseBean<List<ProductResponseBean>> responseBean = new DefaultResponseBean<>();
 		List<ProductResponseBean> list = drugUserService.getProductsByDrugUserId(user.getLeaderPath());
+		DefaultResponseBean<List<ProductResponseBean>> responseBean = new DefaultResponseBean<>();
 		responseBean.setData(list);
+		
 		return responseBean;
 	}
 

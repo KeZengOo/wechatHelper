@@ -5,6 +5,10 @@ import java.util.List;
 import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.product.ProductResponseBean;
 
+/**
+ * 虚拟代表业务接口
+ * @author xiekaiyu
+ */
 public interface DrugUserService {
 
 	/**

@@ -1,11 +1,8 @@
 package com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup;
 
-import java.util.List;
-
 import com.nuoxin.virtual.rep.api.common.bean.PageRequestBean;
 
 import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

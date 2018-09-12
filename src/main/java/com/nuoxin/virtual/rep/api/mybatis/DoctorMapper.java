@@ -47,12 +47,28 @@ public interface DoctorMapper{
 
     void updateFixedHospital(HcpDynamicRequestBean bean);
     
-    ////// 以下是 v2.5 使用到的
+    ////////////////// 以下是 v2.5 使用到的//////////////////
 
+    /**
+     * 根据过滤条件获取医生总条数
+     * @param virtualDrugUserIds 虚拟代表 ID
+     * @param search 搜索内容(mobile,department,doctorName)
+     * @param productLineIds 产品线 IDs
+     * @return 返回符合过滤条件的医生总条
+     */
     int getListCount(@Param(value = "virtualDrugUserIds") List<Long> virtualDrugUserIds,
     		                  @Param(value = "search")  String search,
     		                  @Param(value = "productLineIds") List<Integer> productLineIds);
     
+    /**
+     * 根据过滤条件获取医生拜访列表信息(不含对应的产品信息)
+     * @param virtualDrugUserIds 虚拟代表 ID
+     * @param currentSize startIndex
+     * @param pageSize offset
+     * @param search  搜索内容(mobile,department,doctorName)
+     * @param productLineIds 产品线 IDs
+     * @return 返回符合过滤条件的医生列表信息
+     */
     List<CustomerFollowListBean> getList(@Param(value = "virtualDrugUserIds") List<Long> virtualDrugUserIds,
     		                                                    @Param(value = "currentSize")int currentSize, 
     		                                                    @Param(value = "pageSize")int pageSize, 

@@ -9,12 +9,13 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.SearchReq
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CustomerFollowListBean;
 
 /**
+ * 客户跟进业务接口
  * @author xiekaiyu
  */
 public interface CustomerFollowUpService {
 	
 	/**
-	 * 客户跟进列表实现
+	 * 客户跟进列表实现,补充对应的产品信息 @田存
 	 * @param request
 	 * @return
 	 */
@@ -33,4 +34,6 @@ public interface CustomerFollowUpService {
 	 * @return
 	 */
 	PageResponseBean<List<CustomerFollowListBean>> screen(ScreenRequestBean request);
+	
+	// TODO 更多筛选 @田存
 }

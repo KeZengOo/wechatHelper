@@ -27,7 +27,7 @@ import io.swagger.annotations.ApiOperation;
 @Api(value = "V2.5会议接口")
 @RequestMapping(value = "/meeting/info")
 @RestController
-public class VirtualDoctorMeetingController extends BaseController{
+public class VirtualDoctorMeetingController extends NewBaseController{
 	
 	@Resource(name="virtualDoctorMeetingServiceImpl")
 	private VirtualDoctorMeetingService meetingService;
