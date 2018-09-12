@@ -122,7 +122,7 @@ public class CustomerFollowUpController extends NewBaseController {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	@SuppressWarnings("unchecked")
-	@ApiOperation(value = "根据 leaderPath 获取所有下属医药代表信息", notes = "根据 leaderPath 获取所有下属医药代表信息")
+	@ApiOperation(value = "获取所有下属医药代表信息(医药代表)", notes = "根据获取所有下属医药代表信息(医药代表)")
 	@RequestMapping(value = "/drug_users/get", method = { RequestMethod.GET })
 	public DefaultResponseBean<List<DrugUserResponseBean>> getSubordinates(HttpServletRequest request) {
 		DrugUser user = super.getDrugUser(request);
@@ -138,7 +138,7 @@ public class CustomerFollowUpController extends NewBaseController {
 	}
 	
 	@SuppressWarnings("unchecked")
-	@ApiOperation(value = "根据 leaderPath 获取所有产品线信息", notes = "根据 leaderPath 获取所有产品线信息")
+	@ApiOperation(value = "根据获取所有产品线信息", notes = "根据获取所有产品线信息(产品)")
 	@RequestMapping(value = "/product_lines/get", method = { RequestMethod.GET })
 	public DefaultResponseBean<List<ProductResponseBean>> getAllProductLines(HttpServletRequest request) {
 		DrugUser user = super.getDrugUser(request);
