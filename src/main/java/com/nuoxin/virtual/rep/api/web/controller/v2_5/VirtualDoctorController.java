@@ -34,27 +34,6 @@ public class VirtualDoctorController extends NewBaseController {
 	private VirtualDoctorService virtualDoctorService;
 	
 	@SuppressWarnings("unchecked")
-	@ApiOperation(value = "获取单个客户医生信息", notes = "获取单个客户医生信息")
-	@RequestMapping(value = "/single/get", method = { RequestMethod.POST })
-	public DefaultResponseBean<VirtualDoctorBasicResponse> singleGet(
-			@ApiParam("医生ID") @RequestParam(value = "doctor_id") Long virtualDoctorId, HttpServletRequest request) {
-		DrugUser user = this.getDrugUser(request);
-		if (user == null) {
-			return super.getLoginErrorResponse();
-		}
-
-		if (virtualDoctorId == null) {
-			return super.getParamsErrorResponse("doctor_id is null");
-		}
-
-		VirtualDoctorBasicResponse virtualDoctorBasic = virtualDoctorService.getVirtualDoctorBasic(virtualDoctorId);
-
-		DefaultResponseBean<VirtualDoctorBasicResponse> responseBean = new DefaultResponseBean<VirtualDoctorBasicResponse>();
-		responseBean.setData(virtualDoctorBasic);
-		return responseBean;
-	}
-	
-	@SuppressWarnings("unchecked")
 	@ApiOperation(value = "添加单个客户医生信息", notes = "添加单个客户医生信息")
 	@RequestMapping(value = "/single/save", method = { RequestMethod.POST })
 	public DefaultResponseBean<Boolean> singleSave(HttpServletRequest request,

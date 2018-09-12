@@ -29,30 +29,12 @@ import io.swagger.annotations.ApiOperation;
  * @author xiekaiyu
  */
 @Api(value = "V2.5电话拜访相关接口")
-@RequestMapping(value = "/call/info")
+@RequestMapping(value = "/call_info")
 @RestController
 public class VirtualDoctorCallInfoController extends NewBaseController{
 	
 	@Resource
 	private VirtualDoctorCallInfoService callInfoService;
-	
-	@SuppressWarnings("unchecked")
-	@ApiOperation(value = "获取电话拜访列表信息", notes = "获取电话拜访列表信息")
-	@RequestMapping(value = "/list/get", method = { RequestMethod.POST })
-	public DefaultResponseBean<PageResponseBean<List<CallVisitBean>>> getCallVisitList(HttpServletRequest request,
-			@RequestBody CallInfoListRequest listRequest) {
-		DrugUser user = this.getDrugUser(request);
-		if(user == null) {
-			return super.getLoginErrorResponse();
-		} 
-		
-		String leaderPath = user.getLeaderPath();
-		PageResponseBean<List<CallVisitBean>> result = callInfoService.getCallVisitList(listRequest, leaderPath);
-		DefaultResponseBean<PageResponseBean<List<CallVisitBean>>> responseBean = new DefaultResponseBean<PageResponseBean<List<CallVisitBean>>>();
-		responseBean.setData(result);
-		
-		return responseBean;
-	}
 	
 	@SuppressWarnings("unchecked")
 	@ApiOperation(value = "保存电话接通拜访信息", notes = "保存电话接通拜访信息")
