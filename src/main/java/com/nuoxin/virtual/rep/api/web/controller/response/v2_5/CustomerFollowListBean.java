@@ -25,8 +25,12 @@ public class CustomerFollowListBean implements Serializable {
     private String doctorName;
     @ApiModelProperty(value = "医生性别")
     private Byte gender;
-    @ApiModelProperty(value = "医生电话")
+    @ApiModelProperty(value = "医生主要电话")
     private String doctorMobile;
+    @ApiModelProperty(value = "医生次要电话")
+    private String secondaryDoctorMobile;
+    @ApiModelProperty(value = "医生三要电话")
+    private String thirdaryDoctorMobile;
     
     @ApiModelProperty(value = "医生所在医院名称")
     private String hospitalName;

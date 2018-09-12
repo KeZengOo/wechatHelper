@@ -33,10 +33,10 @@
 	
 	<insert id="saveVirtualDoctorMends" >
 		INSERT INTO doctor_mend
-		 (wechat, address, fixed_phone, virtual_doctor_id)
+		 (wechat, address, fixed_phone, secondary_mobile, thirdary_mobile, virtual_doctor_id)
 		VALUES 
 		<foreach collection ="list" item="item" separator =",">
-        	(#{item.wechat}, #{item.address}, #{item.fixedPhone}, #{item.virtualDoctorId}) 
+        	(#{item.wechat}, #{item.address}, #{item.fixedPhone}, #{item.secondaryMobile}, #{item.thirdaryMobile}, #{item.virtualDoctorId}) 
     	</foreach >
 	</insert> 
 	

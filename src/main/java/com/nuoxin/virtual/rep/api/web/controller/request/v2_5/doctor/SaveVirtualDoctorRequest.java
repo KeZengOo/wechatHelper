@@ -25,6 +25,10 @@ public class SaveVirtualDoctorRequest {
 	@ApiModelProperty(value = "手机号")
 	@NotNull(message="mobile is null")
 	private String mobile;
+    @ApiModelProperty(value = "医生次要电话")
+    private String secondaryMobile;
+    @ApiModelProperty(value = "医生三要电话")
+    private String thirdaryMobile;
 	
 	@ApiModelProperty(value = "微信")
 	private String wechat;

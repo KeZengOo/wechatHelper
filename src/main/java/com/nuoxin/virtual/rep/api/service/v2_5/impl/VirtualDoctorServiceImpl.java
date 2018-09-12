@@ -46,7 +46,7 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService{
 				this.saveVirtualDoctorMend(request, virtualDoctorId);
 				this.saveDrugUserDoctor(request, virtualDoctorId, user);
 				this.saveDrugUserDoctorQuate(request, virtualDoctorId, user);
-				
+				// TODO 医生潜力 @田存
 				return true;
 			}
 		}
@@ -138,6 +138,8 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService{
 		param.setAddress(request.getAddress());
 		param.setFixedPhone(request.getFixedPhone());
 		param.setWechat(request.getWechat());
+		param.setSecondaryMobile(request.getSecondaryMobile());
+		param.setThirdaryMobile(request.getThirdaryMobile());
 		
 		list.add(param);
 		virtualDoctorMapper.saveVirtualDoctorMends(list);
