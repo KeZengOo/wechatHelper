@@ -1,7 +1,9 @@
 package com.nuoxin.virtual.rep.api.web.controller.response.v2_5;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -42,5 +44,8 @@ public class CustomerFollowListBean implements Serializable {
     private byte isHasWeChat;
     @ApiModelProperty(value = "下次拜访时间")
     private Date nextVisitTime;
+    
+    @ApiModelProperty(value = "产品列表,最多只有两条")
+	private List<ProductInfoResponse> productInfos = new ArrayList<>(2);
    
 }
