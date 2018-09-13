@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -25,12 +27,16 @@ public class CustomerFollowListBean implements Serializable {
     private String doctorName;
     @ApiModelProperty(value = "医生性别")
     private Byte gender;
-    @ApiModelProperty(value = "医生主要电话")
+    
+    @JsonIgnore
     private String doctorMobile;
-    @ApiModelProperty(value = "医生次要电话")
+    @JsonIgnore
     private String secondaryDoctorMobile;
-    @ApiModelProperty(value = "医生三要电话")
+    @JsonIgnore
     private String thirdaryDoctorMobile;
+    
+    @ApiModelProperty(value = "手机号 1主,2次,3三")
+	private List<String> mobiles = new ArrayList<>(3);
     
     @ApiModelProperty(value = "医生所在医院名称")
     private String hospitalName;
@@ -38,16 +44,24 @@ public class CustomerFollowListBean implements Serializable {
     private String department;
     
     @ApiModelProperty(value = "上次电话拜访时间")
+    private String visitTimeStr;
+    @JsonIgnore
     private Date visitTime;
-    @ApiModelProperty(value = "距离上次拜访时间间隔,单位:分钟. -1表示未拜访")
-    private long lastVisitTimeInterval;
-    @ApiModelProperty(value = "拜访结果")
-    private String visitResult;    
     
-    @ApiModelProperty(value = "是否添加微信:0.未添加,1.已添加")
-    private byte isHasWeChat;
-    @ApiModelProperty(value = "下次拜访时间")
+    @JsonIgnore
     private Date nextVisitTime;
+    @ApiModelProperty(value = "下次拜访时间")
+    private String nextVisitTimeStr;
+    
+    @JsonIgnore
+    private String visitResult; 
+    @ApiModelProperty(value = "拜访结果")
+    private Object visitResultObj;
+    
+    @JsonIgnore
+    private String wechat;
+    @ApiModelProperty(value = "是否添加微信:0.未添加,1.已添加")
+    private Integer isHasWeChat;
     
     @ApiModelProperty(value = "产品列表,最多只有两条")
 	private List<ProductInfoResponse> productInfos = new ArrayList<>(2);

@@ -124,8 +124,11 @@
 		SELECT 
 			d.id AS doctorId, d.name AS doctorName, d.telephone AS doctorMobile, 
 			d. sex AS gender, d.depart AS department, d.hospital_name AS hospitalName,
-			tel_visit.create_time AS visitTime
+			tel_visit.create_time AS visitTime,tel_visit.next_visit_time AS nextVisitTime,tel_visit.visit_result AS visitResult,
+			dm.wechat, dm.secondary_mobile AS secondaryDoctorMobile, dm.thirdary_mobile AS thirdaryDoctorMobile
 		FROM doctor d 
+		LEFT JOIN doctor_mend dm
+		ON d.id=dm.virtual_doctor_id
 		JOIN (
 			<!-- 根据 virtualDrugUserIds 获取对应的 doctorIds -->
 			SELECT 
@@ -156,13 +159,18 @@
 		
 		<!-- 左连接 virtual_doctor_call_info 表获取电话拜访信息 -->
 		LEFT JOIN (
-			SELECT virtual_doctor_id,create_time FROM virtual_doctor_call_info WHERE id IN (
+			SELECT c.virtual_doctor_id, c.create_time,
+			m.visit_result, m.next_visit_time FROM virtual_doctor_call_info c 
+			JOIN virtual_doctor_call_info_mend m		
+				ON m.call_id=c.id	
+			WHERE c.id IN (
 				SELECT MAX(id) FROM virtual_doctor_call_info  WHERE virtual_drug_user_id IN 
  				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
 		   			#{virtualDrugUserId}
 		  		</foreach> 
 		  		GROUP BY virtual_doctor_id
 			) 
+			
 		) tel_visit ON tel_visit.virtual_doctor_id=d.id
 		
 		GROUP BY d.id
