@@ -1,7 +1,8 @@
 package com.nuoxin.virtual.rep.api.web.intercept;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import java.util.Enumeration;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
+import com.alibaba.fastjson.JSON;
 
 /**
  * web接口统一日志输出
@@ -43,6 +44,12 @@ public class WebLogAop {
 		String remoteIp = request.getRemoteAddr();
 
 		logger.info("\n access_ip:{} \n http_method:{} \n URL: {} \n URI:{}", remoteIp, method, url, uri);
+		
+		Enumeration<String> parameterNames = request.getParameterNames();
+		while (parameterNames.hasMoreElements()) {
+			String args = parameterNames.nextElement();
+			logger.info("args={}, value={}", args, request.getParameter(args));
+		}
 
 		startTime.set(System.currentTimeMillis());
 	}
