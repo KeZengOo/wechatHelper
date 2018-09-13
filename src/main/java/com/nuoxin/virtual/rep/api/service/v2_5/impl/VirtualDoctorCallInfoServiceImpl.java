@@ -98,7 +98,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 
 	@Transactional(value = TxType.REQUIRED, rollbackOn = Exception.class)
 	@Override
-	public boolean connectedsaveCallInfo(SaveCallInfoRequest saveRequest) {
+	public boolean connectedSaveCallInfo(SaveCallInfoRequest saveRequest) {
 		long callId = this.doSaveCallInfo(saveRequest);
 		int effectNum = 0;
 		if (callId > 0) {
@@ -115,7 +115,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	
 	@Transactional(value = TxType.REQUIRED, rollbackOn = Exception.class)
 	@Override
-	public boolean unconnectedsaveCallInfo(SaveCallInfoUnConnectedRequest saveRequest) {
+	public boolean unconnectedSaveCallInfo(SaveCallInfoUnConnectedRequest saveRequest) {
 		if("emptynumber".equals(saveRequest.getStatuaName())) {
 			saveRequest.setIsBreakOff(1);
 		} else {
@@ -176,7 +176,6 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	 */
 	private void changeRelationShip(BaseCallInfoRequest request) {
 		UpdateVirtualDrugUserDoctorRelationship relationShipParams = new UpdateVirtualDrugUserDoctorRelationship();
-		
 		relationShipParams.setVirtualDrugUserId(request.getVirtualDrugUserId());
 		relationShipParams.setDoctorId(request.getVirtualDoctorId());
 		relationShipParams.setProductLineId(request.getProductId());
