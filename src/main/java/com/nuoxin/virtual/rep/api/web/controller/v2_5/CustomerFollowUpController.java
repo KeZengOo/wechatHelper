@@ -113,7 +113,7 @@ public class CustomerFollowUpController extends NewBaseController {
 	}
 	
 	@ApiOperation(value = "更多筛选接口 @田存补充")
-	@RequestMapping(value = "/search/more", method = { RequestMethod.POST })
+	@RequestMapping(value = "/screen/more", method = { RequestMethod.POST })
 	public ResponseEntity<DefaultResponseBean<Boolean>> searchMore(@RequestBody Object object) {
 		// TODO @田存
 		return null;
