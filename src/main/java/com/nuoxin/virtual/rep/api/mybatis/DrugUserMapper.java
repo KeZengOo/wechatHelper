@@ -30,6 +30,8 @@ public interface DrugUserMapper extends MyMapper<DrugUser> {
      * @return
      */
     List<DrugUserResponseBean> relationDrugUser(@Param("leaderPath") String leaderPath,@Param("productId") Long productId);
+    
+    ////////////////////////////////////////以下是V2.5用到的//////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * 根据 leaderPath 查询下属销售

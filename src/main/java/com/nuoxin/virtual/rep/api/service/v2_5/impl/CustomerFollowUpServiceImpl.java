@@ -15,10 +15,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.nuoxin.virtual.rep.api.common.bean.PageRequestBean;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
-import com.nuoxin.virtual.rep.api.entity.Doctor;
 import com.nuoxin.virtual.rep.api.mybatis.DoctorMapper;
 import com.nuoxin.virtual.rep.api.mybatis.DrugUserMapper;
-import com.nuoxin.virtual.rep.api.mybatis.ProductLineMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.CustomerFollowUpService;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.ListRequestBean;
@@ -27,7 +25,6 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.SearchReq
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CustomerFollowListBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.TableHeader;
 
-import io.swagger.annotations.ApiModelProperty;
 import shaded.org.apache.commons.lang3.StringUtils;
 
 /**
