@@ -54,7 +54,7 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 		if ("dealing".equalsIgnoreCase(statusName)) {
 			statusName = "answer";
 		} else if ("notDeal".equalsIgnoreCase(statusName)) {
-			statusName = "incall";
+			statusName = "cancelmakecall  ";
 		}
 
 		super.processCallBack(sinToken, statusName, monitorFilenameUrl);
