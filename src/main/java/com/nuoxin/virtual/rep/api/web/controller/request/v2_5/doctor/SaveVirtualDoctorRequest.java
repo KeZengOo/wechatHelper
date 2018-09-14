@@ -1,5 +1,8 @@
 package com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.validation.constraints.NotNull;
 
 import io.swagger.annotations.ApiModel;
@@ -58,16 +61,7 @@ public class SaveVirtualDoctorRequest {
 	@NotNull(message="hciLevel is null")
 	@ApiModelProperty(value = "医院等级")
 	private Integer hciLevel;
-	
-	@NotNull(message="productLineId is null")
-	@ApiModelProperty(value = "产品ID")
-	private Integer productLineId;
-	
-	@ApiModelProperty(value = "是否有药")
-	private Integer isHasDrug;
-	@ApiModelProperty(value = "是否招募")
-	private Integer isRecruit;
-	
-	// TODO 客户等级,医生潜力 @田存
-	
+
+	@ApiModelProperty(value = "第二页扩展信息")
+	List<SaveVirtualDoctorMendRequest> mends = new ArrayList<>();
 }

@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.MeetingBean;
-import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.meeting.MeetingListRequest;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.meeting.MeetingListRequestBean;
 
 /**
  * 会议业务接口类
@@ -17,5 +17,5 @@ public interface VirtualDoctorMeetingService {
 	 * @param request
 	 * @return
 	 */
-	PageResponseBean<List<MeetingBean>> getMeetingList(MeetingListRequest request);
+	PageResponseBean<List<MeetingBean>> getMeetingList(MeetingListRequestBean request);
 }

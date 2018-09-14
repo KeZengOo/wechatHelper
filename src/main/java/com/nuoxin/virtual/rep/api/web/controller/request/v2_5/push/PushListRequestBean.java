@@ -1,4 +1,4 @@
-package com.nuoxin.virtual.rep.api.web.controller.request.v2_5.meeting;
+package com.nuoxin.virtual.rep.api.web.controller.request.v2_5.push;
 
 import javax.validation.constraints.NotNull;
 
@@ -10,9 +10,9 @@ import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper=false)
 @Data
-public class MeetingListRequest extends PageRequestBean {
+public class PushListRequestBean extends PageRequestBean {
 
-	private static final long serialVersionUID = -6532794852068276506L;
+	private static final long serialVersionUID = 6122980461264600121L;
 	
 	@NotNull(message="virtualDoctorId is null")
 	@ApiModelProperty(value = "客户医生 ID")
