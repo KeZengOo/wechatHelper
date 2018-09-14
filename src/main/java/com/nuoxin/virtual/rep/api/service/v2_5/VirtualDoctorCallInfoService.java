@@ -15,8 +15,9 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.SaveCallI
 public interface VirtualDoctorCallInfoService {
 	
 	/**
-	 * 获取电话拜访列表
+	 * 根据 leaderPath 获取电话拜访列表
 	 * @param request
+	 * @param leaderPath
 	 * @return
 	 */
 	PageResponseBean<List<CallVisitBean>> getCallVisitList(CallInfoListRequest request, String leaderPath);

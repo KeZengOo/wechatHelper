@@ -11,7 +11,7 @@ import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.MeetingBean;
 import com.nuoxin.virtual.rep.api.mybatis.MeetingAttendMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualDoctorMeetingService;
-import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.meeting.MeetingListRequest;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.meeting.MeetingListRequestBean;
 
 /**
  * 会议业务接口类
@@ -25,7 +25,7 @@ public class VirtualDoctorMeetingServiceImpl implements VirtualDoctorMeetingServ
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public PageResponseBean<List<MeetingBean>> getMeetingList(MeetingListRequest request) {
+	public PageResponseBean<List<MeetingBean>> getMeetingList(MeetingListRequestBean request) {
 		PageResponseBean pageResponse = null;
 		Long virtualDoctorId = request.getVirtualDoctorId();
 		int count = meetingAttendMapper.getMeetingAttendCount(virtualDoctorId);
