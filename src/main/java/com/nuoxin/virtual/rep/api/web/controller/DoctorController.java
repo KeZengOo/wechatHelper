@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.nuoxin.virtual.rep.api.entity.v2_5.DoctorExcelBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -59,6 +60,8 @@ public class DoctorController extends BaseController {
     private DrugUserService drugUserService;
     @Autowired
     private ContactPlanService contactPlanService;
+    @Value("${excel.maxNum}")
+    private Integer maxNum;
 
     @ApiOperation(value = "获取医生信息", notes = "获取医生信息")
     @GetMapping("/details/{doctorId}")
@@ -201,6 +204,11 @@ public class DoctorController extends BaseController {
         if(list==null || list.isEmpty()){
             responseBean.setCode(500);
             responseBean.setMessage("导入数据为空");
+            return responseBean;
+        }
+        if(list.size()>maxNum){
+            responseBean.setCode(500);
+            responseBean.setMessage("导入数据大于"+maxNum+"条");
             return responseBean;
         }
         
