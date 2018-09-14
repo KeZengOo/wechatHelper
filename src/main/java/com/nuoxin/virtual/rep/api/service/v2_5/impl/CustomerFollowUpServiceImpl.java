@@ -39,13 +39,9 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	
 	private static final List<TableHeader> tableHeaders = new ArrayList<>(15);
 	
-	@Resource
-	private DrugUserMapper drugUserMapper;
-	@Resource
-	private ProductLineMapper productLineMapper;
-	@Resource
-	private DoctorMapper doctorMapper;
-	
+	/**
+	 * 初始化表头信息
+	 */
 	static {
 		TableHeader id = new TableHeader();
 		id.setLabel("ID");
@@ -97,8 +93,13 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		nextVisitTime.setName("nextVisitTimeStr");
 		tableHeaders.add(nextVisitTime);
 
-		// TODO 补全 @田存
+		// TODO 补全产品信息 @田存
 	}
+	
+	@Resource
+	private DrugUserMapper drugUserMapper;
+	@Resource
+	private DoctorMapper doctorMapper;
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
@@ -115,13 +116,10 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 				int pageSize = request.getPageSize();
 				List<CustomerFollowListBean> list = doctorMapper.getList(virtualDrugUserIds, currentSize, pageSize, null, null);
 				pageResponseBean = this.getDoctorsList(count, list, request);
-				
-				// TODO 补充对应的产品信息 @田存
 			}
 		} 
 		
 		this.compensate(request, pageResponseBean);
-		
 		return pageResponseBean;
 	}
 
@@ -131,8 +129,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		PageResponseBean pageResponseBean = null;
 		int count = 0;
 		
-		// 获取所有下属(直接&间接) virtualDrugUserIds
-		List<Long> virtualDrugUserIds = this.getSubordinateIds(leaderPath);
+		List<Long> virtualDrugUserIds = this.getSubordinateIds(leaderPath); // 获取所有下属(直接&间接) virtualDrugUserIds
 		if (CollectionsUtil.isNotEmptyList(virtualDrugUserIds)) {
 			String search = request.getSearch();
 			count = doctorMapper.getListCount(virtualDrugUserIds, search, null);
@@ -145,7 +142,6 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		} 
 		
 		this.compensate(request, pageResponseBean);
-		
 		return pageResponseBean;
 	}
 	
@@ -153,9 +149,9 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	@Override
 	public PageResponseBean<List<CustomerFollowListBean>> screen(ScreenRequestBean request) {
 		PageResponseBean pageResponseBean = null;
-		
 		List<Long> virtualDrugUserIds = request.getVirtualDrugUserIds();
 		List<Integer> productLineIds = request.getProductLineIds();
+		
 		int count = doctorMapper.getListCount(virtualDrugUserIds, null, productLineIds);
 		if(count > 0 ) {
 			int currentSize = request.getCurrentSize();
@@ -166,7 +162,6 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		}
 		
 		this.compensate(request, pageResponseBean);
-		
 		return pageResponseBean;
 	}
 	
@@ -182,7 +177,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	}
 	
 	/**
-	 * 医生列表信息处理(重要)
+	 * 医生列表信息处理(重要) TODO 补充对应的产品信息 @田存
 	 * @param count int
 	 * @param list List<CustomerFollowListBean>
 	 * @param pageRequestBean
@@ -193,47 +188,8 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 			PageRequestBean pageRequestBean) {
 		if (CollectionsUtil.isNotEmptyList(list)) {
 			list.forEach(doctor -> {
-				List<String> mobiles = doctor.getMobiles();
-				mobiles.add(doctor.getDoctorMobile());
-				String secondary = doctor.getSecondaryDoctorMobile();
-				if(StringUtils.isNotBlank(secondary)) {
-					mobiles.add(doctor.getSecondaryDoctorMobile());
-				}
-				String thirdary = doctor.getThirdaryDoctorMobile();
-				if(StringUtils.isNotBlank(thirdary)) {
-					mobiles.add(doctor.getThirdaryDoctorMobile());
-				}
-				
-				Date visitTime = doctor.getVisitTime();
-				if (visitTime != null) {
-					long visitTimeDelta = System.currentTimeMillis() - visitTime.getTime();
-					String lastVisitTime = this.getVisitStr(visitTimeDelta);
-					doctor.setVisitTimeStr(lastVisitTime);
-				} else {
-					doctor.setVisitTimeStr("无");
-				}
-
-				Date nextVisitTime = doctor.getNextVisitTime();
-				if (nextVisitTime != null) {
-					long nextTimeDelta = System.currentTimeMillis() - nextVisitTime.getTime();
-					String nextVisitTimeStr = this.getVisitStr(nextTimeDelta);
-					doctor.setNextVisitTimeStr(nextVisitTimeStr);
-				} else {
-					doctor.setNextVisitTimeStr("无");
-				}
-				
-				String visitResult = doctor.getVisitResult();
-				if (StringUtils.isNotBlank(visitResult)) {
-					JSONArray jsonArr = JSONObject.parseArray(visitResult);
-					doctor.setVisitResultObj(jsonArr);
-				}
-				
-				String wechat = doctor.getWechat();
-				if (StringUtils.isNotBlank(wechat)) {
-					doctor.setIsHasWeChat(1);
-				} else {
-					doctor.setIsHasWeChat(0);
-				}
+				this.alterCustomerFollowListBean(doctor);
+				// TODO 补充对应的产品信息 @田存
 			});
 		}
 
@@ -244,33 +200,96 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		return new PageResponseBean(pageRequestBean, count, list);
 	}
 	
-	private String getVisitStr (long delta) {
+	/**
+	 * 修正列表信息
+	 * @param doctor
+	 */
+	private void alterCustomerFollowListBean(CustomerFollowListBean doctor) {
+		// 手机号s
+		List<String> mobiles = doctor.getMobiles();
+		mobiles.add(doctor.getDoctorMobile()); // 主要
+		String secondary = doctor.getSecondaryDoctorMobile(); // 次要
+		if(StringUtils.isNotBlank(secondary)) {
+			mobiles.add(doctor.getSecondaryDoctorMobile());
+		}
+		String thirdary = doctor.getThirdaryDoctorMobile();// 三要
+		if(StringUtils.isNotBlank(thirdary)) {
+			mobiles.add(doctor.getThirdaryDoctorMobile());
+		}
+		
+		// 拜访时间
+		Date visitTime = doctor.getVisitTime();
+		if (visitTime != null) {
+			long visitTimeDelta = System.currentTimeMillis() - visitTime.getTime();
+			String lastVisitTime = this.alterVisitTimeContent(visitTimeDelta);
+			doctor.setVisitTimeStr(lastVisitTime);
+		} else {
+			doctor.setVisitTimeStr("无");
+		}
+
+		// 下次拜访时间
+		Date nextVisitTime = doctor.getNextVisitTime();
+		if (nextVisitTime != null) {
+			long nextTimeDelta = System.currentTimeMillis() - nextVisitTime.getTime();
+			String nextVisitTimeStr = this.alterVisitTimeContent(nextTimeDelta);
+			doctor.setNextVisitTimeStr(nextVisitTimeStr);
+		} else {
+			doctor.setNextVisitTimeStr("无");
+		}
+		
+		// 拜访结果
+		String visitResult = doctor.getVisitResult();
+		if (StringUtils.isNotBlank(visitResult)) {
+			JSONArray jsonArr = JSONObject.parseArray(visitResult);
+			doctor.setVisitResultObj(jsonArr);
+		}
+		
+		// 是否有微信
+		String wechat = doctor.getWechat();
+		if (StringUtils.isNotBlank(wechat)) {
+			doctor.setIsHasWeChat(1); // 有
+		} else {
+			doctor.setIsHasWeChat(0); // 无
+		}
+	}
+	
+	/**
+	 * 将 long 类型拜访时间 -> 文字形式
+	 * @param delta
+	 * @return
+	 */
+	private String alterVisitTimeContent (long delta) {
 		// 转换成分钟间隔
 		long minuteInterval = delta / 60000;
 		String str = "";
-		if(minuteInterval > 0) {
-			if (minuteInterval < 60) {
-				str = str.concat(String.valueOf(minuteInterval)).concat("分钟");
-			} else if (minuteInterval < 1440) {
-				BigDecimal result = BigDecimal.valueOf(minuteInterval).divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP);
-				str = str.concat(String.valueOf(result.doubleValue())).concat("小时");
-			} else {
-				BigDecimal result = BigDecimal.valueOf(minuteInterval).divide(BigDecimal.valueOf(1440), 2, RoundingMode.HALF_UP);
-				str = str.concat(String.valueOf(result.doubleValue())).concat("天");
-			}
+		if (minuteInterval > 0) {
+			str = this.doAlterVisitTimeContent(minuteInterval);
 			str = str.concat("前");
 		} else {
+			// 负数转正数
 			minuteInterval = -1 * minuteInterval;
-			if (minuteInterval < 60) {
-				str = str.concat(String.valueOf(minuteInterval)).concat("分钟");
-			} else if (minuteInterval < 1440) {
-				BigDecimal result = BigDecimal.valueOf(minuteInterval).divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP);
-				str = str.concat(String.valueOf(result.doubleValue())).concat("小时");
-			} else {
-				BigDecimal result = BigDecimal.valueOf(minuteInterval).divide(BigDecimal.valueOf(1440), 2, RoundingMode.HALF_UP);
-				str = str.concat(String.valueOf(result.doubleValue())).concat("天");
-			}
+			str = this.doAlterVisitTimeContent(minuteInterval);
 			str = str.concat("后");
+		}
+		
+		return str;
+	}
+	
+	/**
+	 *  将 long 类型拜访时间 -> 文字形式 真正转换
+	 * @param minuteInterval
+	 * @return
+	 */
+	private String doAlterVisitTimeContent(long minuteInterval) {
+		String str = "";
+		if (minuteInterval < 60) {
+			str = str.concat(String.valueOf(minuteInterval)).concat("分钟");
+		} else if (minuteInterval < 1440) {
+			BigDecimal result = BigDecimal.valueOf(minuteInterval).divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP);
+			str = str.concat(String.valueOf(result.doubleValue())).concat("小时");
+		} else {
+			BigDecimal result = BigDecimal.valueOf(minuteInterval).divide(BigDecimal.valueOf(1440), 2, RoundingMode.HALF_UP);
+			str = str.concat(String.valueOf(result.doubleValue())).concat("天");
 		}
 		
 		return str;
