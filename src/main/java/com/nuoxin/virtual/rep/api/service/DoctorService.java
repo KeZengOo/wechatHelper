@@ -1,6 +1,6 @@
 package com.nuoxin.virtual.rep.api.service;
 
-import com.nuoxin.virtual.rep.api.common.bean.DoctorExcel
+import com.nuoxin.virtual.rep.api.common.bean.DoctorExcel;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
