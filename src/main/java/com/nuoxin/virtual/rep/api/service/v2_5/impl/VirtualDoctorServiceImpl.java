@@ -10,6 +10,7 @@ import javax.transaction.Transactional.TxType;
 import org.springframework.stereotype.Service;
 
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
+import com.nuoxin.virtual.rep.api.entity.v2_5.DoctorVirtualParams;
 import com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorParams;
 import com.nuoxin.virtual.rep.api.entity.v2_5.HospitalProvinceBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.UpdateVirtualDrugUserDoctorRelationship;
@@ -48,10 +49,11 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 		int hospitalId = this.getHospiTalId(request);
 		if (hospitalId > 0) {
 			// 保存医生信息
-			long virtualDoctorId = this.saveVirtualDoctor(request, hospitalId);
+			long virtualDoctorId = this.saveDoctor(request, hospitalId);
 			if (virtualDoctorId > 0) {
 				// 保存医生扩展信息
 				this.saveVirtualDoctorMend(request, virtualDoctorId);
+				this.saveVirtualDoctor(request, virtualDoctorId);
 				// 保存医生关联关系
 				this.saveDrugUserDoctor(request, virtualDoctorId, user);
 				// 保存医生关联关系扩展信息
@@ -119,7 +121,7 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 	 * @param hospitalId
 	 * @return 成功返回主键值
 	 */
-	private long saveVirtualDoctor(SaveVirtualDoctorRequest request, int hospitalId) {
+	private long saveDoctor(SaveVirtualDoctorRequest request, int hospitalId) {
 		VirtualDoctorParams param = new VirtualDoctorParams();
 		param.setName(request.getName());
 		param.setGender(request.getGender());
@@ -133,9 +135,9 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 		param.setHospital(request.getHospital());
 		param.setHospitalId(hospitalId);
 
-		List<VirtualDoctorParams> params = new ArrayList<>(1);
-		params.add(param);
-		virtualDoctorMapper.saveVirtualDoctors(params);
+		List<VirtualDoctorParams> list = new ArrayList<>(1);
+		list.add(param);
+		virtualDoctorMapper.saveVirtualDoctors(list);
 
 		return param.getId();
 	}
@@ -159,6 +161,25 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 		virtualDoctorMapper.saveVirtualDoctorMends(list);
 		
 		// TODO 医生潜力 @田存
+	}
+	
+	private void saveVirtualDoctor(SaveVirtualDoctorRequest request, long virtualDoctorId) {
+		List<SaveVirtualDoctorMendRequest> mends = request.getMends();
+		if(CollectionsUtil.isEmptyList(mends)) {
+			return;
+		}
+		
+		int size = mends.size();
+		List<DoctorVirtualParams> list = new ArrayList<>(size);
+		for (int i = 0; i < size; i++) {
+			SaveVirtualDoctorMendRequest doctorVirtual = mends.get(i);
+			DoctorVirtualParams param = new DoctorVirtualParams();
+			param.setVirtualDoctorId(virtualDoctorId);
+			param.setHcpLevel(doctorVirtual.getHcpLevel());
+			list.add(param);
+		}
+		
+		virtualDoctorMapper.saveDoctorVirtuals(list);
 	}
 
 	/**

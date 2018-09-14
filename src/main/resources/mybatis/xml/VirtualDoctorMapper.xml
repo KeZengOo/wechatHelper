@@ -40,4 +40,12 @@
     	</foreach >
 	</insert> 
 	
+	<insert id="saveDoctorVirtuals">
+		INSERT INTO doctor_virtual 
+			(doctor_id, client_level)
+		VALUES 
+		<foreach collection ="list" item="item" separator =",">
+        	(#{item.virtualDoctorId}, #{item.hcpLevel}) 
+    	</foreach >
+	</insert>
 </mapper>

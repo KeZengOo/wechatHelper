@@ -2,6 +2,7 @@ package com.nuoxin.virtual.rep.api.mybatis;
 
 import java.util.List;
 
+import com.nuoxin.virtual.rep.api.entity.v2_5.DoctorVirtualParams;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorDO;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorMendParams;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorParams;
@@ -32,5 +33,12 @@ public interface VirtualDoctorMapper {
 	 * @return
 	 */
 	int saveVirtualDoctorMends(List<VirtualDoctorMendParams> list);
+
+	/**
+	 * 批量添加至 doctor_virtual 表
+	 * @param list
+	 * @return
+	 */
+	int saveDoctorVirtuals(List<DoctorVirtualParams> list);
 
 }
