@@ -1,7 +1,6 @@
 package com.nuoxin.virtual.rep.api.service;
 
-import com.nuoxin.virtual.rep.api.common.bean.DoctorExcel;
-import com.nuoxin.virtual.rep.api.common.bean.DoctorVo;
+import com.nuoxin.virtual.rep.api.common.bean.DoctorExcel
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
@@ -10,6 +9,12 @@ import com.nuoxin.virtual.rep.api.common.service.BaseService;
 import com.nuoxin.virtual.rep.api.common.util.StringUtils;
 import com.nuoxin.virtual.rep.api.dao.*;
 import com.nuoxin.virtual.rep.api.entity.*;
+import com.nuoxin.virtual.rep.api.entity.v2_5.DoctorExcelBean;
+import com.nuoxin.virtual.rep.api.entity.v2_5.HospitalProvinceBean;
+import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorMendParams;
+import com.nuoxin.virtual.rep.api.mybatis.DoctorMendMapper;
+import com.nuoxin.virtual.rep.api.mybatis.DoctorVirtualMapper;
+import com.nuoxin.virtual.rep.api.mybatis.HospitalMapper;
 import com.nuoxin.virtual.rep.api.utils.RegularUtils;
 import com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.doctor.DoctorRequestBean;
@@ -18,26 +23,17 @@ import com.nuoxin.virtual.rep.api.web.controller.request.doctor.RelationRequestB
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorDetailsResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorStatResponseBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.product.ProductResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.vo.Hcp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.management.StringValueExp;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by fenggang on 9/11/17.
@@ -68,6 +64,19 @@ public class DoctorService extends BaseService {
 
     @Autowired
     private ProductLineService productLineService;
+
+    @Autowired
+    private HospitalMapper hospitalMapper;
+
+    @Autowired
+    private DoctorMendMapper doctorMendMapper;
+
+    @Autowired
+    private DoctorVirtualMapper doctorVirtualMapper;
+
+    private int add=0;
+    private int update=1;
+
 
     /**
      * 获取doctor详情
@@ -605,7 +614,7 @@ public class DoctorService extends BaseService {
             doctor.setMobile(excel.getMobile());
             doctor.setStatus(1);
             virtual.setClientLevel(excel.getSex());
-            //TODO 主数据id
+            //TODO 主数据id 改成自己库的医院表
             logger.info("保存【{}】医生时查询主数据对应的医生id写入数据库", doctor.getName());
             if (StringUtils.isNotEmtity(excel.getHospitalName())) {
                 Hcp hcp = masterDataService.getHcpByHciIdAndHcpName(excel.getHospitalName(), excel.getDoctorName());
@@ -617,7 +626,7 @@ public class DoctorService extends BaseService {
                 }
             }
 
-            //TODO 销售代表
+            //TODO 销售代表(废弃)
             logger.info("保存【{}】医生时查询销售坐席写入医生表", doctor.getName());
             if (StringUtils.isNotEmtity(excel.getDrugUserEmail())) {
                 if (map.get(excel.getDrugUserEmail()) == null) {
@@ -693,6 +702,202 @@ public class DoctorService extends BaseService {
 
         return true;
     }
+
+    /**
+     * 导入doctorexcel
+     * @param list
+     * @return
+     */
+    @Transactional(readOnly = false)
+    @CacheEvict(value = "virtual_rep_api_doctor", allEntries = true)
+    public Boolean excelSaves(List<DoctorExcelBean> list, Long productId) throws Exception {
+        //校验数据合法性,并返回销售map
+        Map<String,Long> drugUserMap=checkData(list);
+        //从集合中取出手机号列表
+        List<String> mobiles = list.stream().map(DoctorExcelBean::getMobile).collect(Collectors.toList());
+        List<Doctor> doctors = new ArrayList<>();
+        if (!mobiles.isEmpty()) {
+            //查询手机号在库里的数据
+            doctors = this.findByMobileIn(mobiles);
+        }
+        for (DoctorExcelBean excel:list) {
+            Doctor doctor=new Doctor();
+            Optional<Doctor> doctorOptional = doctors.stream().filter(x->x.getMobile().equals(excel.getMobile())).findFirst();
+            if(null!=doctorOptional&&doctorOptional.isPresent()){
+                doctor=doctorOptional.get();
+            }
+            int type = (doctor.getId()==null||doctor.getId()==0L)?add:update;
+            HospitalProvinceBean hos =this.saveHospital(excel);
+            //保存医生信息
+            saveDoctor(excel, doctor,hos);
+            //保存医生扩展表
+            saveDcotorMend(excel,doctor.getId(),type);
+            //保存医生手机号关系表
+            saveDoctorTelephone(doctor, type);
+            //保存医生级别关系表
+            saveDoctorVirtual(doctor,productId);
+            //添加关系到医生代表产品关系表
+            saveDrugUserDoctor(productId, drugUserMap, excel, doctor);
+        }
+        return true;
+    }
+
+    /**
+     * 保存医生扩展信息
+     * @param excel
+     * @param id
+     * @param type
+     */
+    private void saveDcotorMend(DoctorExcelBean excel, Long id,int type) {
+        VirtualDoctorMendParams virtualDoctorMendParams = new VirtualDoctorMendParams();
+        virtualDoctorMendParams.setAddress(excel.getAddress());
+        virtualDoctorMendParams.setFixedPhone(excel.getFixedPhone());
+        virtualDoctorMendParams.setVirtualDoctorId(id);
+        if(type==add){
+            doctorMendMapper.saveDoctorMend(virtualDoctorMendParams);
+        }else{
+            doctorMendMapper.updateDoctorMend(virtualDoctorMendParams);
+        }
+    }
+
+    /**
+     * 保存医生和手机号关系表
+     * @param doctor
+     * @param type
+     */
+    private void saveDoctorTelephone(Doctor doctor, int type) {
+        if (type==add){
+            doctorTelephoneRepository.deleteAllByDoctorId(doctor.getId());
+            DoctorTelephone doctorTelephone = new DoctorTelephone();
+            doctorTelephone.setDoctorId(doctor.getId());
+            doctorTelephone.setTelephone(doctor.getMobile());
+            doctorTelephone.setCreateTime(new Date());
+            doctorTelephone.setUpdateTime(new Date());
+            doctorTelephoneRepository.save(doctorTelephone);
+        }
+    }
+    /**
+     * 保存医院信息
+     * @param excel
+     * @return
+     */
+    private HospitalProvinceBean saveHospital(DoctorExcelBean excel) {
+        //TODO 主数据id 改成自己库的医院表
+        HospitalProvinceBean hospitalProvinceBean = hospitalMapper.getHospital(excel.getHospitalName());
+        if (hospitalProvinceBean == null) {
+            hospitalProvinceBean=new HospitalProvinceBean();
+            hospitalProvinceBean.setName(excel.getHospitalName());
+            hospitalProvinceBean.setCity(excel.getCity());
+            hospitalProvinceBean.setProvince(excel.getProvince());
+            hospitalMapper.saveHospital(hospitalProvinceBean);
+        }
+        return hospitalProvinceBean;
+    }
+    /**
+     * 保存医生信息
+     * @param excel
+     * @param doctor
+     * @return
+     */
+    private Doctor saveDoctor(DoctorExcelBean excel, Doctor doctor,HospitalProvinceBean hos) {
+        doctor.setHospitalId((long)hos.getId());
+        if(excel.getCustomerCode()!=null){
+            doctor.setMasterDataId(excel.getCustomerCode());
+        }
+        doctor.setCity(hos.getCity());
+        doctor.setProvince(hos.getProvince());
+        doctor.setName(excel.getDoctorName());
+        doctor.setHospitalName(excel.getHospitalName());
+        doctor.setDepartment(excel.getDepartment());
+        doctor.setMobile(excel.getMobile());
+        doctor.setStatus(1);
+        return doctorRepository.saveAndFlush(doctor);
+    }
+
+    /**
+     * 保存医生级别关系表
+     * @param doctor
+     */
+    private void saveDoctorVirtual(Doctor doctor,Long productId) {
+        DoctorVirtual virtual = new DoctorVirtual();
+        virtual.setClientLevel("other");
+        virtual.setDoctorId(doctor.getId());
+        virtual.setCreateTime(new Date());
+        virtual.setProductId(productId);
+        Long id=doctorVirtualMapper.getDoctorVirtualByDoctorId(virtual);
+        if(id!=null){
+            virtual.setId(id);
+            doctorVirtualMapper.updateDoctorVirtual(virtual);
+        }else{
+            doctorVirtualMapper.saveDoctorVirtual(virtual);
+        }
+    }
+
+    /**
+     * 添加关系到医生代表产品关系表
+     * @param productId
+     * @param drugUserMap
+     * @param excel
+     * @param doctor
+     */
+    private void saveDrugUserDoctor(Long productId, Map<String, Long> drugUserMap, DoctorExcelBean excel, Doctor doctor) {
+        //从Map中取出销售代表邮箱对应的销售代表id
+        Long drugUserId=drugUserMap.get(excel.getDrugUserEmail());
+        //TODO 添加关系到医生代表产品关系表
+        List<DrugUserDoctor> list1 = drugUserDoctorRepository.findByDoctorIdAndDrugUserIdAndProductId(doctor.getId(), drugUserId, productId);
+        if (list1 == null || list1.isEmpty()) {
+            DrugUserDoctor dud = new DrugUserDoctor();
+            dud.setDoctorId(doctor.getId());
+            dud.setProductId(productId);
+            dud.setDrugUserId(drugUserId);
+            DrugUser drugUser = drugUserService.findById(drugUserId);
+            if(drugUser!=null){
+                dud.setDrugUserName(drugUser.getName());
+            }
+            dud.setCreateTime(new Date());
+            drugUserDoctorRepository.saveAndFlush(dud);
+            doctorCallInfoRepository.updateDoctorIdAndDrugUserIdAndProductId(dud.getDoctorId(),dud.getDrugUserId(),dud.getProductId(),0);
+        }
+    }
+
+    /**
+     * 校验数据合法性,并返回销售map
+     * @param list
+     * @throws Exception
+     */
+    private Map<String,Long> checkData(List<DoctorExcelBean> list) throws Exception {
+        Map<String,Long> map=new HashMap<>();
+        for (int i = 0, leng = list.size(); i < leng; i++) {
+            DoctorExcelBean excel = list.get(i);
+            int errorLine = i+2;
+            if(StringUtils.isBlank(excel.getDoctorName())){
+                throw new Exception("第（"+errorLine+"）行姓名为空");
+            }
+            if (StringUtils.isEmpty(excel.getMobile())){
+                throw new Exception("第（"+ errorLine +"）行医生为空");
+            }
+            if (StringUtils.isEmpty(excel.getHospitalName())){
+                throw new Exception("第（"+ errorLine +"）行医院为空");
+            }
+            if (StringUtils.isEmpty(excel.getDrugUserName())){
+                throw new Exception("第（"+ errorLine +"）行销售代表姓名为空");
+            }
+            if(StringUtils.isBlank(excel.getDrugUserEmail())){
+                throw new Exception("第（"+errorLine+"）行销售邮箱为空");
+            }
+            boolean matche = RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, excel.getMobile());
+            if (!matche){
+                throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "第("+ errorLine +")行医生手机号输入不合法，请检查是否是文本格式");
+            }
+            DrugUser user = drugUserService.findByEmail(excel.getDrugUserEmail());
+            if(user==null){
+                throw new Exception("第（"+errorLine+"）行销售不存在");
+            }
+            map.put(excel.getDrugUserEmail(),user.getId());
+        }
+        return map;
+    }
+
 
     /**
      * 删除企业用户doctor关系

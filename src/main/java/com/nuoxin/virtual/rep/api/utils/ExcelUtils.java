@@ -117,9 +117,9 @@ public class ExcelUtils<E> {
 				continue;
 			}
 
-			if (row.getCell(0) == null) {
+			/*if (row.getCell(0) == null) {
 				continue;
-			}
+			}*/
 
 			e = get();
 

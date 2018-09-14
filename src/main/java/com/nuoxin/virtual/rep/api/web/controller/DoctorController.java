@@ -8,6 +8,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.nuoxin.virtual.rep.api.entity.v2_5.DoctorExcelBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -167,7 +168,7 @@ public class DoctorController extends BaseController {
     public DefaultResponseBean<Boolean> excel(MultipartFile file,
                                               HttpServletRequest request, HttpServletResponse response){
         DefaultResponseBean responseBean = new DefaultResponseBean();
-        ExcelUtils<DoctorExcel> excelUtils = new ExcelUtils<>(new DoctorExcel());
+        ExcelUtils<DoctorExcelBean> excelUtils = new ExcelUtils<>(new DoctorExcelBean());
         String productId = request.getParameter("productId");
         if(!StringUtils.isNotEmtity(productId)){
             responseBean.setCode(500);
@@ -176,7 +177,7 @@ public class DoctorController extends BaseController {
         }
 
         InputStream inputStream = null;
-        List<DoctorExcel> list = new ArrayList<>();
+        List<DoctorExcelBean> list = new ArrayList<>();
         try{
             inputStream = file.getInputStream();
 			list = excelUtils.readFromFile(null, inputStream);
@@ -204,7 +205,8 @@ public class DoctorController extends BaseController {
         }
         
         try {
-            doctorService.saves(list,Long.valueOf(productId),getLoginUser(request));
+            //doctorService.saves(list,Long.valueOf(productId),getLoginUser(request));
+            doctorService.excelSaves(list,Long.valueOf(productId));
         } catch (Exception e) {
             e.printStackTrace();
             responseBean.setCode(500);

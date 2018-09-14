@@ -38,6 +38,9 @@ public class Doctor extends IdEntity {
     private Date createTime;
     @Column(name = "status")
     private Integer status;
+    @Column(name = "master_data_id")
+    private Integer masterDataId;
+
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH},fetch = FetchType.EAGER)
     @JoinColumn(name = "virtual_doctor_id")
@@ -146,5 +149,13 @@ public class Doctor extends IdEntity {
 
     public void setDoctorVirtual(DoctorVirtual doctorVirtual) {
         this.doctorVirtual = doctorVirtual;
+    }
+
+    public Integer getMasterDataId() {
+        return masterDataId;
+    }
+
+    public void setMasterDataId(Integer masterDataId) {
+        this.masterDataId = masterDataId;
     }
 }

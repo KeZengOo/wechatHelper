@@ -27,6 +27,9 @@ public class DoctorVirtual extends IdEntity {
     @Column(name = "doctor_id")
     private Long doctorId;
 
+    @Column(name = "product_id")
+    private Long productId;
+
     public String getDrugUserIds() {
         return drugUserIds;
     }
@@ -75,4 +78,11 @@ public class DoctorVirtual extends IdEntity {
         this.doctorId = doctorId;
     }
 
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
+    }
 }
