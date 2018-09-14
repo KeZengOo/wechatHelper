@@ -51,7 +51,7 @@ public class CustomerFollowUpDetailController extends NewBaseController {
 	
 	@SuppressWarnings("unchecked")
 	@ApiOperation(value = "获取电话拜访列表信息(电话拜访记录)")
-	@RequestMapping(value = { "/call/info/list/get", "/call_info/list/get" }, method = { RequestMethod.POST })
+	@RequestMapping(value = { "/call/info/list/get" }, method = { RequestMethod.POST })
 	public DefaultResponseBean<PageResponseBean<List<CallVisitBean>>> getCallVisitList(HttpServletRequest request,
 			@RequestBody CallInfoListRequest listRequest) {
 		DrugUser user = this.getDrugUser(request);
