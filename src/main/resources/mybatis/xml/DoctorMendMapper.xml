@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.DoctorMendMapper">
+
+	<insert id="saveDoctorMend" keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO doctor_mend
+			( address, fixed_phone, virtual_doctor_id)
+		VALUES  
+			( #{address}, #{fixedPhone}, #{virtualDoctorId})
+	</insert>
+
+	<update id="updateDoctorMend" >
+		UPDATE doctor_mend SET address=#{address},fixed_phone=#{fixedPhone} WHERE virtual_doctor_id=#{virtualDoctorId}
+	</update>
+	
+</mapper>

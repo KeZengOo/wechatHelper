@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.DoctorVirtualMapper">
+
+	<insert id="saveDoctorVirtual" keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO doctor_virtual
+		( doctor_id, client_level,create_time, product_id)
+		VALUES
+		( #{doctorId}, #{clientLevel}, NOW(),#{productId})
+	</insert>
+
+	<update id="updateDoctorVirtual" >
+		UPDATE doctor_virtual SET client_level=#{clientLevel} where id=#{id}
+	</update>
+
+	<select id="getDoctorVirtualByDoctorId" resultType="java.lang.Long">
+		SELECT id FROM doctor_virtual  WHERE doctor_id=#{doctorId} AND product_id=#{productId}
+	</select>
+	
+</mapper>
