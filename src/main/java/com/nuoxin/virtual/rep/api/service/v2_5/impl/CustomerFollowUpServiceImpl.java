@@ -16,7 +16,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.nuoxin.virtual.rep.api.common.bean.PageRequestBean;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.mybatis.DoctorMapper;
-import com.nuoxin.virtual.rep.api.mybatis.DrugUserMapper;
+import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v2_5.CustomerFollowUpService;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.ListRequestBean;
@@ -94,18 +94,17 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	}
 	
 	@Resource
-	private DrugUserMapper drugUserMapper;
-	@Resource
 	private DoctorMapper doctorMapper;
+	@Resource
+	private CommonService commonService;
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public PageResponseBean<List<CustomerFollowListBean>> list(ListRequestBean request, String leaderPath) {
 		int count = 0;
 		PageResponseBean pageResponseBean = null;
-		
 		// 获取所有下属(直接&间接) virtualDrugUserIds
-		List<Long> virtualDrugUserIds = this.getSubordinateIds(leaderPath);
+		List<Long> virtualDrugUserIds = commonService.getSubordinateIds(leaderPath);
 		if (CollectionsUtil.isNotEmptyList(virtualDrugUserIds)) {
 			count = doctorMapper.getListCount(virtualDrugUserIds, null, null);
 			if(count > 0) {
@@ -125,8 +124,8 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	public PageResponseBean<List<CustomerFollowListBean>> search(SearchRequestBean request, String leaderPath) {
 		PageResponseBean pageResponseBean = null;
 		int count = 0;
-		
-		List<Long> virtualDrugUserIds = this.getSubordinateIds(leaderPath); // 获取所有下属(直接&间接) virtualDrugUserIds
+		 // 获取所有下属(直接&间接) virtualDrugUserIds
+		List<Long> virtualDrugUserIds = commonService.getSubordinateIds(leaderPath);
 		if (CollectionsUtil.isNotEmptyList(virtualDrugUserIds)) {
 			String search = request.getSearch();
 			count = doctorMapper.getListCount(virtualDrugUserIds, search, null);
@@ -163,15 +162,6 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	}
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	/**
-	 * 获取所有下属(直接&间接) virtualDrugUserIds
-	 * @param leaderPath 领导路径
-	 * @return List<Long>
-	 */
-	private List<Long> getSubordinateIds(String leaderPath) {
-		return drugUserMapper.getSubordinateIdsByLeaderPath(leaderPath);
-	}
 	
 	/**
 	 * 医生列表信息处理(重要) TODO 补充对应的产品信息 @田存

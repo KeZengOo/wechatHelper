@@ -26,6 +26,10 @@ import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.SaveVirtualDoctorMendRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.SaveVirtualDoctorRequest;
 
+/**
+ * 医生业务实现类
+ * @author xiekaiyu
+ */
 @Service
 public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 
@@ -43,10 +47,14 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 	public boolean saveVirtualDoctor(SaveVirtualDoctorRequest request, DrugUser user) {
 		int hospitalId = this.getHospiTalId(request);
 		if (hospitalId > 0) {
+			// 保存医生信息
 			long virtualDoctorId = this.saveVirtualDoctor(request, hospitalId);
 			if (virtualDoctorId > 0) {
+				// 保存医生扩展信息
 				this.saveVirtualDoctorMend(request, virtualDoctorId);
+				// 保存医生关联关系
 				this.saveDrugUserDoctor(request, virtualDoctorId, user);
+				// 保存医生关联关系扩展信息
 				this.saveDrugUserDoctorQuate(request, virtualDoctorId, user);
 
 				return true;
@@ -59,6 +67,7 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 	@Override
 	public VirtualDoctorBasicResponse getVirtualDoctorBasic(Long virtualDoctorId) {
 		HospitalProvinceBean hospitalBean = null;
+		
 		VirtualDoctorDO virtualDoctorDO = virtualDoctorMapper.getVirtualDoctor(virtualDoctorId);
 		if (virtualDoctorDO != null) {
 			String hospitalName = virtualDoctorDO.getHospitalName();
@@ -81,7 +90,6 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 
 	/**
 	 * 获取医院ID,走 getOrInsert路线
-	 * 
 	 * @param request
 	 */
 	private int getHospiTalId(SaveVirtualDoctorRequest request) {
@@ -107,14 +115,11 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 
 	/**
 	 * 保存单个客户医生信息,返回主键盘值
-	 * 
 	 * @param request
 	 * @param hospitalId
 	 * @return 成功返回主键值
 	 */
 	private long saveVirtualDoctor(SaveVirtualDoctorRequest request, int hospitalId) {
-		List<VirtualDoctorParams> params = new ArrayList<>(1);
-
 		VirtualDoctorParams param = new VirtualDoctorParams();
 		param.setName(request.getName());
 		param.setGender(request.getGender());
@@ -128,21 +133,19 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 		param.setHospital(request.getHospital());
 		param.setHospitalId(hospitalId);
 
+		List<VirtualDoctorParams> params = new ArrayList<>(1);
 		params.add(param);
 		virtualDoctorMapper.saveVirtualDoctors(params);
 
-		return params.get(0).getId();
+		return param.getId();
 	}
 
 	/**
 	 * 保存客户医生扩展信息
-	 * 
 	 * @param request
 	 * @param virtualDoctorId
 	 */
 	private void saveVirtualDoctorMend(SaveVirtualDoctorRequest request, long virtualDoctorId) {
-		List<VirtualDoctorMendParams> list = new ArrayList<>(1);
-
 		VirtualDoctorMendParams param = new VirtualDoctorMendParams();
 		param.setVirtualDoctorId(virtualDoctorId);
 		param.setAddress(request.getAddress());
@@ -150,7 +153,8 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 		param.setWechat(request.getWechat());
 		param.setSecondaryMobile(request.getSecondaryMobile());
 		param.setThirdaryMobile(request.getThirdaryMobile());
-
+		
+		List<VirtualDoctorMendParams> list = new ArrayList<>(1);
 		list.add(param);
 		virtualDoctorMapper.saveVirtualDoctorMends(list);
 		
@@ -172,15 +176,14 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 		int size = mends.size();
 		List<DrugUserDoctorParams> list = new ArrayList<>(size);
 		for (int i = 0; i < size; i++) {
-			DrugUserDoctorParams param = this.buildDrugUserDoctorParams(request, virtualDoctorId, user,
-					mends.get(i).getProductLineId());
+			DrugUserDoctorParams param = this.buildDrugUserDoctorParams(request, virtualDoctorId, user, mends.get(i));
 			list.add(param);
 		}
 		drugUserDoctorMapper.saveDrugUserDoctors(list);
 	}
 
 	private DrugUserDoctorParams buildDrugUserDoctorParams(SaveVirtualDoctorRequest request, Long virtualDoctorId, DrugUser user,
-			Integer productId) {
+			SaveVirtualDoctorMendRequest mend) {
 		DrugUserDoctorParams param = new DrugUserDoctorParams();
 		param.setDoctorId(virtualDoctorId);
 		param.setDoctorName(request.getName());
@@ -190,7 +193,7 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 		param.setDrugUserName(user.getName());
 		param.setDrugUserEmail(user.getEmail());
 
-		param.setProdId(productId);
+		param.setProdId(mend.getProductLineId());
 
 		return param;
 	}

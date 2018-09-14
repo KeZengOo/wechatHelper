@@ -19,9 +19,9 @@ import com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitMendBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.UpdateVirtualDrugUserDoctorRelationship;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoParams;
 import com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorQuateMapper;
-import com.nuoxin.virtual.rep.api.mybatis.DrugUserMapper;
 import com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorCallInfoMapper;
 import com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorCallInfoMendMapper;
+import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualDoctorCallInfoService;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualQuestionnaireService;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
@@ -47,7 +47,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	@Resource
 	private DrugUserDoctorQuateMapper drugUserDoctorQuateMapper;
 	@Resource
-	private DrugUserMapper drugUserMapper;
+	private CommonService commonService;
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
@@ -55,7 +55,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		PageResponseBean<List<CallVisitBean>> pageResponse = null;
 
 		Long virtualDoctorId = request.getVirtualDoctorId();
-		List<Long> virtualDrugUserIds = this.getSubordinateIds(leaderPath);
+		List<Long> virtualDrugUserIds = commonService.getSubordinateIds(leaderPath);
 		if(CollectionsUtil.isNotEmptyList(virtualDrugUserIds)) {
 			int count = callInfoMapper.getCallVisitCount(virtualDrugUserIds, virtualDoctorId);
 			if (count > 0) {
@@ -232,13 +232,4 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		return callVisitParams;
 	}
 	
-	/**
-	 * 获取所有下属(直接&间接) virtualDrugUserIds
-	 * @param leaderPath 领导路径
-	 * @return List<Long>
-	 */
-	private List<Long> getSubordinateIds(String leaderPath) {
-		return drugUserMapper.getSubordinateIdsByLeaderPath(leaderPath);
-	}
-
 }

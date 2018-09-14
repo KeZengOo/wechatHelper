@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.nuoxin.virtual.rep.api.mybatis.DoctorMapper;
 import com.nuoxin.virtual.rep.api.mybatis.DrugUserMapper;
 import com.nuoxin.virtual.rep.api.mybatis.ProductLineMapper;
+import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v2_5.DrugUserService;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean;
@@ -28,10 +29,12 @@ public class DrugUserServiceImpl implements DrugUserService{
 	private ProductLineMapper productLineMapper;
 	@Resource
 	private DoctorMapper doctorMapper;
+	@Resource
+	private CommonService commonService;
 
 	@Override
 	public List<DrugUserResponseBean> getSubordinates(String leaderPath) {
-		List<DrugUserResponseBean> list = drugUserMapper.getSubordinatesByLeaderPath(leaderPath);
+		List<DrugUserResponseBean> list = commonService.getSubordinates(leaderPath);
 		if(CollectionsUtil.isEmptyList(list)) {
 			list = new ArrayList<>(1);
 		}
@@ -47,7 +50,8 @@ public class DrugUserServiceImpl implements DrugUserService{
 	@Override
 	public List<ProductResponseBean> getProductsByDrugUserId(String leaderPath) {
 		List<ProductResponseBean> list;
-		List<Long> virtualDrugUserIds = drugUserMapper.getSubordinateIdsByLeaderPath(leaderPath);
+		
+		List<Long> virtualDrugUserIds = commonService.getSubordinateIds(leaderPath);
 		if(CollectionsUtil.isNotEmptyList(virtualDrugUserIds)) {
 			list = productLineMapper.getListByDrugUserId(virtualDrugUserIds);
 		} else {
