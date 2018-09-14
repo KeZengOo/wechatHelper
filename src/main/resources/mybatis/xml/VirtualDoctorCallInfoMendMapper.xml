@@ -16,7 +16,7 @@
 	
 	<select id="getCallVisitMendList" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitMendBean">
 		SELECT 
-			call_id AS callId, attitude
+			call_id AS callId, attitude, visit_result AS visitResult
 		FROM virtual_doctor_call_info_mend
 		WHERE 
 			call_id IN 

@@ -16,6 +16,6 @@ public class SaveVirtualDoctorMendRequest {
 	private Integer isRecruit;
 	@ApiModelProperty(value = "客户等级")
 	private String hcpLevel;
-	@ApiModelProperty(value = "医生潜力")
-	private String hcpPotential;
+	@ApiModelProperty(value = "医生潜力 3高,2中,1低,-1未知")
+	private Integer hcpPotential;
 }

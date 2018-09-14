@@ -23,11 +23,11 @@
 	<insert id="saveDrugUserDoctorQuates" parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.UpdateVirtualDrugUserDoctorRelationship">
 		INSERT INTO drug_user_doctor_quate 
 		(drug_user_id,doctor_id,product_id, is_has_drug,
-		 is_target,is_has_ae, is_recruit)
+		 is_target,is_has_ae, is_recruit, hcp_potential)
 		VALUES
 		<foreach collection ="list" item="index" separator =",">
 			 (#{index.virtualDrugUserId}, #{index.doctorId}, #{index.productLineId}, 
-			 #{index.isHasDrug}, #{index.isTarget}, #{index.isHasAe}, #{index.isRecruit})
+			 #{index.isHasDrug}, #{index.isTarget}, #{index.isHasAe}, #{index.isRecruit}, #{index.hcpPotential})
 		</foreach>
 	</insert>
 	

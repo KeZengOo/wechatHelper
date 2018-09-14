@@ -1,5 +1,7 @@
 package com.nuoxin.virtual.rep.api.entity.v2_5;
 
+import com.alibaba.fastjson.JSONArray;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -11,6 +13,9 @@ import lombok.Data;
 @ApiModel("电话拜访 Bean")
 @Data
 public class CallVisitBean {
+	
+	@ApiModelProperty(value = "虚拟代表姓名")
+	private String drugUserName;
 	@ApiModelProperty(value = "callId")
 	private Long callId;
 	@ApiModelProperty(value = "通话时长")
@@ -21,6 +26,8 @@ public class CallVisitBean {
 	private String callUrl;
 	@ApiModelProperty(value = "医生态度")
 	private Integer attitude;
+	@ApiModelProperty(value = "拜访结果")
+	private JSONArray visitResult;
 	@ApiModelProperty(value = "备注")
 	private String remark;
 	@ApiModelProperty(value = "电话拜访时间")

@@ -249,7 +249,8 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 		param.setProductLineId(mend.getProductLineId());
 		param.setIsHasDrug(mend.getIsHasDrug());
 		param.setIsRecruit(mend.getIsRecruit());
-
+		param.setHcpPotential(mend.getHcpPotential());
+		
 		return param;
 	}
 

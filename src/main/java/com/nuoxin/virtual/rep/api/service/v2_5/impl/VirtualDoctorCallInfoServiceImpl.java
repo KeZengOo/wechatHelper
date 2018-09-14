@@ -12,6 +12,7 @@ import javax.transaction.Transactional.TxType;
 
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitBean;
@@ -73,7 +74,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 					if (CollectionsUtil.isNotEmptyList(callInfoMends)) {
 						ConcurrentMap<Long, CallVisitMendBean> map = new ConcurrentHashMap<>(callInfoMends.size());
 						callInfoMends.forEach(mend -> {
-							map.putIfAbsent(mend.getCallId(), mend);
+							map.put(mend.getCallId(), mend);
 						});
 
 						list.forEach(visit -> {
@@ -81,7 +82,14 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 							CallVisitMendBean mend = map.get(callId);
 							if (mend != null) {
 								visit.setAttitude(mend.getAttitude());
+								String visitResultStr = mend.getVisitResult();
+								JSONArray visitResult = JSONObject.parseArray(visitResultStr);
+								visit.setVisitResult(visitResult);
 							}
+							
+							String createTime = visit.getCreateTime();
+							createTime = createTime.replace(".0", "");
+							visit.setCreateTime(createTime);
 						});
 					}
 				}

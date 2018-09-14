@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class DrugUserDoctorParams {
+	private Long drugUserDoctorId;
 	private Long doctorId;
 	private String doctorName;
 	private String doctorEmail;

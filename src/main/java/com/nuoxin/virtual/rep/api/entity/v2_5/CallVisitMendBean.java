@@ -12,5 +12,6 @@ public class CallVisitMendBean {
 	private Long callId;
 	@ApiModelProperty(value = "医生态度")
 	private Integer attitude;
-
+	@ApiModelProperty(value = "拜访结果")
+	private String visitResult;
 }

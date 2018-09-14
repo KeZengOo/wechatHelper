@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorMapper">
 
-	<insert id="saveDrugUserDoctors" parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorParams">
+	<insert id="saveDrugUserDoctors" keyProperty="drugUserDoctorId" useGeneratedKeys="true" parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorParams">
 		INSERT INTO drug_user_doctor
 		(doctor_id, doctor_name, doctor_email, 
 		drug_user_id, drug_user_name, drug_user_email, prod_id, created_time)
