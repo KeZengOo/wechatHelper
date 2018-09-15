@@ -16,23 +16,18 @@ import lombok.Data;
 @ApiModel("保存单个医生信息对象")
 @Data
 public class SaveVirtualDoctorRequest {
-	
-	@NotNull(message="name is null")
+
+	@NotNull(message = "name is null")
 	@ApiModelProperty(value = "医生姓名")
 	private String name;
-	
 	@ApiModelProperty(value = "性别")
-	@NotNull(message="gender is null")
+	@NotNull(message = "gender is null")
 	private Integer gender;
-	
 	@ApiModelProperty(value = "手机号")
-	@NotNull(message="mobile is null")
+	@NotNull(message = "mobile is null")
 	private String mobile;
-    @ApiModelProperty(value = "医生次要电话")
-    private String secondaryMobile;
-    @ApiModelProperty(value = "医生三要电话")
-    private String thirdaryMobile;
-	
+	@ApiModelProperty(value = "是否添加微信:1是,0否")
+	private Integer isAddWechat;
 	@ApiModelProperty(value = "微信")
 	private String wechat;
 	@ApiModelProperty(value = "座机")
@@ -43,25 +38,27 @@ public class SaveVirtualDoctorRequest {
 	private String address;
 	@ApiModelProperty(value = "科室")
 	private String depart;
-	@ApiModelProperty(value = "技术头衔")
+	@ApiModelProperty(value = "职称")
 	private String title;
-	
-	@NotNull(message="hospital is null")
+
+	@ApiModelProperty(value = "医生次要电话")
+	private String secondaryMobile;
+	@ApiModelProperty(value = "医生三要电话")
+	private String thirdaryMobile;
+
+	@NotNull(message = "hospital is null")
 	@ApiModelProperty(value = "医院")
 	private String hospital;
-	
-	@NotNull(message="province is null")
+	@NotNull(message = "province is null")
 	@ApiModelProperty(value = "省份")
 	private String province;
-	
-	@NotNull(message="city is null")
+	@NotNull(message = "city is null")
 	@ApiModelProperty(value = "城市")
 	private String city;
-	
-	@NotNull(message="hciLevel is null")
+	@NotNull(message = "hciLevel is null")
 	@ApiModelProperty(value = "医院等级")
 	private Integer hciLevel;
-
+	
 	@ApiModelProperty(value = "第二页扩展信息")
 	List<SaveVirtualDoctorMendRequest> mends = new ArrayList<>();
 }

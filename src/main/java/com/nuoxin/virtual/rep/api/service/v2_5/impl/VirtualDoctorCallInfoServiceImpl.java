@@ -17,7 +17,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitMendBean;
-import com.nuoxin.virtual.rep.api.entity.v2_5.UpdateVirtualDrugUserDoctorRelationship;
+import com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorQuateParams;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoParams;
 import com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorQuateMapper;
 import com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorCallInfoMapper;
@@ -183,7 +183,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	 * @param saveRequest
 	 */
 	private void changeRelationShip(BaseCallInfoRequest request) {
-		UpdateVirtualDrugUserDoctorRelationship relationShipParams = new UpdateVirtualDrugUserDoctorRelationship();
+		DrugUserDoctorQuateParams relationShipParams = new DrugUserDoctorQuateParams();
 		relationShipParams.setVirtualDrugUserId(request.getVirtualDrugUserId());
 		relationShipParams.setDoctorId(request.getVirtualDoctorId());
 		relationShipParams.setProductLineId(request.getProductId());
@@ -193,6 +193,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 			relationShipParams.setIsHasDrug(saveRequest.getIsHasDrug());
 			relationShipParams.setIsTarget(saveRequest.getIsTarget());
 			relationShipParams.setIsHasAe(saveRequest.getIsHasAe());
+			relationShipParams.setHcpPotential(saveRequest.getHcpPotential());
 		} else if (request instanceof SaveCallInfoUnConnectedRequest) {
 			SaveCallInfoUnConnectedRequest saveRequest = (SaveCallInfoUnConnectedRequest)request;
 			relationShipParams.setIsBreakOff(saveRequest.getIsBreakOff());

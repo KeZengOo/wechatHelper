@@ -13,10 +13,43 @@
 			email,
 			m.wechat,
 			m.address,
-			m.fixed_phone AS fixedPhone
+			m.fixed_phone AS fixedPhone,
+			udo.is_add_wechat AS isAddWechat
 		FROM doctor d
+			
 		LEFT JOIN doctor_mend m
-		ON m.virtual_doctor_id = d.id
+			ON m.virtual_doctor_id = d.id
+		
+		LEFT JOIN drug_user_doctor_one_to_one udo
+			ON udo.doctor_id=d.id
+			
+		WHERE d.id = #{virtualDoctorId}
+	</select>
+	
+	<select id="getVirtualDoctorMini" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorMiniResponse">
+		SELECT 
+			name,
+			hospital_name AS hospitalName,
+			(CASE sex WHEN '男' THEN '0'  ELSE '1' END) AS gender,
+			telephone AS mobile,
+			positions AS title,
+			depart,
+			vd.client_level AS hcpLevel,
+			temp.nextVisit
+		FROM doctor d
+			
+		LEFT JOIN doctor_virtual vd
+			ON vd.doctor_id = d.id 
+			AND d.id = #{virtualDoctorId}
+		LEFT JOIN (
+			SELECT 
+				date_format(next_visit_time, '%Y-%m-%d %H:%i:%S') AS nextVisit,virtual_doctor_id
+			FROM virtual_doctor_call_info_mend
+			WHERE 
+				virtual_doctor_id = #{virtualDoctorId}
+			ORDER BY create_time DESC LIMIT 1	
+		) temp
+		ON temp.virtual_doctor_id=d.id
 		WHERE d.id = #{virtualDoctorId}
 	</select>
 	

@@ -5,6 +5,7 @@ import java.util.List;
 import com.nuoxin.virtual.rep.api.entity.v2_5.DoctorVirtualParams;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorDO;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorMendParams;
+import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorMiniResponse;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorParams;
 
 /**
@@ -19,6 +20,13 @@ public interface VirtualDoctorMapper {
 	 * @return
 	 */
 	VirtualDoctorDO getVirtualDoctor(Long virtualDoctorId);
+	
+	/**
+	 * 根据 virtualDoctorId 获取医生简要信息
+	 * @param virtualDoctorId
+	 * @return
+	 */
+	VirtualDoctorMiniResponse getVirtualDoctorMini(Long virtualDoctorId);
 
 	/**
 	 * 批量添加客户医生

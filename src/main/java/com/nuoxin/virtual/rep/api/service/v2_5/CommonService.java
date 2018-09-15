@@ -25,4 +25,11 @@ public interface CommonService {
 	  * @return
 	  */
 	 List<DrugUserResponseBean> getSubordinates(@Param("leaderPath") String leaderPath);
+	 
+	 /**
+	  * 根据时间 delta 转换文字信息
+	  * @param delta
+	  * @return 字符串
+	  */
+	 String alterVisitTimeContent (long delta);
 }

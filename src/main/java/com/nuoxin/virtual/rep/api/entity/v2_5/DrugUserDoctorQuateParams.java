@@ -3,7 +3,7 @@ package com.nuoxin.virtual.rep.api.entity.v2_5;
 import lombok.Data;
 
 @Data
-public class UpdateVirtualDrugUserDoctorRelationship {
+public class DrugUserDoctorQuateParams {
 	private long virtualDrugUserId;
 	private long doctorId;
 	private int productLineId;
