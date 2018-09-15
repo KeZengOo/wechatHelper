@@ -1,4 +1,4 @@
-package com.nuoxin.virtual.rep.api.web.controller.response.customer;
+package com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -7,14 +7,14 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * 返回的医生动态字段
+ * 客户设置动态字段请求参数
  * @author tiancun
- * @date 2018-09-12
+ * @date 2018-09-15
  */
-@ApiModel(description = "返回的医生动态字段")
+@ApiModel(description = "客户设置动态字段请求参数")
 @Data
-public class DoctorDynamicFieldResponseBean implements Serializable{
-    private static final long serialVersionUID = 426766817698746896L;
+public class DoctorDynamicFieldRequestBean implements Serializable {
+    private static final long serialVersionUID = -2953248116587340016L;
 
     @ApiModelProperty(value = "id")
     private Long id;

@@ -121,7 +121,7 @@
         values (#{ddfvId},#{doctorId},#{drugUserId}, #{fieldId}, #{key}, #{value},#{oldFieldId}, #{oldKey}, #{oldValue}, #{correct})
     </insert>
 
-    <!-- 返回医生基本信息和医院新增的动态字段的 -->
+    <!-- 返回医生基本信息和医院新增的动态字段的 1是医生基本信息，5是医院信息-->
     <select id="getBasicAndHospitalFieldList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.customer.DoctorDynamicFieldResponseBean">
 
         SELECT
@@ -141,5 +141,44 @@
             serial_number ASC
     </select>
 
+    <!-- 客户设置医生动态字段修改 -->
+    <select id="updateDoctorDynamicField" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DoctorDynamicFieldRequestBean">
+
+        update virtual_doctor_dynamic_field
+        <set>
+            <if test="serialNumber !=null and serialNumber !=0">
+                serial_number=#{serialNumber},
+            </if>
+
+            <if test="name != null and name !=''">
+                field_name=#{name},
+            </if>
+
+            <if test="type!=null and type!=0">
+                type=#{type},
+            </if>
+
+            <if test="value !=null and value!=''">
+                field_value=#{value},
+            </if>
+
+            <if test="required !=null">
+                required=#{required},
+            </if>
+
+            <if test="classification !=null and classification !=0">
+                classification=#{classification}
+            </if>
+
+        </set>
+
+        where id=#{id}
+
+    </select>
+
+    <delete id="deleteDoctorDynamicField">
+        delete from virtual_doctor_dynamic_field
+        where id=#{id}
+    </delete>
 
 </mapper>

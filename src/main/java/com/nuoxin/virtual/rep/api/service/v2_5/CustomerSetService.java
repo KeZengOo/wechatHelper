@@ -1,5 +1,6 @@
 package com.nuoxin.virtual.rep.api.service.v2_5;
 
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DoctorDynamicFieldRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.customer.DoctorDynamicFieldResponseBean;
 
 import java.util.List;
@@ -17,5 +18,21 @@ public interface CustomerSetService {
      * @return
      */
     List<DoctorDynamicFieldResponseBean> getBasicAndHospitalFieldList();
+
+
+    /**
+     * 客户设置医生动态字段修改
+     * @param bean
+     */
+    void updateDoctorDynamicField(DoctorDynamicFieldRequestBean bean);
+
+
+
+    /**
+     * 客户设置医生动态字段删除
+     * @param id
+     */
+    void deleteDoctorDynamicField(Long id);
+
 
 }
