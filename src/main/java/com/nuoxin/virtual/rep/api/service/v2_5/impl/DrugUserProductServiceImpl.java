@@ -7,28 +7,25 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import com.nuoxin.virtual.rep.api.mybatis.DoctorMapper;
 import com.nuoxin.virtual.rep.api.mybatis.DrugUserMapper;
 import com.nuoxin.virtual.rep.api.mybatis.ProductLineMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
-import com.nuoxin.virtual.rep.api.service.v2_5.DrugUserService;
+import com.nuoxin.virtual.rep.api.service.v2_5.DrugUserProductService;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.product.ProductResponseBean;
 
 /**
- * 虚拟代表业务实现类
+ * 虚拟代表业产品务实现类
  * @author xiekaiyu
  */
 @Service
-public class DrugUserServiceImpl implements DrugUserService{
+public class DrugUserProductServiceImpl implements DrugUserProductService{
 	
 	@Resource
 	private DrugUserMapper drugUserMapper;
 	@Resource
 	private ProductLineMapper productLineMapper;
-	@Resource
-	private DoctorMapper doctorMapper;
 	@Resource
 	private CommonService commonService;
 

@@ -1,7 +1,5 @@
 package com.nuoxin.virtual.rep.api.service.v2_5.impl;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -9,6 +7,8 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONArray;
@@ -34,63 +34,15 @@ import shaded.org.apache.commons.lang3.StringUtils;
 @Service
 public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	
+	private static final Logger logger = LoggerFactory.getLogger(CustomerFollowUpServiceImpl.class);
+	
 	private static final List<TableHeader> tableHeaders = new ArrayList<>(15);
 	
 	/**
 	 * 初始化表头信息
 	 */
 	static {
-		TableHeader id = new TableHeader();
-		id.setLabel("ID");
-		id.setName("doctorId");
-		tableHeaders.add(id);
-		
-		TableHeader doctorName = new TableHeader();
-		doctorName.setLabel("客户姓名");
-		doctorName.setName("doctorName");
-		tableHeaders.add(doctorName);
-		
-		TableHeader mobile = new TableHeader();
-		mobile.setLabel("手机号");
-		mobile.setName("mobiles");
-		tableHeaders.add(mobile);
-		
-		TableHeader gender = new TableHeader();
-		gender.setLabel("性别");
-		gender.setName("gender");
-		tableHeaders.add(gender);
-		
-		TableHeader department = new TableHeader();
-		department.setLabel("科室");
-		department.setName("department");
-		tableHeaders.add(department);
-		
-		TableHeader isHasWeChat = new TableHeader();
-		isHasWeChat.setLabel("是否添加微信");
-		isHasWeChat.setName("isHasWeChat");
-		tableHeaders.add(isHasWeChat);
-		
-		TableHeader hospitalName = new TableHeader();
-		hospitalName.setLabel("医院");
-		hospitalName.setName("hospitalName");
-		tableHeaders.add(hospitalName);
-		
-		TableHeader visitTime = new TableHeader();
-		visitTime.setLabel("上次拜访时间");
-		visitTime.setName("visitTimeStr");
-		tableHeaders.add(visitTime);
-		
-		TableHeader visitResult = new TableHeader();
-		visitResult.setLabel("拜访结果");
-		visitResult.setName("visitResultObj");
-		tableHeaders.add(visitResult);
-		
-		TableHeader nextVisitTime = new TableHeader();
-		nextVisitTime.setLabel("下次拜访时间");
-		nextVisitTime.setName("nextVisitTimeStr");
-		tableHeaders.add(nextVisitTime);
-
-		// TODO 补全产品信息 @田存
+		CustomerFollowUpServiceImpl.getTableHeaders();
 	}
 	
 	@Resource
@@ -100,23 +52,27 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public PageResponseBean<List<CustomerFollowListBean>> list(ListRequestBean request, String leaderPath) {
+	public PageResponseBean<List<CustomerFollowListBean>> list(ListRequestBean pageRequest, String leaderPath) {
 		int count = 0;
-		PageResponseBean pageResponseBean = null;
+		PageResponseBean pageResponse = null;
 		// 获取所有下属(直接&间接) virtualDrugUserIds
 		List<Long> virtualDrugUserIds = commonService.getSubordinateIds(leaderPath);
 		if (CollectionsUtil.isNotEmptyList(virtualDrugUserIds)) {
 			count = doctorMapper.getListCount(virtualDrugUserIds, null, null);
 			if(count > 0) {
-				int currentSize = request.getCurrentSize();
-				int pageSize = request.getPageSize();
+				int currentSize = pageRequest.getCurrentSize();
+				int pageSize = pageRequest.getPageSize();
+				long startTime = System.currentTimeMillis();
 				List<CustomerFollowListBean> list = doctorMapper.getList(virtualDrugUserIds, currentSize, pageSize, null, null);
-				pageResponseBean = this.getDoctorsList(count, list, request);
+				long endTime = System.currentTimeMillis();
+				logger.info("list 耗时{}", (endTime-startTime) ,"ms");
+				
+				pageResponse = this.getDoctorsList(count, list, pageRequest);
 			}
 		} 
 		
-		this.compensate(request, pageResponseBean);
-		return pageResponseBean;
+		this.compensate(pageRequest, pageResponse);
+		return pageResponse;
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -240,8 +196,6 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		}
 	}
 	
-
-	
 	/**
 	 * PageResponseBean 为null 时的补偿
 	 * @param pageResponseBean
@@ -255,4 +209,57 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		pageResponseBean.setTableHeaders(tableHeaders);
 	}
 	
+	private static  void getTableHeaders () {
+		TableHeader id = new TableHeader();
+		id.setLabel("ID");
+		id.setName("doctorId");
+		tableHeaders.add(id);
+		
+		TableHeader doctorName = new TableHeader();
+		doctorName.setLabel("客户姓名");
+		doctorName.setName("doctorName");
+		tableHeaders.add(doctorName);
+		
+		TableHeader mobile = new TableHeader();
+		mobile.setLabel("手机号");
+		mobile.setName("mobiles");
+		tableHeaders.add(mobile);
+		
+		TableHeader gender = new TableHeader();
+		gender.setLabel("性别");
+		gender.setName("gender");
+		tableHeaders.add(gender);
+		
+		TableHeader department = new TableHeader();
+		department.setLabel("科室");
+		department.setName("department");
+		tableHeaders.add(department);
+		
+		TableHeader isHasWeChat = new TableHeader();
+		isHasWeChat.setLabel("是否添加微信");
+		isHasWeChat.setName("isHasWeChat");
+		tableHeaders.add(isHasWeChat);
+		
+		TableHeader hospitalName = new TableHeader();
+		hospitalName.setLabel("医院");
+		hospitalName.setName("hospitalName");
+		tableHeaders.add(hospitalName);
+		
+		TableHeader visitTime = new TableHeader();
+		visitTime.setLabel("上次拜访时间");
+		visitTime.setName("visitTimeStr");
+		tableHeaders.add(visitTime);
+		
+		TableHeader visitResult = new TableHeader();
+		visitResult.setLabel("拜访结果");
+		visitResult.setName("visitResultObj");
+		tableHeaders.add(visitResult);
+		
+		TableHeader nextVisitTime = new TableHeader();
+		nextVisitTime.setLabel("下次拜访时间");
+		nextVisitTime.setName("nextVisitTimeStr");
+		tableHeaders.add(nextVisitTime);
+
+		// TODO 补全产品信息 @田存
+	}
 }

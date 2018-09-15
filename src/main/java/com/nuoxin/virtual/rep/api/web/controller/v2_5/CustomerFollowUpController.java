@@ -16,7 +16,7 @@ import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.util.mem.SessionMemUtils;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.v2_5.CustomerFollowUpService;
-import com.nuoxin.virtual.rep.api.service.v2_5.DrugUserService;
+import com.nuoxin.virtual.rep.api.service.v2_5.DrugUserProductService;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.ListRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.ScreenRequestBean;
@@ -40,8 +40,8 @@ public class CustomerFollowUpController extends NewBaseController {
 	
 	@Resource
 	private SessionMemUtils memUtils;
-	@Resource(name="drugUserServiceImpl")
-	private DrugUserService drugUserService;
+	@Resource
+	private DrugUserProductService drugUserProductService;
 	@Resource
 	private CustomerFollowUpService customerFollowService;
 	
@@ -130,7 +130,7 @@ public class CustomerFollowUpController extends NewBaseController {
 			return super.getLoginErrorResponse();
 		} 
 		
-		List<DrugUserResponseBean> list = drugUserService.getSubordinates(user.getLeaderPath());
+		List<DrugUserResponseBean> list = drugUserProductService.getSubordinates(user.getLeaderPath());
 		DefaultResponseBean<List<DrugUserResponseBean>> responseBean = new DefaultResponseBean<>();
 		responseBean.setData(list);
 		
@@ -146,7 +146,7 @@ public class CustomerFollowUpController extends NewBaseController {
 			return super.getLoginErrorResponse();
 		} 
 		
-		List<ProductResponseBean> list = drugUserService.getProductsByDrugUserId(user.getLeaderPath());
+		List<ProductResponseBean> list = drugUserProductService.getProductsByDrugUserId(user.getLeaderPath());
 		DefaultResponseBean<List<ProductResponseBean>> responseBean = new DefaultResponseBean<>();
 		responseBean.setData(list);
 		

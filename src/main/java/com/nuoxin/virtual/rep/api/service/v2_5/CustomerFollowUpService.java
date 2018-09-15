@@ -17,6 +17,7 @@ public interface CustomerFollowUpService {
 	/**
 	 * 客户跟进列表实现,补充对应的产品信息 @田存
 	 * @param request
+	 * @param leaderPath 领导路径(包含下级的 drugUserIds,以逗号分隔)
 	 * @return
 	 */
 	PageResponseBean<List<CustomerFollowListBean>> list(ListRequestBean request, String leaderPath);
@@ -24,6 +25,7 @@ public interface CustomerFollowUpService {
 	/**
 	 * 客户跟进搜索实现
 	 * @param request
+	 * @param leaderPath 领导路径(包含下级的 drugUserIds,以逗号分隔)
 	 * @return
 	 */
 	PageResponseBean<List<CustomerFollowListBean>> search(SearchRequestBean request, String leaderPath);

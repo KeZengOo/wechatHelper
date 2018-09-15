@@ -6,13 +6,27 @@
 	<select id="getCallVisitCount" resultType="java.lang.Integer">
 		SELECT 
 			count(*)
-		FROM virtual_doctor_call_info
-		WHERE 
-			virtual_doctor_id=#{virtualDoctorId}
-			AND virtual_drug_user_id IN
-			<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
-		   		#{virtualDrugUserId}
-		  	</foreach> 
+		FROM virtual_doctor_call_info v
+		JOIN (
+			SELECT 
+				DISTINCT d.id  
+			FROM drug_user_doctor dud
+			JOIN doctor d
+			ON d.id=dud.doctor_id
+			JOIN  drug_user du
+			ON dud.drug_user_id=du.id
+			AND dud.doctor_id = #{virtualDoctorId}
+			AND du.leader_path LIKE CONCAT(#{leaderPath},'%')
+			AND dud.is_available=1
+		) temp 
+		ON v.virtual_doctor_id=temp.id
+	    WHERE v.product_id IN (
+	    	SELECT DISTINCT prod_id 
+	    	FROM product_user pu
+	    	JOIN drug_user du
+	    	ON pu.user_id=du.id
+	    	WHERE du.leader_path LIKE CONCAT(#{leaderPath},'%')
+	    )
 	</select>
 	
 	<select id="getCallVisitList" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitBean">
@@ -23,12 +37,28 @@
 		FROM virtual_doctor_call_info v
 		JOIN drug_user du
 		ON v.virtual_drug_user_id = du.id
-		WHERE 
-			virtual_doctor_id=#{virtualDoctorId}
-			AND virtual_drug_user_id IN
-			<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
-		   		#{virtualDrugUserId}
-		  	</foreach> 
+		JOIN (
+			SELECT 
+				DISTINCT d.id  
+			FROM drug_user_doctor dud
+			JOIN doctor d
+			ON d.id=dud.doctor_id
+			JOIN  drug_user du
+			ON dud.drug_user_id=du.id
+			AND dud.doctor_id = #{virtualDoctorId}
+			AND du.leader_path LIKE CONCAT(#{leaderPath},'%')
+			AND dud.is_available=1
+		) temp 
+		ON v.virtual_doctor_id=temp.id
+	    WHERE v.product_id IN (
+	    	SELECT DISTINCT prod_id 
+	    	FROM product_user pu
+	    	JOIN drug_user du
+	    	ON pu.user_id=du.id
+	    	WHERE du.leader_path LIKE CONCAT(#{leaderPath},'%')
+	    )
+		
+		ORDER BY createTime DESC
 		LIMIT #{currentSize}, #{pageSize}
 	</select>
 

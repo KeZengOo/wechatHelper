@@ -56,42 +56,39 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		PageResponseBean<List<CallVisitBean>> pageResponse = null;
 
 		Long virtualDoctorId = request.getVirtualDoctorId();
-		List<Long> virtualDrugUserIds = commonService.getSubordinateIds(leaderPath);
-		if(CollectionsUtil.isNotEmptyList(virtualDrugUserIds)) {
-			int count = callInfoMapper.getCallVisitCount(virtualDrugUserIds, virtualDoctorId);
-			if (count > 0) {
-				int currentSize = request.getCurrentSize();
-				int pageSize = request.getPageSize();
-				List<CallVisitBean> list = callInfoMapper.getCallVisitList(virtualDrugUserIds, virtualDoctorId, currentSize, pageSize);
-				if (CollectionsUtil.isNotEmptyList(list)) {
-					List<Long> callIds = new ArrayList<>(list.size());
-					list.forEach(visitBean ->{
-						callIds.add(visitBean.getCallId());
+		int count = callInfoMapper.getCallVisitCount(leaderPath, virtualDoctorId);
+		if (count > 0) {
+			int currentSize = request.getCurrentSize();
+			int pageSize = request.getPageSize();
+			List<CallVisitBean> list = callInfoMapper.getCallVisitList(leaderPath, virtualDoctorId, currentSize, pageSize);
+			if (CollectionsUtil.isNotEmptyList(list)) {
+				List<Long> callIds = new ArrayList<>(list.size());
+				list.forEach(visitBean ->{
+					callIds.add(visitBean.getCallId());
+				});
+				
+				// 补充 VirtualDoctorCallInfoMend 信息
+				List<CallVisitMendBean> callInfoMends = callInfoMendMapper.getCallVisitMendList(callIds);
+				if (CollectionsUtil.isNotEmptyList(callInfoMends)) {
+					ConcurrentMap<Long, CallVisitMendBean> map = new ConcurrentHashMap<>(callInfoMends.size());
+					callInfoMends.forEach(mend -> {
+						map.put(mend.getCallId(), mend);
 					});
-					
-					// 补充 VirtualDoctorCallInfoMend 信息
-					List<CallVisitMendBean> callInfoMends = callInfoMendMapper.getCallVisitMendList(callIds);
-					if (CollectionsUtil.isNotEmptyList(callInfoMends)) {
-						ConcurrentMap<Long, CallVisitMendBean> map = new ConcurrentHashMap<>(callInfoMends.size());
-						callInfoMends.forEach(mend -> {
-							map.put(mend.getCallId(), mend);
-						});
 
-						list.forEach(visit -> {
-							Long callId = visit.getCallId();
-							CallVisitMendBean mend = map.get(callId);
-							if (mend != null) {
-								visit.setAttitude(mend.getAttitude());
-								String visitResultStr = mend.getVisitResult();
-								JSONArray visitResult = JSONObject.parseArray(visitResultStr);
-								visit.setVisitResult(visitResult);
-							}
-						});
-					}
+					list.forEach(visit -> {
+						Long callId = visit.getCallId();
+						CallVisitMendBean mend = map.get(callId);
+						if (mend != null) {
+							visit.setAttitude(mend.getAttitude());
+							String visitResultStr = mend.getVisitResult();
+							JSONArray visitResult = JSONObject.parseArray(visitResultStr);
+							visit.setVisitResult(visitResult);
+						}
+					});
 				}
-				pageResponse = new PageResponseBean(request, count, list);
-			} 
-		}
+			}
+			pageResponse = new PageResponseBean(request, count, list);
+		} 
 		
 		if (pageResponse == null) {
 			pageResponse = new PageResponseBean(request, 0, Collections.emptyList());

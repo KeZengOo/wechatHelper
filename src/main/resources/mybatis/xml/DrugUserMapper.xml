@@ -107,14 +107,12 @@
     
     <!-- 以下是 v2.5 使用到的 -->
     
-    <!-- 模糊查询不走索引 -->
     <select id="getSubordinatesByLeaderPath" resultMap="drugUserResponseBean">
-    	SELECT id,name FROM drug_user WHERE leader_path LIKE #{leaderPath,jdbcType=VARCHAR}
+    	SELECT id,name FROM drug_user WHERE leader_path LIKE CONCAT(#{leaderPath},'%')
     </select>
     
-    <!-- 模糊查询不走索引 -->
     <select id="getSubordinateIdsByLeaderPath" resultType="java.lang.Long">
-    	SELECT id FROM drug_user WHERE leader_path LIKE #{leaderPath,jdbcType=VARCHAR}
+    	SELECT id FROM drug_user WHERE leader_path LIKE CONCAT(#{leaderPath},'%')
     </select>
     
 </mapper>
