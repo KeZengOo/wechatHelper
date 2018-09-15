@@ -121,5 +121,25 @@
         values (#{ddfvId},#{doctorId},#{drugUserId}, #{fieldId}, #{key}, #{value},#{oldFieldId}, #{oldKey}, #{oldValue}, #{correct})
     </insert>
 
+    <!-- 返回医生基本信息和医院新增的动态字段的 -->
+    <select id="getBasicAndHospitalFieldList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.customer.DoctorDynamicFieldResponseBean">
+
+        SELECT
+            id,
+            serial_number serialNumber,
+            field_name `name`,
+            `type`,
+            field_value `value`,
+            required,
+            classification
+        FROM
+            virtual_doctor_dynamic_field
+        WHERE
+            classification IN (1, 5)
+        ORDER BY
+            classification ASC,
+            serial_number ASC
+    </select>
+
 
 </mapper>

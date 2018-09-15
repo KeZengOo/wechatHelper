@@ -1,7 +1,6 @@
 package com.nuoxin.virtual.rep.api.mybatis;
 
 import com.nuoxin.virtual.rep.api.web.controller.request.hcp.HcpBasicFieldRequestBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.customer.DoctorDymamicFieldValueResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.customer.DoctorDynamicFieldResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorBasicInfoResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpBasicInfoHistoryResponseBean;
@@ -79,5 +78,9 @@ public interface DynamicFieldMapper {
      */
     List<DoctorDynamicFieldResponseBean> getList();
 
-
+    /**
+     * 返回医生基本信息和医院新增的动态字段的
+     * @return
+     */
+    List<DoctorDynamicFieldResponseBean> getBasicAndHospitalFieldList();
 }
