@@ -21,10 +21,8 @@ public class SaveCallInfoRequest  extends BaseCallInfoRequest{
 	
 	@ApiModelProperty(value = "是否有药 1.有,0.无")
 	private Integer isHasDrug;
-	
 	@ApiModelProperty(value = "是否是目标客户 1.是,0.非")
 	private Integer isTarget;
-	
 	@ApiModelProperty(value = "是否有 AE 1.是,0.非")
 	private Integer isHasAe;
 	

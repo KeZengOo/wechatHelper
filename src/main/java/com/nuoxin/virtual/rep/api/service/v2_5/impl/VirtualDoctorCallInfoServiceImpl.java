@@ -86,10 +86,6 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 								JSONArray visitResult = JSONObject.parseArray(visitResultStr);
 								visit.setVisitResult(visitResult);
 							}
-							
-							String createTime = visit.getCreateTime();
-							createTime = createTime.replace(".0", "");
-							visit.setCreateTime(createTime);
 						});
 					}
 				}
@@ -179,7 +175,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	}
 	
 	/**
-	 * 变更虚拟代表关联的医生关系信息:是否有药,是否是目标客户,是否有AE
+	 * 变更虚拟代医生扩展关系信息
 	 * @param saveRequest
 	 */
 	private void changeRelationShip(BaseCallInfoRequest request) {
