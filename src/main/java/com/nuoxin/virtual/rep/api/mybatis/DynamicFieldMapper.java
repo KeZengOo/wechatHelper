@@ -1,7 +1,7 @@
 package com.nuoxin.virtual.rep.api.mybatis;
 
 import com.nuoxin.virtual.rep.api.web.controller.request.hcp.HcpBasicFieldRequestBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.customer.DoctorDymamicFieldValueResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DoctorDynamicFieldRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.customer.DoctorDynamicFieldResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorBasicInfoResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpBasicInfoHistoryResponseBean;
@@ -9,7 +9,7 @@ import com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpDynamicRequestB
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
-import java.util.Map;
+
 
 /**
  * Create by tiancun on 2017/10/19
@@ -79,5 +79,31 @@ public interface DynamicFieldMapper {
      */
     List<DoctorDynamicFieldResponseBean> getList();
 
+    /**
+     * 如果是客户设置返回的是医生的基本信息和医院信息
+     * 如果是产品设置返回的是处方和拜访记录
+     * @param bean 产品id,只有产品设置的时候才会有这个字段
+     * @return
+     */
+    List<DoctorDynamicFieldResponseBean> getDoctorDynamicFieldList(DoctorDynamicFieldRequestBean bean);
+
+    /**
+     * 动态字段修改
+     * @param bean
+     */
+    void updateDoctorDynamicField(DoctorDynamicFieldRequestBean bean);
+
+    /**
+     * 动态字段删除
+     * @param id
+     */
+    void deleteDoctorDynamicField(@Param(value="id") Long id);
+
+    /**
+     * 动态字段新增
+     * @param bean
+     * @return
+     */
+    void insertDoctorDynamicField(DoctorDynamicFieldRequestBean bean);
 
 }
