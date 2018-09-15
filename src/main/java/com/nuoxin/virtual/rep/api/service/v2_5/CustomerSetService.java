@@ -6,7 +6,7 @@ import com.nuoxin.virtual.rep.api.web.controller.response.customer.DoctorDynamic
 import java.util.List;
 
 /**
- * 新版客户设置相关业务
+ * 新版客户设置或者产品设置相关
  * @author tiancun
  * @date 2018-09-12
  */
@@ -19,6 +19,12 @@ public interface CustomerSetService {
      */
     List<DoctorDynamicFieldResponseBean> getBasicAndHospitalFieldList();
 
+    /**
+     * 返回产品新增的动态字段
+     * @param productId
+     * @return
+     */
+    List<DoctorDynamicFieldResponseBean> getProductFieldList(Long productId);
 
     /**
      * 客户设置医生动态字段修改
@@ -35,4 +41,18 @@ public interface CustomerSetService {
     void deleteDoctorDynamicField(Long id);
 
 
+    /**
+     * 客户设置动态字段新增
+     * @param bean
+     * @return
+     */
+    Long insertDoctorDynamicField(DoctorDynamicFieldRequestBean bean);
+
+
+    /**
+     * 产品设置动态字段新增
+     * @param bean
+     * @return
+     */
+    Long insertProductDoctorDynamicField(DoctorDynamicFieldRequestBean bean);
 }

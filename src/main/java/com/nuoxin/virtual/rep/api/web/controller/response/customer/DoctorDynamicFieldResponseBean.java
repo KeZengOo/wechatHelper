@@ -7,11 +7,11 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * 返回的医生动态字段
+ * 客户设置或者产品设置返回的字段
  * @author tiancun
  * @date 2018-09-12
  */
-@ApiModel(description = "返回的医生动态字段")
+@ApiModel(description = "客户设置或者产品设置返回的字段")
 @Data
 public class DoctorDynamicFieldResponseBean implements Serializable{
     private static final long serialVersionUID = 426766817698746896L;
@@ -19,7 +19,7 @@ public class DoctorDynamicFieldResponseBean implements Serializable{
     @ApiModelProperty(value = "id")
     private Long id;
 
-    @ApiModelProperty(value = "序号")
+    @ApiModelProperty(value = "序号", hidden = true)
     private Integer serialNumber;
 
     @ApiModelProperty(value = "字段名称")

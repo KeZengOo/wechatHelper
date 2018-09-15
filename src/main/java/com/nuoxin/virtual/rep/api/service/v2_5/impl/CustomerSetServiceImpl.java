@@ -24,8 +24,19 @@ public class CustomerSetServiceImpl implements CustomerSetService {
 
     @Override
     public List<DoctorDynamicFieldResponseBean> getBasicAndHospitalFieldList() {
-        List<DoctorDynamicFieldResponseBean> basicAndHospitalFieldList = dynamicFieldMapper.getBasicAndHospitalFieldList();
-        return basicAndHospitalFieldList;
+        List<DoctorDynamicFieldResponseBean> dynamicFieldList = dynamicFieldMapper.getDoctorDynamicFieldList(null);
+        return dynamicFieldList;
+    }
+
+    @Override
+    public List<DoctorDynamicFieldResponseBean> getProductFieldList(Long productId) {
+        if (productId == null || productId <=0){
+            throw new BusinessException(ErrorEnum.ERROR.getStatus(),"产品id 不能为空");
+        }
+        DoctorDynamicFieldRequestBean bean = new DoctorDynamicFieldRequestBean();
+        bean.setProductId(productId);
+        List<DoctorDynamicFieldResponseBean> dynamicFieldList = dynamicFieldMapper.getDoctorDynamicFieldList(bean);
+        return dynamicFieldList;
     }
 
     @Override
@@ -46,5 +57,23 @@ public class CustomerSetServiceImpl implements CustomerSetService {
         }
 
         dynamicFieldMapper.deleteDoctorDynamicField(id);
+    }
+
+    @Override
+    public Long insertDoctorDynamicField(DoctorDynamicFieldRequestBean bean) {
+
+        dynamicFieldMapper.insertDoctorDynamicField(bean);
+        return bean.getId();
+    }
+
+    @Override
+    public Long insertProductDoctorDynamicField(DoctorDynamicFieldRequestBean bean) {
+        Long productId = bean.getProductId();
+        if (productId == null || productId <= 0){
+            throw new BusinessException(ErrorEnum.ERROR.getStatus(),"产品id 不能为空");
+        }
+
+        dynamicFieldMapper.insertDoctorDynamicField(bean);
+        return bean.getId();
     }
 }

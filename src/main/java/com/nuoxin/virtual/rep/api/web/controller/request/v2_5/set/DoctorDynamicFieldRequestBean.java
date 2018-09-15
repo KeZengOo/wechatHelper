@@ -19,7 +19,7 @@ public class DoctorDynamicFieldRequestBean implements Serializable {
     @ApiModelProperty(value = "id")
     private Long id;
 
-    @ApiModelProperty(value = "序号")
+    @ApiModelProperty(value = "序号", hidden = true)
     private Integer serialNumber;
 
     @ApiModelProperty(value = "字段名称")
@@ -36,5 +36,21 @@ public class DoctorDynamicFieldRequestBean implements Serializable {
 
     @ApiModelProperty(value = "分类，目前1基本信息，2医生的处方信息，3之前拜访记录，4分析，5是医院信息")
     private Integer classification;
+
+    @ApiModelProperty(value = "产品id,只有产品设置的时候才会有这个的字段")
+    private Long productId = 0L;
+
+    @ApiModelProperty(value = "创建者id,前端不用传", hidden = true)
+    private Long creatorId;
+
+    @ApiModelProperty(value = "创建者，前端不用传", hidden = true)
+    private String creatorName;
+
+    @ApiModelProperty(value = "修改者id,前端不用传", hidden = true)
+    private Long menderId;
+
+    @ApiModelProperty(value = "修改者，前端不用传", hidden = true)
+    private String menderName;
+
 
 }

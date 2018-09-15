@@ -9,7 +9,7 @@ import com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpDynamicRequestB
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
-import java.util.Map;
+
 
 /**
  * Create by tiancun on 2017/10/19
@@ -80,21 +80,30 @@ public interface DynamicFieldMapper {
     List<DoctorDynamicFieldResponseBean> getList();
 
     /**
-     * 返回医生基本信息和医院新增的动态字段的
+     * 如果是客户设置返回的是医生的基本信息和医院信息
+     * 如果是产品设置返回的是处方和拜访记录
+     * @param bean 产品id,只有产品设置的时候才会有这个字段
      * @return
      */
-    List<DoctorDynamicFieldResponseBean> getBasicAndHospitalFieldList();
+    List<DoctorDynamicFieldResponseBean> getDoctorDynamicFieldList(DoctorDynamicFieldRequestBean bean);
 
     /**
-     * 客户设置医生动态字段修改
+     * 动态字段修改
      * @param bean
      */
     void updateDoctorDynamicField(DoctorDynamicFieldRequestBean bean);
 
     /**
-     * 客户设置医生动态字段删除
+     * 动态字段删除
      * @param id
      */
     void deleteDoctorDynamicField(@Param(value="id") Long id);
+
+    /**
+     * 动态字段新增
+     * @param bean
+     * @return
+     */
+    void insertDoctorDynamicField(DoctorDynamicFieldRequestBean bean);
 
 }

@@ -121,8 +121,8 @@
         values (#{ddfvId},#{doctorId},#{drugUserId}, #{fieldId}, #{key}, #{value},#{oldFieldId}, #{oldKey}, #{oldValue}, #{correct})
     </insert>
 
-    <!-- 返回医生基本信息和医院新增的动态字段的 1是医生基本信息，5是医院信息-->
-    <select id="getBasicAndHospitalFieldList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.customer.DoctorDynamicFieldResponseBean">
+    <!-- 返回医生基本信息和医院新增的动态字段的 1是医生基本信息，5是医院信息,2是处方信息3是拜访记录-->
+    <select id="getDoctorDynamicFieldList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.customer.DoctorDynamicFieldResponseBean">
 
         SELECT
             id,
@@ -134,11 +134,20 @@
             classification
         FROM
             virtual_doctor_dynamic_field
-        WHERE
-            classification IN (1, 5)
+        WHERE 1=1
+
+        <if test="productId !=null and productId !=0">
+            and product_id=#{productId}
+            and classification IN (2, 3)
+        </if>
+
+        <if test="productId==null or productId==0">
+            and classification IN (1, 5)
+        </if>
+
         ORDER BY
             classification ASC,
-            serial_number ASC
+            id ASC
     </select>
 
     <!-- 客户设置医生动态字段修改 -->
@@ -167,9 +176,16 @@
             </if>
 
             <if test="classification !=null and classification !=0">
-                classification=#{classification}
+                classification=#{classification},
             </if>
 
+            <if test="menderId !=null and menderId !=0">
+                mender_id=#{menderId},
+            </if>
+
+            <if test="menderName !=null and menderName !=''">
+                mender_name=#{menderName}
+            </if>
         </set>
 
         where id=#{id}
@@ -180,5 +196,11 @@
         delete from virtual_doctor_dynamic_field
         where id=#{id}
     </delete>
+
+    <insert id="insertDoctorDynamicField" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DoctorDynamicFieldRequestBean" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into virtual_doctor_dynamic_field(serial_number, field_name, type, field_value, classification, required, product_id, creator_id, creator_name, mender_id, mender_name)
+        values
+        (#{serialNumber}, #{name}, #{type}, #{value}, #{classification}, #{required}, #{productId}, #{creatorId}, #{creatorName}, #{menderId}, #{menderName})
+    </insert>
 
 </mapper>
