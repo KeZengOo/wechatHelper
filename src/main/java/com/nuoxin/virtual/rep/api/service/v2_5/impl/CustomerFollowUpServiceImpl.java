@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.nuoxin.virtual.rep.api.common.bean.PageRequestBean;
-import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
+import com.nuoxin.virtual.rep.api.entity.v2_5.CustomerFollowUpPageResponseBean;
 import com.nuoxin.virtual.rep.api.mybatis.DoctorMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v2_5.CustomerFollowUpService;
@@ -52,9 +52,9 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public PageResponseBean<List<CustomerFollowListBean>> list(ListRequestBean pageRequest, String leaderPath) {
+	public CustomerFollowUpPageResponseBean<List<CustomerFollowListBean>> list(ListRequestBean pageRequest, String leaderPath) {
 		int count = 0;
-		PageResponseBean pageResponse = null;
+		CustomerFollowUpPageResponseBean pageResponse = null;
 		// 获取所有下属(直接&间接) virtualDrugUserIds
 		List<Long> virtualDrugUserIds = commonService.getSubordinateIds(leaderPath);
 		if (CollectionsUtil.isNotEmptyList(virtualDrugUserIds)) {
@@ -77,8 +77,8 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public PageResponseBean<List<CustomerFollowListBean>> search(SearchRequestBean request, String leaderPath) {
-		PageResponseBean pageResponseBean = null;
+	public CustomerFollowUpPageResponseBean<List<CustomerFollowListBean>> search(SearchRequestBean request, String leaderPath) {
+		CustomerFollowUpPageResponseBean pageResponseBean = null;
 		int count = 0;
 		 // 获取所有下属(直接&间接) virtualDrugUserIds
 		List<Long> virtualDrugUserIds = commonService.getSubordinateIds(leaderPath);
@@ -99,8 +99,8 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public PageResponseBean<List<CustomerFollowListBean>> screen(ScreenRequestBean request) {
-		PageResponseBean pageResponseBean = null;
+	public CustomerFollowUpPageResponseBean<List<CustomerFollowListBean>> screen(ScreenRequestBean request) {
+		CustomerFollowUpPageResponseBean pageResponseBean = null;
 		List<Long> virtualDrugUserIds = request.getVirtualDrugUserIds();
 		List<Integer> productLineIds = request.getProductLineIds();
 		
@@ -127,7 +127,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	 * @return PageResponseBean<List<CustomerFollowListBean>>
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private PageResponseBean<List<CustomerFollowListBean>> getDoctorsList(int count, List<CustomerFollowListBean> list,
+	private CustomerFollowUpPageResponseBean<List<CustomerFollowListBean>> getDoctorsList(int count, List<CustomerFollowListBean> list,
 			PageRequestBean pageRequestBean) {
 		if (CollectionsUtil.isNotEmptyList(list)) {
 			list.forEach(doctor -> {
@@ -140,7 +140,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 			list = Collections.emptyList();
 		}
 
-		return new PageResponseBean(pageRequestBean, count, list);
+		return new CustomerFollowUpPageResponseBean(pageRequestBean, count, list);
 	}
 	
 	/**
@@ -201,10 +201,10 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	 * @param pageResponseBean
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private void compensate(PageRequestBean request, PageResponseBean pageResponseBean) {
+	private void compensate(PageRequestBean request, CustomerFollowUpPageResponseBean pageResponseBean) {
 		if (pageResponseBean == null) {
 			int count = 0;
-			pageResponseBean = new PageResponseBean(request, count, Collections.emptyList());
+			pageResponseBean = new CustomerFollowUpPageResponseBean(request, count, Collections.emptyList());
 		}
 		pageResponseBean.setTableHeaders(tableHeaders);
 	}

@@ -17,8 +17,6 @@ public class PageResponseBean<T> implements Serializable {
 
 	private static final long serialVersionUID = 6887389993060457824L;
 
-	@ApiModelProperty(value = "表头信息")
-	private List<TableHeader> tableHeaders;
 	/**
 	 * 返回数据内容
 	 */
@@ -180,14 +178,6 @@ public class PageResponseBean<T> implements Serializable {
 
 	public void setFirst(boolean first) {
 		this.first = first;
-	}
-
-	public List<TableHeader> getTableHeaders() {
-		return tableHeaders;
-	}
-
-	public void setTableHeaders(List<TableHeader> tableHeaders) {
-		this.tableHeaders = tableHeaders;
 	}
 
 }
