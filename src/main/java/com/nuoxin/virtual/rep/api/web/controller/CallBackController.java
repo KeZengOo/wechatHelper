@@ -1,32 +1,29 @@
 package com.nuoxin.virtual.rep.api.web.controller;
 
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
-import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
-import com.nuoxin.virtual.rep.api.web.controller.request.call.Call7mmorRequestBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.call.Call7mmorResponseBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alibaba.fastjson.JSONObject;
+import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.bean.ResponseObj;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
 import com.nuoxin.virtual.rep.api.service.CallBackService;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
+import com.nuoxin.virtual.rep.api.web.controller.request.call.Call7mmorRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.call.Call7mmorResponseBean;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -35,65 +32,65 @@ import io.swagger.annotations.ApiOperation;
 @RestController
 @RequestMapping(value = "/callback")
 public class CallBackController extends BaseController {
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(CallBackController.class);
 
-	private ExecutorService executorService = Executors.newFixedThreadPool(50);
-
 	@Resource(name = "sevenMoor")
-    private CallBackService callBackService;
+	private CallBackService callBackService;
 
-    /**
-     * 七陌回调入口方法
-     * 参考链接 https://developer.7moor.com/event/
-     * @param request
-     * @param response
-     * @return
-     */
-    @ApiOperation(value = "回调接口方法", notes = "回调接口方法")
-    @RequestMapping("/7moor")
-    public ResponseObj callback(HttpServletRequest request, HttpServletResponse response) {
-		Map<String, String> paramsMap = this.getParamsMap(request);
+	/**
+	 * 七陌回调入口方法 参考链接 https://developer.7moor.com/event/
+	 * @param request
+	 * @param response
+	 * @return ResponseEntity<?>
+	 */
+	@ApiOperation(value = "回调接口方法", notes = "回调接口方法")
+	@RequestMapping("/7moor")
+	public ResponseEntity<?> callback(HttpServletRequest request, HttpServletResponse response) {
+		ResponseEntity<?> responseEntity;
+		// 参数转换
+		ConcurrentMap<String, String> paramsMap = this.getParamsMap(request);
 		if (CollectionsUtil.isNotEmptyMap(paramsMap)) {
-			this.executeByThreadPool(paramsMap);
+			// 调用业务方法
+			responseEntity = this.callBack(paramsMap);
 		} else {
-			logger.error("7moor request params is blank!");
+			logger.error("7moor 传参异常,响应给 7moor 500");
+			responseEntity = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
-		ResponseObj responseObj = new ResponseObj();
-		responseObj.setData("callback successed");
-		responseObj.setMessage("callback successed");
-		responseObj.setDescription("callback successed");
-    	return responseObj;
-    }
-
-
+		return responseEntity;
+	}
 
 	@ApiOperation(value = "查询通话记录", notes = "查询通话记录")
 	@GetMapping("/call/list")
 	public ResponseEntity<DefaultResponseBean<List<Call7mmorResponseBean>>> getCallList(Call7mmorRequestBean bean) {
 
-        List<Call7mmorResponseBean> callList = callBackService.getCallList(bean);
-        DefaultResponseBean responseBean = new DefaultResponseBean();
-        responseBean.setData(callList);
-        return ResponseEntity.ok(responseBean);
-    }
+		List<Call7mmorResponseBean> callList = callBackService.getCallList(bean);
+		DefaultResponseBean<List<Call7mmorResponseBean>> responseBean = new DefaultResponseBean<>();
+		responseBean.setData(callList);
+		return ResponseEntity.ok(responseBean);
+	}
 
-    @ApiOperation(value = "录音文件重新上传", notes = "录音文件重新上传")
-    @GetMapping("/call/url/repeat")
-    public ResponseEntity<DefaultResponseBean<Boolean>> repeatUploadFile(Call7mmorRequestBean bean) {
+	@ApiOperation(value = "录音文件重新上传", notes = "录音文件重新上传")
+	@GetMapping("/call/url/repeat")
+	public ResponseEntity<DefaultResponseBean<Boolean>> repeatUploadFile(Call7mmorRequestBean bean) {
 
-        callBackService.repeatUploadFile(bean);
-        DefaultResponseBean responseBean = new DefaultResponseBean();
-        responseBean.setData(true);
-        return ResponseEntity.ok(responseBean);
-    }
+		callBackService.repeatUploadFile(bean);
+		DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
+		responseBean.setData(true);
+		return ResponseEntity.ok(responseBean);
+	}
 
-    
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
-    private Map<String, String> getParamsMap (HttpServletRequest request) {
-    	Map<String, String> paramsMap = new HashMap<>();
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * 将回调 GET 请求参数转换为 Map 
+	 * @param request
+	 * @return
+	 */
+	private ConcurrentMap<String, String> getParamsMap(HttpServletRequest request) {
+		ConcurrentMap<String, String> paramsMap = new ConcurrentHashMap<>();
+		
 		Enumeration<String> paramNames = request.getParameterNames();
 		while (paramNames != null && paramNames.hasMoreElements()) {
 			String parameter = paramNames.nextElement();
@@ -104,26 +101,37 @@ public class CallBackController extends BaseController {
 				logger.info("{}={}", parameter, parameterValue);
 			}
 		}
-		
+
 		return paramsMap;
-    }
-    
-    private void executeByThreadPool (Map<String, String> paramsMap) {
-    	executorService.execute(() -> {
-			logger.info("执行 7moor 回调方法...");
-			try {
-				callBackService.callBack(paramsMap);
-			} catch (Exception e) {
-				logger.error("7moor 信息异步文件处理及入库失败:{}", JSONObject.toJSONString(paramsMap), e);
-				// 后期追加补偿机制代码 TODO
+	}
+	
+	/**
+	 * 调业务层方法
+	 * @param paramsMap
+	 * @return ResponseEntity<?>
+	 */
+	private ResponseEntity<?> callBack (ConcurrentMap<String, String> paramsMap) {
+		ResponseEntity<?> responseEntity;
+		String callSheetId = paramsMap.get("CallSheetID");
+		try {
+			boolean flag = callBackService.callBack(paramsMap);
+			if(flag) {
+				ResponseObj responseObj = new ResponseObj();
+				responseObj.setData("callback successed");
+				responseObj.setMessage("callback successed");
+				responseObj.setDescription("callback successed");
+				
+				responseEntity =  new ResponseEntity<>(responseObj, HttpStatus.OK);
+			} else {
+				responseEntity = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+				logger.error("文件处理失败响应给 7moor 500, callSheetId:{}", callSheetId);
 			}
-			logger.info("执行 7moor 回调方法完成!");
-		});
-    }
-    
-    @PreDestroy
-    private void preDestory() {
-    	executorService.shutdownNow();
-    }
+		} catch (Exception e) {
+			responseEntity = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			logger.error("文件处理异常响应给 7moor 500, callSheetId:{}", callSheetId, e);
+		}
+		
+		return responseEntity;
+	}
 
 }
