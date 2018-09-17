@@ -100,6 +100,10 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	@Transactional(value = TxType.REQUIRED, rollbackOn = Exception.class)
 	@Override
 	public boolean connectedSaveCallInfo(SaveCallInfoRequest saveRequest) {
+		if (saveRequest.getVirtualDoctorId() == null) {
+			saveRequest.setVirtualDrugUserId(0L);
+		}
+		
 		long callId = this.doSaveCallInfo(saveRequest);
 		int effectNum = 0;
 		if (callId > 0) {
