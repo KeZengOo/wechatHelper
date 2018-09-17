@@ -131,6 +131,25 @@
 
     </select>
 
+
+
+    <!-- 查询名下所有的产品 -->
+    <select id="getSetDynamicFieldProductList" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.ProductDO">
+
+        SELECT
+        DISTINCT pl.prod_id productId, pl.prod_name productName
+        FROM product_line pl
+        INNER JOIN product_user pu
+        ON pl.prod_id=pl.prod_id
+        INNER JOIN drug_user du
+        ON pu.user_id=du.id
+        INNER JOIN virtual_doctor_dynamic_field vddf
+        ON pl.prod_id=vddf.product_id
+        WHERE du.leader_path
+        LIKE #{leaderPath}
+
+    </select>
+
     <!-- 根据ID获得已经拼上%的leaderPath -->
     <select id="getLeaderPathById" resultType="java.lang.String">
         SELECT concat(du.leader_path, '%')

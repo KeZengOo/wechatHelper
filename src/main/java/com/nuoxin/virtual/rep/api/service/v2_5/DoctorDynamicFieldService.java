@@ -30,7 +30,7 @@ public interface DoctorDynamicFieldService {
 
 
     /**
-     * 得到医生的基本信息填充的值
+     * 得到医生的基本信息动态字段填充的值
      * @param doctorId
      * @return
      */
@@ -38,11 +38,11 @@ public interface DoctorDynamicFieldService {
 
 
     /**
-     * 得到医生的基本信息填充的值
+     * 得到医生的产品动态字段填充的值
      * @param doctorId
      * @param drugUserId
      * @return
      */
-    List<DoctorProductDynamicFieldValueResponseBean> getDoctorProductDynamicFieldValue(Long doctorId, Long drugUserId);
+    List<List<DoctorProductDynamicFieldValueResponseBean>> getDoctorProductDynamicFieldValue(Long doctorId, Long drugUserId);
 
 }

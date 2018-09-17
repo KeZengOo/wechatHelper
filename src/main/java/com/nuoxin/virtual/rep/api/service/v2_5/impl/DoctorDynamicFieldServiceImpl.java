@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,7 +31,7 @@ import java.util.stream.Collectors;
  * @author tiancun
  * @date 2018-09-17
  */
-@Service
+@Service(value = "dynamic")
 public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService {
 
     @Resource
@@ -112,11 +113,27 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
     }
 
     @Override
-    public List<DoctorProductDynamicFieldValueResponseBean> getDoctorProductDynamicFieldValue(Long doctorId, Long drugUserId) {
-
+    public List<List<DoctorProductDynamicFieldValueResponseBean>> getDoctorProductDynamicFieldValue(Long doctorId, Long drugUserId) {
+        List<List<DoctorProductDynamicFieldValueResponseBean>> list = new ArrayList<>();
         String leaderPath = drugUserMapper.getLeaderPathById(drugUserId);
-        List<ProductDO> productList = drugUserMapper.getProductList(leaderPath);
+        List<ProductDO> productList = drugUserMapper.getSetDynamicFieldProductList(leaderPath);
+        if (CollectionsUtil.isEmptyList(productList)){
+            return list;
+        }
 
-        return null;
+        List<Long> productIdList = productList.stream().map(ProductDO::getProductId).distinct().collect(Collectors.toList());
+        if (CollectionsUtil.isEmptyList(productIdList)){
+            return list;
+        }
+
+
+        productIdList.forEach(productId->{
+            List<DoctorProductDynamicFieldValueResponseBean> doctorProductDynamicFieldValue = dynamicFieldMapper.getDoctorProductDynamicFieldValue(doctorId, productId);
+            if (CollectionsUtil.isNotEmptyList(doctorProductDynamicFieldValue)){
+                list.add(doctorProductDynamicFieldValue);
+            }
+        });
+
+        return list;
     }
 }
