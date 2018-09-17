@@ -10,6 +10,8 @@ import lombok.Data;
 @ApiModel
 @Data
 public class SaveVirtualQuestionnaireRecordRequestBean {
+	@ApiModelProperty(value = "问卷  ID")
+	private Long questionaireId;
 
 	@ApiModelProperty(value = "医生 ID")
 	private Long virtualDoctorId;

@@ -100,7 +100,7 @@ public class CustomerFollowUpDetailController extends NewBaseController {
 		}
 
 		if (virtualDoctorId == null) {
-			return super.getParamsErrorResponse("doctor_id is null");
+			virtualDoctorId = 0L;
 		}
 
 		VirtualDoctorMiniResponse virtualDoctorBasic = virtualDoctorService.getVirtualDoctorMini(virtualDoctorId);

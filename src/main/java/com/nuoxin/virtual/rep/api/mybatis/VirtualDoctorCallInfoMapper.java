@@ -40,5 +40,12 @@ public interface VirtualDoctorCallInfoMapper {
 	 * @return
 	 */
 	int saveVirtualDoctorCallInfo(VirtualDoctorCallInfoParams params);
+	
+	/**
+	 * 修改电话拜访信息
+	 * @param params
+	 * @return 返回影响条数
+	 */
+	int updateVirtualDoctorCallInfo(VirtualDoctorCallInfoParams params);
 }
 

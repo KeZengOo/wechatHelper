@@ -86,14 +86,16 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 	@Override
 	public VirtualDoctorMiniResponse getVirtualDoctorMini(Long virtualDoctorId) {
 		VirtualDoctorMiniResponse miniResponse = virtualDoctorMapper.getVirtualDoctorMini(virtualDoctorId);
-		Date nextVisit = miniResponse.getNextVisit();
-		if(nextVisit != null) {
-			long delta = System.currentTimeMillis() - nextVisit.getTime();
-			String nextVisitTimeContent = commonService.alterVisitTimeContent(delta);
-			miniResponse.setNextVisitTimeContent(nextVisitTimeContent);
-			
-			SimpleDateFormat fmt=new SimpleDateFormat("yyyy-MM-dd");
-			miniResponse.setNextVisitTime(fmt.format(nextVisit));
+		if(miniResponse != null) {
+			Date nextVisit = miniResponse.getNextVisit();
+			if(nextVisit != null) {
+				long delta = System.currentTimeMillis() - nextVisit.getTime();
+				String nextVisitTimeContent = commonService.alterVisitTimeContent(delta);
+				miniResponse.setNextVisitTimeContent(nextVisitTimeContent);
+				
+				SimpleDateFormat fmt=new SimpleDateFormat("yyyy-MM-dd");
+				miniResponse.setNextVisitTime(fmt.format(nextVisit));
+			}
 		}
 		
 		return miniResponse;

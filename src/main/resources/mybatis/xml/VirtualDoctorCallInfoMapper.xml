@@ -62,7 +62,6 @@
 		LIMIT #{currentSize}, #{pageSize}
 	</select>
 
-	<!-- 保存问卷作答 -->
 	<insert id="saveVirtualDoctorCallInfo" keyProperty="callId" useGeneratedKeys="true"
 		parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoParams">
 		INSERT INTO virtual_doctor_call_info
@@ -74,5 +73,11 @@
 		 #{virtualDrugUserId}, #{virtualDoctorId}, #{doctorQuestionnaireId}, #{productId},
 		 #{mobile}, #{type}, #{remark}, #{status}, #{statusName}, NOW())
 	</insert>
+	
+	<update id="updateVirtualDoctorCallInfo" parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoParams">
+		UPDATE virtual_doctor_call_info 
+		SET product_id =  #{productId} ,doctor_questionnaire_id=#{doctorQuestionnaireId}
+		WHERE id=#{callId}
+	</update>
 	
 </mapper>

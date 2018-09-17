@@ -5,7 +5,6 @@ import lombok.Data;
 @Data
 public class VirtualDoctorCallInfoParams{
 	private long callId;
-	private String sinToken;
 	private long virtualDrugUserId;
 	private Long virtualDoctorId;
 	private Integer doctorQuestionnaireId;

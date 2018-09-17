@@ -103,16 +103,16 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		if (saveRequest.getVirtualDoctorId() == null) {
 			saveRequest.setVirtualDrugUserId(0L);
 		}
-		
-		long callId = this.doSaveCallInfo(saveRequest);
-		int effectNum = 0;
-		if (callId > 0) {
-			effectNum = this.doSaveVirtualQuestionnaireRecord(saveRequest, callId);
-		}
-		
-		if (effectNum > 0) {
-			this.changeRelationShip(saveRequest);
-			return true;
+
+		Long callId = saveRequest.getCallInfoId();
+		if (callId != null && callId > 0) {
+			this.doSaveCallInfo(saveRequest);
+			int effectNum = this.doSaveVirtualQuestionnaireRecord(saveRequest);
+			if (effectNum > 0) {
+				this.changeRelationShip(saveRequest);
+
+				return true;
+			}
 		}
 
 		return false;
@@ -121,41 +121,35 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	@Transactional(value = TxType.REQUIRED, rollbackOn = Exception.class)
 	@Override
 	public boolean unconnectedSaveCallInfo(SaveCallInfoUnConnectedRequest saveRequest) {
-		if("emptynumber".equals(saveRequest.getStatuaName())) {
+		if ("emptynumber".equals(saveRequest.getStatuaName())) {
 			saveRequest.setIsBreakOff(1);
 		} else {
 			saveRequest.setIsBreakOff(0);
 		}
-		
-		long callId = this.doSaveCallInfo(saveRequest);
-		if(callId > 0) {
+
+		Long callId = saveRequest.getCallInfoId();
+		if (callId != null && callId > 0) {
+			this.doSaveCallInfo(saveRequest);
 			this.changeRelationShip(saveRequest);
+
 			return true;
 		}
-		
+
 		return false;
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/**
-	 * 保存电话拜访信息及扩展信息<br>
-	 * 写入 virtual_doctor_call_info,virtual_doctor_call_info_mend 表
+	 * 修改电话拜访信息,保存扩展信息<br>
 	 * @param saveRequest
 	 * @return 返回 callId
 	 */
-	private long doSaveCallInfo(BaseCallInfoRequest saveRequest) {
+	private void doSaveCallInfo(BaseCallInfoRequest saveRequest) {
 		VirtualDoctorCallInfoParams callVisitParams = this.getVirtualDoctorCallInfoParams(saveRequest);
-		// 写入 virtual_doctor_call_info 表
-		callInfoMapper.saveVirtualDoctorCallInfo(callVisitParams);
-
-		long calld = callVisitParams.getCallId();
-		if (calld > 0L) {
-			// 写入 virtual_doctor_call_info_mend 表
-			callInfoMendMapper.saveVirtualDoctorCallInfoMend(callVisitParams);
-		}
-
-		return calld;
+		// P.S :保存电话拜访信息前前端通过调用call/save 已经向数据库插入记录,因此走的是修改
+		callInfoMapper.updateVirtualDoctorCallInfo(callVisitParams);
+		callInfoMendMapper.saveVirtualDoctorCallInfoMend(callVisitParams);
 	}
 	
 	/**
@@ -164,13 +158,13 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	 * @param callId
 	 * @return 返回影响条数
 	 */
-	private int doSaveVirtualQuestionnaireRecord(SaveCallInfoRequest saveRequest, Long callId) {
+	private int doSaveVirtualQuestionnaireRecord(SaveCallInfoRequest saveRequest) {
 		SaveVirtualQuestionnaireRecordRequestBean questionParams = new SaveVirtualQuestionnaireRecordRequestBean();
 		questionParams.setVirtualDoctorId(saveRequest.getVirtualDoctorId());
 		questionParams.setVirtualDrugUserId(saveRequest.getVirtualDrugUserId());
 		questionParams.setVirtualQuestionaireId(saveRequest.getVirtualQuestionaireId());
 		questionParams.setQuestions(saveRequest.getQuestions());
-		questionParams.setCallId(callId);
+		questionParams.setCallId(saveRequest.getCallInfoId());
 		
 		return questionnaireService.saveQuestionnaire(questionParams);
 	}
@@ -206,7 +200,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	
 	private VirtualDoctorCallInfoParams getVirtualDoctorCallInfoParams (BaseCallInfoRequest saveRequest) {
 		VirtualDoctorCallInfoParams callVisitParams = new VirtualDoctorCallInfoParams();
-		callVisitParams.setSinToken(saveRequest.getSinToken());
+		callVisitParams.setCallId(saveRequest.getCallInfoId());
 		callVisitParams.setVirtualDoctorId(saveRequest.getVirtualDoctorId());
 		callVisitParams.setVirtualDrugUserId(saveRequest.getVirtualDrugUserId());
 		callVisitParams.setProductId(saveRequest.getProductId());
