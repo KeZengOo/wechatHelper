@@ -1,11 +1,14 @@
 package com.nuoxin.virtual.rep.api.mybatis;
 
 import com.nuoxin.virtual.rep.api.web.controller.request.hcp.HcpBasicFieldRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorDynamicFieldValueRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DoctorDynamicFieldRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.customer.DoctorDynamicFieldResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorBasicInfoResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpBasicInfoHistoryResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpDynamicRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorBasicDynamicFieldValueResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorProductDynamicFieldValueResponseBean;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -106,4 +109,42 @@ public interface DynamicFieldMapper {
      */
     void insertDoctorDynamicField(DoctorDynamicFieldRequestBean bean);
 
+
+    /**
+     * 得到医生基本信息动态字段填充的值
+     * @param doctorId
+     * @return
+     */
+    List<DoctorBasicDynamicFieldValueResponseBean> getDoctorBasicDynamicFieldValue(@Param(value = "doctorId") Long doctorId, @Param(value="classification") Integer classification);
+
+
+    /**
+     * 得到医生产品信息动态字段填充的值
+     * @param doctorId
+     * @param productId
+     * @return
+     */
+    List<DoctorProductDynamicFieldValueResponseBean> getDoctorProductDynamicFieldValue(@Param(value = "doctorId") Long doctorId,@Param(value = "productId") Long productId);
+
+    /**
+     * 新增医生动态字段填充的值
+     * @param doctorId
+     * @param list
+     */
+    void addDoctorBasicDynamicFieldValue(@Param(value="doctorId") Long doctorId,@Param(value = "list") List<DoctorDynamicFieldValueRequestBean> list);
+
+    /**
+     * 删除医生动态字段填充的值
+     * @param doctorId 医生id
+     * @param classification 分类：目前1基本信息，2医生的处方信息，3之前拜访记录，4分析，5是医院信息
+     */
+    void deleteDoctorDynamicFieldValue(@Param(value="doctorId") Long doctorId,@Param(value="classification") Integer classification);
+
+
+    /**
+     * 找出填的字段中的必填字段
+     * @param list
+     * @return
+     */
+    List<Long> getRequiredFieldId(@Param(value = "list") List<Long> list);
 }

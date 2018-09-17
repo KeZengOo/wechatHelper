@@ -2,6 +2,7 @@ package com.nuoxin.virtual.rep.api.mybatis;
 
 import com.nuoxin.virtual.rep.api.common.util.MyMapper;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
+import com.nuoxin.virtual.rep.api.entity.v2_5.ProductDO;
 import com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorResponseBean;
@@ -46,5 +47,21 @@ public interface DrugUserMapper extends MyMapper<DrugUser> {
      * @return 有结果返回 List<Long>,否则返回[] 
      */
 	List<Long> getSubordinateIdsByLeaderPath(@Param("leaderPath") String leaderPath);
+
+
+    /**
+     * 查询名下所有的产品
+     * @param leaderPath
+     * @return
+     */
+	List<ProductDO> getProductList(@Param(value = "leaderPath") String leaderPath);
+
+
+    /**
+     * 根据ID获得已经拼上%的leaderPath
+     * @param id
+     * @return
+     */
+	String getLeaderPathById(@Param(value = "id") Long id);
     
 }
