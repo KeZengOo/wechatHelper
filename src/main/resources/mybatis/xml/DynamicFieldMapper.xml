@@ -240,9 +240,13 @@
                     vddf.field_name dynamicFieldName,
                     vddf.field_value dynamicFieldSelectValue,
                     vddf.required,
-                    vddf.classification
+                    vddf.classification,
+                    pl.prod_id productId,
+                    pl.prod_name productName
                 FROM
                     virtual_doctor_dynamic_field vddf
+                    INNER JOIN product_line pl
+                    ON vddf.product_id=pl.prod_id
 
                 WHERE
                     vddf.product_id=#{productId}

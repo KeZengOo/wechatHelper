@@ -56,6 +56,13 @@ public interface DrugUserMapper extends MyMapper<DrugUser> {
      */
 	List<ProductDO> getProductList(@Param(value = "leaderPath") String leaderPath);
 
+    /**
+     * 查询名下所有设置动态字段的产品
+     * @param leaderPath
+     * @return
+     */
+    List<ProductDO> getSetDynamicFieldProductList(@Param(value = "leaderPath") String leaderPath);
+
 
     /**
      * 根据ID获得已经拼上%的leaderPath
