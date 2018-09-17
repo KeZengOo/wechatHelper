@@ -203,4 +203,98 @@
         (#{serialNumber}, #{name}, #{type}, #{value}, #{classification}, #{required}, #{productId}, #{creatorId}, #{creatorName}, #{menderId}, #{menderName})
     </insert>
 
+    <!-- 得到医生基本信息动态字段填充的值 -->
+    <select id="getDoctorBasicDynamicFieldValue" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorBasicDynamicFieldValueResponseBean">
+        SELECT
+            t.*, t2.dynamic_field_value dynamicFieldValue,
+            t2.dynamic_extend_value dymaicExtendValue
+        FROM
+            (
+                SELECT
+                    vddf.id dynamicFieldId,
+                    vddf.field_name dynamicFieldName,
+                    vddf.field_value dynamicFieldSelectValue,
+                    vddf.required,
+                    vddf.classification
+                FROM
+                    virtual_doctor_dynamic_field vddf
+                WHERE
+                    classification=#{classification}
+            ) t
+        LEFT JOIN virtual_doctor_dynamic_field_value t2 ON t.dynamicFieldId = t2.dynamic_field_id
+        WHERE
+            t2.doctor_id = #{doctorId}
+        ORDER BY
+            t.dynamicFieldId ASC
+    </select>
+
+    <!-- 得到医生产品信息动态字段填充的值 -->
+    <select id="getDoctorProductDynamicFieldValue" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorProductDynamicFieldValueResponseBean">
+        SELECT
+            t.*, t2.dynamic_field_value dynamicFieldValue,
+            t2.dynamic_extend_value dymaicExtendValue
+        FROM
+            (
+                SELECT DISTINCT
+                    vddf.id dynamicFieldId,
+                    vddf.field_name dynamicFieldName,
+                    vddf.field_value dynamicFieldSelectValue,
+                    vddf.required,
+                    vddf.classification
+                FROM
+                    virtual_doctor_dynamic_field vddf
+
+                WHERE
+                    vddf.product_id=#{productId}
+                    and classification IN (2, 3)
+            ) t
+        LEFT JOIN virtual_doctor_dynamic_field_value t2 ON t.dynamicFieldId = t2.dynamic_field_id
+        WHERE
+            t2.doctor_id = #{doctorId}
+        ORDER BY
+            t.classification ASC,
+            t.dynamicFieldId ASC
+    </select>
+
+
+    <insert id="addDoctorBasicDynamicFieldValue">
+        INSERT INTO
+        virtual_doctor_dynamic_field_value(doctorId, dynamic_field_id, dynamic_field_name, dynamic_field_value,dynamic_extend_value)
+        VALUES
+        <foreach collection="list" item="d" separator=",">
+            (#{doctorId}, #{d.dynamicFieldId}, #{d.dynamicFieldName}, #{d.dynamicFieldValue}, #{dynamicExtendValue})
+        </foreach>
+
+    </insert>
+
+    <delete id="deleteDoctorDynamicFieldValue">
+        DELETE
+        FROM
+            virtual_doctor_dynamic_field_value
+        WHERE
+            doctor_id = #{doctorId}
+        AND dynamic_field_id IN (
+            SELECT
+                id
+            FROM
+                virtual_doctor_dynamic_field
+            WHERE
+                classification = #{classification}
+        )
+    </delete>
+
+
+    <!-- 找出填的字段中的必填字段 -->
+    <select id="getRequiredFieldId" resultType="java.lang.Long">
+        SELECT id
+        FROM virtual_doctor_dynamic_field_value
+        WHERE required=1
+        AND id IN
+        <foreach item="item" index="index" collection="list"
+                 open="(" separator="," close=")">
+            #{item}
+        </foreach>
+
+    </select>
+
 </mapper>

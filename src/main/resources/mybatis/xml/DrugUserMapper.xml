@@ -114,5 +114,28 @@
     <select id="getSubordinateIdsByLeaderPath" resultType="java.lang.Long">
     	SELECT id FROM drug_user WHERE leader_path LIKE CONCAT(#{leaderPath},'%')
     </select>
+
+
+    <!-- 查询名下所有的产品 -->
+    <select id="getProductList" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.ProductDO">
+
+        SELECT
+        DISTINCT pl.prod_id productId, pl.prod_name productName
+        FROM product_line pl
+        INNER JOIN product_user pu
+        ON pl.prod_id=pl.prod_id
+        INNER JOIN drug_user du
+        ON pu.user_id=du.id
+        WHERE du.leader_path
+        LIKE #{leaderPath}
+
+    </select>
+
+    <!-- 根据ID获得已经拼上%的leaderPath -->
+    <select id="getLeaderPathById" resultType="java.lang.String">
+        SELECT concat(du.leader_path, '%')
+        FROM drug_user du
+        WHERE du.id=#{id}
+    </select>
     
 </mapper>
