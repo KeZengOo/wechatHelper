@@ -32,5 +32,6 @@ public class CallVisitBean {
 	private String remark;
 	@ApiModelProperty(value = "电话拜访时间")
 	private String createTime;
-	
+	@ApiModelProperty(value = "电话拜访类型1呼出,2呼入")
+	private Integer type;
 }
