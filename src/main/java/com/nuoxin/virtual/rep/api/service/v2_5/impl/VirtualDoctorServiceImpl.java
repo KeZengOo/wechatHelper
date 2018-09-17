@@ -1,6 +1,8 @@
 package com.nuoxin.virtual.rep.api.service.v2_5.impl;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -11,17 +13,20 @@ import org.springframework.stereotype.Service;
 
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.v2_5.DoctorVirtualParams;
+import com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorOneToOneParams;
 import com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorParams;
+import com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorQuateParams;
 import com.nuoxin.virtual.rep.api.entity.v2_5.HospitalProvinceBean;
-import com.nuoxin.virtual.rep.api.entity.v2_5.UpdateVirtualDrugUserDoctorRelationship;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorBasicResponse;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorDO;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorMendParams;
+import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorMiniResponse;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorParams;
 import com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorMapper;
 import com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorQuateMapper;
 import com.nuoxin.virtual.rep.api.mybatis.HospitalMapper;
 import com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorMapper;
+import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualDoctorService;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.SaveVirtualDoctorMendRequest;
@@ -42,6 +47,8 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 	private DrugUserDoctorMapper drugUserDoctorMapper;
 	@Resource
 	private DrugUserDoctorQuateMapper drugUserDoctorQuateMapper;
+	@Resource
+	private CommonService commonService;
 
 	@Override
 	@Transactional(value = TxType.REQUIRED, rollbackOn = Exception.class)
@@ -49,16 +56,9 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 		int hospitalId = this.getHospiTalId(request);
 		if (hospitalId > 0) {
 			// 保存医生信息
-			long virtualDoctorId = this.saveDoctor(request, hospitalId);
+			long virtualDoctorId = this.saveSingleDoctor(request, hospitalId);
 			if (virtualDoctorId > 0) {
-				// 保存医生扩展信息
-				this.saveVirtualDoctorMend(request, virtualDoctorId);
-				this.saveVirtualDoctor(request, virtualDoctorId);
-				// 保存医生关联关系
-				this.saveDrugUserDoctor(request, virtualDoctorId, user);
-				// 保存医生关联关系扩展信息
-				this.saveDrugUserDoctorQuate(request, virtualDoctorId, user);
-
+				this.saveDrugUserDoctorProductRelationShip(request, virtualDoctorId, user);
 				return true;
 			}
 		}
@@ -69,7 +69,7 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 	@Override
 	public VirtualDoctorBasicResponse getVirtualDoctorBasic(Long virtualDoctorId) {
 		HospitalProvinceBean hospitalBean = null;
-		
+
 		VirtualDoctorDO virtualDoctorDO = virtualDoctorMapper.getVirtualDoctor(virtualDoctorId);
 		if (virtualDoctorDO != null) {
 			String hospitalName = virtualDoctorDO.getHospitalName();
@@ -81,6 +81,22 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 		virtualDoctorBasic.setHospital(hospitalBean);
 
 		return virtualDoctorBasic;
+	}
+	
+	@Override
+	public VirtualDoctorMiniResponse getVirtualDoctorMini(Long virtualDoctorId) {
+		VirtualDoctorMiniResponse miniResponse = virtualDoctorMapper.getVirtualDoctorMini(virtualDoctorId);
+		Date nextVisit = miniResponse.getNextVisit();
+		if(nextVisit != null) {
+			long delta = System.currentTimeMillis() - nextVisit.getTime();
+			String nextVisitTimeContent = commonService.alterVisitTimeContent(delta);
+			miniResponse.setNextVisitTimeContent(nextVisitTimeContent);
+			
+			SimpleDateFormat fmt=new SimpleDateFormat("yyyy-MM-dd");
+			miniResponse.setNextVisitTime(fmt.format(nextVisit));
+		}
+		
+		return miniResponse;
 	}
 
 	@Override
@@ -113,6 +129,24 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 		}
 
 		return hospitalId;
+	}
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * 保存单个医生信息
+	 * @param request    SaveVirtualDoctorRequest 页面请求对象
+	 * @param hospitalId 医院ID
+	 * @return 返回医生ID
+	 */
+	private long saveSingleDoctor(SaveVirtualDoctorRequest request, int hospitalId) {
+		long doctorId = this.saveDoctor(request, hospitalId);
+		// 保存医生扩展信息
+		this.saveVirtualDoctorMend(request, doctorId);
+		// 保存虚拟代表指定医生参数信息
+		this.saveVirtualDoctor(request, doctorId);
+
+		return doctorId;
 	}
 
 	/**
@@ -149,37 +183,72 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 	 */
 	private void saveVirtualDoctorMend(SaveVirtualDoctorRequest request, long virtualDoctorId) {
 		VirtualDoctorMendParams param = new VirtualDoctorMendParams();
-		param.setVirtualDoctorId(virtualDoctorId);
+		param.setVirtualDoctorId(virtualDoctorId); // 保存关联关系
 		param.setAddress(request.getAddress());
 		param.setFixedPhone(request.getFixedPhone());
 		param.setWechat(request.getWechat());
 		param.setSecondaryMobile(request.getSecondaryMobile());
 		param.setThirdaryMobile(request.getThirdaryMobile());
-		
+
 		List<VirtualDoctorMendParams> list = new ArrayList<>(1);
 		list.add(param);
 		virtualDoctorMapper.saveVirtualDoctorMends(list);
-		
-		// TODO 医生潜力 @田存
 	}
-	
+
+	/**
+	 * 保存虚拟代表指定医生参数信息
+	 * @param request
+	 * @param virtualDoctorId
+	 */
 	private void saveVirtualDoctor(SaveVirtualDoctorRequest request, long virtualDoctorId) {
 		List<SaveVirtualDoctorMendRequest> mends = request.getMends();
-		if(CollectionsUtil.isEmptyList(mends)) {
+		if (CollectionsUtil.isEmptyList(mends)) {
 			return;
 		}
-		
+
 		int size = mends.size();
 		List<DoctorVirtualParams> list = new ArrayList<>(size);
 		for (int i = 0; i < size; i++) {
 			SaveVirtualDoctorMendRequest doctorVirtual = mends.get(i);
 			DoctorVirtualParams param = new DoctorVirtualParams();
-			param.setVirtualDoctorId(virtualDoctorId);
-			param.setHcpLevel(doctorVirtual.getHcpLevel());
+			param.setVirtualDoctorId(virtualDoctorId); // 设置关联关系
+			param.setHcpLevel(doctorVirtual.getHcpLevel()); // 虚拟代表指定的医生等级
 			list.add(param);
 		}
-		
+
 		virtualDoctorMapper.saveDoctorVirtuals(list);
+	}
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	/**
+	 * 保存代表与医生关联关系信息
+	 * @param request
+	 * @param virtualDoctorId
+	 * @param user
+	 */
+	private void saveDrugUserDoctorProductRelationShip(SaveVirtualDoctorRequest request, long virtualDoctorId, DrugUser user) {
+		// 保存代表医生一对一关联关系
+		this.saveDrugUserDoctor(request, virtualDoctorId, user);
+		// 保存代表医生产品关联关系
+		this.saveDrugUserDoctorProduct(request, virtualDoctorId, user);
+	}
+
+	/**
+	 * 保存虚拟代表医生一对一关系
+	 * @param request
+	 * @param virtualDoctorId
+	 * @param user
+	 */
+	private void saveDrugUserDoctor(SaveVirtualDoctorRequest request, Long virtualDoctorId, DrugUser user) {
+		DrugUserDoctorOneToOneParams param = new DrugUserDoctorOneToOneParams();
+		param.setDoctorId(virtualDoctorId);
+		param.setDrugUserId(user.getId());
+		param.setIsAddWechat(request.getIsAddWechat());
+
+		List<DrugUserDoctorOneToOneParams> list = new ArrayList<>(1);
+		list.add(param);
+		drugUserDoctorMapper.saveDrugUserDoctorsOneToOne(list);
 	}
 
 	/**
@@ -188,69 +257,55 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 	 * @param virtualDoctorId
 	 * @param user
 	 */
-	private void saveDrugUserDoctor(SaveVirtualDoctorRequest request, Long virtualDoctorId, DrugUser user) {
+	private void saveDrugUserDoctorProduct(SaveVirtualDoctorRequest request, Long virtualDoctorId, DrugUser user) {
 		List<SaveVirtualDoctorMendRequest> mends = request.getMends();
 		if (CollectionsUtil.isEmptyList(mends)) {
 			return;
 		}
 
 		int size = mends.size();
-		List<DrugUserDoctorParams> list = new ArrayList<>(size);
+
+		List<DrugUserDoctorParams> drugUserDoctorParams = new ArrayList<>(size);
 		for (int i = 0; i < size; i++) {
-			DrugUserDoctorParams param = this.buildDrugUserDoctorParams(request, virtualDoctorId, user, mends.get(i));
-			list.add(param);
+			DrugUserDoctorParams drugUserDoctorParam = this.buildDrugUserDoctorProduct(request, virtualDoctorId, user, mends.get(i));
+			drugUserDoctorParams.add(drugUserDoctorParam);
 		}
-		drugUserDoctorMapper.saveDrugUserDoctors(list);
+		drugUserDoctorMapper.saveDrugUserDoctors(drugUserDoctorParams);
+		
+		List<DrugUserDoctorQuateParams> drugUserDoctorQuateParams = new ArrayList<>(size);
+		for (int i = 0; i < size; i++) {
+			DrugUserDoctorQuateParams drugUserDoctorQuateParam = this.buildDrugUserDoctorProductQuate(virtualDoctorId,
+					user, mends.get(i), request.getIsAddWechat());
+			drugUserDoctorQuateParams.add(drugUserDoctorQuateParam);
+		}
+		drugUserDoctorQuateMapper.saveDrugUserDoctorQuates(drugUserDoctorQuateParams);
 	}
 
-	private DrugUserDoctorParams buildDrugUserDoctorParams(SaveVirtualDoctorRequest request, Long virtualDoctorId, DrugUser user,
+	private DrugUserDoctorParams buildDrugUserDoctorProduct(SaveVirtualDoctorRequest request, Long virtualDoctorId, DrugUser user,
 			SaveVirtualDoctorMendRequest mend) {
 		DrugUserDoctorParams param = new DrugUserDoctorParams();
-		param.setDoctorId(virtualDoctorId);
+		param.setDoctorId(virtualDoctorId); // 保存关联关系
+		param.setDrugUserId(user.getId()); // 保存关联关系
+		param.setProdId(mend.getProductLineId()); // 保存关联关系
+
 		param.setDoctorName(request.getName());
 		param.setDoctorEmail(request.getEmail());
-
-		param.setDrugUserId(user.getId());
 		param.setDrugUserName(user.getName());
 		param.setDrugUserEmail(user.getEmail());
-
-		param.setProdId(mend.getProductLineId());
 
 		return param;
 	}
 
-	/**
-	 * 写入 drug_user_doctor_quate 表
-	 * @param request
-	 * @param virtualDoctorId
-	 * @param user
-	 */
-	private void saveDrugUserDoctorQuate(SaveVirtualDoctorRequest request, Long virtualDoctorId, DrugUser user) {
-		List<SaveVirtualDoctorMendRequest> mends = request.getMends();
-		if (CollectionsUtil.isEmptyList(mends)) {
-			return;
-		}
+	private DrugUserDoctorQuateParams buildDrugUserDoctorProductQuate(Long virtualDoctorId,
+			DrugUser user, SaveVirtualDoctorMendRequest mend, int isAddWechat) {
+		DrugUserDoctorQuateParams param = new DrugUserDoctorQuateParams();
+		param.setDoctorId(virtualDoctorId); // 关联医生ID
+		param.setVirtualDrugUserId(user.getId()); // 关联代表ID
+		param.setProductLineId(mend.getProductLineId()); // 关联产品ID
 		
-		int size = mends.size();
-		List<UpdateVirtualDrugUserDoctorRelationship> list = new ArrayList<>(size);
-		for (int i = 0; i < size; i++) {
-			UpdateVirtualDrugUserDoctorRelationship param = this.buildUpdateVirtualDrugUserDoctorRelationship(virtualDoctorId,
-					user, mends.get(i));
-			list.add(param);
-		}
-		drugUserDoctorQuateMapper.saveDrugUserDoctorQuates(list);
-	}
-
-	private UpdateVirtualDrugUserDoctorRelationship buildUpdateVirtualDrugUserDoctorRelationship(Long virtualDoctorId,
-			DrugUser user, SaveVirtualDoctorMendRequest mend) {
-		UpdateVirtualDrugUserDoctorRelationship param = new UpdateVirtualDrugUserDoctorRelationship();
-		param.setDoctorId(virtualDoctorId);
-		param.setVirtualDrugUserId(user.getId());
-		param.setProductLineId(mend.getProductLineId());
 		param.setIsHasDrug(mend.getIsHasDrug());
 		param.setIsRecruit(mend.getIsRecruit());
 		param.setHcpPotential(mend.getHcpPotential());
-		
 		return param;
 	}
 

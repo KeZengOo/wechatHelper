@@ -22,7 +22,7 @@ public class CallRequestBean implements Serializable {
     private String statusName;
     @ApiModelProperty(value = "状态(1-成功接通，0-未成功)")
     private Integer status;
-    @ApiModelProperty(value = "类型(1,呼出,2-呼出)")
+    @ApiModelProperty(value = "类型(1,呼出,2-呼入)")
     private Integer type;
     @ApiModelProperty(value = "通话时长")
     private Long times;

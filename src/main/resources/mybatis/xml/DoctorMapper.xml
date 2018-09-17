@@ -90,7 +90,7 @@
 			count(d.id)
 		FROM doctor d 
 		JOIN (
-			<!-- 根据 virtualDrugUserIds 获取对应去重后的 doctorIds -->
+			<!-- 根据 virtualDrugUserIds (所有下属的)获取对应去重后的 doctorIds -->
 	  		SELECT 
 				DISTINCT doctor_id 
 			FROM drug_user_doctor 
@@ -157,11 +157,11 @@
 			)
   		</if>
 		
-		<!-- 左连接 virtual_doctor_call_info 表获取电话拜访信息 -->
+		<!-- 左连接 virtual_doctor_call_info_mend 表获取电话拜访信息 -->
 		LEFT JOIN (
 			SELECT c.virtual_doctor_id, c.create_time,
 			m.visit_result, m.next_visit_time FROM virtual_doctor_call_info c 
-			JOIN virtual_doctor_call_info_mend m		
+			LEFT JOIN virtual_doctor_call_info_mend m		
 				ON m.call_id=c.id	
 			WHERE c.id IN (
 				SELECT MAX(id) FROM virtual_doctor_call_info  WHERE virtual_drug_user_id IN 

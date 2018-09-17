@@ -4,6 +4,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
+
+import javax.annotation.Resource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestTemplate;
 
 import com.alibaba.fastjson.JSONObject;
 import com.nuoxin.virtual.rep.api.mybatis.DoctorCallInfoMapper;
@@ -14,13 +23,8 @@ import com.nuoxin.virtual.rep.api.utils.StringUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.Call7mmorRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.call.Call7mmorResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.call.Default7MoorResponseBean;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.Resource;
+import lombok.Data;
 
 /**
  * 回调Service类
@@ -36,28 +40,25 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 
 	@Resource
 	private DoctorCallInfoMapper doctorCallInfoMapper;
+	
 	/**
 	 * 参考链接 https://developer.7moor.com/event/
 	 * @param paramsMap
 	 */
-	public void callBack(Map<String, String> paramsMap) {
-		this.pause();
+	@Override
+	public boolean callBack(ConcurrentMap<String, String> paramsMap) {
+		logger.info("执行 7moor 回调方法... params:{}", JSONObject.toJSONString(paramsMap));
+		// 线程休眠等待文件生成
+		this.threadSleep();
+		// 变更通话状态,将 7moor -> 老状态
+		AlterResult alterResult = this.alterStatusName(paramsMap);
+		// 通用父类方法处理回调
+		boolean flag = super.processCallBack(alterResult.getSinToken(), alterResult.getStatusName(),
+				alterResult.getMonitorFilenameUrl());
 		
-		// 与数据库对应的字段 sin_token(callId)
-		String sinToken = paramsMap.get("CallSheetID");
-		// 与数据库对应的字段 status_name
-		String statusName = paramsMap.get("State");
-		// 电话录音下载地址
-		String monitorFilenameUrl = paramsMap.get("MonitorFilename");
+		logger.info("执行 7moor 回调方完成法完成! params:{}", JSONObject.toJSONString(paramsMap));
 		
-		// 7moor 状态-> 转成老的状态
-		if ("dealing".equalsIgnoreCase(statusName)) {
-			statusName = "answer";
-		} else if ("notDeal".equalsIgnoreCase(statusName)) {
-			statusName = "cancelmakecall  ";
-		}
-
-		super.processCallBack(sinToken, statusName, monitorFilenameUrl);
+		return flag;
 	}
 
 	// TODO 代码临时写，有的参数写死，待优化
@@ -128,11 +129,66 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 	/**
 	 * 线程暂停70秒
 	 */
-	private void pause () {
+	private void threadSleep() {
 		try {
-			Thread.sleep(70000);
+			Thread.sleep(70000); // 这个值是在 7moor 技术人员给出的1分钟基础上又加了10秒钟  
 		} catch (InterruptedException e) {
 			logger.error("InterruptedException", e);
 		}
+	}
+	
+	/**
+	 * 变更通话状态,将 7moor -> 老状态
+	 * @param paramsMap
+	 * @return AlterResult
+	 */
+	private AlterResult alterStatusName(ConcurrentMap<String, String> paramsMap) {
+		// 通话记录ID,CallSheetID 是这条通话记录再DB中的唯一id 与数据库对应的字段 sin_token
+		String sinToken = paramsMap.get("CallSheetID");
+		/*
+		 * 接听状态：dealing（已接）,notDeal（振铃未接听）,
+		 * leak（ivr放弃）,queueLeak（排队放弃）,blackList（黑名单）,voicemail（留言） 与数据库对应的字段
+		 * status_name
+		 */
+		String statusName = paramsMap.get("State");
+		// 电话录音下载地址
+		String monitorFilenameUrl = paramsMap.get("MonitorFilename");
+		// 通话类型：dialout外呼通话,normal普通来电,transfer转接电话,dialTransfer外呼转接
+		String callType = paramsMap.get("CallType");
+		
+		logger.info("sinToken:{},通话类型:{},录音下载地址:{}", sinToken, callType, monitorFilenameUrl);
+
+		// 7moor 呼出状态-> 转成老的状态
+		if ("dialout".equalsIgnoreCase(callType)) {
+			if ("dealing".equalsIgnoreCase(statusName)) {
+				statusName = "answer";
+			} else if ("notDeal".equalsIgnoreCase(statusName)) {
+				// notDeal（振铃未接听）
+				statusName = "cancelmakecall  ";
+			}
+		} 
+		// 7moor 呼入状态-> 转成老的状态
+		else if ("normal".equalsIgnoreCase(callType)) {
+			if ("dealing".equalsIgnoreCase(statusName)) {
+				statusName = "incall";
+			} else if ("notDeal".equalsIgnoreCase(statusName)) {
+				// notDeal（振铃未接听）
+				statusName = "cancelmakecall  ";
+			}
+		}
+		
+		AlterResult alterResult = new AlterResult();
+		alterResult.setSinToken(sinToken);
+		alterResult.setStatusName(statusName);
+		alterResult.setMonitorFilenameUrl(monitorFilenameUrl);
+		
+		return alterResult;
+	}
+	
+	@Data
+	private static class AlterResult{
+		private String sinToken;
+		private String statusName;
+		private String monitorFilenameUrl;
 	}
 }

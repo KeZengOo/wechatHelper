@@ -13,4 +13,13 @@
         	#{index.prodId}, NOW())
     	</foreach >
 	</insert>		
+	
+	<insert id="saveDrugUserDoctorsOneToOne">
+		INSERT INTO drug_user_doctor_one_to_one 
+		(drug_user_id, doctor_id, is_add_wechat,create_time)
+		VALUES 
+		<foreach collection ="list" item="index" separator =",">
+        	(#{index.drugUserId}, #{index.doctorId}, #{index.isAddWechat}, NOW())
+    	</foreach >
+	</insert>
 </mapper>

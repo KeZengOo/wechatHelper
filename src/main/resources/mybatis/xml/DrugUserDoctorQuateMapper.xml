@@ -3,9 +3,11 @@
 <mapper namespace="com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorQuateMapper">
 	<insert id="backupRelationShipInfo">
 		INSERT INTO drug_user_doctor_quate_log 
-		(drug_user_id,doctor_id,product_id, is_has_drug,is_target,is_has_ae,is_recruit, is_break_off)
+		(drug_user_id,doctor_id,product_id, is_has_drug,is_target,
+		is_has_ae,is_recruit, is_break_off, hcp_potential)
 		
-		SELECT drug_user_id,doctor_id,product_id, is_has_drug,is_target,is_has_ae, is_recruit, is_break_off
+		SELECT drug_user_id,doctor_id,product_id, is_has_drug,is_target,
+		is_has_ae, is_recruit, is_break_off, hcp_potential
 		FROM drug_user_doctor_quate
 		WHERE  
 			drug_user_id = #{virtualDrugUserId} 
@@ -16,20 +18,21 @@
 	<!-- 使用 MYSQL 私有语法, 通过 drug_user_id, doctor_id, product_id 创建唯一约束 -->
 	<insert id="replaceRelationShipInfo">
 		REPLACE INTO drug_user_doctor_quate 
-		(drug_user_id,doctor_id,product_id, is_has_drug,is_target,is_has_ae, is_break_off)
-		VALUE (#{virtualDrugUserId}, #{doctorId}, #{productLineId}, #{isHasDrug}, #{isTarget}, #{isHasAe}, #{isBreakOff})
+		(drug_user_id,doctor_id,product_id, is_has_drug,is_target,
+		is_has_ae, is_break_off, hcp_potential)
+		VALUE (#{virtualDrugUserId}, #{doctorId}, #{productLineId}, #{isHasDrug}, #{isTarget}, 
+		#{isHasAe}, #{isBreakOff}, #{hcpPotential})
 	</insert>
 	
-	<insert id="saveDrugUserDoctorQuates" parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.UpdateVirtualDrugUserDoctorRelationship">
+	<insert id="saveDrugUserDoctorQuates" parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorQuateParams">
 		INSERT INTO drug_user_doctor_quate 
 		(drug_user_id,doctor_id,product_id, is_has_drug,
 		 is_target,is_has_ae, is_recruit, hcp_potential)
 		VALUES
 		<foreach collection ="list" item="index" separator =",">
-			 (#{index.virtualDrugUserId}, #{index.doctorId}, #{index.productLineId}, 
-			 #{index.isHasDrug}, #{index.isTarget}, #{index.isHasAe}, #{index.isRecruit}, #{index.hcpPotential})
+			 (#{index.virtualDrugUserId}, #{index.doctorId}, #{index.productLineId}, #{index.isHasDrug}, 
+			 #{index.isTarget}, #{index.isHasAe}, #{index.isRecruit}, #{index.hcpPotential})
 		</foreach>
 	</insert>
-	
 		
 </mapper>

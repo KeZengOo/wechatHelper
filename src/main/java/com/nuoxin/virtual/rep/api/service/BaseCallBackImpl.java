@@ -35,24 +35,26 @@ public abstract class BaseCallBackImpl implements CallBackService {
 	
 	/**
 	 * 父类通用回调处理
-	 * @param sinToken
-	 * @param statusName
-	 * @param downLoadUrl
+	 * @param sinToken 通话记录ID
+	 * @param statusName 状态名
+	 * @param audioFileDownloadUrl 语音文件下载地址
 	 */
-	protected void processCallBack(String sinToken, String statusName, String downLoadUrl) {
+	protected boolean processCallBack(String sinToken, String statusName, String audioFileDownloadUrl) {
 		DoctorCallInfo info = this.getDoctorCallInfoBySinToken(sinToken);
 		if(info == null) {
 			logger.error("无法获取 DoctorCallInfo 信息 sinToken:{}", sinToken);
-			return;
+			return false;
 		}
 		
-		String callOssUrl = this.processFile(downLoadUrl, sinToken);
+		String callOssUrl = this.processFile(audioFileDownloadUrl, sinToken);
 		// 这里走了个补偿.即:当上传至阿里失败时写入回调时供应商传递过来的文件下载链接
 		if(StringUtils.isBlank(callOssUrl)) {
-			callOssUrl = downLoadUrl;
+			callOssUrl = audioFileDownloadUrl;
 		}
 		
 		this.updateUrl(callOssUrl, statusName, info.getId());
+		
+		return true;
 	}
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

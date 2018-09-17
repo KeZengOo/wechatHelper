@@ -1,10 +1,10 @@
 package com.nuoxin.virtual.rep.api.service;
 
+import java.util.List;
+import java.util.concurrent.ConcurrentMap;
+
 import com.nuoxin.virtual.rep.api.web.controller.request.call.Call7mmorRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.call.Call7mmorResponseBean;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * 回调接口类
@@ -16,8 +16,7 @@ public interface CallBackService {
 	 * 回调业务方法
 	 * @param paramsMap 参数键值对
 	 */
-	void callBack(Map<String, String> paramsMap);
-
+	boolean callBack(ConcurrentMap<String, String> paramsMap) throws Exception;
 
 	/**
 	 *
@@ -31,4 +30,5 @@ public interface CallBackService {
 	 * @param bean
 	 */
 	void repeatUploadFile(Call7mmorRequestBean bean);
+	
 }

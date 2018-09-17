@@ -19,7 +19,7 @@ public interface VirtualDoctorCallInfoMapper {
 	 * @param virtualDoctorId
 	 * @return 返回记录总条数
 	 */
-	int getCallVisitCount(@Param(value = "virtualDrugUserIds") List<Long> virtualDrugUserIds,
+	int getCallVisitCount(@Param(value = "leaderPath") String leaderPath,
 			@Param(value = "virtualDoctorId") Long virtualDoctorId);
 
 	/**
@@ -30,7 +30,7 @@ public interface VirtualDoctorCallInfoMapper {
 	 * @param pageSize
 	 * @return
 	 */
-	List<CallVisitBean> getCallVisitList(@Param(value = "virtualDrugUserIds") List<Long> virtualDrugUserIds,
+	List<CallVisitBean> getCallVisitList(@Param(value = "leaderPath") String leaderPath,
 			@Param(value = "virtualDoctorId") Long virtualDoctorId, @Param(value = "currentSize") Integer currentSize,
 			@Param(value = "pageSize") Integer pageSize);
 	

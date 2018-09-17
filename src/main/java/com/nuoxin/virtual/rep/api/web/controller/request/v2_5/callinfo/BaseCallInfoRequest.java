@@ -21,17 +21,17 @@ public class BaseCallInfoRequest {
 	@NotNull(message = "virtualDrugUserId is null")
 	@ApiModelProperty(value = "虚拟代表 id ")
 	private Long virtualDrugUserId;
-	@NotNull(message = "virtualDoctorId is null")
+	@NotNull(message = "productId is null")
+	@ApiModelProperty(value = "产品ID")
+	private Integer productId;
+	
 	@ApiModelProperty(value = "医生ID")
 	private Long virtualDoctorId;
-	@NotNull(message = "productId is null")
-	@ApiModelProperty(value = "产品线ID")
-	private Integer productId;
 	
 	///////////////////////////////////////////////////////
 	
 	@NotNull(message = "mobile is null")
-	@ApiModelProperty(value = "医生手机号")
+	@ApiModelProperty(value = "拨打的医生手机号")
 	private String mobile;
 	
 	@Min(value=1,message = "min is 1")

@@ -17,7 +17,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitMendBean;
-import com.nuoxin.virtual.rep.api.entity.v2_5.UpdateVirtualDrugUserDoctorRelationship;
+import com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorQuateParams;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoParams;
 import com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorQuateMapper;
 import com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorCallInfoMapper;
@@ -56,46 +56,39 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		PageResponseBean<List<CallVisitBean>> pageResponse = null;
 
 		Long virtualDoctorId = request.getVirtualDoctorId();
-		List<Long> virtualDrugUserIds = commonService.getSubordinateIds(leaderPath);
-		if(CollectionsUtil.isNotEmptyList(virtualDrugUserIds)) {
-			int count = callInfoMapper.getCallVisitCount(virtualDrugUserIds, virtualDoctorId);
-			if (count > 0) {
-				int currentSize = request.getCurrentSize();
-				int pageSize = request.getPageSize();
-				List<CallVisitBean> list = callInfoMapper.getCallVisitList(virtualDrugUserIds, virtualDoctorId, currentSize, pageSize);
-				if (CollectionsUtil.isNotEmptyList(list)) {
-					List<Long> callIds = new ArrayList<>(list.size());
-					list.forEach(visitBean ->{
-						callIds.add(visitBean.getCallId());
+		int count = callInfoMapper.getCallVisitCount(leaderPath, virtualDoctorId);
+		if (count > 0) {
+			int currentSize = request.getCurrentSize();
+			int pageSize = request.getPageSize();
+			List<CallVisitBean> list = callInfoMapper.getCallVisitList(leaderPath, virtualDoctorId, currentSize, pageSize);
+			if (CollectionsUtil.isNotEmptyList(list)) {
+				List<Long> callIds = new ArrayList<>(list.size());
+				list.forEach(visitBean ->{
+					callIds.add(visitBean.getCallId());
+				});
+				
+				// 补充 VirtualDoctorCallInfoMend 信息
+				List<CallVisitMendBean> callInfoMends = callInfoMendMapper.getCallVisitMendList(callIds);
+				if (CollectionsUtil.isNotEmptyList(callInfoMends)) {
+					ConcurrentMap<Long, CallVisitMendBean> map = new ConcurrentHashMap<>(callInfoMends.size());
+					callInfoMends.forEach(mend -> {
+						map.put(mend.getCallId(), mend);
 					});
-					
-					// 补充 VirtualDoctorCallInfoMend 信息
-					List<CallVisitMendBean> callInfoMends = callInfoMendMapper.getCallVisitMendList(callIds);
-					if (CollectionsUtil.isNotEmptyList(callInfoMends)) {
-						ConcurrentMap<Long, CallVisitMendBean> map = new ConcurrentHashMap<>(callInfoMends.size());
-						callInfoMends.forEach(mend -> {
-							map.put(mend.getCallId(), mend);
-						});
 
-						list.forEach(visit -> {
-							Long callId = visit.getCallId();
-							CallVisitMendBean mend = map.get(callId);
-							if (mend != null) {
-								visit.setAttitude(mend.getAttitude());
-								String visitResultStr = mend.getVisitResult();
-								JSONArray visitResult = JSONObject.parseArray(visitResultStr);
-								visit.setVisitResult(visitResult);
-							}
-							
-							String createTime = visit.getCreateTime();
-							createTime = createTime.replace(".0", "");
-							visit.setCreateTime(createTime);
-						});
-					}
+					list.forEach(visit -> {
+						Long callId = visit.getCallId();
+						CallVisitMendBean mend = map.get(callId);
+						if (mend != null) {
+							visit.setAttitude(mend.getAttitude());
+							String visitResultStr = mend.getVisitResult();
+							JSONArray visitResult = JSONObject.parseArray(visitResultStr);
+							visit.setVisitResult(visitResult);
+						}
+					});
 				}
-				pageResponse = new PageResponseBean(request, count, list);
-			} 
-		}
+			}
+			pageResponse = new PageResponseBean(request, count, list);
+		} 
 		
 		if (pageResponse == null) {
 			pageResponse = new PageResponseBean(request, 0, Collections.emptyList());
@@ -179,11 +172,11 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	}
 	
 	/**
-	 * 变更虚拟代表关联的医生关系信息:是否有药,是否是目标客户,是否有AE
+	 * 变更虚拟代医生扩展关系信息
 	 * @param saveRequest
 	 */
 	private void changeRelationShip(BaseCallInfoRequest request) {
-		UpdateVirtualDrugUserDoctorRelationship relationShipParams = new UpdateVirtualDrugUserDoctorRelationship();
+		DrugUserDoctorQuateParams relationShipParams = new DrugUserDoctorQuateParams();
 		relationShipParams.setVirtualDrugUserId(request.getVirtualDrugUserId());
 		relationShipParams.setDoctorId(request.getVirtualDoctorId());
 		relationShipParams.setProductLineId(request.getProductId());
@@ -193,6 +186,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 			relationShipParams.setIsHasDrug(saveRequest.getIsHasDrug());
 			relationShipParams.setIsTarget(saveRequest.getIsTarget());
 			relationShipParams.setIsHasAe(saveRequest.getIsHasAe());
+			relationShipParams.setHcpPotential(saveRequest.getHcpPotential());
 		} else if (request instanceof SaveCallInfoUnConnectedRequest) {
 			SaveCallInfoUnConnectedRequest saveRequest = (SaveCallInfoUnConnectedRequest)request;
 			relationShipParams.setIsBreakOff(saveRequest.getIsBreakOff());

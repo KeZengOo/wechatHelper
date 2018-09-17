@@ -78,19 +78,35 @@ public class BaseController {
 	}
 
 	/**
-	 * 电话呼叫状态转换:dealing -> answer,notDeal -> cancelmakecall
+	 * 电话呼叫状态转换:
+	 * 呼出:dealing -> answer,notDeal -> cancelmakecall
+	 * 呼入:dealing -> incall, notDeal-> cancelmakecall
 	 * @param bean
 	 */
 	protected void convertCallStatus(CallRequestBean bean) {
 		String statusName = bean.getStatusName();
 		if (StringUtils.isNotBlank(statusName)) {
-			// dealing -> answer
-			if ("dealing".equalsIgnoreCase(statusName)) {
-				bean.setStatusName("answer");
+			// 1呼出
+			if (1 == bean.getType()) {
+				// dealing -> answer
+				if ("dealing".equalsIgnoreCase(statusName)) {
+					bean.setStatusName("answer");
+				}
+				// notDeal -> cancelmakecall
+				else if ("notDeal".equalsIgnoreCase(statusName)) {
+					bean.setStatusName("cancelmakecall");
+				}
 			} 
-			// notDeal -> cancelmakecall  
-			else if ("notDeal".equalsIgnoreCase(statusName)) {
-				bean.setStatusName("cancelmakecall");
+			// 2呼入
+			else if (2 == bean.getType()) {
+				// dealing -> answer
+				if ("dealing".equalsIgnoreCase(statusName)) {
+					bean.setStatusName("incall");
+				}
+				// notDeal -> cancelmakecall
+				else if ("notDeal".equalsIgnoreCase(statusName)) {
+					bean.setStatusName("cancelmakecall");
+				}
 			}
 		}
 	}

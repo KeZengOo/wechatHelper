@@ -19,6 +19,7 @@ import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.MeetingBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorBasicResponse;
+import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorMiniResponse;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualDoctorCallInfoService;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualDoctorMeetingService;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualDoctorPushService;
@@ -89,9 +90,29 @@ public class CustomerFollowUpDetailController extends NewBaseController {
 	}
 	
 	@SuppressWarnings("unchecked")
+	@ApiOperation(value = "获取单个客户医生简要信息")
+	@RequestMapping(value = "/doctor/single/mini/get", method = { RequestMethod.GET })
+	public DefaultResponseBean<VirtualDoctorMiniResponse> getSingleMini(
+			@ApiParam("医生ID") @RequestParam(value = "doctor_id") Long virtualDoctorId, HttpServletRequest request) {
+		DrugUser user = this.getDrugUser(request);
+		if (user == null) {
+			return super.getLoginErrorResponse();
+		}
+
+		if (virtualDoctorId == null) {
+			return super.getParamsErrorResponse("doctor_id is null");
+		}
+
+		VirtualDoctorMiniResponse virtualDoctorBasic = virtualDoctorService.getVirtualDoctorMini(virtualDoctorId);
+		DefaultResponseBean<VirtualDoctorMiniResponse> responseBean = new DefaultResponseBean<VirtualDoctorMiniResponse>();
+		responseBean.setData(virtualDoctorBasic);
+		return responseBean;
+	}
+	
+	@SuppressWarnings("unchecked")
 	@ApiOperation(value = "获取单个客户医生信息(基本信息)")
 	@RequestMapping(value = "/doctor/single/get", method = { RequestMethod.GET })
-	public DefaultResponseBean<VirtualDoctorBasicResponse> singleGet(
+	public DefaultResponseBean<VirtualDoctorBasicResponse> getSingleBasic(
 			@ApiParam("医生ID") @RequestParam(value = "doctor_id") Long virtualDoctorId, HttpServletRequest request) {
 		DrugUser user = this.getDrugUser(request);
 		if (user == null) {

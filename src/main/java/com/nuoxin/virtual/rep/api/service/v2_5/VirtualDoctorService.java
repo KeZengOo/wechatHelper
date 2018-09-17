@@ -5,6 +5,7 @@ import java.util.List;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.v2_5.HospitalProvinceBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorBasicResponse;
+import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorMiniResponse;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.SaveVirtualDoctorRequest;
 
 public interface VirtualDoctorService {
@@ -24,6 +25,13 @@ public interface VirtualDoctorService {
 	 * @return 返回 VirtualDoctorBasicResponse 对象
 	 */
 	VirtualDoctorBasicResponse getVirtualDoctorBasic(Long virtualDoctorId);
+	
+	/**
+	 * 获取客户医生简要信息信息
+	 * @param virtualDoctorId  医生ID
+	 * @return 返回 VirtualDoctorMiniResponse 对象
+	 */
+	VirtualDoctorMiniResponse getVirtualDoctorMini(Long virtualDoctorId);
 	
 	/**
 	 * 根据医院名模糊匹配

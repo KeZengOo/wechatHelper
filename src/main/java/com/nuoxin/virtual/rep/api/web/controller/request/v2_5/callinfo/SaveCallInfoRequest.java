@@ -16,17 +16,21 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper=false)
 @Data
 public class SaveCallInfoRequest  extends BaseCallInfoRequest{
-	@NotNull(message="isHasDrug is null 1.有,0.无")
-	@ApiModelProperty(value = "是否有药")
+	@ApiModelProperty(value = "医生潜力 3高,2中,1低,-1未知")
+	private Integer hcpPotential;
+	
+	@ApiModelProperty(value = "是否有药 1.有,0.无")
 	private Integer isHasDrug;
-	@NotNull(message="isTarget is null")
 	@ApiModelProperty(value = "是否是目标客户 1.是,0.非")
 	private Integer isTarget;
-	@NotNull(message="isHasAe is null")
 	@ApiModelProperty(value = "是否有 AE 1.是,0.非")
 	private Integer isHasAe;
+	
+	@NotNull(message="attitude is null")
 	@ApiModelProperty(value = "医生态度 0-5")
 	private Integer attitude;
+	
+	@NotNull(message="visitResult is null")
 	@ApiModelProperty(value = "拜访结果,以字符串数组形式传入如[\"a\",\"b\"]")
 	private List<String> visitResult;
 	
@@ -36,5 +40,7 @@ public class SaveCallInfoRequest  extends BaseCallInfoRequest{
 	@ApiModelProperty(value = "问卷ID")
 	private Integer virtualQuestionaireId;
 	@ApiModelProperty(value = "作答结果")
+	
+	@NotNull(message="questions is null")
 	List<VirtualQuestionRequestBean> questions = new ArrayList<>();
 }
