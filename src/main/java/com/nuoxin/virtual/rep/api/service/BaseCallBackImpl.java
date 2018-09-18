@@ -36,10 +36,11 @@ public abstract class BaseCallBackImpl implements CallBackService {
 	/**
 	 * 父类通用回调处理
 	 * @param sinToken 通话记录ID
-	 * @param statusName 状态名
+	 * @param statusName 转换后的状态名
 	 * @param audioFileDownloadUrl 语音文件下载地址
+	 * @param callTime 通话时长
 	 */
-	protected boolean processCallBack(String sinToken, String statusName, String audioFileDownloadUrl) {
+	protected boolean processCallBack(String sinToken, String statusName, String audioFileDownloadUrl, long callTime) {
 		DoctorCallInfo info = this.getDoctorCallInfoBySinToken(sinToken);
 		if(info == null) {
 			logger.error("无法获取 DoctorCallInfo 信息 sinToken:{}", sinToken);
@@ -52,7 +53,10 @@ public abstract class BaseCallBackImpl implements CallBackService {
 			callOssUrl = audioFileDownloadUrl;
 		}
 		
-		this.updateUrl(callOssUrl, statusName, info.getId());
+		Long callId = info.getId();
+		this.updateUrl(callOssUrl, statusName, callId, callTime);
+		logger.warn("回调执行成功, 返回 true! callId:{},sinToken:{},statusName{},downloadUrl:{},callTime:{}", 
+													callId, sinToken, statusName, callOssUrl, callTime);
 		
 		return true;
 	}
@@ -87,11 +91,11 @@ public abstract class BaseCallBackImpl implements CallBackService {
 	 * @param callOssUrl OSS URL
 	 * @param statusName 状态名
 	 * @param id 打电话记录主键
+	 * @param callTime 通话时长
 	 */
-	@Transactional
-	private void updateUrl(String callOssUrl, String statusName, Long id) {
+	private void updateUrl(String callOssUrl, String statusName, Long id, Long callTime) {
 		logger.info("callUrl:{},statusName:{},id:{}", callOssUrl, statusName, id);
-		callInfoDao.updateUrlRefactor(callOssUrl, statusName, id);
+		callInfoDao.updateUrlRefactor(callOssUrl, statusName, id, callTime);
 	}
 
 }

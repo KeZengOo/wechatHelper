@@ -28,7 +28,7 @@ import com.nuoxin.virtual.rep.api.web.controller.response.call.Call7mmorResponse
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
-@Api(value = "电话回调 Controller 类", description = "电话回调 Controller 类")
+@Api(value = "电话回调 Controller 类")
 @RestController
 @RequestMapping(value = "/callback")
 public class CallBackController extends BaseController {
@@ -39,7 +39,8 @@ public class CallBackController extends BaseController {
 	private CallBackService callBackService;
 
 	/**
-	 * 七陌回调入口方法 参考链接 https://developer.7moor.com/event/
+	 * 七陌回调入口方法<br> 
+	 * 参考链接 https://developer.7moor.com/event/
 	 * @param request
 	 * @param response
 	 * @return ResponseEntity<?>
@@ -52,7 +53,7 @@ public class CallBackController extends BaseController {
 		ConcurrentMap<String, String> paramsMap = this.getParamsMap(request);
 		if (CollectionsUtil.isNotEmptyMap(paramsMap)) {
 			// 调用业务方法
-			responseEntity = this.callBack(paramsMap);
+			responseEntity = this.processCallBack(paramsMap);
 		} else {
 			logger.error("7moor 传参异常,响应给 7moor 500");
 			responseEntity = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -64,7 +65,6 @@ public class CallBackController extends BaseController {
 	@ApiOperation(value = "查询通话记录", notes = "查询通话记录")
 	@GetMapping("/call/list")
 	public ResponseEntity<DefaultResponseBean<List<Call7mmorResponseBean>>> getCallList(Call7mmorRequestBean bean) {
-
 		List<Call7mmorResponseBean> callList = callBackService.getCallList(bean);
 		DefaultResponseBean<List<Call7mmorResponseBean>> responseBean = new DefaultResponseBean<>();
 		responseBean.setData(callList);
@@ -74,7 +74,6 @@ public class CallBackController extends BaseController {
 	@ApiOperation(value = "录音文件重新上传", notes = "录音文件重新上传")
 	@GetMapping("/call/url/repeat")
 	public ResponseEntity<DefaultResponseBean<Boolean>> repeatUploadFile(Call7mmorRequestBean bean) {
-
 		callBackService.repeatUploadFile(bean);
 		DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
 		responseBean.setData(true);
@@ -110,8 +109,9 @@ public class CallBackController extends BaseController {
 	 * @param paramsMap
 	 * @return ResponseEntity<?>
 	 */
-	private ResponseEntity<?> callBack (ConcurrentMap<String, String> paramsMap) {
+	private ResponseEntity<?> processCallBack (ConcurrentMap<String, String> paramsMap) {
 		ResponseEntity<?> responseEntity;
+		
 		String callSheetId = paramsMap.get("CallSheetID");
 		try {
 			boolean flag = callBackService.callBack(paramsMap);
