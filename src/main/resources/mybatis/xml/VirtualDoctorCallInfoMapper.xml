@@ -77,5 +77,24 @@
 		SET product_id =  #{productId} ,doctor_questionnaire_id=#{doctorQuestionnaireId}
 		WHERE id=#{callId}
 	</update>
+
+	<select id="geTelephoneDoctorVisitCount" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse">
+		SELECT
+		virtual_drug_user_id drugUserId,count(DISTINCT virtual_doctor_id) total
+		FROM virtual_doctor_call_info
+		WHERE
+		virtual_drug_user_id IN
+		<foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		<if test="startTime!=null">
+			and date_format(create_time,'%Y-%m-%d')&gt;=#{startTime}
+		</if>
+		<if test="endTime!=null">
+			and date_format(create_time,'%Y-%m-%d')&lt;=#{endTime}
+		</if>
+		AND product_id=#{productId}
+		GROUP BY virtual_drug_user_id
+	</select>
 	
 </mapper>

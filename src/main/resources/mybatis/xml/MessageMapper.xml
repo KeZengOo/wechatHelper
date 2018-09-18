@@ -520,4 +520,44 @@
         and du.leader_path like #{leaderPath}
         and date_format(vei.create_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
     </select>
+
+    <select id="getWeiXinDoctorVisitCount"  resultType="com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse">
+        SELECT
+        drug_user_id drugUserId,count(DISTINCT doctor_id) total
+        FROM virtual_message
+        WHERE message_type=1 and
+        drug_user_id IN
+        <foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+            #{drugUserId}
+        </foreach>
+        <if test="startTime!=null">
+            and date_format(message_time,'%Y-%m-%d')&gt;=#{startTime}
+        </if>
+        <if test="endTime!=null">
+            and date_format(message_time,'%Y-%m-%d')&lt;=#{endTime}
+        </if>
+        AND product_id=#{productId}
+        GROUP BY drug_user_id
+    </select>
+
+    <select id="getWeiXinMessageCount"  resultType="com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse">
+        SELECT
+        drug_user_id drugUserId,count(DISTINCT doctor_id) total
+        FROM virtual_message
+        WHERE message_type=1 and
+        drug_user_id IN
+        <foreach collection="statisticsParams.drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+            #{drugUserId}
+        </foreach>
+        <if test="statisticsParams.startTime!=null">
+            and date_format(message_time,'%Y-%m-%d')&gt;=#{statisticsParams.startTime}
+        </if>
+        <if test="statisticsParams.endTime!=null">
+            and date_format(message_time,'%Y-%m-%d')&lt;=#{statisticsParams.endTime}
+        </if>
+        AND product_id=#{statisticsParams.productId} and wechat_message_status=#{wechatMessageStatus}
+        GROUP BY drug_user_id
+    </select>
+
+
 </mapper>

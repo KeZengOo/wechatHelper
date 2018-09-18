@@ -313,6 +313,7 @@
                 WHERE
                     product_id = t.productId
                 AND update_time = t.updateTime
+                LIMIT 1
             ) menderName
         FROM
             (
@@ -363,5 +364,17 @@
         FROM virtual_doctor_dynamic_field
         WHERE product_id=#{oldProductId}
     </insert>
+
+    <!-- 得到医生指定产品下的问卷列表 -->
+    <select id="getProductQuestionnaireList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ProductQuestionnaireResponseBean">
+
+    </select>
+
+    <!-- 得到医生指定产品下的问卷列表 -->
+    <select id="getProductDynamicFieldCount" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM virtual_doctor_dynamic_field
+        WHERE product_id=#{productId}
+    </select>
 
 </mapper>
