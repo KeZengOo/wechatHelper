@@ -6,6 +6,7 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DoctorDynamicF
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DynamicFieldProductRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.customer.DoctorDynamicFieldResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DynamicFieldProductResponseBean;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -74,5 +75,12 @@ public interface CustomerSetService {
      * @param newProductId
      */
     void copyDynamicFieldByProductId(DrugUser user, Long oldProductId, Long newProductId);
+
+    /**
+     * 得到产品下动态字段的总数
+     * @param productId
+     * @return
+     */
+    Integer getProductDynamicFieldCount(Long productId);
 
 }

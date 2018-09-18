@@ -149,6 +149,19 @@ public class CustomerSetController extends NewBaseController{
     }
 
 
+    @ApiOperation(value = "产品设置产品信息复制前检查", notes = "产品设置产品信息复制前检查")
+    @PostMapping(value = "/product/set/copy/check/{productId}")
+    public DefaultResponseBean<Integer> getProductDynamicFieldCount(HttpServletRequest request, @PathVariable(value = "productId") Long productId) {
+        DrugUser user = super.getDrugUser(request);
+        if(user == null) {
+            return super.getLoginErrorResponse();
+        }
+        Integer fieldCount = customerSetService.getProductDynamicFieldCount(productId);
+        DefaultResponseBean<Integer> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(fieldCount);
+        return responseBean;
+    }
+
     @ApiOperation(value = "产品设置产品信息复制", notes = "产品设置产品信息复制")
     @PostMapping(value = "/product/set/copy/{oldProductId}/{newProductId}")
     public DefaultResponseBean<Boolean> deleteDoctorDynamicField(HttpServletRequest request,@PathVariable(value = "oldProductId") Long oldProductId, @PathVariable(value = "newProductId") Long newProductId) {
