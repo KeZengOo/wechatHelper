@@ -46,7 +46,7 @@ public class DoctorDynamicFieldController extends NewBaseController{
 
 
     @ApiOperation(value = "医生基本信息医院信息及录入的值", notes = "医生基本信息医院信息及录入的值")
-    @PostMapping(value = "/basic")
+    @GetMapping(value = "/basic/{doctorId}")
     public DefaultResponseBean<DoctorBasicDynamicFieldValueListResponseBean> getDoctorBasicDynamicFieldValue(HttpServletRequest request, @PathVariable(value = "doctorId") Long doctorId) {
         DrugUser user = super.getDrugUser(request);
         if(user == null) {
@@ -61,7 +61,7 @@ public class DoctorDynamicFieldController extends NewBaseController{
     }
 
     @ApiOperation(value = "医生产品信息及录入的值", notes = "医生产品信息及录入的值")
-    @PostMapping(value = "/product")
+    @GetMapping(value = "/product/{doctorId}")
     public DefaultResponseBean<List<List<DoctorProductDynamicFieldValueResponseBean>>> getDoctorProductDynamicFieldValue(HttpServletRequest request, @PathVariable(value = "doctorId") Long doctorId) {
         DrugUser user = super.getDrugUser(request);
         if(user == null) {

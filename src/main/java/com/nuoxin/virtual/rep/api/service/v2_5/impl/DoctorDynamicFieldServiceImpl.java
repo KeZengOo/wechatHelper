@@ -71,7 +71,7 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
 
 
         List<Long> requiredFieldId = dynamicFieldMapper.getRequiredFieldId(collectIdList);
-        if (requiredFieldId == null || collectIdList.isEmpty()){
+        if (requiredFieldId == null || requiredFieldId.isEmpty()){
             return true;
         }
 

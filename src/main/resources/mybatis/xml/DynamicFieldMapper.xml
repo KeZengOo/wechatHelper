@@ -206,14 +206,14 @@
     <!-- 得到医生基本信息动态字段填充的值 -->
     <select id="getDoctorBasicDynamicFieldValue" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorBasicDynamicFieldValueResponseBean">
         SELECT
-            t.*, t2.dynamic_field_value dynamicFieldValue,
-            t2.dynamic_extend_value dymaicExtendValue
+            t.*, t2.id,IFNULL(t2.dynamic_field_value,'') dynamicFieldValue,
+            IFNULL(t2.dynamic_extend_value,'') dymaicExtendValue
         FROM
             (
                 SELECT
                     vddf.id dynamicFieldId,
-                    vddf.field_name dynamicFieldName,
-                    vddf.field_value dynamicFieldSelectValue,
+                    IFNULL(vddf.field_name,'') dynamicFieldName,
+                    IFNULL(vddf.field_value,'') dynamicFieldSelectValue,
                     vddf.required,
                     vddf.classification
                 FROM
@@ -231,14 +231,14 @@
     <!-- 得到医生产品信息动态字段填充的值 -->
     <select id="getDoctorProductDynamicFieldValue" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorProductDynamicFieldValueResponseBean">
         SELECT
-            t.*, t2.dynamic_field_value dynamicFieldValue,
-            t2.dynamic_extend_value dymaicExtendValue
+            t.*, IFNULL(t2.dynamic_field_value,'') dynamicFieldValue,
+            IFNULL(t2.dynamic_extend_value,'') dymaicExtendValue
         FROM
             (
                 SELECT DISTINCT
                     vddf.id dynamicFieldId,
-                    vddf.field_name dynamicFieldName,
-                    vddf.field_value dynamicFieldSelectValue,
+                    IFNULL(vddf.field_name,'') dynamicFieldName,
+                    IFNULL(vddf.field_value,'') dynamicFieldSelectValue,
                     vddf.required,
                     vddf.classification,
                     pl.prod_id productId,
@@ -263,10 +263,10 @@
 
     <insert id="addDoctorBasicDynamicFieldValue">
         INSERT INTO
-        virtual_doctor_dynamic_field_value(doctorId, dynamic_field_id, dynamic_field_name, dynamic_field_value,dynamic_extend_value)
+        virtual_doctor_dynamic_field_value(doctor_id, dynamic_field_id, dynamic_field_name, dynamic_field_value,dynamic_extend_value)
         VALUES
         <foreach collection="list" item="d" separator=",">
-            (#{doctorId}, #{d.dynamicFieldId}, #{d.dynamicFieldName}, #{d.dynamicFieldValue}, #{dynamicExtendValue})
+            (#{doctorId}, #{d.dynamicFieldId}, #{d.dynamicFieldName}, #{d.dynamicFieldValue}, #{d.dynamicExtendValue})
         </foreach>
 
     </insert>
@@ -291,7 +291,7 @@
     <!-- 找出填的字段中的必填字段 -->
     <select id="getRequiredFieldId" resultType="java.lang.Long">
         SELECT id
-        FROM virtual_doctor_dynamic_field_value
+        FROM virtual_doctor_dynamic_field
         WHERE required=1
         AND id IN
         <foreach item="item" index="index" collection="list"

@@ -32,10 +32,10 @@ public class LoginValidationInterceptor extends HandlerInterceptorAdapter {
 			return true;
 		}
 		
-		if(request.getServletPath().equals("/error")){
-			throw new BusinessException(ErrorEnum.ERROR);
-		}
-		
+//		if(request.getServletPath().equals("/error")){
+//			throw new BusinessException(ErrorEnum.ERROR);
+//		}
+//
 		logger.info("接口【{}】请求开始登录验证",request.getServletPath());
 		sercurityService.sessionValidation(request);
 		DrugUser user = sercurityService.getDrugUser(request);
