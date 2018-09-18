@@ -37,23 +37,6 @@ public class VirtualDoctorCallInfoController extends NewBaseController{
 	private VirtualDoctorCallInfoService callInfoService;
 	
 	@SuppressWarnings("unchecked")
-	@ApiOperation(value = "获取医生对应的产品信息(用于电话拜访接通)")
-	@RequestMapping(value = "/products/get", method = { RequestMethod.GET })
-	public DefaultResponseBean<List<ProductBean>> getProducts(HttpServletRequest request,
-			@ApiParam(value = "医生ID") @RequestParam(value = "doctor_id") Long virtualDoctorId) {
-		DrugUser user = this.getDrugUser(request);
-		if(user == null) {
-			return super.getLoginErrorResponse();
-		} 
-		
-		List<ProductBean> products = callInfoService.getProducts(user.getId(), virtualDoctorId);
-		DefaultResponseBean<List<ProductBean>> responseBean = new DefaultResponseBean<>();
-		responseBean.setData(products);
-		
-		return responseBean;
-	}
-	
-	@SuppressWarnings("unchecked")
 	@ApiOperation(value = "保存电话接通拜访信息", notes = "保存电话接通拜访信息")
 	@RequestMapping(value = "/connected/save", method = { RequestMethod.POST })
 	public DefaultResponseBean<Boolean> connectedSave(HttpServletRequest request, 
