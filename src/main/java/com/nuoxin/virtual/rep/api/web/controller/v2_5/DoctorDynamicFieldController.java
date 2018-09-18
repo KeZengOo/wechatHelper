@@ -8,6 +8,7 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorDynam
 
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorBasicDynamicFieldValueListResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorProductDynamicFieldValueResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ProductDynamicFieldQuestionnaireResponseBean;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
@@ -64,14 +65,14 @@ public class DoctorDynamicFieldController extends NewBaseController{
     @SuppressWarnings("unchecked")
     @ApiOperation(value = "医生产品信息及录入的值", notes = "医生产品信息及录入的值")
     @GetMapping(value = "/product/{doctorId}")
-    public DefaultResponseBean<List<List<DoctorProductDynamicFieldValueResponseBean>>> getDoctorProductDynamicFieldValue(HttpServletRequest request, @PathVariable(value = "doctorId") Long doctorId) {
+    public DefaultResponseBean<List<ProductDynamicFieldQuestionnaireResponseBean>> getDoctorProductDynamicFieldValue(HttpServletRequest request, @PathVariable(value = "doctorId") Long doctorId) {
         DrugUser user = super.getDrugUser(request);
         if(user == null) {
             return super.getLoginErrorResponse();
         }
 
-        List<List<DoctorProductDynamicFieldValueResponseBean>> doctorProductDynamicFieldValue = doctorDynamicFieldService.getDoctorProductDynamicFieldValue(doctorId, user.getId());
-        DefaultResponseBean<List<List<DoctorProductDynamicFieldValueResponseBean>>> responseBean = new DefaultResponseBean<>();
+        List<ProductDynamicFieldQuestionnaireResponseBean> doctorProductDynamicFieldValue = doctorDynamicFieldService.getDoctorProductDynamicFieldValue(doctorId, user.getId());
+        DefaultResponseBean<List<ProductDynamicFieldQuestionnaireResponseBean>> responseBean = new DefaultResponseBean<>();
         responseBean.setData(doctorProductDynamicFieldValue);
         return responseBean;
     }

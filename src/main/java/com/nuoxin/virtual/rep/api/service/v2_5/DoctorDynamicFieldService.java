@@ -4,6 +4,7 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorDynam
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorBasicDynamicFieldValueListResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorBasicDynamicFieldValueResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorProductDynamicFieldValueResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ProductDynamicFieldQuestionnaireResponseBean;
 
 import java.util.List;
 
@@ -43,6 +44,6 @@ public interface DoctorDynamicFieldService {
      * @param drugUserId
      * @return
      */
-    List<List<DoctorProductDynamicFieldValueResponseBean>> getDoctorProductDynamicFieldValue(Long doctorId, Long drugUserId);
+    List<ProductDynamicFieldQuestionnaireResponseBean> getDoctorProductDynamicFieldValue(Long doctorId, Long drugUserId);
 
 }

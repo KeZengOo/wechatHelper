@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,9 +23,6 @@ import com.nuoxin.virtual.rep.api.service.v2_5.DoctorDynamicFieldService;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorDynamicFieldValueListRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorDynamicFieldValueRequestBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorBasicDynamicFieldValueListResponseBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorBasicDynamicFieldValueResponseBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorProductDynamicFieldValueResponseBean;
 
 /**
  * 医生动态字段相关业务接口实现
@@ -107,8 +105,8 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
     }
 
     @Override
-    public List<List<DoctorProductDynamicFieldValueResponseBean>> getDoctorProductDynamicFieldValue(Long doctorId, Long drugUserId) {
-        List<List<DoctorProductDynamicFieldValueResponseBean>> list = new ArrayList<>();
+    public List<ProductDynamicFieldQuestionnaireResponseBean> getDoctorProductDynamicFieldValue(Long doctorId, Long drugUserId) {
+        List<ProductDynamicFieldQuestionnaireResponseBean> list = new ArrayList<>();
         String leaderPath = commonService.getLeaderPathById(drugUserId);
         List<ProductDO> productList = drugUserMapper.getSetDynamicFieldProductList(leaderPath);
         if (CollectionsUtil.isEmptyList(productList)){
@@ -120,10 +118,18 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
             return list;
         }
 
+
         productIdList.forEach(productId->{
             List<DoctorProductDynamicFieldValueResponseBean> doctorProductDynamicFieldValue = dynamicFieldMapper.getDoctorProductDynamicFieldValue(doctorId, productId);
             if (CollectionsUtil.isNotEmptyList(doctorProductDynamicFieldValue)){
-                list.add(doctorProductDynamicFieldValue);
+                ProductDynamicFieldQuestionnaireResponseBean productDynamicFieldQuestionnaireResponseBean = new ProductDynamicFieldQuestionnaireResponseBean();
+                productDynamicFieldQuestionnaireResponseBean.setProductDynamicFieldList(doctorProductDynamicFieldValue);
+                List<ProductQuestionnaireResponseBean> productQuestionnaireList = dynamicFieldMapper.getProductQuestionnaireList(doctorId, productId);
+                if (CollectionsUtil.isNotEmptyList(productQuestionnaireList)){
+                    productDynamicFieldQuestionnaireResponseBean.setProductQuestionnaireList(productQuestionnaireList);
+                }
+
+                list.add(productDynamicFieldQuestionnaireResponseBean);
             }
         });
 

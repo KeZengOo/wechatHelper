@@ -367,6 +367,58 @@
 
     <!-- 得到医生指定产品下的问卷列表 -->
     <select id="getProductQuestionnaireList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ProductQuestionnaireResponseBean">
+        SELECT
+            t.*, (
+                SELECT
+                    count(*)
+                FROM
+                    virtual_question a
+                INNER JOIN virtual_doctor_questionnaire b ON a.id = b.virtual_question_id
+                WHERE
+                    a.del_flag = 0
+                AND a.virtual_questionnaire_id = t.questionnaireId
+                AND date_format(
+                    b.create_time,
+                    '%Y-%m-%d %H:%i'
+                ) = date_format(
+                    t.answerTime,
+                    '%Y-%m-%d %H:%i'
+                )
+                LIMIT 1
+            ) answerQuestionCount
+        FROM
+            (
+                SELECT
+                    vq.id questionnaireId,
+                    vq.title questionnaireName,
+                    max(vdq.create_time) answerTime,
+                    (
+                        SELECT
+                            NAME
+                        FROM
+                            drug_user
+                        WHERE
+                            id = vdq.virtual_drug_user_id
+                    ) drugUserName,
+                    (
+                        SELECT
+                            count(*)
+                        FROM
+                            virtual_question a
+                        WHERE
+                            a.virtual_questionnaire_id = vq.id
+                        AND a.del_flag = 0
+                    ) questionCount
+                FROM
+                    virtual_questionnaire vq
+                INNER JOIN virtual_doctor_questionnaire vdq ON vq.id = vdq.virtual_questionnaire_id
+                WHERE
+                    vq.product_id = #{productId}
+                AND vq.del_flag = 0
+                GROUP BY
+                    vq.id
+            ) t
+
 
     </select>
 
