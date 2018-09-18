@@ -12,6 +12,7 @@ import com.nuoxin.virtual.rep.api.mybatis.VirtualQuestionnaireMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualQuestionnaireService;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.questionnaire.SaveVirtualQuestionnaireRecordRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.questionnaire.VirtualQuestionRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VirtualQuestionnaireRecordResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VirtualQuestionnaireResponse;
 
@@ -47,8 +48,14 @@ public class VirtualQuestionnaireServiceImpl implements VirtualQuestionnaireServ
 
 	@Override
 	public int saveQuestionnaire(SaveVirtualQuestionnaireRecordRequestBean request) {
-		return questionnaireMapper.saveQuestionnaire(request.getVirtualDoctorId(), request.getVirtualDrugUserId(),
-				request.getVirtualQuestionaireId(), request.getCallId(), request.getQuestions());
+		int effectNum = 0;
+		List<VirtualQuestionRequestBean> questions = request.getQuestions();
+		if (CollectionsUtil.isNotEmptyList(questions)) {
+			effectNum = questionnaireMapper.saveQuestionnaire(request.getVirtualDoctorId(), request.getVirtualDrugUserId(),
+					request.getVirtualQuestionaireId(), request.getCallId(), questions);
+		}
+		
+		return effectNum;
 	}
 
 	@Override
