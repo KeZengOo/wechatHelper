@@ -42,13 +42,13 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	@Resource
 	private VirtualQuestionnaireService questionnaireService;
 	@Resource
+	private CommonService commonService;
+	@Resource
 	private VirtualDoctorCallInfoMapper callInfoMapper;
 	@Resource
 	private VirtualDoctorCallInfoMendMapper callInfoMendMapper;
 	@Resource
 	private DrugUserDoctorQuateMapper drugUserDoctorQuateMapper;
-	@Resource
-	private CommonService commonService;
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
@@ -60,32 +60,11 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		if (count > 0) {
 			int currentSize = request.getCurrentSize();
 			int pageSize = request.getPageSize();
+			// 获取电话拜访信息
 			List<CallVisitBean> list = callInfoMapper.getCallVisitList(leaderPath, virtualDoctorId, currentSize, pageSize);
 			if (CollectionsUtil.isNotEmptyList(list)) {
-				List<Long> callIds = new ArrayList<>(list.size());
-				list.forEach(visitBean ->{
-					callIds.add(visitBean.getCallId());
-				});
-				
-				// 补充 VirtualDoctorCallInfoMend 信息
-				List<CallVisitMendBean> callInfoMends = callInfoMendMapper.getCallVisitMendList(callIds);
-				if (CollectionsUtil.isNotEmptyList(callInfoMends)) {
-					ConcurrentMap<Long, CallVisitMendBean> map = new ConcurrentHashMap<>(callInfoMends.size());
-					callInfoMends.forEach(mend -> {
-						map.put(mend.getCallId(), mend);
-					});
-
-					list.forEach(visit -> {
-						Long callId = visit.getCallId();
-						CallVisitMendBean mend = map.get(callId);
-						if (mend != null) {
-							visit.setAttitude(mend.getAttitude());
-							String visitResultStr = mend.getVisitResult();
-							JSONArray visitResult = JSONObject.parseArray(visitResultStr);
-							visit.setVisitResult(visitResult);
-						}
-					});
-				}
+				// 获取电话拜访扩展信息
+				this.getVirtualDoctorCallInfoMend(list);
 			}
 			pageResponse = new PageResponseBean(request, count, list);
 		} 
@@ -99,17 +78,18 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 
 	@Transactional(value = TxType.REQUIRED, rollbackOn = Exception.class)
 	@Override
-	public boolean connectedSaveCallInfo(SaveCallInfoRequest saveRequest) {
-		if (saveRequest.getVirtualDoctorId() == null) {
-			saveRequest.setVirtualDrugUserId(0L);
+	public boolean saveConnectedCallInfo(SaveCallInfoRequest saveRequest) {
+		if (saveRequest.getVirtualDoctorId() == null) { // 非库内医生
+			// 将医生ID置为0
+			saveRequest.setVirtualDoctorId(0L);
 		}
 
-		Long callId = saveRequest.getCallInfoId();
+		Long callId = saveRequest.getCallInfoId(); // 电话拜访主键值
 		if (callId != null && callId > 0) {
-			this.doSaveCallInfo(saveRequest);
+			this.saveCallInfo(saveRequest);
 			int effectNum = this.doSaveVirtualQuestionnaireRecord(saveRequest);
 			if (effectNum > 0) {
-				this.changeRelationShip(saveRequest);
+				this.alterRelationShip(saveRequest);
 
 				return true;
 			}
@@ -120,7 +100,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	
 	@Transactional(value = TxType.REQUIRED, rollbackOn = Exception.class)
 	@Override
-	public boolean unconnectedSaveCallInfo(SaveCallInfoUnConnectedRequest saveRequest) {
+	public boolean saveUnconnectedCallInfo(SaveCallInfoUnConnectedRequest saveRequest) {
 		if ("emptynumber".equals(saveRequest.getStatuaName())) {
 			saveRequest.setIsBreakOff(1);
 		} else {
@@ -129,8 +109,8 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 
 		Long callId = saveRequest.getCallInfoId();
 		if (callId != null && callId > 0) {
-			this.doSaveCallInfo(saveRequest);
-			this.changeRelationShip(saveRequest);
+			this.saveCallInfo(saveRequest);
+			this.alterRelationShip(saveRequest);
 
 			return true;
 		}
@@ -141,11 +121,42 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/**
+	 * 根据 List<CallVisitBean> 获取电话拜访扩展信息
+	 * @param list
+	 */
+	private void getVirtualDoctorCallInfoMend(List<CallVisitBean> list) {
+		List<Long> callIds = new ArrayList<>(list.size());
+		list.forEach(visitBean ->{
+			callIds.add(visitBean.getCallId());
+		});
+		
+		// 补充 VirtualDoctorCallInfoMend 信息
+		List<CallVisitMendBean> callInfoMends = callInfoMendMapper.getCallVisitMendList(callIds);
+		if (CollectionsUtil.isNotEmptyList(callInfoMends)) {
+			ConcurrentMap<Long, CallVisitMendBean> map = new ConcurrentHashMap<>(callInfoMends.size());
+			callInfoMends.forEach(mend -> {
+				map.put(mend.getCallId(), mend);
+			});
+
+			list.forEach(visit -> {
+				Long callId = visit.getCallId();
+				CallVisitMendBean mend = map.get(callId);
+				if (mend != null) {
+					visit.setAttitude(mend.getAttitude()); // 医生态度
+					String visitResultStr = mend.getVisitResult(); // 拜访结果
+					JSONArray visitResult = JSONObject.parseArray(visitResultStr);
+					visit.setVisitResult(visitResult);
+				}
+			});
+		}
+	}
+	
+	/**
 	 * 修改电话拜访信息,保存扩展信息<br>
 	 * @param saveRequest
 	 * @return 返回 callId
 	 */
-	private void doSaveCallInfo(BaseCallInfoRequest saveRequest) {
+	private void saveCallInfo(BaseCallInfoRequest saveRequest) {
 		VirtualDoctorCallInfoParams callVisitParams = this.getVirtualDoctorCallInfoParams(saveRequest);
 		// P.S :保存电话拜访信息前前端通过调用call/save 已经向数据库插入记录,因此走的是修改
 		callInfoMapper.updateVirtualDoctorCallInfo(callVisitParams);
@@ -153,7 +164,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	}
 	
 	/**
-	 * 保存 问卷做题结果
+	 * 保存问卷做题结果
 	 * @param saveRequest
 	 * @param callId
 	 * @return 返回影响条数
@@ -173,7 +184,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	 * 变更虚拟代医生扩展关系信息
 	 * @param saveRequest
 	 */
-	private void changeRelationShip(BaseCallInfoRequest request) {
+	private void alterRelationShip(BaseCallInfoRequest request) {
 		DrugUserDoctorQuateParams relationShipParams = new DrugUserDoctorQuateParams();
 		relationShipParams.setVirtualDrugUserId(request.getVirtualDrugUserId());
 		relationShipParams.setDoctorId(request.getVirtualDoctorId());
@@ -204,16 +215,17 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		callVisitParams.setVirtualDoctorId(saveRequest.getVirtualDoctorId());
 		callVisitParams.setVirtualDrugUserId(saveRequest.getVirtualDrugUserId());
 		callVisitParams.setProductId(saveRequest.getProductId());
-		callVisitParams.setMobile(saveRequest.getMobile());
+		
 		// 只能是1 或者 2在前面的参数校验中加了限制
 		callVisitParams.setType(saveRequest.getType());
+		callVisitParams.setMobile(saveRequest.getMobile());
 		callVisitParams.setRemark(saveRequest.getRemark());
 		callVisitParams.setStatus(saveRequest.getStatus());
 		callVisitParams.setStatusName(saveRequest.getStatuaName());
 		callVisitParams.setNextVisitTime(saveRequest.getNextVisitTime());
 		
 		Integer virtualQuestinairedId = null;
-		if (saveRequest instanceof SaveCallInfoRequest) {
+		if (saveRequest instanceof SaveCallInfoRequest) { // 接通
 			SaveCallInfoRequest saveCallInfoRequest = (SaveCallInfoRequest) saveRequest;
 		
 			String visitResult = JSONObject.toJSONString(saveCallInfoRequest.getVisitResult());
@@ -221,9 +233,10 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 			callVisitParams.setAttitude(saveCallInfoRequest.getAttitude());
 
 			virtualQuestinairedId = saveCallInfoRequest.getVirtualQuestionaireId();
-		} else { 
+		} else { // 未接通
 			virtualQuestinairedId = 0;
 		}
+		
 		if (virtualQuestinairedId == null) {
 			virtualQuestinairedId = 0;
 		}

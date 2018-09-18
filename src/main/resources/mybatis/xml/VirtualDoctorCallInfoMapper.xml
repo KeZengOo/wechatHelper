@@ -35,6 +35,7 @@
 			date_format(v.create_time, '%Y-%m-%d %H:%i:%S') AS createTime,
 			remark,du.name AS drugUserName 
 		FROM virtual_doctor_call_info v
+		<!-- START  -->
 		JOIN drug_user du
 		ON v.virtual_drug_user_id = du.id
 		JOIN (
@@ -50,6 +51,7 @@
 			AND dud.is_available=1
 		) temp 
 		ON v.virtual_doctor_id=temp.id
+		<!-- END -->
 	    WHERE v.product_id IN (
 	    	SELECT DISTINCT prod_id 
 	    	FROM product_user pu

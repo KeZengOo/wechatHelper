@@ -46,7 +46,7 @@ public class VirtualDoctorCallInfoController extends NewBaseController{
 			return super.getParamsErrorResponse(bindingResult.getFieldError().getDefaultMessage());
         }
 		
-		boolean flag = callInfoService.connectedSaveCallInfo(saveRequest);
+		boolean flag = callInfoService.saveConnectedCallInfo(saveRequest);
 		DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<Boolean>();
 		responseBean.setData(flag);
 		
@@ -68,7 +68,7 @@ public class VirtualDoctorCallInfoController extends NewBaseController{
 			return super.getParamsErrorResponse(bindingResult.getFieldError().getDefaultMessage());
         }
 		
-		boolean flag = callInfoService.unconnectedSaveCallInfo(saveRequest);
+		boolean flag = callInfoService.saveUnconnectedCallInfo(saveRequest);
 		DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<Boolean>();
 		responseBean.setData(flag);
 		
