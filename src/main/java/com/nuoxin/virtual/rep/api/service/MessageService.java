@@ -14,10 +14,7 @@ import com.nuoxin.virtual.rep.api.entity.Message;
 import com.nuoxin.virtual.rep.api.enums.MessageTypeEnum;
 import com.nuoxin.virtual.rep.api.enums.UserTypeEnum;
 import com.nuoxin.virtual.rep.api.mybatis.MessageMapper;
-import com.nuoxin.virtual.rep.api.utils.DateUtil;
-import com.nuoxin.virtual.rep.api.utils.ExcelUtils;
-import com.nuoxin.virtual.rep.api.utils.RegularUtils;
-import com.nuoxin.virtual.rep.api.utils.StringFormatUtil;
+import com.nuoxin.virtual.rep.api.utils.*;
 import com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.vo.WechatMessageVo;
 import com.nuoxin.virtual.rep.api.web.controller.response.message.MessageLinkmanResponseBean;
@@ -41,6 +38,7 @@ import javax.persistence.criteria.Root;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.*;
+import java.util.regex.Matcher;
 
 /**
  * 微信相关接口
@@ -104,29 +102,9 @@ public class MessageService extends BaseService {
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public boolean importExcel(MultipartFile file, DrugUser drugUser) {
         boolean success = false;
-        
-        String originalFilename = file.getOriginalFilename();
-        if (StringUtils.isEmpty(originalFilename)){
-            throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "文件名称不能为空");
-        }
-        
-        if (!originalFilename.endsWith(RegularUtils.EXTENSION_XLS) && !originalFilename.endsWith(RegularUtils.EXTENSION_XLSX)) {
-            throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
-        }
 
-        String fileName = originalFilename.substring(0,originalFilename.lastIndexOf("."));
-        boolean matcher = RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, fileName);
-        if (!matcher){
-            throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "文件名称输入不合法，请以医生的手机号命名");
-        }
-
-        String doctorTelephone = fileName;
-        boolean matche = RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, doctorTelephone);
-        if (!matche){
-            throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "手机号输入有误，请检查是否是文本格式");
-        }
-
-        List<Message> list = new ArrayList<>();
+        // 检查文件
+        Doctor doctor = checkWechatFile(file);
 
         ExcelUtils<WechatMessageVo> excelUtils = new ExcelUtils<>(new WechatMessageVo());
         List<WechatMessageVo> wechatMessageVos = null;
@@ -134,9 +112,12 @@ public class MessageService extends BaseService {
         try {
         	inputStream = file.getInputStream();
             wechatMessageVos = excelUtils.readFromFile(null, inputStream);
+            if (CollectionsUtil.isEmptyList(wechatMessageVos)){
+                throw new FileFormatException();
+            }
         } catch (Exception e) {
             logger.error("读取上传的excel文件失败。。", e);
-            throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
+            throw new FileFormatException(ErrorEnum.ERROR, "读取上传的excel文件失败!");
         } finally {
         	if(inputStream != null) {
         		try {
@@ -147,10 +128,25 @@ public class MessageService extends BaseService {
         	}
         }
 
-        if (null == wechatMessageVos || wechatMessageVos.size() <= 0) {
-            return false;
+        // 得到去重后的聊天消息
+        List<Message> list = getDuplicateRemovalMessageList(wechatMessageVos, doctor,  drugUser);
+        //批量保存微信聊天消息
+        messageRepository.save(list);
+        success = true;
+        return success;
+    }
+
+    /**
+     * 得到去重后的消息列表
+     * @param wechatMessageVos
+     * @return
+     */
+    private List<Message> getDuplicateRemovalMessageList(List<WechatMessageVo> wechatMessageVos,Doctor doctor, DrugUser drugUser) {
+        if (CollectionsUtil.isEmptyList(wechatMessageVos)){
+            return null;
         }
 
+        List<Message> list = new ArrayList<>();
         for (WechatMessageVo wechatMessageVo : wechatMessageVos) {
             if (null != wechatMessageVo) {
                 String id = wechatMessageVo.getId();
@@ -167,9 +163,8 @@ public class MessageService extends BaseService {
                 String message = wechatMessageVo.getMessage();
 
                 //判断数据库中是否存在该条数据
-				Message findMessage = messageRepository.findTopByMessageTypeAndWechatNumberAndMessageTimeOrderByMessageTimeDesc(
-						MessageTypeEnum.WECHAT.getMessageType(), wechatNumber, wechatTime);
-                if (findMessage != null){
+                Integer count = messageMapper.getCountByTypeAndWechatNumAndTime(MessageTypeEnum.WECHAT.getMessageType(), wechatNumber, wechatTime);
+                if (count != null && count > 0){
                     //数据库存在该条数据
                     continue;
                 }
@@ -179,23 +174,18 @@ public class MessageService extends BaseService {
                 String telephone = "";
                 Long userId = 0L;
 
-                Doctor doctor = doctorRepository.findTopByMobile(doctorTelephone);
-                if (doctor == null) {
-                    throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
-                }
-
                 Long drugUserId = drugUser.getId();
                 Long doctorId = doctor.getId();
-                if (wechatNickName == null) {
-                    throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
+                if (StringUtils.isEmpty(wechatNickName)){
+                    throw new FileFormatException(ErrorEnum.ERROR.getStatus(), "文件中昵称不能为空！");
                 }
 
-                if (wechatNickName != null && DRUG_USER_NICKNAME.equals(wechatNickName)) {
+                if (DRUG_USER_NICKNAME.equals(wechatNickName)) {
                     userType = UserTypeEnum.DRUG_USER.getUserType();
                     nickname = drugUser.getName();
                     telephone = drugUser.getMobile();
                     userId = drugUserId;
-                } else if (wechatNickName != null && !DRUG_USER_NICKNAME.equals(wechatNickName)) {
+                } else{
                     userType = UserTypeEnum.DOCTOR.getUserType();
                     nickname = doctor.getName();
                     telephone = doctor.getMobile();
@@ -220,11 +210,37 @@ public class MessageService extends BaseService {
             }
         }
 
-        //批量保存微信聊天消息
-        messageRepository.save(list);
+        return list;
+    }
 
-        success = true;
-        return success;
+    /**
+     * 检查导入的的微信消息文件是否合法，不合法会抛出异常，合法返回医生信息
+     * @param file
+     */
+    private Doctor checkWechatFile(MultipartFile file) {
+        String originalFilename = file.getOriginalFilename();
+        if (StringUtils.isEmpty(originalFilename)){
+            throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "文件名不能为空");
+        }
+
+        if (!originalFilename.endsWith(RegularUtils.EXTENSION_XLS) && !originalFilename.endsWith(RegularUtils.EXTENSION_XLSX)) {
+            throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
+        }
+
+
+        String fileName = originalFilename.substring(0,originalFilename.lastIndexOf("."));
+        Matcher matcher = RegularUtils.getMatcher(RegularUtils.MATCH_TELEPHONE, fileName);
+        if (matcher.find()){
+            String telephone = matcher.group(0);
+            Doctor doctor = doctorRepository.findTopByMobile(telephone);
+            if (doctor == null){
+                throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "文件名中包含的手机号匹配不到医生！");
+            }
+            return doctor;
+        }else {
+            throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "文件名中没有包含手机号！");
+        }
+
     }
 
     //mybatis的写法

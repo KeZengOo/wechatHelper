@@ -48,7 +48,7 @@ public class ExcelUtils<E> {
 	 * 最好是所有的单元格都是文本格式，<br>
 	 * 日期格式要求yyyy-MM-dd HH:mm:ss,布尔类型0：真，1：假
 	 * @param edf 数据格式化，如果没有要格式化的，传null
-	 * @param is  Excel文件输入流，支持xlsx 和 xls 后缀的文件
+	 * @param inputStream  Excel文件输入流，支持xlsx 和 xls 后缀的文件
 	 * @return List<E>
 	 * @throws Exception
 	 */

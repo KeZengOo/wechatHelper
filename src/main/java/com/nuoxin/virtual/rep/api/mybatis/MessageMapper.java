@@ -1,5 +1,6 @@
 package com.nuoxin.virtual.rep.api.mybatis;
 
+import com.nuoxin.virtual.rep.api.entity.Message;
 import com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.message.MessageLinkmanResponseBean;
@@ -48,6 +49,16 @@ public interface MessageMapper {
 
     //今日邮件会话数
     Integer emailMessageCount(MessageRequestBean bean);
+
+
+    /**
+     * 查询消息类型，判断是否重复
+     * @param messageType
+     * @param wechatNumber
+     * @param messageTime
+     * @return
+     */
+    Integer getCountByTypeAndWechatNumAndTime(@Param(value = "messageType") Integer messageType,@Param(value = "wechatNumber") String wechatNumber,@Param(value = "messageTime") String messageTime);
 
 
 }

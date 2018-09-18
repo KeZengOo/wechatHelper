@@ -13,9 +13,6 @@ public class WechatMessageVo {
     @Excel(name = "ID", width = 50)
     private String id;
 
-//    @Excel(name = "时间", width = 30)
-//    private String wechatTime;
-
     @Excel(name = "时间", width = 30)
     private Date wechatTime;
 
@@ -34,13 +31,6 @@ public class WechatMessageVo {
     @Excel(name = "消息", width = 1000)
     private String message;
 
-//    @Excel(name = "销售代表手机号", width = 20)
-//    private String drugUserTelephone;
-//
-//    @Excel(name = "医生手机号", width = 20)
-//    private String doctorTelephone;
-
-
     public String getId() {
         return id;
     }
@@ -48,14 +38,6 @@ public class WechatMessageVo {
     public void setId(String id) {
         this.id = id;
     }
-
-//    public String getWechatTime() {
-//        return wechatTime;
-//    }
-//
-//    public void setWechatTime(String wechatTime) {
-//        this.wechatTime = wechatTime;
-//    }
 
     public String getNickname() {
         return nickname;
@@ -96,25 +78,6 @@ public class WechatMessageVo {
     public void setMessage(String message) {
         this.message = message;
     }
-
-
-//    public String getDrugUserTelephone() {
-//        return drugUserTelephone;
-//    }
-//
-//    public void setDrugUserTelephone(String drugUserTelephone) {
-//        this.drugUserTelephone = drugUserTelephone;
-//    }
-//
-//    public String getDoctorTelephone() {
-//        return doctorTelephone;
-//    }
-//
-//    public void setDoctorTelephone(String doctorTelephone) {
-//        this.doctorTelephone = doctorTelephone;
-//    }
-
-
 
 
     public Date getWechatTime() {
