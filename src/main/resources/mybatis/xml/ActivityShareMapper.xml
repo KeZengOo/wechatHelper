@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.ActivityShareMapper">
+
+	<select id="getMessageDoctorVisitCount" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse">
+		SELECT
+		t.drug_user_id drugUserId,count(DISTINCT t.share_person_id) total
+		FROM activity_share t join t_content_product t1 on t.data_id=t1.content_id
+		WHERE
+		t.share_type=2 and t.drug_user_id IN
+		<foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		<if test="startTime!=null">
+			and date_format(t.create_time,'%Y-%m-%d')&gt;=#{startTime}
+		</if>
+		<if test="endTime!=null">
+			and date_format(t.create_time,'%Y-%m-%d')&lt;=#{endTime}
+		</if>
+		AND t1.product_id=#{productId}
+		GROUP BY t.drug_user_id
+	</select>
+
+	<select id="getContentServiceCount" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse">
+		SELECT
+		t.drug_user_id drugUserId,count(DISTINCT t.share_person_id) total
+		FROM
+		activity_share t JOIN activity_share_extend t1 ON t.`id`=t1.`activity_share_id`
+		join t_content_product t2 on t.data_id=t2.content_id
+		WHERE
+		t1.`share_status` IN(2,3) and t.drug_user_id IN
+		<foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		<if test="startTime!=null">
+			and date_format(t.create_time,'%Y-%m-%d')&gt;=#{startTime}
+		</if>
+		<if test="endTime!=null">
+			and date_format(t.create_time,'%Y-%m-%d')&lt;=#{endTime}
+		</if>
+		AND t2.product_id=#{productId}
+		GROUP BY t.drug_user_id
+	</select>
+
+	<select id="getContentSendCount" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse">
+		SELECT
+		t.drug_user_id drugUserId,count(DISTINCT t.share_person_id) total
+		FROM activity_share t join t_content_product t1 on t.data_id=t1.content_id
+		WHERE
+		t.drug_user_id IN
+		<foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		<if test="startTime!=null">
+			and date_format(t.create_time,'%Y-%m-%d')&gt;=#{startTime}
+		</if>
+		<if test="endTime!=null">
+			and date_format(t.create_time,'%Y-%m-%d')&lt;=#{endTime}
+		</if>
+		AND t1.product_id=#{productId}
+		GROUP BY t.drug_user_id
+	</select>
+
+	<select id="getContentReadCount" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse">
+		SELECT
+		t.drug_user_id drugUserId,count(DISTINCT t.read_person_id) total
+		FROM activity_read t join t_content_product t1 on t.data_id=t1.content_id
+		WHERE
+		t.drug_user_id IN
+		<foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		<if test="startTime!=null">
+			and date_format(t.create_time,'%Y-%m-%d')&gt;=#{startTime}
+		</if>
+		<if test="endTime!=null">
+			and date_format(t.create_time,'%Y-%m-%d')&lt;=#{endTime}
+		</if>
+		AND t1.product_id=#{productId}
+		GROUP BY t.drug_user_id
+	</select>
+
+	<select id="getContentReadTimeCount" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse">
+		SELECT
+		t.drug_user_id drugUserId,sum(t.read_time) total
+		FROM activity_read t join t_content_product t1 on t.data_id=t1.content_id
+		WHERE
+		t.drug_user_id IN
+		<foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		<if test="startTime!=null">
+			and date_format(t.create_time,'%Y-%m-%d')&gt;=#{startTime}
+		</if>
+		<if test="endTime!=null">
+			and date_format(t.create_time,'%Y-%m-%d')&lt;=#{endTime}
+		</if>
+		AND t1.product_id=#{productId}
+		GROUP BY t.drug_user_id
+	</select>
+
+</mapper>

@@ -25,5 +25,27 @@
 		  	</foreach> 	
 	</select>
 
+	<select id="getDoctorNum" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse">
+		SELECT virtual_drug_user_id drugUserId,count(DISTINCT virtual_doctor_id) total
+		FROM virtual_doctor_call_info_mend
+		WHERE
+		virtual_drug_user_id IN
+		<foreach collection="statisticsParams.drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		and
+		<foreach collection="contents" item="content" open="(" close=")" separator="or">
+			visit_result LIKE CONCAT('%',#{content},'%')
+		</foreach>
+		<if test="statisticsParams.startTime!=null">
+			and date_format(create_time,'%Y-%m-%d')&gt;=#{statisticsParams.startTime}
+		</if>
+		<if test="statisticsParams.endTime!=null">
+			and date_format(create_time,'%Y-%m-%d')&lt;=#{statisticsParams.endTime}
+		</if>
+		and product_id=#{statisticsParams.productId}
+		GROUP BY virtual_drug_user_id
+	</select>
+
 </mapper>
 

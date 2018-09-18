@@ -22,4 +22,25 @@
         	(#{index.drugUserId}, #{index.doctorId}, #{index.isAddWechat}, NOW())
     	</foreach >
 	</insert>
+
+	<select id="selectDrugUserDoctors" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsResponse">
+		SELECT DISTINCT user_id AS drugUserId,t1.name AS drugUserName FROM `product_user` t JOIN drug_user t1 ON t.user_id=t1.id
+		WHERE t.prod_id = #{productId} AND t1.status=1
+		and t.user_id IN
+		<foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		ORDER BY user_id
+		LIMIT #{currentSize},#{pageSize}
+	</select>
+
+	<select id="selectDrugUserDoctorsCount" resultType="java.lang.Integer">
+		select count(DISTINCT user_id) total FROM `product_user` t JOIN drug_user t1 ON t.user_id=t1.id
+		WHERE t.prod_id =#{productId}  AND t1.status=1
+		and t.user_id IN
+		<foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+	</select>
+
 </mapper>

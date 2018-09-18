@@ -34,5 +34,24 @@
 			 #{index.isTarget}, #{index.isHasAe}, #{index.isRecruit}, #{index.hcpPotential})
 		</foreach>
 	</insert>
+
+	<select id="getPotentialDoctorCount" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse">
+		SELECT
+		drug_user_id drugUserId,count(DISTINCT doctor_id) total
+		FROM drug_user_doctor_quate
+		WHERE
+		drug_user_id IN
+		<foreach collection="statisticsParams.drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		<if test="statisticsParams.startTime!=null">
+			and date_format(create_time,'%Y-%m-%d')&gt;=#{statisticsParams.startTime}
+		</if>
+		<if test="statisticsParams.endTime!=null">
+			and date_format(create_time,'%Y-%m-%d')&lt;=#{statisticsParams.endTime}
+		</if>
+		AND product_id=#{statisticsParams.productId} and is_available=1 and hcp_potential=#{hcpPotential}
+		GROUP BY drug_user_id
+	</select>
 		
 </mapper>
