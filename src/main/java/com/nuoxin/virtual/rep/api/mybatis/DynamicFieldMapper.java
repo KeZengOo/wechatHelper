@@ -12,6 +12,7 @@ import com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpDynamicRequestB
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorBasicDynamicFieldValueResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorProductDynamicFieldValueResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DynamicFieldProductResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ProductQuestionnaireResponseBean;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -180,4 +181,21 @@ public interface DynamicFieldMapper {
      * @param newProductId 复制的产品ID
      */
     void copyByProductId(@Param(value = "drugUserId") Long drugUserId,@Param(value = "drugUserName") String drugUserName,@Param(value = "oldProductId") Long oldProductId,@Param(value = "newProductId") Long newProductId);
+
+
+    /**
+     * 得到医生指定产品下的问卷列表
+     * @param doctorId
+     * @param productId
+     * @return
+     */
+    List<ProductQuestionnaireResponseBean> getProductQuestionnaireList(@Param(value = "doctorId") Long doctorId,@Param(value = "productId") Long productId);
+
+
+    /**
+     * 得到产品下动态字段的总数
+     * @param productId
+     * @return
+     */
+    Integer getProductDynamicFieldCount(@Param(value = "productId") Long productId);
 }

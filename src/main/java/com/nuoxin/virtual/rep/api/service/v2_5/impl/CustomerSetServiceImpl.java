@@ -120,4 +120,14 @@ public class CustomerSetServiceImpl implements CustomerSetService {
         dynamicFieldMapper.deleteByProductId(newProductId);
         dynamicFieldMapper.copyByProductId(user.getId(), user.getName(), oldProductId, newProductId);
     }
+
+    @Override
+    public Integer getProductDynamicFieldCount(Long productId) {
+        Integer fieldCount = dynamicFieldMapper.getProductDynamicFieldCount(productId);
+        if (fieldCount == null){
+            fieldCount = 0;
+        }
+
+        return fieldCount;
+    }
 }
