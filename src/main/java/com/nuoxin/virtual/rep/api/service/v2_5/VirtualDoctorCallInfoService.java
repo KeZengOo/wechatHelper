@@ -27,13 +27,13 @@ public interface VirtualDoctorCallInfoService {
 	 * @param saveRequest
 	 * @return 成功返回 true ,否则返回 false
 	 */
-	boolean connectedSaveCallInfo(SaveCallInfoRequest saveRequest);
+	boolean saveConnectedCallInfo(SaveCallInfoRequest saveRequest);
 	
 	/**
 	 * 保存电话未接通拜访结果,有RERUIRED事务
 	 * @param saveRequest
 	 * @return
 	 */
-	boolean unconnectedSaveCallInfo(SaveCallInfoUnConnectedRequest saveRequest);
+	boolean saveUnconnectedCallInfo(SaveCallInfoUnConnectedRequest saveRequest);
 	
 }

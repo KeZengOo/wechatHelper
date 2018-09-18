@@ -24,10 +24,6 @@ public class BaseCallInfoRequest {
 	@ApiModelProperty(value = "产品ID")
 	private Integer productId;
 	
-	@NotNull(message = "virtualDoctorId is null")
-	@ApiModelProperty(value = "医生ID")
-	private Long virtualDoctorId;
-	
 	@NotNull(message = "mobile is null")
 	@ApiModelProperty(value = "拨打的医生手机号")
 	private String mobile;
@@ -37,6 +33,9 @@ public class BaseCallInfoRequest {
 	@NotNull(message = "type is null")
 	@ApiModelProperty(value = "呼叫类型 1.呼出,2.呼入")
 	private Integer type;
+	
+	@ApiModelProperty(value = "医生ID")
+	private Long virtualDoctorId;
 	
 	///////////////////////////////////////////////////////
 	
