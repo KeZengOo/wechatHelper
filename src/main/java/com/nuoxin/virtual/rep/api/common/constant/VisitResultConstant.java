@@ -9,9 +9,9 @@ import java.util.List;
  */
 public class VisitResultConstant {
 
-	public static final String RECRUITMENTSUCCESS = "招募成功";
-	public static final String TRANSFERSUCCESS = "传递成功";
-	public static final String TYPINGSUCCESS= "分型成功";
+	public static final String RECRUITMENTSUCCESS = "成功招募";
+	public static final String TRANSFERSUCCESS = "成功传递";
+	public static final String TYPINGSUCCESS= "医生分型";
 	public static final String SERVICEPHONE = "服务电话";
 	public static final String DOCTORREFUSED = "医生拒绝";
 	public static final String CALLLATER = "稍后致电";

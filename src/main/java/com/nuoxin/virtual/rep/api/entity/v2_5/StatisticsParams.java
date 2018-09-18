@@ -19,11 +19,6 @@ public class StatisticsParams extends PageRequestBean {
 	 * 销售代表列表id
 	 */
 	private List<Integer> drugUserIds;
-
-	/**
-	 * 销售代表名称
-	 */
-	private String drugUserName;
 	/**
 	 * 开始时间
 	 */
@@ -36,4 +31,8 @@ public class StatisticsParams extends PageRequestBean {
 	 * 电话回访结果
 	 */
 	private List<String> contents;
+	/**
+	 * 1 列表 2 导出
+	 */
+	private Integer  type;
 }

@@ -40,49 +40,71 @@ public class StatisticalServiceImpl implements StatisticalService {
 	@Autowired
 	private DrugUserDoctorQuateMapper drugUserDoctorQuateMapper;
 
-
-
+	/**
+	 * 列表
+	 * @param statisticsParams
+	 * @return
+	 */
 	@Override
-	public PageResponseBean<List<StatisticsResponse>> visitStatisticsList(StatisticsParams statisticsParams) {
-		int total=drugUserDoctorMapper.selectDrugUserDoctorsCount(statisticsParams);
-		List<StatisticsResponse> list=new ArrayList<>();
-		if(total>0){
-			list=drugUserDoctorMapper.selectDrugUserDoctors(statisticsParams);
-			//内容服务人数
-			List<StatisticsDrugNumResponse> contentServiceTotal=activityShareMapper.getContentServiceCount(statisticsParams);
-			//设置拜访医生数
-			setVisitDoctorNum(statisticsParams, list);
-			//设置接触医生数
-			setContactDoctorNum(statisticsParams, list, contentServiceTotal);
-			//设置成功医生数
-			setSuccessDoctorNum(statisticsParams, list, contentServiceTotal);
-			//设置招募医生数
-			setRecruitmentDoctorNum(statisticsParams, list);
-			//设置覆盖医生数
-			setCoverDoctorNum(statisticsParams, list, contentServiceTotal);
-			//设置高潜力医生
-			setPotentialDoctor(statisticsParams, list,StatisticalConstant.HIGH);
-			//设置中潜力医生
-			setPotentialDoctor(statisticsParams, list,StatisticalConstant.MIDDLE);
-			//设置低潜力医生
-			setPotentialDoctor(statisticsParams, list,StatisticalConstant.LOW);
-			//设置微信回复人数
-			setWeiXin(statisticsParams, list,StatisticalConstant.REPLY);
-			//设置微信发送人数
-			setWeiXin(statisticsParams, list,StatisticalConstant.SEND);
-			//设置内容发送人数
-			setContentSendNum(statisticsParams, list);
-			//设置内容阅读人数
-			setContentReadNum(statisticsParams, list);
-			//设置内容阅读率
-			setContentReadRate(list);
-			//设置内容阅读时长
-			setContentReadTime(statisticsParams, list);
-			//增加求和列
-			addSum(list);
-		}
+	public List<StatisticsResponse> visitStatisticsList(StatisticsParams statisticsParams) {
+		return getStatisticsList(statisticsParams);
+	}
 
+	/**
+	 * 分页
+	 * @param statisticsParams
+	 * @return
+	 */
+	@Override
+	public PageResponseBean<List<StatisticsResponse>> visitStatisticsPage(StatisticsParams statisticsParams) {
+		int total=drugUserDoctorMapper.selectDrugUserDoctorsCount(statisticsParams);
+		List<StatisticsResponse> list =new ArrayList<>();
+		if(total>0){
+			list=getStatisticsList(statisticsParams);
+		}
 		return new PageResponseBean(statisticsParams, total, list);
+	}
+
+	/**
+	 * 封装list
+	 * @param statisticsParams
+	 * @return
+	 */
+	private List<StatisticsResponse> getStatisticsList(StatisticsParams statisticsParams) {
+		List<StatisticsResponse> list=drugUserDoctorMapper.selectDrugUserDoctors(statisticsParams);
+		//内容服务人数
+		List<StatisticsDrugNumResponse> contentServiceTotal=activityShareMapper.getContentServiceCount(statisticsParams);
+		//设置拜访医生数
+		setVisitDoctorNum(statisticsParams, list);
+		//设置接触医生数
+		setContactDoctorNum(statisticsParams, list, contentServiceTotal);
+		//设置成功医生数
+		setSuccessDoctorNum(statisticsParams, list, contentServiceTotal);
+		//设置招募医生数
+		setRecruitmentDoctorNum(statisticsParams, list);
+		//设置覆盖医生数
+		setCoverDoctorNum(statisticsParams, list, contentServiceTotal);
+		//设置高潜力医生
+		setPotentialDoctor(statisticsParams, list, StatisticalConstant.HIGH);
+		//设置中潜力医生
+		setPotentialDoctor(statisticsParams, list,StatisticalConstant.MIDDLE);
+		//设置低潜力医生
+		setPotentialDoctor(statisticsParams, list,StatisticalConstant.LOW);
+		//设置微信回复人数
+		setWeiXin(statisticsParams, list,StatisticalConstant.REPLY);
+		//设置微信发送人数
+		setWeiXin(statisticsParams, list,StatisticalConstant.SEND);
+		//设置内容发送人数
+		setContentSendNum(statisticsParams, list);
+		//设置内容阅读人数
+		setContentReadNum(statisticsParams, list);
+		//设置内容阅读率
+		setContentReadRate(list);
+		//设置内容阅读时长
+		setContentReadTime(statisticsParams, list);
+		//增加求和列
+		addSum(list);
+		return list;
 	}
 
 	/**

@@ -16,6 +16,13 @@ public interface StatisticalService {
 	 * @param statisticsParams
 	 * @return
 	 */
-	PageResponseBean<List<StatisticsResponse>> visitStatisticsList(StatisticsParams statisticsParams);
+	List<StatisticsResponse> visitStatisticsList(StatisticsParams statisticsParams);
+
+	/**
+	 * 拜访统计列表分页
+	 * @param statisticsParams
+	 * @return
+	 */
+	PageResponseBean<List<StatisticsResponse>> visitStatisticsPage(StatisticsParams statisticsParams);
 
 }

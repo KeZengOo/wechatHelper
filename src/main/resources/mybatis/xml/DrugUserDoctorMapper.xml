@@ -31,7 +31,9 @@
 			#{drugUserId}
 		</foreach>
 		ORDER BY user_id
-		LIMIT #{currentSize},#{pageSize}
+		<if test="type==1">
+			LIMIT #{currentSize},#{pageSize}
+		</if>
 	</select>
 
 	<select id="selectDrugUserDoctorsCount" resultType="java.lang.Integer">
