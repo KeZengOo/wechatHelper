@@ -92,7 +92,10 @@ public interface DoctorCallInfoRepository extends JpaRepository<DoctorCallInfo,L
      * @param id
      */
     @Modifying
-    @Query("UPDATE DoctorCallInfo d SET d.callUrl=:url, d.statusName=:statusName WHERE d.id=:id")
-    void updateUrlRefactor(@Param("url") String url, @Param("statusName")String statusName, @Param("id") Long id);
+    @Query("UPDATE DoctorCallInfo d SET d.callUrl=:url, d.statusName=:statusName,callTime=:callTime WHERE d.id=:id")
+    void updateUrlRefactor(@Param("url") String url, 
+    		                             @Param("statusName")String statusName, 
+    		                             @Param("id") Long id, 
+    		                             @Param("callTime")Long callTime);
 
 }

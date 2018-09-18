@@ -1,5 +1,7 @@
 package com.nuoxin.virtual.rep.api.service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +39,6 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 
 	@Resource
 	private RestTemplate restTemplate;
-
 	@Resource
 	private DoctorCallInfoMapper doctorCallInfoMapper;
 	
@@ -48,13 +49,13 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 	@Override
 	public boolean callBack(ConcurrentMap<String, String> paramsMap) {
 		logger.info("执行 7moor 回调方法... params:{}", JSONObject.toJSONString(paramsMap));
-		// 线程休眠等待文件生成
+		// 线程休眠70秒等待文件生成
 		this.threadSleep();
-		// 变更通话状态,将 7moor -> 老状态
-		AlterResult alterResult = this.alterStatusName(paramsMap);
+		// 变更通话状态将 7moor 状态 -> 老状态,计算通话时长
+		ConvertResult alterResult = this.convertAttributes(paramsMap);
 		// 通用父类方法处理回调
 		boolean flag = super.processCallBack(alterResult.getSinToken(), alterResult.getStatusName(),
-				alterResult.getMonitorFilenameUrl());
+				alterResult.getMonitorFilenameUrl(), alterResult.getCallTime());
 		
 		logger.info("执行 7moor 回调方完成法完成! params:{}", JSONObject.toJSONString(paramsMap));
 		
@@ -116,12 +117,9 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
                     }catch (Exception e){
                         e.printStackTrace();
                     }
-
                 }
             }
-
         }
-        
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -131,7 +129,7 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 	 */
 	private void threadSleep() {
 		try {
-			Thread.sleep(70000); // 这个值是在 7moor 技术人员给出的1分钟基础上又加了10秒钟  
+			Thread.sleep(70); // 这个值是在 7moor 技术人员给出的1分钟基础上又加了10秒钟  
 		} catch (InterruptedException e) {
 			logger.error("InterruptedException", e);
 		}
@@ -142,33 +140,54 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 	 * @param paramsMap
 	 * @return AlterResult
 	 */
-	private AlterResult alterStatusName(ConcurrentMap<String, String> paramsMap) {
+	private ConvertResult convertAttributes(ConcurrentMap<String, String> paramsMap) {
 		// 通话记录ID,CallSheetID 是这条通话记录再DB中的唯一id 与数据库对应的字段 sin_token
 		String sinToken = paramsMap.get("CallSheetID");
+		String callType = paramsMap.get("CallType");
 		/*
 		 * 接听状态：dealing（已接）,notDeal（振铃未接听）,
 		 * leak（ivr放弃）,queueLeak（排队放弃）,blackList（黑名单）,voicemail（留言） 与数据库对应的字段
 		 * status_name
 		 */
 		String statusName = paramsMap.get("State");
+		statusName = this.convertStatusName(callType, statusName);
 		// 电话录音下载地址
 		String monitorFilenameUrl = paramsMap.get("MonitorFilename");
 		// 通话类型：dialout外呼通话,normal普通来电,transfer转接电话,dialTransfer外呼转接
-		String callType = paramsMap.get("CallType");
 		
-		logger.info("sinToken:{},通话类型:{},录音下载地址:{}", sinToken, callType, monitorFilenameUrl);
-
-		// 7moor 呼出状态-> 转成老的状态
-		if ("dialout".equalsIgnoreCase(callType)) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String begin = paramsMap.get("Begin");
+		String end = paramsMap.get("End");
+		
+		logger.info("sinToken:{},通话类型:{},录音下载地址:{},begin:{},end{}", sinToken, callType, monitorFilenameUrl, begin, end);
+		
+		ConvertResult alterResult = new ConvertResult();
+		alterResult.setSinToken(sinToken);
+		alterResult.setStatusName(statusName);
+		alterResult.setMonitorFilenameUrl(monitorFilenameUrl);
+		
+		try {
+			Date startDate = sdf.parse(begin);
+			Date endDate = sdf.parse(end);
+			long delta = (endDate.getTime() - startDate.getTime()) / 1000; 
+			
+			alterResult.setCallTime(delta);
+		} catch (ParseException e) {
+			logger.error("时间转换异常:", e);
+		}
+		
+		return alterResult;
+	}
+	
+	private String convertStatusName(String callType, String statusName) {
+		if ("dialout".equalsIgnoreCase(callType)) { // 7moor 呼出状态-> 转成老的状态
 			if ("dealing".equalsIgnoreCase(statusName)) {
 				statusName = "answer";
 			} else if ("notDeal".equalsIgnoreCase(statusName)) {
 				// notDeal（振铃未接听）
 				statusName = "cancelmakecall  ";
 			}
-		} 
-		// 7moor 呼入状态-> 转成老的状态
-		else if ("normal".equalsIgnoreCase(callType)) {
+		} else if ("normal".equalsIgnoreCase(callType)) { // 7moor 呼入状态-> 转成老的状态
 			if ("dealing".equalsIgnoreCase(statusName)) {
 				statusName = "incall";
 			} else if ("notDeal".equalsIgnoreCase(statusName)) {
@@ -177,18 +196,14 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 			}
 		}
 		
-		AlterResult alterResult = new AlterResult();
-		alterResult.setSinToken(sinToken);
-		alterResult.setStatusName(statusName);
-		alterResult.setMonitorFilenameUrl(monitorFilenameUrl);
-		
-		return alterResult;
+		return statusName;
 	}
 	
 	@Data
-	private static class AlterResult{
-		private String sinToken;
-		private String statusName;
-		private String monitorFilenameUrl;
+	private static class ConvertResult{
+		private String sinToken; // 通话唯一标识
+		private String statusName; // 状态名
+		private String monitorFilenameUrl; // 录音文件地址
+		private long callTime; // 通话时长
 	}
 }
