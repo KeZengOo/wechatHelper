@@ -1,11 +1,16 @@
 package com.nuoxin.virtual.rep.api.service.v2_5.impl;
 
+import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
+import com.nuoxin.virtual.rep.api.entity.DrugUser;
+import com.nuoxin.virtual.rep.api.mybatis.DrugUserMapper;
 import com.nuoxin.virtual.rep.api.mybatis.DynamicFieldMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.CustomerSetService;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DoctorDynamicFieldRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DynamicFieldProductRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.customer.DoctorDynamicFieldResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DynamicFieldProductResponseBean;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -21,6 +26,9 @@ public class CustomerSetServiceImpl implements CustomerSetService {
 
     @Resource
     private DynamicFieldMapper dynamicFieldMapper;
+
+    @Resource
+    private DrugUserMapper drugUserMapper;
 
     @Override
     public List<DoctorDynamicFieldResponseBean> getBasicAndHospitalFieldList() {
@@ -75,5 +83,24 @@ public class CustomerSetServiceImpl implements CustomerSetService {
 
         dynamicFieldMapper.insertDoctorDynamicField(bean);
         return bean.getId();
+    }
+
+    @Override
+    public PageResponseBean<DynamicFieldProductResponseBean> getDynamicFieldProductPage(DrugUser user, DynamicFieldProductRequestBean bean) {
+        bean.setLeaderPath(drugUserMapper.getLeaderPathById(user.getId()));
+        Integer page = bean.getPage();
+        Integer pageSize = bean.getPageSize();
+        bean.setCurrentSize(page  * pageSize);
+
+        PageResponseBean<DynamicFieldProductResponseBean> pageEmpty = new PageResponseBean<>();
+        Integer dynamicFieldProductListCount = dynamicFieldMapper.getDynamicFieldProductListCount(bean);
+        if (dynamicFieldProductListCount != null && dynamicFieldProductListCount > 0){
+            List<DynamicFieldProductResponseBean> dynamicFieldProductList = dynamicFieldMapper.getDynamicFieldProductList(bean);
+            PageResponseBean<DynamicFieldProductResponseBean> pageResponseBean = new PageResponseBean<>(bean, dynamicFieldProductListCount, dynamicFieldProductList);
+            return pageResponseBean;
+
+        }
+
+        return pageEmpty;
     }
 }

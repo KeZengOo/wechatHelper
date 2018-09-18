@@ -3,12 +3,14 @@ package com.nuoxin.virtual.rep.api.mybatis;
 import com.nuoxin.virtual.rep.api.web.controller.request.hcp.HcpBasicFieldRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorDynamicFieldValueRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DoctorDynamicFieldRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DynamicFieldProductRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.customer.DoctorDynamicFieldResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorBasicInfoResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpBasicInfoHistoryResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpDynamicRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorBasicDynamicFieldValueResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorProductDynamicFieldValueResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DynamicFieldProductResponseBean;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -147,4 +149,18 @@ public interface DynamicFieldMapper {
      * @return
      */
     List<Long> getRequiredFieldId(@Param(value = "list") List<Long> list);
+
+    /**
+     * 客户设置产品信息列表
+     * @param bean
+     * @return
+     */
+    List<DynamicFieldProductResponseBean> getDynamicFieldProductList(DynamicFieldProductRequestBean bean);
+
+    /**
+     * 客户设置产品信息列表总数
+     * @param bean
+     * @return
+     */
+    Integer getDynamicFieldProductListCount(DynamicFieldProductRequestBean bean);
 }

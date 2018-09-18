@@ -1,7 +1,11 @@
 package com.nuoxin.virtual.rep.api.service.v2_5;
 
+import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
+import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DoctorDynamicFieldRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DynamicFieldProductRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.customer.DoctorDynamicFieldResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DynamicFieldProductResponseBean;
 
 import java.util.List;
 
@@ -55,4 +59,12 @@ public interface CustomerSetService {
      * @return
      */
     Long insertProductDoctorDynamicField(DoctorDynamicFieldRequestBean bean);
+
+    /**
+     * 客户设置产品信息列表
+     * @param bean
+     * @return
+     */
+    PageResponseBean<DynamicFieldProductResponseBean> getDynamicFieldProductPage(DrugUser user,DynamicFieldProductRequestBean bean);
+
 }

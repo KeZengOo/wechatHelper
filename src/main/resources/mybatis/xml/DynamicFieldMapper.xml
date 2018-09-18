@@ -301,4 +301,54 @@
 
     </select>
 
+
+    <!-- 客户设置产品信息列表 -->
+    <select id="getDynamicFieldProductList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DynamicFieldProductResponseBean" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DynamicFieldProductRequestBean">
+        SELECT
+            t.*, (
+                SELECT
+                    mender_name
+                FROM
+                    virtual_doctor_dynamic_field vddf
+                WHERE
+                    product_id = t.productId
+                AND update_time = t.updateTime
+            ) menderName
+        FROM
+            (
+                SELECT DISTINCT
+                    pl.prod_id productId,
+                    pl.prod_name productName,
+                    date_format(
+                        MAX(vddf.update_time),
+                        '%Y-%m-%d %H:%i:%s'
+                    ) updateTime
+                FROM
+                    product_line pl
+                INNER JOIN virtual_doctor_dynamic_field vddf ON pl.prod_id = vddf.product_id
+                INNER JOIN product_user pu ON pl.prod_id = pu.prod_id
+                INNER JOIN drug_user du ON pu.user_id = du.id
+                WHERE
+                    du.leader_path LIKE #{leaderPath}
+                GROUP BY
+                    pl.prod_id
+            ) t
+            LIMIT #{currentSize},#{pageSize}
+
+    </select>
+
+
+    <!-- 客户设置产品信息列表总数 -->
+    <select id="getDynamicFieldProductListCount" resultType="java.lang.Integer" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DynamicFieldProductRequestBean">
+        SELECT
+            COUNT(DISTINCT pl.prod_id)
+        FROM
+            product_line pl
+        INNER JOIN virtual_doctor_dynamic_field vddf ON pl.prod_id = vddf.product_id
+        INNER JOIN product_user pu ON pl.prod_id = pu.prod_id
+        INNER JOIN drug_user du ON pu.user_id = du.id
+        WHERE
+            du.leader_path LIKE #{leaderPath}
+    </select>
+
 </mapper>
