@@ -125,11 +125,11 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * 线程暂停70秒
+	 * 线程暂停65秒
 	 */
 	private void threadSleep() {
 		try {
-			Thread.sleep(70); // 这个值是在 7moor 技术人员给出的1分钟基础上又加了10秒钟  
+			Thread.sleep(65000); // 这个值是在 7moor 技术人员给出的1分钟基础上又加了5秒钟  
 		} catch (InterruptedException e) {
 			logger.error("InterruptedException", e);
 		}
