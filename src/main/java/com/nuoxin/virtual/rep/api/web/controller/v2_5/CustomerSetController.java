@@ -149,4 +149,17 @@ public class CustomerSetController extends NewBaseController{
     }
 
 
+    @ApiOperation(value = "产品设置产品信息复制", notes = "产品设置产品信息复制")
+    @PostMapping(value = "/product/set/copy/{oldProductId}/{newProductId}")
+    public DefaultResponseBean<Boolean> deleteDoctorDynamicField(HttpServletRequest request,@PathVariable(value = "oldProductId") Long oldProductId, @PathVariable(value = "newProductId") Long newProductId) {
+        DrugUser user = super.getDrugUser(request);
+        if(user == null) {
+            return super.getLoginErrorResponse();
+        }
+        customerSetService.copyDynamicFieldByProductId(user, oldProductId, newProductId);
+        DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(true);
+        return responseBean;
+    }
+
 }

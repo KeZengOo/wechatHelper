@@ -12,6 +12,8 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DynamicFieldPr
 import com.nuoxin.virtual.rep.api.web.controller.response.customer.DoctorDynamicFieldResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DynamicFieldProductResponseBean;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -102,5 +104,20 @@ public class CustomerSetServiceImpl implements CustomerSetService {
         }
 
         return pageEmpty;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    public void copyDynamicFieldByProductId(DrugUser user, Long oldProductId, Long newProductId) {
+        if (oldProductId == null || newProductId == null){
+            throw new BusinessException(ErrorEnum.ERROR.getStatus(), "复制的产品ID或者被复制的产品ID不能为空");
+        }
+
+        if (oldProductId.equals(newProductId)){
+            throw new BusinessException(ErrorEnum.ERROR.getStatus(), "复制的产品ID和被复制的产品ID不能相同");
+        }
+
+        dynamicFieldMapper.deleteByProductId(newProductId);
+        dynamicFieldMapper.copyByProductId(user.getId(), user.getName(), oldProductId, newProductId);
     }
 }

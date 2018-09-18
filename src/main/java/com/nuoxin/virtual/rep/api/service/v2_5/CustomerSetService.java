@@ -67,4 +67,12 @@ public interface CustomerSetService {
      */
     PageResponseBean<DynamicFieldProductResponseBean> getDynamicFieldProductPage(DrugUser user,DynamicFieldProductRequestBean bean);
 
+    /**
+     * 根据产品复制动态字段
+     * @param user
+     * @param oldProductId
+     * @param newProductId
+     */
+    void copyDynamicFieldByProductId(DrugUser user, Long oldProductId, Long newProductId);
+
 }

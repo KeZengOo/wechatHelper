@@ -1,5 +1,6 @@
 package com.nuoxin.virtual.rep.api.mybatis;
 
+import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.web.controller.request.hcp.HcpBasicFieldRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorDynamicFieldValueRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DoctorDynamicFieldRequestBean;
@@ -163,4 +164,20 @@ public interface DynamicFieldMapper {
      * @return
      */
     Integer getDynamicFieldProductListCount(DynamicFieldProductRequestBean bean);
+
+
+    /**
+     * 根据产品ID删除
+     * @param productId
+     */
+    void deleteByProductId(@Param(value = "productId") Long productId);
+
+    /**
+     * 根据产品复制动态字段
+     * @param drugUserId 销售代表ID
+     * @param drugUserName 销售代表姓名
+     * @param oldProductId 被复制的产品ID
+     * @param newProductId 复制的产品ID
+     */
+    void copyByProductId(@Param(value = "drugUserId") Long drugUserId,@Param(value = "drugUserName") String drugUserName,@Param(value = "oldProductId") Long oldProductId,@Param(value = "newProductId") Long newProductId);
 }

@@ -351,4 +351,17 @@
             du.leader_path LIKE #{leaderPath}
     </select>
 
+    <!-- 根据产品ID删除 -->
+    <select id="deleteByProductId">
+        DELETE FROM virtual_doctor_dynamic_field WHERE product_id=#{productId}
+    </select>
+
+    <!-- 根据产品复制动态字段 -->
+    <insert id="copyByProductId">
+        INSERT INTO virtual_doctor_dynamic_field(field_name, type, field_value, classification, required, product_id, creator_id, creator_name, mender_id, mender_name)
+        SELECT field_name, type, field_value, classification, required, #{newProductId} product_id, #{drugUserId} creator_id,#{drugUserName} creator_name,#{drugUserId} mender_id, #{drugUserName} mender_name
+        FROM virtual_doctor_dynamic_field
+        WHERE product_id=#{oldProductId}
+    </insert>
+
 </mapper>
