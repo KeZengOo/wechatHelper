@@ -28,7 +28,8 @@ public class DoctorDynamicFieldController extends NewBaseController{
     @Resource(name="dynamic")
     private DoctorDynamicFieldService doctorDynamicFieldService;
 
-    @ApiOperation(value = "录入字段的对应的值", notes = "录入字段的对应的值")
+    @SuppressWarnings("unchecked")
+	@ApiOperation(value = "录入字段的对应的值", notes = "录入字段的对应的值")
     @PostMapping(value = "/value/add")
     public DefaultResponseBean<Boolean> addDoctorDynamicFieldValue(HttpServletRequest request, @RequestBody DoctorDynamicFieldValueListRequestBean bean) {
         DrugUser user = super.getDrugUser(request);
@@ -44,8 +45,8 @@ public class DoctorDynamicFieldController extends NewBaseController{
         return responseBean;
     }
 
-
-    @ApiOperation(value = "医生基本信息医院信息及录入的值", notes = "医生基本信息医院信息及录入的值")
+    @SuppressWarnings("unchecked")
+	@ApiOperation(value = "医生基本信息医院信息及录入的值", notes = "医生基本信息医院信息及录入的值")
     @PostMapping(value = "/basic")
     public DefaultResponseBean<DoctorBasicDynamicFieldValueListResponseBean> getDoctorBasicDynamicFieldValue(HttpServletRequest request, @PathVariable(value = "doctorId") Long doctorId) {
         DrugUser user = super.getDrugUser(request);
@@ -60,7 +61,8 @@ public class DoctorDynamicFieldController extends NewBaseController{
         return responseBean;
     }
 
-    @ApiOperation(value = "医生产品信息及录入的值", notes = "医生产品信息及录入的值")
+    @SuppressWarnings("unchecked")
+	@ApiOperation(value = "医生产品信息及录入的值", notes = "医生产品信息及录入的值")
     @PostMapping(value = "/product")
     public DefaultResponseBean<List<List<DoctorProductDynamicFieldValueResponseBean>>> getDoctorProductDynamicFieldValue(HttpServletRequest request, @PathVariable(value = "doctorId") Long doctorId) {
         DrugUser user = super.getDrugUser(request);
@@ -73,6 +75,5 @@ public class DoctorDynamicFieldController extends NewBaseController{
         responseBean.setData(doctorProductDynamicFieldValue);
         return responseBean;
     }
-
 
 }

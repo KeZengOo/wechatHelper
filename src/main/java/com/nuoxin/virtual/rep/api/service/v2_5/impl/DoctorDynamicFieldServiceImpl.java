@@ -1,12 +1,23 @@
 package com.nuoxin.virtual.rep.api.service.v2_5.impl;
 
-import com.alibaba.fastjson.JSONObject;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
 import com.nuoxin.virtual.rep.api.common.enums.ClassificationEnum;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.entity.v2_5.ProductDO;
 import com.nuoxin.virtual.rep.api.mybatis.DrugUserMapper;
 import com.nuoxin.virtual.rep.api.mybatis.DynamicFieldMapper;
+import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v2_5.DoctorDynamicFieldService;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorDynamicFieldValueListRequestBean;
@@ -14,17 +25,6 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorDynam
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorBasicDynamicFieldValueListResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorBasicDynamicFieldValueResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorProductDynamicFieldValueResponseBean;
-import org.apache.ibatis.builder.BuilderException;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
-
-import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * 医生动态字段相关业务接口实现
@@ -36,14 +36,14 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
 
     @Resource
     private DynamicFieldMapper dynamicFieldMapper;
-
     @Resource
     private DrugUserMapper drugUserMapper;
+    @Resource
+    private CommonService commonService;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public void addDoctorDynamicFieldValue(DoctorDynamicFieldValueListRequestBean bean) {
-
         Long doctorId = bean.getDoctorId();
         Integer classification = bean.getClassification();
         List<DoctorDynamicFieldValueRequestBean> list = bean.getList();
@@ -51,7 +51,6 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
             deleteDoctorDynamicFieldValue(doctorId, classification);
             dynamicFieldMapper.addDoctorBasicDynamicFieldValue(doctorId, list);
         }
-
     }
 
     /**
@@ -69,12 +68,10 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
             return false;
         }
 
-
         List<Long> requiredFieldId = dynamicFieldMapper.getRequiredFieldId(collectIdList);
         if (requiredFieldId == null || collectIdList.isEmpty()){
             return true;
         }
-
 
         requiredFieldId.forEach(id->{
             List<DoctorDynamicFieldValueRequestBean> collect = list.stream().filter(k -> k.getDynamicFieldId().equals(id)).filter(k -> StringUtils.isEmpty(k.getDynamicFieldValue())).collect(Collectors.toList());
@@ -84,19 +81,16 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
             }
         });
 
-
         return true;
     }
 
     @Override
     public void deleteDoctorDynamicFieldValue(Long doctorId, Integer classification) {
-
         dynamicFieldMapper.deleteDoctorDynamicFieldValue(doctorId, classification);
     }
 
     @Override
     public DoctorBasicDynamicFieldValueListResponseBean getDoctorBasicDynamicFieldValue(Long doctorId) {
-
         DoctorBasicDynamicFieldValueListResponseBean bean = new DoctorBasicDynamicFieldValueListResponseBean();
 
         List<DoctorBasicDynamicFieldValueResponseBean> doctorBasicDynamicFieldValue = dynamicFieldMapper.getDoctorBasicDynamicFieldValue(doctorId, ClassificationEnum.BASIC.getType());
@@ -115,7 +109,7 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
     @Override
     public List<List<DoctorProductDynamicFieldValueResponseBean>> getDoctorProductDynamicFieldValue(Long doctorId, Long drugUserId) {
         List<List<DoctorProductDynamicFieldValueResponseBean>> list = new ArrayList<>();
-        String leaderPath = drugUserMapper.getLeaderPathById(drugUserId);
+        String leaderPath = commonService.getLeaderPathById(drugUserId);
         List<ProductDO> productList = drugUserMapper.getSetDynamicFieldProductList(leaderPath);
         if (CollectionsUtil.isEmptyList(productList)){
             return list;
@@ -125,7 +119,6 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
         if (CollectionsUtil.isEmptyList(productIdList)){
             return list;
         }
-
 
         productIdList.forEach(productId->{
             List<DoctorProductDynamicFieldValueResponseBean> doctorProductDynamicFieldValue = dynamicFieldMapper.getDoctorProductDynamicFieldValue(doctorId, productId);
