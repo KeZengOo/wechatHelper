@@ -2,6 +2,8 @@ package com.nuoxin.virtual.rep.api.mybatis;
 
 import java.util.List;
 
+import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse;
+import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsParams;
 import org.apache.ibatis.annotations.Param;
 
 import com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitBean;
@@ -47,5 +49,12 @@ public interface VirtualDoctorCallInfoMapper {
 	 * @return 返回影响条数
 	 */
 	int updateVirtualDoctorCallInfo(VirtualDoctorCallInfoParams params);
+
+	/**
+	 * 医生拜访数
+	 * @param statisticsParams
+	 * @return 返回记录总条数
+	 */
+	List<StatisticsDrugNumResponse> geTelephoneDoctorVisitCount(StatisticsParams statisticsParams);
 }
 

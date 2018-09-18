@@ -1,5 +1,7 @@
 package com.nuoxin.virtual.rep.api.mybatis;
 
+import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse;
+import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsParams;
 import com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.message.MessageLinkmanResponseBean;
@@ -7,12 +9,14 @@ import com.nuoxin.virtual.rep.api.web.controller.response.message.MessageRespons
 import com.nuoxin.virtual.rep.api.web.controller.response.work.TodayStatisticsResponseBean;
 import io.swagger.models.auth.In;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 /**
  * Create by tiancun on 2017/10/12
  */
+@Component
 public interface MessageMapper {
 
 
@@ -48,6 +52,20 @@ public interface MessageMapper {
 
     //今日邮件会话数
     Integer emailMessageCount(MessageRequestBean bean);
+
+    /**
+     * 医生微信拜访数
+     * @param  statisticsParams
+     * @return
+     */
+    List<StatisticsDrugNumResponse> getWeiXinDoctorVisitCount(StatisticsParams statisticsParams);
+
+    /**
+     * 医生微信信息次数
+     * @param  statisticsParams
+     * @return
+     */
+    List<StatisticsDrugNumResponse> getWeiXinMessageCount(@Param(value = "statisticsParams")StatisticsParams statisticsParams,@Param(value = "wechatMessageStatus")String wechatMessageStatus);
 
 
 }
