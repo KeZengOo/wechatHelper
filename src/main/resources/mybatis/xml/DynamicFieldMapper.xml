@@ -231,7 +231,7 @@
     <!-- 得到医生产品信息动态字段填充的值 -->
     <select id="getDoctorProductDynamicFieldValue" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorProductDynamicFieldValueResponseBean">
         SELECT
-            t.*, IFNULL(t2.dynamic_field_value,'') dynamicFieldValue,
+            t.*, t2.id,IFNULL(t2.dynamic_field_value,'') dynamicFieldValue,
             IFNULL(t2.dynamic_extend_value,'') dymaicExtendValue
         FROM
             (
@@ -456,6 +456,24 @@
         SELECT COUNT(*)
         FROM virtual_doctor_dynamic_field
         WHERE product_id=#{productId}
+    </select>
+
+    <!-- 得到医生详情问卷问题列表 -->
+    <select id="getDynamicFieldQuestionList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DynamicFieldQuestionDetailResponseBean">
+        SELECT DISTINCT
+            vq.title,
+            vq.`options`,
+            vdq.answer
+        FROM
+            virtual_question vq
+        INNER JOIN virtual_doctor_questionnaire vdq ON vq.id = vdq.virtual_question_id
+        WHERE
+            vq.virtual_questionnaire_id = #{questionnaireId}
+        AND vdq.virtual_doctor_id = #{doctorId}
+        AND DATE_FORMAT(
+            vdq.create_time,
+            '%Y-%m-%d %H:%i'
+        ) = DATE_FORMAT(#{answerTime},'%Y-%m-%d %H:%i')
     </select>
 
 </mapper>

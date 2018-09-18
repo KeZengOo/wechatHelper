@@ -9,10 +9,7 @@ import com.nuoxin.virtual.rep.api.web.controller.response.customer.DoctorDynamic
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorBasicInfoResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpBasicInfoHistoryResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpDynamicRequestBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorBasicDynamicFieldValueResponseBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorProductDynamicFieldValueResponseBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DynamicFieldProductResponseBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ProductQuestionnaireResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.*;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -198,4 +195,12 @@ public interface DynamicFieldMapper {
      * @return
      */
     Integer getProductDynamicFieldCount(@Param(value = "productId") Long productId);
+
+    /**
+     * 得到医生详情问卷问题列表
+     * @param questionnaireId
+     * @param doctorId
+     * @return
+     */
+    List<DynamicFieldQuestionDetailResponseBean> getDynamicFieldQuestionList(@Param(value = "questionnaireId") Long questionnaireId,@Param(value = "doctorId") Long doctorId,@Param(value = "answerTime") String answerTime);
 }

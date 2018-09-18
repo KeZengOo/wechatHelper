@@ -6,8 +6,10 @@ import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.v2_5.DoctorDynamicFieldService;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorDynamicFieldValueListRequestBean;
 
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorQuestionnaireDetailRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorBasicDynamicFieldValueListResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorProductDynamicFieldValueResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DynamicFieldQuestionDetailResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ProductDynamicFieldQuestionnaireResponseBean;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -76,5 +78,19 @@ public class DoctorDynamicFieldController extends NewBaseController{
         responseBean.setData(doctorProductDynamicFieldValue);
         return responseBean;
     }
+
+
+    @SuppressWarnings("unchecked")
+    @ApiOperation(value = "医生产品信息问卷详情", notes = "医生产品信息问卷详情")
+    @PostMapping(value = "/product/questionnaire/detail")
+    public DefaultResponseBean<List<DynamicFieldQuestionDetailResponseBean>> getDynamicFieldQuestionList(@RequestBody DoctorQuestionnaireDetailRequestBean bean) {
+
+        List<DynamicFieldQuestionDetailResponseBean> dynamicFieldQuestionList = doctorDynamicFieldService.getDynamicFieldQuestionList(bean);
+        DefaultResponseBean<List<DynamicFieldQuestionDetailResponseBean>> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(dynamicFieldQuestionList);
+        return responseBean;
+    }
+
+
 
 }

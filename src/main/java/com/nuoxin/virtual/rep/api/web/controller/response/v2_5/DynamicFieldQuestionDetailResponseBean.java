@@ -2,6 +2,7 @@ package com.nuoxin.virtual.rep.api.web.controller.response.v2_5;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 import java.io.Serializable;
 
@@ -11,6 +12,7 @@ import java.io.Serializable;
  * @date 2018-09-18
  */
 @ApiModel(value = "医生详情产品信息问题详情")
+@Data
 public class DynamicFieldQuestionDetailResponseBean implements Serializable {
     private static final long serialVersionUID = 3150701929998936382L;
 

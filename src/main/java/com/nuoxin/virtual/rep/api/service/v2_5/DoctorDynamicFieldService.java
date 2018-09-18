@@ -1,9 +1,9 @@
 package com.nuoxin.virtual.rep.api.service.v2_5;
 
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorDynamicFieldValueListRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorQuestionnaireDetailRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorBasicDynamicFieldValueListResponseBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorBasicDynamicFieldValueResponseBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorProductDynamicFieldValueResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DynamicFieldQuestionDetailResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ProductDynamicFieldQuestionnaireResponseBean;
 
 import java.util.List;
@@ -45,5 +45,14 @@ public interface DoctorDynamicFieldService {
      * @return
      */
     List<ProductDynamicFieldQuestionnaireResponseBean> getDoctorProductDynamicFieldValue(Long doctorId, Long drugUserId);
+
+
+    /**
+     * 得到医生详情问卷问题列表
+     * @param bean
+     * @return
+     */
+    List<DynamicFieldQuestionDetailResponseBean> getDynamicFieldQuestionList(DoctorQuestionnaireDetailRequestBean bean);
+
 
 }

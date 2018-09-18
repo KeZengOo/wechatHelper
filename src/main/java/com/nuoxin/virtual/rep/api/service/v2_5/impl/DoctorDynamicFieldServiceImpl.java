@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorQuestionnaireDetailRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -134,5 +135,11 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
         });
 
         return list;
+    }
+
+    @Override
+    public List<DynamicFieldQuestionDetailResponseBean> getDynamicFieldQuestionList(DoctorQuestionnaireDetailRequestBean bean) {
+        List<DynamicFieldQuestionDetailResponseBean> dynamicFieldQuestionList = dynamicFieldMapper.getDynamicFieldQuestionList(bean.getQuestionnaireId(), bean.getDoctorId(), bean.getAnswerTime());
+        return dynamicFieldQuestionList;
     }
 }
