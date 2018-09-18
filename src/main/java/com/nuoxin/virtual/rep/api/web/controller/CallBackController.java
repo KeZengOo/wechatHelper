@@ -83,7 +83,7 @@ public class CallBackController extends BaseController {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * 将回调 GET 请求参数转换为 Map 
+	 * 将回调 GET 请求参数 -> Map 
 	 * @param request
 	 * @return
 	 */
@@ -112,15 +112,11 @@ public class CallBackController extends BaseController {
 	private void processCallBack (ConcurrentMap<String, String> paramsMap) {
 		String callSheetId = paramsMap.get("CallSheetID");
 		try {
-			boolean flag = callBackService.callBack(paramsMap);
-			if(flag) {
-				ResponseObj responseObj = new ResponseObj();
-				responseObj.setData("callback successed");
-				responseObj.setMessage("callback successed");
-				responseObj.setDescription("callback successed");
-			} else {
-				logger.error("文件处理失败响应给 7moor 500, callSheetId:{}", callSheetId);
-			}
+			callBackService.callBack(paramsMap);
+			ResponseObj responseObj = new ResponseObj();
+			responseObj.setData("callback successed");
+			responseObj.setMessage("callback successed");
+			responseObj.setDescription("callback successed");
 		} catch (Exception e) {
 			logger.error("文件处理异常响应给 7moor 500, callSheetId:{}", callSheetId, e);
 		}

@@ -47,19 +47,14 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 	 * @param paramsMap
 	 */
 	@Override
-	public boolean callBack(ConcurrentMap<String, String> paramsMap) {
+	public void callBack(ConcurrentMap<String, String> paramsMap) {
 		logger.info("执行 7moor 回调方法... params:{}", JSONObject.toJSONString(paramsMap));
-		// 线程休眠70秒等待文件生成
+	
 		this.threadSleep();
-		// 变更通话状态将 7moor 状态 -> 老状态,计算通话时长
-		ConvertResult alterResult = this.convertAttributes(paramsMap);
-		// 通用父类方法处理回调
-		boolean flag = super.processCallBack(alterResult.getSinToken(), alterResult.getStatusName(),
-				alterResult.getMonitorFilenameUrl(), alterResult.getCallTime());
+		ConvertResult alterResult = this.buildConvertResult(paramsMap);
+		super.processCallBack(alterResult);
 		
 		logger.info("执行 7moor 回调方完成法完成! params:{}", JSONObject.toJSONString(paramsMap));
-		
-		return flag;
 	}
 
 	// TODO 代码临时写，有的参数写死，待优化
@@ -140,9 +135,11 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 	 * @param paramsMap
 	 * @return AlterResult
 	 */
-	private ConvertResult convertAttributes(ConcurrentMap<String, String> paramsMap) {
-		// 通话记录ID,CallSheetID 是这条通话记录再DB中的唯一id 与数据库对应的字段 sin_token
+	private ConvertResult buildConvertResult(ConcurrentMap<String, String> paramsMap) {
+		String callNo = paramsMap.get("CallNo"); // 被叫号码
+		// 通话唯一标识
 		String sinToken = paramsMap.get("CallSheetID");
+		// 通话类型：dialout外呼通话,normal普通来电,transfer转接电话,dialTransfer外呼转接
 		String callType = paramsMap.get("CallType");
 		/*
 		 * 接听状态：dealing（已接）,notDeal（振铃未接听）,
@@ -153,7 +150,6 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 		statusName = this.convertStatusName(callType, statusName);
 		// 电话录音下载地址
 		String monitorFilenameUrl = paramsMap.get("MonitorFilename");
-		// 通话类型：dialout外呼通话,normal普通来电,transfer转接电话,dialTransfer外呼转接
 		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String begin = paramsMap.get("Begin");
@@ -161,22 +157,30 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 		
 		logger.info("sinToken:{},通话类型:{},录音下载地址:{},begin:{},end{}", sinToken, callType, monitorFilenameUrl, begin, end);
 		
-		ConvertResult alterResult = new ConvertResult();
-		alterResult.setSinToken(sinToken);
-		alterResult.setStatusName(statusName);
-		alterResult.setMonitorFilenameUrl(monitorFilenameUrl);
+		ConvertResult converResult = new ConvertResult();
+		converResult.setSinToken(sinToken);
+		converResult.setCallNo(callNo);
+		converResult.setStatusName(statusName);
+		converResult.setMonitorFilenameUrl(monitorFilenameUrl);
+		converResult.setVisitTime(begin);
+		
+		if ("dialout".equalsIgnoreCase(callType)) {
+			converResult.setType(1); // 呼出
+		} else  if ("normal".equalsIgnoreCase(callType)) {
+			converResult.setType(2); // 呼入
+		}
 		
 		try {
 			Date startDate = sdf.parse(begin);
 			Date endDate = sdf.parse(end);
 			long delta = (endDate.getTime() - startDate.getTime()) / 1000; 
 			
-			alterResult.setCallTime(delta);
+			converResult.setCallTime(delta);
 		} catch (ParseException e) {
 			logger.error("时间转换异常:", e);
 		}
 		
-		return alterResult;
+		return converResult;
 	}
 	
 	private String convertStatusName(String callType, String statusName) {
@@ -199,11 +203,15 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 		return statusName;
 	}
 	
-	@Data
-	private static class ConvertResult{
-		private String sinToken; // 通话唯一标识
-		private String statusName; // 状态名
-		private String monitorFilenameUrl; // 录音文件地址
-		private long callTime; // 通话时长
-	}
+}
+
+@Data
+class ConvertResult{
+	private String sinToken; // 通话唯一标识
+	private String statusName; // 状态名
+	private String monitorFilenameUrl; // 录音文件地址
+	private long callTime; // 通话时长
+	private int type; // 呼叫方式 
+	private String callNo; // 被叫号码
+	private String visitTime; // 拜访时间
 }

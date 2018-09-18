@@ -14,6 +14,8 @@ import com.nuoxin.virtual.rep.api.common.constant.FileConstant;
 import com.nuoxin.virtual.rep.api.common.util.StringUtils;
 import com.nuoxin.virtual.rep.api.dao.DoctorCallInfoRepository;
 import com.nuoxin.virtual.rep.api.entity.DoctorCallInfo;
+import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoParams;
+import com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorCallInfoMapper;
 
 @Transactional
 @Service
@@ -32,6 +34,8 @@ public abstract class BaseCallBackImpl implements CallBackService {
 	private OssService ossService;
 	@Resource
 	private FileService fileService;
+	@Resource
+	private VirtualDoctorCallInfoMapper callInfoMapper;
 	
 	/**
 	 * 父类通用回调处理
@@ -40,25 +44,28 @@ public abstract class BaseCallBackImpl implements CallBackService {
 	 * @param audioFileDownloadUrl 语音文件下载地址
 	 * @param callTime 通话时长
 	 */
-	protected boolean processCallBack(String sinToken, String statusName, String audioFileDownloadUrl, long callTime) {
-		DoctorCallInfo info = this.getDoctorCallInfoBySinToken(sinToken);
-		if(info == null) {
-			logger.error("无法获取 DoctorCallInfo 信息 sinToken:{}", sinToken);
-			return false;
-		}
-		
-		String callOssUrl = this.processFile(audioFileDownloadUrl, sinToken);
+	protected void processCallBack(ConvertResult result) {
+		String sinToken = result.getSinToken();
+		String audioFileDownloadUrl = result.getMonitorFilenameUrl();
+
+		String callOssUrl = this.processFile(audioFileDownloadUrl, sinToken); // 文件处理(保存至本地及上传至阿里OSS)
 		// 这里走了个补偿.即:当上传至阿里失败时写入回调时供应商传递过来的文件下载链接
-		if(StringUtils.isBlank(callOssUrl)) {
+		if (StringUtils.isBlank(callOssUrl)) {
 			callOssUrl = audioFileDownloadUrl;
 		}
-		
-		Long callId = info.getId();
-		this.updateUrl(callOssUrl, statusName, callId, callTime);
-		logger.warn("回调执行成功, 返回 true! callId:{},sinToken:{},statusName{},downloadUrl:{},callTime:{}", 
-													callId, sinToken, statusName, callOssUrl, callTime);
-		
-		return true;
+		result.setMonitorFilenameUrl(callOssUrl);
+
+		DoctorCallInfo info = this.getDoctorCallInfoBySinToken(sinToken);
+		if (info == null) {
+			logger.warn("无法获取 DoctorCallInfo 信息 sinToken:{}, 走插入表路线", sinToken);
+			this.saveCallInfo(result);
+		} else {
+			logger.warn("可以获取 DoctorCallInfo 信息 sinToken:{}, 走修改表路线", sinToken);
+			Long callId = info.getId();
+			this.updateUrl(callOssUrl, result.getStatusName(), callId, result.getCallTime());
+		}
+
+		logger.warn("回调执行成功! ,sinToken:{},downloadUrl:{}", sinToken, callOssUrl);
 	}
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -96,6 +103,20 @@ public abstract class BaseCallBackImpl implements CallBackService {
 	private void updateUrl(String callOssUrl, String statusName, Long id, Long callTime) {
 		logger.info("callUrl:{},statusName:{},id:{}", callOssUrl, statusName, id);
 		callInfoDao.updateUrlRefactor(callOssUrl, statusName, id, callTime);
+	}
+	
+	private void saveCallInfo(ConvertResult result) {
+		VirtualDoctorCallInfoParams params = new VirtualDoctorCallInfoParams();
+		params.setSinToken(result.getSinToken());
+		params.setType(result.getType());
+		params.setMobile(result.getCallNo());
+		params.setCallUrl(result.getMonitorFilenameUrl());
+		params.setStatus(1);
+		params.setStatusName(result.getStatusName());
+		params.setVisitTime(result.getVisitTime());
+		params.setCallTime(result.getCallTime());
+		
+		callInfoMapper.saveVirtualDoctorCallInfo(params);
 	}
 
 }

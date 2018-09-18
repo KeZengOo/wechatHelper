@@ -21,7 +21,7 @@ public class CallVisitBean {
 	@ApiModelProperty(value = "通话时长")
 	private Integer callTime;
 	@ApiModelProperty(value = "通话状态")
-	private String statueName;
+	private String statusName;
 	@ApiModelProperty(value = "录音URL")
 	private String callUrl;
 	@ApiModelProperty(value = "医生态度")

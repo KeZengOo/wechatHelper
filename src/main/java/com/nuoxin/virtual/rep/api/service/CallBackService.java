@@ -16,7 +16,7 @@ public interface CallBackService {
 	 * 回调业务方法
 	 * @param paramsMap 参数键值对
 	 */
-	boolean callBack(ConcurrentMap<String, String> paramsMap) throws Exception;
+	void callBack(ConcurrentMap<String, String> paramsMap) throws Exception;
 
 	/**
 	 *

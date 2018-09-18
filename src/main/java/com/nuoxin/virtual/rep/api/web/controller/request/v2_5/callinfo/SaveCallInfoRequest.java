@@ -31,7 +31,7 @@ public class SaveCallInfoRequest  extends BaseCallInfoRequest{
 	private Integer attitude;
 	
 	@NotNull(message="visitResult is null")
-	@ApiModelProperty(value = "拜访结果,以字符串数组形式传入如[\"a\",\"b\"]")
+	@ApiModelProperty(value = "拜访结果,以字符串数组形式传入具体文字如[\"成功招募\",\"成功传递\"]")
 	private List<String> visitResult;
 	
 	///////////////////////////////////////////////////////
