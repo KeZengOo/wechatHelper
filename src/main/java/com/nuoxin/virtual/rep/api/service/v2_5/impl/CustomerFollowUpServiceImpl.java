@@ -102,7 +102,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	public CustomerFollowUpPageResponseBean<List<CustomerFollowListBean>> screen(ScreenRequestBean request) {
 		CustomerFollowUpPageResponseBean pageResponseBean = null;
 		List<Long> virtualDrugUserIds = request.getVirtualDrugUserIds();
-		List<Integer> productLineIds = request.getProductLineIds();
+		List<Long> productLineIds = request.getProductLineIds();
 		
 		int count = doctorMapper.getListCount(virtualDrugUserIds, null, productLineIds);
 		if(count > 0 ) {

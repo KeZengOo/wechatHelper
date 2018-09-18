@@ -58,7 +58,7 @@ public interface DoctorMapper{
      */
     int getListCount(@Param(value = "virtualDrugUserIds") List<Long> virtualDrugUserIds,
     		                  @Param(value = "search")  String search,
-    		                  @Param(value = "productLineIds") List<Integer> productLineIds);
+    		                  @Param(value = "productLineIds") List<Long> productLineIds);
     
     /**
      * 根据过滤条件获取医生拜访列表信息(不含对应的产品信息)
@@ -73,5 +73,5 @@ public interface DoctorMapper{
     		                                                    @Param(value = "currentSize")int currentSize, 
     		                                                    @Param(value = "pageSize")int pageSize, 
     		                                                    @Param(value = "search")String search,
-    		                                                    @Param(value = "productLineIds") List<Integer> productLineIds);
+    		                                                    @Param(value = "productLineIds") List<Long> productLineIds);
 }

@@ -1,5 +1,6 @@
 package com.nuoxin.virtual.rep.api.web.controller.v2_5;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -101,12 +102,36 @@ public class CustomerFollowUpController extends NewBaseController {
 		if (CollectionsUtil.isEmptyList(virtualDrugUserIds)) {
 			return super.getParamsErrorResponse("virtualDrugUserIds is empty list");
 		}
+		
+		if (virtualDrugUserIds.size() == 1 && virtualDrugUserIds.get(0) == -1) {
+			List<DrugUserResponseBean> subordinates = drugUserProductService.getSubordinates(user.getLeaderPath());
+			if (CollectionsUtil.isNotEmptyList(subordinates)) {
+				List<Long> virtualDrugUserIdsTemp = new ArrayList<>();
+				subordinates.forEach(subordinate -> {
+					virtualDrugUserIdsTemp.add(subordinate.getId());
+				});
+				virtualDrugUserIds = virtualDrugUserIdsTemp;
+				screenRequest.setVirtualDrugUserIds(virtualDrugUserIds);
+			}
+		}
 
-		List<Integer> productLineIds = screenRequest.getProductLineIds();
+		List<Long> productLineIds = screenRequest.getProductLineIds();
 		if (CollectionsUtil.isEmptyList(productLineIds)) {
 			return super.getParamsErrorResponse("productLineIds is empty list");
 		}
-
+		
+		if (productLineIds.size() == 1 && productLineIds.get(0) == -1) {
+			List<ProductResponseBean> products = drugUserProductService.getProductsByDrugUserId(user.getLeaderPath());
+			if (CollectionsUtil.isNotEmptyList(products)) {
+				List<Long> productLineIdsTemp = new ArrayList<>();
+				products.forEach(product ->{
+					productLineIdsTemp.add(product.getProductId());
+				});
+				productLineIds = productLineIdsTemp;
+				screenRequest.setProductLineIds(productLineIds);
+			}
+		}
+		
 		CustomerFollowUpPageResponseBean<List<CustomerFollowListBean>> pageResponse = customerFollowService.screen(screenRequest);
 		DefaultResponseBean<CustomerFollowUpPageResponseBean<List<CustomerFollowListBean>>> responseBean = new DefaultResponseBean<>();
 		responseBean.setData(pageResponse);

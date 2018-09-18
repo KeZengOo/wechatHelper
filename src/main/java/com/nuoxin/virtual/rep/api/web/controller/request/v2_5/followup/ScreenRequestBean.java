@@ -29,6 +29,6 @@ public class ScreenRequestBean extends PageRequestBean {
 	 * 产品线 id
 	 */
 	@ApiModelProperty(value="产品线ids")
-	private List<Integer> productLineIds;
+	private List<Long> productLineIds;
 	
 }
