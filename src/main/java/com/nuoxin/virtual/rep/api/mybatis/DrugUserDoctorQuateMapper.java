@@ -3,6 +3,9 @@ package com.nuoxin.virtual.rep.api.mybatis;
 import java.util.List;
 
 import com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorQuateParams;
+import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse;
+import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsParams;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * drug_user_doctor Mapper 类
@@ -30,5 +33,12 @@ public interface DrugUserDoctorQuateMapper {
 	 * @return 返回影响条数
 	 */
 	int backupRelationShipInfo(DrugUserDoctorQuateParams params);
+
+	/**
+	 *
+	 * @param statisticsParams
+	 * @return 返回影响条数
+	 */
+	List<StatisticsDrugNumResponse>  getPotentialDoctorCount(@Param(value = "statisticsParams")StatisticsParams statisticsParams, @Param(value = "hcpPotential") Integer hcpPotential);
 }
 

@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,7 +40,7 @@ public class CallBackController extends BaseController {
 	private CallBackService callBackService;
 
 	/**
-	 * 七陌回调入口方法<br> 
+	 * 七陌回调入口方法 默认超时时间为10s<br> 
 	 * 参考链接 https://developer.7moor.com/event/
 	 * @param request
 	 * @param response
@@ -48,12 +49,11 @@ public class CallBackController extends BaseController {
 	@ApiOperation(value = "回调接口方法", notes = "回调接口方法")
 	@RequestMapping("/7moor")
 	public ResponseEntity<?> callback(HttpServletRequest request, HttpServletResponse response) {
-		ResponseEntity<?> responseEntity;
+		ResponseEntity<?> responseEntity = new ResponseEntity<>(HttpStatus.OK);
 		// 参数转换
 		ConcurrentMap<String, String> paramsMap = this.getParamsMap(request);
 		if (CollectionsUtil.isNotEmptyMap(paramsMap)) {
-			// 调用业务方法
-			responseEntity = this.processCallBack(paramsMap);
+			this.processCallBack(paramsMap); // 调用异步处理业务方法
 		} else {
 			logger.error("7moor 传参异常,响应给 7moor 500");
 			responseEntity = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -107,11 +107,9 @@ public class CallBackController extends BaseController {
 	/**
 	 * 调业务层方法
 	 * @param paramsMap
-	 * @return ResponseEntity<?>
 	 */
-	private ResponseEntity<?> processCallBack (ConcurrentMap<String, String> paramsMap) {
-		ResponseEntity<?> responseEntity;
-		
+	@Async
+	private void processCallBack (ConcurrentMap<String, String> paramsMap) {
 		String callSheetId = paramsMap.get("CallSheetID");
 		try {
 			boolean flag = callBackService.callBack(paramsMap);
@@ -120,18 +118,12 @@ public class CallBackController extends BaseController {
 				responseObj.setData("callback successed");
 				responseObj.setMessage("callback successed");
 				responseObj.setDescription("callback successed");
-				
-				responseEntity =  new ResponseEntity<>(responseObj, HttpStatus.OK);
 			} else {
-				responseEntity = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 				logger.error("文件处理失败响应给 7moor 500, callSheetId:{}", callSheetId);
 			}
 		} catch (Exception e) {
-			responseEntity = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 			logger.error("文件处理异常响应给 7moor 500, callSheetId:{}", callSheetId, e);
 		}
-		
-		return responseEntity;
 	}
 
 }
