@@ -2,8 +2,11 @@ package com.nuoxin.virtual.rep.api.mybatis;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorOneToOneParams;
 import com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorParams;
+import com.nuoxin.virtual.rep.api.entity.v2_5.ProductBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsParams;
 import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsResponse;
 
@@ -37,6 +40,9 @@ public interface DrugUserDoctorMapper {
 	 * @return
 	 */
 	Integer selectDrugUserDoctorsCount(StatisticsParams statisticsParams);
+	
+	List<ProductBean>getProducts(@Param(value = "virtualDrugUserId")Long virtualDrugUserId, 
+			                                          @Param(value = "virtualDoctorId")Long virtualDoctorId);
 	
 }
 

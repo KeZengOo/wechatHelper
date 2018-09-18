@@ -18,7 +18,9 @@ import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitMendBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorQuateParams;
+import com.nuoxin.virtual.rep.api.entity.v2_5.ProductBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoParams;
+import com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorMapper;
 import com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorQuateMapper;
 import com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorCallInfoMapper;
 import com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorCallInfoMendMapper;
@@ -46,9 +48,21 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	@Resource
 	private VirtualDoctorCallInfoMapper callInfoMapper;
 	@Resource
+	private DrugUserDoctorMapper drugUserDoctorMapper;
+	@Resource
 	private VirtualDoctorCallInfoMendMapper callInfoMendMapper;
 	@Resource
 	private DrugUserDoctorQuateMapper drugUserDoctorQuateMapper;
+	
+	@Override
+	public List<ProductBean> getProducts(Long virtualDrugUserId, Long virtualDoctorId) {
+		List<ProductBean> list = drugUserDoctorMapper.getProducts(virtualDrugUserId, virtualDoctorId);
+		if (list == null) {
+			list = Collections.emptyList();
+		}
+
+		return list;
+	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override

@@ -2,8 +2,11 @@ package com.nuoxin.virtual.rep.api.service.v2_5;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitBean;
+import com.nuoxin.virtual.rep.api.entity.v2_5.ProductBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.CallInfoListRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.SaveCallInfoRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.SaveCallInfoUnConnectedRequest;
@@ -35,5 +38,8 @@ public interface VirtualDoctorCallInfoService {
 	 * @return
 	 */
 	boolean saveUnconnectedCallInfo(SaveCallInfoUnConnectedRequest saveRequest);
+	
+	List<ProductBean> getProducts(Long virtualDrugUserId, Long virtualDoctorId);
+	
 	
 }

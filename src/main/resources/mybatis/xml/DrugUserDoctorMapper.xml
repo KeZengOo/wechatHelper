@@ -42,5 +42,15 @@
 			#{drugUserId}
 		</foreach>
 	</select>
+	
+	<select id="getProducts" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.ProductBean">
+		SELECT 
+			p.prod_id AS productId, prod_name AS productName 
+		FROM drug_user_doctor dud 
+		JOIN product_line p
+			ON p.prod_id=dud.prod_id 
+			AND dud.drug_user_id=#{virtualDrugUserId} 
+			AND dud.doctor_id = #{virtualDoctorId}
+	</select>
 
 </mapper>
