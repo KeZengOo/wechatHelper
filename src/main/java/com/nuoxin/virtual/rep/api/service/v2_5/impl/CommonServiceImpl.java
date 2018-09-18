@@ -32,6 +32,11 @@ public class CommonServiceImpl implements CommonService {
 		return drugUserMapper.getSubordinatesByLeaderPath(leaderPath);
 	}
 	
+	@Override
+	public String getLeaderPathById(Long drugUserId) {
+		return drugUserMapper.getLeaderPathById(drugUserId);
+	}
+	
 	/**
 	 * 将 long 类型拜访时间 -> 文字形式
 	 * @param delta

@@ -24,7 +24,14 @@ public interface CommonService {
 	  * @param leaderPath
 	  * @return
 	  */
-	 List<DrugUserResponseBean> getSubordinates(@Param("leaderPath") String leaderPath);
+	 List<DrugUserResponseBean> getSubordinates(String leaderPath);
+	 
+	 /**
+	  * 根据 drugUserId 获取 leaderPath
+	  * @param drugUserId
+	  * @return
+	  */
+	 String getLeaderPathById(Long drugUserId); 
 	 
 	 /**
 	  * 根据时间 delta 转换文字信息
