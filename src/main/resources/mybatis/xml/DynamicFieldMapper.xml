@@ -385,16 +385,45 @@
                     '%Y-%m-%d %H:%i'
                 )
                 LIMIT 1
-            ) answerQuestionCount
+            ) answerQuestionCount,
+            (
+                SELECT
+                    date_format(
+                        v1.create_time,
+                        '%Y-%m-%d %H:%i:%s'
+                    )
+                FROM
+                    virtual_doctor_questionnaire v1
+                INNER JOIN virtual_question v2 ON v1.virtual_question_id = v2.id
+                WHERE
+                    v1.virtual_doctor_id = #{doctorId}
+                AND v2.del_flag = 0
+                AND v2.virtual_questionnaire_id = t.questionnaireId
+                AND date_format(
+                    v1.create_time,
+                    '%Y-%m-%d %H:%i'
+                ) != date_format(
+                    t.answerTime,
+                    '%Y-%m-%d %H:%i'
+                )
+                ORDER BY
+                    v1.create_time DESC
+                LIMIT 1
+            ) beforeTime
         FROM
             (
                 SELECT
                     vq.id questionnaireId,
                     vq.title questionnaireName,
-                    max(vdq.create_time) answerTime,
+                    max(
+                        date_format(
+                            vdq.create_time,
+                            '%Y-%m-%d %H:%i:%s'
+                        )
+                    ) answerTime,
                     (
                         SELECT
-                            NAME
+                            `name`
                         FROM
                             drug_user
                         WHERE
@@ -414,11 +443,11 @@
                 INNER JOIN virtual_doctor_questionnaire vdq ON vq.id = vdq.virtual_questionnaire_id
                 WHERE
                     vq.product_id = #{productId}
+                AND vdq.virtual_doctor_id = #{doctorId}
                 AND vq.del_flag = 0
                 GROUP BY
                     vq.id
             ) t
-
 
     </select>
 

@@ -25,6 +25,8 @@ public class ProductQuestionnaireResponseBean implements Serializable {
     @ApiModelProperty(value = "回答时间")
     private String answerTime;
 
+    @ApiModelProperty(value = "上次调研时间")
+    private String beforeTime;
 
     @ApiModelProperty(value = "销售代表姓名")
     private String drugUserName;
