@@ -1,5 +1,6 @@
 package com.nuoxin.virtual.rep.api.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
@@ -113,6 +114,7 @@ public class MessageService extends BaseService {
         	inputStream = file.getInputStream();
             wechatMessageVos = excelUtils.readFromFile(null, inputStream);
             if (CollectionsUtil.isEmptyList(wechatMessageVos)){
+                logger.warn("微信聊天excel文件读取失败：wechatMessageVos={}", JSONObject.toJSONString(wechatMessageVos));
                 throw new FileFormatException();
             }
         } catch (Exception e) {
@@ -131,7 +133,9 @@ public class MessageService extends BaseService {
         // 得到去重后的聊天消息
         List<Message> list = getDuplicateRemovalMessageList(wechatMessageVos, doctor,  drugUser);
         //批量保存微信聊天消息
+        logger.info("开始批量插入聊天记录drugUserId={}, drugUserName={}, doctorId={}, doctorName={}, size={}", drugUser.getId(), drugUser.getName(), doctor.getId(), doctor.getName(), list.size());
         messageRepository.save(list);
+        logger.info("批量插入聊天记录结束！！");
         success = true;
         return success;
     }
@@ -151,6 +155,7 @@ public class MessageService extends BaseService {
             if (null != wechatMessageVo) {
                 String id = wechatMessageVo.getId();
                 if (StringUtils.isEmpty(id)) {
+                    logger.warn("WechatId 是{} 过滤掉这条！" ,id );
                     continue;
                 }
 
@@ -166,6 +171,7 @@ public class MessageService extends BaseService {
                 Integer count = messageMapper.getCountByTypeAndWechatNumAndTime(MessageTypeEnum.WECHAT.getMessageType(), wechatNumber, wechatTime);
                 if (count != null && count > 0){
                     //数据库存在该条数据
+                    logger.warn("数据库存在该条数据，过滤掉这条！");
                     continue;
                 }
 
@@ -198,6 +204,7 @@ public class MessageService extends BaseService {
                 wechatMessage.setNickname(nickname);
                 wechatMessage.setDrugUserId(drugUserId);
                 wechatMessage.setDoctorId(doctorId);
+                wechatMessage.setWechatId(id);
                 wechatMessage.setWechatNumber(wechatNumber);
                 wechatMessage.setTelephone(telephone);
                 wechatMessage.setWechatMessageStatus(wechatMessageStatus);
@@ -229,9 +236,9 @@ public class MessageService extends BaseService {
 
 
         String fileName = originalFilename.substring(0,originalFilename.lastIndexOf("."));
-        Matcher matcher = RegularUtils.getMatcher(RegularUtils.MATCH_TELEPHONE, fileName);
+        Matcher matcher = RegularUtils.getMatcher(RegularUtils.MATCH_ELEVEN_NUM, fileName);
         if (matcher.find()){
-            String telephone = matcher.group(0);
+            String telephone = matcher.group();
             Doctor doctor = doctorRepository.findTopByMobile(telephone);
             if (doctor == null){
                 throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "文件名中包含的手机号匹配不到医生！");

@@ -522,12 +522,12 @@
     </select>
 
     <!-- 查询消息类型，判断是否重复 -->
-    <select id="getCountByTypeAndWechatNumAndTime" resultType="com.nuoxin.virtual.rep.api.entity.Message">
+    <select id="getCountByTypeAndWechatNumAndTime" resultType="java.lang.Integer">
         SELECT COUNT(*)
         FROM virtual_message
         WHERE message_type=#{messageType}
         AND wechat_number=#{wechatNumber}
-        AND DATE_FORMAT(message_time,'%Y-%m-%d %H:%i:%s')=DATE_FORMAT(message_time,'%Y-%m-%d %H:%i:%s', messageTime)
+        AND DATE_FORMAT(message_time,'%Y-%m-%d %H:%i:%s')=DATE_FORMAT(#{wechatTime},'%Y-%m-%d %H:%i:%s')
     </select>
 
 </mapper>

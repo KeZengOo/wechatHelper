@@ -58,7 +58,7 @@ public interface MessageMapper {
      * @param messageTime
      * @return
      */
-    Integer getCountByTypeAndWechatNumAndTime(@Param(value = "messageType") Integer messageType,@Param(value = "wechatNumber") String wechatNumber,@Param(value = "messageTime") String messageTime);
+    Integer getCountByTypeAndWechatNumAndTime(@Param(value = "messageType") Integer messageType,@Param(value = "wechatNumber") String wechatNumber,@Param(value = "wechatTime") String wechatTime);
 
 
 }
