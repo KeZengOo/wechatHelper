@@ -17,6 +17,7 @@ import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitBean;
+import com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitStatisticsBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.MeetingBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorBasicResponse;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorMiniResponse;
@@ -49,6 +50,31 @@ public class CustomerFollowUpDetailController extends NewBaseController {
 	private VirtualDoctorService virtualDoctorService;
 	@Resource
 	private VirtualDoctorPushService pushService;
+	
+	@SuppressWarnings("unchecked")
+	@ApiOperation(value = "获取电话拜访列表信息(统计接通数与未接通数) TODO @田存")
+	@RequestMapping(value = { "/call/info/list/statistics/get" }, method = { RequestMethod.POST })
+	public DefaultResponseBean<CallVisitStatisticsBean> getCallVisitListStatistics(HttpServletRequest request,
+			@ApiParam("医生ID") @RequestParam(value = "doctor_id") Long virtualDoctorId) {
+		DrugUser user = this.getDrugUser(request);
+		if(user == null) {
+			return super.getLoginErrorResponse();
+		} 
+		
+		DefaultResponseBean<CallVisitStatisticsBean> responseBean = new DefaultResponseBean<>();
+		CallVisitStatisticsBean result;
+		if(virtualDoctorId == null || virtualDoctorId.equals(0L)) {
+			result = new CallVisitStatisticsBean();
+			result.setConnectedTotalNums(0);
+			result.setUnConnectedTotalNums(0);
+		} else {
+			String leaderPath = user.getLeaderPath();
+			result = callInfoService.getCallVisitListStatistics(virtualDoctorId, leaderPath);
+		}
+		
+		responseBean.setData(result);
+		return responseBean;
+	}
 	
 	@SuppressWarnings("unchecked")
 	@ApiOperation(value = "获取电话拜访列表信息(电话拜访记录)")

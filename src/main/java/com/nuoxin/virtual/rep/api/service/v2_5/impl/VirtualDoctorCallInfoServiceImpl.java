@@ -17,8 +17,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitMendBean;
+import com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitStatisticsBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorQuateParams;
-import com.nuoxin.virtual.rep.api.entity.v2_5.ProductBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoParams;
 import com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorMapper;
 import com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorQuateMapper;
@@ -55,13 +55,9 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	private DrugUserDoctorQuateMapper drugUserDoctorQuateMapper;
 	
 	@Override
-	public List<ProductBean> getProducts(Long virtualDrugUserId, Long virtualDoctorId) {
-		List<ProductBean> list = drugUserDoctorMapper.getProducts(virtualDrugUserId, virtualDoctorId);
-		if (list == null) {
-			list = Collections.emptyList();
-		}
-
-		return list;
+	public CallVisitStatisticsBean getCallVisitListStatistics(Long virtualDoctorId, String leaderPath) {
+		// TODO @田存
+		return null;
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
