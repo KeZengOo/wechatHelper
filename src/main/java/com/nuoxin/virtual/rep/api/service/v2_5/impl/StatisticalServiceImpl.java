@@ -143,7 +143,7 @@ public class StatisticalServiceImpl implements StatisticalService {
 
 	private String getRate(StatisticsResponse x) {
 		DecimalFormat df1 = new DecimalFormat("##.00%");    //##.00%   百分比格式，后面不足2位的用0补齐
-		return df1.format((float) x.getContentReadNum() / (float) x.getContentSendNum());
+		return df1.format(x.getContentSendNum()==0?0.00:(float) x.getContentReadNum() / (float) x.getContentSendNum());
 	}
 
 	/**
