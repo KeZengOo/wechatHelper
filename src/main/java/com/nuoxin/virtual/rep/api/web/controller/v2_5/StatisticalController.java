@@ -6,6 +6,7 @@ import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.v2_5.HospitalProvinceBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsParams;
 import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsResponse;
+import com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.StatisticalService;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualDoctorService;
 import com.nuoxin.virtual.rep.api.utils.ExportExcel;
@@ -38,6 +39,8 @@ public class StatisticalController extends NewBaseController {
 	
 	@Resource
 	private StatisticalService statisticalService;
+	@Resource
+	private DrugUserDoctorMapper drugUserDoctorMapper;
 	//分页
 	private int page=1;
 	//列表
@@ -95,6 +98,23 @@ public class StatisticalController extends NewBaseController {
 			e.printStackTrace();
 		}
 		return new DefaultResponseBean();
+	}
+
+	@ApiOperation(value = "根据产品id查询销售列表")
+	@RequestMapping(value = "/visit/getDrugUser/{productId}", method = { RequestMethod.GET })
+	public DefaultResponseBean<List<StatisticsResponse>> getDrugUserIdByProductId(HttpServletRequest request,
+																							   @PathVariable(value = "productId") Integer productId) {
+		DrugUser user = this.getDrugUser(request);
+		if (user == null) {
+			return super.getLoginErrorResponse();
+		}
+		if(productId==null){
+			return super.getParamsErrorResponse("ProductId is null");
+		}
+		List<StatisticsResponse> data=drugUserDoctorMapper.getDrugUserIdByProductId(productId,user.getLeaderPath());
+		DefaultResponseBean<List<StatisticsResponse>> responseBean = new DefaultResponseBean<>();
+		responseBean.setData(data);
+		return responseBean;
 	}
 
 }

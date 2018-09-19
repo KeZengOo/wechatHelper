@@ -43,6 +43,9 @@ public interface DrugUserDoctorMapper {
 	
 	List<ProductBean>getProducts(@Param(value = "virtualDrugUserId")Long virtualDrugUserId, 
 			                                          @Param(value = "virtualDoctorId")Long virtualDoctorId);
+
+	List<StatisticsResponse> getDrugUserIdByProductId(@Param(value = "productId")Integer productId,
+			                                          @Param(value = "leaderPath")String leaderPath);
 	
 }
 

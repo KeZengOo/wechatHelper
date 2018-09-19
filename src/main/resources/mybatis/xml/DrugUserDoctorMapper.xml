@@ -55,4 +55,9 @@
 			AND dud.doctor_id = #{virtualDoctorId}
 	</select>
 
+	<select id="getDrugUserIdByProductId" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsResponse">
+		SELECT DISTINCT user_id AS drugUserId,t1.name AS drugUserName FROM `product_user` t JOIN drug_user t1 ON t.user_id=t1.id
+		WHERE t.prod_id = #{productId} AND t1.status=1 AND t1.`leader_path` LIKE #{leaderPath}
+	</select>
+
 </mapper>
