@@ -40,6 +40,9 @@ public class Message extends IdEntity {
     @Column(name = "product_id")
     private Long productId;
 
+    @Column(name = "wechat_id")
+    private String wechatId;
+
     //微信号
     @Column(name = "wechat_number")
     private String wechatNumber;
@@ -188,5 +191,14 @@ public class Message extends IdEntity {
 
     public void setProductId(Long productId) {
         this.productId = productId;
+    }
+
+
+    public String getWechatId() {
+        return wechatId;
+    }
+
+    public void setWechatId(String wechatId) {
+        this.wechatId = wechatId;
     }
 }

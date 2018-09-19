@@ -8,7 +8,7 @@ public enum MessageTypeEnum {
 
     WECHAT(1,"微信"),
     IM(2,"短信"),
-    EMAIL(3,"短信");
+    EMAIL(3,"邮件");
 
     private Integer messageType;
 

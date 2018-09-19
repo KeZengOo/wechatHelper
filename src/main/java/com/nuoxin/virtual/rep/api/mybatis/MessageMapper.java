@@ -68,4 +68,14 @@ public interface MessageMapper {
     List<StatisticsDrugNumResponse> getWeiXinMessageCount(@Param(value = "statisticsParams")StatisticsParams statisticsParams,@Param(value = "wechatMessageStatus")String wechatMessageStatus);
 
 
+    /**
+     * 查询消息类型，判断是否重复
+     * @param messageType
+     * @param wechatNumber
+     * @param wechatTime
+     * @return
+     */
+    Integer getCountByTypeAndWechatNumAndTime(@Param(value = "messageType") Integer messageType,@Param(value = "wechatNumber") String wechatNumber,@Param(value = "wechatTime") String wechatTime);
+
+
 }
