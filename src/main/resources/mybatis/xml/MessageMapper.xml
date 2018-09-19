@@ -81,6 +81,9 @@
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean"
             resultType="com.nuoxin.virtual.rep.api.web.controller.response.message.MessageLinkmanResponseBean">
 
+
+
+        <!-- 2018-09-19 重构
         select
         a.doctor_id doctorId,
         a.doctorName nickname,
@@ -166,13 +169,7 @@
         ) t group by t.type,t.product_id,t.doctor_id
         ) a
         where 1=1
-       <!-- <if test="startTime !=null and startTime !=''">
-            and date_format(a.maxMessageTime,'%Y-%m-%d %H:%i:%s') &gt;=#{startTime}
-        </if>
 
-        <if test="endTime !=null and endTime !=''">
-            and date_format(a.maxMessageTime,'%Y-%m-%d %H:%i:%s') &lt;=#{endTime}
-        </if>-->
         <if test="messageType !=null and messageType !=0">
             and a.type=#{messageType}
         </if>
@@ -182,8 +179,89 @@
 
 
         order by a.maxMessageTime desc limit #{currentSize},#{pageSize}
+            -->
 
 
+        <!-- 2018-09-19 重构后 -->
+        SELECT DISTINCT
+        content_dud.doctorId,
+        content_dud.doctorName nickname,
+        vm.message_type messageType,
+        (
+        SELECT
+        MAX(
+        DATE_FORMAT(
+        message_time,
+        '%Y-%m-%d %H:%i:%s'
+        )
+        )
+        FROM
+        virtual_message
+        WHERE
+        doctor_id = content_dud.doctorId
+        AND message_type = 1
+
+        <if test="startTime !=null and startTime !=''">
+            and date_format(message_time,'%Y-%m-%d %H:%i:%s') &gt;=date_format(#{startTime},'%Y-%m-%d %H:%i:%s')
+        </if>
+
+        <if test="endTime !=null and endTime !=''">
+            and date_format(message_time,'%Y-%m-%d %H:%i:%s') &lt;=date_format(#{endTime},'%Y-%m-%d %H:%i:%s')
+        </if>
+
+
+        ) lastTime,
+        (
+        SELECT
+        message
+        FROM
+        virtual_message
+        WHERE
+        doctor_id = content_dud.doctorId
+        AND message_type = 1
+        <if test="startTime !=null and startTime !=''">
+            and date_format(message_time,'%Y-%m-%d %H:%i:%s') &gt;=date_format(#{startTime},'%Y-%m-%d %H:%i:%s')
+        </if>
+
+        <if test="endTime !=null and endTime !=''">
+            and date_format(message_time,'%Y-%m-%d %H:%i:%s') &lt;=date_format(#{endTime},'%Y-%m-%d %H:%i:%s')
+        </if>
+
+        ORDER BY
+        message_time DESC
+        LIMIT 1
+        ) lastMessage
+        FROM
+        (
+        SELECT DISTINCT
+        d.id doctorId,
+        d. NAME doctorName
+        FROM
+        doctor d
+        INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+        INNER JOIN drug_user du ON dud.drug_user_id = du.id
+        WHERE
+        du.leader_path LIKE #{leaderPath}
+        <if test="nickname !=null and nickname !=''">
+            and d.`name` like concat('%',#{nickname},'%')
+        </if>
+
+        ) content_dud
+        INNER JOIN virtual_message vm ON content_dud.doctorId = vm.doctor_id
+        AND vm.message_type=1
+        WHERE 1=1
+        <if test="startTime !=null and startTime !=''">
+            and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &gt;=date_format(#{startTime},'%Y-%m-%d %H:%i:%s')
+        </if>
+
+        <if test="endTime !=null and endTime !=''">
+            and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &lt;=date_format(#{endTime},'%Y-%m-%d %H:%i:%s')
+        </if>
+
+        <!-- 排序比较慢，暂时不加了
+        ORDER BY vm.message_time DESC
+        -->
+        LIMIT #{currentSize},#{pageSize}
 
     </select>
 
@@ -191,6 +269,7 @@
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean"
             resultType="java.lang.Integer">
 
+        <!-- 2018-09-19 重构前
         select count(1)
         from (
         select t.doctor_id,max(message_time) as maxMessageTime,t.type,t.doctorName,t.product_id from (
@@ -268,24 +347,44 @@
         ) t group by t.type,t.product_id,t.doctor_id
         ) a
         where 1=1
-        <!--<if test="startTime !=null and startTime !=''">
-            and date_format(a.maxMessageTime,'%Y-%m-%d %H:%i:%s') &gt;=#{startTime}
-        </if>
-
-        <if test="endTime !=null and endTime !=''">
-            and date_format(a.maxMessageTime,'%Y-%m-%d %H:%i:%s') &lt;=#{endTime}
-        </if>-->
         <if test="messageType !=null and messageType !=0">
             and a.type=#{messageType}
         </if>
         <if test="nickname !=null and nickname !=''">
             and a.doctorName like concat('%',#{nickname},'%')
         </if>
+         -->
 
 
+        <!-- 2018-09-19 重构后 -->
+        SELECT count(DISTINCT content_dud.doctorId)
 
+        FROM
+        (
+        SELECT DISTINCT
+        d.id doctorId,
+        d. NAME doctorName
+        FROM
+        doctor d
+        INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+        INNER JOIN drug_user du ON dud.drug_user_id = du.id
+        WHERE
+        du.leader_path LIKE #{leaderPath}
+        <if test="nickname !=null and nickname !=''">
+            and d.`name` like concat('%',#{nickname},'%')
+        </if>
 
+        ) content_dud
+        INNER JOIN virtual_message vm ON content_dud.doctorId = vm.doctor_id
+        AND vm.message_type=1
+        WHERE 1=1
+        <if test="startTime !=null and startTime !=''">
+            and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &gt;=date_format(#{startTime},'%Y-%m-%d %H:%i:%s')
+        </if>
 
+        <if test="endTime !=null and endTime !=''">
+            and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &lt;=date_format(#{endTime},'%Y-%m-%d %H:%i:%s')
+        </if>
 
 
     </select>
@@ -304,6 +403,7 @@
     <select id="getMessageList" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean"
             resultType="com.nuoxin.virtual.rep.api.web.controller.response.message.MessageResponseBean">
 
+      <!-- 2018-09-19 重构
         select
         distinct
         vm.id id,
@@ -340,19 +440,46 @@
         </if>
 
         and vm.doctor_id=#{doctorId}
-        <!--<if test="startTime !=null and endTime !=null">
-            and date_format(vm.message_time,'%Y-%m-%d') between #{startTime} and #{endTime}
-        </if>-->
-
         <if test="startTime !=null and startTime !=''">
-            and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &gt;=#{startTime}
+            and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &gt;=date_format(#{startTime},'%Y-%m-%d %H:%i:%s')
         </if>
 
         <if test="endTime !=null and endTime !=''">
-            and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &lt;=#{endTime}
+            and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &lt;=date_format(#{endTime},'%Y-%m-%d %H:%i:%s')
         </if>
         and vm.drug_user_id in (select id from drug_user where leader_path like #{leaderPath})
         order by vm.message_time desc limit #{currentSize},#{pageSize}
+        -->
+
+
+        SELECT
+        vm.id,
+        vm.user_id userId,
+        vm.user_type userType,
+        vm.nickname,
+        vm.wechat_number wechatNumer,
+        vm.telephone,
+        vm.wechat_message_status wechatMessageStatus,
+        vm.wechat_message_type wechatMessageType,
+        vm.message,
+        vm.message_type messageType,
+        vm.message_time messageTime
+        FROM
+        virtual_message vm
+        WHERE
+        vm.doctor_id = #{doctorId}
+        AND vm.message_type = #{messageType}
+
+        <if test="startTime !=null and startTime !=''">
+            and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &gt;=date_format(#{startTime},'%Y-%m-%d %H:%i:%s')
+        </if>
+
+        <if test="endTime !=null and endTime !=''">
+            and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &lt;=date_format(#{endTime},'%Y-%m-%d %H:%i:%s')
+        </if>
+
+        ORDER BY vm.message_time DESC
+        LIMIT #{currentSize},#{pageSize}
 
 
     </select>
@@ -361,6 +488,8 @@
     <select id="getMessageListCount" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean"
             resultType="java.lang.Integer">
 
+
+        <!-- 2018-09-19 重构
         select
         count(distinct vm.id)
         from virtual_message vm
@@ -395,6 +524,26 @@
             and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &lt;=#{endTime}
         </if>
         and vm.drug_user_id in (select id from drug_user where leader_path like #{leaderPath})
+        -->
+
+        SELECT
+        COUNT(*)
+        FROM
+        virtual_message vm
+        WHERE
+        vm.doctor_id = #{doctorId}
+        AND vm.message_type =#{messageType}
+
+        <if test="startTime !=null and startTime !=''">
+            and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &gt;=date_format(#{startTime},'%Y-%m-%d %H:%i:%s')
+        </if>
+
+        <if test="endTime !=null and endTime !=''">
+            and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &lt;=date_format(#{endTime},'%Y-%m-%d %H:%i:%s')
+        </if>
+
+
+
 
 
     </select>

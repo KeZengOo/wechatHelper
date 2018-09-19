@@ -260,7 +260,6 @@ public class MessageService extends BaseService {
         bean.setLeaderPath(leaderPath +"%");
         Integer page = bean.getPage();
         Integer pageSize = bean.getPageSize();
-        //bean.setPage(page  * pageSize);
         bean.setCurrentSize(page  * pageSize);
 
         List<MessageResponseBean> messageList = null;
@@ -268,13 +267,17 @@ public class MessageService extends BaseService {
         Integer messageType = bean.getMessageType();
         if (messageType != null){
             if (messageType == MessageTypeEnum.IM.getMessageType() || messageType == MessageTypeEnum.WECHAT.getMessageType()){
-                messageList = messageMapper.getMessageList(bean);
                 messageListCount = messageMapper.getMessageListCount(bean);
+                if (messageListCount != null && messageListCount > 0){
+                    messageList = messageMapper.getMessageList(bean);
+                }
             }
 
             if (messageType == MessageTypeEnum.EMAIL.getMessageType()){
-                messageList = messageMapper.getEmailMessageList(bean);
                 messageListCount = messageMapper.getEmailMessageListCount(bean);
+                if (messageListCount != null && messageListCount > 0){
+                    messageList = messageMapper.getEmailMessageList(bean);
+                }
             }
         }
 
@@ -327,27 +330,31 @@ public class MessageService extends BaseService {
         bean.setLeaderPath(leaderPath+"%");
         Integer page = bean.getPage();
         Integer pageSize = bean.getPageSize();
-        //bean.setPage(page * pageSize);
         bean.setCurrentSize(page * pageSize);
-        List<MessageLinkmanResponseBean> messageLinkmanList = messageMapper.getMessageLinkmanList(bean);
-        if (null != messageLinkmanList && !messageLinkmanList.isEmpty()){
-            for (MessageLinkmanResponseBean messageLinkmanResponseBean:messageLinkmanList){
-                Integer messageType = messageLinkmanResponseBean.getMessageType();
-                if (messageType != null){
-                    if (messageType == MessageTypeEnum.WECHAT.getMessageType() || messageType == MessageTypeEnum.IM.getMessageType()){
-                        String lastMessage = messageMapper.getLastMessage(messageType, messageLinkmanResponseBean.getDoctorId(), messageLinkmanResponseBean.getLastTime());
-                        messageLinkmanResponseBean.setLastMessage(lastMessage);
-                    }
 
-                    if (messageType == MessageTypeEnum.EMAIL.getMessageType()){
-                        String lastEmailMessage = messageMapper.getLastEmailMessage(messageLinkmanResponseBean.getDoctorId(), messageLinkmanResponseBean.getLastTime());
-                        messageLinkmanResponseBean.setLastMessage(lastEmailMessage);
+        Integer messageLinkmanListCount = messageMapper.getMessageLinkmanListCount(bean);
+        List<MessageLinkmanResponseBean> messageLinkmanList = null;
+        if (messageLinkmanListCount !=null && messageLinkmanListCount > 0){
+            messageLinkmanList = messageMapper.getMessageLinkmanList(bean);
+            if (null != messageLinkmanList && !messageLinkmanList.isEmpty()){
+                for (MessageLinkmanResponseBean messageLinkmanResponseBean:messageLinkmanList){
+                    Integer messageType = messageLinkmanResponseBean.getMessageType();
+                    if (messageType != null){
+                        if (messageType == MessageTypeEnum.WECHAT.getMessageType() || messageType == MessageTypeEnum.IM.getMessageType()){
+                            String lastMessage = messageMapper.getLastMessage(messageType, messageLinkmanResponseBean.getDoctorId(), messageLinkmanResponseBean.getLastTime());
+                            messageLinkmanResponseBean.setLastMessage(lastMessage);
+                        }
+                        if (messageType == MessageTypeEnum.EMAIL.getMessageType()){
+                            String lastEmailMessage = messageMapper.getLastEmailMessage(messageLinkmanResponseBean.getDoctorId(), messageLinkmanResponseBean.getLastTime());
+                            messageLinkmanResponseBean.setLastMessage(lastEmailMessage);
+                        }
                     }
                 }
             }
         }
 
-        Integer messageLinkmanListCount = messageMapper.getMessageLinkmanListCount(bean);
+
+
         PageResponseBean<MessageLinkmanResponseBean> pageResponseBean = new PageResponseBean<>(bean,messageLinkmanListCount, messageLinkmanList);
 
         return pageResponseBean;
