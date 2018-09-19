@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
@@ -58,6 +59,8 @@ public class ExcelUtils<E> {
 		try {
 			wb = WorkbookFactory.create(inputStream);
 			list = this.convertExcelToList(edf, wb, this.getTextToMap());
+		} catch (InvalidFormatException e){
+			throw new InvalidFormatException("非Excel格式文件,文件需要另存为Excel格式");
 		} catch (Exception e) {
 			logger.error("Exception", e);
 		} finally {

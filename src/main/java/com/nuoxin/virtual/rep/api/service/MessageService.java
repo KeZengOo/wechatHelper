@@ -20,6 +20,7 @@ import com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestB
 import com.nuoxin.virtual.rep.api.web.controller.request.vo.WechatMessageVo;
 import com.nuoxin.virtual.rep.api.web.controller.response.message.MessageLinkmanResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.message.MessageResponseBean;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -111,15 +112,17 @@ public class MessageService extends BaseService {
         List<WechatMessageVo> wechatMessageVos = null;
         InputStream inputStream = null;
         try {
-        	inputStream = file.getInputStream();
+            inputStream = file.getInputStream();
             wechatMessageVos = excelUtils.readFromFile(null, inputStream);
-            if (CollectionsUtil.isEmptyList(wechatMessageVos)){
+            if (CollectionsUtil.isEmptyList(wechatMessageVos)) {
                 logger.warn("微信聊天excel文件读取失败：wechatMessageVos={}", JSONObject.toJSONString(wechatMessageVos));
-                throw new FileFormatException();
+                throw new FileFormatException(ErrorEnum.ERROR,"Excel读取为空！");
             }
+        }catch (InvalidFormatException e){
+            throw new FileFormatException(ErrorEnum.ERROR,e.getMessage());
         } catch (Exception e) {
             logger.error("读取上传的excel文件失败。。", e);
-            throw new FileFormatException(ErrorEnum.ERROR, "读取上传的excel文件失败!");
+            throw new FileFormatException(ErrorEnum.ERROR, e.getMessage() );
         } finally {
         	if(inputStream != null) {
         		try {
