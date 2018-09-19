@@ -109,16 +109,12 @@ public class CallBackController extends BaseController {
 	 * @param paramsMap
 	 */
 	@Async
-	private void processCallBack (ConcurrentMap<String, String> paramsMap) {
+	private void processCallBack(ConcurrentMap<String, String> paramsMap) {
 		String callSheetId = paramsMap.get("CallSheetID");
 		try {
 			callBackService.callBack(paramsMap);
-			ResponseObj responseObj = new ResponseObj();
-			responseObj.setData("callback successed");
-			responseObj.setMessage("callback successed");
-			responseObj.setDescription("callback successed");
 		} catch (Exception e) {
-			logger.error("文件处理异常响应给 7moor 500, callSheetId:{}", callSheetId, e);
+			logger.error(" 7moor 回调处理异常, callSheetId:{}", callSheetId, e);
 		}
 	}
 

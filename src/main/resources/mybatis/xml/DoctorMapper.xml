@@ -83,6 +83,9 @@
     </update>
 
 	<!-- 以下是虚拟工作台 v2.5 后用到的 -->
+	<select id="getDoctorIdByMobile" resultType="java.lang.Long">
+		SELECT id FROM doctor WHERE telephone=#{mobile}
+	</select>
 	
 	<!-- 根据过滤条件获取医生总条数 -->
 	<select id="getListCount" resultType="java.lang.Integer">

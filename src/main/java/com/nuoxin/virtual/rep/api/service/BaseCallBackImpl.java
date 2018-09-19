@@ -15,6 +15,7 @@ import com.nuoxin.virtual.rep.api.common.util.StringUtils;
 import com.nuoxin.virtual.rep.api.dao.DoctorCallInfoRepository;
 import com.nuoxin.virtual.rep.api.entity.DoctorCallInfo;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoParams;
+import com.nuoxin.virtual.rep.api.mybatis.DoctorMapper;
 import com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorCallInfoMapper;
 
 @Transactional
@@ -36,6 +37,8 @@ public abstract class BaseCallBackImpl implements CallBackService {
 	private FileService fileService;
 	@Resource
 	private VirtualDoctorCallInfoMapper callInfoMapper;
+	@Resource
+	private DoctorMapper doctorMapper;
 	
 	/**
 	 * 父类通用回调处理
@@ -47,9 +50,10 @@ public abstract class BaseCallBackImpl implements CallBackService {
 	protected void processCallBack(ConvertResult result) {
 		String sinToken = result.getSinToken();
 		String audioFileDownloadUrl = result.getMonitorFilenameUrl();
-
-		String callOssUrl = this.processFile(audioFileDownloadUrl, sinToken); // 文件处理(保存至本地及上传至阿里OSS)
-		// 这里走了个补偿.即:当上传至阿里失败时写入回调时供应商传递过来的文件下载链接
+		 // 文件处理(保存至本地及上传至阿里OSS)
+		String callOssUrl = this.processFile(audioFileDownloadUrl, sinToken);
+		
+		// 这里走了补偿机制.即:当上传至阿里失败时写入回调时供应商传递过来的文件下载链接
 		if (StringUtils.isBlank(callOssUrl)) {
 			callOssUrl = audioFileDownloadUrl;
 		}
@@ -115,6 +119,12 @@ public abstract class BaseCallBackImpl implements CallBackService {
 		params.setStatusName(result.getStatusName());
 		params.setVisitTime(result.getVisitTime());
 		params.setCallTime(result.getCallTime());
+		
+		Long virtualDoctorId = doctorMapper.getDoctorIdByMobile(result.getCallNo());
+		if (virtualDoctorId == null) {
+			virtualDoctorId = 0L;
+		}
+		params.setVirtualDoctorId(virtualDoctorId);
 		
 		callInfoMapper.saveVirtualDoctorCallInfo(params);
 	}

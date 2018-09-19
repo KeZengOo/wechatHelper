@@ -48,6 +48,8 @@ public interface DoctorMapper{
     void updateFixedHospital(HcpDynamicRequestBean bean);
     
     ////////////////// 以下是 v2.5 使用到的//////////////////
+    
+	Long getDoctorIdByMobile(@Param(value = "mobile") String mobile);
 
     /**
      * 根据过滤条件获取医生总条数

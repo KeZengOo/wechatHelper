@@ -67,9 +67,9 @@
 	<insert id="saveVirtualDoctorCallInfo" keyProperty="callId" useGeneratedKeys="true"
 		parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoParams">
 		INSERT INTO virtual_doctor_call_info
-		(sin_token, mobile, type, status, status_name, create_time, call_url, call_time)
+		(sin_token, virtual_doctor_id, mobile, type, status, status_name, create_time, call_url, call_time)
 		VALUES
-		(#{sinToken}, #{mobile}, #{type}, #{status}, #{statusName}, #{visitTime}, #{callUrl}, #{callTime})
+		(#{sinToken}, #{virtualDoctorId}, #{mobile}, #{type}, #{status}, #{statusName}, #{visitTime}, #{callUrl}, #{callTime})
 	</insert>
 	
 	<update id="updateVirtualDoctorCallInfo" parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoParams">
