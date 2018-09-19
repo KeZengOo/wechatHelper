@@ -234,11 +234,12 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		Integer virtualQuestinairedId = null;
 		if (saveRequest instanceof SaveCallInfoRequest) { // 接通
 			SaveCallInfoRequest saveCallInfoRequest = (SaveCallInfoRequest) saveRequest;
+			callVisitParams.setAttitude(saveCallInfoRequest.getAttitude());
+			callVisitParams.setCallUrl(((SaveCallInfoRequest) saveRequest).getCallUrl());
 		
 			String visitResult = JSONObject.toJSONString(saveCallInfoRequest.getVisitResult());
 			callVisitParams.setVisitResult(visitResult);
-			callVisitParams.setAttitude(saveCallInfoRequest.getAttitude());
-
+			
 			virtualQuestinairedId = saveCallInfoRequest.getVirtualQuestionaireId();
 		} else { // 未接通
 			virtualQuestinairedId = 0;

@@ -33,6 +33,8 @@ public class SaveCallInfoRequest  extends BaseCallInfoRequest{
 	@NotNull(message="visitResult is null")
 	@ApiModelProperty(value = "拜访结果,以字符串数组形式传入具体文字如[\"成功招募\",\"成功传递\"]")
 	private List<String> visitResult;
+	@ApiModelProperty(value = "通话录音地址")
+	private String callUrl;
 	
 	///////////////////////////////////////////////////////
 	
