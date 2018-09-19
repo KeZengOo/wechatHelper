@@ -22,4 +22,11 @@ public interface DoctorMendMapper {
 	 * @return
 	 */
 	int updateDoctorMend(VirtualDoctorMendParams virtualDoctorMendParams);
+
+	/**
+	 * 查询医生扩展信息
+	 * @param virtualDoctorMendParams
+	 * @return
+	 */
+	Long getDoctorMend(VirtualDoctorMendParams virtualDoctorMendParams);
 }

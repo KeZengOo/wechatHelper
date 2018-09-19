@@ -180,4 +180,29 @@
 		ORDER BY visitTime DESC <!-- OTHER ORDER BY TODO  -->
 		LIMIT #{currentSize},#{pageSize}
 	</select>
+
+	<select id="selectDoctorByMobiles" resultType="com.nuoxin.virtual.rep.api.entity.Doctor">
+		select id,email,name,hospital_id hospitalId,hospital_name hospitalName,provice,city,depart department,telephone mobile,positions doctorLevel,
+		create_time createTime,status,master_data_id masterDataId
+		FROM doctor t
+		WHERE
+		t.telephone IN
+		<foreach collection="mobiles" item="mobile" open="(" close=")" separator=",">
+			#{mobile}
+		</foreach>
+	</select>
+
+	<insert id="saveDoctor" keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO doctor
+		( email, name, hospital_id,hospital_name,provice,city,depart,telephone,positions,create_time,status,master_data_id)
+		VALUES
+		( #{email}, #{name}, #{hospitalId}, #{hospitalName}, #{province}, #{city}, #{department}, #{mobile}, #{doctorLevel},now(),1,#{masterDataId})
+	</insert>
+
+	<update id="updateDoctor" >
+		UPDATE doctor SET email=#{email},name=#{name},hospital_id=#{hospitalId},
+		hospital_name=#{hospitalName},provice=#{province},city=#{city},depart=#{department},telephone=#{mobile},
+		positions=#{doctorLevel},master_data_id=#{masterDataId}
+		WHERE id=#{id}
+	</update>
 </mapper>

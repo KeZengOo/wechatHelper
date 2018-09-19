@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class VirtualDoctorMendParams {
-	private int id;
+	private long id;
 	private long virtualDoctorId;
 	private String wechat;
 	private String address;

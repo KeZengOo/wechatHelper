@@ -2,6 +2,7 @@ package com.nuoxin.virtual.rep.api.mybatis;
 
 import java.util.List;
 
+import com.nuoxin.virtual.rep.api.entity.Doctor;
 import org.apache.ibatis.annotations.Param;
 
 import com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean;
@@ -76,4 +77,24 @@ public interface DoctorMapper{
     		                                                    @Param(value = "pageSize")int pageSize, 
     		                                                    @Param(value = "search")String search,
     		                                                    @Param(value = "productLineIds") List<Long> productLineIds);
+    /**
+     * 根据手机号列表查询医生
+     * @param mobiles
+     * @return
+     */
+    List<Doctor> selectDoctorByMobiles(@Param(value = "mobiles") List<String> mobiles);
+
+    /**
+     * 保存医生
+     * @param doctor
+     * @return
+     */
+    int saveDoctor(Doctor doctor);
+
+    /**
+     * 修改医生
+     * @param doctor
+     * @return
+     */
+    int updateDoctor(Doctor doctor);
 }

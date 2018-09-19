@@ -16,6 +16,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,7 +35,7 @@ import java.util.List;
  */
 @Api(value = "V2.5统计分析")
 @RequestMapping(value = "/statistics")
-@RestController
+@Controller
 public class StatisticalController extends NewBaseController {
 	
 	@Resource
@@ -47,6 +48,7 @@ public class StatisticalController extends NewBaseController {
 	private int list=2;
 
 	@ApiOperation(value = "拜访记录列表")
+	@ResponseBody
 	@RequestMapping(value = "/visit/statisticsList", method = { RequestMethod.POST })
 	public DefaultResponseBean<PageResponseBean<List<StatisticsResponse>>> visitStatisticsList(HttpServletRequest request,
 			@RequestBody StatisticsParams statisticsParams) {
@@ -69,17 +71,17 @@ public class StatisticalController extends NewBaseController {
 
 	@ApiOperation(value = "拜访记录列表导出")
 	@RequestMapping(value = "/visit/statisticsListExportExcel", method = { RequestMethod.POST })
-	public DefaultResponseBean statisticsListExportExcel(HttpServletRequest request, HttpServletResponse response,
+	public void statisticsListExportExcel(HttpServletRequest request, HttpServletResponse response,
 																							   @RequestBody StatisticsParams statisticsParams) {
 		DrugUser user = this.getDrugUser(request);
 		if (user == null) {
-			return super.getLoginErrorResponse();
+			return ;
 		}
 		if(statisticsParams.getProductId()==null){
-			return super.getParamsErrorResponse("ProductId is null");
+			return ;
 		}
 		if(statisticsParams.getDrugUserIds()==null||statisticsParams.getDrugUserIds().isEmpty()){
-			return super.getParamsErrorResponse("DrugUserIds is null");
+			return ;
 		}
 		String fileName="医生拜访统计表 "+statisticsParams.getStartTime()+"-"+statisticsParams.getEndTime();
 		statisticsParams.setType(list);
@@ -97,10 +99,10 @@ public class StatisticalController extends NewBaseController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return new DefaultResponseBean();
 	}
 
 	@ApiOperation(value = "根据产品id查询销售列表")
+	@ResponseBody
 	@RequestMapping(value = "/visit/getDrugUser/{productId}", method = { RequestMethod.GET })
 	public DefaultResponseBean<List<StatisticsResponse>> getDrugUserIdByProductId(HttpServletRequest request,
 																							   @PathVariable(value = "productId") Integer productId) {

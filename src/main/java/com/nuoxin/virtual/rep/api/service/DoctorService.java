@@ -12,6 +12,7 @@ import com.nuoxin.virtual.rep.api.entity.*;
 import com.nuoxin.virtual.rep.api.entity.v2_5.DoctorExcelBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.HospitalProvinceBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorMendParams;
+import com.nuoxin.virtual.rep.api.mybatis.DoctorMapper;
 import com.nuoxin.virtual.rep.api.mybatis.DoctorMendMapper;
 import com.nuoxin.virtual.rep.api.mybatis.DoctorVirtualMapper;
 import com.nuoxin.virtual.rep.api.mybatis.HospitalMapper;
@@ -73,6 +74,9 @@ public class DoctorService extends BaseService {
 
     @Autowired
     private DoctorVirtualMapper doctorVirtualMapper;
+
+    @Autowired
+    private DoctorMapper doctorMapper;
 
     private int add=0;
     private int update=1;
@@ -718,7 +722,7 @@ public class DoctorService extends BaseService {
         List<Doctor> doctors = new ArrayList<>();
         if (!mobiles.isEmpty()) {
             //查询手机号在库里的数据
-            doctors = this.findByMobileIn(mobiles);
+            doctors =doctorMapper.selectDoctorByMobiles(mobiles);
         }
         for (DoctorExcelBean excel:list) {
             Doctor doctor=new Doctor();
@@ -729,9 +733,9 @@ public class DoctorService extends BaseService {
             int type = (doctor.getId()==null||doctor.getId()==0L)?add:update;
             HospitalProvinceBean hos =this.saveHospital(excel);
             //保存医生信息
-            saveDoctor(excel, doctor,hos);
+            saveDoctor(excel, doctor,hos,type);
             //保存医生扩展表
-            saveDcotorMend(excel,doctor.getId(),type);
+            saveDcotorMend(excel,doctor.getId());
             //保存医生手机号关系表
             saveDoctorTelephone(doctor, type);
             //保存医生级别关系表
@@ -746,16 +750,17 @@ public class DoctorService extends BaseService {
      * 保存医生扩展信息
      * @param excel
      * @param id
-     * @param type
      */
-    private void saveDcotorMend(DoctorExcelBean excel, Long id,int type) {
+    private void saveDcotorMend(DoctorExcelBean excel, Long id) {
         VirtualDoctorMendParams virtualDoctorMendParams = new VirtualDoctorMendParams();
         virtualDoctorMendParams.setAddress(excel.getAddress());
         virtualDoctorMendParams.setFixedPhone(excel.getFixedPhone());
         virtualDoctorMendParams.setVirtualDoctorId(id);
-        if(type==add){
+        Long mendId=doctorMendMapper.getDoctorMend(virtualDoctorMendParams);
+        if(null==mendId){
             doctorMendMapper.saveDoctorMend(virtualDoctorMendParams);
         }else{
+            virtualDoctorMendParams.setId(mendId);
             doctorMendMapper.updateDoctorMend(virtualDoctorMendParams);
         }
     }
@@ -799,7 +804,7 @@ public class DoctorService extends BaseService {
      * @param doctor
      * @return
      */
-    private Doctor saveDoctor(DoctorExcelBean excel, Doctor doctor,HospitalProvinceBean hos) {
+    private Doctor saveDoctor(DoctorExcelBean excel, Doctor doctor,HospitalProvinceBean hos,int type) {
         doctor.setHospitalId((long)hos.getId());
         if(excel.getCustomerCode()!=null){
             doctor.setMasterDataId(excel.getCustomerCode());
@@ -811,7 +816,12 @@ public class DoctorService extends BaseService {
         doctor.setDepartment(excel.getDepartment());
         doctor.setMobile(excel.getMobile());
         doctor.setStatus(1);
-        return doctorRepository.saveAndFlush(doctor);
+        if(type==add){
+            doctorMapper.saveDoctor(doctor);
+        }else{
+            doctorMapper.updateDoctor(doctor);
+        }
+        return doctor;
     }
 
     /**

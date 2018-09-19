@@ -12,5 +12,9 @@
 	<update id="updateDoctorMend" >
 		UPDATE doctor_mend SET address=#{address},fixed_phone=#{fixedPhone} WHERE virtual_doctor_id=#{virtualDoctorId}
 	</update>
+
+	<select id="getDoctorMend" resultType="java.lang.Long">
+		SELECT id FROM doctor_mend  WHERE virtual_doctor_id=#{virtualDoctorId}
+	</select>
 	
 </mapper>
