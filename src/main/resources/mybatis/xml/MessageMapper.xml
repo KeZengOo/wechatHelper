@@ -617,6 +617,8 @@
 
 
     <select id="messageCount" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean" resultType="java.lang.Integer">
+
+        <!-- 2018-09-19 重构前
         select
         count(distinct vm.doctor_id)
         from virtual_message vm
@@ -646,6 +648,30 @@
                 and du.leader_path like #{leaderPath}
             )
         and vm.drug_user_id in (select id from drug_user where leader_path like #{leaderPath})
+        -->
+
+
+        <!-- 2018-09-19 重构后 -->
+
+        SELECT
+        COUNT(DISTINCT vm.doctor_id)
+        FROM
+        (
+        SELECT DISTINCT
+        d.id doctorId,
+        d. NAME doctorName
+        FROM
+        doctor d
+        INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+        INNER JOIN drug_user du ON dud.drug_user_id = du.id
+        WHERE
+        du.leader_path LIKE #{leaderPath}
+        ) content_dud
+        INNER JOIN virtual_message vm ON content_dud.doctorId = vm.doctor_id
+        AND vm.message_type = 1
+        WHERE
+        DATE_FORMAT(vm.message_time, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d')
+
 
 
     </select>

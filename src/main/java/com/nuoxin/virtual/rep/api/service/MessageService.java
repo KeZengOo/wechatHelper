@@ -304,15 +304,21 @@ public class MessageService extends BaseService {
         bean.setLeaderPath(leaderPath +"%");
         bean.setMessageType(MessageTypeEnum.WECHAT.getMessageType());
         Integer wechatCount = messageMapper.messageCount(bean);
-        bean.setMessageType(MessageTypeEnum.IM.getMessageType());
-        Integer imCount = messageMapper.messageCount(bean);
-        Integer emailMessageCount = messageMapper.emailMessageCount(bean);
-        if (emailMessageCount == null){
-            emailMessageCount=0;
-        }
-        map.put("wechat", wechatCount);
+//        bean.setMessageType(MessageTypeEnum.IM.getMessageType());
+//        Integer imCount = messageMapper.messageCount(bean);
+//        Integer emailMessageCount = messageMapper.emailMessageCount(bean);
+//        if (emailMessageCount == null){
+//            emailMessageCount=0;
+//        }
+
+        // 现在只有微信
+        /*map.put("wechat", wechatCount);
         map.put("im", imCount);
-        map.put("email",emailMessageCount);
+        map.put("email",emailMessageCount);*/
+
+        map.put("wechat", wechatCount);
+        map.put("im", 0);
+        map.put("email",0);
 
         return map;
     }
