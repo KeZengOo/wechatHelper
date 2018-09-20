@@ -97,8 +97,8 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 
 		String leaderPatnTemp = leaderPath + "%";
 		list.forEach(listBean ->{
-			List<ProductInfoResponse> productInfoList = drugUserDoctorQuateMapper
-					.getProductInfoList(Long.valueOf(listBean.getDoctorId()), leaderPatnTemp);
+			List<ProductInfoResponse> productInfoList = drugUserDoctorQuateMapper.getProductInfoList(listBean.getDoctorId(),
+					leaderPatnTemp);
 			if (CollectionsUtil.isNotEmptyList(productInfoList)){
 				listBean.setProductInfos(productInfoList);
 			}

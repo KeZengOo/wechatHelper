@@ -22,7 +22,7 @@ public class CustomerFollowListBean implements Serializable {
     private static final long serialVersionUID = 9122147743030730987L;
     
     @ApiModelProperty(value = "医生ID")
-    private String doctorId;
+    private Long doctorId;
     @ApiModelProperty(value = "医生姓名")
     private String doctorName;
     @ApiModelProperty(value = "医生性别")
