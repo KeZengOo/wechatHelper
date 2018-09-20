@@ -215,6 +215,7 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 			DoctorVirtualParams param = new DoctorVirtualParams();
 			param.setVirtualDoctorId(virtualDoctorId); // 设置关联关系
 			param.setHcpLevel(doctorVirtual.getHcpLevel()); // 虚拟代表指定的医生等级
+			param.setProductId(doctorVirtual.getProductLineId());
 			list.add(param);
 		}
 

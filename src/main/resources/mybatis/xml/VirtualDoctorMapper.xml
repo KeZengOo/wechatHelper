@@ -75,10 +75,10 @@
 	
 	<insert id="saveDoctorVirtuals">
 		INSERT INTO doctor_virtual 
-			(doctor_id, client_level)
+			(doctor_id, client_level, product_id)
 		VALUES 
 		<foreach collection ="list" item="item" separator =",">
-        	(#{item.virtualDoctorId}, #{item.hcpLevel}) 
+        	(#{item.virtualDoctorId}, #{item.hcpLevel}, #{item.productId}) 
     	</foreach >
 	</insert>
 </mapper>

@@ -6,4 +6,5 @@ import lombok.Data;
 public class DoctorVirtualParams {
 	private long virtualDoctorId;
 	private String hcpLevel;
+	private long productId;
 }
