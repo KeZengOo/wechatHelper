@@ -126,7 +126,7 @@
 		<!-- 根据 virtualDrugUserIds 获取对应医生基本信息 -->
 		SELECT 
 			d.id AS doctorId, d.name AS doctorName, d.telephone AS doctorMobile, 
-			d. sex AS gender, d.depart AS department, d.hospital_name AS hospitalName,
+			d. sex AS gender, d.depart AS department, d.hospital_name AS hospitalName,d.email,
 			tel_visit.create_time AS visitTime,tel_visit.next_visit_time AS nextVisitTime,tel_visit.visit_result AS visitResult,
 			dm.wechat, dm.secondary_mobile AS secondaryDoctorMobile, dm.thirdary_mobile AS thirdaryDoctorMobile
 		FROM doctor d 
