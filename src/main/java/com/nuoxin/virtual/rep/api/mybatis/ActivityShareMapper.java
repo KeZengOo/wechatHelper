@@ -2,6 +2,10 @@ package com.nuoxin.virtual.rep.api.mybatis;
 
 import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse;
 import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsParams;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.share.ShareRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ContentCommentResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ContentShareResponseBean;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -46,5 +50,28 @@ public interface ActivityShareMapper {
 	 * @return 返回记录总条数
 	 */
 	List<StatisticsDrugNumResponse> getContentReadTimeCount(StatisticsParams statisticsParams);
+
+	/**
+	 * 内容推送记录列表
+	 * @param bean
+	 * @return
+	 */
+	List<ContentShareResponseBean> getContentShareList(ShareRequestBean bean);
+
+	/**
+	 * 内容推送记录列表总数
+	 * @param bean
+	 * @return
+	 */
+	Integer getContentShareListCount(ShareRequestBean bean);
+
+	/**
+	 * 得到内容的评论
+	 * @param doctorId
+	 * @param contentId
+	 * @return
+	 */
+	List<ContentCommentResponseBean> getContentCommentList(@Param(value = "doctorId") Long doctorId,@Param(value = "contentId") Long contentId);
+
 }
 

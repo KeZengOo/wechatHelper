@@ -25,7 +25,7 @@ public class PageRequestBean implements Serializable {
 	@ApiModelProperty(value="每页多少条，默认10条")
 	private int pageSize = DEFAULT_SIZE;
 
-	@ApiModelProperty(value="不用传")
+	@ApiModelProperty(value="前端不用传")
 	private Integer currentSize;
 
 	public int getPage() {
