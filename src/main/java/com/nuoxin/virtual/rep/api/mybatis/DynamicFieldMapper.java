@@ -197,6 +197,13 @@ public interface DynamicFieldMapper {
     Integer getProductDynamicFieldCount(@Param(value = "productId") Long productId);
 
     /**
+     * 得到产品下动态字段
+     * @param productId
+     * @return
+     */
+    List<String> getProductDynamicField(@Param(value = "productId") Integer productId);
+
+    /**
      * 得到医生详情问卷问题列表
      * @param questionnaireId
      * @param doctorId

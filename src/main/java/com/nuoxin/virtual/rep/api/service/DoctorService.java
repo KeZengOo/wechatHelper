@@ -743,6 +743,7 @@ public class DoctorService extends BaseService {
             //添加关系到医生代表产品关系表
             saveDrugUserDoctor(productId, drugUserMap, excel, doctor);
         }
+        doctorRepository.updateVirtualDoctorId();
         return true;
     }
 

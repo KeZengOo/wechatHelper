@@ -476,4 +476,11 @@
         ) = DATE_FORMAT(#{answerTime},'%Y-%m-%d %H:%i')
     </select>
 
+    <!-- 得到指定产品下的字段列表 -->
+    <select id="getProductDynamicField" resultType="java.lang.String">
+        SELECT field_name name
+        FROM virtual_doctor_dynamic_field
+        WHERE product_id=#{productId} order by id
+    </select>
+
 </mapper>
