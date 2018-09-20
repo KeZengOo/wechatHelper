@@ -115,8 +115,8 @@
   		<if test="search != null">
   			WHERE 
 			d.name LIKE "%"#{search,jdbcType=VARCHAR}"%" 
-			OR d.telephone=#{search,jdbcType=VARCHAR} 
-			OR d.depart=#{search,jdbcType=VARCHAR}
+			OR d.telephone LIKE "%"#{search,jdbcType=VARCHAR}"%" 
+			OR d.depart LIKE "%"#{search,jdbcType=VARCHAR}"%"
   		</if>
   		
 	</select>
@@ -155,8 +155,8 @@
 	  	<if test="search != null">
   			AND (
   				d.name LIKE "%"#{search,jdbcType=VARCHAR}"%" 
-				OR d.telephone=#{search,jdbcType=VARCHAR} 
-				OR d.depart=#{search,jdbcType=VARCHAR}
+				OR d.telephone LIKE "%"#{search,jdbcType=VARCHAR} "%"
+				OR d.depart LIKE "%"#{search,jdbcType=VARCHAR}"%"
 			)
   		</if>
 		

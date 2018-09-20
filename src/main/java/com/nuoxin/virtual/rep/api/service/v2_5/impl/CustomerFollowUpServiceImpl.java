@@ -85,26 +85,6 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		return pageResponse;
 	}
 
-	/**
-	 * 填充上产品信息
-	 * @param list
-	 * @return
-	 */
-	private void fillProductInfos(List<CustomerFollowListBean> list, String leaderPath) {
-		if (CollectionsUtil.isEmptyList(list)){
-			return;
-		}
-
-		String leaderPatnTemp = leaderPath + "%";
-		list.forEach(listBean ->{
-			List<ProductInfoResponse> productInfoList = drugUserDoctorQuateMapper.getProductInfoList(listBean.getDoctorId(),
-					leaderPatnTemp);
-			if (CollectionsUtil.isNotEmptyList(productInfoList)){
-				listBean.setProductInfos(productInfoList);
-			}
-		});
-	}
-
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public CustomerFollowUpPageResponseBean<List<CustomerFollowListBean>> search(SearchRequestBean request, String leaderPath) {
@@ -171,6 +151,26 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		}
 
 		return new CustomerFollowUpPageResponseBean(pageRequestBean, count, list);
+	}
+	
+	/**
+	 * 填充上产品信息
+	 * @param list
+	 * @return
+	 */
+	private void fillProductInfos(List<CustomerFollowListBean> list, String leaderPath) {
+		if (CollectionsUtil.isEmptyList(list)){
+			return;
+		}
+
+		String leaderPatnTemp = leaderPath + "%";
+		list.forEach(listBean ->{
+			List<ProductInfoResponse> productInfoList = drugUserDoctorQuateMapper.getProductInfoList(listBean.getDoctorId(),
+					leaderPatnTemp);
+			if (CollectionsUtil.isNotEmptyList(productInfoList)){
+				listBean.setProductInfos(productInfoList);
+			}
+		});
 	}
 	
 	/**
