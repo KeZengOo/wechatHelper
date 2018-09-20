@@ -291,7 +291,38 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		nextVisitTime.setLabel("下次拜访时间");
 		nextVisitTime.setName("nextVisitTimeStr");
 		tableHeaders.add(nextVisitTime);
+		
+		//////产品信息//////
 
-		// TODO 补全产品信息 @田存
+		TableHeader productInfo = new TableHeader();
+		productInfo.setLabel("产品信息");
+		productInfo.setName("productInfo");
+		tableHeaders.add(productInfo);
+		
+		TableHeader product = new TableHeader();
+		product.setLabel("产品");
+		product.setName("product");
+		tableHeaders.add(product);
+		
+		TableHeader isRecruit = new TableHeader();
+		isRecruit.setLabel("是否招募");
+		isRecruit.setName("isRecruit");
+		tableHeaders.add(isRecruit);
+		
+		TableHeader hcpPotential = new TableHeader();
+		hcpPotential.setLabel("医生潜力");
+		hcpPotential.setName("hcpPotential");
+		tableHeaders.add(hcpPotential);
+		
+		TableHeader hcpLevel = new TableHeader();
+		hcpLevel.setLabel("客户等级");
+		hcpLevel.setName("hcpLevel");
+		tableHeaders.add(hcpLevel);
+		
+		TableHeader isHasDrug = new TableHeader();
+		hcpLevel.setLabel("是否有药");
+		isHasDrug.setName("isHasDrug");
+		tableHeaders.add(isHasDrug);
+		
 	}
 }
