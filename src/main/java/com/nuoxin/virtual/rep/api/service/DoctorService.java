@@ -836,10 +836,7 @@ public class DoctorService extends BaseService {
         virtual.setCreateTime(new Date());
         virtual.setProductId(productId);
         Long id=doctorVirtualMapper.getDoctorVirtualByDoctorId(virtual);
-        if(id!=null){
-            virtual.setId(id);
-            doctorVirtualMapper.updateDoctorVirtual(virtual);
-        }else{
+        if(id==null){
             doctorVirtualMapper.saveDoctorVirtual(virtual);
         }
     }
