@@ -70,8 +70,8 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 				long startTime = System.currentTimeMillis();
 				List<CustomerFollowListBean> list = doctorMapper.getList(virtualDrugUserIds, currentSize, pageSize, null, null);
 				if (CollectionsUtil.isNotEmptyList(list)){
-					// 填充上产品信息
-					list = fillProductInfos(list, leaderPath);
+					// 填充产品信息
+					this.fillProductInfos(list, leaderPath);
 				}
 
 				long endTime = System.currentTimeMillis();
@@ -90,21 +90,19 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	 * @param list
 	 * @return
 	 */
-	private List<CustomerFollowListBean> fillProductInfos(List<CustomerFollowListBean> list, String leaderPath) {
+	private void fillProductInfos(List<CustomerFollowListBean> list, String leaderPath) {
 		if (CollectionsUtil.isEmptyList(list)){
-			return list;
+			return;
 		}
 
-		leaderPath = leaderPath + "%";
-		for (CustomerFollowListBean customerFollowListBean:list){
-			List<ProductInfoResponse> productInfoList = drugUserDoctorQuateMapper.getProductInfoList(Long.valueOf(customerFollowListBean.getDoctorId()), leaderPath);
+		String leaderPatnTemp = leaderPath + "%";
+		list.forEach(listBean ->{
+			List<ProductInfoResponse> productInfoList = drugUserDoctorQuateMapper
+					.getProductInfoList(Long.valueOf(listBean.getDoctorId()), leaderPatnTemp);
 			if (CollectionsUtil.isNotEmptyList(productInfoList)){
-				customerFollowListBean.setProductInfos(productInfoList);
+				listBean.setProductInfos(productInfoList);
 			}
-		}
-
-
-		return list;
+		});
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
