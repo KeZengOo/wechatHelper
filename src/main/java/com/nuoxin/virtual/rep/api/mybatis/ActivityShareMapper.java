@@ -73,5 +73,25 @@ public interface ActivityShareMapper {
 	 */
 	List<ContentCommentResponseBean> getContentCommentList(@Param(value = "doctorId") Long doctorId,@Param(value = "contentId") Long contentId);
 
+	/**
+	 * 新增分享类型
+	 * @param shareId
+	 * @param shareStatus
+	 */
+	void addShareStatus(@Param(value = "shareId") Long shareId,@Param(value = "shareStatus") Integer shareStatus);
+
+	/**
+	 * 更新分享类型
+	 * @param shareId
+	 * @param shareStatus
+	 */
+	void updateShareStatus(@Param(value = "shareId") Long shareId,@Param(value = "shareStatus") Integer shareStatus);
+
+	/**
+	 * 查询分享类型，判断是否已经存在
+	 * @param shareId
+	 * @return
+	 */
+	Integer getShareStatusCount(@Param(value = "shareId") Long shareId);
 }
 

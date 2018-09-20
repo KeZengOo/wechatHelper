@@ -201,5 +201,22 @@
 			create_time DESC
 	</select>
 
+	<insert id="addShareStatus">
+		INSERT INTO activity_share_extend(activity_share_id, share_status)
+		VALUES(#{shareId}, #{shareStatus})
+	</insert>
+
+
+	<update id="updateShareStatus">
+		UPDATE activity_share_extend SET share_status=#{shareStatus}
+		WHERE activity_share_id=#{shareId}
+	</update>
+
+	<select id="getShareStatusCount" resultType="java.lang.Integer">
+		SELECT COUNT(*)
+		FROM activity_share_extend
+		WHERE activity_share_id=#{shareId}
+	</select>
+
 
 </mapper>
