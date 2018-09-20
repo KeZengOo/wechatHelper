@@ -116,7 +116,7 @@ public class ControllerAssist {
 	public ResponseEntity<DefaultResponseBean<?>> handleSQLException(HttpServletRequest request, Exception exception, Locale locale) {
 		logger.info("{}", exception);
 		ErrorEnum error = ErrorEnum.ERROR;
-		return ResponseEntity.ok(DefaultResponseBean.clone(error.getMessage(), error.getStatus(), "数据库操作异常"));
+		return ResponseEntity.ok(DefaultResponseBean.clone(error.getMessage(), error.getStatus(), exception.getCause().toString()));
 	}
 
 
