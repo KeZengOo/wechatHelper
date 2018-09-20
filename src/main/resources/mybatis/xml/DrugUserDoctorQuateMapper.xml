@@ -53,5 +53,34 @@
 		AND product_id=#{statisticsParams.productId} and is_available=1 and hcp_potential=#{hcpPotential}
 		GROUP BY drug_user_id
 	</select>
+
+	<!-- 医生的产品信息，每个医生只取两条 -->
+	<select id="getProductInfoList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ProductInfoResponse">
+		SELECT
+			a.prod_name productName,
+			qudq.is_recruit isRecruit,
+			qudq.hcp_potential doctorPotential,
+			dv.client_level doctorLevel,
+			qudq.is_has_drug isHasDrug
+		FROM
+			(
+				SELECT DISTINCT
+					pl.prod_id,
+					pl.prod_name
+				FROM
+					drug_user du
+				INNER JOIN drug_user_doctor dud ON du.id = dud.drug_user_id
+				INNER JOIN product_line pl ON dud.prod_id = pl.prod_id
+				WHERE
+					dud.is_available = 1
+				AND dud.doctor_id = #{doctorId}
+				AND du.leader_path LIKE #{leaderPath}
+				LIMIT 2
+			) a
+		LEFT JOIN drug_user_doctor_quate qudq ON a.prod_id = qudq.product_id
+		AND qudq.doctor_id = #{doctorId}
+		LEFT JOIN doctor_virtual dv ON a.prod_id = dv.product_id
+		AND dv.doctor_id = #{doctorId}
+	</select>
 		
 </mapper>

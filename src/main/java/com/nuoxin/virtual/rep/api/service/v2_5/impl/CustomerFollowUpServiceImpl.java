@@ -7,6 +7,8 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorQuateMapper;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ProductInfoResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -37,7 +39,10 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	private static final Logger logger = LoggerFactory.getLogger(CustomerFollowUpServiceImpl.class);
 	
 	private static final List<TableHeader> tableHeaders = new ArrayList<>(15);
-	
+
+	@Resource
+	private DrugUserDoctorQuateMapper drugUserDoctorQuateMapper;
+
 	/**
 	 * 初始化表头信息
 	 */
@@ -64,6 +69,11 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 				int pageSize = pageRequest.getPageSize();
 				long startTime = System.currentTimeMillis();
 				List<CustomerFollowListBean> list = doctorMapper.getList(virtualDrugUserIds, currentSize, pageSize, null, null);
+				if (CollectionsUtil.isNotEmptyList(list)){
+					// 填充上产品信息
+					list = fillProductInfos(list, leaderPath);
+				}
+
 				long endTime = System.currentTimeMillis();
 				logger.info("list 耗时{}", (endTime-startTime) ,"ms");
 				
@@ -73,6 +83,28 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		
 		this.compensate(pageRequest, pageResponse);
 		return pageResponse;
+	}
+
+	/**
+	 * 填充上产品信息
+	 * @param list
+	 * @return
+	 */
+	private List<CustomerFollowListBean> fillProductInfos(List<CustomerFollowListBean> list, String leaderPath) {
+		if (CollectionsUtil.isEmptyList(list)){
+			return list;
+		}
+
+		leaderPath = leaderPath + "%";
+		for (CustomerFollowListBean customerFollowListBean:list){
+			List<ProductInfoResponse> productInfoList = drugUserDoctorQuateMapper.getProductInfoList(Long.valueOf(customerFollowListBean.getDoctorId()), leaderPath);
+			if (CollectionsUtil.isNotEmptyList(productInfoList)){
+				customerFollowListBean.setProductInfos(productInfoList);
+			}
+		}
+
+
+		return list;
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })

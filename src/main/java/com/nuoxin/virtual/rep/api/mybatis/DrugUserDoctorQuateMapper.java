@@ -5,6 +5,7 @@ import java.util.List;
 import com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorQuateParams;
 import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse;
 import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsParams;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ProductInfoResponse;
 import org.apache.ibatis.annotations.Param;
 
 /**
@@ -40,5 +41,13 @@ public interface DrugUserDoctorQuateMapper {
 	 * @return 返回影响条数
 	 */
 	List<StatisticsDrugNumResponse>  getPotentialDoctorCount(@Param(value = "statisticsParams")StatisticsParams statisticsParams, @Param(value = "hcpPotential") Integer hcpPotential);
+
+	/**
+	 * 医生的产品信息，每个医生只取两条
+	 * @param doctorId
+	 * @param leaderPath
+	 * @return
+	 */
+	List<ProductInfoResponse> getProductInfoList(@Param(value = "doctorId") Long doctorId,@Param(value = "leaderPath") String leaderPath);
 }
 
