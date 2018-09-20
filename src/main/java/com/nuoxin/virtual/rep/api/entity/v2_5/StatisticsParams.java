@@ -20,6 +20,10 @@ public class StatisticsParams extends PageRequestBean {
 	 */
 	private List<Integer> drugUserIds;
 	/**
+	 * 销售代表id
+	 */
+	private Integer drugUserId;
+	/**
 	 * 开始时间
 	 */
 	private String startTime;

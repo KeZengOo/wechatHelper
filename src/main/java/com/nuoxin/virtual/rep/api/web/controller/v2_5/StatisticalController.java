@@ -2,6 +2,7 @@ package com.nuoxin.virtual.rep.api.web.controller.v2_5;
 
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
+import com.nuoxin.virtual.rep.api.common.util.StringUtils;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.v2_5.DynamicFieldResponse;
 import com.nuoxin.virtual.rep.api.entity.v2_5.HospitalProvinceBean;
@@ -21,6 +22,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -29,10 +31,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 医生 Controller 类
@@ -47,14 +46,12 @@ public class StatisticalController extends NewBaseController {
 	private StatisticalService statisticalService;
 	@Resource
 	private DrugUserDoctorMapper drugUserDoctorMapper;
-	@Resource
-	private DynamicFieldMapper dynamicFieldMapper;
 	//分页
 	private int page=1;
 	//列表
 	private int list=2;
 
-	@ApiOperation(value = "拜访记录列表")
+	@ApiOperation(value = "医生拜访统计列表")
 	@ResponseBody
 	@RequestMapping(value = "/visit/statisticsList", method = { RequestMethod.POST })
 	public DefaultResponseBean<PageResponseBean<List<StatisticsResponse>>> visitStatisticsList(HttpServletRequest request,
@@ -76,22 +73,33 @@ public class StatisticalController extends NewBaseController {
 		return responseBean;
 	}
 
-	@ApiOperation(value = "拜访记录列表导出")
-	@RequestMapping(value = "/visit/statisticsListExportExcel", method = { RequestMethod.POST })
-	public void statisticsListExportExcel(HttpServletRequest request, HttpServletResponse response,
-																							   @RequestBody StatisticsParams statisticsParams) {
-		DrugUser user = this.getDrugUser(request);
-		if (user == null) {
+	@ApiOperation(value = "医生拜访统计表导出")
+	@RequestMapping(value = "/visit/statisticsListExportExcel", method = { RequestMethod.GET })
+	public void statisticsListExportExcel( HttpServletRequest request, HttpServletResponse response,
+										  Integer productId,String drugUserIds,String startTime,String endTime) {
+		/*DrugUser user = this.getDrugUser(request);*/
+		/*if (user == null) {
+			return ;
+		}*/
+		if(productId==null){
 			return ;
 		}
-		if(statisticsParams.getProductId()==null){
+		if(drugUserIds==null|| drugUserIds==""){
 			return ;
 		}
-		if(statisticsParams.getDrugUserIds()==null||statisticsParams.getDrugUserIds().isEmpty()){
-			return ;
+		List<Integer> ids=new ArrayList<>();
+		for(String str : drugUserIds.split(",")) {
+			int i = Integer.valueOf(str);
+			ids.add(i);
 		}
-		String fileName="医生拜访统计表 "+statisticsParams.getStartTime()+"-"+statisticsParams.getEndTime();
+		StatisticsParams statisticsParams=new StatisticsParams();
+		statisticsParams.setEndTime(endTime);
+		statisticsParams.setStartTime(startTime);
 		statisticsParams.setType(list);
+		statisticsParams.setDrugUserIds(ids);
+		statisticsParams.setProductId(productId);
+		String fileName="医生拜访统计表 "+statisticsParams.getStartTime()+"-"+statisticsParams.getEndTime()+".xls";
+
 		List<StatisticsResponse> list=statisticalService.visitStatisticsList(statisticsParams);
 		HSSFWorkbook wb=ExportExcel.excelExport(list, ExportExcelTitle.getStatisticsListTitleMap(),"医生拜访统计表");
 		OutputStream ouputStream = null;
@@ -107,6 +115,26 @@ public class StatisticalController extends NewBaseController {
 			e.printStackTrace();
 		}
 	}
+
+	@ApiOperation(value = "医生拜访明细列表")
+	@ResponseBody
+	@RequestMapping(value = "/visit/doctorVisitDetailList", method = { RequestMethod.POST })
+	public DefaultResponseBean<PageResponseBean<List<LinkedHashMap<String,Object>>>> doctorVisitDetailList(HttpServletRequest request,
+																							   @RequestBody StatisticsParams statisticsParams) {
+		DrugUser user = this.getDrugUser(request);
+		if (user == null) {
+			return super.getLoginErrorResponse();
+		}
+		if(statisticsParams.getProductId()==null){
+			return super.getParamsErrorResponse("ProductId is null");
+		}
+		statisticsParams.setType(page);
+		PageResponseBean<List<LinkedHashMap<String,Object>>> page=statisticalService.doctorVisitDetailPage(statisticsParams);
+		DefaultResponseBean<PageResponseBean<List<LinkedHashMap<String,Object>>>> responseBean = new DefaultResponseBean<>();
+		responseBean.setData(page);
+		return responseBean;
+	}
+
 
 	@ApiOperation(value = "根据产品id查询销售列表")
 	@ResponseBody
@@ -138,37 +166,7 @@ public class StatisticalController extends NewBaseController {
 		if(productId==null){
 			return super.getParamsErrorResponse("ProductId is null");
 		}
-		Map<String, String> map=new LinkedHashMap<>();
-		map.put("drugUserName","代表");
-		map.put("visitTime","拜访时间");
-		map.put("doctorId","医生ID");
-		map.put("doctorName","医生姓名");
-		map.put("hospital","医院");
-		map.put("visitType","拜访方式");
-		map.put("shareContent","分享内容");
-		map.put("visitResult","拜访结果");
-		map.put("attitude","医生态度");
-		map.put("nextVisitTime","下次拜访时间");
-		List<DynamicFieldResponse> list=new ArrayList<>();
-		map.forEach((k,v)->{
-			DynamicFieldResponse t= new DynamicFieldResponse();
-			t.setLable(v);
-			t.setProp(k);
-			list.add(t);
-		});
-		DynamicFieldResponse t= new DynamicFieldResponse();
-		t.setLable(productName);
-		t.setProp("product");
-		List<String> data=dynamicFieldMapper.getProductDynamicField(productId);
-		List<DynamicFieldResponse> fieldlist=new ArrayList<>();
-		for(int i=0;i<data.size();i++){
-			DynamicFieldResponse xx= new DynamicFieldResponse();
-			xx.setLable(data.get(i));
-			xx.setProp("field"+(i+1));
-			fieldlist.add(xx);
-		}
-		t.setChildren(fieldlist);
-		list.add(t);
+		List<DynamicFieldResponse> list=statisticalService.getDynamicFieldByProductId(productId,productName);
 		DefaultResponseBean<List<DynamicFieldResponse>> responseBean = new DefaultResponseBean<>();
 		responseBean.setData(list);
 		return responseBean;
