@@ -1,11 +1,13 @@
 package com.nuoxin.virtual.rep.api.mybatis;
 
+import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsParams;
 import com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.call.CallInfoResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.work.TodayStatisticsResponseBean;
 import org.apache.ibatis.annotations.Param;
 
 
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -44,4 +46,18 @@ public interface DoctorCallInfoMapper {
      * @param signToken
      */
     void updateCallUrlBySigToken(@Param(value = "callUrl") String callUrl, @Param(value = "sinToken") String signToken);
+
+    /**
+     * 医生拜访明细表
+     * @param statisticsParams
+     * @return
+     */
+    List<LinkedHashMap<String,Object>> getDoctorVisitDetailList(StatisticsParams statisticsParams);
+
+    /**
+     * 医生拜访明细表统计
+     * @param statisticsParams
+     * @return
+     */
+    int getDoctorVisitDetailListCount(StatisticsParams statisticsParams);
 }

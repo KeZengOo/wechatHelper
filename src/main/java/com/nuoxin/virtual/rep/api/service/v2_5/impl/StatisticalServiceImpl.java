@@ -3,12 +3,14 @@ package com.nuoxin.virtual.rep.api.service.v2_5.impl;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.constant.StatisticalConstant;
 import com.nuoxin.virtual.rep.api.common.constant.VisitResultConstant;
+import com.nuoxin.virtual.rep.api.entity.v2_5.DynamicFieldResponse;
 import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse;
 import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsParams;
 import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsResponse;
 import com.nuoxin.virtual.rep.api.mybatis.*;
 import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v2_5.StatisticalService;
+import com.nuoxin.virtual.rep.api.utils.ArithUtil;
 import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +20,9 @@ import javax.annotation.Resource;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -39,9 +43,51 @@ public class StatisticalServiceImpl implements StatisticalService {
 	private ActivityShareMapper activityShareMapper;
 	@Autowired
 	private DrugUserDoctorQuateMapper drugUserDoctorQuateMapper;
+	@Autowired
+	private DoctorCallInfoMapper doctorCallInfoMapper;
+	@Resource
+	private DynamicFieldMapper dynamicFieldMapper;
 
 	/**
-	 * 列表
+	 * 医生拜访明细表·分页
+	 * @param statisticsParams
+	 * @return
+	 */
+	@Override
+	public PageResponseBean<List<LinkedHashMap<String,Object>>> doctorVisitDetailPage(StatisticsParams statisticsParams) {
+		int total=doctorCallInfoMapper.getDoctorVisitDetailListCount(statisticsParams);
+		List<LinkedHashMap<String,Object>> list =new ArrayList<>();
+		if(total>0){
+			list=getDoctorVisitDetailList(statisticsParams);
+		}
+		return new PageResponseBean(statisticsParams, total, list);
+	}
+
+	/**
+	 * 医生拜访明细表·列表
+	 * @param statisticsParams
+	 * @return
+	 */
+	@Override
+	public List<LinkedHashMap<String,Object>> doctorVisitDetailList(StatisticsParams statisticsParams) {
+		return getDoctorVisitDetailList(statisticsParams);
+	}
+
+	/**
+	 * 医生拜访明细表·封装list
+	 * @param statisticsParams
+	 * @return
+	 */
+	private List<LinkedHashMap<String,Object>> getDoctorVisitDetailList(StatisticsParams statisticsParams) {
+		List<LinkedHashMap<String,Object>> list=doctorCallInfoMapper.getDoctorVisitDetailList(statisticsParams);
+		return list;
+	}
+
+
+
+
+	/**
+	 * 医生拜访统计表·列表
 	 * @param statisticsParams
 	 * @return
 	 */
@@ -51,7 +97,7 @@ public class StatisticalServiceImpl implements StatisticalService {
 	}
 
 	/**
-	 * 分页
+	 * 医生拜访统计表·分页
 	 * @param statisticsParams
 	 * @return
 	 */
@@ -66,11 +112,12 @@ public class StatisticalServiceImpl implements StatisticalService {
 	}
 
 	/**
-	 * 封装list
+	 * 医生拜访统计表·封装list
 	 * @param statisticsParams
 	 * @return
 	 */
 	private List<StatisticsResponse> getStatisticsList(StatisticsParams statisticsParams) {
+
 		List<StatisticsResponse> list=drugUserDoctorMapper.selectDrugUserDoctors(statisticsParams);
 		//内容服务人数
 		List<StatisticsDrugNumResponse> contentServiceTotal=activityShareMapper.getContentServiceCount(statisticsParams);
@@ -142,8 +189,10 @@ public class StatisticalServiceImpl implements StatisticalService {
 	}
 
 	private String getRate(StatisticsResponse x) {
-		DecimalFormat df1 = new DecimalFormat("##.00%");    //##.00%   百分比格式，后面不足2位的用0补齐
-		return df1.format(x.getContentSendNum()==0?0.00:(float) x.getContentReadNum() / (float) x.getContentSendNum());
+		if(x.getContentSendNum()==0){
+			return "0.00%";
+		}
+		return ArithUtil.divPercentage((double) x.getContentReadNum(),(double) x.getContentSendNum())+"%";
 	}
 
 	/**
@@ -338,6 +387,35 @@ public class StatisticalServiceImpl implements StatisticalService {
             }
         }
 		return 0;
+	}
+
+	@Override
+	public List<DynamicFieldResponse> getDynamicFieldByProductId(Integer productId, String productName) {
+		Map<String, String> map=new LinkedHashMap<>();
+		map.put("drugUserName","代表");
+		map.put("visitTime","拜访时间");
+		map.put("doctorId","医生ID");
+		map.put("doctorName","医生姓名");
+		map.put("hospital","医院");
+		map.put("visitType","拜访方式");
+		map.put("shareContent","分享内容");
+		map.put("visitResult","拜访结果");
+		map.put("attitude","医生态度");
+		map.put("nextVisitTime","下次拜访时间");
+		map.put("nextVisitTime","客户等级");
+		List<DynamicFieldResponse> list=new ArrayList<>();
+		map.forEach((k,v)->{
+			DynamicFieldResponse t= new DynamicFieldResponse();
+			t.setLable(v);
+			t.setProp(k);
+			list.add(t);
+		});
+		DynamicFieldResponse t= new DynamicFieldResponse();
+		t.setLable(productName);
+		t.setProp("product");
+		t.setChildren(dynamicFieldMapper.getProductDynamicField(productId));
+		list.add(t);
+		return list;
 	}
 
 }

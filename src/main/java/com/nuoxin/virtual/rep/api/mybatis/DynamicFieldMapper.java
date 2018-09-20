@@ -1,6 +1,7 @@
 package com.nuoxin.virtual.rep.api.mybatis;
 
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
+import com.nuoxin.virtual.rep.api.entity.v2_5.DynamicFieldResponse;
 import com.nuoxin.virtual.rep.api.web.controller.request.hcp.HcpBasicFieldRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorDynamicFieldValueRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DoctorDynamicFieldRequestBean;
@@ -201,7 +202,7 @@ public interface DynamicFieldMapper {
      * @param productId
      * @return
      */
-    List<String> getProductDynamicField(@Param(value = "productId") Integer productId);
+    List<DynamicFieldResponse> getProductDynamicField(@Param(value = "productId") Integer productId);
 
     /**
      * 得到医生详情问卷问题列表

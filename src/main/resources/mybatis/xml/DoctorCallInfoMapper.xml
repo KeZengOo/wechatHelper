@@ -125,4 +125,98 @@
         update virtual_doctor_call_info set call_url = #{callUrl} where sin_token = #{sinToken}
     </update>
 
+    <select id="getDoctorVisitDetailList" resultType="java.util.LinkedHashMap">
+        SELECT * FROM
+        (SELECT DISTINCT t.`id`,IFNULL(t2.`name`,'') drugUserName,IFNULL(date_format(t.`create_time`, '%Y-%m-%d %H:%i:%s'),'')  visitTime,IFNULL(t3.`id`,'') doctorId,IFNULL(t3.`name`,'') doctorName,
+        IFNULL(t3.`hospital_name`,'') hospitalName,"电话" visitType,"" shareContent,IFNULL(t1.`visit_result`,'') visitResult,IFNULL(t1.`attitude`,'') attitude,IFNULL(date_format(t1.`next_visit_time`, '%Y-%m-%d %H:%i:%s'),'') nextVisitTime
+        FROM `virtual_doctor_call_info` t LEFT JOIN `virtual_doctor_call_info_mend` t1 ON t.id=t1.`call_id`
+        JOIN drug_user t2 ON t.virtual_drug_user_id=t2.`id`
+        JOIN doctor t3 ON t.`virtual_doctor_id`=t3.id
+        WHERE t.product_id=#{productId}
+        <if test="drugUserId!=null">
+            and t.virtual_drug_user_id=#{drugUserId}
+        </if>
+        <if test="startTime!=null">
+            and date_format(t.create_time,'%Y-%m-%d')&gt;=#{startTime}
+        </if>
+        <if test="endTime!=null">
+            and date_format(t.create_time,'%Y-%m-%d')&lt;=#{endTime}
+        </if>
+        <if test="contents!=null and contents.size>0">
+            and
+            <foreach collection="contents" item="content" open="(" close=")" separator="or">
+                t1.visit_result LIKE CONCAT('%',#{content},'%')
+            </foreach>
+        </if>
+        <if test="contents==null or contents.size==0">
+            UNION ALL
+            SELECT DISTINCT t.`id`,IFNULL(t3.`name`,'') drugUserName,IFNULL(date_format(t.`create_time`, '%Y-%m-%d %H:%i:%s'),'') visitTime,IFNULL(t4.`id`,'') doctorId,IFNULL(t4.`name`,'') doctorName,
+            IFNULL(t4.`hospital_name`,'') hospitalName,CASE WHEN share_type=1 THEN "微信" WHEN share_type=2 THEN "短信" WHEN share_type=3 THEN "邮件" END visitType,
+            IFNULL(t2.title,'') shareContent,"" visitResult,"" attitude,"" nextVisitTime
+            FROM `activity_share` t
+            JOIN `t_content_product` t1 ON t.`data_id`=t1.`content_id`
+            JOIN `activity_info` t2 ON t.`data_id`=t2.`data_id`
+            JOIN drug_user t3 ON t.drug_user_id=t3.`id`
+            JOIN doctor t4 ON t.`share_person_id`=t4.id
+            WHERE t1.product_id=#{productId}
+            <if test="drugUserId!=null">
+                 and t.drug_user_id=#{drugUserId}
+            </if>
+            <if test="startTime!=null">
+                and date_format(t.create_time,'%Y-%m-%d')&gt;=#{startTime}
+            </if>
+            <if test="endTime!=null">
+                and date_format(t.create_time,'%Y-%m-%d')&lt;=#{endTime}
+            </if>
+        </if>
+        ) t ORDER BY t.visitTime DESC
+        <if test="type==1">
+            LIMIT #{currentSize},#{pageSize}
+        </if>
+    </select>
+
+    <select id="getDoctorVisitDetailListCount" resultType="java.lang.Integer">
+        SELECT count(*) total FROM
+        (SELECT DISTINCT t.`id`
+        FROM `virtual_doctor_call_info` t LEFT JOIN `virtual_doctor_call_info_mend` t1 ON t.id=t1.`call_id`
+        JOIN drug_user t2 ON t.virtual_drug_user_id=t2.`id`
+        JOIN doctor t3 ON t.`virtual_doctor_id`=t3.id
+        WHERE t.product_id=#{productId}
+        <if test="drugUserId!=null">
+            and t.virtual_drug_user_id=#{drugUserId}
+        </if>
+        <if test="startTime!=null">
+            and date_format(t.create_time,'%Y-%m-%d')&gt;=#{startTime}
+        </if>
+        <if test="endTime!=null">
+            and date_format(t.create_time,'%Y-%m-%d')&lt;=#{endTime}
+        </if>
+        <if test="contents!=null and contents.size>0">
+            and
+            <foreach collection="contents" item="content" open="(" close=")" separator="or">
+                t1.visit_result LIKE CONCAT('%',#{content},'%')
+            </foreach>
+        </if>
+        <if test="contents==null or contents.size==0">
+            UNION ALL
+            SELECT DISTINCT t.`id`
+            FROM `activity_share` t
+            JOIN `t_content_product` t1 ON t.`data_id`=t1.`content_id`
+            JOIN `activity_info` t2 ON t.`data_id`=t2.`data_id`
+            JOIN drug_user t3 ON t.drug_user_id=t3.`id`
+            JOIN doctor t4 ON t.`share_person_id`=t4.id
+            WHERE t1.product_id=#{productId}
+            <if test="drugUserId!=null">
+                and t.drug_user_id=#{drugUserId}
+            </if>
+            <if test="startTime!=null">
+                and date_format(t.create_time,'%Y-%m-%d')&gt;=#{startTime}
+            </if>
+            <if test="endTime!=null">
+                and date_format(t.create_time,'%Y-%m-%d')&lt;=#{endTime}
+            </if>
+        </if>
+        ) t
+    </select>
+
 </mapper>
