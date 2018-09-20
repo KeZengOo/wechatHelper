@@ -27,6 +27,8 @@ public class CustomerFollowListBean implements Serializable {
     private String doctorName;
     @ApiModelProperty(value = "医生性别")
     private Byte gender;
+    @ApiModelProperty(value = "邮箱")
+    private String email;
     
     @JsonIgnore
     private String doctorMobile;
@@ -63,7 +65,7 @@ public class CustomerFollowListBean implements Serializable {
     @ApiModelProperty(value = "是否添加微信:0.未添加,1.已添加")
     private Integer isHasWeChat;
     
-    @ApiModelProperty(value = "产品列表,最多只有两条")
+    @ApiModelProperty(value = "产品列表,最多只有两条 @田存TODO")
 	private List<ProductInfoResponse> productInfos = new ArrayList<>(2);
    
 }

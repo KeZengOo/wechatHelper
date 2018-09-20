@@ -239,10 +239,11 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		
 			String visitResult = JSONObject.toJSONString(saveCallInfoRequest.getVisitResult());
 			callVisitParams.setVisitResult(visitResult);
-			
+			callVisitParams.setStatus(1); // 接通
 			virtualQuestinairedId = saveCallInfoRequest.getVirtualQuestionaireId();
 		} else { // 未接通
 			virtualQuestinairedId = 0;
+			callVisitParams.setStatus(0); // 未接通
 		}
 		
 		if (virtualQuestinairedId == null) {

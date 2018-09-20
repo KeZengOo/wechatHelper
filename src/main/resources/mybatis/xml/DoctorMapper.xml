@@ -126,7 +126,7 @@
 		<!-- 根据 virtualDrugUserIds 获取对应医生基本信息 -->
 		SELECT 
 			d.id AS doctorId, d.name AS doctorName, d.telephone AS doctorMobile, 
-			d. sex AS gender, d.depart AS department, d.hospital_name AS hospitalName,
+			d. sex AS gender, d.depart AS department, d.hospital_name AS hospitalName,d.email,
 			tel_visit.create_time AS visitTime,tel_visit.next_visit_time AS nextVisitTime,tel_visit.visit_result AS visitResult,
 			dm.wechat, dm.secondary_mobile AS secondaryDoctorMobile, dm.thirdary_mobile AS thirdaryDoctorMobile
 		FROM doctor d 
@@ -200,9 +200,39 @@
 	</insert>
 
 	<update id="updateDoctor" >
-		UPDATE doctor SET email=#{email},name=#{name},hospital_id=#{hospitalId},
-		hospital_name=#{hospitalName},provice=#{province},city=#{city},depart=#{department},telephone=#{mobile},
-		positions=#{doctorLevel},master_data_id=#{masterDataId}
+		UPDATE doctor
+		<trim prefix="set" suffixOverrides=",">
+			<if test="email !=null and email !=''">
+				email=#{email},
+			</if>
+			<if test="name !=null and name !=''">
+				name=#{name},
+			</if>
+			<if test="hospitalId !=null ">
+				hospital_id=#{hospitalId},
+			</if>
+			<if test="hospitalName !=null and hospitalName !=''">
+				hospital_name=#{hospitalName},
+			</if>
+			<if test="province !=null and province !=''">
+				provice=#{province},
+			</if>
+			<if test="city !=null and city !=''">
+				city=#{city},
+			</if>
+			<if test="department !=null and department !=''">
+				depart=#{department},
+			</if>
+			<if test="mobile !=null and mobile !=''">
+				telephone=#{mobile},
+			</if>
+			<if test="doctorLevel !=null ">
+				positions=#{doctorLevel},
+			</if>
+			<if test="masterDataId !=null ">
+				master_data_id=#{masterDataId},
+			</if>
+		</trim>
 		WHERE id=#{id}
 	</update>
 </mapper>

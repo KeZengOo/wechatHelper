@@ -743,6 +743,7 @@ public class DoctorService extends BaseService {
             //添加关系到医生代表产品关系表
             saveDrugUserDoctor(productId, drugUserMap, excel, doctor);
         }
+        doctorRepository.updateVirtualDoctorId();
         return true;
     }
 
@@ -835,10 +836,7 @@ public class DoctorService extends BaseService {
         virtual.setCreateTime(new Date());
         virtual.setProductId(productId);
         Long id=doctorVirtualMapper.getDoctorVirtualByDoctorId(virtual);
-        if(id!=null){
-            virtual.setId(id);
-            doctorVirtualMapper.updateDoctorVirtual(virtual);
-        }else{
+        if(id==null){
             doctorVirtualMapper.saveDoctorVirtual(virtual);
         }
     }

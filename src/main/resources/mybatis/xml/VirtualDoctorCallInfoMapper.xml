@@ -78,6 +78,7 @@
 			product_id =  #{productId} ,
 			doctor_questionnaire_id=#{doctorQuestionnaireId},
 			call_url=#{callUrl},
+			status=#{status},
 			remark=#{remark}
 		WHERE id=#{callId}
 	</update>
