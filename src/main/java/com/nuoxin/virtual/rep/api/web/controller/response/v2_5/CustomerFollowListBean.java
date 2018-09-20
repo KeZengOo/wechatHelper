@@ -65,7 +65,7 @@ public class CustomerFollowListBean implements Serializable {
     @ApiModelProperty(value = "是否添加微信:0.未添加,1.已添加")
     private Integer isHasWeChat;
     
-    @ApiModelProperty(value = "产品列表,最多只有两条")
+    @ApiModelProperty(value = "产品列表,最多只有两条 @田存TODO")
 	private List<ProductInfoResponse> productInfos = new ArrayList<>(2);
    
 }
