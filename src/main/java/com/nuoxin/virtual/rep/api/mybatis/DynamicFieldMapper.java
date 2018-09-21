@@ -1,7 +1,7 @@
 package com.nuoxin.virtual.rep.api.mybatis;
 
-import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.v2_5.DynamicFieldResponse;
+import com.nuoxin.virtual.rep.api.entity.v2_5.DynamicFieldValueResponse;
 import com.nuoxin.virtual.rep.api.web.controller.request.hcp.HcpBasicFieldRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorDynamicFieldValueRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DoctorDynamicFieldRequestBean;
@@ -14,6 +14,7 @@ import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.*;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -203,6 +204,13 @@ public interface DynamicFieldMapper {
      * @return
      */
     List<DynamicFieldResponse> getProductDynamicField(@Param(value = "productId") Integer productId);
+
+    /**
+     * 得到产品下动态字段
+     * @param productId
+     * @return
+     */
+    List<DynamicFieldValueResponse> getProductDynamicFieldValue(@Param(value = "productId") Integer productId, @Param(value = "doctorIds") Set<Integer> doctorIds);
 
     /**
      * 得到医生详情问卷问题列表
