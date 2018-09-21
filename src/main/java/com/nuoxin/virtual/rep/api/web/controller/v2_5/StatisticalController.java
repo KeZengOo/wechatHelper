@@ -46,6 +46,8 @@ public class StatisticalController extends NewBaseController {
 	private StatisticalService statisticalService;
 	@Resource
 	private DrugUserDoctorMapper drugUserDoctorMapper;
+    @Resource
+    private DynamicFieldMapper dynamicFieldMapper;
 	//分页
 	private int page=1;
 	//列表
@@ -133,6 +135,49 @@ public class StatisticalController extends NewBaseController {
 		responseBean.setData(map);
 		return responseBean;
 	}
+
+    @ApiOperation(value = "医生拜访明细表导出")
+    @RequestMapping(value = "/visit/doctorVisitDetaiListExportExcel", method = { RequestMethod.GET })
+    public void doctorVisitDetaiListExportExcel( HttpServletRequest request, HttpServletResponse response,
+                                           Integer productId,Integer drugUserId,String startTime,String endTime,String contents) {
+        if(productId==null){
+            return ;
+        }
+        StatisticsParams statisticsParams=new StatisticsParams();
+        statisticsParams.setEndTime(endTime);
+        statisticsParams.setStartTime(startTime);
+        statisticsParams.setType(list);
+        if(StringUtils.isNotEmtity(contents)){
+            List<String> contentList=Arrays.asList(contents.split(","));
+            statisticsParams.setContents(contentList);
+        }
+        statisticsParams.setProductId(productId);
+        statisticsParams.setDrugUserId(drugUserId);
+        StringBuffer fileName=new StringBuffer();
+        fileName.append("医生拜访明细表 ").append(statisticsParams.getStartTime()).append("-").append(statisticsParams.getEndTime()).append(".xls");
+        List<LinkedHashMap<String,Object>> list=statisticalService.doctorVisitDetailList(statisticsParams);
+        List<DynamicFieldResponse> titleList=dynamicFieldMapper.getProductDynamicField(productId);
+        HSSFWorkbook wb=ExportExcel.excelLinkedHashMapExport(list, ExportExcelTitle.getDoctorVisitDetaiListTitleMap(titleList),"医生拜访明细表");
+        OutputStream ouputStream = null;
+        try {
+            response.setContentType("application/vnd.ms-excel");
+            response.setHeader("Content-disposition", "attachment;filename=" + URLEncoder.encode(fileName.toString(),"UTF-8"));
+            response.setHeader("Pragma", "No-cache");
+            ouputStream = response.getOutputStream();
+            if(ouputStream!=null){
+                wb.write(ouputStream);
+            }
+            ouputStream.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally {
+            try {
+                ouputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
 
 	@ApiOperation(value = "根据产品id查询销售列表")

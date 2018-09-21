@@ -1,13 +1,11 @@
 package com.nuoxin.virtual.rep.api.utils;
 
-import com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitMendBean;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,8 +56,25 @@ public final class ExportExcel {
         initHSSFWorkbook(sheetName);
         // 表头行
         createHeadRow(titleMap);
-        // 文本行
         createContentRow(dataList, titleMap);
+        return workbook;
+    }
+
+    /**
+     *
+     * @param dataList
+     *        对象集合
+     * @param titleMap
+     *        表头信息（对象属性名称->要显示的标题值)[按顺序添加]
+     * @param sheetName
+     *        sheet名称和表头值
+     */
+    public static HSSFWorkbook excelLinkedHashMapExport(List<LinkedHashMap<String,Object>> dataList, Map<String, String> titleMap, String sheetName) {
+        // 初始化workbook
+        initHSSFWorkbook(sheetName);
+        // 表头行
+        createHeadRow(titleMap);
+        createContentRowMap(dataList, titleMap);
         return workbook;
     }
 
@@ -116,28 +131,31 @@ public final class ExportExcel {
         }
     }
 
-    public static void main(String[] args) {
-        /**模拟数据开始*/
-        List<CallVisitMendBean> staffs = new ArrayList<CallVisitMendBean>();
-        CallVisitMendBean s=new CallVisitMendBean();
-        s.setAttitude(1);
-        s.setCallId(1l);
-        s.setVisitResult("12313123");
-        staffs.add(s);
+    /**
+     *
+     * @param dataList 对象数据集合
+     * @param titleMap 表头信息
+     */
+    private static void createContentRowMap(List<LinkedHashMap<String,Object>> dataList, Map<String, String> titleMap) {
+        try {
+            int i=0;
+            for (LinkedHashMap obj : dataList) {
+                HSSFRow textRow = sheet.createRow(CONTENT_START_POSITION + i);
+                int j = 0;
+                for (String entry : titleMap.keySet()) {
+                    String value =obj.get(entry)!=null?obj.get(entry).toString():"";
+                    HSSFCell textcell = textRow.createCell(j);
+                    textcell.setCellValue(value);
+                    j++;
+                }
+                i++;
+            }
 
-        Map<String,String> titleMap = new LinkedHashMap<String,String>();
-        titleMap.put("attitude", "姓名");
-        titleMap.put("callId", "组号");
-        titleMap.put("visitResult", "年份");
-        String sheetName = "信息导出";
-        /**模拟数据结束*/
-
-        System.out.println("start导出");
-        long start = System.currentTimeMillis();
-        ExportExcel.excelExport(staffs, titleMap, sheetName);
-        long end = System.currentTimeMillis();
-        System.out.println("end导出");
-        System.out.println("耗时："+(end-start)+"ms");
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+
 
 }
