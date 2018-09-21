@@ -169,17 +169,14 @@ public class DoctorController extends BaseController {
     @ApiOperation(value = "医生excle导入", notes = "医生excle导入")
     @PostMapping("/excel")
     public DefaultResponseBean<Boolean> excel(MultipartFile file,
-                                              HttpServletRequest request, HttpServletResponse response){
+                                              String productId,HttpServletRequest request, HttpServletResponse response){
         DefaultResponseBean responseBean = new DefaultResponseBean();
         ExcelUtils<DoctorExcelBean> excelUtils = new ExcelUtils<>(new DoctorExcelBean());
-      //  String productId = request.getParameter("productId");
-        String productId ="2";
         if(!StringUtils.isNotEmtity(productId)){
             responseBean.setCode(500);
             responseBean.setMessage("产品不能为空");
             return responseBean;
         }
-
         InputStream inputStream = null;
         List<DoctorExcelBean> list = new ArrayList<>();
         try{

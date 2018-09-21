@@ -40,6 +40,8 @@ public class Doctor extends IdEntity {
     private Integer status;
     @Column(name = "master_data_id")
     private Integer masterDataId;
+    @Column(name = "sex")
+    private Integer sex;
 
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH},fetch = FetchType.EAGER)
@@ -157,5 +159,13 @@ public class Doctor extends IdEntity {
 
     public void setMasterDataId(Integer masterDataId) {
         this.masterDataId = masterDataId;
+    }
+
+    public Integer getSex() {
+        return sex;
+    }
+
+    public void setSex(Integer sex) {
+        this.sex = sex;
     }
 }
