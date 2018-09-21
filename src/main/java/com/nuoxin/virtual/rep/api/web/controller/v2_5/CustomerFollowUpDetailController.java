@@ -4,9 +4,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -27,7 +25,6 @@ import com.nuoxin.virtual.rep.api.service.v2_5.VirtualDoctorPushService;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualDoctorService;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.CallInfoListRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.meeting.MeetingListRequestBean;
-import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.push.PushListRequestBean;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -152,26 +149,6 @@ public class CustomerFollowUpDetailController extends NewBaseController {
 		VirtualDoctorBasicResponse virtualDoctorBasic = virtualDoctorService.getVirtualDoctorBasic(virtualDoctorId);
 		DefaultResponseBean<VirtualDoctorBasicResponse> responseBean = new DefaultResponseBean<VirtualDoctorBasicResponse>();
 		responseBean.setData(virtualDoctorBasic);
-		return responseBean;
-	}
-	
-	@SuppressWarnings("unchecked")
-	@ApiOperation(value = "获取推送信息列表(内容推送记录) TODO @李成新")
-	@RequestMapping(value = "/push/info/list/get", method = { RequestMethod.POST })
-	public DefaultResponseBean<Object> getPushInfoList(HttpServletRequest request,
-			@RequestBody @Valid PushListRequestBean pushRequest, BindingResult bindingResult) {
-		DrugUser user = this.getDrugUser(request);
-		if (user == null) {
-			return super.getLoginErrorResponse();
-		}
-
-		if(bindingResult.hasErrors()){
-			return super.getParamsErrorResponse(bindingResult.getFieldError().getDefaultMessage());
-        }
-
-		String leaderPath = user.getLeaderPath();
-		List<Object> list = pushService.getPushList(leaderPath, pushRequest);
-		DefaultResponseBean<Object> responseBean = new DefaultResponseBean<Object>();
 		return responseBean;
 	}
 
