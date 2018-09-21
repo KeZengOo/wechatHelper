@@ -817,6 +817,13 @@ public class DoctorService extends BaseService {
         doctor.setDepartment(excel.getDepartment());
         doctor.setMobile(excel.getMobile());
         doctor.setStatus(1);
+        if(null!=excel.getSex()&&excel.getSex().equals("男")||excel.getSex().equals("0")){
+            doctor.setSex(0);
+        }else if(null!=excel.getSex()&&excel.getSex().equals("女")||excel.getSex().equals("1")){
+            doctor.setSex(1);
+        }else{
+            doctor.setSex(0);
+        }
         if(type==add){
             doctorMapper.saveDoctor(doctor);
         }else{
@@ -882,7 +889,7 @@ public class DoctorService extends BaseService {
                 throw new Exception("第（"+errorLine+"）行姓名为空");
             }
             if (StringUtils.isEmpty(excel.getMobile())){
-                throw new Exception("第（"+ errorLine +"）行医生为空");
+                throw new Exception("第（"+ errorLine +"）行手机号为空");
             }
             if (StringUtils.isEmpty(excel.getHospitalName())){
                 throw new Exception("第（"+ errorLine +"）行医院为空");
