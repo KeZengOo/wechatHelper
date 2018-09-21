@@ -478,7 +478,9 @@
             and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &lt;=date_format(#{endTime},'%Y-%m-%d %H:%i:%s')
         </if>
 
+        <!-- 不要按时间倒叙啦，不然对话是反的
         ORDER BY vm.message_time DESC
+        -->
         LIMIT #{currentSize},#{pageSize}
 
 
