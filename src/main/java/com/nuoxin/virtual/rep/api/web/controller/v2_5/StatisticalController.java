@@ -155,7 +155,9 @@ public class StatisticalController extends NewBaseController {
         statisticsParams.setDrugUserId(drugUserId);
         StringBuffer fileName=new StringBuffer();
         fileName.append("医生拜访明细表 ").append(statisticsParams.getStartTime()).append("-").append(statisticsParams.getEndTime()).append(".xls");
+        //固定字段对应的值
         List<LinkedHashMap<String,Object>> list=statisticalService.doctorVisitDetailList(statisticsParams);
+        //产品的动态字段
         List<DynamicFieldResponse> titleList=dynamicFieldMapper.getProductDynamicField(productId);
         HSSFWorkbook wb=ExportExcel.excelLinkedHashMapExport(list, ExportExcelTitle.getDoctorVisitDetaiListTitleMap(titleList),"医生拜访明细表");
         OutputStream ouputStream = null;

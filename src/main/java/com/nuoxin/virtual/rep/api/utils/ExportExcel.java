@@ -104,7 +104,7 @@ public final class ExportExcel {
     }
 
     /**
-     *
+     * List<对象类型的通用导出></>
      * @param dataList 对象数据集合
      * @param titleMap 表头信息
      */
@@ -132,7 +132,7 @@ public final class ExportExcel {
     }
 
     /**
-     *
+     * List<LinkedHashMap> 导出字段是动态的</>
      * @param dataList 对象数据集合
      * @param titleMap 表头信息
      */
@@ -150,7 +150,6 @@ public final class ExportExcel {
                 }
                 i++;
             }
-
         }
         catch (Exception e) {
             e.printStackTrace();
