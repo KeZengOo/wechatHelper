@@ -59,10 +59,12 @@ public class StatisticalController extends NewBaseController {
 	public DefaultResponseBean<PageResponseBean<List<StatisticsResponse>>> visitStatisticsList(HttpServletRequest request,
 			@RequestBody StatisticsParams statisticsParams) {
 		if(statisticsParams.getProductId()==null){
-			return super.getParamsErrorResponse("ProductId is null");
+			return super.getParamsErrorResponse("请选择一个产品");
 		}
 		if(statisticsParams.getDrugUserIds()==null||statisticsParams.getDrugUserIds().isEmpty()){
-			return super.getParamsErrorResponse("DrugUserIds is null");
+			DefaultResponseBean<PageResponseBean<List<StatisticsResponse>>> responseBean = new DefaultResponseBean<>();
+			responseBean.setData(new PageResponseBean(statisticsParams, 0, new ArrayList<>()));
+			return responseBean;
 		}
 		statisticsParams.setType(page);
 		PageResponseBean<List<StatisticsResponse>> page=statisticalService.visitStatisticsPage(statisticsParams);
