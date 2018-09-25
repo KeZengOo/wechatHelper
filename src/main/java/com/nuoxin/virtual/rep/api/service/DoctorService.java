@@ -817,12 +817,10 @@ public class DoctorService extends BaseService {
         doctor.setDepartment(excel.getDepartment());
         doctor.setMobile(excel.getMobile());
         doctor.setStatus(1);
-        if(null!=excel.getSex()&&excel.getSex().equals("男")||excel.getSex().equals("0")){
+        if(null!=excel.getSex()&&(excel.getSex().equals("男")||excel.getSex().equals("0"))){
             doctor.setSex(0);
-        }else if(null!=excel.getSex()&&excel.getSex().equals("女")||excel.getSex().equals("1")){
+        }else if(null!=excel.getSex()&&(excel.getSex().equals("女")||excel.getSex().equals("1"))){
             doctor.setSex(1);
-        }else{
-            doctor.setSex(0);
         }
         if(type==add){
             doctorMapper.saveDoctor(doctor);
