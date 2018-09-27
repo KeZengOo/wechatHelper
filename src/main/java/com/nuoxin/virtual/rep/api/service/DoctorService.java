@@ -17,6 +17,7 @@ import com.nuoxin.virtual.rep.api.mybatis.DoctorMendMapper;
 import com.nuoxin.virtual.rep.api.mybatis.DoctorVirtualMapper;
 import com.nuoxin.virtual.rep.api.mybatis.HospitalMapper;
 import com.nuoxin.virtual.rep.api.utils.RegularUtils;
+import com.nuoxin.virtual.rep.api.utils.StringUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.doctor.DoctorRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.doctor.DoctorUpdateRequestBean;
@@ -822,6 +823,11 @@ public class DoctorService extends BaseService {
         }else if(null!=excel.getSex()&&(excel.getSex().equals("女")||excel.getSex().equals("1"))){
             doctor.setSex(1);
         }
+
+        if (org.springframework.util.StringUtils.isEmpty(excel.getSex())){
+            doctor.setSex(2);
+        }
+
         if(type==add){
             doctorMapper.saveDoctor(doctor);
         }else{
@@ -902,6 +908,13 @@ public class DoctorService extends BaseService {
             if (!matche){
                 throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "第("+ errorLine +")行医生手机号输入不合法，请检查是否是文本格式");
             }
+            String sex = excel.getSex();
+            if (StringUtils.isNotEmtity(sex)){
+                if (!("男".equals(sex) || "女".equals(sex))){
+                    throw new Exception("第（"+errorLine+"）行性别只能输入男或者女");
+                }
+            }
+
             DrugUser user = drugUserService.findByEmail(excel.getDrugUserEmail());
             if(user==null){
                 throw new Exception("第（"+errorLine+"）行销售不存在");
