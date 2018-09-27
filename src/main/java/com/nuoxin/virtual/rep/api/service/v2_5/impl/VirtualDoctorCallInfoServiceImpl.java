@@ -97,7 +97,10 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		Long callId = saveRequest.getCallInfoId(); // 电话拜访主键值
 		if (callId != null && callId > 0) {
 			this.saveCallInfo(saveRequest);
-			this.doSaveVirtualQuestionnaireRecord(saveRequest);
+			Integer virtualQuestionaireId = saveRequest.getVirtualQuestionaireId();
+			if (virtualQuestionaireId != null && virtualQuestionaireId > 0){
+				this.doSaveVirtualQuestionnaireRecord(saveRequest);
+			}
 			this.alterRelationShip(saveRequest);
 			return true;
 		}

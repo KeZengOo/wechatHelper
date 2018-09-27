@@ -156,5 +156,15 @@
         FROM drug_user du
         WHERE du.id=#{id}
     </select>
+
+    <!-- 根据邮箱查询代表的产品ID列表 -->
+    <select id="getProductIdListByEmail" resultType="java.lang.Long">
+        SELECT DISTINCT pl.prod_id FROM product_line pl
+        INNER JOIN product_user pu
+        ON pl.prod_id=pu.prod_id
+        INNER JOIN drug_user du
+        ON pu.user_id=du.id
+        WHERE du.email=#{email}
+    </select>
     
 </mapper>

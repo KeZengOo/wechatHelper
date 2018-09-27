@@ -38,7 +38,7 @@ public class SaveCallInfoRequest  extends BaseCallInfoRequest{
 	
 	///////////////////////////////////////////////////////
 	
-	@NotNull(message="virtualQuestionaireId is null")
+	//@NotNull(message="virtualQuestionaireId is null")
 	@ApiModelProperty(value = "问卷ID")
 	private Integer virtualQuestionaireId;
 	@ApiModelProperty(value = "作答结果")

@@ -169,6 +169,10 @@ public class MessageService extends BaseService {
                 String wechatMessageStatus = wechatMessageVo.getMessageStatus();
                 String wechatMessageType = wechatMessageVo.getMessageType();
                 String message = wechatMessageVo.getMessage();
+                if (StringUtils.isEmpty(wechatNumber)){
+                    throw new FileFormatException(ErrorEnum.ERROR, "微信号不能为空");
+                }
+
 
                 //判断数据库中是否存在该条数据
                 Integer count = messageMapper.getCountByTypeAndWechatNumAndTime(MessageTypeEnum.WECHAT.getMessageType(), wechatNumber, wechatTime);
