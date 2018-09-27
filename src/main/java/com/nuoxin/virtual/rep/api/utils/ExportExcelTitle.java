@@ -1,9 +1,8 @@
 package com.nuoxin.virtual.rep.api.utils;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.TreeMap;
+import com.nuoxin.virtual.rep.api.entity.v2_5.DynamicFieldResponse;
+
+import java.util.*;
 
 /**
  *
@@ -30,6 +29,29 @@ public class ExportExcelTitle {
         map.put("contentReadNum","内容阅读人数");
         map.put("contentReadRate","内容阅读率");
         map.put("contentReadTime","内容阅读时长");
+        return map;
+    }
+
+    public static Map<String, String> getDoctorVisitDetaiListTitleMap(List<DynamicFieldResponse> list){
+        Map<String, String> map=new LinkedHashMap<>();
+        map.put("drugUserName","代表");
+        map.put("visitTime","拜访时间");
+        map.put("doctorId","医生ID");
+        map.put("doctorName","医生姓名");
+        map.put("hospitalName","医院");
+        map.put("visitType","拜访方式");
+        map.put("shareContent","分享内容");
+        map.put("visitResult","拜访结果");
+        map.put("attitude","医生态度");
+        map.put("nextVisitTime","下次拜访时间");
+        map.put("clientLevel","客户等级");
+        map.put("hcpPotential","医生潜力");
+        map.put("isHasDrug","是否有药");
+        map.put("isTarget","是否是目标客户");
+        map.put("isHasAe","是否有AE");
+        list.forEach(x->{
+            map.put(x.getProp(),x.getLable());
+        });
         return map;
     }
 

@@ -129,9 +129,12 @@
         SELECT * FROM
         (SELECT DISTINCT t.`id`,IFNULL(t2.`name`,'') drugUserName,IFNULL(date_format(t.`create_time`, '%Y-%m-%d %H:%i:%s'),'')  visitTime,IFNULL(t3.`id`,'') doctorId,IFNULL(t3.`name`,'') doctorName,
         IFNULL(t3.`hospital_name`,'') hospitalName,"电话" visitType,"" shareContent,IFNULL(t1.`visit_result`,'') visitResult,IFNULL(t1.`attitude`,'') attitude,IFNULL(date_format(t1.`next_visit_time`, '%Y-%m-%d %H:%i:%s'),'') nextVisitTime
+        ,IFNULL(t4.client_level,'') clientLevel,IFNULL(t5.`hcp_potential`,'') hcpPotential,IFNULL(t5.is_has_drug,'') isHasDrug,IFNULL(t5.`is_target`,'') isTarget,IFNULL(t5.`is_has_ae`,'')  isHasAe
         FROM `virtual_doctor_call_info` t LEFT JOIN `virtual_doctor_call_info_mend` t1 ON t.id=t1.`call_id`
         JOIN drug_user t2 ON t.virtual_drug_user_id=t2.`id`
         JOIN doctor t3 ON t.`virtual_doctor_id`=t3.id
+        LEFT JOIN `doctor_virtual` t4 ON t.`virtual_doctor_id`=t4.`doctor_id` AND t.`product_id`=t4.`product_id`
+        LEFT JOIN `drug_user_doctor_quate` t5 ON t.`virtual_doctor_id`=t5.`doctor_id` AND t.`product_id`=t5.`product_id` AND t.`virtual_drug_user_id`=t5.`drug_user_id`
         WHERE t.product_id=#{productId}
         <if test="drugUserId!=null">
             and t.virtual_drug_user_id=#{drugUserId}
@@ -151,13 +154,16 @@
         <if test="contents==null or contents.size==0">
             UNION ALL
             SELECT DISTINCT t.`id`,IFNULL(t3.`name`,'') drugUserName,IFNULL(date_format(t.`create_time`, '%Y-%m-%d %H:%i:%s'),'') visitTime,IFNULL(t4.`id`,'') doctorId,IFNULL(t4.`name`,'') doctorName,
-            IFNULL(t4.`hospital_name`,'') hospitalName,CASE WHEN share_type=1 THEN "微信" WHEN share_type=2 THEN "短信" WHEN share_type=3 THEN "邮件" END visitType,
+            IFNULL(t4.`hospital_name`,'') hospitalName,CASE WHEN share_type=1 THEN "微信" WHEN share_type=2 THEN "短信" WHEN share_type=3 THEN "邮件" else "" END  visitType,
             IFNULL(t2.title,'') shareContent,"" visitResult,"" attitude,"" nextVisitTime
+            ,IFNULL(t5.client_level,'') clientLevel,IFNULL(t6.`hcp_potential`,'') hcpPotential,IFNULL(t6.is_has_drug,'') isHasDrug,IFNULL(t6.`is_target`,'') isTarget,IFNULL(t6.`is_has_ae`,'')  isHasAe
             FROM `activity_share` t
             JOIN `t_content_product` t1 ON t.`data_id`=t1.`content_id`
             JOIN `activity_info` t2 ON t.`data_id`=t2.`data_id`
             JOIN drug_user t3 ON t.drug_user_id=t3.`id`
             JOIN doctor t4 ON t.`share_person_id`=t4.id
+            LEFT JOIN `doctor_virtual` t5 ON t.`share_person_id`=t5.`doctor_id` AND t1.`product_id`=t5.`product_id`
+            LEFT JOIN `drug_user_doctor_quate` t6 ON t.`share_person_id`=t6.`doctor_id` AND t1.`product_id`=t6.`product_id` AND t.`drug_user_id`=t6.`drug_user_id`
             WHERE t1.product_id=#{productId}
             <if test="drugUserId!=null">
                  and t.drug_user_id=#{drugUserId}

@@ -483,4 +483,20 @@
         WHERE product_id=#{productId}  ORDER BY id
     </select>
 
+    <!-- 根据医生得到指定产品下的字段值 -->
+    <select id="getProductDynamicFieldValue" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.DynamicFieldValueResponse">
+        SELECT t.id doctorId,t1.prop,t1.lable,t2.dynamic_field_value VALUE FROM doctor t
+        LEFT JOIN (SELECT field_name lable,CONCAT("field",(@i:=@i+1)) prop
+        FROM virtual_doctor_dynamic_field,(SELECT @i:=0) a
+        WHERE product_id=#{productId}  ORDER BY id) t1 ON 1=1
+        LEFT JOIN (SELECT t.`field_name`,t1.`doctor_id` ,t1.`dynamic_field_value`
+        FROM `virtual_doctor_dynamic_field` t
+        LEFT JOIN `virtual_doctor_dynamic_field_value` t1 ON t.`id`=t1.`dynamic_field_id`
+        WHERE product_id=#{productId} ) t2 ON t.`id`=t2.doctor_id AND t1.lable=t2.field_name
+        WHERE t.id IN
+        <foreach collection="doctorIds" item="doctorId" open="(" close=")" separator=",">
+            #{doctorId}
+        </foreach>
+    </select>
+
 </mapper>

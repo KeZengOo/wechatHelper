@@ -7,8 +7,6 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorQuateMapper;
-import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ProductInfoResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -18,6 +16,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.nuoxin.virtual.rep.api.common.bean.PageRequestBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.CustomerFollowUpPageResponseBean;
 import com.nuoxin.virtual.rep.api.mybatis.DoctorMapper;
+import com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorQuateMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v2_5.CustomerFollowUpService;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
@@ -25,6 +24,8 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.ListReque
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.ScreenRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.SearchRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CustomerFollowListBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ProductInfoResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ProductTableHeader;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.TableHeader;
 
 import shaded.org.apache.commons.lang3.StringUtils;
@@ -38,7 +39,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	
 	private static final Logger logger = LoggerFactory.getLogger(CustomerFollowUpServiceImpl.class);
 	
-	private static final List<TableHeader> tableHeaders = new ArrayList<>(15);
+	private static final List<Object> tableHeaders = new ArrayList<>(20);
 
 	@Resource
 	private DrugUserDoctorQuateMapper drugUserDoctorQuateMapper;
@@ -292,35 +293,36 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		
 		//////产品信息//////
 
-		TableHeader productInfo = new TableHeader();
+		ProductTableHeader productInfo = new ProductTableHeader();
 		productInfo.setLabel("产品信息");
-		productInfo.setName("productInfo");
+		productInfo.setName("productInfos");
 		tableHeaders.add(productInfo);
+		List<TableHeader> info = productInfo.getInfo();
 		
 		TableHeader product = new TableHeader();
 		product.setLabel("产品");
 		product.setName("product");
-		tableHeaders.add(product);
+		info.add(product);
 		
 		TableHeader isRecruit = new TableHeader();
 		isRecruit.setLabel("是否招募");
 		isRecruit.setName("isRecruit");
-		tableHeaders.add(isRecruit);
+		info.add(isRecruit);
 		
 		TableHeader hcpPotential = new TableHeader();
 		hcpPotential.setLabel("医生潜力");
 		hcpPotential.setName("hcpPotential");
-		tableHeaders.add(hcpPotential);
+		info.add(hcpPotential);
 		
 		TableHeader hcpLevel = new TableHeader();
 		hcpLevel.setLabel("客户等级");
 		hcpLevel.setName("hcpLevel");
-		tableHeaders.add(hcpLevel);
+		info.add(hcpLevel);
 		
 		TableHeader isHasDrug = new TableHeader();
-		hcpLevel.setLabel("是否有药");
+		isHasDrug.setLabel("是否有药");
 		isHasDrug.setName("isHasDrug");
-		tableHeaders.add(isHasDrug);
+		info.add(isHasDrug);
 		
 	}
 }

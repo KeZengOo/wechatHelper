@@ -226,6 +226,9 @@
 			<if test="mobile !=null and mobile !=''">
 				telephone=#{mobile},
 			</if>
+			<if test="sex !=null and sex !=''">
+				sex=#{sex},
+			</if>
 			<if test="doctorLevel !=null ">
 				positions=#{doctorLevel},
 			</if>

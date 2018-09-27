@@ -3,10 +3,8 @@ package com.nuoxin.virtual.rep.api.service.v2_5.impl;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.constant.StatisticalConstant;
 import com.nuoxin.virtual.rep.api.common.constant.VisitResultConstant;
-import com.nuoxin.virtual.rep.api.entity.v2_5.DynamicFieldResponse;
-import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse;
-import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsParams;
-import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsResponse;
+import com.nuoxin.virtual.rep.api.entity.DoctorDynamicFieldValue;
+import com.nuoxin.virtual.rep.api.entity.v2_5.*;
 import com.nuoxin.virtual.rep.api.mybatis.*;
 import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v2_5.StatisticalService;
@@ -19,10 +17,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -80,11 +75,25 @@ public class StatisticalServiceImpl implements StatisticalService {
 	 */
 	private List<LinkedHashMap<String,Object>> getDoctorVisitDetailList(StatisticsParams statisticsParams) {
 		List<LinkedHashMap<String,Object>> list=doctorCallInfoMapper.getDoctorVisitDetailList(statisticsParams);
+		Set<Integer> ids=new HashSet<>();
+		list.forEach(x->{
+			ids.add(Integer.parseInt(x.get("doctorId").toString()));
+			x.put("hcpPotential",getLevel((String)x.get("hcpPotential")));
+			x.put("isHasDrug",getValue((String)x.get("isHasDrug")));
+			x.put("isTarget",getValue((String)x.get("isTarget")));
+			x.put("isHasAe",getValue((String)x.get("isHasAe")));
+		});
+		List<DynamicFieldValueResponse> fieldValueList=dynamicFieldMapper.getProductDynamicFieldValue(statisticsParams.getProductId(),ids);
+		Map<Integer, List<DynamicFieldValueResponse>> map = fieldValueList.stream().collect(Collectors.groupingBy(DynamicFieldValueResponse::getDoctorId));
+		list.forEach(x->{
+			Integer doctorId=Integer.parseInt(x.get("doctorId").toString());
+			List<DynamicFieldValueResponse> valueList=map.get(doctorId);
+			valueList.forEach(xx->{
+				x.put(xx.getProp(),xx.getValue()==null?"":xx.getValue());
+			});
+		});
 		return list;
 	}
-
-
-
 
 	/**
 	 * 医生拜访统计表·列表
@@ -152,6 +161,55 @@ public class StatisticalServiceImpl implements StatisticalService {
 		//增加求和列
 		addSum(list);
 		return list;
+	}
+
+	/**
+	 *
+	 * @param productId
+	 * @param productName
+	 * @return
+	 */
+	@Override
+	public List<DynamicFieldResponse> getDynamicFieldByProductId(Integer productId, String productName) {
+		Map<String, String> map=new LinkedHashMap<>();
+		map.put("drugUserName","代表");
+		map.put("visitTime","拜访时间");
+		map.put("doctorId","医生ID");
+		map.put("doctorName","医生姓名");
+		map.put("hospitalName","医院");
+		map.put("visitType","拜访方式");
+		map.put("shareContent","分享内容");
+		map.put("visitResult","拜访结果");
+		map.put("attitude","医生态度");
+		map.put("nextVisitTime","下次拜访时间");
+		map.put("clientLevel","客户等级");
+		map.put("hcpPotential","医生潜力");
+		map.put("isHasDrug","是否有药");
+		map.put("isTarget","是否是目标客户");
+		map.put("isHasAe","是否有AE");
+		List<DynamicFieldResponse> list=new ArrayList<>();
+		map.forEach((k,v)->{
+			DynamicFieldResponse t= new DynamicFieldResponse();
+			t.setLable(v);
+			t.setProp(k);
+			list.add(t);
+		});
+		DynamicFieldResponse t= new DynamicFieldResponse();
+		t.setLable(productName);
+		t.setProp("product");
+		t.setChildren(dynamicFieldMapper.getProductDynamicField(productId));
+		list.add(t);
+		return list;
+	}
+
+	private String getValue(String value){
+		if(value.equals("0")){
+			return "否";
+		}else if(value.equals("1")){
+			return "是";
+		}else{
+			return "未知";
+		}
 	}
 
 	/**
@@ -382,40 +440,23 @@ public class StatisticalServiceImpl implements StatisticalService {
 	 */
 	private Integer getTotal(List<StatisticsDrugNumResponse> total, Integer drugUserId) {
 		for(StatisticsDrugNumResponse t:total){
-            if(drugUserId.equals(t.getDrugUserId())){
-                return t.getTotal();
-            }
-        }
+			if(drugUserId.equals(t.getDrugUserId())){
+				return t.getTotal();
+			}
+		}
 		return 0;
 	}
 
-	@Override
-	public List<DynamicFieldResponse> getDynamicFieldByProductId(Integer productId, String productName) {
-		Map<String, String> map=new LinkedHashMap<>();
-		map.put("drugUserName","代表");
-		map.put("visitTime","拜访时间");
-		map.put("doctorId","医生ID");
-		map.put("doctorName","医生姓名");
-		map.put("hospital","医院");
-		map.put("visitType","拜访方式");
-		map.put("shareContent","分享内容");
-		map.put("visitResult","拜访结果");
-		map.put("attitude","医生态度");
-		map.put("nextVisitTime","下次拜访时间");
-		map.put("nextVisitTime","客户等级");
-		List<DynamicFieldResponse> list=new ArrayList<>();
-		map.forEach((k,v)->{
-			DynamicFieldResponse t= new DynamicFieldResponse();
-			t.setLable(v);
-			t.setProp(k);
-			list.add(t);
-		});
-		DynamicFieldResponse t= new DynamicFieldResponse();
-		t.setLable(productName);
-		t.setProp("product");
-		t.setChildren(dynamicFieldMapper.getProductDynamicField(productId));
-		list.add(t);
-		return list;
+	private String getLevel(String value){
+		if(value.equals("3")){
+			return "高";
+		}else if(value.equals("2")){
+			return "中";
+		}else if(value.equals("1")){
+			return "低";
+		}else{
+			return "未知";
+		}
 	}
 
 }
