@@ -229,7 +229,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		callVisitParams.setRemark(saveRequest.getRemark());
 		callVisitParams.setStatus(saveRequest.getStatus());
 		callVisitParams.setStatusName(saveRequest.getStatuaName());
-		callVisitParams.setNextVisitTime(saveRequest.getNextVisitTime());
+		callVisitParams.setNextVisitTime(saveRequest.getNextVisitTime().concat(" 23:59:59"));
 		
 		Integer virtualQuestinairedId = null;
 		if (saveRequest instanceof SaveCallInfoRequest) { // 接通
