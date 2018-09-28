@@ -135,6 +135,9 @@ public class MessageService extends BaseService {
 
         // 得到去重后的聊天消息
         List<Message> list = getDuplicateRemovalMessageList(wechatMessageVos, doctor,  drugUser);
+        if (CollectionsUtil.isEmptyList(list)){
+            throw new FileFormatException(ErrorEnum.ERROR,"医生的聊天记录已经被导入！");
+        }
         //批量保存微信聊天消息
         logger.info("开始批量插入聊天记录drugUserId={}, drugUserName={}, doctorId={}, doctorName={}, size={}", drugUser.getId(), drugUser.getName(), doctor.getId(), doctor.getName(), list.size());
         messageRepository.save(list);

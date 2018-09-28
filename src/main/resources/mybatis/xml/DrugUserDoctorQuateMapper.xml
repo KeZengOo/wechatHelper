@@ -57,6 +57,7 @@
 	<!-- 医生的产品信息，每个医生只取两条 -->
 	<select id="getProductInfoList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ProductInfoResponse">
 		SELECT
+		DISTINCT
 			a.prod_name productName,
 			qudq.is_recruit isRecruit,
 			qudq.hcp_potential doctorPotential,
@@ -81,6 +82,32 @@
 		AND qudq.doctor_id = #{doctorId}
 		LEFT JOIN doctor_virtual dv ON a.prod_id = dv.product_id
 		AND dv.doctor_id = #{doctorId}
+	</select>
+
+
+
+	<!-- 医生的产品信息，每个医生只取两条 -->
+	<select id="getProductInfoListByProductIdList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ProductInfoResponse">
+		SELECT
+		DISTINCT
+			a.prod_name productName,
+			qudq.is_recruit isRecruit,
+			qudq.hcp_potential doctorPotential,
+			dv.client_level doctorLevel,
+			qudq.is_has_drug isHasDrug
+		FROM
+			product_line a
+		LEFT JOIN drug_user_doctor_quate qudq ON a.prod_id = qudq.product_id
+		AND qudq.doctor_id = #{doctorId}
+		LEFT JOIN doctor_virtual dv ON a.prod_id = dv.product_id
+		AND dv.doctor_id = #{doctorId}
+		WHERE a.prod_id IN
+		<foreach item="id" index="index" collection="productIdList"
+				 open="(" separator="," close=")">
+			#{id}
+		</foreach>
+
+		LIMIT 2
 	</select>
 		
 </mapper>

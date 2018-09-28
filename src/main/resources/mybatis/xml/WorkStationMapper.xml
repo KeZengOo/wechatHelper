@@ -121,7 +121,7 @@
         on d.id = dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id=du.id
-        where dud.is_available=1 and
+        where dud.is_available=1
         and du.leader_path like #{leaderPath}
         and dud.prod_id=#{productId}
         group by dv.client_level
@@ -211,7 +211,7 @@
                         on d.id=dud.doctor_id
                         inner join drug_user du
                         on dud.drug_user_id=du.id
-                        where dud.is_available=1 and
+                        where dud.is_available=1
 
                         <!-- and vdcid.status_name='answer'-->
                         and vdcid.status_name in ('answer','incall')
@@ -2988,7 +2988,7 @@
         on tcp.product_id=pl.prod_id
         inner join activity_info ai
         on tcp.content_id=ai.id
-        where dud.is_available=1 and
+        where dud.is_available=1
         and du.leader_path like #{leaderPath}
 
         <if test="dateType !=null">

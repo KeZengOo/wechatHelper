@@ -10,6 +10,8 @@ import javax.annotation.Resource;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
+import com.nuoxin.virtual.rep.api.utils.StringUtil;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONArray;
@@ -170,6 +172,10 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		VirtualDoctorCallInfoParams callVisitParams = this.getVirtualDoctorCallInfoParams(saveRequest);
 		// P.S :保存电话拜访信息前前端通过调用call/save 已经向数据库插入记录,因此走的是修改
 		callInfoMapper.updateVirtualDoctorCallInfo(callVisitParams);
+		String nextVisitTime = callVisitParams.getNextVisitTime();
+		if (StringUtils.isBlank(nextVisitTime)){
+			callVisitParams.setNextVisitTime(null);
+		}
 		callInfoMendMapper.saveVirtualDoctorCallInfoMend(callVisitParams);
 	}
 	

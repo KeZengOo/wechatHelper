@@ -139,11 +139,17 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private CustomerFollowUpPageResponseBean<List<CustomerFollowListBean>> getDoctorsList(int count, List<CustomerFollowListBean> list,
-			PageRequestBean pageRequestBean) {
+																						  ScreenRequestBean pageRequestBean) {
+		List<Long> productLineIds = pageRequestBean.getProductLineIds();
+		final List<CustomerFollowListBean> customerFollowListBeanList = list;
 		if (CollectionsUtil.isNotEmptyList(list)) {
 			list.forEach(doctor -> {
 				this.alterCustomerFollowListBean(doctor);
 				// TODO 补充对应的产品信息 @田存
+				if (CollectionsUtil.isNotEmptyList(productLineIds)){
+					this.fillProductInfos(customerFollowListBeanList, productLineIds);
+				}
+
 			});
 		}
 
@@ -153,7 +159,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 
 		return new CustomerFollowUpPageResponseBean(pageRequestBean, count, list);
 	}
-	
+
 	/**
 	 * 填充上产品信息
 	 * @param list
@@ -168,6 +174,26 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		list.forEach(listBean ->{
 			List<ProductInfoResponse> productInfoList = drugUserDoctorQuateMapper.getProductInfoList(listBean.getDoctorId(),
 					leaderPatnTemp);
+			if (CollectionsUtil.isNotEmptyList(productInfoList)){
+				listBean.setProductInfos(productInfoList);
+			}
+		});
+	}
+
+
+	/**
+	 * 填充上产品信息
+	 * @param list
+	 * @param productIdList
+	 * @return
+	 */
+	private void fillProductInfos(List<CustomerFollowListBean> list, List<Long> productIdList) {
+		if (CollectionsUtil.isEmptyList(list)){
+			return;
+		}
+		list.forEach(listBean ->{
+			List<ProductInfoResponse> productInfoList = drugUserDoctorQuateMapper.getProductInfoListByProductIdList(listBean.getDoctorId(),
+					productIdList);
 			if (CollectionsUtil.isNotEmptyList(productInfoList)){
 				listBean.setProductInfos(productInfoList);
 			}

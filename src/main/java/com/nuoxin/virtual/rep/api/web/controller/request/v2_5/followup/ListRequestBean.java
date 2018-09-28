@@ -13,7 +13,7 @@ import lombok.EqualsAndHashCode;
 @ApiModel
 @EqualsAndHashCode(callSuper=false)
 @Data
-public class ListRequestBean extends PageRequestBean {
+public class ListRequestBean extends ScreenRequestBean {
 
 	private static final long serialVersionUID = 8545014227620171255L;
 	

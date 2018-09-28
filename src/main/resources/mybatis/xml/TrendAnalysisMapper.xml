@@ -314,7 +314,7 @@
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TrendAnalysisRequestBean">
         select COUNT(DISTINCT dc.sin_token) callout,DATE_FORMAT(dc.create_time,'%k') hours,dc.create_time from
         virtual_doctor_call_info dc join drug_user_doctor dud on dud.doctor_id=dc.virtual_doctor_id join virtual_doctor_call_info_details dcd on dcd.call_id=dc.id join
-        drug_user d on d.id=dc.virtual_drug_user_id where 1=1 and dud.is_available=1 and
+        drug_user d on d.id=dc.virtual_drug_user_id where 1=1 and dud.is_available=1
         and dc.create_time BETWEEN #{startDate} AND #{endDate} and d.leader_path like #{leaderPath,jdbcType=VARCHAR} AND dc.del_flag=0
 
         <if test="drugUserId!=null and drugUserId!=0">

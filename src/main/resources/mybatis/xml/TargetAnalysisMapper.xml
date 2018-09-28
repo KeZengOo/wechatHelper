@@ -63,7 +63,7 @@
         UNION ALL
         select DISTINCT vm.doctor_id from virtual_message vm join doctor_virtual dv on
         dv.doctor_id=vm.doctor_id join drug_user d on d.id=vm.drug_user_id  join drug_user_doctor dud on dud.doctor_id=vm.doctor_id AND dud.drug_user_id=vm.drug_user_id where
-         and is_available=1 and
+         is_available=1 and
         d.leader_path like #{leaderPath,jdbcType=VARCHAR}
         AND vm.message_time BETWEEN #{startDate} AND #{endDate} and vm.message_type=1
         <!--<if test="productId!=null and productId!=0">-->

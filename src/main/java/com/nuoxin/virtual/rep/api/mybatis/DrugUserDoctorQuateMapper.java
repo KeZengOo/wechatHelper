@@ -49,5 +49,13 @@ public interface DrugUserDoctorQuateMapper {
 	 * @return
 	 */
 	List<ProductInfoResponse> getProductInfoList(@Param(value = "doctorId") Long doctorId,@Param(value = "leaderPath") String leaderPath);
+
+	/**
+	 * 医生的产品信息，每个医生只取两条
+	 * @param doctorId
+	 * @param productIdList
+	 * @return
+	 */
+	List<ProductInfoResponse> getProductInfoListByProductIdList(@Param(value = "doctorId") Long doctorId,@Param(value = "productIdList") List<Long> productIdList);
 }
 
