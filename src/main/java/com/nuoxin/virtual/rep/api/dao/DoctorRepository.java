@@ -31,7 +31,7 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long>, JpaSpecif
      * @return
      */
     //@Query("select count(distinct d.id) as doctorNum,count(distinct d.hospitalName) as hospitalNum from DrugUserDoctor d where d.doctorVirtual.drugUserIds like :drugUserId ")
-    @Query(value = "select count(distinct d.id) as doctorNum  from drug_user_doctor dud join drug_user du on du.id=dud.drug_user_id join doctor d on d.id=dud.doctor_id where du.leader_path like :drugUserId",nativeQuery = true)
+    @Query(value = "select count(distinct d.id) as doctorNum  from drug_user_doctor dud join drug_user du on du.id=dud.drug_user_id join doctor d on d.id=dud.doctor_id where dud.is_available=1 and du.leader_path like :drugUserId",nativeQuery = true)
     Integer statDrugUserDoctorNum(@Param("drugUserId") String drugUserId);
 
     /**
@@ -39,7 +39,7 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long>, JpaSpecif
      * @param drugUserId
      * @return
      */
-    @Query(value = "select count(distinct d.hospital_name) as hospitalNum from drug_user_doctor dud join drug_user du on du.id=dud.drug_user_id join doctor d on d.id=dud.doctor_id where du.leader_path like :drugUserId",nativeQuery = true)
+    @Query(value = "select count(distinct d.hospital_name) as hospitalNum from drug_user_doctor dud join drug_user du on du.id=dud.drug_user_id join doctor d on d.id=dud.doctor_id where dud.is_available=1 and du.leader_path like :drugUserId",nativeQuery = true)
     Integer statDrugUserhospitalNum(@Param("drugUserId") String drugUserId);
 
     @Modifying

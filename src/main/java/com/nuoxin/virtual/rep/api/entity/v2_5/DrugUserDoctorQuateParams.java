@@ -6,7 +6,8 @@ import lombok.Data;
 public class DrugUserDoctorQuateParams {
 	private long virtualDrugUserId;
 	private long doctorId;
-	private int productLineId;
+	// 默认给0，null会插入失败
+	private int productLineId=0;
 	private int isHasDrug;
 	private int isHasAe;
 	private int isTarget;

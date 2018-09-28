@@ -97,7 +97,10 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		Long callId = saveRequest.getCallInfoId(); // 电话拜访主键值
 		if (callId != null && callId > 0) {
 			this.saveCallInfo(saveRequest);
-			this.doSaveVirtualQuestionnaireRecord(saveRequest);
+			Integer virtualQuestionaireId = saveRequest.getVirtualQuestionaireId();
+			if (virtualQuestionaireId != null && virtualQuestionaireId > 0){
+				this.doSaveVirtualQuestionnaireRecord(saveRequest);
+			}
 			this.alterRelationShip(saveRequest);
 			return true;
 		}
@@ -195,8 +198,11 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		DrugUserDoctorQuateParams relationShipParams = new DrugUserDoctorQuateParams();
 		relationShipParams.setVirtualDrugUserId(request.getVirtualDrugUserId());
 		relationShipParams.setDoctorId(request.getVirtualDoctorId());
-		relationShipParams.setProductLineId(request.getProductId());
-		
+		Integer productId = request.getProductId();
+		if (productId != null && productId > 0){
+			relationShipParams.setProductLineId(productId);
+		}
+
 		if (request instanceof SaveCallInfoRequest) {
 			SaveCallInfoRequest saveRequest = (SaveCallInfoRequest)request;
 			relationShipParams.setIsHasDrug(saveRequest.getIsHasDrug());

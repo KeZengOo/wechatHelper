@@ -18,14 +18,12 @@
         select count(DISTINCT mad.doctor_tel) dCount,count(DISTINCT mad.meeting_id) mCount from
         t_meeting_data md join t_meeting_attend_details mad on md.id=mad.meeting_id join doctor_virtual dv on
         dv.doctor_id=mad.doctor_id  join drug_user_doctor dud on dud.doctor_id=mad.doctor_id join drug_user d on
-        d.id=dud.drug_user_id where
+        d.id=dud.drug_user_id where dud.is_available=1 and
         mad.attend_start_time BETWEEN #{startDate} AND #{endDate} AND d.leader_path like #{leaderPath,jdbcType=VARCHAR}
         <if test="productId!=null and productId!=0">
             AND md.product_id=#{productId}
         </if>
-        <!--<if test="drugUserId!=null and drugUserId!=0">-->
-            <!--AND dud.drug_user_id = #{drugUserId}-->
-        <!--</if>-->
+
         <if test="customLevel!=null and customLevel!=''">
             AND dv.client_level = #{customLevel}
         </if>
@@ -36,7 +34,7 @@
         select count(DISTINCT t.doctor_id) from (
         select DISTINCT vd.virtual_doctor_id doctor_id from virtual_doctor_call_info vd join doctor_virtual dv on
         dv.doctor_id=vd.virtual_doctor_id join drug_user_doctor dud on dud.doctor_id=vd.virtual_doctor_id join drug_user d on
-        d.id=vd.virtual_drug_user_id where d.leader_path like #{leaderPath,jdbcType=VARCHAR}
+        d.id=vd.virtual_drug_user_id where dud.is_available=1 and d.leader_path like #{leaderPath,jdbcType=VARCHAR}
         AND vd.create_time BETWEEN #{startDate} AND #{endDate} AND vd.del_flag=0
         <if test="productId!=null and productId!=0">
             AND vd.product_id=#{productId}
@@ -50,6 +48,7 @@
         UNION ALL
         select DISTINCT vm.doctor_id from virtual_message vm join doctor_virtual dv on
         dv.doctor_id=vm.doctor_id join drug_user d on d.id=vm.drug_user_id  join drug_user_doctor dud on dud.doctor_id=vm.doctor_id AND dud.drug_user_id=vm.drug_user_id where
+         dud.is_available=1 and
         d.leader_path like #{leaderPath,jdbcType=VARCHAR} and vm.message_type=2
         AND vm.message_time BETWEEN #{startDate} AND #{endDate}
         <if test="productId!=null and productId!=0">
@@ -64,6 +63,7 @@
         UNION ALL
         select DISTINCT vm.doctor_id from virtual_message vm join doctor_virtual dv on
         dv.doctor_id=vm.doctor_id join drug_user d on d.id=vm.drug_user_id  join drug_user_doctor dud on dud.doctor_id=vm.doctor_id AND dud.drug_user_id=vm.drug_user_id where
+         and is_available=1 and
         d.leader_path like #{leaderPath,jdbcType=VARCHAR}
         AND vm.message_time BETWEEN #{startDate} AND #{endDate} and vm.message_type=1
         <!--<if test="productId!=null and productId!=0">-->
@@ -78,7 +78,9 @@
         UNION ALL
         select DISTINCT mad.doctor_id from t_meeting_attend_details mad join doctor_virtual dv on
         dv.doctor_id=mad.doctor_id join t_meeting_data md on md.id=mad.meeting_id join drug_user_doctor dud on dud.doctor_id=mad.doctor_id
-        join drug_user d on d.id=mad.drug_user_id where d.leader_path like #{leaderPath,jdbcType=VARCHAR}
+        join drug_user d on d.id=mad.drug_user_id where
+         is_available=1 and
+        d.leader_path like #{leaderPath,jdbcType=VARCHAR}
         AND mad.attend_start_time BETWEEN #{startDate} AND #{endDate}
         <if test="productId!=null and productId!=0">
             AND md.product_id=#{productId}
@@ -92,7 +94,7 @@
         UNION ALL
         select DISTINCT ei.doctor_id from virtual_email_info ei join doctor_virtual dv on
         dv.doctor_id=ei.doctor_id join drug_user d on d.id=ei.drug_user_id join drug_user_doctor dud on dud.doctor_id=ei.doctor_id AND dud.drug_user_id=ei.drug_user_id
-        where d.leader_path like #{leaderPath,jdbcType=VARCHAR}
+        where dud.is_available=1 and d.leader_path like #{leaderPath,jdbcType=VARCHAR}
         AND ei.create_time BETWEEN #{startDate} AND #{endDate}
         <if test="productId!=null and productId!=0">
             AND ei.product_id=#{productId}
@@ -110,7 +112,7 @@
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TargetAnalysisRequestBean">
         select count(DISTINCT vd.virtual_doctor_id) coverNum from virtual_doctor_call_info vd join virtual_doctor_call_info_details v2 on vd.id=v2.call_id join doctor_virtual dv on
         dv.doctor_id=vd.virtual_doctor_id join drug_user_doctor dud on dud.doctor_id=vd.virtual_doctor_id  join doctor do on do.id=vd.virtual_doctor_id join drug_user d on
-        d.id=vd.virtual_drug_user_id where d.leader_path like #{leaderPath,jdbcType=VARCHAR}
+        d.id=vd.virtual_drug_user_id where dud.is_available=1 and d.leader_path like #{leaderPath,jdbcType=VARCHAR}
         AND vd.create_time BETWEEN #{startDate} AND #{endDate} AND vd.del_flag=0 and v2.status_name in ('answer','incall')
         <if test="productId!=null and productId!=0">
             AND vd.product_id=#{productId}
@@ -130,7 +132,7 @@
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TargetAnalysisRequestBean">
         select count(vd.id) coverNum from virtual_doctor_call_info vd join virtual_doctor_call_info_details v2 on vd.id=v2.call_id join doctor_virtual dv on
         dv.doctor_id=vd.virtual_doctor_id join drug_user_doctor dud on dud.doctor_id=vd.virtual_doctor_id join doctor do on do.id=vd.virtual_doctor_id join drug_user d on
-        d.id=vd.virtual_drug_user_id where d.leader_path like #{leaderPath,jdbcType=VARCHAR}
+        d.id=vd.virtual_drug_user_id where dud.is_available=1 and d.leader_path like #{leaderPath,jdbcType=VARCHAR}
         AND vd.create_time BETWEEN #{startDate} AND #{endDate} AND vd.del_flag=0 and v2.status_name in ('answer','incall')
         <if test="productId!=null and productId!=0">
             AND vd.product_id=#{productId}
@@ -149,6 +151,7 @@
     <select id="customSms" resultMap="targetResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TargetAnalysisRequestBean">
         select count(DISTINCT vm.doctor_id) coverNum from virtual_message vm  join drug_user_doctor dud on dud.doctor_id=vm.doctor_id AND dud.drug_user_id=vm.drug_user_id join doctor do on do.id=vm.doctor_id join doctor_virtual dv on dv.doctor_id=vm.doctor_id join drug_user d on d.id=vm.drug_user_id where
+         dud.is_available=1 and
         d.leader_path like #{leaderPath,jdbcType=VARCHAR} and vm.message_type=2
         AND vm.message_time BETWEEN #{startDate} AND #{endDate}
         <if test="productId!=null and productId!=0">
@@ -188,7 +191,7 @@
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TargetAnalysisRequestBean">
         select sum(vd.call_time) coverNum from virtual_doctor_call_info vd join drug_user_doctor dud on dud.doctor_id=vd.virtual_doctor_id join doctor_virtual dv on
         dv.doctor_id=vd.virtual_doctor_id join doctor do on do.id=vd.virtual_doctor_id join drug_user d on
-        d.id=vd.virtual_drug_user_id where d.leader_path like #{leaderPath,jdbcType=VARCHAR}
+        d.id=vd.virtual_drug_user_id where dud.is_available=1 and d.leader_path like #{leaderPath,jdbcType=VARCHAR}
         AND vd.create_time BETWEEN #{startDate} AND #{endDate} AND vd.del_flag=0
         <if test="productId!=null and productId!=0">
             AND vd.product_id=#{productId}
@@ -209,7 +212,7 @@
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TargetAnalysisRequestBean">
         select avg(vd.call_time) coverNum from virtual_doctor_call_info vd join virtual_doctor_call_info_details v2 on vd.id=v2.call_id join drug_user_doctor dud on dud.doctor_id=vd.virtual_doctor_id join doctor_virtual dv on
         dv.doctor_id=vd.virtual_doctor_id join doctor do on do.id=vd.virtual_doctor_id join drug_user d on
-        d.id=vd.virtual_drug_user_id where d.leader_path like #{leaderPath,jdbcType=VARCHAR}
+        d.id=vd.virtual_drug_user_id where dud.is_available=1 and d.leader_path like #{leaderPath,jdbcType=VARCHAR}
         AND vd.create_time BETWEEN #{startDate} AND #{endDate}  AND vd.del_flag=0 and v2.status_name in ('answer','incall')
 
         <if test="productId!=null and productId!=0">
@@ -228,7 +231,7 @@
 
     <select id="followUpType" resultType="java.util.Map" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.TargetAnalysisRequestBean">
         select vd.follow_up_type,count(DISTINCT vd.virtual_doctor_id) countNum from virtual_doctor_call_info vd join doctor d on d.id=vd.virtual_doctor_id join doctor_virtual dv on dv.doctor_id=vd.virtual_doctor_id join drug_user_doctor dud on dud.doctor_id=vd.virtual_doctor_id join drug_user du on du.id=dud.drug_user_id
-        where du.leader_path like #{leaderPath,jdbcType=VARCHAR}
+        where dud.is_available=1 and du.leader_path like #{leaderPath,jdbcType=VARCHAR}
         AND vd.create_time BETWEEN #{startDate} AND #{endDate}
 
         <if test="customLevel!=null and customLevel!=''">

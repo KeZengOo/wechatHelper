@@ -194,9 +194,9 @@
 
 	<insert id="saveDoctor" keyProperty="id" useGeneratedKeys="true">
 		INSERT INTO doctor
-		( email, name, hospital_id,hospital_name,provice,city,depart,telephone,positions,create_time,status,master_data_id)
+		( email, name, sex,hospital_id,hospital_name,provice,city,depart,telephone,positions,create_time,status,master_data_id)
 		VALUES
-		( #{email}, #{name}, #{hospitalId}, #{hospitalName}, #{province}, #{city}, #{department}, #{mobile}, #{doctorLevel},now(),1,#{masterDataId})
+		( #{email}, #{name},#{sex}, #{hospitalId}, #{hospitalName}, #{province}, #{city}, #{department}, #{mobile}, #{doctorLevel},now(),1,#{masterDataId})
 	</insert>
 
 	<update id="updateDoctor" >
@@ -226,7 +226,7 @@
 			<if test="mobile !=null and mobile !=''">
 				telephone=#{mobile},
 			</if>
-			<if test="sex !=null and sex !=''">
+			<if test="sex !=null">
 				sex=#{sex},
 			</if>
 			<if test="doctorLevel !=null ">

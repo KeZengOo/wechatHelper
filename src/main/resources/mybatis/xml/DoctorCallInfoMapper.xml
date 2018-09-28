@@ -17,6 +17,7 @@
                 inner join product_line pl
                 on dud.prod_id=pl.prod_id
                 where 1=1
+                and dud.is_available=1
                 <if test="productId != null and productId !=0">
                     and dud.prod_id=#{productId}
                     and vdci.product_id = #{productId}
@@ -40,6 +41,7 @@
                 inner join product_line pl
                 on dud.prod_id=pl.prod_id
                 where 1=1
+                and dud.is_available=1
                 <if test="productId!=null and productId !=0">
                     and dud.prod_id=#{productId}
                     and vdci.product_id = #{productId}
@@ -92,7 +94,7 @@
         inner join product_line pl
         on dud.prod_id=pl.prod_id
         where 1=1
-
+        and dud.is_available=1
         and dud.prod_id=#{productId}
         and vdci.product_id=#{productId}
 

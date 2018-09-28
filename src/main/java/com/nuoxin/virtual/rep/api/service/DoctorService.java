@@ -12,11 +12,10 @@ import com.nuoxin.virtual.rep.api.entity.*;
 import com.nuoxin.virtual.rep.api.entity.v2_5.DoctorExcelBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.HospitalProvinceBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorMendParams;
-import com.nuoxin.virtual.rep.api.mybatis.DoctorMapper;
-import com.nuoxin.virtual.rep.api.mybatis.DoctorMendMapper;
-import com.nuoxin.virtual.rep.api.mybatis.DoctorVirtualMapper;
-import com.nuoxin.virtual.rep.api.mybatis.HospitalMapper;
+import com.nuoxin.virtual.rep.api.mybatis.*;
+import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.utils.RegularUtils;
+import com.nuoxin.virtual.rep.api.utils.StringUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.doctor.DoctorRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.doctor.DoctorUpdateRequestBean;
@@ -71,6 +70,9 @@ public class DoctorService extends BaseService {
 
     @Autowired
     private DoctorMendMapper doctorMendMapper;
+
+    @Autowired
+    private DrugUserMapper drugUserMapper;
 
     @Autowired
     private DoctorVirtualMapper doctorVirtualMapper;
@@ -716,7 +718,7 @@ public class DoctorService extends BaseService {
     @CacheEvict(value = "virtual_rep_api_doctor", allEntries = true)
     public Boolean excelSaves(List<DoctorExcelBean> list, Long productId) throws Exception {
         //校验数据合法性,并返回销售map
-        Map<String,Long> drugUserMap=checkData(list);
+        Map<String,Long> drugUserMap=checkData(list, productId);
         //从集合中取出手机号列表
         List<String> mobiles = list.stream().map(DoctorExcelBean::getMobile).collect(Collectors.toList());
         List<Doctor> doctors = new ArrayList<>();
@@ -822,6 +824,11 @@ public class DoctorService extends BaseService {
         }else if(null!=excel.getSex()&&(excel.getSex().equals("女")||excel.getSex().equals("1"))){
             doctor.setSex(1);
         }
+
+        if (org.springframework.util.StringUtils.isEmpty(excel.getSex())){
+            doctor.setSex(2);
+        }
+
         if(type==add){
             doctorMapper.saveDoctor(doctor);
         }else{
@@ -878,7 +885,7 @@ public class DoctorService extends BaseService {
      * @param list
      * @throws Exception
      */
-    private Map<String,Long> checkData(List<DoctorExcelBean> list) throws Exception {
+    private Map<String,Long> checkData(List<DoctorExcelBean> list, Long productId) throws Exception {
         Map<String,Long> map=new HashMap<>();
         for (int i = 0, leng = list.size(); i < leng; i++) {
             DoctorExcelBean excel = list.get(i);
@@ -902,10 +909,24 @@ public class DoctorService extends BaseService {
             if (!matche){
                 throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "第("+ errorLine +")行医生手机号输入不合法，请检查是否是文本格式");
             }
+            String sex = excel.getSex();
+            if (StringUtils.isNotEmtity(sex)){
+                if (!("男".equals(sex) || "女".equals(sex))){
+                    throw new Exception("第（"+errorLine+"）行性别只能输入男或者女");
+                }
+            }
+
             DrugUser user = drugUserService.findByEmail(excel.getDrugUserEmail());
             if(user==null){
                 throw new Exception("第（"+errorLine+"）行销售不存在");
             }
+
+            List<Long> productIdList = drugUserMapper.getProductIdListByEmail(excel.getDrugUserEmail());
+            if (CollectionsUtil.isEmptyList(productIdList) || (!productIdList.contains(productId))){
+                throw new Exception("第（"+errorLine+"）行销售不在选定的产品下");
+            }
+
+
             map.put(excel.getDrugUserEmail(),user.getId());
         }
         return map;

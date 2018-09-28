@@ -28,7 +28,7 @@
         select
         d.id,d.name,d.email,d.hospital_id,d.hospital_name,d.provice,d.city,d.depart,d.telephone,d.positions,d.create_time,d.status,dv.doctor_id,dv.hospital_level,dv.client_level,dv.master_data_id,du.name
         drug_user_name,dud.prod_id product_id,dud.drug_user_id,pl.prod_name product_name from drug_user_doctor dud join doctor d on d.id=dud.doctor_id join
-        drug_user du on du.id=dud.drug_user_id join doctor_virtual dv on dv.doctor_id=dud.doctor_id join product_line pl on pl.prod_id=dud.prod_id where du.leader_path
+        drug_user du on du.id=dud.drug_user_id join doctor_virtual dv on dv.doctor_id=dud.doctor_id join product_line pl on pl.prod_id=dud.prod_id where dud.is_available=1 and du.leader_path
         like #{leaderPath,jdbcType=VARCHAR}
         <if test="name!=null and name!=''">
 
@@ -63,7 +63,7 @@
     <select id="doctorPageCount" resultType="java.lang.Integer"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean">
         select count(1) num from drug_user_doctor dud join doctor d on d.id=dud.doctor_id join
-        drug_user du on du.id=dud.drug_user_id join doctor_virtual dv on dv.doctor_id=dud.doctor_id where du.leader_path
+        drug_user du on du.id=dud.drug_user_id join doctor_virtual dv on dv.doctor_id=dud.doctor_id where dud.is_available=1 and du.leader_path
         like #{leaderPath,jdbcType=VARCHAR}
         <if test="name!=null and name!=''">
 
@@ -155,6 +155,16 @@
         SELECT concat(du.leader_path, '%')
         FROM drug_user du
         WHERE du.id=#{id}
+    </select>
+
+    <!-- 根据邮箱查询代表的产品ID列表 -->
+    <select id="getProductIdListByEmail" resultType="java.lang.Long">
+        SELECT DISTINCT pl.prod_id FROM product_line pl
+        INNER JOIN product_user pu
+        ON pl.prod_id=pu.prod_id
+        INNER JOIN drug_user du
+        ON pu.user_id=du.id
+        WHERE du.email=#{email}
     </select>
     
 </mapper>

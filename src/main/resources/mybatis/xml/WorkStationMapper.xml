@@ -12,6 +12,7 @@
         inner join drug_user du
         on dud.drug_user_id=du.id
         where 1=1
+        and dud.is_available=1
         and du.leader_path like #{leaderPath}
         and dud.prod_id=#{productId}
         group by dv.client_level
@@ -28,6 +29,7 @@
         inner join drug_user du
         on dud.drug_user_id=du.id
         where 1=1
+        and dud.is_available=1
         and date_format(dud.modify_time,'%Y-%m')=date_format(now(),'%Y-%m')
         and du.leader_path like #{leaderPath}
         and dud.prod_id=#{productId}
@@ -76,6 +78,7 @@
         inner join drug_user du
         on dud.drug_user_id=du.id
         where 1=1
+        and dud.is_available=1
         <!-- and vdcid.status_name='answer' -->
         and vdcid.status_name in ('answer','incall')
         and du.leader_path like #{leaderPath}
@@ -100,7 +103,9 @@
         on d.id=dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id=du.id
-        where du.leader_path like #{leaderPath}
+        where
+        dud.is_available=1 and
+        du.leader_path like #{leaderPath}
         and dud.prod_id=#{productId}
         and tcp.product_id=#{productId}
         and date_format(ar.create_time,'%Y-%m')=date_format(now(),'%Y-%m')
@@ -116,7 +121,7 @@
         on d.id = dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id=du.id
-        where 1=1
+        where dud.is_available=1 and
         and du.leader_path like #{leaderPath}
         and dud.prod_id=#{productId}
         group by dv.client_level
@@ -136,7 +141,7 @@
                 on d.id=dud.doctor_id
                 inner join drug_user du
                 on dud.drug_user_id=du.id
-                where dud.prod_id=#{productId}
+                where dud.is_available=1 and dud.prod_id=#{productId}
                 and du.leader_path like #{leaderPath}
                 and dv.client_level=#{level}
         ) b
@@ -152,7 +157,7 @@
                 on d.id=dud.doctor_id
                 inner join drug_user du
                 on dud.drug_user_id=du.id
-                where 1=1
+                where dud.is_available=1
                 <!-- and vdcid.status_name='answer'-->
                 and vdcid.status_name in ('answer','incall')
                 and du.leader_path like  #{leaderPath}
@@ -190,7 +195,7 @@
                         on d.id=dud.doctor_id
                         inner join drug_user du
                         on dud.drug_user_id=du.id
-                        where dud.prod_id=#{productId}
+                        where dud.is_available=1 and dud.prod_id=#{productId}
                         and du.leader_path like #{leaderPath}
                          and dv.client_level=#{level}
                 ) b
@@ -206,7 +211,8 @@
                         on d.id=dud.doctor_id
                         inner join drug_user du
                         on dud.drug_user_id=du.id
-                        where 1=1
+                        where dud.is_available=1 and
+
                         <!-- and vdcid.status_name='answer'-->
                         and vdcid.status_name in ('answer','incall')
                         and du.leader_path like #{leaderPath}
@@ -249,7 +255,7 @@
           on d.id=dud.doctor_id
           inner join drug_user du
           on dud.drug_user_id=du.id
-          where 1=1
+          where dud.is_available=1
            <if test="productId !=null and productId !=0">
                and dud.prod_id=#{productId}
            </if>
@@ -298,7 +304,7 @@
           on d.id=dud.doctor_id
           inner join drug_user du
           on dud.drug_user_id=du.id
-          where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+          where dud.is_available=1 and dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
         )
         and du.leader_path like #{leaderPath}
         group by vdci.virtual_drug_user_id order by sum_call_time limit 1
@@ -411,7 +417,7 @@
           on d.id=dud.doctor_id
           inner join drug_user du
           on dud.drug_user_id=du.id
-          where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+          where dud.is_available=1 and  dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
         )
         and du.leader_path like #{leaderPath}
         group by vdci.virtual_drug_user_id
@@ -532,7 +538,7 @@
           on d.id=dud.doctor_id
           inner join drug_user du
           on dud.drug_user_id=du.id
-          where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+          where dud.is_available=1 and dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
         )
         and du.leader_path like #{leaderPath}
         group by vdci.virtual_drug_user_id order by minCallCount limit 1
@@ -573,7 +579,7 @@
         on d.id=dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id=du.id
-        where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+        where dud.is_available=1 and dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
         )
         and du.leader_path like #{leaderPath}
         group by vdci.virtual_drug_user_id
@@ -615,7 +621,7 @@
         on d.id=dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id=du.id
-        where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+        where dud.is_available=1 and  dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
         )
         and du.leader_path like #{leaderPath}
         group by vdci.virtual_drug_user_id order by minCallCoveredCount limit 1
@@ -657,7 +663,7 @@
         on d.id=dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id=du.id
-        where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+        where dud.is_available=1 and  dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
         )
         and du.leader_path like #{leaderPath}
         group by vdci.virtual_drug_user_id
@@ -697,7 +703,7 @@
         on d.id=dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id=du.id
-        where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+        where dud.is_available=1 and  dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
         )
         group by vm.drug_user_id order by minImCount limit 1
     </select>
@@ -736,7 +742,7 @@
         on d.id=dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id=du.id
-        where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+        where dud.is_available=1 and  dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
         )
         group by vm.drug_user_id
         ) t where t.num = #{minImCount}
@@ -773,7 +779,7 @@
                   on d.id=dud.doctor_id
                   inner join drug_user du
                   on dud.drug_user_id=du.id
-                  where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+                  where dud.is_available=1 and  dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
                 )
         group by vm.drug_user_id order by minImCoveredCount limit 1
 
@@ -812,7 +818,7 @@
         on d.id=dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id=du.id
-        where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+        where dud.is_available=1 and dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
         )
         group by vm.drug_user_id
         ) t where t.num=#{minImCoveredCount}
@@ -851,7 +857,7 @@
                   on d.id=dud.doctor_id
                   inner join drug_user du
                   on dud.drug_user_id=du.id
-                  where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+                  where dud.is_available=1 and  dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
                 )
         group by vm.drug_user_id order by minWechatCount limit 1
 
@@ -892,7 +898,7 @@
         on d.id=dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id=du.id
-        where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+        where dud.is_available=1 and  dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
         )
         group by vm.drug_user_id
     ) t where t.num=#{minWechatCount}
@@ -930,7 +936,7 @@
                   on d.id=dud.doctor_id
                   inner join drug_user du
                   on dud.drug_user_id=du.id
-                  where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+                  where dud.is_available=1 and dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
                 )
         group by vm.drug_user_id order by minWechatCoveredCount limit 1
 
@@ -969,7 +975,7 @@
         on d.id=dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id=du.id
-        where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+        where dud.is_available=1 and  dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
         )
         group by vm.drug_user_id
         ) t
@@ -1006,7 +1012,7 @@
             on d.id=dud.doctor_id
           inner join drug_user du
           on dud.drug_user_id= du.id
-          where dud.prod_id=#{productId}
+          where dud.is_available=1 and  dud.prod_id=#{productId}
           and du.leader_path like #{leaderPath}
         )
         group by vei.drug_user_id order by minEmailCount limit 1
@@ -1046,7 +1052,7 @@
             on d.id=dud.doctor_id
           inner join drug_user du
           on dud.drug_user_id= du.id
-          where dud.prod_id=#{productId}
+          where dud.is_available=1 and dud.prod_id=#{productId}
           and du.leader_path like #{leaderPath}
         )
         group by vei.drug_user_id
@@ -1082,7 +1088,7 @@
         on d.id=dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id= du.id
-        where dud.prod_id=#{productId}
+        where dud.is_available=1 and  dud.prod_id=#{productId}
         and du.leader_path like #{leaderPath}
         )
         group by vei.drug_user_id order by minEmailCoveredCount limit 1
@@ -1121,7 +1127,7 @@
                 on d.id=dud.doctor_id
                 inner join drug_user du
                 on dud.drug_user_id= du.id
-                where dud.prod_id=#{productId}
+                where dud.is_available=1 and dud.prod_id=#{productId}
                 and du.leader_path like #{leaderPath}
                 )
                 group by vei.drug_user_id
@@ -1164,7 +1170,7 @@
                 on d.id=dud.doctor_id
                 inner join drug_user du
                 on dud.drug_user_id=du.id
-                where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+                where dud.is_available=1 and dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
             )
             and du.leader_path like #{leaderPath}
             group by vdci.virtual_drug_user_id
@@ -1203,7 +1209,7 @@
         on d.id=dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id=du.id
-        where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+        where dud.is_available=1 and  dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
         )
         group by vm.drug_user_id
 
@@ -1244,7 +1250,7 @@
         on d.id=dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id=du.id
-        where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+        where dud.is_available=1 and  dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
         )
         group by vm.drug_user_id
 
@@ -1285,7 +1291,7 @@
         on d.id=dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id= du.id
-        where dud.prod_id=#{productId}
+        where dud.is_available=1 and  dud.prod_id=#{productId}
         and du.leader_path like #{leaderPath}
         )
         group by vei.drug_user_id
@@ -1309,6 +1315,7 @@
                 inner join drug_user du on
                 dud.drug_user_id=du.id
                 where 1=1
+                and dud.is_available=1
                 and dud.prod_id=#{productId}
                 and du.leader_path like #{leaderPath}
                 and dv.client_level=#{level}
@@ -1328,6 +1335,7 @@
                 inner join drug_user du
                 on dud.drug_user_id=du.id
                 where 1=1
+                and dud.is_available=1
                 <!-- and vdcid.status_name='answer'-->
                 and vdcid.status_name in ('answer','incall')
                 and du.leader_path like #{leaderPath}
@@ -1350,7 +1358,7 @@
                 on d.id=dud.doctor_id
                 inner join drug_user du
                 on dud.drug_user_id=du.id
-                where du.leader_path like #{leaderPath}
+                where dud.is_available=1 and  du.leader_path like #{leaderPath}
                 and dud.prod_id=#{productId}
                 and tcp.product_id=#{productId}
 
@@ -1383,6 +1391,7 @@
         and dud.prod_id=#{productId}
         and du.leader_path like #{leaderPath}
         and dv.client_level=#{level}
+        and dud.is_available=1
         ) b
         inner join
 
@@ -1398,7 +1407,7 @@
                 on d.id=dud.doctor_id
                 inner join drug_user du
                 on dud.drug_user_id=du.id
-                where 1=1
+                where dud.is_available=1
                 <!-- and vdcid.status_name='answer'-->
                 and vdcid.status_name in ('answer','incall')
                 and du.leader_path like #{leaderPath}
@@ -1421,7 +1430,7 @@
                 on d.id=dud.doctor_id
                 inner join drug_user du
                 on dud.drug_user_id=du.id
-                where du.leader_path like #{leaderPath}
+                where dud.is_available=1 and  du.leader_path like #{leaderPath}
                 and dud.prod_id=#{productId}
                 and tcp.product_id=#{productId}
 
@@ -1455,6 +1464,7 @@
         and dud.prod_id=#{productId}
         and du.leader_path like #{leaderPath}
         and dv.client_level=#{level}
+        and dud.is_available=1
         ) b
         inner join
 
@@ -1470,7 +1480,7 @@
                 on d.id=dud.doctor_id
                 inner join drug_user du
                 on dud.drug_user_id=du.id
-                where 1=1
+                where dud.is_available=1
                 <!-- and vdcid.status_name='answer'-->
                 and vdcid.status_name in ('answer','incall')
                 and du.leader_path like #{leaderPath}
@@ -1493,7 +1503,7 @@
                 on d.id=dud.doctor_id
                 inner join drug_user du
                 on dud.drug_user_id=du.id
-                where du.leader_path like #{leaderPath}
+                where dud.is_available=1 and du.leader_path like #{leaderPath}
                 and dud.prod_id=#{productId}
                 and tcp.product_id=#{productId}
 
@@ -1531,7 +1541,7 @@
         on d.id=dud.doctor_id
         inner join drug_user du
 				on dud.drug_user_id=du.id
-        where vdci.product_id=#{productId}
+        where dud.is_available=1 and vdci.product_id=#{productId}
         <!-- and vdcid.status_name='answer'-->
         and vdcid.status_name in ('answer','incall')
 				and du.leader_path like #{leaderPath}
@@ -1558,7 +1568,7 @@
           on d.id=dud.doctor_id
           inner join drug_user du
           on dud.drug_user_id=du.id
-          where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+          where dud.is_available=1 and  dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
         )
         group by vdci.virtual_doctor_id order by minCallTotalTime limit 1
     </select>
@@ -1621,7 +1631,7 @@
         on d.id=vdci.virtual_doctor_id
         inner join virtual_doctor_call_info_details vdcid
         on vdci.id=vdcid.call_id
-        where du.leader_path like #{leaderPath}
+        where dud.is_available=1 and  du.leader_path like #{leaderPath}
         <!-- and vdcid.status_name='answer' -->
         and vdcid.status_name in ('answer','incall')
         and dud.prod_id=#{productId}
@@ -1663,7 +1673,7 @@
         on d.id=dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id=du.id
-        where vdci.product_id=#{productId}
+        where dud.is_available=1 and  vdci.product_id=#{productId}
         <!-- and vdcid.status_name='answer'-->
         and vdcid.status_name in ('answer','incall')
         and du.leader_path like #{leaderPath}
@@ -1690,7 +1700,7 @@
             on d.id=dud.doctor_id
             inner join drug_user du
             on dud.drug_user_id=du.id
-            where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+            where dud.is_available=1 and  dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
         )
         group by vdci.virtual_doctor_id
         ) t group by t.id order by minAvgCallTotalTime limit 1
@@ -1758,7 +1768,7 @@
         on d.id=vdci.virtual_doctor_id
         inner join virtual_doctor_call_info_details vdcid
         on vdci.id=vdcid.call_id
-        where du.leader_path like #{leaderPath}
+        where dud.is_available=1 and  du.leader_path like #{leaderPath}
         <!-- and vdcid.status_name='answer' -->
         and vdcid.status_name in ('answer','incall')
         and dud.prod_id=#{productId}
@@ -1804,7 +1814,7 @@
         on d.id=dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id=du.id
-        where vdci.product_id=#{productId}
+        where dud.is_available=1 and  vdci.product_id=#{productId}
 
         <!-- and vdcid.status_name='answer'-->
         and vdcid.status_name in ('answer','incall')
@@ -1832,7 +1842,7 @@
             on d.id=dud.doctor_id
             inner join drug_user du
             on dud.drug_user_id=du.id
-            where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+            where dud.is_available=1 and  dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
         )
 
         group by vdci.virtual_doctor_id order by minCallCount limit 1
@@ -1853,7 +1863,7 @@
         on d.id=dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id=du.id
-        where vdci.product_id=#{productId}
+        where dud.is_available=1 and  vdci.product_id=#{productId}
         <!-- and vdcid.status_name='answer'-->
         and vdcid.status_name in ('answer','incall')
         and du.leader_path like #{leaderPath}
@@ -1880,7 +1890,7 @@
             on d.id=dud.doctor_id
             inner join drug_user du
             on dud.drug_user_id=du.id
-            where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+            where dud.is_available=1 and  dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
         )
 
         group by vdci.virtual_doctor_id
@@ -1904,7 +1914,7 @@
         on d.id=vdci.virtual_doctor_id
         inner join virtual_doctor_call_info_details vdcid
         on vdci.id=vdcid.call_id
-        where du.leader_path like #{leaderPath}
+        where dud.is_available=1 and du.leader_path like #{leaderPath}
         <!-- and vdcid.status_name='answer'-->
         and vdcid.status_name in ('answer','incall')
         and dud.prod_id=#{productId}
@@ -1944,7 +1954,7 @@
 				on d.id=dud.doctor_id
 				inner join drug_user du
 				on dud.drug_user_id=du.id
-        where vm.product_id=#{productId}
+        where dud.is_available=1 and  vm.product_id=#{productId}
         and vm.message_type=2
         and vm.user_type=2
 
@@ -1971,7 +1981,7 @@
         on d.id=dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id=du.id
-        where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+        where dud.is_available=1 and  dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
         )
         group by vm.doctor_id order by minImCount limit 1
     </select>
@@ -1987,7 +1997,7 @@
 				on d.id=dud.doctor_id
 				inner join drug_user du
 				on dud.drug_user_id=du.id
-        where vm.product_id=#{productId}
+        where dud.is_available=1 and  vm.product_id=#{productId}
         and vm.message_type=2
         and vm.user_type=2
 
@@ -2014,7 +2024,7 @@
         on d.id=dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id=du.id
-        where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+        where dud.is_available=1 and dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
         )
         group by vm.doctor_id
         ) t where t.num=#{minImCount}
@@ -2031,7 +2041,7 @@
 				on d.id=dud.doctor_id
 				inner join drug_user du
 				on dud.drug_user_id=du.id
-        where 1=1
+        where dud.is_available=1
         and vm.message_type=1
         and vm.user_type=2
 
@@ -2059,7 +2069,7 @@
         on d.id=dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id=du.id
-        where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+        where dud.is_available=1 and  dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
         )
         group by vm.doctor_id order by minWechatCount limit 1
 
@@ -2078,7 +2088,7 @@
 				on d.id=dud.doctor_id
 				inner join drug_user du
 				on dud.drug_user_id=du.id
-        where 1=1
+        where dud.is_available=1
         and vm.message_type=1
         and vm.user_type=2
 
@@ -2108,7 +2118,7 @@
         on d.id=dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id=du.id
-        where dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
+        where dud.is_available=1 and  dud.prod_id=#{productId} and du.leader_path like #{leaderPath}
         )
         group by vm.doctor_id
         ) t where t.num=#{minWechatCount}
@@ -2126,7 +2136,7 @@
 				on d.id=dud.doctor_id
 				inner join drug_user du
 				on dud.drug_user_id=du.id
-        where vei.product_id= #{productId}
+        where dud.is_available=1 and vei.product_id= #{productId}
         and du.leader_path like #{leaderPath}
 
 
@@ -2152,7 +2162,7 @@
             on d.id=dud.doctor_id
           inner join drug_user du
           on dud.drug_user_id= du.id
-          where dud.prod_id=#{productId}
+          where dud.is_available=1 and dud.prod_id=#{productId}
           and du.leader_path like #{leaderPath}
         )
         group by vei.doctor_id order by minEmailCount limit 1
@@ -2169,7 +2179,7 @@
 				on d.id=dud.doctor_id
 				inner join drug_user du
 				on dud.drug_user_id=du.id
-        where vei.product_id= #{productId}
+        where dud.is_available=1 and  vei.product_id= #{productId}
         and du.leader_path like #{leaderPath}
 
 
@@ -2182,7 +2192,7 @@
             on d.id=dud.doctor_id
           inner join drug_user du
           on dud.drug_user_id= du.id
-          where dud.prod_id=#{productId}
+          where dud.is_available=1 and  dud.prod_id=#{productId}
           and du.leader_path like #{leaderPath}
         )
         group by vei.doctor_id
@@ -2202,7 +2212,7 @@
         on d.id=dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id=du.id
-        where tma.product_id=#{productId}
+        where dud.is_available=1 and  tma.product_id=#{productId}
         and dud.prod_id=#{productId}
         and du.leader_path like #{leaderPath}
         <if test="dateType !=null">
@@ -2282,7 +2292,7 @@
                         on d.id=dud.doctor_id
                         inner join drug_user du
                         on dud.drug_user_id=du.id
-                        where pl.prod_id=#{productId}
+                        where dud.is_available=1 and  pl.prod_id=#{productId}
                         and dud.prod_id=#{productId}
                         and du.leader_path like #{leaderPath}
                         <if test="dateType !=null">
@@ -2317,7 +2327,7 @@
                         on d.id=dud.doctor_id
                         inner join drug_user du
                         on dud.drug_user_id=du.id
-                        where pl.prod_id=#{productId}
+                        where dud.is_available=1 and  pl.prod_id=#{productId}
                         and dud.prod_id=#{productId}
                         and du.leader_path like #{leaderPath}
                         <if test="dateType !=null">
@@ -2352,7 +2362,7 @@
                     on d.id=dud.doctor_id
                     inner join drug_user du
                     on dud.drug_user_id=du.id
-                    where pl.prod_id=#{productId}
+                    where dud.is_available=1 and  pl.prod_id=#{productId}
                     and dud.prod_id=#{productId}
                     and du.leader_path like #{leaderPath}
                     <if test="dateType !=null">
@@ -2386,7 +2396,7 @@
                 on d.id=dud.doctor_id
                 inner join drug_user du
                 on dud.drug_user_id=du.id
-                where 1=1
+                where dud.is_available=1
                 <!-- and vdcid.status_name='answer'-->
                 and vdcid.status_name in ('answer','incall')
                 and du.leader_path like #{leaderPath}
@@ -2425,7 +2435,7 @@
         on d.id=dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id=du.id
-        where du.leader_path like #{leaderPath}
+        where dud.is_available=1 and  du.leader_path like #{leaderPath}
         and dud.prod_id=#{productId}
         and tma.product_id=#{productId}
         <if test="dateType !=null">
@@ -2651,7 +2661,7 @@
         on d.id=dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id=du.id
-        where tma.product_id=#{productId}
+        where dud.is_available=1 and  tma.product_id=#{productId}
         and dud.prod_id=#{productId}
         and du.leader_path like #{leaderPath}
         <if test="dateType !=null">
@@ -2686,7 +2696,7 @@
             on d.id=dud.doctor_id
             inner join drug_user du
             on dud.drug_user_id=du.id
-            where tma.product_id=#{productId}
+            where dud.is_available=1 and  tma.product_id=#{productId}
             and dud.prod_id=#{productId}
             and du.leader_path like #{leaderPath}
             <if test="dateType !=null">
@@ -2832,7 +2842,7 @@
         on d.id=tmad.doctor_id
         inner join t_meeting_data tma
         on tmad.meeting_id=tma.id
-        where tma.product_id=#{productId}
+        where dud.is_available=1 and tma.product_id=#{productId}
         and du.leader_path like #{leaderPath}
         <if test="dateType !=null">
             <if test="dateType==1">
@@ -2881,7 +2891,7 @@
                         on d.id=dud.doctor_id
                         inner join drug_user du
                         on dud.drug_user_id=du.id
-                        where 1=1
+                        where dud.is_available=1
                         <!-- and vdcid.status_name='answer'-->
                         and vdcid.status_name in ('answer','incall')
                         and du.leader_path like #{leaderPath}
@@ -2919,7 +2929,7 @@
                         on d.id=dud.doctor_id
                         inner join drug_user du
                         on dud.drug_user_id=du.id
-                        where du.leader_path like #{leaderPath}
+                        where dud.is_available=1 and  du.leader_path like #{leaderPath}
                         and dud.prod_id=#{productId}
                         and tcp.product_id=#{productId}
 
@@ -2951,6 +2961,7 @@
         on d.id=b2.doctor_id
         where dv.client_level=#{level}
         and du.leader_path like #{leaderPath}
+        and dud.is_available=1
         and dud.prod_id=#{productId}
         group by du.id
 
@@ -2977,7 +2988,7 @@
         on tcp.product_id=pl.prod_id
         inner join activity_info ai
         on tcp.content_id=ai.id
-        where 1=1
+        where dud.is_available=1 and
         and du.leader_path like #{leaderPath}
 
         <if test="dateType !=null">
@@ -3024,7 +3035,7 @@
         on tcp.product_id=pl.prod_id
         inner join activity_info ai
         on tcp.content_id=ai.id
-        where 1=1
+        where dud.is_available=1
         and du.leader_path like #{leaderPath}
 
         <if test="dateType !=null">
@@ -3069,7 +3080,7 @@
         on tcp.product_id=pl.prod_id
         inner join activity_info ai
         on tcp.content_id=ai.id
-        where 1=1
+        where dud.is_available=1
         and du.leader_path like #{leaderPath}
 
         <if test="dateType !=null">
@@ -3112,7 +3123,7 @@
         on d.id=tmad.doctor_id
         inner join t_meeting_data tma
         on tmad.meeting_id=tma.id
-        where tma.product_id=#{productId}
+        where dud.is_available=1 and  tma.product_id=#{productId}
         and du.leader_path like #{leaderPath}
 
         <if test="dateType !=null">

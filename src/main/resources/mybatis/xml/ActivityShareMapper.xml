@@ -110,7 +110,7 @@
 				a.create_time,
 				'%Y-%m-%d %H:%i:%s'
 			) shareTime,
-			a.share_type,
+			a.share_type shareType,
 			ai.title,
 			ai.id contentId,
 			ase.share_status shareStatus,
