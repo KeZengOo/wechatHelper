@@ -238,4 +238,13 @@
 		</trim>
 		WHERE id=#{id}
 	</update>
+
+
+	<select id="doctorCountByMobile" resultType="java.lang.Integer">
+		SELECT sum(num) FROM (
+		SELECT COUNT(*) num FROM doctor WHERE telephone=#{mobile}
+		UNION
+		SELECT COUNT(*) num FROM doctor_telephone WHERE telephone=#{mobile}
+		) t
+	</select>
 </mapper>

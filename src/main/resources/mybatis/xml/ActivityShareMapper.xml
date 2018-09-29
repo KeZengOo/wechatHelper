@@ -4,6 +4,7 @@
 <mapper namespace="com.nuoxin.virtual.rep.api.mybatis.ActivityShareMapper">
 
 	<select id="getMessageDoctorVisitCount" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse">
+		<!-- 2018-09-29 重构前
 		SELECT
 		t.drug_user_id drugUserId,count(DISTINCT t.share_person_id) total
 		FROM activity_share t join t_content_product t1 on t.data_id=t1.content_id
@@ -20,13 +21,62 @@
 		</if>
 		AND t1.product_id=#{productId}
 		GROUP BY t.drug_user_id
+		-->
+
+
+		<!-- 2018-09-29 重构后 -->
+		SELECT
+		content_dud.drugUserId,
+		COUNT(DISTINCT a.share_person_id) total
+		FROM
+		activity_share a
+		INNER JOIN (
+		SELECT DISTINCT
+		d.id doctorId,
+		du.id drugUserId
+		FROM
+		doctor d
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		WHERE
+		dud.is_available = 1
+		AND dud.prod_id = #{productId}
+		AND du.id IN
+
+		<foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+
+		) content_dud ON a.share_person_id = content_dud.doctorId
+		WHERE
+		a.share_type=2 AND
+		a.data_id IN (
+		SELECT DISTINCT
+		tcp.content_id
+		FROM
+		t_content_product tcp
+		INNER JOIN product_line pl ON tcp.product_id = pl.prod_id
+		INNER JOIN activity_info ai ON tcp.content_id = ai.id
+		WHERE
+		tcp.product_id = #{productId}
+		)
+		<if test="startTime!=null">
+			and date_format(a.create_time,'%Y-%m-%d') &gt;=#{startTime}
+		</if>
+		<if test="endTime!=null">
+			and date_format(a.create_time,'%Y-%m-%d') &lt;=#{endTime}
+		</if>
+		GROUP BY
+		content_dud.drugUserId
+
 	</select>
 
 	<select id="getContentServiceCount" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse">
+		<!-- 2018-09-29 修改前
 		SELECT
 		t.drug_user_id drugUserId,count(DISTINCT t.share_person_id) total
 		FROM
-		activity_share t JOIN activity_share_extend t1 ON t.`id`=t1.`activity_share_id`
+		activity_share t  JOIN activity_share_extend t1 ON t.`id`=t1.`activity_share_id`
 		join t_content_product t2 on t.data_id=t2.content_id
 		WHERE
 		t1.`share_status` IN(2,3) and t.drug_user_id IN
@@ -41,9 +91,63 @@
 		</if>
 		AND t2.product_id=#{productId}
 		GROUP BY t.drug_user_id
+		-->
+
+		<!-- 2018-09-29 重构后，由于 activity_share_extend 暂无修改的地方，这个表就不在关联-->
+		SELECT
+		content_dud.drugUserId,
+		COUNT(DISTINCT a.share_person_id) total
+		FROM
+		activity_share a
+		INNER JOIN (
+		SELECT DISTINCT
+		d.id doctorId,
+		du.id drugUserId
+		FROM
+		doctor d
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		WHERE
+		dud.is_available = 1
+		AND dud.prod_id = #{productId}
+		AND du.id IN
+
+		<foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+
+		) content_dud ON a.share_person_id = content_dud.doctorId
+		WHERE
+		a.data_id IN (
+		SELECT DISTINCT
+		tcp.content_id
+		FROM
+		t_content_product tcp
+		INNER JOIN product_line pl ON tcp.product_id = pl.prod_id
+		INNER JOIN activity_info ai ON tcp.content_id = ai.id
+		WHERE
+		tcp.product_id = #{productId}
+		)
+
+		<if test="startTime!=null">
+		AND DATE_FORMAT(a.create_time, '%Y-%m-%d') &gt;= #{startTime}
+		</if>
+
+		<if test="endTime!=null">
+		AND DATE_FORMAT(a.create_time, '%Y-%m-%d') &lt;= #{endTime}
+		</if>
+
+		GROUP BY
+		content_dud.drugUserId
+
+
+
+
 	</select>
 
 	<select id="getContentSendCount" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse">
+
+		<!-- 2018-09-29 修改前
 		SELECT
 		t.drug_user_id drugUserId,count(DISTINCT t.share_person_id) total
 		FROM activity_share t join t_content_product t1 on t.data_id=t1.content_id
@@ -60,9 +164,58 @@
 		</if>
 		AND t1.product_id=#{productId}
 		GROUP BY t.drug_user_id
+		 -->
+
+		<!-- 2018-09-29 修改后 -->
+		SELECT
+		content_dud.drugUserId,
+		COUNT(DISTINCT a.share_person_id) total
+		FROM
+		activity_share a
+		INNER JOIN (
+		SELECT DISTINCT
+		d.id doctorId,
+		du.id drugUserId
+		FROM
+		doctor d
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		WHERE
+		dud.is_available = 1
+		AND dud.prod_id = #{productId}
+		AND du.id IN
+
+		<foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+
+		) content_dud ON a.share_person_id = content_dud.doctorId
+		WHERE
+		a.data_id IN (
+		SELECT DISTINCT
+		tcp.content_id
+		FROM
+		t_content_product tcp
+		INNER JOIN product_line pl ON tcp.product_id = pl.prod_id
+		INNER JOIN activity_info ai ON tcp.content_id = ai.id
+		WHERE
+		tcp.product_id = #{productId}
+		)
+
+		<if test="startTime!=null">
+			and date_format(a.create_time,'%Y-%m-%d')&gt;=#{startTime}
+		</if>
+		<if test="endTime!=null">
+			and date_format(a.create_time,'%Y-%m-%d')&lt;=#{endTime}
+		</if>
+
+		GROUP BY
+		content_dud.drugUserId
+
 	</select>
 
 	<select id="getContentReadCount" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse">
+		<!-- 2018-09-29 修改前
 		SELECT
 		t.drug_user_id drugUserId,count(DISTINCT t.read_person_id) total
 		FROM activity_read t join t_content_product t1 on t.data_id=t1.content_id
@@ -79,9 +232,56 @@
 		</if>
 		AND t1.product_id=#{productId}
 		GROUP BY t.drug_user_id
+		-->
+
+		<!-- 2018-09-29 修改后 -->
+		SELECT
+		content_dud.drugUserId,
+		COUNT(DISTINCT a.read_person_id) total
+		FROM
+		activity_read a
+		INNER JOIN (
+		SELECT DISTINCT
+		d.id doctorId,
+		du.id drugUserId
+		FROM
+		doctor d
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		WHERE
+		dud.is_available = 1
+		AND dud.prod_id = #{productId}
+		AND du.id IN
+
+		<foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+
+		) content_dud ON a.read_person_id = content_dud.doctorId
+		WHERE
+		a.data_id IN (
+		SELECT DISTINCT
+		tcp.content_id
+		FROM
+		t_content_product tcp
+		INNER JOIN product_line pl ON tcp.product_id = pl.prod_id
+		INNER JOIN activity_info ai ON tcp.content_id = ai.id
+		WHERE
+		tcp.product_id = #{productId}
+		)
+		<if test="startTime!=null">
+			and date_format(a.create_time,'%Y-%m-%d')&gt;=#{startTime}
+		</if>
+		<if test="endTime!=null">
+			and date_format(a.create_time,'%Y-%m-%d')&lt;=#{endTime}
+		</if>
+		GROUP BY
+		content_dud.drugUserId
+
 	</select>
 
 	<select id="getContentReadTimeCount" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse">
+		<!-- 2018-09-29 重构前
 		SELECT
 		t.drug_user_id drugUserId,sum(t.read_time) total
 		FROM activity_read t join t_content_product t1 on t.data_id=t1.content_id
@@ -98,6 +298,52 @@
 		</if>
 		AND t1.product_id=#{productId}
 		GROUP BY t.drug_user_id
+		-->
+
+		<!-- 2018-09-29 重构后 -->
+		SELECT
+		content_dud.drugUserId,
+		sum(a.read_time) total
+		FROM
+		activity_read a
+		INNER JOIN (
+		SELECT DISTINCT
+		d.id doctorId,
+		du.id drugUserId
+		FROM
+		doctor d
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		WHERE
+		dud.is_available = 1
+		AND dud.prod_id = #{productId}
+		AND du.id IN
+
+		<foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+
+		) content_dud ON a.read_person_id = content_dud.doctorId
+		WHERE
+		a.data_id IN (
+		SELECT DISTINCT
+		tcp.content_id
+		FROM
+		t_content_product tcp
+		INNER JOIN product_line pl ON tcp.product_id = pl.prod_id
+		INNER JOIN activity_info ai ON tcp.content_id = ai.id
+		WHERE
+		tcp.product_id = #{productId}
+		)
+		<if test="startTime!=null">
+			and date_format(a.create_time,'%Y-%m-%d')&gt;=#{startTime}
+		</if>
+		<if test="endTime!=null">
+			and date_format(a.create_time,'%Y-%m-%d')&lt;=#{endTime}
+		</if>
+		GROUP BY
+		content_dud.drugUserId
+
 	</select>
 	
 	

@@ -705,6 +705,7 @@
     </select>
 
     <select id="getWeiXinDoctorVisitCount"  resultType="com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse">
+        <!-- 2018-09-29 修改前
         SELECT
         drug_user_id drugUserId,count(DISTINCT doctor_id) total
         FROM virtual_message
@@ -721,9 +722,48 @@
         </if>
         AND product_id=#{productId}
         GROUP BY drug_user_id
+        -->
+
+        <!-- 2018-09-29 修改后 -->
+        SELECT
+        message_dud.drugUserId,
+        COUNT(DISTINCT vm.doctor_id)
+        FROM
+        virtual_message vm
+        INNER JOIN (
+        SELECT DISTINCT
+        d.id doctorId,
+        du.id drugUserId
+        FROM
+        doctor d
+        INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+        INNER JOIN drug_user du ON dud.drug_user_id = du.id
+        WHERE
+        dud.is_available = 1
+        AND dud.prod_id = #{productId}
+        AND du.id IN
+
+        <foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+            #{drugUserId}
+        </foreach>
+
+        ) message_dud ON vm.doctor_id = message_dud.doctorId
+        AND vm.message_type = 1
+        WHERE 1=1
+        <if test="startTime!=null">
+            and date_format(vm.message_time,'%Y-%m-%d') &gt;=#{startTime}
+        </if>
+        <if test="endTime!=null">
+            and date_format(vm.message_time,'%Y-%m-%d') &lt;=#{endTime}
+        </if>
+        GROUP BY
+        message_dud.drugUserId
+
     </select>
 
     <select id="getWeiXinMessageCount"  resultType="com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse">
+       <!-- 2018-09-29 修改前
+
         SELECT
         drug_user_id drugUserId,count(DISTINCT doctor_id) total
         FROM virtual_message
@@ -740,6 +780,44 @@
         </if>
         AND product_id=#{statisticsParams.productId} and wechat_message_status=#{wechatMessageStatus}
         GROUP BY drug_user_id
+        -->
+
+        <!-- 2018-09-29 修改后 -->
+        SELECT
+        message_dud.drugUserId,
+        COUNT(DISTINCT vm.doctor_id)
+        FROM
+        virtual_message vm
+        INNER JOIN (
+        SELECT DISTINCT
+        d.id doctorId,
+        du.id drugUserId
+        FROM
+        doctor d
+        INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+        INNER JOIN drug_user du ON dud.drug_user_id = du.id
+        WHERE
+        dud.is_available = 1
+        AND dud.prod_id = #{statisticsParams.productId}
+        AND du.id IN
+        <foreach collection="statisticsParams.drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+            #{drugUserId}
+        </foreach>
+
+        ) message_dud ON vm.doctor_id = message_dud.doctorId
+        AND vm.message_type = 1
+        WHERE wechat_message_status=#{wechatMessageStatus}
+
+        <if test="statisticsParams.startTime!=null">
+            and date_format(vm.message_time,'%Y-%m-%d')&gt;=#{statisticsParams.startTime}
+        </if>
+        <if test="statisticsParams.endTime!=null">
+            and date_format(vm.message_time,'%Y-%m-%d')&lt;=#{statisticsParams.endTime}
+        </if>
+        GROUP BY
+        message_dud.drugUserId
+
+
     </select>
 
 

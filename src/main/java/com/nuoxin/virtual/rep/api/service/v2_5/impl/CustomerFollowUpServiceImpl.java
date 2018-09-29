@@ -92,6 +92,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		CustomerFollowUpPageResponseBean pageResponseBean = null;
 		int count = 0;
 		 // 获取所有下属(直接&间接) virtualDrugUserIds
+		List<Long> productLineIds = request.getProductLineIds();
 		List<Long> virtualDrugUserIds = commonService.getSubordinateIds(leaderPath);
 		if (CollectionsUtil.isNotEmptyList(virtualDrugUserIds)) {
 			String search = request.getSearch();
@@ -100,7 +101,9 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 				int currentSize = request.getCurrentSize();
 				int pageSize = request.getPageSize();
 				List<CustomerFollowListBean> list = doctorMapper.getList(virtualDrugUserIds, currentSize, pageSize, search, null);
+				// TODO 填充上产品
 				pageResponseBean = this.getDoctorsList(count, list, request);
+				this.fillProductInfos(list, productLineIds);
 			}
 		} 
 		

@@ -32,6 +32,21 @@
 				AND virtual_questionnaire_id=#{virtualQuestionnaireId}
 		)
 	</select>
+
+
+	<!-- 获取最近一次做题记录 -->
+	<select id="getQuestionnaireById" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VirtualQuestionnaireRecordResponse">
+		SELECT
+		vq.id,
+		vq.title,
+		vq.`options`,
+		vq.type
+	FROM
+		virtual_question vq
+	WHERE
+		vq.virtual_questionnaire_id = #{id}
+	</select>
+
 	
 	<!-- 保存问卷作答 -->	
 	<insert id="saveQuestionnaire" parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorParams">

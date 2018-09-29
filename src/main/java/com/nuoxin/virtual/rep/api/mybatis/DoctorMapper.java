@@ -97,4 +97,12 @@ public interface DoctorMapper{
      * @return
      */
     int updateDoctor(Doctor doctor);
+
+    /**
+     * 根据手机号查询医生，校验医生是否存在
+     * @param mobile
+     * @return
+     */
+    Integer doctorCountByMobile(@Param(value = "mobile") String mobile);
+
 }

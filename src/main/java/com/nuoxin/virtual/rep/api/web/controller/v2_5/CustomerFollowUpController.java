@@ -81,6 +81,28 @@ public class CustomerFollowUpController extends NewBaseController {
 			return super.getParamsErrorResponse("search is blank");
 		}
 
+		List<Long> virtualDrugUserIds = null;
+		List<DrugUserResponseBean> subordinates = drugUserProductService.getSubordinates(user.getLeaderPath());
+		if (CollectionsUtil.isNotEmptyList(subordinates)) {
+			List<Long> virtualDrugUserIdsTemp = new ArrayList<>();
+			subordinates.forEach(subordinate -> {
+				virtualDrugUserIdsTemp.add(subordinate.getId());
+			});
+			virtualDrugUserIds = virtualDrugUserIdsTemp;
+			searchRequest.setVirtualDrugUserIds(virtualDrugUserIds);
+		}
+
+		List<Long> productLineIds = null;
+		List<ProductResponseBean> products = drugUserProductService.getProductsByDrugUserId(user.getLeaderPath());
+		if (CollectionsUtil.isNotEmptyList(products)) {
+			List<Long> productLineIdsTemp = new ArrayList<>();
+			products.forEach(product ->{
+				productLineIdsTemp.add(product.getProductId());
+			});
+			productLineIds = productLineIdsTemp;
+			searchRequest.setProductLineIds(productLineIds);
+		}
+
 		CustomerFollowUpPageResponseBean<List<CustomerFollowListBean>> pageResponse = customerFollowService.search(searchRequest,
 				user.getLeaderPath());
 		DefaultResponseBean<CustomerFollowUpPageResponseBean<List<CustomerFollowListBean>>> responseBean = new DefaultResponseBean<>();

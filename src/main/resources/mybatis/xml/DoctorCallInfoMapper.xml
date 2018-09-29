@@ -128,6 +128,8 @@
     </update>
 
     <select id="getDoctorVisitDetailList" resultType="java.util.LinkedHashMap">
+
+        <!-- 2018-09-29 修改前 -->
         SELECT * FROM
         (SELECT DISTINCT t.`id`,IFNULL(t2.`name`,'') drugUserName,IFNULL(date_format(t.`create_time`, '%Y-%m-%d %H:%i:%s'),'')  visitTime,IFNULL(t3.`id`,'') doctorId,IFNULL(t3.`name`,'') doctorName,
         IFNULL(t3.`hospital_name`,'') hospitalName,"电话" visitType,"" shareContent,IFNULL(t1.`visit_result`,'') visitResult,IFNULL(t1.`attitude`,'') attitude,IFNULL(date_format(t1.`next_visit_time`, '%Y-%m-%d %H:%i:%s'),'') nextVisitTime
@@ -158,7 +160,7 @@
             SELECT DISTINCT t.`id`,IFNULL(t3.`name`,'') drugUserName,IFNULL(date_format(t.`create_time`, '%Y-%m-%d %H:%i:%s'),'') visitTime,IFNULL(t4.`id`,'') doctorId,IFNULL(t4.`name`,'') doctorName,
             IFNULL(t4.`hospital_name`,'') hospitalName,CASE WHEN share_type=1 THEN "微信" WHEN share_type=2 THEN "短信" WHEN share_type=3 THEN "邮件" else "" END  visitType,
             IFNULL(t2.title,'') shareContent,"" visitResult,"" attitude,"" nextVisitTime
-            ,IFNULL(t5.client_level,'') clientLevel,IFNULL(t6.`hcp_potential`,'') hcpPotential,IFNULL(t6.is_has_drug,'') isHasDrug,IFNULL(t6.`is_target`,'') isTarget,IFNULL(t6.`is_has_ae`,'')  isHasAe
+            ,call_dud.clientLevel,IFNULL(t6.`hcp_potential`,'') hcpPotential,IFNULL(t6.is_has_drug,'') isHasDrug,IFNULL(t6.`is_target`,'') isTarget,IFNULL(t6.`is_has_ae`,'')  isHasAe
             FROM `activity_share` t
             JOIN `t_content_product` t1 ON t.`data_id`=t1.`content_id`
             JOIN `activity_info` t2 ON t.`data_id`=t2.`data_id`
@@ -181,9 +183,116 @@
         <if test="type==1">
             LIMIT #{currentSize},#{pageSize}
         </if>
+
+
+
+
+
+        SELECT * FROM (
+        SELECT
+        DISTINCT vdci.`id`,call_dud.drugUserName,IFNULL(date_format(vdci.`create_time`, '%Y-%m-%d %H:%i:%s'),'')  visitTime,call_dud.doctorId,call_dud.doctorName,
+        call_dud.hospitalName,"电话" visitType,"" shareContent,IFNULL(vdcim.`visit_result`,'') visitResult,IFNULL(vdcim.`attitude`,'') attitude,IFNULL(date_format(vdcim.`next_visit_time`, '%Y-%m-%d %H:%i:%s'),'') nextVisitTime
+        ,IFNULL(t4.client_level,'') clientLevel,IFNULL(dudq.`hcp_potential`,'') hcpPotential,IFNULL(dudq.is_has_drug,'') isHasDrug,IFNULL(dudq.`is_target`,'') isTarget,IFNULL(dudq.`is_has_ae`,'')  isHasAe
+        FROM
+        virtual_doctor_call_info vdci
+        LEFT JOIN virtual_doctor_call_info_mend vdcim ON vdci.id=vdcim.call_id
+        INNER JOIN (
+        SELECT DISTINCT
+        d.id doctorId,d.`name` doctorName,d.hospital_name hospitalName,IFNULL(dv.client_level,'') clientLevel,du.`name` drugUserName
+        FROM
+        doctor d
+        INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+        INNER JOIN drug_user du ON dud.drug_user_id = du.id
+        LEFT JOIN doctor_virtual dv
+        ON d.id=dv.doctor_id AND dv.product_id=#{productId}
+        WHERE
+        dud.is_available = 1
+        AND dud.prod_id = #{productId}
+
+        <if test="drugUserId!=null">
+            and du.id=#{drugUserId}
+        </if>
+
+        ) call_dud ON vdci.virtual_doctor_id = call_dud.doctorId
+        LEFT JOIN drug_user_doctor_quate dudq ON call_dud.doctorId=dudq.doctor_id AND dudq.product_id=#{productId}
+        WHERE
+        vdci.product_id=#{productId}
+
+        <if test="startTime!=null">
+            and date_format(vdci.create_time,'%Y-%m-%d') &gt;=#{startTime}
+        </if>
+        <if test="endTime!=null">
+            and date_format(vdci.create_time,'%Y-%m-%d') &lt;=#{endTime}
+        </if>
+        <if test="contents!=null and contents.size>0">
+            and
+            <foreach collection="contents" item="content" open="(" close=")" separator="or">
+                vdcim.visit_result LIKE CONCAT('%',#{content},'%')
+            </foreach>
+        </if>
+
+        <if test="contents==null or contents.size==0">
+            UNION ALL
+            SELECT
+            DISTINCT a.id,content_dud.drugUserName,IFNULL(date_format(a.`create_time`, '%Y-%m-%d %H:%i:%s'),'') visitTime,content_dud.doctorId,content_dud.doctorName,
+            content_dud.hospitalName,CASE WHEN a.share_type=1 THEN "微信" WHEN a.share_type=2 THEN "短信" WHEN a.share_type=3 THEN "邮件" else "" END  visitType,
+            IFNULL(ai.title,'') shareContent,"" visitResult,"" attitude,"" nextVisitTime
+            ,call_dud.clientLevel,IFNULL(dudq.`hcp_potential`,'') hcpPotential,IFNULL(dudq.is_has_drug,'') isHasDrug,IFNULL(dudq.`is_target`,'') isTarget,IFNULL(dudq.`is_has_ae`,'')  isHasAe
+
+            FROM
+            activity_share a
+            INNER JOIN (
+            SELECT DISTINCT
+            d.id doctorId,d.`name` doctorName,d.hospital_name hospitalName,IFNULL(dv.client_level,'') clientLevel,du.`name` drugUserName
+            FROM
+            doctor d
+            INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+            INNER JOIN drug_user du ON dud.drug_user_id = du.id
+            LEFT JOIN doctor_virtual dv
+            ON d.id=dv.doctor_id AND dv.product_id=#{productId}
+            WHERE
+            dud.is_available = 1
+            AND dud.prod_id = #{productId}
+
+            <if test="drugUserId!=null">
+                and du.id=#{drugUserId}
+            </if>
+
+            ) content_dud ON a.share_person_id = content_dud.doctorId
+            INNER JOIN activity_info ai ON ai.id=a.data_id
+            LEFT JOIN drug_user_doctor_quate dudq ON dudq.doctor_id=content_dud.doctorId AND dudq.product_id=#{productId}
+            WHERE
+            a.data_id IN (
+            SELECT DISTINCT
+            tcp.content_id
+            FROM
+            t_content_product tcp
+            INNER JOIN product_line pl ON tcp.product_id = pl.prod_id
+            INNER JOIN activity_info ai ON tcp.content_id = ai.id
+            WHERE
+            tcp.product_id = #{productId}
+            )
+            <if test="startTime!=null">
+                and date_format(a.create_time,'%Y-%m-%d') &gt;=#{startTime}
+            </if>
+            <if test="endTime!=null">
+                and date_format(a.create_time,'%Y-%m-%d') &lt;=#{endTime}
+            </if>
+
+        </if>
+        ) b
+        ORDER BY b.visitTime DESC
+        <if test="type==1">
+            LIMIT #{currentSize},#{pageSize}
+        </if>
+
+
+
     </select>
 
     <select id="getDoctorVisitDetailListCount" resultType="java.lang.Integer">
+
+        <!-- 2018-09-29 修改前
         SELECT count(*) total FROM
         (SELECT DISTINCT t.`id`
         FROM `virtual_doctor_call_info` t LEFT JOIN `virtual_doctor_call_info_mend` t1 ON t.id=t1.`call_id`
@@ -225,6 +334,90 @@
             </if>
         </if>
         ) t
+        -->
+
+
+        <!-- 2018-09-29 修改后 -->
+        SELECT COUNT(*) FROM (
+        SELECT
+        DISTINCT vdci.id
+        FROM
+        virtual_doctor_call_info vdci
+        LEFT JOIN virtual_doctor_call_info_mend vdcim ON vdci.id=vdcim.call_id
+        INNER JOIN (
+        SELECT DISTINCT
+        d.id doctorId
+        FROM
+        doctor d
+        INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+        INNER JOIN drug_user du ON dud.drug_user_id = du.id
+        WHERE
+        dud.is_available = 1
+        AND dud.prod_id = #{productId}
+
+        <if test="drugUserId!=null">
+            and du.id=#{drugUserId}
+        </if>
+
+        ) call_dud ON vdci.virtual_doctor_id = call_dud.doctorId
+        WHERE
+        vdci.product_id=#{productId}
+
+        <if test="startTime!=null">
+            and date_format(vdci.create_time,'%Y-%m-%d') &gt;=#{startTime}
+        </if>
+        <if test="endTime!=null">
+            and date_format(vdci.create_time,'%Y-%m-%d') &lt;=#{endTime}
+        </if>
+        <if test="contents!=null and contents.size>0">
+            and
+            <foreach collection="contents" item="content" open="(" close=")" separator="or">
+                vdcim.visit_result LIKE CONCAT('%',#{content},'%')
+            </foreach>
+        </if>
+
+        <if test="contents==null or contents.size==0">
+            UNION ALL
+            SELECT
+            DISTINCT a.id
+            FROM
+            activity_share a
+            INNER JOIN (
+            SELECT DISTINCT
+            d.id doctorId
+            FROM
+            doctor d
+            INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+            INNER JOIN drug_user du ON dud.drug_user_id = du.id
+            WHERE
+            dud.is_available = 1
+            AND dud.prod_id = #{productId}
+
+            <if test="drugUserId!=null">
+                and du.id=#{drugUserId}
+            </if>
+            ) content_dud ON a.share_person_id = content_dud.doctorId
+            WHERE
+            a.data_id IN (
+            SELECT DISTINCT
+            tcp.content_id
+            FROM
+            t_content_product tcp
+            INNER JOIN product_line pl ON tcp.product_id = pl.prod_id
+            INNER JOIN activity_info ai ON tcp.content_id = ai.id
+            WHERE
+            tcp.product_id = #{productId}
+            )
+            <if test="startTime!=null">
+                and date_format(a.create_time,'%Y-%m-%d') &gt;=#{startTime}
+            </if>
+            <if test="endTime!=null">
+                and date_format(a.create_time,'%Y-%m-%d') &lt;=#{endTime}
+            </if>
+
+        </if>
+        ) b
+
     </select>
 
 </mapper>

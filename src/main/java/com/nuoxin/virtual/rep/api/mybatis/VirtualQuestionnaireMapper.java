@@ -32,6 +32,15 @@ public interface VirtualQuestionnaireMapper {
 	List<VirtualQuestionnaireRecordResponse> getLastQuestionnaireRecord(@Param(value = "virtualDrugUserId")Long virtualDrugUserId, 
 			                                                @Param(value = "virtualDoctorId")Long virtualDoctorId, 
 			                                                @Param(value = "virtualQuestionnaireId")Long virtualQuestionnaireId);
+
+
+	/**
+	 * 根据问卷ID获取问题
+	 * @param id
+	 * @return
+	 */
+	List<VirtualQuestionnaireRecordResponse> getQuestionnaireById(@Param(value = "id") Long id);
+
 	/**
 	 * 保存问卷作答
 	 * @param virtualDoctorId 医生ID

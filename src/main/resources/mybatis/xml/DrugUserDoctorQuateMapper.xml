@@ -36,6 +36,7 @@
 	</insert>
 
 	<select id="getPotentialDoctorCount" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse">
+		<!-- 2018-09-29 重构前
 		SELECT
 		drug_user_id drugUserId,count(DISTINCT doctor_id) total
 		FROM drug_user_doctor_quate
@@ -52,6 +53,49 @@
 		</if>
 		AND product_id=#{statisticsParams.productId} and is_available=1 and hcp_potential=#{hcpPotential}
 		GROUP BY drug_user_id
+
+		 -->
+
+		<!-- 2018-09-29 重构后 -->
+		SELECT
+		call_dud.drugUserId,
+		COUNT(
+		DISTINCT vdci.doctor_id
+		) total
+		FROM
+		drug_user_doctor_quate vdci
+		INNER JOIN (
+		SELECT DISTINCT
+		d.id doctorId,
+		du.id drugUserId
+		FROM
+		doctor d
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		WHERE
+		dud.is_available = 1
+		AND dud.prod_id = #{statisticsParams.productId}
+		AND du.id IN
+
+		<foreach collection="statisticsParams.drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+
+		) call_dud ON vdci.doctor_id = call_dud.doctorId
+		WHERE
+		vdci.product_id = #{statisticsParams.productId}
+
+		<if test="statisticsParams.startTime!=null">
+			and date_format(vdci.create_time,'%Y-%m-%d') &gt;=#{statisticsParams.startTime}
+		</if>
+		<if test="statisticsParams.endTime!=null">
+			and date_format(vdci.create_time,'%Y-%m-%d') &lt;=#{statisticsParams.endTime}
+		</if>
+		and vdci.is_available=1 and vdci.hcp_potential=#{hcpPotential}
+		GROUP BY
+		call_dud.drugUserId
+
+
 	</select>
 
 	<!-- 医生的产品信息，每个医生只取两条 -->
@@ -97,6 +141,8 @@
 			qudq.is_has_drug isHasDrug
 		FROM
 			product_line a
+		INNER JOIN drug_user_doctor dud
+		ON a.prod_id=dud.prod_id AND dud.is_available=1 AND dud.doctor_id=#{doctorId}
 		LEFT JOIN drug_user_doctor_quate qudq ON a.prod_id = qudq.product_id
 		AND qudq.doctor_id = #{doctorId}
 		LEFT JOIN doctor_virtual dv ON a.prod_id = dv.product_id

@@ -9,6 +9,9 @@ import javax.annotation.Resource;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
+import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
+import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
+import com.nuoxin.virtual.rep.api.mybatis.*;
 import org.springframework.stereotype.Service;
 
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
@@ -22,10 +25,6 @@ import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorDO;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorMendParams;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorMiniResponse;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorParams;
-import com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorMapper;
-import com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorQuateMapper;
-import com.nuoxin.virtual.rep.api.mybatis.HospitalMapper;
-import com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualDoctorService;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
@@ -46,6 +45,8 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 	@Resource
 	private DrugUserDoctorMapper drugUserDoctorMapper;
 	@Resource
+	private DoctorMapper doctorMapper;
+	@Resource
 	private DrugUserDoctorQuateMapper drugUserDoctorQuateMapper;
 	@Resource
 	private CommonService commonService;
@@ -53,6 +54,9 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 	@Override
 	@Transactional(value = TxType.REQUIRED, rollbackOn = Exception.class)
 	public boolean saveVirtualDoctor(SaveVirtualDoctorRequest request, DrugUser user) {
+
+		checkSaveVirtualDoctorParam(request);
+
 		int hospitalId = this.getHospiTalId(request);
 		if (hospitalId > 0) {
 			// 保存医生信息
@@ -65,6 +69,8 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 
 		return false;
 	}
+
+
 
 	@Override
 	public VirtualDoctorBasicResponse getVirtualDoctorBasic(Long virtualDoctorId) {
@@ -107,6 +113,21 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * 校验新增客户的参数
+	 * @param request
+	 */
+	private void checkSaveVirtualDoctorParam(SaveVirtualDoctorRequest request) {
+
+		String mobile = request.getMobile();
+		Integer doctorCount = doctorMapper.doctorCountByMobile(mobile);
+		if (doctorCount != null && doctorCount > 0){
+			throw new BusinessException(ErrorEnum.ERROR, "手机号已经存在!");
+		}
+
+	}
+
 
 	/**
 	 * 获取医院ID,走 getOrInsert路线
@@ -300,7 +321,7 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 	}
 
 	private DrugUserDoctorQuateParams buildDrugUserDoctorProductQuate(Long virtualDoctorId,
-			DrugUser user, SaveVirtualDoctorMendRequest mend, int isAddWechat) {
+			DrugUser user, SaveVirtualDoctorMendRequest mend, Integer isAddWechat) {
 		DrugUserDoctorQuateParams param = new DrugUserDoctorQuateParams();
 		param.setDoctorId(virtualDoctorId); // 关联医生ID
 		param.setVirtualDrugUserId(user.getId()); // 关联代表ID

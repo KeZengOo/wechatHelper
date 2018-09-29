@@ -84,6 +84,7 @@
 	</update>
 
 	<select id="geTelephoneDoctorVisitCount" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse">
+		<!-- 2018-09-29 修改前
 		SELECT
 		virtual_drug_user_id drugUserId,count(DISTINCT virtual_doctor_id) total
 		FROM virtual_doctor_call_info
@@ -100,6 +101,43 @@
 		</if>
 		AND product_id=#{productId}
 		GROUP BY virtual_drug_user_id
+		-->
+
+		<!-- 2018-09-29 重构后 -->
+		SELECT
+		call_dud.drugUserId,
+		COUNT(
+		DISTINCT vdci.virtual_doctor_id
+		) total
+		FROM
+		virtual_doctor_call_info vdci
+		INNER JOIN (
+		SELECT DISTINCT
+		d.id doctorId,
+		du.id drugUserId
+		FROM
+		doctor d
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		WHERE
+		dud.is_available = 1
+		AND dud.prod_id = #{productId}
+		AND du.id IN
+		<foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		) call_dud ON vdci.virtual_doctor_id = call_dud.doctorId
+		WHERE
+		vdci.product_id
+		<if test="startTime!=null">
+			AND DATE_FORMAT(create_time,'%Y-%m-%d') &gt;=#{startTime}
+		</if>
+		<if test="endTime!=null">
+			AND DATE_FORMAT(create_time,'%Y-%m-%d') &lt;=#{endTime}
+		</if>
+		GROUP BY
+		call_dud.drugUserId
+
 	</select>
 	
 </mapper>

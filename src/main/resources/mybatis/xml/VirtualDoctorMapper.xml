@@ -51,6 +51,7 @@
 		) temp
 		ON temp.virtual_doctor_id=d.id
 		WHERE d.id = #{virtualDoctorId}
+		LIMIT 1
 	</select>
 	
 	<insert id="saveVirtualDoctors"  keyProperty="id" useGeneratedKeys="true">

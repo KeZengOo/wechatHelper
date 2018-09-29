@@ -39,6 +39,18 @@ public class VirtualQuestionnaireServiceImpl implements VirtualQuestionnaireServ
 					question.setOptions(jsonArray);
 				}
 			});
+		} else if (CollectionsUtil.isEmptyList(list)){
+			list = questionnaireMapper.getQuestionnaireById(virtualQuestionnaireId);
+			if (CollectionsUtil.isNotEmptyList(list)){
+				list.forEach(question->{
+					Object options = question.getOptions();
+					if(options != null) {
+						com.alibaba.fastjson.JSONArray jsonArray = JSONObject.parseArray(options.toString());
+						question.setOptions(jsonArray);
+					}
+				});
+			}
+
 		} else if (list == null) {
 			list = Collections.emptyList();
 		}
