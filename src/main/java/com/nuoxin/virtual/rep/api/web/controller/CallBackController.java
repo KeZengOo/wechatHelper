@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
-import com.nuoxin.virtual.rep.api.common.bean.ResponseObj;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
 import com.nuoxin.virtual.rep.api.service.CallBackService;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
@@ -97,7 +96,7 @@ public class CallBackController extends BaseController {
 			if (parameterValues.length == 1) {
 				String parameterValue = parameterValues[0];
 				paramsMap.put(parameter, parameterValue);
-				logger.info("{}={}", parameter, parameterValue);
+				logger.warn("{}={}", parameter, parameterValue);
 			}
 		}
 

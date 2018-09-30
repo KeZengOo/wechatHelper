@@ -66,7 +66,7 @@ public abstract class BaseCallBackImpl implements CallBackService {
 		} else {
 			logger.warn("可以获取 DoctorCallInfo 信息 sinToken:{}, 走修改表路线", sinToken);
 			Long callId = info.getId();
-			this.updateUrl(callOssUrl, result.getStatusName(), callId, result.getCallTime());
+			this.updateUrl(callOssUrl, result.getStatus(), result.getStatusName(), callId, result.getCallTime());
 		}
 
 		logger.warn("回调执行成功! ,sinToken:{},downloadUrl:{}", sinToken, callOssUrl);
@@ -104,18 +104,22 @@ public abstract class BaseCallBackImpl implements CallBackService {
 	 * @param id 打电话记录主键
 	 * @param callTime 通话时长
 	 */
-	private void updateUrl(String callOssUrl, String statusName, Long id, Long callTime) {
-		logger.info("callUrl:{},statusName:{},id:{}", callOssUrl, statusName, id);
-		callInfoDao.updateUrlRefactor(callOssUrl, statusName, id, callTime);
+	private void updateUrl(String callOssUrl, Integer status, String statusName, Long id, Long callTime) {
+		logger.info("callUrl:{},status:{}, statusName:{},id:{}", callOssUrl, status, statusName, id);
+		callInfoDao.updateUrlRefactor(callOssUrl, status, statusName, id, callTime);
 	}
 	
+	/**
+	 * 保存回调信息
+	 * @param result
+	 */
 	private void saveCallInfo(ConvertResult result) {
 		VirtualDoctorCallInfoParams params = new VirtualDoctorCallInfoParams();
 		params.setSinToken(result.getSinToken());
 		params.setType(result.getType());
 		params.setMobile(result.getCallNo());
 		params.setCallUrl(result.getMonitorFilenameUrl());
-		params.setStatus(1);
+		params.setStatus(result.getStatus());
 		params.setStatusName(result.getStatusName());
 		params.setVisitTime(result.getVisitTime());
 		params.setCallTime(result.getCallTime());
