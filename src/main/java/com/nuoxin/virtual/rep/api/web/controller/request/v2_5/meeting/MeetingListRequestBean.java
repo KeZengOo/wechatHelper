@@ -17,4 +17,7 @@ public class MeetingListRequestBean extends PageRequestBean {
 	@NotNull(message="virtualDoctorId is null")
 	@ApiModelProperty(value = "客户医生 ID")
 	private Long virtualDoctorId;
+
+	@ApiModelProperty(value = "前端不用传")
+	private String leaderPath;
 }

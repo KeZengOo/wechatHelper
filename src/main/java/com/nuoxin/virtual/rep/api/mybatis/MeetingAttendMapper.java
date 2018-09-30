@@ -17,7 +17,7 @@ public interface MeetingAttendMapper {
 	 * @param virtualDoctorId
 	 * @return
 	 */
-	int getMeetingAttendCount(@Param(value = "virtualDoctorId") Long virtualDoctorId);
+	int getMeetingAttendCount(@Param(value = "virtualDoctorId") Long virtualDoctorId,@Param(value = "leaderPath") String leaderPath);
 	
 	/**
 	 * 根据客户医生ID 获取列表
@@ -26,7 +26,7 @@ public interface MeetingAttendMapper {
 	 * @param pageSize
 	 * @return
 	 */
-	List<MeetingBean> getMeetingAttendList(@Param(value = "virtualDoctorId") Long virtualDoctorId,
+	List<MeetingBean> getMeetingAttendList(@Param(value = "virtualDoctorId") Long virtualDoctorId, @Param(value = "leaderPath") String leaderPath,
 			@Param(value = "currentSize") Integer currentSize, @Param(value = "pageSize") Integer pageSize);
 }
 

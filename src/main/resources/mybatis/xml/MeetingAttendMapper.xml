@@ -11,6 +11,16 @@
 		ON a.meeting_id = m.id
 		WHERE 
 			doctor_id = #{virtualDoctorId}
+			<!-- 加上产品 -->
+			AND m.product_id IN
+			(
+			SELECT DISTINCT pl.prod_id FROM product_line pl
+			INNER JOIN product_user pu
+			ON pl.prod_id=pu.prod_id
+			INNER JOIN drug_user du
+			ON pu.user_id=du.id
+			WHERE du.leader_path LIKE concat(#{leaderPath},'%')
+		)
 	</select>
 	
 	<select id="getMeetingAttendList" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.MeetingBean">
@@ -26,6 +36,17 @@
 		ON a.meeting_id = m.id
 		WHERE 
 			doctor_id = #{virtualDoctorId}
+		<!-- 加上产品 -->
+		AND m.product_id IN
+		(
+		SELECT DISTINCT pl.prod_id FROM product_line pl
+		INNER JOIN product_user pu
+		ON pl.prod_id=pu.prod_id
+		INNER JOIN drug_user du
+		ON pu.user_id=du.id
+		WHERE du.leader_path LIKE concat(#{leaderPath},'%')
+		)
+
 		LIMIT #{currentSize}, #{pageSize}
 	</select>
 

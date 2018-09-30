@@ -30,5 +30,10 @@ public interface CallBackService {
 	 * @param bean
 	 */
 	void repeatUploadFile(Call7mmorRequestBean bean);
-	
+
+	/**
+	 * 重新更新或者添加没有回调的电话拜访记录
+	 * @param bean
+	 */
+	void repeatSaveOrUpdateCall(Call7mmorRequestBean bean);
 }

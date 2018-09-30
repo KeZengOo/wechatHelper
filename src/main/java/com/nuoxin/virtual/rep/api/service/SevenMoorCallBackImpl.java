@@ -7,9 +7,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
+import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -82,6 +85,7 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
             call7mmorResponseBeans = JSONObject.parseArray(default7MoorResponseBean.getData().toString(), Call7mmorResponseBean.class);
         }else{
             logger.error("获取通话记录失败：{}", JSONObject.toJSONString(default7MoorResponseBean));
+            throw new BusinessException(ErrorEnum.ERROR, "获取通话记录失败!");
         }
 
         return call7mmorResponseBeans;
@@ -117,7 +121,33 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
         }
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	@Override
+	public void repeatSaveOrUpdateCall(Call7mmorRequestBean bean) {
+		List<Call7mmorResponseBean> callList = getCallList(bean);
+		if (CollectionsUtil.isEmptyList(callList)){
+			logger.warn("params= {} 没有要重新新增或者更新的录音文件", JSONObject.toJSONString(bean));
+			return;
+		}
+
+
+		// 获得接通的电话记录(status=dealing)
+		List<Call7mmorResponseBean> dealingList = callList.stream().filter(call -> call.getSTATUS().equals("dealing")).collect(Collectors.toList());
+		if (CollectionsUtil.isEmptyList(dealingList)){
+			logger.warn("params= {} 没有要重新新增或者更新 status=dealing 录音文件", JSONObject.toJSONString(bean));
+			return;
+		}
+
+		saveOrUpdateDealingCallList(dealingList);
+
+	}
+
+
+	private void saveOrUpdateDealingCallList(List<Call7mmorResponseBean> dealingList) {
+
+
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
 	 * 线程暂停65秒

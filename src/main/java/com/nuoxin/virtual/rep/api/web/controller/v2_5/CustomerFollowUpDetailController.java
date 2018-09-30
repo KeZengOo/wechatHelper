@@ -104,7 +104,7 @@ public class CustomerFollowUpDetailController extends NewBaseController {
 		if(listRequest.getVirtualDoctorId() == null) {
 			return super.getParamsErrorResponse("virtualDoctorId is null");
 		}
-		
+		listRequest.setLeaderPath(user.getLeaderPath());
 		PageResponseBean<List<MeetingBean>> result = meetingService.getMeetingList(listRequest);
 		DefaultResponseBean<PageResponseBean<List<MeetingBean>>> responseBean = new DefaultResponseBean<PageResponseBean<List<MeetingBean>>>();
 		responseBean.setData(result);
