@@ -76,7 +76,7 @@
 		) call_dud ON vdci.virtual_doctor_id = call_dud.doctorId
 		WHERE
 		vdci.product_id = #{statisticsParams.productId}
-
+		and
 		<foreach collection="contents" item="content" open="(" close=")" separator="or">
 			vdci.visit_result LIKE CONCAT('%',#{content},'%')
 		</foreach>

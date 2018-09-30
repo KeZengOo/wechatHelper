@@ -129,7 +129,7 @@
 
     <select id="getDoctorVisitDetailList" resultType="java.util.LinkedHashMap">
 
-        <!-- 2018-09-29 修改前 -->
+        <!-- 2018-09-29 修改前
         SELECT * FROM
         (SELECT DISTINCT t.`id`,IFNULL(t2.`name`,'') drugUserName,IFNULL(date_format(t.`create_time`, '%Y-%m-%d %H:%i:%s'),'')  visitTime,IFNULL(t3.`id`,'') doctorId,IFNULL(t3.`name`,'') doctorName,
         IFNULL(t3.`hospital_name`,'') hospitalName,"电话" visitType,"" shareContent,IFNULL(t1.`visit_result`,'') visitResult,IFNULL(t1.`attitude`,'') attitude,IFNULL(date_format(t1.`next_visit_time`, '%Y-%m-%d %H:%i:%s'),'') nextVisitTime
@@ -183,16 +183,16 @@
         <if test="type==1">
             LIMIT #{currentSize},#{pageSize}
         </if>
+        -->
 
 
 
-
-
+        <!-- 2018-09-29 修改后 -->
         SELECT * FROM (
         SELECT
-        DISTINCT vdci.`id`,call_dud.drugUserName,IFNULL(date_format(vdci.`create_time`, '%Y-%m-%d %H:%i:%s'),'')  visitTime,call_dud.doctorId,call_dud.doctorName,
+        DISTINCT vdci.id,call_dud.drugUserName,IFNULL(date_format(vdci.create_time, '%Y-%m-%d %H:%i:%s'),'')  visitTime,call_dud.doctorId,call_dud.doctorName,
         call_dud.hospitalName,"电话" visitType,"" shareContent,IFNULL(vdcim.`visit_result`,'') visitResult,IFNULL(vdcim.`attitude`,'') attitude,IFNULL(date_format(vdcim.`next_visit_time`, '%Y-%m-%d %H:%i:%s'),'') nextVisitTime
-        ,IFNULL(t4.client_level,'') clientLevel,IFNULL(dudq.`hcp_potential`,'') hcpPotential,IFNULL(dudq.is_has_drug,'') isHasDrug,IFNULL(dudq.`is_target`,'') isTarget,IFNULL(dudq.`is_has_ae`,'')  isHasAe
+        ,call_dud.clientLevel,IFNULL(dudq.`hcp_potential`,'') hcpPotential,IFNULL(dudq.is_has_drug,'') isHasDrug,IFNULL(dudq.`is_target`,'') isTarget,IFNULL(dudq.`is_has_ae`,'')  isHasAe
         FROM
         virtual_doctor_call_info vdci
         LEFT JOIN virtual_doctor_call_info_mend vdcim ON vdci.id=vdcim.call_id
