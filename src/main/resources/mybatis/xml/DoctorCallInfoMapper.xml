@@ -237,7 +237,7 @@
             DISTINCT a.id,content_dud.drugUserName,IFNULL(date_format(a.`create_time`, '%Y-%m-%d %H:%i:%s'),'') visitTime,content_dud.doctorId,content_dud.doctorName,
             content_dud.hospitalName,CASE WHEN a.share_type=1 THEN "微信" WHEN a.share_type=2 THEN "短信" WHEN a.share_type=3 THEN "邮件" else "" END  visitType,
             IFNULL(ai.title,'') shareContent,"" visitResult,"" attitude,"" nextVisitTime
-            ,call_dud.clientLevel,IFNULL(dudq.`hcp_potential`,'') hcpPotential,IFNULL(dudq.is_has_drug,'') isHasDrug,IFNULL(dudq.`is_target`,'') isTarget,IFNULL(dudq.`is_has_ae`,'')  isHasAe
+            ,content_dud.clientLevel,IFNULL(dudq.`hcp_potential`,'') hcpPotential,IFNULL(dudq.is_has_drug,'') isHasDrug,IFNULL(dudq.`is_target`,'') isTarget,IFNULL(dudq.`is_has_ae`,'')  isHasAe
 
             FROM
             activity_share a
