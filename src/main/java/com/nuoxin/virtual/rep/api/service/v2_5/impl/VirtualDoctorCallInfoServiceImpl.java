@@ -10,7 +10,6 @@ import javax.annotation.Resource;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
-import com.nuoxin.virtual.rep.api.utils.StringUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -113,6 +112,12 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	@Transactional(value = TxType.REQUIRED, rollbackOn = Exception.class)
 	@Override
 	public boolean saveUnconnectedCallInfo(SaveCallInfoUnConnectedRequest saveRequest) {
+		// 如果没有传状态值则设置为 cancelmakecall
+		if(StringUtils.isBlank(saveRequest.getStatuaName())) {
+			saveRequest.setStatuaName("cancelmakecall");
+		}
+		
+		// statusName 为 emptynumber 时将 isBreakOff 设置为1
 		if ("emptynumber".equalsIgnoreCase(saveRequest.getStatuaName())) {
 			saveRequest.setIsBreakOff(1);
 		} else {
@@ -237,10 +242,10 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		callVisitParams.setCallId(saveRequest.getCallInfoId());
 		callVisitParams.setVirtualDoctorId(saveRequest.getVirtualDoctorId());
 		callVisitParams.setVirtualDrugUserId(saveRequest.getVirtualDrugUserId());
-
 		
-		// 只能是1 或者 2在前面的参数校验中加了限制
-		callVisitParams.setType(saveRequest.getType());
+		// 这里的 type 值只能是1 或者 2在前面的参数校验中加了限制
+		Integer type = saveRequest.getType();
+		callVisitParams.setType(type);
 		callVisitParams.setMobile(saveRequest.getMobile());
 		callVisitParams.setRemark(saveRequest.getRemark());
 		callVisitParams.setStatus(saveRequest.getStatus());
@@ -248,22 +253,35 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		callVisitParams.setNextVisitTime(saveRequest.getNextVisitTime().concat(" 23:59:59"));
 		
 		Integer virtualQuestinairedId = null;
-		if (saveRequest instanceof SaveCallInfoRequest) { // 接通
+		if (saveRequest instanceof SaveCallInfoRequest) {
 			SaveCallInfoRequest saveCallInfoRequest = (SaveCallInfoRequest) saveRequest;
 			callVisitParams.setAttitude(saveCallInfoRequest.getAttitude());
 			callVisitParams.setCallUrl(((SaveCallInfoRequest) saveRequest).getCallUrl());
 			callVisitParams.setProductId(saveCallInfoRequest.getProductId());
+			callVisitParams.setStatus(1); // 接通
+			callVisitParams.setIsBreakOff(0); // 接通时不会脱落
+			callVisitParams.setIsHasAe(saveCallInfoRequest.getIsHasAe());
+			callVisitParams.setIsHasDrug(saveCallInfoRequest.getIsHasDrug());
+			callVisitParams.setIsTarget(saveCallInfoRequest.getIsTarget());
+			callVisitParams.setHcpPotential(saveCallInfoRequest.getHcpPotential());
+			
 			String visitResult = JSONObject.toJSONString(saveCallInfoRequest.getVisitResult());
 			callVisitParams.setVisitResult(visitResult);
-			callVisitParams.setStatus(1); // 接通
-			callVisitParams.setStatusName("answer"); // 状态名
+			
+			if(type.equals(1)) { // 呼出
+				callVisitParams.setStatusName("answer"); // 状态名
+			} else if(type.equals(2)) { // 呼入
+				callVisitParams.setStatusName("incall"); // 状态名
+			}
+			
 			virtualQuestinairedId = saveCallInfoRequest.getVirtualQuestionaireId();
 		} else { // 未接通
 			SaveCallInfoUnConnectedRequest saveCallInfoRequest = (SaveCallInfoUnConnectedRequest) saveRequest;
 			virtualQuestinairedId = 0;
 			callVisitParams.setStatus(0); // 未接通
-			callVisitParams.setStatusName("cancelmakecall"); // 状态名
+			callVisitParams.setStatusName(saveCallInfoRequest.getStatuaName()); // 状态名
 			callVisitParams.setProductId(saveCallInfoRequest.getProductId());
+			callVisitParams.setIsBreakOff(saveCallInfoRequest.getIsBreakOff());
 		}
 		
 		if (virtualQuestinairedId == null) {
