@@ -4,14 +4,14 @@ import lombok.Data;
 
 @Data
 public class DrugUserDoctorQuateParams {
-	private long virtualDrugUserId;
-	private long doctorId;
+	private Long virtualDrugUserId;
+	private Long doctorId;
 	// 默认给0，null会插入失败
-	private int productLineId=0;
-	private int isHasDrug;
-	private int isHasAe;
-	private int isTarget;
-	private int isRecruit;
-	private int isBreakOff;
-	private int hcpPotential;
+	private Integer productLineId=0;
+	private Integer isHasDrug;
+	private Integer isHasAe;
+	private Integer isTarget;
+	private Integer isRecruit;
+	private Integer isBreakOff;
+	private Integer hcpPotential;
 }

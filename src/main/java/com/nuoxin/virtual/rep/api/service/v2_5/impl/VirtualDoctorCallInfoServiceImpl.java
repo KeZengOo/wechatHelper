@@ -208,6 +208,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		DrugUserDoctorQuateParams relationShipParams = new DrugUserDoctorQuateParams();
 		relationShipParams.setVirtualDrugUserId(request.getVirtualDrugUserId());
 		relationShipParams.setDoctorId(request.getVirtualDoctorId());
+		relationShipParams.setIsBreakOff(request.getIsBreakOff());
 
 		if (request instanceof SaveCallInfoRequest) {
 			SaveCallInfoRequest saveRequest = (SaveCallInfoRequest)request;
