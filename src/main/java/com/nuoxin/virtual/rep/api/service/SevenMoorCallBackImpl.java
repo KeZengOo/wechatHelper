@@ -78,7 +78,7 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 		header.put("Authorization", base64Auth);
 		header.put("charset", "utf-8");
         String jsonStr = RestUtils.post(url, JSONObject.toJSONString(bean), header);
-        Default7MoorResponseBean default7MoorResponseBean = JSONObject.parseObject(jsonStr, Default7MoorResponseBean.class);
+        Default7MoorResponseBean<?> default7MoorResponseBean = JSONObject.parseObject(jsonStr, Default7MoorResponseBean.class);
         boolean success = default7MoorResponseBean.isSuccess();
         if (success){
             call7mmorResponseBeans = JSONObject.parseArray(default7MoorResponseBean.getData().toString(), Call7mmorResponseBean.class);
@@ -210,7 +210,7 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 				}else {
 					type = 2;
 				}
-				String begin_time = call7mmorResponseBean.getBEGIN_TIME();
+				
 				String call_no = call7mmorResponseBean.getCALLED_NO();
 
 				RetryCallInfoRequestBean retryCallInfoRequestBean = new RetryCallInfoRequestBean();
@@ -232,7 +232,7 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * 线程暂停65秒
+	 * 线程暂停65秒,等待录音文件生成
 	 */
 	private void threadSleep() {
 		try {
@@ -249,30 +249,29 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 	 * @return AlterResult
 	 */
 	private ConvertResult buildConvertResult(ConcurrentMap<String, String> paramsMap) {
-		String callNo = paramsMap.get("CallNo"); 
-		String sinToken = paramsMap.get("CallSheetID");
-		String callType = paramsMap.get("CallType");
-		String statusName = paramsMap.get("State");
-		String monitorFilenameUrl = paramsMap.get("MonitorFilename");
-		String begin = paramsMap.get("Begin");
-		String end = paramsMap.get("End");
+		String calledNo = paramsMap.get("CalledNo"); //被叫号码
+		String sinToken = paramsMap.get("CallSheetID"); // 呼叫唯一标识 
+		String callType = paramsMap.get("CallType"); // dialout 呼出
+		String statusName = paramsMap.get("State"); // dealing 接听
+		String monitorFilenameUrl = paramsMap.get("MonitorFilename"); // 录音文件
+		String begin = paramsMap.get("Begin"); // 通话开始时间
+		String end = paramsMap.get("End"); // 通话结束时间
 		
-		logger.warn("sinToken:{},通话类型:{},录音下载地址:{},begin:{},end{}", 
-				sinToken, callType, monitorFilenameUrl, begin, end);
+		logger.warn("sinToken:{},通话类型:{},录音下载地址:{},begin:{},end{}", sinToken, callType, monitorFilenameUrl, begin, end);
 		
 		ConvertResult convertResult = new ConvertResult();
 		convertResult.setSinToken(sinToken);
-		convertResult.setCallNo(callNo);
+		convertResult.setCalledNo(calledNo);
 		convertResult.setMonitorFilenameUrl(monitorFilenameUrl);
-		convertResult.setVisitTime(begin);
+		convertResult.setVisitTime(begin); // 拜访时间
 		
 		statusName = this.convertStatusName(callType, statusName);
 		convertResult.setStatusName(statusName);
 
 		if ("cancelmakecall".equals(statusName)) {
-			convertResult.setStatus(0);
+			convertResult.setStatus(0); // 未接通
 		} else {
-			convertResult.setStatus(1);
+			convertResult.setStatus(1); // 已接通
 		}
 		
 		if ("dialout".equalsIgnoreCase(callType)) {
@@ -323,7 +322,7 @@ class ConvertResult{
 	private String monitorFilenameUrl; // 录音文件地址
 	private long callTime; // 通话时长
 	private Integer type; // 呼叫方式 
-	private String callNo; // 被叫号码
+	private String calledNo; // 被叫号码
 	private String visitTime; // 拜访时间
 	private Integer status;
 }

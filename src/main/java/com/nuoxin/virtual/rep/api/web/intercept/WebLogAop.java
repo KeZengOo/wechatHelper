@@ -42,13 +42,14 @@ public class WebLogAop {
 		String uri = request.getRequestURI();
 		String method = request.getMethod();
 		String remoteIp = request.getRemoteAddr();
+		String queryString =  request.getQueryString();
 
-		logger.info("\n access_ip:{} \n http_method:{} \n URL: {} \n URI:{}", remoteIp, method, url, uri);
+		logger.info("\n access_ip:{} \n http_method:{} \n URL: {} \n URI:{},Querystring:{}", remoteIp, method, url, uri, queryString);
 		
 		Enumeration<String> parameterNames = request.getParameterNames();
 		while (parameterNames.hasMoreElements()) {
 			String args = parameterNames.nextElement();
-			logger.info("args={}, value={}", args, request.getParameter(args));
+			logger.debug("args={}, value={}", args, request.getParameter(args));
 		}
 
 		startTime.set(System.currentTimeMillis());

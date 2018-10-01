@@ -30,8 +30,6 @@ public abstract class BaseCallBackImpl implements CallBackService {
 	private String url;
 
 	@Resource
-	private DoctorCallInfoRepository callInfoDao;
-	@Resource
 	private OssService ossService;
 	@Resource
 	private FileService fileService;
@@ -39,24 +37,17 @@ public abstract class BaseCallBackImpl implements CallBackService {
 	private VirtualDoctorCallInfoMapper callInfoMapper;
 	@Resource
 	private DoctorMapper doctorMapper;
+	@Resource
+	private DoctorCallInfoRepository callInfoDao;
 	
 	/**
 	 * 父类通用回调处理
-	 * @param sinToken 通话记录ID
-	 * @param statusName 转换后的状态名
-	 * @param audioFileDownloadUrl 语音文件下载地址
-	 * @param callTime 通话时长
+	 * @param result ConvertResult 对象
 	 */
 	protected void processCallBack(ConvertResult result) {
 		String sinToken = result.getSinToken();
 		String audioFileDownloadUrl = result.getMonitorFilenameUrl();
-		 // 文件处理(保存至本地及上传至阿里OSS)
 		String callOssUrl = this.processFile(audioFileDownloadUrl, sinToken);
-		
-		// 这里走了补偿机制.即:当上传至阿里失败时写入回调时供应商传递过来的文件下载链接
-		if (StringUtils.isBlank(callOssUrl)) {
-			callOssUrl = audioFileDownloadUrl;
-		}
 		result.setMonitorFilenameUrl(callOssUrl);
 
 		DoctorCallInfo info = this.getDoctorCallInfoBySinToken(sinToken);
@@ -67,10 +58,10 @@ public abstract class BaseCallBackImpl implements CallBackService {
 			logger.warn("可以获取 DoctorCallInfo 信息 sinToken:{}, 走修改表路线", sinToken);
 			Long callId = info.getId();
 			String statusName = info.getStatusName();
-			if(StringUtils.isNotBlank(statusName)) { // 修改前如果有状态的话,用原来的
+			if(this.flag(statusName)) {
 				result.setStatusName(statusName);
 			}
-			
+
 			this.updateUrl(callOssUrl, result.getStatus(), result.getStatusName(), callId, result.getCallTime());
 		}
 
@@ -89,53 +80,73 @@ public abstract class BaseCallBackImpl implements CallBackService {
 	}
 
 	/**
-	 * 文件处理
-	 * @param url 文件下载 URL
+	 * 文件处理(保存至本地及上传至阿里OSS)
+	 * @param audioFileUrl 供应商提供的录音文件下载 URL
 	 * @param sinToken 通讯唯一标识
-	 * @return 成功返回 OSS URL,否则返回 null
+	 * @return 返回 OSS URL
 	 */
-	public String processFile(String url, String sinToken) {
+	protected String processFile(String audioFileUrl, String sinToken) {
 		String fileName = sinToken.concat(FileConstant.MP3_SUFFIX);
 		fileService.processLocalFile(url, fileName, path);
 		
 		String fullFileName = path.concat(fileName);
-		return ossService.uploadFile(new File(fullFileName));
+		String ossUrl = ossService.uploadFile(new File(fullFileName));
+		
+		// 这里走了补偿机制.即:当上传至阿里失败时写入回调时供应商传递过来的文件下载链接
+		if (StringUtils.isBlank(ossUrl)) {
+			ossUrl = audioFileUrl;
+		}
+		
+		return ossUrl;
 	}
 	
 	/**
-	 * 根据 id 更新 statusName, callOssUrl
-	 * @param callOssUrl OSS URL
-	 * @param statusName 状态名
-	 * @param id 打电话记录主键
-	 * @param callTime 通话时长
+	 * 当 statusName 关机,拒接,空号,忙音,停机,无人接听时,不使用回调状态值 TODO 和前端确认 statusName 的值 @谢开宇
+	 * @param statusName
+	 * @return
 	 */
-	private void updateUrl(String callOssUrl, Integer status, String statusName, Long id, Long callTime) {
-		logger.info("callUrl:{},status:{}, statusName:{},id:{}", callOssUrl, status, statusName, id);
-		callInfoDao.updateUrlRefactor(callOssUrl, status, statusName, id, callTime);
+	private boolean flag(String statusName) {
+		// 关机,拒接,空号,忙音,停机,无人接听
+		return "poweroff".equalsIgnoreCase(statusName) || "reject".equalsIgnoreCase(statusName)
+				|| "emptynumber".equalsIgnoreCase(statusName) || "busy".equalsIgnoreCase(statusName)
+				|| "stop".equalsIgnoreCase(statusName) || "noanswer".equals(statusName);
 	}
 	
+	
 	/**
-	 * 保存回调信息
-	 * @param result
+	 * 插入回调信息
+	 * @param result ConvertResult 对象
 	 */
 	private void saveCallInfo(ConvertResult result) {
+		Long virtualDoctorId = doctorMapper.getDoctorIdByMobile(result.getCalledNo());
+		if (virtualDoctorId == null) {
+			virtualDoctorId = 0L;
+		}
+		
 		VirtualDoctorCallInfoParams params = new VirtualDoctorCallInfoParams();
 		params.setSinToken(result.getSinToken());
 		params.setType(result.getType());
-		params.setMobile(result.getCallNo());
+		params.setMobile(result.getCalledNo());
 		params.setCallUrl(result.getMonitorFilenameUrl());
 		params.setStatus(result.getStatus());
 		params.setStatusName(result.getStatusName());
 		params.setVisitTime(result.getVisitTime());
 		params.setCallTime(result.getCallTime());
-		
-		Long virtualDoctorId = doctorMapper.getDoctorIdByMobile(result.getCallNo());
-		if (virtualDoctorId == null) {
-			virtualDoctorId = 0L;
-		}
 		params.setVirtualDoctorId(virtualDoctorId);
 		
 		callInfoMapper.saveVirtualDoctorCallInfo(params);
 	}
-
+	
+	/**
+	 * 根据 callId 更新 statusName, callOssUrl
+	 * @param callOssUrl OSS URL
+	 * @param statusName 状态名
+	 * @param callId 打电话记录主键
+	 * @param callTime 通话时长
+	 */
+	private void updateUrl(String callOssUrl, Integer status, String statusName, Long callId, Long callTime) {
+		logger.info("callUrl:{},status:{}, statusName:{},id:{}", callOssUrl, status, statusName, callId);
+		callInfoDao.updateUrlRefactor(callOssUrl, status, statusName, callId, callTime);
+	}
+	
 }
