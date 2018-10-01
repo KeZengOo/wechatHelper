@@ -230,10 +230,10 @@
         WHERE
         vdci.product_id=#{productId}
 
-        <if test="startTime!=null">
+        <if test="startTime!=null and startTime!=''">
             and date_format(vdci.create_time,'%Y-%m-%d') &gt;=#{startTime}
         </if>
-        <if test="endTime!=null">
+        <if test="endTime!=null  and endTime!=''">
             and date_format(vdci.create_time,'%Y-%m-%d') &lt;=#{endTime}
         </if>
         <if test="contents!=null and contents.size>0">
@@ -284,10 +284,10 @@
             WHERE
             tcp.product_id = #{productId}
             )
-            <if test="startTime!=null">
+            <if test="startTime!=null and startTime!=''">
                 and date_format(a.create_time,'%Y-%m-%d') &gt;=#{startTime}
             </if>
-            <if test="endTime!=null">
+            <if test="endTime!=null and endTime!=''">
                 and date_format(a.create_time,'%Y-%m-%d') &lt;=#{endTime}
             </if>
 
@@ -375,10 +375,10 @@
         WHERE
         vdci.product_id=#{productId}
 
-        <if test="startTime!=null">
+        <if test="startTime!=null and startTime!=''">
             and date_format(vdci.create_time,'%Y-%m-%d') &gt;=#{startTime}
         </if>
-        <if test="endTime!=null">
+        <if test="endTime!=null  and endTime!=''">
             and date_format(vdci.create_time,'%Y-%m-%d') &lt;=#{endTime}
         </if>
         <if test="contents!=null and contents.size>0">
@@ -420,10 +420,10 @@
             WHERE
             tcp.product_id = #{productId}
             )
-            <if test="startTime!=null">
+            <if test="startTime!=null and startTime!=''">
                 and date_format(a.create_time,'%Y-%m-%d') &gt;=#{startTime}
             </if>
-            <if test="endTime!=null">
+            <if test="endTime!=null and endTime!=''">
                 and date_format(a.create_time,'%Y-%m-%d') &lt;=#{endTime}
             </if>
 
