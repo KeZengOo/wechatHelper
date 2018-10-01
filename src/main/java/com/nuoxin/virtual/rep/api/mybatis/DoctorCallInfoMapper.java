@@ -2,6 +2,7 @@ package com.nuoxin.virtual.rep.api.mybatis;
 
 import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsParams;
 import com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.RetryCallInfoRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.call.CallInfoResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.work.TodayStatisticsResponseBean;
 import org.apache.ibatis.annotations.Param;
@@ -39,6 +40,19 @@ public interface DoctorCallInfoMapper {
      * @return
      */
     String getCallUrlBySigToken(@Param(value = "sigToken") String sinToken);
+
+    /**
+     * 根据sinToken查询电话记录信息
+     * @param sinToken
+     * @return
+     */
+    CallInfoResponseBean getCallInfoBySinToken(@Param(value = "sinToken") String sinToken);
+
+    /**
+     * 新增重试的电话记录
+     * @param bean
+     */
+    void addRetryCallInfo(RetryCallInfoRequestBean bean);
 
     /**
      * 根据sigToken更新录音url

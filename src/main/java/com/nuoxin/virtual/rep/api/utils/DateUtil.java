@@ -490,6 +490,40 @@ public final class DateUtil {
         return cdate.getTime();
     }
 
+    /**
+     * 得到两个时间之间相差的秒数
+     * @param startDate
+     * @param endDate
+     * @return
+     */
+    public static int calLastedTime(Date startDate, Date endDate) {
+        long a = endDate.getTime();
+        long b = startDate.getTime();
+        int c = (int) ((a - b) / 1000);
+        return c;
+    }
+
+
+    /**
+     * 得到两个时间之间相差的秒数
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    public static int calLastedTime(String startTime, String endTime) {
+        try {
+            Date startDate = DateFormat.getDateTimeInstance().parse(startTime);
+            Date endDate = DateFormat.getDateTimeInstance().parse(endTime);
+            int time = calLastedTime(startDate, endDate);
+            return time;
+        }catch (Exception e){
+            e.printStackTrace();
+            return 0;
+
+        }
+    }
+
+
     public static void main(String[] args) {
         int d = DateUtil.getCurrentMonthLastDay();
         System.out.println(d);
