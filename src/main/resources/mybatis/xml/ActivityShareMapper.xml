@@ -349,61 +349,78 @@
 	
 	<!-- 内容推送记录列表 -->
 	<select id="getContentShareList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ContentShareResponseBean">
-		SELECT
-			a.id,
-			a.drug_user_name drugUserName,
-			DATE_FORMAT(
-				a.create_time,
-				'%Y-%m-%d %H:%i:%s'
-			) shareTime,
-			a.share_type shareType,
-			ai.title,
-			ai.id contentId,
-			ase.share_status shareStatus,
-			IFNULL(count(ar.id), 0) readCount,
-			IFNULL(sum(ar.read_time), 0) readTime,
-			(
-				SELECT
 
-				IF (count(*) > 0, 1, 0)
-				FROM
-					activity_retrans aa
-				WHERE
-					aa.retrans_person_id = a.share_person_id
-				AND aa.data_id = a.data_id
-			) forward,
-			(
-				SELECT
-					tcp.`status`
-				FROM
-					t_content_popularity tcp
-				WHERE
-					doctor_id = a.share_person_id
-				AND content_id = a.data_id
-			) useful
-		FROM
-			activity_share a
-		INNER JOIN activity_info ai ON a.data_id = ai.id
-		LEFT JOIN activity_read ar ON a.data_id = ar.data_id
-		AND ar.read_person_id = #{doctorId}
-		LEFT JOIN activity_share_extend ase ON a.id = ase.activity_share_id
-		WHERE
-			a.share_person_id = #{doctorId}
-		AND a.data_id IN (
-			SELECT DISTINCT
-				content_id
+			SELECT
+				a.id,
+				a.drug_user_name drugUserName,
+				DATE_FORMAT(
+					a.create_time,
+					'%Y-%m-%d %H:%i:%s'
+				) shareTime,
+				a.share_type shareType,
+				ai.title,
+				ai.id contentId,
+				ase.share_status shareStatus,
+				(
+					SELECT
+						IFNULL(count(*), 0)
+					FROM
+						activity_read
+					WHERE
+						data_id = a.data_id
+					AND read_person_id = a.share_person_id
+				) readCount,
+				(
+					SELECT
+						IFNULL(sum(read_time), 0)
+					FROM
+						activity_read
+					WHERE
+						data_id = a.data_id
+					AND read_person_id = a.share_person_id
+				) readCount,
+				(
+					SELECT
+
+					IF (count(*) > 0, 1, 0)
+					FROM
+						activity_retrans aa
+					WHERE
+						aa.retrans_person_id = a.share_person_id
+					AND aa.data_id = a.data_id
+				) forward,
+				(
+					SELECT
+						tcp.`status`
+					FROM
+						t_content_popularity tcp
+					WHERE
+						doctor_id = a.share_person_id
+					AND content_id = a.data_id
+				) useful
 			FROM
-				t_content_product tcp
-			INNER JOIN product_user pu ON tcp.product_id = pu.prod_id
-			INNER JOIN drug_user du ON pu.user_id = du.id
+				activity_share a
+			INNER JOIN activity_info ai ON a.data_id = ai.id
+			LEFT JOIN activity_share_extend ase ON a.id = ase.activity_share_id
 			WHERE
-				du.leader_path LIKE #{leaderPath}
-		)
-		GROUP BY
-			a.data_id
-		ORDER BY
-			a.create_time DESC
+				a.share_person_id = #{doctorId}
+			AND a.data_id IN (
+				SELECT DISTINCT
+					content_id
+				FROM
+					t_content_product tcp
+				INNER JOIN product_user pu ON tcp.product_id = pu.prod_id
+				INNER JOIN drug_user du ON pu.user_id = du.id
+				WHERE
+					du.leader_path LIKE #{leaderPath}
+			)
+			ORDER BY
+				a.create_time DESC
 			LIMIT #{currentSize}, #{pageSize}
+
+
+
+
 	</select>
 
 
