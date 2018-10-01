@@ -113,7 +113,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	@Transactional(value = TxType.REQUIRED, rollbackOn = Exception.class)
 	@Override
 	public boolean saveUnconnectedCallInfo(SaveCallInfoUnConnectedRequest saveRequest) {
-		if ("emptynumber".equals(saveRequest.getStatuaName())) {
+		if ("emptynumber".equalsIgnoreCase(saveRequest.getStatuaName())) {
 			saveRequest.setIsBreakOff(1);
 		} else {
 			saveRequest.setIsBreakOff(0);
