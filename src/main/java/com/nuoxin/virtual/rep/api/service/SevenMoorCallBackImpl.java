@@ -2,10 +2,7 @@ package com.nuoxin.virtual.rep.api.service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
@@ -13,6 +10,8 @@ import javax.annotation.Resource;
 
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.RetryCallInfoRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.call.CallInfoResponseBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -123,6 +122,24 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 
 	@Override
 	public void repeatSaveOrUpdateCall(Call7mmorRequestBean bean) {
+
+		String beginTime = bean.getBeginTime();
+		// 如果没有开始时间，取当前时间前6天的时间
+		if (StringUtils.isEmpty(beginTime)){
+			Date date=new Date();
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(date);
+			calendar.add(Calendar.DAY_OF_MONTH, -6);
+			date = calendar.getTime();
+			bean.setBeginTime(DateUtil.getDateTimeString(date));
+		}
+
+		String endTime = bean.getEndTime();
+		// 如果没有结束时间，取当前时间
+		if (StringUtils.isEmpty(endTime)){
+			bean.setEndTime(DateUtil.getDateTimeString(new Date()));
+		}
+
 		List<Call7mmorResponseBean> callList = getCallList(bean);
 		if (CollectionsUtil.isEmptyList(callList)){
 			logger.warn("params= {} 没有要重新新增或者更新的录音文件", JSONObject.toJSONString(bean));
@@ -141,9 +158,74 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 
 	}
 
-
+	/**
+	 * 新增或者更新电话记录
+	 * @param dealingList
+	 */
 	private void saveOrUpdateDealingCallList(List<Call7mmorResponseBean> dealingList) {
+		logger.info("电话记录开始走补偿机制进行校验。。。。");
+		for (Call7mmorResponseBean call7mmorResponseBean:dealingList){
+			String call_sheet_id = call7mmorResponseBean.getCALL_SHEET_ID();
+			logger.info("开始校验sinToken={} 的电话记录！！", call_sheet_id);
+			CallInfoResponseBean callInfo = doctorCallInfoMapper.getCallInfoBySinToken(call_sheet_id);
+			if (callInfo != null){
+				String callUrl = callInfo.getCallUrl();
+				if (StringUtils.isEmpty(callUrl)){
+					String record_file_name = call7mmorResponseBean.getRECORD_FILE_NAME();
+					String file_server = call7mmorResponseBean.getFILE_SERVER();
+					String originFilePath = file_server +"/" +  record_file_name;
+					String ossFilePath = null;
+					try {
+						ossFilePath = super.processFile(originFilePath, call_sheet_id);
+					}catch (Exception e){
+						logger.error("sinToken={} 文件上传失败", call_sheet_id, e);
+					}
+					if (!StringUtils.isEmpty(originFilePath)){
 
+						doctorCallInfoMapper.updateCallUrlBySigToken(ossFilePath, call_sheet_id);
+						logger.info("sinToken={} 的电话记录，没有call_url，更新成功！", call_sheet_id);
+					}
+				}else {
+					logger.info("sinToken={} 的电话记录，库里存在且有call_url，不需要补偿！", call_sheet_id);
+				}
+			}else {
+
+				String record_file_name = call7mmorResponseBean.getRECORD_FILE_NAME();
+				String file_server = call7mmorResponseBean.getFILE_SERVER();
+				String originFilePath = file_server +"/" +  record_file_name;
+				String ossFilePath = null;
+				try {
+					ossFilePath = super.processFile(originFilePath, call_sheet_id);
+				}catch (Exception e){
+					logger.error("sinToken={} 文件上传失败", call_sheet_id, e);
+				}
+
+				String connect_type = call7mmorResponseBean.getCONNECT_TYPE();
+				String beginTime = call7mmorResponseBean.getBEGIN_TIME();
+				String endTime = call7mmorResponseBean.getEND_TIME();
+				Integer type = -1;
+				// 1是呼出，2是呼入
+				if (connect_type != null && "dialout".equals(connect_type)){
+					type = 1;
+				}else {
+					type = 2;
+				}
+				String begin_time = call7mmorResponseBean.getBEGIN_TIME();
+				String call_no = call7mmorResponseBean.getCALL_NO();
+
+				RetryCallInfoRequestBean retryCallInfoRequestBean = new RetryCallInfoRequestBean();
+				retryCallInfoRequestBean.setSinToken(call_sheet_id);
+				retryCallInfoRequestBean.setMobile(call_no);
+				// 走补偿的都是接通的
+				retryCallInfoRequestBean.setStatusName("answer");
+				retryCallInfoRequestBean.setCallTime(DateUtil.calLastedTime(beginTime, endTime));
+				retryCallInfoRequestBean.setCallUrl(ossFilePath);
+				retryCallInfoRequestBean.setCreateTime(beginTime);
+				retryCallInfoRequestBean.setType(type);
+				doctorCallInfoMapper.addRetryCallInfo(retryCallInfoRequestBean);
+				logger.info("sinToken={} 的电话记录，库里不存在，新增成功！", call_sheet_id);
+			}
+		}
 
 	}
 

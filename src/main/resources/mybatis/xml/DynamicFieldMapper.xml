@@ -215,6 +215,7 @@
                     IFNULL(vddf.field_name,'') dynamicFieldName,
                     IFNULL(vddf.field_value,'') dynamicFieldSelectValue,
                     vddf.required,
+                    vddf.type,
                     vddf.classification
                 FROM
                     virtual_doctor_dynamic_field vddf
@@ -241,6 +242,7 @@
                     IFNULL(vddf.field_value,'') dynamicFieldSelectValue,
                     vddf.required,
                     vddf.classification,
+                    vddf.type,
                     pl.prod_id productId,
                     pl.prod_name productName
                 FROM
@@ -259,6 +261,33 @@
             t.classification ASC,
             t.dynamicFieldId ASC
     </select>
+
+
+
+    <!-- 得到产品信息动态字段填充的值 -->
+    <select id="getDoctorProductDynamicFieldValueByProductId" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorProductDynamicFieldValueResponseBean">
+       SELECT DISTINCT
+            vddf.id dynamicFieldId,
+            IFNULL(vddf.field_name,'') dynamicFieldName,
+            IFNULL(vddf.field_value,'') dynamicFieldSelectValue,
+            vddf.required,
+            vddf.classification,
+            vddf.type,
+            pl.prod_id productId,
+            pl.prod_name productName
+        FROM
+            virtual_doctor_dynamic_field vddf
+            INNER JOIN product_line pl
+            ON vddf.product_id=pl.prod_id
+
+        WHERE
+            vddf.product_id=#{productId}
+            and classification IN (2, 3)
+            ORDER BY
+            vddf.classification ASC,
+            vddf.id ASC
+    </select>
+
 
 
     <insert id="addDoctorBasicDynamicFieldValue">
@@ -326,9 +355,9 @@
                     ) updateTime
                 FROM
                     product_line pl
-                INNER JOIN virtual_doctor_dynamic_field vddf ON pl.prod_id = vddf.product_id
                 INNER JOIN product_user pu ON pl.prod_id = pu.prod_id
                 INNER JOIN drug_user du ON pu.user_id = du.id
+                LEFT JOIN virtual_doctor_dynamic_field vddf ON pl.prod_id = vddf.product_id
                 WHERE
                     du.leader_path LIKE #{leaderPath}
                 GROUP BY
@@ -341,15 +370,15 @@
 
     <!-- 客户设置产品信息列表总数 -->
     <select id="getDynamicFieldProductListCount" resultType="java.lang.Integer" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DynamicFieldProductRequestBean">
+
         SELECT
             COUNT(DISTINCT pl.prod_id)
         FROM
             product_line pl
-        INNER JOIN virtual_doctor_dynamic_field vddf ON pl.prod_id = vddf.product_id
         INNER JOIN product_user pu ON pl.prod_id = pu.prod_id
         INNER JOIN drug_user du ON pu.user_id = du.id
         WHERE
-            du.leader_path LIKE #{leaderPath}
+        du.leader_path LIKE #{leaderPath}
     </select>
 
     <!-- 根据产品ID删除 -->

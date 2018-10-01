@@ -41,6 +41,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.*;
 import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 
 /**
  * 微信相关接口
@@ -155,6 +156,20 @@ public class MessageService extends BaseService {
         if (CollectionsUtil.isEmptyList(wechatMessageVos)){
             return null;
         }
+
+        // 校验是否是IOS客户端导入的，暂时不支持安卓端的导入
+        List<String> collectNickNameList = wechatMessageVos.stream().filter(wechatMessageVo->(!StringUtils.isEmpty(wechatMessageVo.getId()))).map(WechatMessageVo::getNickname).distinct().collect(Collectors.toList());
+        if (CollectionsUtil.isEmptyList(collectNickNameList)){
+            throw new FileFormatException(ErrorEnum.ERROR, "微信昵称不能为空");
+        }
+        if (collectNickNameList.size() !=2){
+            throw new FileFormatException(ErrorEnum.ERROR, "Excel文件微信昵称只能有两个");
+        }
+
+        if (!collectNickNameList.contains(DRUG_USER_NICKNAME)){
+            throw new FileFormatException(ErrorEnum.ERROR, "目前只支持IOS端导出的聊天记录");
+        }
+
 
         List<Message> list = new ArrayList<>();
         for (WechatMessageVo wechatMessageVo : wechatMessageVos) {

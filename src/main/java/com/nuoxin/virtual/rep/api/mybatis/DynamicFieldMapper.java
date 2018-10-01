@@ -129,6 +129,16 @@ public interface DynamicFieldMapper {
      */
     List<DoctorProductDynamicFieldValueResponseBean> getDoctorProductDynamicFieldValue(@Param(value = "doctorId") Long doctorId,@Param(value = "productId") Long productId);
 
+
+    /**
+     * 得到产品信息动态字段填充的值
+     * @param productId
+     * @return
+     */
+    List<DoctorProductDynamicFieldValueResponseBean> getDoctorProductDynamicFieldValueByProductId(@Param(value = "productId") Long productId);
+
+
+
     /**
      * 新增医生动态字段填充的值
      * @param doctorId
