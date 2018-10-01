@@ -66,7 +66,16 @@ public class ControllerAssist {
 	@ResponseBody
 	public ResponseEntity<DefaultResponseBean<?>> handleBusinessException(BusinessException exception, HttpServletRequest request) {
 		logger.info("{}", exception);
-		return ResponseEntity.ok(DefaultResponseBean.clone(exception.getLabel(), exception.getCode(), exception.getMessage()));
+		//return ResponseEntity.ok(DefaultResponseBean.clone(exception.getLabel(), exception.getCode(), exception.getMessage()));
+
+		ErrorEnum error = ErrorEnum.FILE_FORMAT_ERROR;
+		String errorMessage = exception.getMessage();
+		if (StringUtils.isEmpty(errorMessage)){
+			errorMessage=error.getMessage();
+		}
+		return ResponseEntity.ok(DefaultResponseBean.clone(errorMessage, error.getStatus(), exception.getMessage()));
+
+
 	}
 
 	@ExceptionHandler(NeedLoginException.class)

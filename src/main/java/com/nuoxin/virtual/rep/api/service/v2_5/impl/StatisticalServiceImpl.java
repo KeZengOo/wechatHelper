@@ -476,7 +476,11 @@ public class StatisticalServiceImpl implements StatisticalService {
     private Integer getTotal(List<StatisticsDrugNumResponse> total, Integer drugUserId) {
         for (StatisticsDrugNumResponse t : total) {
             if (drugUserId.equals(t.getDrugUserId())) {
-                return t.getTotal();
+                Integer total1 = t.getTotal();
+                if (total1 == null){
+                    total1 = 0;
+                }
+                return total1;
             }
         }
         return 0;
