@@ -33,6 +33,7 @@ public interface DrugUserDoctorQuateMapper {
 	 * @param params
 	 * @return 返回影响条数
 	 */
+	@Deprecated
 	int backupRelationShipInfo(DrugUserDoctorQuateParams params);
 
 	/**

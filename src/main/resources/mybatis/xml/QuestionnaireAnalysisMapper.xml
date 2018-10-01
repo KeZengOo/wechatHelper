@@ -62,10 +62,10 @@
         du.id=dq.virtual_drug_user_id where 1=1
         and dud.is_available=1
         <if test="startDate!=null and startDate!=''">
-            AND dq.create_time &gt;= #{startDate}
+            AND DATE_FORMAT(dq.create_time, '%Y-%m-%d') &gt;= DATE_FORMAT(#{startDate}, '%Y-%m-%d')
         </if>
         <if test="endDate!=null and endDate!=''">
-            AND dq.create_time &lt;= #{endDate}
+            AND DATE_FORMAT(dq.create_time, '%Y-%m-%d') &lt;= DATE_FORMAT(#{endDate}, '%Y-%m-%d')
         </if>
         and du.leader_path like #{leaderPath,jdbcType=VARCHAR}
     </select>
@@ -78,10 +78,10 @@
         du.id=dq.virtual_drug_user_id where 1=1
         and dud.is_available=1
         <if test="startDate!=null and startDate!=''">
-            AND dq.create_time &gt;= #{startDate}
+            AND DATE_FORMAT(dq.create_time, '%Y-%m-%d') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d')
         </if>
         <if test="endDate!=null and endDate!=''">
-            AND dq.create_time &lt;= #{endDate}
+            AND DATE_FORMAT(dq.create_time, '%Y-%m-%d') &lt;= DATE_FORMAT(#{endDate}, '%Y-%m-%d')
         </if>
         and du.leader_path like #{leaderPath,jdbcType=VARCHAR} group by DATE_FORMAT(dq.create_time,'%Y-%m-%d')
     </select>
@@ -92,10 +92,10 @@
         q on q.id=dq.virtual_question_id join drug_user du on du.id=dq.virtual_drug_user_id where 1=1
         and dud.is_available=1
         <if test="startDate!=null and startDate!=''">
-            AND dq.create_time &gt;= #{startDate}
+            AND DATE_FORMAT(dq.create_time, '%Y-%m-%d') &gt;= DATE_FORMAT(#{startDate}, '%Y-%m-%d')
         </if>
         <if test="endDate!=null and endDate!=''">
-            AND dq.create_time &lt;= #{endDate}
+            AND DATE_FORMAT(dq.create_time, '%Y-%m-%d') &lt;= DATE_FORMAT(#{endDate}, '%Y-%m-%d')
         </if>
         and du.leader_path like #{leaderPath,jdbcType=VARCHAR}
         and dq.virtual_questionnaire_id =#{questionnaireId} group by dq.virtual_question_id
@@ -108,10 +108,10 @@
          dud.is_available=1 and
         q.type=0
         <if test="startDate!=null and startDate!=''">
-            AND dq.create_time &gt;= #{startDate}
+            AND DATE_FORMAT(dq.create_time, '%Y-%m-%d') &gt;= DATE_FORMAT(#{startDate}, '%Y-%m-%d')
         </if>
         <if test="endDate!=null and endDate!=''">
-            AND dq.create_time &lt;= #{endDate}
+            AND DATE_FORMAT(dq.create_time, '%Y-%m-%d') &lt;= DATE_FORMAT(#{endDate}, '%Y-%m-%d')
         </if>
         and du.leader_path like #{leaderPath,jdbcType=VARCHAR}
         and dq.virtual_questionnaire_id =#{questionnaireId} group by dq.virtual_question_id,dq.answer
@@ -122,10 +122,10 @@
         select COUNT(DISTINCT dq.virtual_doctor_id) count_num,dq.virtual_question_id question_id,dq.answer from virtual_doctor_questionnaire dq join drug_user_doctor dud on dud.doctor_id=dq.virtual_doctor_id AND dud.drug_user_id=dq.virtual_drug_user_id join virtual_question
         q on q.id=dq.virtual_question_id join drug_user du on du.id=dq.virtual_drug_user_id where dud.is_available=1 and  q.type=1
         <if test="startDate!=null and startDate!=''">
-            AND dq.create_time &gt;= #{startDate}
+            AND DATE_FORMAT(dq.create_time, '%Y-%m-%d') &gt;= DATE_FORMAT(#{startDate}, '%Y-%m-%d')
         </if>
         <if test="endDate!=null and endDate!=''">
-            AND dq.create_time &lt;= #{endDate}
+            AND DATE_FORMAT(dq.create_time, '%Y-%m-%d') &lt;= DATE_FORMAT(#{endDate}, '%Y-%m-%d')
         </if>
         and du.leader_path like #{leaderPath,jdbcType=VARCHAR}
         and dq.virtual_questionnaire_id =#{questionnaireId} group by dq.virtual_question_id
