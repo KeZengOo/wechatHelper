@@ -326,9 +326,9 @@
                     ) updateTime
                 FROM
                     product_line pl
-                INNER JOIN virtual_doctor_dynamic_field vddf ON pl.prod_id = vddf.product_id
                 INNER JOIN product_user pu ON pl.prod_id = pu.prod_id
                 INNER JOIN drug_user du ON pu.user_id = du.id
+                LEFT JOIN virtual_doctor_dynamic_field vddf ON pl.prod_id = vddf.product_id
                 WHERE
                     du.leader_path LIKE #{leaderPath}
                 GROUP BY
@@ -341,15 +341,15 @@
 
     <!-- 客户设置产品信息列表总数 -->
     <select id="getDynamicFieldProductListCount" resultType="java.lang.Integer" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DynamicFieldProductRequestBean">
+
         SELECT
             COUNT(DISTINCT pl.prod_id)
         FROM
             product_line pl
-        INNER JOIN virtual_doctor_dynamic_field vddf ON pl.prod_id = vddf.product_id
         INNER JOIN product_user pu ON pl.prod_id = pu.prod_id
         INNER JOIN drug_user du ON pu.user_id = du.id
         WHERE
-            du.leader_path LIKE #{leaderPath}
+        du.leader_path LIKE #{leaderPath}
     </select>
 
     <!-- 根据产品ID删除 -->
