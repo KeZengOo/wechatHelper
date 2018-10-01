@@ -29,6 +29,10 @@ public class SaveCallInfoRequest  extends BaseCallInfoRequest{
 	@NotNull(message="attitude is null")
 	@ApiModelProperty(value = "医生态度 0-5")
 	private Integer attitude;
+
+	@NotNull(message = "请选择产品！")
+	@ApiModelProperty(value = "产品ID")
+	private Integer productId;
 	
 	@NotNull(message="visitResult is null")
 	@ApiModelProperty(value = "拜访结果,以字符串数组形式传入具体文字如[\"成功招募\",\"成功传递\"]")

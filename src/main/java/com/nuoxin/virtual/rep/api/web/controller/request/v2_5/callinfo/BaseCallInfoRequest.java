@@ -20,9 +20,6 @@ public class BaseCallInfoRequest {
 	@ApiModelProperty(value = "虚拟代表 id ")
 	private Long virtualDrugUserId;
 	
-	@ApiModelProperty(value = "产品ID")
-	private Integer productId;
-	
 	@NotNull(message = "mobile is null")
 	@ApiModelProperty(value = "拨打的医生手机号")
 	private String mobile;
