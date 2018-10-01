@@ -128,10 +128,13 @@
 			d.id AS doctorId, d.name AS doctorName, d.telephone AS doctorMobile, 
 			d. sex AS gender, d.depart AS department, d.hospital_name AS hospitalName,d.email,
 			tel_visit.create_time AS visitTime,tel_visit.next_visit_time AS nextVisitTime,tel_visit.visit_result AS visitResult,
-			dm.wechat, dm.secondary_mobile AS secondaryDoctorMobile, dm.thirdary_mobile AS thirdaryDoctorMobile
+			dm.wechat, dm.secondary_mobile AS secondaryDoctorMobile, dm.thirdary_mobile AS thirdaryDoctorMobile,
+			dudq.is_target AS isTarget,dudq.is_break_off AS isBreakOff
 		FROM doctor d 
+		LEFT JOIN drug_user_doctor_quate dudq
+			ON dudq.doctor_id = d.id
 		LEFT JOIN doctor_mend dm
-		ON d.id=dm.virtual_doctor_id
+			ON d.id=dm.virtual_doctor_id
 		JOIN (
 			<!-- 根据 virtualDrugUserIds 获取对应的 doctorIds -->
 			SELECT 
