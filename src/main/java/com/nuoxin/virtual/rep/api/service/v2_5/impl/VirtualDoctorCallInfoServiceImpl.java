@@ -249,6 +249,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		callVisitParams.setStatus(saveRequest.getStatus());
 		callVisitParams.setStatusName(saveRequest.getStatuaName());
 		callVisitParams.setNextVisitTime(saveRequest.getNextVisitTime().concat(" 23:59:59"));
+		callVisitParams.setIsBreakOff(saveRequest.getIsBreakOff());
 		
 		Integer virtualQuestinairedId = null;
 		if (saveRequest instanceof SaveCallInfoRequest) {
@@ -257,7 +258,6 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 			callVisitParams.setCallUrl(((SaveCallInfoRequest) saveRequest).getCallUrl());
 			callVisitParams.setProductId(saveCallInfoRequest.getProductId());
 			callVisitParams.setStatus(1); // 接通
-			callVisitParams.setIsBreakOff(0); // 接通时不会脱落
 			callVisitParams.setIsHasAe(saveCallInfoRequest.getIsHasAe());
 			callVisitParams.setIsHasDrug(saveCallInfoRequest.getIsHasDrug());
 			callVisitParams.setIsTarget(saveCallInfoRequest.getIsTarget());

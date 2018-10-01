@@ -16,9 +16,6 @@ import javax.validation.constraints.NotNull;
 @Data
 public class SaveCallInfoUnConnectedRequest extends BaseCallInfoRequest {
 	
-	@ApiModelProperty(value = "是否脱落:1.脱落,2.未脱落.该值由后端计算,当为空号时,即:statusName=emptynumber 时,isBreakOff=1")
-	private Integer isBreakOff = 0;
-
 	@ApiModelProperty(value = "产品ID")
 	private Integer productId;
 	
