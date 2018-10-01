@@ -209,13 +209,13 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		relationShipParams.setVirtualDrugUserId(request.getVirtualDrugUserId());
 		relationShipParams.setDoctorId(request.getVirtualDoctorId());
 
-
 		if (request instanceof SaveCallInfoRequest) {
 			SaveCallInfoRequest saveRequest = (SaveCallInfoRequest)request;
 			relationShipParams.setIsHasDrug(saveRequest.getIsHasDrug());
 			relationShipParams.setIsTarget(saveRequest.getIsTarget());
 			relationShipParams.setIsHasAe(saveRequest.getIsHasAe());
 			relationShipParams.setHcpPotential(saveRequest.getHcpPotential());
+	
 			Integer productId = saveRequest.getProductId();
 			if (productId != null && productId > 0){
 				relationShipParams.setProductLineId(productId);
@@ -229,8 +229,6 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 			}
 		}
 		
-		// 备份关系
-		drugUserDoctorQuateMapper.backupRelationShipInfo(relationShipParams);
 		// 变更关系
 		drugUserDoctorQuateMapper.replaceRelationShipInfo(relationShipParams);
 	}
