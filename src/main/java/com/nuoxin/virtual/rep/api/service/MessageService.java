@@ -158,7 +158,7 @@ public class MessageService extends BaseService {
         }
 
         // 校验是否是IOS客户端导入的，暂时不支持安卓端的导入
-        List<String> collectNickNameList = wechatMessageVos.stream().map(WechatMessageVo::getNickname).distinct().collect(Collectors.toList());
+        List<String> collectNickNameList = wechatMessageVos.stream().filter(wechatMessageVo->(!StringUtils.isEmpty(wechatMessageVo.getId()))).map(WechatMessageVo::getNickname).distinct().collect(Collectors.toList());
         if (CollectionsUtil.isEmptyList(collectNickNameList)){
             throw new FileFormatException(ErrorEnum.ERROR, "微信昵称不能为空");
         }
