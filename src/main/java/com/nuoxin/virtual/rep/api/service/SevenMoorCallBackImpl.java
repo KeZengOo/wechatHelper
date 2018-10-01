@@ -243,56 +243,55 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 	}
 	
 	/**
-	 * 变更通话状态,将 7moor -> 老状态
+	 * 变更通话状态,将 7moor -> 老状态<br>
+	 * 参考链接 https://developer.7moor.com/event/
 	 * @param paramsMap
 	 * @return AlterResult
 	 */
 	private ConvertResult buildConvertResult(ConcurrentMap<String, String> paramsMap) {
-		String callNo = paramsMap.get("CallNo"); // 被叫号码
-		// 通话唯一标识
+		String callNo = paramsMap.get("CallNo"); 
 		String sinToken = paramsMap.get("CallSheetID");
-		// 通话类型：dialout外呼通话,normal普通来电,transfer转接电话,dialTransfer外呼转接
 		String callType = paramsMap.get("CallType");
-		/*
-		 * 接听状态：dealing（已接）,notDeal（振铃未接听）,
-		 * leak（ivr放弃）,queueLeak（排队放弃）,blackList（黑名单）,voicemail（留言） 与数据库对应的字段
-		 * status_name
-		 */
 		String statusName = paramsMap.get("State");
-		statusName = this.convertStatusName(callType, statusName);
-		// 电话录音下载地址
 		String monitorFilenameUrl = paramsMap.get("MonitorFilename");
-		
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String begin = paramsMap.get("Begin");
 		String end = paramsMap.get("End");
 		
-		logger.info("sinToken:{},通话类型:{},录音下载地址:{},begin:{},end{}", sinToken, callType, monitorFilenameUrl, begin, end);
+		logger.warn("sinToken:{},通话类型:{},录音下载地址:{},begin:{},end{}", 
+				sinToken, callType, monitorFilenameUrl, begin, end);
 		
-		ConvertResult converResult = new ConvertResult();
-		converResult.setSinToken(sinToken);
-		converResult.setCallNo(callNo);
-		converResult.setStatusName(statusName);
-		converResult.setMonitorFilenameUrl(monitorFilenameUrl);
-		converResult.setVisitTime(begin);
+		ConvertResult convertResult = new ConvertResult();
+		convertResult.setSinToken(sinToken);
+		convertResult.setCallNo(callNo);
+		convertResult.setMonitorFilenameUrl(monitorFilenameUrl);
+		convertResult.setVisitTime(begin);
+		
+		statusName = this.convertStatusName(callType, statusName);
+		convertResult.setStatusName(statusName);
+
+		if ("cancelmakecall".equals(statusName)) {
+			convertResult.setStatus(0);
+		} else {
+			convertResult.setStatus(1);
+		}
 		
 		if ("dialout".equalsIgnoreCase(callType)) {
-			converResult.setType(1); // 呼出
+			convertResult.setType(1); // 呼出
 		} else  if ("normal".equalsIgnoreCase(callType)) {
-			converResult.setType(2); // 呼入
+			convertResult.setType(2); // 呼入
 		}
 		
 		try {
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			Date startDate = sdf.parse(begin);
 			Date endDate = sdf.parse(end);
 			long delta = (endDate.getTime() - startDate.getTime()) / 1000; 
-			
-			converResult.setCallTime(delta);
+			convertResult.setCallTime(delta);
 		} catch (ParseException e) {
 			logger.error("时间转换异常:", e);
 		}
 		
-		return converResult;
+		return convertResult;
 	}
 	
 	private String convertStatusName(String callType, String statusName) {
@@ -323,7 +322,8 @@ class ConvertResult{
 	private String statusName; // 状态名
 	private String monitorFilenameUrl; // 录音文件地址
 	private long callTime; // 通话时长
-	private int type; // 呼叫方式 
+	private Integer type; // 呼叫方式 
 	private String callNo; // 被叫号码
 	private String visitTime; // 拜访时间
+	private Integer status;
 }
