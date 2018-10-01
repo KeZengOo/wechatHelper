@@ -204,7 +204,7 @@
         SELECT
         DISTINCT vdci.id,call_dud.drugUserName,IFNULL(date_format(vdci.create_time, '%Y-%m-%d %H:%i:%s'),'')  visitTime,call_dud.doctorId,call_dud.doctorName,
         call_dud.hospitalName,"电话" visitType,"" shareContent,IFNULL(vdcim.`visit_result`,'') visitResult,IFNULL(vdcim.`attitude`,'') attitude,IFNULL(date_format(vdcim.`next_visit_time`, '%Y-%m-%d %H:%i:%s'),'') nextVisitTime
-        ,call_dud.clientLevel,IFNULL(dudq.`hcp_potential`,'') hcpPotential,IFNULL(dudq.is_has_drug,'') isHasDrug,IFNULL(dudq.`is_target`,'') isTarget,IFNULL(dudq.`is_has_ae`,'')  isHasAe
+        ,call_dud.clientLevel,IFNULL(vdcim.`hcp_potential`,'未知') hcpPotential,IFNULL(vdcim.is_has_drug,'未知') isHasDrug,IFNULL(vdcim.`is_target`,'未知') isTarget,IFNULL(vdcim.`is_has_ae`,'未知')  isHasAe
         FROM
         virtual_doctor_call_info vdci
         LEFT JOIN virtual_doctor_call_info_mend vdcim ON vdci.id=vdcim.call_id
@@ -226,7 +226,6 @@
         </if>
 
         ) call_dud ON vdci.virtual_doctor_id = call_dud.doctorId
-        LEFT JOIN drug_user_doctor_quate dudq ON call_dud.doctorId=dudq.doctor_id AND dudq.product_id=#{productId}
         WHERE
         vdci.product_id=#{productId}
 
@@ -249,8 +248,7 @@
             DISTINCT a.id,content_dud.drugUserName,IFNULL(date_format(a.`create_time`, '%Y-%m-%d %H:%i:%s'),'') visitTime,content_dud.doctorId,content_dud.doctorName,
             content_dud.hospitalName,CASE WHEN a.share_type=1 THEN "微信" WHEN a.share_type=2 THEN "短信" WHEN a.share_type=3 THEN "邮件" else "" END  visitType,
             IFNULL(ai.title,'') shareContent,"" visitResult,"" attitude,"" nextVisitTime
-            ,content_dud.clientLevel,IFNULL(dudq.`hcp_potential`,'') hcpPotential,IFNULL(dudq.is_has_drug,'') isHasDrug,IFNULL(dudq.`is_target`,'') isTarget,IFNULL(dudq.`is_has_ae`,'')  isHasAe
-
+            ,content_dud.clientLevel,'未知' hcpPotential,'未知' isHasDrug,'未知' isTarget,'未知'  isHasAe
             FROM
             activity_share a
             INNER JOIN (
@@ -272,7 +270,6 @@
 
             ) content_dud ON a.share_person_id = content_dud.doctorId
             INNER JOIN activity_info ai ON ai.id=a.data_id
-            LEFT JOIN drug_user_doctor_quate dudq ON dudq.doctor_id=content_dud.doctorId AND dudq.product_id=#{productId}
             WHERE
             a.data_id IN (
             SELECT DISTINCT
