@@ -60,10 +60,10 @@
 		WHERE
 		tcp.product_id = #{productId}
 		)
-		<if test="startTime!=null">
+		<if test="startTime!=null and startTime!=''">
 			and date_format(a.create_time,'%Y-%m-%d') &gt;=#{startTime}
 		</if>
-		<if test="endTime!=null">
+		<if test="endTime!=null and endTime!=''">
 			and date_format(a.create_time,'%Y-%m-%d') &lt;=#{endTime}
 		</if>
 		GROUP BY
@@ -129,11 +129,11 @@
 		tcp.product_id = #{productId}
 		)
 
-		<if test="startTime!=null">
+		<if test="startTime!=null and startTime!=''">
 		AND DATE_FORMAT(a.create_time, '%Y-%m-%d') &gt;= #{startTime}
 		</if>
 
-		<if test="endTime!=null">
+		<if test="endTime!=null and endTime!=''">
 		AND DATE_FORMAT(a.create_time, '%Y-%m-%d') &lt;= #{endTime}
 		</if>
 
@@ -202,10 +202,10 @@
 		tcp.product_id = #{productId}
 		)
 
-		<if test="startTime!=null">
+		<if test="startTime!=null and startTime!=''">
 			and date_format(a.create_time,'%Y-%m-%d')&gt;=#{startTime}
 		</if>
-		<if test="endTime!=null">
+		<if test="endTime!=null and endTime!=''">
 			and date_format(a.create_time,'%Y-%m-%d')&lt;=#{endTime}
 		</if>
 
@@ -269,10 +269,10 @@
 		WHERE
 		tcp.product_id = #{productId}
 		)
-		<if test="startTime!=null">
+		<if test="startTime!=null and startTime!=''">
 			and date_format(a.create_time,'%Y-%m-%d')&gt;=#{startTime}
 		</if>
-		<if test="endTime!=null">
+		<if test="endTime!=null and endTime!=''">
 			and date_format(a.create_time,'%Y-%m-%d')&lt;=#{endTime}
 		</if>
 		GROUP BY
@@ -335,10 +335,10 @@
 		WHERE
 		tcp.product_id = #{productId}
 		)
-		<if test="startTime!=null">
+		<if test="startTime!=null and startTime!=''">
 			and date_format(a.create_time,'%Y-%m-%d')&gt;=#{startTime}
 		</if>
-		<if test="endTime!=null">
+		<if test="endTime!=null and endTime!=''">
 			and date_format(a.create_time,'%Y-%m-%d')&lt;=#{endTime}
 		</if>
 		GROUP BY

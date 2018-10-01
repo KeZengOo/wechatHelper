@@ -129,10 +129,10 @@
 		) call_dud ON vdci.virtual_doctor_id = call_dud.doctorId
 		WHERE
 		vdci.product_id
-		<if test="startTime!=null">
+		<if test="startTime!=null and startTime!=''">
 			AND DATE_FORMAT(create_time,'%Y-%m-%d') &gt;=#{startTime}
 		</if>
-		<if test="endTime!=null">
+		<if test="endTime!=null and endTime!=''">
 			AND DATE_FORMAT(create_time,'%Y-%m-%d') &lt;=#{endTime}
 		</if>
 		GROUP BY

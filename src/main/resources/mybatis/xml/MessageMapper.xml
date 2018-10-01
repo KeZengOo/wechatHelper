@@ -750,10 +750,10 @@
         ) message_dud ON vm.doctor_id = message_dud.doctorId
         AND vm.message_type = 1
         WHERE 1=1
-        <if test="startTime!=null">
+        <if test="startTime!=null and startTime!=''">
             and date_format(vm.message_time,'%Y-%m-%d') &gt;=#{startTime}
         </if>
-        <if test="endTime!=null">
+        <if test="endTime!=null and endTime!=''">
             and date_format(vm.message_time,'%Y-%m-%d') &lt;=#{endTime}
         </if>
         GROUP BY
@@ -808,10 +808,10 @@
         AND vm.message_type = 1
         WHERE wechat_message_status=#{wechatMessageStatus}
 
-        <if test="statisticsParams.startTime!=null">
+        <if test="statisticsParams.startTime!=null and statisticsParams.startTime!=''">
             and date_format(vm.message_time,'%Y-%m-%d')&gt;=#{statisticsParams.startTime}
         </if>
-        <if test="statisticsParams.endTime!=null">
+        <if test="statisticsParams.endTime!=null and statisticsParams.endTime!=''">
             and date_format(vm.message_time,'%Y-%m-%d')&lt;=#{statisticsParams.endTime}
         </if>
         GROUP BY

@@ -85,10 +85,10 @@
 		WHERE
 		vdci.product_id = #{statisticsParams.productId}
 
-		<if test="statisticsParams.startTime!=null">
+		<if test="statisticsParams.startTime!=null and statisticsParams.startTime!=''">
 			and date_format(vdci.create_time,'%Y-%m-%d') &gt;=#{statisticsParams.startTime}
 		</if>
-		<if test="statisticsParams.endTime!=null">
+		<if test="statisticsParams.endTime!=null and statisticsParams.endTime!=''">
 			and date_format(vdci.create_time,'%Y-%m-%d') &lt;=#{statisticsParams.endTime}
 		</if>
 		and vdci.is_available=1 and vdci.hcp_potential=#{hcpPotential}
