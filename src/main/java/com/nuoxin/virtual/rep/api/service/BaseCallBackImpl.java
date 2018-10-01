@@ -66,6 +66,11 @@ public abstract class BaseCallBackImpl implements CallBackService {
 		} else {
 			logger.warn("可以获取 DoctorCallInfo 信息 sinToken:{}, 走修改表路线", sinToken);
 			Long callId = info.getId();
+			String statusName = info.getStatusName();
+			if(StringUtils.isNotBlank(statusName)) { // 修改前如果有状态的话,用原来的
+				result.setStatusName(statusName);
+			}
+			
 			this.updateUrl(callOssUrl, result.getStatus(), result.getStatusName(), callId, result.getCallTime());
 		}
 

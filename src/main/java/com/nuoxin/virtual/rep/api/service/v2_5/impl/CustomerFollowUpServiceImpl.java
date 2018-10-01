@@ -320,6 +320,16 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		nextVisitTime.setName("nextVisitTimeStr");
 		tableHeaders.add(nextVisitTime);
 		
+		TableHeader isBreakOff = new TableHeader();
+		isBreakOff.setLabel("是否脱落");
+		isBreakOff.setName("isBreakOff");
+		tableHeaders.add(isBreakOff);
+		
+		TableHeader isTarget = new TableHeader();
+		isTarget.setLabel("是否是目标客户");
+		isTarget.setName("isTarget");
+		tableHeaders.add(isTarget);
+		
 		//////产品信息//////
 
 		ProductTableHeader productInfo = new ProductTableHeader();
