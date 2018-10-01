@@ -40,5 +40,8 @@ public class DoctorBasicDynamicFieldValueResponseBean implements Serializable {
     @ApiModelProperty(value = "分类，目前1基本信息，2医生的处方信息，3之前拜访记录，4分析，5是医院信息")
     private Integer classification;
 
+    @ApiModelProperty(value = "字段类型，1是输入框，2单选框，3单选下拉，4联系方式，5多选下拉，6数字")
+    private Integer type;
+
 
 }

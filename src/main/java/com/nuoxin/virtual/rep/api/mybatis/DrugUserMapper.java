@@ -57,11 +57,19 @@ public interface DrugUserMapper extends MyMapper<DrugUser> {
 	List<ProductDO> getProductList(@Param(value = "leaderPath") String leaderPath);
 
     /**
-     * 查询名下所有设置动态字段的产品
+     * 查询销售名下所有设置动态字段的产品
      * @param leaderPath
      * @return
      */
     List<ProductDO> getSetDynamicFieldProductList(@Param(value = "leaderPath") String leaderPath);
+
+    /**
+     * 查询销售名下某个医生所有设置动态字段的产品
+     * @param leaderPath
+     * @param doctorId
+     * @return
+     */
+    List<ProductDO> getSetDynamicFieldProductListByDoctorId(@Param(value = "leaderPath") String leaderPath,@Param(value = "doctorId") Long doctorId);
 
 
     /**

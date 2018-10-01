@@ -109,7 +109,7 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
     public List<ProductDynamicFieldQuestionnaireResponseBean> getDoctorProductDynamicFieldValue(Long doctorId, Long drugUserId) {
         List<ProductDynamicFieldQuestionnaireResponseBean> list = new ArrayList<>();
         String leaderPath = commonService.getLeaderPathById(drugUserId);
-        List<ProductDO> productList = drugUserMapper.getSetDynamicFieldProductList(leaderPath);
+        List<ProductDO> productList = drugUserMapper.getSetDynamicFieldProductListByDoctorId(leaderPath, doctorId);
         if (CollectionsUtil.isEmptyList(productList)){
             return list;
         }
@@ -122,6 +122,11 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
 
         productIdList.forEach(productId->{
             List<DoctorProductDynamicFieldValueResponseBean> doctorProductDynamicFieldValue = dynamicFieldMapper.getDoctorProductDynamicFieldValue(doctorId, productId);
+            // 没设置过字段或者是还没有录入值
+            if (CollectionsUtil.isEmptyList(doctorProductDynamicFieldValue)){
+                doctorProductDynamicFieldValue = dynamicFieldMapper.getDoctorProductDynamicFieldValueByProductId(productId);
+            }
+
             if (CollectionsUtil.isNotEmptyList(doctorProductDynamicFieldValue)){
                 ProductDynamicFieldQuestionnaireResponseBean productDynamicFieldQuestionnaireResponseBean = new ProductDynamicFieldQuestionnaireResponseBean();
                 productDynamicFieldQuestionnaireResponseBean.setProductDynamicFieldList(doctorProductDynamicFieldValue);
