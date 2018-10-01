@@ -46,10 +46,10 @@
         du.id=dq.virtual_drug_user_id where 1=1
         and dud.is_available=1
         <if test="startDate!=null and startDate!=''">
-            AND dq.create_time &gt;= #{startDate}
+            AND DATE_FORMAT(dq.create_time, '%Y-%m-%d') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d')
         </if>
         <if test="endDate!=null and endDate!=''">
-            AND dq.create_time &lt;= #{endDate}
+            AND DATE_FORMAT(dq.create_time, '%Y-%m-%d') &lt;= DATE_FORMAT(#{endDate}, '%Y-%m-%d')
         </if>
         and du.leader_path like #{leaderPath,jdbcType=VARCHAR} GROUP BY dq.virtual_questionnaire_id;
     </select>
