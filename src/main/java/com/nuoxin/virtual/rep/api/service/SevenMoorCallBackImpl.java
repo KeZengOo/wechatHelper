@@ -37,7 +37,7 @@ import lombok.Data;
 @Service("sevenMoor")
 public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackService{
 
-	private static final Logger logger = LoggerFactory.getLogger(CallBackService.class);
+	private static final Logger logger = LoggerFactory.getLogger(SevenMoorCallBackImpl.class);
 
 	@Resource
 	private RestTemplate restTemplate;
@@ -211,7 +211,7 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 					type = 2;
 				}
 				String begin_time = call7mmorResponseBean.getBEGIN_TIME();
-				String call_no = call7mmorResponseBean.getCALL_NO();
+				String call_no = call7mmorResponseBean.getCALLED_NO();
 
 				RetryCallInfoRequestBean retryCallInfoRequestBean = new RetryCallInfoRequestBean();
 				retryCallInfoRequestBean.setSinToken(call_sheet_id);
