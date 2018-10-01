@@ -30,6 +30,9 @@ public class SaveCallInfoRequest  extends BaseCallInfoRequest{
 	@ApiModelProperty(value = "医生态度 0-5")
 	private Integer attitude;
 
+	/**
+	 * 保存问卷的时候必须选择
+ 	 */
 	@NotNull(message = "请选择产品！")
 	@ApiModelProperty(value = "产品ID")
 	private Integer productId;

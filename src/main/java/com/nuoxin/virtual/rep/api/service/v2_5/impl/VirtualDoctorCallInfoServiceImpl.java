@@ -182,7 +182,6 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	/**
 	 * 保存问卷做题结果
 	 * @param saveRequest
-	 * @param callId
 	 * @return 返回影响条数
 	 */
 	private int doSaveVirtualQuestionnaireRecord(SaveCallInfoRequest saveRequest) {
@@ -198,16 +197,13 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	
 	/**
 	 * 变更虚拟代医生扩展关系信息
-	 * @param saveRequest
+	 * @param request
 	 */
 	private void alterRelationShip(BaseCallInfoRequest request) {
 		DrugUserDoctorQuateParams relationShipParams = new DrugUserDoctorQuateParams();
 		relationShipParams.setVirtualDrugUserId(request.getVirtualDrugUserId());
 		relationShipParams.setDoctorId(request.getVirtualDoctorId());
-		Integer productId = request.getProductId();
-		if (productId != null && productId > 0){
-			relationShipParams.setProductLineId(productId);
-		}
+
 
 		if (request instanceof SaveCallInfoRequest) {
 			SaveCallInfoRequest saveRequest = (SaveCallInfoRequest)request;
@@ -215,9 +211,17 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 			relationShipParams.setIsTarget(saveRequest.getIsTarget());
 			relationShipParams.setIsHasAe(saveRequest.getIsHasAe());
 			relationShipParams.setHcpPotential(saveRequest.getHcpPotential());
+			Integer productId = saveRequest.getProductId();
+			if (productId != null && productId > 0){
+				relationShipParams.setProductLineId(productId);
+			}
 		} else if (request instanceof SaveCallInfoUnConnectedRequest) {
 			SaveCallInfoUnConnectedRequest saveRequest = (SaveCallInfoUnConnectedRequest)request;
 			relationShipParams.setIsBreakOff(saveRequest.getIsBreakOff());
+			Integer productId = saveRequest.getProductId();
+			if (productId != null && productId > 0){
+				relationShipParams.setProductLineId(productId);
+			}
 		}
 		
 		// 备份关系
@@ -233,7 +237,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		callVisitParams.setCallId(saveRequest.getCallInfoId());
 		callVisitParams.setVirtualDoctorId(saveRequest.getVirtualDoctorId());
 		callVisitParams.setVirtualDrugUserId(saveRequest.getVirtualDrugUserId());
-		callVisitParams.setProductId(saveRequest.getProductId());
+
 		
 		// 只能是1 或者 2在前面的参数校验中加了限制
 		callVisitParams.setType(saveRequest.getType());
@@ -248,16 +252,18 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 			SaveCallInfoRequest saveCallInfoRequest = (SaveCallInfoRequest) saveRequest;
 			callVisitParams.setAttitude(saveCallInfoRequest.getAttitude());
 			callVisitParams.setCallUrl(((SaveCallInfoRequest) saveRequest).getCallUrl());
-		
+			callVisitParams.setProductId(saveCallInfoRequest.getProductId());
 			String visitResult = JSONObject.toJSONString(saveCallInfoRequest.getVisitResult());
 			callVisitParams.setVisitResult(visitResult);
 			callVisitParams.setStatus(1); // 接通
 			callVisitParams.setStatusName("answer"); // 状态名
 			virtualQuestinairedId = saveCallInfoRequest.getVirtualQuestionaireId();
 		} else { // 未接通
+			SaveCallInfoUnConnectedRequest saveCallInfoRequest = (SaveCallInfoUnConnectedRequest) saveRequest;
 			virtualQuestinairedId = 0;
 			callVisitParams.setStatus(0); // 未接通
 			callVisitParams.setStatusName("cancelmakecall"); // 状态名
+			callVisitParams.setProductId(saveCallInfoRequest.getProductId());
 		}
 		
 		if (virtualQuestinairedId == null) {
