@@ -74,12 +74,23 @@
 	
 	<update id="updateVirtualDoctorCallInfo" parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoParams">
 		UPDATE virtual_doctor_call_info 
-		SET 
-			product_id =  #{productId} ,
-			doctor_questionnaire_id=#{doctorQuestionnaireId},
-			call_url=#{callUrl},
-			status=#{status},
-			remark=#{remark}
+		<set>
+			<if test="productId != null and productId>0">
+				product_id = #{productId} ,
+			</if>
+			<if test="doctorQuestionnaireId != null and doctorQuestionnaireId > 0">
+				doctor_questionnaire_id=#{doctorQuestionnaireId},
+			</if>
+			<if test="callUrl != null and callUrl !=''">
+				call_url=#{callUrl},
+			</if>
+			<if test="status != null">
+				status=#{status},
+			</if>
+			<if test="remark != null and remark !=''">
+				remark=#{remark}
+			</if>
+		</set>
 		WHERE id=#{callId}
 	</update>
 
