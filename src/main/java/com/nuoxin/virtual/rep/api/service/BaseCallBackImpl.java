@@ -132,7 +132,11 @@ public abstract class BaseCallBackImpl implements CallBackService {
 		params.setCallUrl(result.getMonitorFilenameUrl());
 		params.setStatus(result.getStatus());
 		params.setStatusName(result.getStatusName());
-		params.setVisitTime(result.getVisitTime());
+		if (StringUtils.isBlank(result.getVisitTime())) {
+			params.setVisitTime(null);
+		} else {
+			params.setVisitTime(result.getVisitTime());
+		}
 		params.setCallTime(result.getCallTime());
 		params.setVirtualDoctorId(virtualDoctorId);
 		
