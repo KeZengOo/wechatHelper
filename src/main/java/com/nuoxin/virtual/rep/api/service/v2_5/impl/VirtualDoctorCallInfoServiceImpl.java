@@ -208,13 +208,13 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		DrugUserDoctorQuateParams relationShipParams = new DrugUserDoctorQuateParams();
 		relationShipParams.setVirtualDrugUserId(request.getVirtualDrugUserId());
 		relationShipParams.setDoctorId(request.getVirtualDoctorId());
-		relationShipParams.setIsBreakOff(request.getIsBreakOff());
+		relationShipParams.setIsBreakOff(request.getIsBreakOff()); // 否脱落
 
 		if (request instanceof SaveCallInfoRequest) {
 			SaveCallInfoRequest saveRequest = (SaveCallInfoRequest)request;
-			relationShipParams.setIsHasDrug(saveRequest.getIsHasDrug());
-			relationShipParams.setIsTarget(saveRequest.getIsTarget());
-			relationShipParams.setIsHasAe(saveRequest.getIsHasAe());
+			relationShipParams.setIsHasDrug(saveRequest.getIsHasDrug()); // 是否有药
+			relationShipParams.setIsTarget(saveRequest.getIsTarget()); // 是否目标客户
+			relationShipParams.setIsHasAe(saveRequest.getIsHasAe()); //是否AE
 			relationShipParams.setHcpPotential(saveRequest.getHcpPotential());
 	
 			Integer productId = saveRequest.getProductId();
@@ -249,7 +249,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		callVisitParams.setRemark(saveRequest.getRemark());
 		callVisitParams.setStatus(saveRequest.getStatus());
 		callVisitParams.setStatusName(saveRequest.getStatuaName());
-		callVisitParams.setIsBreakOff(saveRequest.getIsBreakOff());
+		callVisitParams.setIsBreakOff(saveRequest.getIsBreakOff()); //  是否脱落
 		
 		String nextVisitTime = saveRequest.getNextVisitTime();
 		if(StringUtils.isNotBlank(nextVisitTime)) {
@@ -263,10 +263,10 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 			callVisitParams.setCallUrl(((SaveCallInfoRequest) saveRequest).getCallUrl());
 			callVisitParams.setProductId(saveCallInfoRequest.getProductId());
 			callVisitParams.setStatus(1); // 接通
-			callVisitParams.setIsHasAe(saveCallInfoRequest.getIsHasAe());
-			callVisitParams.setIsHasDrug(saveCallInfoRequest.getIsHasDrug());
-			callVisitParams.setIsTarget(saveCallInfoRequest.getIsTarget());
-			callVisitParams.setHcpPotential(saveCallInfoRequest.getHcpPotential());
+			callVisitParams.setIsHasAe(saveCallInfoRequest.getIsHasAe()); // 是否AE
+			callVisitParams.setIsHasDrug(saveCallInfoRequest.getIsHasDrug()); // 是否有药
+			callVisitParams.setIsTarget(saveCallInfoRequest.getIsTarget()); // 是否目标
+			callVisitParams.setHcpPotential(saveCallInfoRequest.getHcpPotential()); // 潜力
 			
 			String visitResult = JSONObject.toJSONString(saveCallInfoRequest.getVisitResult());
 			callVisitParams.setVisitResult(visitResult);
@@ -284,7 +284,6 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 			callVisitParams.setStatus(0); // 未接通
 			callVisitParams.setStatusName(saveCallInfoRequest.getStatuaName()); // 状态名
 			callVisitParams.setProductId(saveCallInfoRequest.getProductId());
-			callVisitParams.setIsBreakOff(saveCallInfoRequest.getIsBreakOff());
 		}
 		
 		if (virtualQuestinairedId == null) {

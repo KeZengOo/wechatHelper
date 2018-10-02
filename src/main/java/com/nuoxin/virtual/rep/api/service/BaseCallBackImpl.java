@@ -112,7 +112,6 @@ public abstract class BaseCallBackImpl implements CallBackService {
 				|| "stop".equalsIgnoreCase(statusName) || "noanswer".equals(statusName);
 	}
 	
-	
 	/**
 	 * 插入回调信息
 	 * @param result ConvertResult 对象

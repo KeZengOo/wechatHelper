@@ -131,8 +131,6 @@
 			dm.wechat, dm.secondary_mobile AS secondaryDoctorMobile, dm.thirdary_mobile AS thirdaryDoctorMobile,
 			dudq.is_target AS isTarget,dudq.is_break_off AS isBreakOff
 		FROM doctor d 
-		LEFT JOIN drug_user_doctor_quate dudq
-			ON dudq.doctor_id = d.id
 		LEFT JOIN doctor_mend dm
 			ON d.id=dm.virtual_doctor_id
 		JOIN (

@@ -42,7 +42,7 @@ public class BaseCallInfoRequest {
 	@ApiModelProperty(value = "备注")
 	private String remark;
 	
-	@ApiModelProperty(value = "是否脱落:1.脱落,2.未脱落.该值由后端计算,当为空号时,即:statusName=emptynumber 时,isBreakOff=1")
+	@ApiModelProperty(value = "是否脱落:1.脱落,0.未脱落 -1 未知.该值由后端计算,当为空号时,即:statusName=emptynumber 时,isBreakOff=1")
 	private Integer isBreakOff;
 	
 	///////////////////////////////////////////////////////
