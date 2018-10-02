@@ -48,6 +48,7 @@ public abstract class BaseCallBackImpl implements CallBackService {
 		String sinToken = result.getSinToken();
 		String audioFileDownloadUrl = result.getMonitorFilenameUrl();
 		String callOssUrl = this.processFile(audioFileDownloadUrl, sinToken);
+		
 		result.setMonitorFilenameUrl(callOssUrl);
 
 		DoctorCallInfo info = this.getDoctorCallInfoBySinToken(sinToken);
@@ -59,6 +60,7 @@ public abstract class BaseCallBackImpl implements CallBackService {
 			Long callId = info.getId();
 			String statusName = info.getStatusName();
 			if(this.flag(statusName)) {
+				logger.warn("将 naxions私有 statueName:{} 回写至记录", statusName);
 				result.setStatusName(statusName);
 			}
 

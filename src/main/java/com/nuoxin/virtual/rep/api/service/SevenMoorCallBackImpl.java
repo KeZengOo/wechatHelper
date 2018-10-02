@@ -2,16 +2,16 @@ package com.nuoxin.virtual.rep.api.service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
-import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
-import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
-import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.RetryCallInfoRequestBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.call.CallInfoResponseBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -19,13 +19,18 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import com.alibaba.fastjson.JSONObject;
+import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
+import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.mybatis.DoctorCallInfoMapper;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
+import com.nuoxin.virtual.rep.api.utils.ConvertStatusUtil;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.utils.RestUtils;
 import com.nuoxin.virtual.rep.api.utils.StringUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.Call7mmorRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.RetryCallInfoRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.call.Call7mmorResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.call.CallInfoResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.call.Default7MoorResponseBean;
 
 import lombok.Data;
@@ -50,13 +55,10 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 	 */
 	@Override
 	public void callBack(ConcurrentMap<String, String> paramsMap) {
-		logger.info("执行 7moor 回调方法... params:{}", JSONObject.toJSONString(paramsMap));
-	
+		logger.warn("执行 7moor 回调方法... params:{}", JSONObject.toJSONString(paramsMap));
 		this.threadSleep();
-		ConvertResult alterResult = this.buildConvertResult(paramsMap);
-		super.processCallBack(alterResult);
-		
-		logger.info("执行 7moor 回调方完成法完成! params:{}", JSONObject.toJSONString(paramsMap));
+		super.processCallBack(this.buildConvertResult(paramsMap));
+		logger.warn("执行 7moor 回调方完成法完成! params:{}", JSONObject.toJSONString(paramsMap));
 	}
 
 	// TODO 代码临时写，有的参数写死，待优化
@@ -251,28 +253,53 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 	private ConvertResult buildConvertResult(ConcurrentMap<String, String> paramsMap) {
 		String calledNo = paramsMap.get("CalledNo"); //被叫号码
 		String sinToken = paramsMap.get("CallSheetID"); // 呼叫唯一标识 
-		String callType = paramsMap.get("CallType"); // dialout 呼出
-		String statusName = paramsMap.get("State"); // dealing 接听
+		String statusName = paramsMap.get("State");
 		String monitorFilenameUrl = paramsMap.get("MonitorFilename"); // 录音文件
 		String begin = paramsMap.get("Begin"); // 通话开始时间
 		String end = paramsMap.get("End"); // 通话结束时间
+		/*
+		 * 通话类型：
+		 * dialout外呼通话,normal普通来电,
+		 * transfer转接电话,dialTransfer外呼转接
+		 */
+		String callType = paramsMap.get("CallType"); // dialout 呼出
+		/*
+		 * 接听状态：
+		 * dealing（已接）,notDeal（振铃未接听）,
+		 * leak（ivr放弃）,queueLeak（排队放弃）,
+		 * blackList（黑名单）,voicemail（留言）
+		 */
+		logger.warn("sinToken:{},通话类型:{},录音下载地址:{},begin:{},end{}, statusName:{}", 
+				sinToken, callType, monitorFilenameUrl, begin, end, statusName);
 		
-		logger.warn("sinToken:{},通话类型:{},录音下载地址:{},begin:{},end{}", sinToken, callType, monitorFilenameUrl, begin, end);
-		
+		return this.doBuildConvertResult(sinToken, calledNo, monitorFilenameUrl, begin, end, callType, statusName);
+	}
+	
+	/**
+	 * 建造 ConvertResult 对象 
+	 * @param sinToken
+	 * @param calledNo
+	 * @param monitorFilenameUrl
+	 * @param begin
+	 * @param end
+	 * @param callType
+	 * @param statusName
+	 * @return
+	 */
+	private ConvertResult doBuildConvertResult(String sinToken, String calledNo, String monitorFilenameUrl,
+			String begin, String end, String callType, String statusName) {
 		ConvertResult convertResult = new ConvertResult();
+		
 		convertResult.setSinToken(sinToken);
 		convertResult.setCalledNo(calledNo);
 		convertResult.setMonitorFilenameUrl(monitorFilenameUrl);
-		convertResult.setVisitTime(begin); // 拜访时间
+		convertResult.setVisitTime(begin); // 打电话开始时间即为拜访时间
 		
-		statusName = this.convertStatusName(callType, statusName);
+		statusName = ConvertStatusUtil.convertStatusName(callType, statusName);
 		convertResult.setStatusName(statusName);
 
-		if ("cancelmakecall".equals(statusName)) {
-			convertResult.setStatus(0); // 未接通
-		} else {
-			convertResult.setStatus(1); // 已接通
-		}
+		Integer status = ConvertStatusUtil.getStatus(statusName);
+		convertResult.setStatus(status);
 		
 		if ("dialout".equalsIgnoreCase(callType)) {
 			convertResult.setType(1); // 呼出
@@ -287,32 +314,11 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 			long delta = (endDate.getTime() - startDate.getTime()) / 1000; 
 			convertResult.setCallTime(delta);
 		} catch (ParseException e) {
-			logger.error("时间转换异常:", e);
+			logger.error("时间转换异常:startDate{}, endDate:{}", begin, end, e);
 		}
 		
 		return convertResult;
 	}
-	
-	private String convertStatusName(String callType, String statusName) {
-		if ("dialout".equalsIgnoreCase(callType)) { // 7moor 呼出状态-> 转成老的状态
-			if ("dealing".equalsIgnoreCase(statusName)) {
-				statusName = "answer";
-			} else if ("notDeal".equalsIgnoreCase(statusName)) {
-				// notDeal（振铃未接听）
-				statusName = "cancelmakecall  ";
-			}
-		} else if ("normal".equalsIgnoreCase(callType)) { // 7moor 呼入状态-> 转成老的状态
-			if ("dealing".equalsIgnoreCase(statusName)) {
-				statusName = "incall";
-			} else if ("notDeal".equalsIgnoreCase(statusName)) {
-				// notDeal（振铃未接听）
-				statusName = "cancelmakecall  ";
-			}
-		}
-		
-		return statusName;
-	}
-	
 }
 
 @Data
