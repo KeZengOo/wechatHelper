@@ -78,25 +78,30 @@ public class StatisticalServiceImpl implements StatisticalService {
      */
     private List<LinkedHashMap<String, Object>> getDoctorVisitDetailList(StatisticsParams statisticsParams) {
         List<LinkedHashMap<String, Object>> list = doctorCallInfoMapper.getDoctorVisitDetailList(statisticsParams);
-        Set<Integer> ids = new HashSet<>();
-        list.forEach(x -> {
-            ids.add(Integer.parseInt(x.get("doctorId").toString()));
-            x.put("hcpPotential", getLevel((String) x.get("hcpPotential")));
-            x.put("isHasDrug", getValue((String) x.get("isHasDrug")));
-            x.put("isTarget", getValue((String) x.get("isTarget")));
-            x.put("isHasAe", getValue((String) x.get("isHasAe")));
-        });
-        List<DynamicFieldValueResponse> fieldValueList = dynamicFieldMapper.getProductDynamicFieldValue(statisticsParams.getProductId(), ids);
-        Map<Integer, List<DynamicFieldValueResponse>> map = fieldValueList.stream().collect(Collectors.groupingBy(DynamicFieldValueResponse::getDoctorId));
-        list.forEach(x -> {
-            Integer doctorId = Integer.parseInt(x.get("doctorId").toString());
-            List<DynamicFieldValueResponse> valueList = map.get(doctorId);
-            valueList.forEach(xx -> {
-                if (xx.getProp() !=null && (!"".equals(xx.getProp().trim()))) {
-                    x.put(xx.getProp(), xx.getValue() == null ? "" : xx.getValue());
-                }
+        if(null!=list&&list.size()>0){
+            Set<Integer> ids = new HashSet<>();
+            list.forEach(x -> {
+                ids.add(Integer.parseInt(x.get("doctorId").toString()));
+                x.put("hcpPotential", getLevel((String) x.get("hcpPotential")));
+                x.put("isHasDrug", getValue((String) x.get("isHasDrug")));
+                x.put("isTarget", getValue((String) x.get("isTarget")));
+                x.put("isHasAe", getValue((String) x.get("isHasAe")));
             });
-        });
+            if(ids.size()>0){
+                List<DynamicFieldValueResponse> fieldValueList = dynamicFieldMapper.getProductDynamicFieldValue(statisticsParams.getProductId(), ids);
+                Map<Integer, List<DynamicFieldValueResponse>> map = fieldValueList.stream().collect(Collectors.groupingBy(DynamicFieldValueResponse::getDoctorId));
+                list.forEach(x -> {
+                    Integer doctorId = Integer.parseInt(x.get("doctorId").toString());
+                    List<DynamicFieldValueResponse> valueList = map.get(doctorId);
+                    valueList.forEach(xx -> {
+                        if (xx.getProp() !=null && (!"".equals(xx.getProp().trim()))) {
+                            x.put(xx.getProp(), xx.getValue() == null ? "" : xx.getValue());
+                        }
+                    });
+                });
+            }
+        }
+
         return list;
     }
 
