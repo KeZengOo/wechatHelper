@@ -7,6 +7,9 @@ import com.nuoxin.virtual.rep.api.dao.DoctorRepository;
 import com.nuoxin.virtual.rep.api.dao.MeetingDetailRepository;
 import com.nuoxin.virtual.rep.api.entity.Doctor;
 import com.nuoxin.virtual.rep.api.entity.MeetingDetail;
+import com.nuoxin.virtual.rep.api.enums.AttendMeetingDownloadEnum;
+import com.nuoxin.virtual.rep.api.enums.AttendMeetingTypeEnum;
+import com.nuoxin.virtual.rep.api.enums.AttendMeetingWayEnum;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.utils.ExcelUtils;
 import com.nuoxin.virtual.rep.api.utils.RegularUtils;
@@ -59,7 +62,7 @@ public class MeetingDetailService extends BaseService{
 			meetingDetailVos = excelUtils.readFromFile(null, inputStream);
 		} catch (Exception e) {
 			logger.error("读取上传的excel文件失败。。", e);
-			throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
+			throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "读取上传的excel文件失败");
 		} finally {
 			if(inputStream != null) {
         		try {
@@ -81,34 +84,82 @@ public class MeetingDetailService extends BaseService{
                 meetingDetail.setMeetingId(meetingId);
                 Date meetingStartTime = meetingDetailVo.getAttendStartTime();
                 Date meetingEndTime = meetingDetailVo.getAttendEndTime();
-                meetingDetail.setAttendStartTime(DateUtil.getDateTimeString(meetingStartTime));
-                meetingDetail.setAttendEndTime(DateUtil.getDateTimeString(meetingEndTime));
-                Long meetingEnd = meetingEndTime.getTime();
-                Long meetingStart = meetingStartTime.getTime();
-                int m = (int)((meetingEnd - meetingStart)/(1000*60));
-                meetingDetail.setAttendSumTime(m);
+                String attendWayStr = meetingDetailVo.getAttendWay();
+
                 String telephone = meetingDetailVo.getTelephone();
                 telephone = StringFormatUtil.getTelephoneStr(telephone);
                 boolean matcher = RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, telephone);
                 if (!matcher){
                     throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "手机号输入有误，请检查是否是文本格式");
                 }
-                
-                Doctor doctor = doctorRepository.findTopByMobile(telephone);
-                if (doctor != null){
-                    List<MeetingDetail> meetingDetailList = meetingDetailRepository.findByMeetingIdAndDoctorId(meetingId, doctor.getId());
-                    if (meetingDetailList != null && meetingDetailList.size() > 0){
-                        meetingDetailRepository.deleteAllByMeetingIdAndDoctorId(meetingId,doctor.getId());
-                    }
 
-                    meetingDetail.setTelephone(telephone);
-                    meetingDetail.setDoctorId(doctor.getId());
-                    meetingDetail.setDoctorName(doctor.getName());
+                Integer attendWay = null;
+                try {
+                    attendWay = (int)(Double.parseDouble(attendWayStr));
+                }catch (Exception e){
+                    logger.error("attendWayStr-->attendWay Error", e);
+                    throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "手机号:" + telephone + "参会方式输入不合法");
                 }
 
-                meetingDetail.setAttendType(meetingDetailVo.getAttendType());
-                meetingDetail.setAttendWay(meetingDetailVo.getAttendWay());
-                meetingDetail.setDownload(meetingDetailVo.getDownload());
+                String attendTypeStr = meetingDetailVo.getAttendType();
+                Integer attendType = null;
+                try {
+                   attendType = (int)(Double.parseDouble(attendTypeStr));
+                }catch (Exception e){
+                    logger.error("attendTypeStr-->attendType Error", e);
+                    throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "手机号:" + telephone + "参会类型输入不合法");
+                }
+
+                String downloadStr = meetingDetailVo.getDownload();
+                Integer download = null;
+                try {
+                    download = (int)(Double.parseDouble(downloadStr));
+                }catch (Exception e){
+                    logger.error("downloadStr-->download Error", e);
+                    throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "手机号:" + telephone + "是否下载输入不合法");
+                }
+
+                if (attendType == null || (!(attendType.equals(AttendMeetingTypeEnum.ATTEND.getType())
+                        || attendWay.equals(AttendMeetingTypeEnum.VIEW.getType())))){
+                    throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "手机号:" + telephone + "参会方式输入不合法");
+                }
+
+
+                if (download == null || (!(download.equals(AttendMeetingDownloadEnum.DOWNLOAD.getType())
+                        || attendWay.equals(AttendMeetingDownloadEnum.NO_DOWNLOAD.getType())))){
+                    throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "手机号:" + telephone + "是否下载输入不合法");
+                }
+
+                if (attendWay == null || (!(attendWay.equals(AttendMeetingWayEnum.WEBSITE.getType())
+                        || attendWay.equals(AttendMeetingWayEnum.WEBSITE.getType())
+                        || attendWay.equals(AttendMeetingWayEnum.WEBSITE.getType())))){
+                    throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "手机号:" + telephone + "参会方式输入不合法");
+                }
+
+
+                meetingDetail.setAttendStartTime(DateUtil.getDateTimeString(meetingStartTime));
+                meetingDetail.setAttendEndTime(DateUtil.getDateTimeString(meetingEndTime));
+                Long meetingEnd = meetingEndTime.getTime();
+                Long meetingStart = meetingStartTime.getTime();
+                int m = (int)((meetingEnd - meetingStart)/(1000*60));
+                meetingDetail.setAttendSumTime(m);
+
+//
+//                Doctor doctor = doctorRepository.findTopByMobile(telephone);
+//                if (doctor != null){
+//                    List<MeetingDetail> meetingDetailList = meetingDetailRepository.findByMeetingIdAndDoctorId(meetingId, doctor.getId());
+//                    if (meetingDetailList != null && meetingDetailList.size() > 0){
+//                        meetingDetailRepository.deleteAllByMeetingIdAndDoctorId(meetingId,doctor.getId());
+//                    }
+//
+//                    meetingDetail.setTelephone(telephone);
+//                    meetingDetail.setDoctorId(doctor.getId());
+//                    meetingDetail.setDoctorName(doctor.getName());
+//                }
+
+                meetingDetail.setAttendType(attendType);
+                meetingDetail.setAttendWay(attendWay);
+                meetingDetail.setDownload(download);
                 meetingDetail.setCreateTime(new Date());
 
                 meetingDetails.add(meetingDetail);
