@@ -120,17 +120,23 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
         }
 
 
-        productIdList.forEach(productId->{
-            List<DoctorProductDynamicFieldValueResponseBean> doctorProductDynamicFieldValue = dynamicFieldMapper.getDoctorProductDynamicFieldValue(doctorId, productId);
+        productList.forEach(product->{
+            ProductDynamicFieldQuestionnaireResponseBean productDynamicFieldQuestionnaireResponseBean = new ProductDynamicFieldQuestionnaireResponseBean();
+            ProductLineResponseBean productLineResponseBean = new ProductLineResponseBean();
+            productLineResponseBean.setProductId(product.getProductId());
+            productLineResponseBean.setProductName(product.getProductName());
+            productDynamicFieldQuestionnaireResponseBean.setProductLineResponseBean(productLineResponseBean);
+
+            List<DoctorProductDynamicFieldValueResponseBean> doctorProductDynamicFieldValue = dynamicFieldMapper.getDoctorProductDynamicFieldValue(doctorId, product.getProductId());
             // 没设置过字段或者是还没有录入值
             if (CollectionsUtil.isEmptyList(doctorProductDynamicFieldValue)){
-                doctorProductDynamicFieldValue = dynamicFieldMapper.getDoctorProductDynamicFieldValueByProductId(productId);
+                doctorProductDynamicFieldValue = dynamicFieldMapper.getDoctorProductDynamicFieldValueByProductId(product.getProductId());
             }
 
             if (CollectionsUtil.isNotEmptyList(doctorProductDynamicFieldValue)){
-                ProductDynamicFieldQuestionnaireResponseBean productDynamicFieldQuestionnaireResponseBean = new ProductDynamicFieldQuestionnaireResponseBean();
+
                 productDynamicFieldQuestionnaireResponseBean.setProductDynamicFieldList(doctorProductDynamicFieldValue);
-                List<ProductQuestionnaireResponseBean> productQuestionnaireList = dynamicFieldMapper.getProductQuestionnaireList(doctorId, productId);
+                List<ProductQuestionnaireResponseBean> productQuestionnaireList = dynamicFieldMapper.getProductQuestionnaireList(doctorId, product.getProductId());
                 if (CollectionsUtil.isNotEmptyList(productQuestionnaireList)){
                     productDynamicFieldQuestionnaireResponseBean.setProductQuestionnaireList(productQuestionnaireList);
                 }

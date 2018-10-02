@@ -3,6 +3,7 @@ package com.nuoxin.virtual.rep.api.web.controller.response.v2_5;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.security.access.method.P;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -17,6 +18,9 @@ import java.util.List;
 @Data
 public class ProductDynamicFieldQuestionnaireResponseBean implements Serializable {
     private static final long serialVersionUID = -650497624101900561L;
+
+    @ApiModelProperty(value = "产品")
+    private ProductLineResponseBean productLineResponseBean;
 
     @ApiModelProperty(value = "产品动态字段")
     private List<DoctorProductDynamicFieldValueResponseBean> productDynamicFieldList = new ArrayList<>();
