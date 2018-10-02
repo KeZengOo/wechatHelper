@@ -22,7 +22,7 @@ public class ConvertStatusUtil {
 			if ("dealing".equalsIgnoreCase(statusName)) {
 				statusName = "incall";
 			} else {
-				notDeal(statusName);
+				statusName = notDeal(statusName);
 			}
 		}
 
