@@ -30,6 +30,9 @@ public class VirtualDoctorMiniResponse {
 	private String mobile;
 	@ApiModelProperty(value = "医院名")
 	private String hospitalName;
+
+	@ApiModelProperty(value = "医院等级")
+	private Integer hospitalGrade;
 	
 	@ApiModelProperty(value = "下次拜访时间文字")
 	private String nextVisitTimeContent;

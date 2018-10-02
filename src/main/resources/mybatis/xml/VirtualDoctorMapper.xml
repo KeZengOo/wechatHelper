@@ -35,9 +35,9 @@
 			positions AS title,
 			depart,
 			vd.client_level AS hcpLevel,
-			temp.nextVisit
+			temp.nextVisit,
+			(SELECT `level` FROM hospital WHERE id=d.hospital_id) hospitalGrade
 		FROM doctor d
-			
 		LEFT JOIN doctor_virtual vd
 			ON vd.doctor_id = d.id 
 			AND d.id = #{virtualDoctorId}
