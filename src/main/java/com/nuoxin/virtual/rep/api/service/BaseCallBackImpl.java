@@ -65,7 +65,8 @@ public abstract class BaseCallBackImpl implements CallBackService {
 			this.updateUrl(callOssUrl, result.getStatus(), result.getStatusName(), callId, result.getCallTime());
 		}
 
-		logger.warn("回调执行成功! ,sinToken:{},downloadUrl:{}", sinToken, callOssUrl);
+		logger.warn("回调执行成功! sinToken:{}, status:{}, statusName:{}, downloadUrl:{}", 
+				sinToken, result.getStatus(), result.getStatusName(), callOssUrl);
 	}
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
