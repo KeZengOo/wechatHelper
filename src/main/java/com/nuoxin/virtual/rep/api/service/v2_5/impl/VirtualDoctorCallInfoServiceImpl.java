@@ -249,8 +249,12 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		callVisitParams.setRemark(saveRequest.getRemark());
 		callVisitParams.setStatus(saveRequest.getStatus());
 		callVisitParams.setStatusName(saveRequest.getStatuaName());
-		callVisitParams.setNextVisitTime(saveRequest.getNextVisitTime().concat(" 23:59:59"));
 		callVisitParams.setIsBreakOff(saveRequest.getIsBreakOff());
+		
+		String nextVisitTime = saveRequest.getNextVisitTime();
+		if(StringUtils.isNotBlank(nextVisitTime)) {
+			callVisitParams.setNextVisitTime(nextVisitTime.concat(" 23:59:59"));
+		}
 		
 		Integer virtualQuestinairedId = null;
 		if (saveRequest instanceof SaveCallInfoRequest) {
