@@ -512,14 +512,14 @@ public final class DateUtil {
      */
     public static int calLastedTime(String startTime, String endTime) {
         try {
-            Date startDate = DateFormat.getDateTimeInstance().parse(startTime);
-            Date endDate = DateFormat.getDateTimeInstance().parse(endTime);
+        	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date startDate = sdf.parse(startTime);
+            Date endDate = sdf.parse(endTime);
             int time = calLastedTime(startDate, endDate);
             return time;
         }catch (Exception e){
             e.printStackTrace();
             return 0;
-
         }
     }
 
@@ -527,5 +527,8 @@ public final class DateUtil {
     public static void main(String[] args) {
         int d = DateUtil.getCurrentMonthLastDay();
         System.out.println(d);
+        
+        int result = calLastedTime("2018-10-01 23:10:15", "2018-10-01 23:10:35");
+        System.out.println(result);
     }
 }
