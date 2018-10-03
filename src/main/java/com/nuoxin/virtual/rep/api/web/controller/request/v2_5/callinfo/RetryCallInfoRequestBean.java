@@ -28,6 +28,10 @@ public class RetryCallInfoRequestBean implements Serializable {
      */
     private String mobile;
 
+    /**
+     * 电话接通状态
+     */
+    private Integer status;
 
     /**
      * 电话接通状态

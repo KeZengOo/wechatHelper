@@ -219,6 +219,7 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 				retryCallInfoRequestBean.setSinToken(call_sheet_id);
 				retryCallInfoRequestBean.setMobile(call_no);
 				// 走补偿的都是接通的
+				retryCallInfoRequestBean.setStatus(1);
 				retryCallInfoRequestBean.setStatusName("answer");
 				retryCallInfoRequestBean.setCallTime(DateUtil.calLastedTime(beginTime, endTime));
 				retryCallInfoRequestBean.setCallUrl(ossFilePath);

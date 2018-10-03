@@ -130,8 +130,8 @@
 
     <!-- 新增重试的电话记录 -->
     <insert id="addRetryCallInfo">
-        INSERT INTO virtual_doctor_call_info(sin_token, is_retry, mobile, status_name, call_time, call_url, create_time, type)
-        VALUES (#{sinToken}, #{retry}, #{mobile}, #{statusName}, #{callTime}, #{callUrl}, #{createTime}, #{type})
+        INSERT INTO virtual_doctor_call_info(sin_token, is_retry, mobile,status, status_name, call_time, call_url, create_time, type)
+        VALUES (#{sinToken}, #{retry}, #{mobile},#{status}, #{statusName}, #{callTime}, #{callUrl}, #{createTime}, #{type})
     </insert>
 
 
