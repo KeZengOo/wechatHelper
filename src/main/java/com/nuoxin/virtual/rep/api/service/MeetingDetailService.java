@@ -119,22 +119,24 @@ public class MeetingDetailService extends BaseService{
                     throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "手机号:" + telephone + "是否下载输入不合法");
                 }
 
-                if (attendType == null || (!(attendType.equals(AttendMeetingTypeEnum.ATTEND.getType())
-                        || attendWay.equals(AttendMeetingTypeEnum.VIEW.getType())))){
+                if (attendWay == null || (!(attendWay.equals(AttendMeetingWayEnum.WEBSITE.getType())
+                        || attendWay.equals(AttendMeetingWayEnum.TELEPHONE.getType())
+                        || attendWay.equals(AttendMeetingWayEnum.WECHAT.getType())))){
                     throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "手机号:" + telephone + "参会方式输入不合法");
+                }
+
+                if (attendType == null || (!(attendType.equals(AttendMeetingTypeEnum.ATTEND.getType())
+                        || attendType.equals(AttendMeetingTypeEnum.VIEW.getType())))){
+                    throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "手机号:" + telephone + "参会类型输入不合法");
                 }
 
 
                 if (download == null || (!(download.equals(AttendMeetingDownloadEnum.DOWNLOAD.getType())
-                        || attendWay.equals(AttendMeetingDownloadEnum.NO_DOWNLOAD.getType())))){
+                        || download.equals(AttendMeetingDownloadEnum.NO_DOWNLOAD.getType())))){
                     throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "手机号:" + telephone + "是否下载输入不合法");
                 }
 
-                if (attendWay == null || (!(attendWay.equals(AttendMeetingWayEnum.WEBSITE.getType())
-                        || attendWay.equals(AttendMeetingWayEnum.WEBSITE.getType())
-                        || attendWay.equals(AttendMeetingWayEnum.WEBSITE.getType())))){
-                    throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "手机号:" + telephone + "参会方式输入不合法");
-                }
+
 
 
                 meetingDetail.setAttendStartTime(DateUtil.getDateTimeString(meetingStartTime));
@@ -143,19 +145,6 @@ public class MeetingDetailService extends BaseService{
                 Long meetingStart = meetingStartTime.getTime();
                 int m = (int)((meetingEnd - meetingStart)/(1000*60));
                 meetingDetail.setAttendSumTime(m);
-
-//
-//                Doctor doctor = doctorRepository.findTopByMobile(telephone);
-//                if (doctor != null){
-//                    List<MeetingDetail> meetingDetailList = meetingDetailRepository.findByMeetingIdAndDoctorId(meetingId, doctor.getId());
-//                    if (meetingDetailList != null && meetingDetailList.size() > 0){
-//                        meetingDetailRepository.deleteAllByMeetingIdAndDoctorId(meetingId,doctor.getId());
-//                    }
-//
-//                    meetingDetail.setTelephone(telephone);
-//                    meetingDetail.setDoctorId(doctor.getId());
-//                    meetingDetail.setDoctorName(doctor.getName());
-//                }
 
                 meetingDetail.setAttendType(attendType);
                 meetingDetail.setAttendWay(attendWay);
