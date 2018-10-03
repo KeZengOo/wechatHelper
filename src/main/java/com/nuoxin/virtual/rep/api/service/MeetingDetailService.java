@@ -136,7 +136,7 @@ public class MeetingDetailService extends BaseService{
                     throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "手机号:" + telephone + "是否下载输入不合法");
                 }
 
-
+                Doctor doctor = doctorRepository.findTopByMobile(telephone);
 
 
                 meetingDetail.setAttendStartTime(DateUtil.getDateTimeString(meetingStartTime));
@@ -145,6 +145,10 @@ public class MeetingDetailService extends BaseService{
                 Long meetingStart = meetingStartTime.getTime();
                 int m = (int)((meetingEnd - meetingStart)/(1000*60));
                 meetingDetail.setAttendSumTime(m);
+                if (doctor != null){
+                    meetingDetail.setDoctorId(doctor.getId());
+                    meetingDetail.setDoctorName(doctor.getName());
+                }
 
                 meetingDetail.setAttendType(attendType);
                 meetingDetail.setAttendWay(attendWay);
