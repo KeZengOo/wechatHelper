@@ -26,8 +26,6 @@ public abstract class BaseCallBackImpl implements CallBackService {
 
 	@Value("${recording.file.path}")
 	private String path;
-	@Value("${audio.download.url}")
-	private String url;
 
 	@Resource
 	private OssService ossService;
@@ -90,7 +88,7 @@ public abstract class BaseCallBackImpl implements CallBackService {
 	 */
 	protected String processFile(String audioFileUrl, String sinToken) {
 		String fileName = sinToken.concat(FileConstant.MP3_SUFFIX);
-		fileService.processLocalFile(url, fileName, path);
+		fileService.processLocalFile(audioFileUrl, fileName, path);
 		
 		String fullFileName = path.concat(fileName);
 		String ossUrl = ossService.uploadFile(new File(fullFileName));

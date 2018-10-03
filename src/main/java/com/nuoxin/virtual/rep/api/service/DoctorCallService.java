@@ -64,6 +64,7 @@ public class DoctorCallService extends BaseService {
 
 	@Value("${recording.file.path}")
     private String path;
+	@Deprecated
     @Value("${audio.download.url}")
     private String url;
 	
