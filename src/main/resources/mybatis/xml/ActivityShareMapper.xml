@@ -368,7 +368,7 @@
 						activity_read
 					WHERE
 						data_id = a.data_id
-					AND read_person_id = a.share_person_id
+					AND read_person_id = #{doctorId}
 				) readCount,
 				(
 					SELECT
@@ -377,8 +377,8 @@
 						activity_read
 					WHERE
 						data_id = a.data_id
-					AND read_person_id = a.share_person_id
-				) readCount,
+					AND read_person_id = #{doctorId}
+				) readTime,
 				(
 					SELECT
 
@@ -386,7 +386,7 @@
 					FROM
 						activity_retrans aa
 					WHERE
-						aa.retrans_person_id = a.share_person_id
+						aa.retrans_person_id = #{doctorId}
 					AND aa.data_id = a.data_id
 				) forward,
 				(
@@ -395,7 +395,7 @@
 					FROM
 						t_content_popularity tcp
 					WHERE
-						doctor_id = a.share_person_id
+						doctor_id = #{doctorId}
 					AND content_id = a.data_id
 				) useful
 			FROM
