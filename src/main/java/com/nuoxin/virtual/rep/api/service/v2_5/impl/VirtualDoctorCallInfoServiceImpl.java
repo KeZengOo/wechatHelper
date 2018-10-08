@@ -90,11 +90,8 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	@Transactional(value = TxType.REQUIRED, rollbackOn = Exception.class)
 	@Override
 	public boolean saveConnectedCallInfo(SaveCallInfoRequest saveRequest) {
-		if (saveRequest.getVirtualDoctorId() == null) { // 非库内医生
-			// 将医生ID置为0
-			saveRequest.setVirtualDoctorId(0L);
-		}
-
+		this.configSaveCallInfoRequestValue(saveRequest);
+		
 		Long callId = saveRequest.getCallInfoId(); // 电话拜访主键值
 		if (callId != null && callId > 0) {
 			this.saveCallInfo(saveRequest);
@@ -136,6 +133,30 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	private void configSaveCallInfoRequestValue(SaveCallInfoRequest saveRequest) {
+		if (saveRequest.getVirtualDoctorId() == null) { // 非库内医生
+			// 将医生ID置为0
+			saveRequest.setVirtualDoctorId(0L);
+		}
+
+		List<String> results = saveRequest.getVisitResult();
+		if (CollectionsUtil.isNotEmptyList(results)) {
+			results.forEach(result -> {
+				if (StringUtils.isNotBlank(result)) {
+					if ("成功招募".equals(result)) {
+						// 设置为成功招募
+						saveRequest.setIsRecruit(1);
+					}
+				}
+			});
+			
+			if (saveRequest.getIsRecruit() == null) {
+				// 未知
+				saveRequest.setIsRecruit(-1);
+			}
+		}
+	}
 	
 	/**
 	 * 根据 List<CallVisitBean> 获取电话拜访扩展信息
@@ -208,10 +229,12 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		DrugUserDoctorQuateParams relationShipParams = new DrugUserDoctorQuateParams();
 		relationShipParams.setVirtualDrugUserId(request.getVirtualDrugUserId());
 		relationShipParams.setDoctorId(request.getVirtualDoctorId());
-		relationShipParams.setIsBreakOff(request.getIsBreakOff()); // 否脱落
+		relationShipParams.setIsBreakOff(request.getIsBreakOff()); // 是否脱落来自页面传值(接通/未接通)
 
 		if (request instanceof SaveCallInfoRequest) {
 			SaveCallInfoRequest saveRequest = (SaveCallInfoRequest)request;
+			
+			relationShipParams.setIsRecruit(saveRequest.getIsRecruit()); // 是否有药
 			relationShipParams.setIsHasDrug(saveRequest.getIsHasDrug()); // 是否有药
 			relationShipParams.setIsTarget(saveRequest.getIsTarget()); // 是否目标客户
 			relationShipParams.setIsHasAe(saveRequest.getIsHasAe()); //是否AE
@@ -243,13 +266,13 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		callVisitParams.setVirtualDrugUserId(saveRequest.getVirtualDrugUserId());
 		
 		// 这里的 type 值只能是1 或者 2在前面的参数校验中加了限制
-		Integer type = saveRequest.getType();
+		Integer type = saveRequest.getType(); 
 		callVisitParams.setType(type);
 		callVisitParams.setMobile(saveRequest.getMobile());
 		callVisitParams.setRemark(saveRequest.getRemark());
 		callVisitParams.setStatus(saveRequest.getStatus());
 		callVisitParams.setStatusName(saveRequest.getStatuaName());
-		callVisitParams.setIsBreakOff(saveRequest.getIsBreakOff()); //  是否脱落
+		callVisitParams.setIsBreakOff(saveRequest.getIsBreakOff()); // 是否脱落来自页面传值(接通/未接通)
 		
 		String nextVisitTime = saveRequest.getNextVisitTime();
 		if(StringUtils.isNotBlank(nextVisitTime)) {
@@ -259,10 +282,13 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		Integer virtualQuestinairedId = null;
 		if (saveRequest instanceof SaveCallInfoRequest) {
 			SaveCallInfoRequest saveCallInfoRequest = (SaveCallInfoRequest) saveRequest;
+			
 			callVisitParams.setAttitude(saveCallInfoRequest.getAttitude());
 			callVisitParams.setCallUrl(((SaveCallInfoRequest) saveRequest).getCallUrl());
 			callVisitParams.setProductId(saveCallInfoRequest.getProductId());
 			callVisitParams.setStatus(1); // 接通
+			
+			callVisitParams.setIsRecruit(saveCallInfoRequest.getIsRecruit()); // 是否招募
 			callVisitParams.setIsHasAe(saveCallInfoRequest.getIsHasAe()); // 是否AE
 			callVisitParams.setIsHasDrug(saveCallInfoRequest.getIsHasDrug()); // 是否有药
 			callVisitParams.setIsTarget(saveCallInfoRequest.getIsTarget()); // 是否目标

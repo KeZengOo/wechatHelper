@@ -19,12 +19,14 @@ public class SaveCallInfoRequest  extends BaseCallInfoRequest{
 	@ApiModelProperty(value = "医生潜力 3高,2中,1低,-1未知")
 	private Integer hcpPotential;
 	
-	@ApiModelProperty(value = "是否有药 1.有,0.无")
+	@ApiModelProperty(value = "是否有药 1.有,0.无,-1未知")
 	private Integer isHasDrug;
-	@ApiModelProperty(value = "是否是目标客户 1.是,0.非")
+	@ApiModelProperty(value = "是否是目标客户 1.是,0.非,-1未知")
 	private Integer isTarget;
-	@ApiModelProperty(value = "是否有 AE 1.是,0.非")
+	@ApiModelProperty(value = "是否有 AE 1.是,0.非,-1未知")
 	private Integer isHasAe;
+	@ApiModelProperty(value = "是否招募 1.是,0.非, -1未知")
+	private Integer isRecruit;
 	
 	@NotNull(message="attitude is null")
 	@ApiModelProperty(value = "医生态度 0-5")

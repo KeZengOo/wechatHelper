@@ -33,7 +33,7 @@ public class VirtualDoctorCallInfoParams{
 	@ApiModelProperty(value = "是否有 AE 1.是,0.非,-1未知")
 	private Integer isHasAe;
 	@ApiModelProperty(value = "是否有 招募 1.是,0.非,-1未知")
-	private Integer isRrecruit;
+	private Integer isRecruit;
 	@ApiModelProperty(value = "是否脱落1.是,0.非,-1未知")
 	private Integer isBreakOff;
 }
