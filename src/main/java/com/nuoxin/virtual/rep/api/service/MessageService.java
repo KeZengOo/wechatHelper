@@ -14,6 +14,7 @@ import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.Message;
 import com.nuoxin.virtual.rep.api.enums.MessageTypeEnum;
 import com.nuoxin.virtual.rep.api.enums.UserTypeEnum;
+import com.nuoxin.virtual.rep.api.mybatis.DrugUserWechatMapper;
 import com.nuoxin.virtual.rep.api.mybatis.MessageMapper;
 import com.nuoxin.virtual.rep.api.utils.*;
 import com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean;
@@ -33,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
@@ -61,6 +63,9 @@ public class MessageService extends BaseService {
     private DoctorRepository doctorRepository;
     @Autowired
     private MessageMapper messageMapper;
+
+    @Resource
+    private DrugUserWechatMapper drugUserWechatMapper;
 
     public void downloadExcel(HttpServletResponse response) {
         response.setHeader("content-Type", "application/vnd.ms-excel");
@@ -157,7 +162,7 @@ public class MessageService extends BaseService {
             return null;
         }
 
-        // 校验是否是IOS客户端导入的，暂时不支持安卓端的导入
+        // 校验是否是IOS客户端导入的，安卓端的导入需要特殊处理 DRUG_USER_NICKNAME
         List<String> collectNickNameList = wechatMessageVos.stream().filter(wechatMessageVo->(!StringUtils.isEmpty(wechatMessageVo.getId()))).map(WechatMessageVo::getNickname).distinct().collect(Collectors.toList());
         if (CollectionsUtil.isEmptyList(collectNickNameList)){
             throw new FileFormatException(ErrorEnum.ERROR, "微信昵称不能为空");
@@ -166,8 +171,38 @@ public class MessageService extends BaseService {
             throw new FileFormatException(ErrorEnum.ERROR, "Excel文件微信昵称只能有两个");
         }
 
+        // 不是安卓端导出的聊天记录，将对应销售昵称替换成
         if (!collectNickNameList.contains(DRUG_USER_NICKNAME)){
-            throw new FileFormatException(ErrorEnum.ERROR, "目前只支持IOS端导出的聊天记录");
+            List<String> collectWechatNumber = wechatMessageVos.stream().filter(wechatMessageVo -> (!StringUtils.isEmpty(wechatMessageVo.getId()))).filter(wechatMessageVo -> (!StringUtils.isEmpty(wechatMessageVo.getWechatNumber()))).map(WechatMessageVo::getWechatNumber).distinct().collect(Collectors.toList());
+            if (CollectionsUtil.isEmptyList(collectWechatNumber)){
+                throw new FileFormatException(ErrorEnum.ERROR, "微信号不能为空");
+            }
+            if (collectNickNameList.size() !=2){
+                throw new FileFormatException(ErrorEnum.ERROR, "Excel文件微信号只能有两个");
+            }
+
+            Map<String, String> map = new HashMap<>(1);
+            String wechatNumber = collectWechatNumber.get(0);
+            Integer count = drugUserWechatMapper.getCountByWechat(wechatNumber);
+            if (count == null || count == 0){
+                wechatNumber = collectWechatNumber.get(1);
+                count = drugUserWechatMapper.getCountByWechat(wechatNumber);
+                if (count == null || count == 0){
+                    throw new FileFormatException(ErrorEnum.ERROR, "安卓手机导出的聊天记录需要绑定微信号！");
+                }else {
+                    map.put(wechatNumber, DRUG_USER_NICKNAME);
+                }
+            }else{
+                map.put(wechatNumber, DRUG_USER_NICKNAME);
+            }
+
+            wechatMessageVos.forEach(anWechatMessageVo -> {
+                String s = map.get(anWechatMessageVo.getWechatNumber());
+                if (!StringUtils.isEmpty(s)){
+                    anWechatMessageVo.setNickname(DRUG_USER_NICKNAME);
+                }
+            });
+
         }
 
 
