@@ -61,6 +61,43 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		return null;
 	}
 	
+	@Transactional(value = TxType.REQUIRED, rollbackOn = Exception.class)
+	@Override
+	public boolean saveConnectedCallInfo(SaveCallInfoRequest saveRequest) {
+		this.configSaveCallInfoRequestValue(saveRequest);
+		
+		Long callId = saveRequest.getCallInfoId(); // 电话拜访主键值
+		if (callId != null && callId > 0) {
+			this.saveCallInfo(saveRequest);
+			
+			Integer virtualQuestionaireId = saveRequest.getVirtualQuestionaireId();
+			if (virtualQuestionaireId != null && virtualQuestionaireId > 0){
+				this.doSaveVirtualQuestionnaireRecord(saveRequest);
+			}
+			
+			this.alterRelationShip(saveRequest);
+			return true;
+		}
+
+		return false;
+	}
+	
+	@Transactional(value = TxType.REQUIRED, rollbackOn = Exception.class)
+	@Override
+	public boolean saveUnconnectedCallInfo(SaveCallInfoUnConnectedRequest saveRequest) {
+		this.configSaveCallInfoUnConnectedRequest(saveRequest);
+		
+		Long callId = saveRequest.getCallInfoId();
+		if (callId != null && callId > 0) {
+			this.saveCallInfo(saveRequest);
+			this.alterRelationShip(saveRequest);
+
+			return true;
+		}
+
+		return false;
+	}
+	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public PageResponseBean<List<CallVisitBean>> getCallVisitList(CallInfoListRequest request, String leaderPath) {
@@ -86,51 +123,6 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		
 		return pageResponse;
 	}
-
-	@Transactional(value = TxType.REQUIRED, rollbackOn = Exception.class)
-	@Override
-	public boolean saveConnectedCallInfo(SaveCallInfoRequest saveRequest) {
-		this.configSaveCallInfoRequestValue(saveRequest);
-		
-		Long callId = saveRequest.getCallInfoId(); // 电话拜访主键值
-		if (callId != null && callId > 0) {
-			this.saveCallInfo(saveRequest);
-			Integer virtualQuestionaireId = saveRequest.getVirtualQuestionaireId();
-			if (virtualQuestionaireId != null && virtualQuestionaireId > 0){
-				this.doSaveVirtualQuestionnaireRecord(saveRequest);
-			}
-			this.alterRelationShip(saveRequest);
-			return true;
-		}
-
-		return false;
-	}
-	
-	@Transactional(value = TxType.REQUIRED, rollbackOn = Exception.class)
-	@Override
-	public boolean saveUnconnectedCallInfo(SaveCallInfoUnConnectedRequest saveRequest) {
-		// 如果没有传状态值则设置为 cancelmakecall
-		if(StringUtils.isBlank(saveRequest.getStatuaName())) {
-			saveRequest.setStatuaName("cancelmakecall");
-		}
-		
-		// statusName 为 emptynumber 时将 isBreakOff 设置为1
-		if ("emptynumber".equalsIgnoreCase(saveRequest.getStatuaName())) {
-			saveRequest.setIsBreakOff(1);
-		} else {
-			saveRequest.setIsBreakOff(0);
-		}
-
-		Long callId = saveRequest.getCallInfoId();
-		if (callId != null && callId > 0) {
-			this.saveCallInfo(saveRequest);
-			this.alterRelationShip(saveRequest);
-
-			return true;
-		}
-
-		return false;
-	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
@@ -155,6 +147,20 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 				// 未知
 				saveRequest.setIsRecruit(-1);
 			}
+		}
+	}
+	
+	private void configSaveCallInfoUnConnectedRequest(SaveCallInfoUnConnectedRequest saveRequest) {
+		// 如果没有传状态值则设置为 cancelmakecall
+		if (StringUtils.isBlank(saveRequest.getStatuaName())) {
+			saveRequest.setStatuaName("cancelmakecall");
+		}
+
+		// statusName 为 emptynumber 时将 isBreakOff 设置为1
+		if ("emptynumber".equalsIgnoreCase(saveRequest.getStatuaName())) {
+			saveRequest.setIsBreakOff(1);
+		} else {
+			saveRequest.setIsBreakOff(0);
 		}
 	}
 	
