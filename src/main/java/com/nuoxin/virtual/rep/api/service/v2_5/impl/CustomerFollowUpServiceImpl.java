@@ -220,11 +220,11 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 			mobiles.add(doctor.getThirdaryDoctorMobile());
 		}
 		
-		// 拜访时间
+		// (上次)拜访时间
 		Date visitTime = doctor.getVisitTime();
 		if (visitTime != null) {
 			long visitTimeDelta = System.currentTimeMillis() - visitTime.getTime();
-			String lastVisitTime = commonService.alterVisitTimeContent(visitTimeDelta);
+			String lastVisitTime = commonService.alterLastVisitTimeContent(visitTimeDelta);
 			doctor.setVisitTimeStr(lastVisitTime);
 		} else {
 			doctor.setVisitTimeStr("无");
@@ -233,8 +233,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		// 下次拜访时间
 		Date nextVisitTime = doctor.getNextVisitTime();
 		if (nextVisitTime != null) {
-			long nextTimeDelta = System.currentTimeMillis() - nextVisitTime.getTime();
-			String nextVisitTimeStr = commonService.alterVisitTimeContent(nextTimeDelta);
+			String nextVisitTimeStr = commonService.alterNextVisitTimeContent(nextVisitTime);
 			doctor.setNextVisitTimeStr(nextVisitTimeStr);
 		} else {
 			doctor.setNextVisitTimeStr("无");
