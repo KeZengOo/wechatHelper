@@ -118,7 +118,16 @@ public interface DynamicFieldMapper {
      * @param doctorId
      * @return
      */
+    @Deprecated
     List<DoctorBasicDynamicFieldValueResponseBean> getDoctorBasicDynamicFieldValue(@Param(value = "doctorId") Long doctorId, @Param(value="classification") Integer classification);
+
+
+    /**
+     * 得到医生基本信息动态字段
+     * @param doctorId
+     * @return
+     */
+    List<DoctorBasicDynamicFieldValueResponseBean> getDoctorBasicDynamicField(@Param(value = "doctorId") Long doctorId, @Param(value="classification") Integer classification);
 
 
     /**
@@ -127,7 +136,26 @@ public interface DynamicFieldMapper {
      * @param productId
      * @return
      */
+    @Deprecated
     List<DoctorProductDynamicFieldValueResponseBean> getDoctorProductDynamicFieldValue(@Param(value = "doctorId") Long doctorId,@Param(value = "productId") Long productId);
+
+
+    /**
+     * 根据产品ID得到产品设置的动态字段
+     * @param productId
+     * @return
+     */
+    List<DoctorProductDynamicFieldValueResponseBean> getDoctorProductDynamicField(@Param(value = "productId") Long productId);
+
+
+    /**
+     * 得到医生字段填充的值
+     * @param doctorId
+     * @param dynamicFieldId
+     * @return
+     */
+    DoctorBasicDynamicFieldValueResponseBean getDoctorDynamicFieldValue(@Param(value = "doctorId") Long doctorId,@Param(value = "dynamicFieldId") Long dynamicFieldId);
+
 
 
     /**

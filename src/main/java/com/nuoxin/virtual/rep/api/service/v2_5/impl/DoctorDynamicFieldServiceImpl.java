@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import com.nuoxin.virtual.rep.api.entity.v2_5.DynamicFieldResponse;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorQuestionnaireDetailRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.*;
 import org.springframework.stereotype.Service;
@@ -44,10 +45,15 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public void addDoctorDynamicFieldValue(DoctorDynamicFieldValueListRequestBean bean) {
         Long doctorId = bean.getDoctorId();
-        Integer classification = bean.getClassification();
         List<DoctorDynamicFieldValueRequestBean> list = bean.getList();
         if(checkRequiredDoctorDynamicFieldValueList(list)){
-            deleteDoctorDynamicFieldValue(doctorId, classification);
+            List<Integer> collectClassification = list.stream().map(DoctorDynamicFieldValueRequestBean::getClassification).distinct().collect(Collectors.toList());
+            if (CollectionsUtil.isNotEmptyList(collectClassification)){
+                collectClassification.forEach(classification->{
+                    deleteDoctorDynamicFieldValue(doctorId, classification);
+                });
+            }
+
             dynamicFieldMapper.addDoctorBasicDynamicFieldValue(doctorId, list);
         }
     }
@@ -92,13 +98,33 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
     public DoctorBasicDynamicFieldValueListResponseBean getDoctorBasicDynamicFieldValue(Long doctorId) {
         DoctorBasicDynamicFieldValueListResponseBean bean = new DoctorBasicDynamicFieldValueListResponseBean();
 
-        List<DoctorBasicDynamicFieldValueResponseBean> doctorBasicDynamicFieldValue = dynamicFieldMapper.getDoctorBasicDynamicFieldValue(doctorId, ClassificationEnum.BASIC.getType());
+        //List<DoctorBasicDynamicFieldValueResponseBean> doctorBasicDynamicFieldValue = dynamicFieldMapper.getDoctorBasicDynamicFieldValue(doctorId, ClassificationEnum.BASIC.getType());
+        List<DoctorBasicDynamicFieldValueResponseBean> doctorBasicDynamicFieldValue = dynamicFieldMapper.getDoctorBasicDynamicField(doctorId, ClassificationEnum.BASIC.getType());
+
         if (CollectionsUtil.isNotEmptyList(doctorBasicDynamicFieldValue)){
+            doctorBasicDynamicFieldValue.forEach(doctorBasicDynamicField->{
+                DoctorBasicDynamicFieldValueResponseBean doctorDynamicFieldValue = dynamicFieldMapper.getDoctorDynamicFieldValue(doctorId, doctorBasicDynamicField.getDynamicFieldId());
+                if (doctorDynamicFieldValue !=null){
+                    doctorBasicDynamicField.setDynamicFieldValue(doctorDynamicFieldValue.getDynamicFieldValue());
+                    doctorBasicDynamicField.setDynamicExtendValue(doctorDynamicFieldValue.getDynamicExtendValue());
+                }
+            });
+
+
             bean.setBasic(doctorBasicDynamicFieldValue);
         }
 
-        List<DoctorBasicDynamicFieldValueResponseBean> doctorHospitalDynamicFieldValue = dynamicFieldMapper.getDoctorBasicDynamicFieldValue(doctorId, ClassificationEnum.HOSPITAL.getType());
+        //List<DoctorBasicDynamicFieldValueResponseBean> doctorHospitalDynamicFieldValue = dynamicFieldMapper.getDoctorBasicDynamicFieldValue(doctorId, ClassificationEnum.HOSPITAL.getType());
+        List<DoctorBasicDynamicFieldValueResponseBean> doctorHospitalDynamicFieldValue = dynamicFieldMapper.getDoctorBasicDynamicField(doctorId, ClassificationEnum.HOSPITAL.getType());
         if (CollectionsUtil.isNotEmptyList(doctorHospitalDynamicFieldValue)){
+            doctorHospitalDynamicFieldValue.forEach(doctorBasicDynamicField->{
+                DoctorBasicDynamicFieldValueResponseBean doctorDynamicFieldValue = dynamicFieldMapper.getDoctorDynamicFieldValue(doctorId, doctorBasicDynamicField.getDynamicFieldId());
+                if (doctorDynamicFieldValue !=null){
+                    doctorBasicDynamicField.setDynamicFieldValue(doctorDynamicFieldValue.getDynamicFieldValue());
+                    doctorBasicDynamicField.setDynamicExtendValue(doctorDynamicFieldValue.getDynamicExtendValue());
+                }
+            });
+
             bean.setHospital(doctorHospitalDynamicFieldValue);
         }
 
@@ -127,14 +153,23 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
             productLineResponseBean.setProductName(product.getProductName());
             productDynamicFieldQuestionnaireResponseBean.setProductLineResponseBean(productLineResponseBean);
 
-            List<DoctorProductDynamicFieldValueResponseBean> doctorProductDynamicFieldValue = dynamicFieldMapper.getDoctorProductDynamicFieldValue(doctorId, product.getProductId());
-            // 没设置过字段或者是还没有录入值
-            if (CollectionsUtil.isEmptyList(doctorProductDynamicFieldValue)){
-                doctorProductDynamicFieldValue = dynamicFieldMapper.getDoctorProductDynamicFieldValueByProductId(product.getProductId());
+            //List<DoctorProductDynamicFieldValueResponseBean> doctorProductDynamicFieldValue = dynamicFieldMapper.getDoctorProductDynamicFieldValue(doctorId, product.getProductId());
+
+            List<DoctorProductDynamicFieldValueResponseBean> doctorProductDynamicFieldValue = dynamicFieldMapper.getDoctorProductDynamicField(product.getProductId());
+            if (CollectionsUtil.isNotEmptyList(doctorProductDynamicFieldValue)){
+                doctorProductDynamicFieldValue.forEach(doctorProductDynamicField->{
+                    DoctorBasicDynamicFieldValueResponseBean doctorDynamicFieldValue = dynamicFieldMapper.getDoctorDynamicFieldValue(doctorId, doctorProductDynamicField.getDynamicFieldId());
+                    if (doctorDynamicFieldValue !=null){
+                        doctorProductDynamicField.setDynamicFieldValue(doctorDynamicFieldValue.getDynamicFieldValue());
+                        doctorProductDynamicField.setDynamicExtendValue(doctorDynamicFieldValue.getDynamicExtendValue());
+                    }
+                });
             }
 
-            if (CollectionsUtil.isNotEmptyList(doctorProductDynamicFieldValue)){
 
+
+
+            if (CollectionsUtil.isNotEmptyList(doctorProductDynamicFieldValue)){
                 productDynamicFieldQuestionnaireResponseBean.setProductDynamicFieldList(doctorProductDynamicFieldValue);
                 List<ProductQuestionnaireResponseBean> productQuestionnaireList = dynamicFieldMapper.getProductQuestionnaireList(doctorId, product.getProductId());
                 if (CollectionsUtil.isNotEmptyList(productQuestionnaireList)){

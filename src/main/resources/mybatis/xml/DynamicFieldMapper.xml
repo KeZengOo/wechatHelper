@@ -229,6 +229,25 @@
             t.dynamicFieldId ASC
     </select>
 
+
+
+    <!-- 得到医生基本信息动态字段填充的值 -->
+    <select id="getDoctorBasicDynamicField" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorBasicDynamicFieldValueResponseBean">
+       SELECT
+                    vddf.id dynamicFieldId,
+                    IFNULL(vddf.field_name,'') dynamicFieldName,
+                    IFNULL(vddf.field_value,'') dynamicFieldSelectValue,
+                    vddf.required,
+                    vddf.type,
+                    vddf.classification
+                FROM
+                    virtual_doctor_dynamic_field vddf
+                WHERE
+                    vddf.classification=#{classification}
+                    ORDER BY vddf.id
+    </select>
+
+
     <!-- 得到医生产品信息动态字段填充的值 -->
     <select id="getDoctorProductDynamicFieldValue" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorProductDynamicFieldValueResponseBean">
         SELECT
@@ -261,6 +280,48 @@
             t.classification ASC,
             t.dynamicFieldId ASC
     </select>
+
+
+
+
+    <!-- 根据产品ID得到产品设置的动态字段 -->
+    <select id="getDoctorProductDynamicField" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorProductDynamicFieldValueResponseBean">
+
+        SELECT DISTINCT
+            vddf.id dynamicFieldId,
+            IFNULL(vddf.field_name,'') dynamicFieldName,
+            IFNULL(vddf.field_value,'') dynamicFieldSelectValue,
+            vddf.required,
+            vddf.classification,
+            vddf.type,
+            pl.prod_id productId,
+            pl.prod_name productName
+        FROM
+            virtual_doctor_dynamic_field vddf
+            INNER JOIN product_line pl
+            ON vddf.product_id=pl.prod_id
+
+        WHERE
+            vddf.product_id=#{productId}
+            and classification IN (2, 3)
+            ORDER BY
+            vddf.classification ASC,
+            vddf.id ASC
+
+
+    </select>
+
+    <!-- 得到医生字段填充的值 -->
+    <select id="getDoctorDynamicFieldValue" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorBasicDynamicFieldValueResponseBean">
+
+        SELECT IFNULL(t.dynamic_field_value,'') dynamicFieldValue,
+            IFNULL(t.dynamic_extend_value,'') dymaicExtendValue
+        FROM virtual_doctor_dynamic_field_value t
+        WHERE t.doctor_id=#{doctorId} AND t.dynamic_field_id=#{dynamicFieldId}
+
+
+    </select>
+
 
 
 
