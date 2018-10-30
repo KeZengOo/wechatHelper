@@ -1,6 +1,7 @@
 package com.nuoxin.virtual.rep.api.entity.v2_5;
 
 import lombok.Data;
+import lombok.ToString;
 
 @Data
 public class DrugUserDoctorParams {

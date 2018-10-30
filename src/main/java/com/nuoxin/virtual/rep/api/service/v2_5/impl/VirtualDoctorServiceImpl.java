@@ -388,7 +388,13 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 			DrugUserDoctorParams drugUserDoctorParam = this.buildDrugUserDoctorProduct(request, virtualDoctorId, user, mends.get(i));
 			drugUserDoctorParams.add(drugUserDoctorParam);
 		}
-		drugUserDoctorMapper.saveDrugUserDoctors(drugUserDoctorParams);
+
+		List<DrugUserDoctorParams> collectDrugUserDoctorParams = drugUserDoctorParams.stream().filter(d -> d.getProdId() > 0).distinct().collect(Collectors.toList());
+		if (CollectionsUtil.isNotEmptyList(collectDrugUserDoctorParams)){
+			drugUserDoctorMapper.saveDrugUserDoctors(collectDrugUserDoctorParams);
+		}
+
+
 		
 		List<DrugUserDoctorQuateParams> drugUserDoctorQuateParams = new ArrayList<>(size);
 		for (int i = 0; i < size; i++) {
@@ -396,7 +402,11 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 					user, mends.get(i), request.getIsAddWechat());
 			drugUserDoctorQuateParams.add(drugUserDoctorQuateParam);
 		}
-		drugUserDoctorQuateMapper.saveDrugUserDoctorQuates(drugUserDoctorQuateParams);
+		List<DrugUserDoctorQuateParams> collectDrugUserDoctorQuateParams = drugUserDoctorQuateParams.stream().filter(d -> d.getProductLineId() > 0).distinct().collect(Collectors.toList());
+		if (CollectionsUtil.isNotEmptyList(collectDrugUserDoctorQuateParams)){
+			drugUserDoctorQuateMapper.saveDrugUserDoctorQuates(collectDrugUserDoctorQuateParams);
+		}
+
 	}
 
 	private DrugUserDoctorParams buildDrugUserDoctorProduct(SaveVirtualDoctorRequest request, Long virtualDoctorId, DrugUser user,
