@@ -4,6 +4,7 @@ import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.v2_5.DoctorDynamicFieldService;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorBasicDynamicFieldValueListRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorDynamicFieldValueListRequestBean;
 
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorQuestionnaireDetailRequestBean;
@@ -32,7 +33,7 @@ public class DoctorDynamicFieldController extends NewBaseController{
     private DoctorDynamicFieldService doctorDynamicFieldService;
 
     @SuppressWarnings("unchecked")
-	@ApiOperation(value = "录入字段的对应的值", notes = "录入字段的对应的值")
+	@ApiOperation(value = "产品信息录入字段的对应的值", notes = "产品信息录入字段的对应的值")
     @PostMapping(value = "/value/add")
     public DefaultResponseBean<Boolean> addDoctorDynamicFieldValue(HttpServletRequest request, @RequestBody DoctorDynamicFieldValueListRequestBean bean) {
         DrugUser user = super.getDrugUser(request);
@@ -47,6 +48,25 @@ public class DoctorDynamicFieldController extends NewBaseController{
 
         return responseBean;
     }
+
+
+    @SuppressWarnings("unchecked")
+    @ApiOperation(value = "基本信息录入字段的对应的值", notes = "基本信息录入字段的对应的值")
+    @PostMapping(value = "/basic/value/add")
+    public DefaultResponseBean<Boolean> addBasicDoctorDynamicFieldValue(HttpServletRequest request, @RequestBody DoctorBasicDynamicFieldValueListRequestBean bean) {
+        DrugUser user = super.getDrugUser(request);
+        if(user == null) {
+            return super.getLoginErrorResponse();
+        }
+
+        doctorDynamicFieldService.addDoctorBasicDynamicFieldValue(bean);
+
+        DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(true);
+
+        return responseBean;
+    }
+
 
     @SuppressWarnings("unchecked")
     @ApiOperation(value = "医生基本信息医院信息及录入的值", notes = "医生基本信息医院信息及录入的值")

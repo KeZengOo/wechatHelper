@@ -1,5 +1,6 @@
 package com.nuoxin.virtual.rep.api.service.v2_5;
 
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorBasicDynamicFieldValueListRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorDynamicFieldValueListRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorQuestionnaireDetailRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorBasicDynamicFieldValueListResponseBean;
@@ -20,6 +21,12 @@ public interface DoctorDynamicFieldService {
      * @param bean
      */
     void addDoctorDynamicFieldValue(DoctorDynamicFieldValueListRequestBean bean);
+
+    /**
+     * 新增医生的基本信息医院信息动态字段填充的值
+     * @param bean
+     */
+    void addDoctorBasicDynamicFieldValue(DoctorBasicDynamicFieldValueListRequestBean bean);
 
 
     /**

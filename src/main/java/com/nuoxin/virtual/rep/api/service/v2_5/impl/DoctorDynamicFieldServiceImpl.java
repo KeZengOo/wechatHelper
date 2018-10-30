@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Resource;
 
 import com.nuoxin.virtual.rep.api.entity.v2_5.DynamicFieldResponse;
-import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorQuestionnaireDetailRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.*;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -23,8 +23,6 @@ import com.nuoxin.virtual.rep.api.mybatis.DynamicFieldMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v2_5.DoctorDynamicFieldService;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
-import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorDynamicFieldValueListRequestBean;
-import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorDynamicFieldValueRequestBean;
 
 /**
  * 医生动态字段相关业务接口实现
@@ -56,6 +54,37 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
 
             dynamicFieldMapper.addDoctorBasicDynamicFieldValue(doctorId, list);
         }
+    }
+
+    @Override
+    public void addDoctorBasicDynamicFieldValue(DoctorBasicDynamicFieldValueListRequestBean bean) {
+        DoctorDynamicFieldValueListRequestBean doctorDynamicFieldValueListRequestBean = getDoctorDynamicFieldValueList(bean);
+        this.addDoctorDynamicFieldValue(doctorDynamicFieldValueListRequestBean);
+
+
+    }
+
+    /**
+     * 将 DoctorBasicDynamicFieldValueListRequestBean 转为 DoctorDynamicFieldValueListRequestBean
+     * @param bean
+     * @return
+     */
+    private DoctorDynamicFieldValueListRequestBean getDoctorDynamicFieldValueList(DoctorBasicDynamicFieldValueListRequestBean bean) {
+        Long doctorId = bean.getDoctorId();
+        List<DoctorDynamicFieldValueRequestBean> list = new ArrayList<>();
+        List<DoctorBasicDynamicFieldValueRequestBean> basic = bean.getBasic();
+        if (CollectionsUtil.isNotEmptyList(basic)){
+            basic.forEach(b->{
+                DoctorDynamicFieldValueRequestBean doctorDynamicFieldValueRequestBean = new DoctorDynamicFieldValueRequestBean();
+                //doctorDynamicFieldValueRequestBean.setClassification();
+            });
+        }
+
+
+        List<DoctorBasicDynamicFieldValueRequestBean> hospital = bean.getHospital();
+
+
+        return null;
     }
 
     /**
