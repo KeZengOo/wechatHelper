@@ -63,8 +63,21 @@
         	(#{item.name}, #{item.gender}, #{item.mobile}, #{item.email}, #{item.depart}, 
         	#{item.title}, #{item.hospital}, #{item.hospitalId}, #{item.province}, #{item.city}, NOW())
     	</foreach >
-	</insert> 
-	
+	</insert>
+
+	<insert id="saveVirtualDoctor"  keyProperty="id" useGeneratedKeys="true"
+			parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorParams">
+		INSERT INTO doctor
+		(name, sex, telephone, email, depart,
+		positions, hospital_name, hospital_id, provice, city, create_time)
+		VALUES
+		(#{name}, #{gender}, #{mobile}, #{email}, #{depart},
+		#{title}, #{hospital}, #{hospitalId}, #{province}, #{city}, NOW())
+
+	</insert>
+
+
+
 	<insert id="saveVirtualDoctorMends" >
 		INSERT INTO doctor_mend
 		 (wechat, address, fixed_phone, secondary_mobile, thirdary_mobile, virtual_doctor_id)
@@ -82,4 +95,10 @@
         	(#{item.virtualDoctorId}, #{item.hcpLevel}, #{item.productId}) 
     	</foreach >
 	</insert>
+
+
+	<!-- 得到以4开头的最大的手机号 -->
+	<select id="maxTelephone" resultType="java.lang.String">
+		SELECT max(telephone) FROM doctor WHERE LEFT(telephone,1)=4
+	</select>
 </mapper>

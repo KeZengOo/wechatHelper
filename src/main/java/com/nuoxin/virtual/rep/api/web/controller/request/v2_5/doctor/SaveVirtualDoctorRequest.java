@@ -23,15 +23,14 @@ public class SaveVirtualDoctorRequest {
 	@ApiModelProperty(value = "性别")
 	@NotNull(message = "gender is null")
 	private Integer gender;
-	@ApiModelProperty(value = "手机号")
-	@NotNull(message = "mobile is null")
-	private String mobile;
+
+	@ApiModelProperty(value = "医生的联系方式，可以有多个")
+	private List<String> telephones;
+
 	@ApiModelProperty(value = "是否添加微信:1是,0否")
 	private Integer isAddWechat;
 	@ApiModelProperty(value = "微信")
 	private String wechat;
-	@ApiModelProperty(value = "座机")
-	private String fixedPhone;
 	@ApiModelProperty(value = "邮箱")
 	private String email;
 	@ApiModelProperty(value = "地址")
@@ -40,11 +39,6 @@ public class SaveVirtualDoctorRequest {
 	private String depart;
 	@ApiModelProperty(value = "职称")
 	private String title;
-
-	@ApiModelProperty(value = "医生次要电话")
-	private String secondaryMobile;
-	@ApiModelProperty(value = "医生三要电话")
-	private String thirdaryMobile;
 
 	@NotNull(message = "hospital is null")
 	@ApiModelProperty(value = "医院")

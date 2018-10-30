@@ -3,6 +3,7 @@ package com.nuoxin.virtual.rep.api.mybatis;
 import java.util.List;
 
 import com.nuoxin.virtual.rep.api.entity.Doctor;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.SaveDoctorTelephoneRequestBean;
 import org.apache.ibatis.annotations.Param;
 
 import com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean;
@@ -104,5 +105,13 @@ public interface DoctorMapper{
      * @return
      */
     Integer doctorCountByMobile(@Param(value = "mobile") String mobile);
+
+
+    /**
+     * 保存医生的多个手机号
+     * @param list
+     */
+    void insertDoctorTelephone(List<SaveDoctorTelephoneRequestBean> list);
+
 
 }

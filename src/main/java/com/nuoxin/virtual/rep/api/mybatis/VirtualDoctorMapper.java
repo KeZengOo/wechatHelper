@@ -30,10 +30,19 @@ public interface VirtualDoctorMapper {
 
 	/**
 	 * 批量添加客户医生
-	 * @param saveRequest
+	 * @param list
 	 * @return 返回影响条数
 	 */
 	int saveVirtualDoctors(List<VirtualDoctorParams> list);
+
+
+	/**
+	 * 添加单个客户医生
+	 * @param virtualDoctorParams
+	 * @return 返回影响条数
+	 */
+	void saveVirtualDoctor(VirtualDoctorParams virtualDoctorParams);
+
 	
 	/**
 	 * 批量添加客户医生扩展信息
@@ -48,5 +57,12 @@ public interface VirtualDoctorMapper {
 	 * @return
 	 */
 	int saveDoctorVirtuals(List<DoctorVirtualParams> list);
+
+
+	/**
+	 * 得到以4开头的最大的手机号
+	 * @return
+	 */
+	String maxTelephone();
 
 }

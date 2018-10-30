@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
@@ -12,6 +13,9 @@ import javax.transaction.Transactional.TxType;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.mybatis.*;
+import com.nuoxin.virtual.rep.api.utils.RegularUtils;
+import com.nuoxin.virtual.rep.api.utils.StringUtil;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.SaveDoctorTelephoneRequestBean;
 import org.springframework.stereotype.Service;
 
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
@@ -119,10 +123,36 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 	 */
 	private void checkSaveVirtualDoctorParam(SaveVirtualDoctorRequest request) {
 
-		String mobile = request.getMobile();
-		Integer doctorCount = doctorMapper.doctorCountByMobile(mobile);
-		if (doctorCount != null && doctorCount > 0){
-			throw new BusinessException(ErrorEnum.ERROR, "手机号已经存在!");
+//		String mobile = request.getMobile();
+//		Integer doctorCount = doctorMapper.doctorCountByMobile(mobile);
+//		if (doctorCount != null && doctorCount > 0){
+//			throw new BusinessException(ErrorEnum.ERROR, "手机号已经存在!");
+//		}
+
+
+		List<String> telephones = request.getTelephones();
+		if (CollectionsUtil.isEmptyList(telephones)){
+			throw new BusinessException(ErrorEnum.ERROR, "联系方式不能为空！");
+		}
+
+		List<String> collectTelphone = telephones.stream().map(String::trim).distinct().collect(Collectors.toList());
+		if (telephones.size() != collectTelphone.size()){
+			throw new BusinessException(ErrorEnum.ERROR, "联系方式不能重复");
+		}
+
+		for (String telephone:telephones){
+			boolean mobileMatcher = RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, telephone);
+			if (!mobileMatcher){
+				boolean fixPhoneMatch = RegularUtils.isMatcher(RegularUtils.MATCH_FIX_PHONE, telephone);
+				if (!fixPhoneMatch){
+					throw new BusinessException(ErrorEnum.ERROR, "联系方式:" + telephone + " 输入不合法！");
+				}
+			}else {
+				Integer count = doctorMapper.doctorCountByMobile(telephone);
+				if (count !=null && count > 0){
+					throw new BusinessException(ErrorEnum.ERROR, "手机号：" + telephone + " 已经存在！");
+				}
+			}
 		}
 
 	}
@@ -163,12 +193,47 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 	 */
 	private long saveSingleDoctor(SaveVirtualDoctorRequest request, int hospitalId) {
 		long doctorId = this.saveDoctor(request, hospitalId);
+		this.saveDoctorTelephones(request, doctorId);
+
+
 		// 保存医生扩展信息
 		this.saveVirtualDoctorMend(request, doctorId);
-		// 保存虚拟代表指定医生参数信息
-		this.saveVirtualDoctor(request, doctorId);
+
+
+
+		// 保存虚拟代表指定医生参数信息 方法废弃
+		// this.saveVirtualDoctor(request, doctorId);
 
 		return doctorId;
+	}
+
+	/**
+	 * 保存医生的多个联系方式
+	 * @param request
+	 * @param doctorId
+	 */
+	private void saveDoctorTelephones(SaveVirtualDoctorRequest request, long doctorId) {
+
+		List<String> telephones = request.getTelephones();
+		List<SaveDoctorTelephoneRequestBean> list = new ArrayList<>();
+		for (String telephone:telephones){
+			boolean matcher = RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, telephone);
+			SaveDoctorTelephoneRequestBean saveDoctorTelephoneRequestBean = new SaveDoctorTelephoneRequestBean();
+			if (matcher){
+				saveDoctorTelephoneRequestBean.setType(1);
+			}else {
+				saveDoctorTelephoneRequestBean.setType(2);
+			}
+
+			saveDoctorTelephoneRequestBean.setDoctorId(doctorId);
+			saveDoctorTelephoneRequestBean.setTelephone(telephone);
+			list.add(saveDoctorTelephoneRequestBean);
+		}
+
+
+		if (CollectionsUtil.isNotEmptyList(list)){
+			doctorMapper.insertDoctorTelephone(list);
+		}
 	}
 
 	/**
@@ -181,7 +246,12 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 		VirtualDoctorParams param = new VirtualDoctorParams();
 		param.setName(request.getName());
 		param.setGender(request.getGender());
-		param.setMobile(request.getMobile());
+
+		List<String> telephones = request.getTelephones();
+		String mobile = getMobile(telephones);
+
+		param.setMobile(mobile);
+
 		param.setEmail(request.getEmail());
 		param.setDepart(request.getDepart());
 		param.setTitle(request.getTitle());
@@ -191,11 +261,36 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 		param.setHospital(request.getHospital());
 		param.setHospitalId(hospitalId);
 
-		List<VirtualDoctorParams> list = new ArrayList<>(1);
-		list.add(param);
-		virtualDoctorMapper.saveVirtualDoctors(list);
+		virtualDoctorMapper.saveVirtualDoctor(param);
 
 		return param.getId();
+	}
+
+	/**
+	 * 得到医生要插入的手机号，如果没有就创建一个以4开头的虚拟手机号
+	 * @param telephones
+	 * @return
+	 */
+	private String getMobile(List<String> telephones) {
+
+		String mobile = null;
+		for (String telephone:telephones){
+			if (RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, telephone)){
+				mobile = telephone;
+				break;
+			}
+		}
+
+		if (StringUtil.isEmpty(mobile)){
+			String telephone = virtualDoctorMapper.maxTelephone();
+			if (StringUtil.isEmpty(telephone)){
+				mobile = "40000000000";
+			}else{
+				mobile = Integer.valueOf(telephone) + 1 + "";
+			}
+		}
+
+		return mobile;
 	}
 
 	/**
@@ -207,10 +302,8 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 		VirtualDoctorMendParams param = new VirtualDoctorMendParams();
 		param.setVirtualDoctorId(virtualDoctorId); // 保存关联关系
 		param.setAddress(request.getAddress());
-		param.setFixedPhone(request.getFixedPhone());
+
 		param.setWechat(request.getWechat());
-		param.setSecondaryMobile(request.getSecondaryMobile());
-		param.setThirdaryMobile(request.getThirdaryMobile());
 
 		List<VirtualDoctorMendParams> list = new ArrayList<>(1);
 		list.add(param);
@@ -218,10 +311,12 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 	}
 
 	/**
+	 * 方法废弃，去掉医生等级字段
 	 * 保存虚拟代表指定医生参数信息
 	 * @param request
 	 * @param virtualDoctorId
 	 */
+	@Deprecated
 	private void saveVirtualDoctor(SaveVirtualDoctorRequest request, long virtualDoctorId) {
 		List<SaveVirtualDoctorMendRequest> mends = request.getMends();
 		if (CollectionsUtil.isEmptyList(mends)) {

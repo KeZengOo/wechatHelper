@@ -18,6 +18,10 @@ public class RegularUtils {
     //手机号验证
     public static final String MATCH_TELEPHONE = "^1\\d{10}$";
 
+    // 校验座机号
+    public static final String MATCH_FIX_PHONE = "^(0\\d{2,3}-?)?\\d{7,8}$";
+
+    // 匹配1开头的11位数字
     public static final String MATCH_ELEVEN_NUM = "(?<!\\d)(?:(?:1\\d{10}))";
 
     /**
@@ -48,34 +52,12 @@ public class RegularUtils {
 
     public static void main(String[] args) {
 
-        String s = "白小明18121278141";
-
-
-        //Pattern p = Pattern.compile("^.*\\d{11}.*$");
-        //Pattern pattern = Pattern.compile("(?<!\\d)(?:(?:1\\d{10}))");
-        Pattern p = Pattern.compile("(?<!\\d)(?:(?:1\\d{10}))");
-        Matcher m = p.matcher(s);
-        while (m.find()){
-            System.out.println(m.group());
-        }
+        String s = "07712186087";
+        boolean matcher = RegularUtils.isMatcher(RegularUtils.MATCH_FIX_PHONE, s);
+        System.out.println(matcher);
 
 
     }
-
-
-
-//    public static void main(String[] args) {
-//
-//        String s = "我的手机号是18837112195，曾经用过18888888888，还用过18812345678";
-//        String regex = "1[35789]\\d{9}";
-//        Pattern p = Pattern.compile(regex);
-//        Matcher m = p.matcher(s);
-//
-//        while (m.find()) { //一定需要先查找再调用group获取电话号码
-//            System.out.println(m.group());
-//        }
-//    }
-
 
 
 }

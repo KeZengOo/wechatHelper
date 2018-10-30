@@ -247,4 +247,14 @@
 		SELECT COUNT(*) num FROM doctor_telephone WHERE telephone=#{mobile}
 		) t
 	</select>
+
+	<!-- 保存医生的多个手机号 -->
+	<insert id="insertDoctorTelephone">
+		INSERT INTO doctor_telephone(doctor_id, telephone, type)
+		VALUES
+		<foreach collection="list" item="d" separator=",">
+			(#{d.doctorId}, #{d.telephone}, #{d.type})
+		</foreach>
+	</insert>
+
 </mapper>

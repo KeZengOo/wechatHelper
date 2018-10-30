@@ -13,6 +13,31 @@ import java.security.NoSuchAlgorithmException;
 public class StringUtil {
 
     /**
+     * 判断字符串是否为空
+     * @param str
+     * @return
+     */
+    public static boolean isEmpty(String str){
+
+        return str == null || str.trim().equals("");
+
+    }
+
+    /**
+     * 判断字符串是否不为空
+     * @param str
+     * @return
+     */
+    public static boolean isNotEmpty(String str){
+
+        return str != null && (!str.trim().equals(""));
+    }
+
+
+
+
+
+    /**
      * 生成32位md5码
      * @param password
      * @return
