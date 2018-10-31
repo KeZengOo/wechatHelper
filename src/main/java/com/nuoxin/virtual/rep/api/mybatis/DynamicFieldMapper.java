@@ -257,4 +257,11 @@ public interface DynamicFieldMapper {
      * @return
      */
     List<DynamicFieldQuestionDetailResponseBean> getDynamicFieldQuestionList(@Param(value = "questionnaireId") Long questionnaireId,@Param(value = "doctorId") Long doctorId,@Param(value = "answerTime") String answerTime);
+
+    /**
+     * 根据ID得到动态字段的名称
+     * @param id
+     * @return
+     */
+    DoctorBasicDynamicFieldValueResponseBean getDynamicFieldNameById(@Param(value = "id") Long id);
 }

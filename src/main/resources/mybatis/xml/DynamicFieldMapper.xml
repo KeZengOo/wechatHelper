@@ -589,4 +589,9 @@
         </foreach>
     </select>
 
+
+    <select id="getDynamicFieldNameById" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorBasicDynamicFieldValueResponseBean">
+        SELECT field_name dynamicFieldName, classification, required FROM virtual_doctor_dynamic_field WHERE id = #{id}
+    </select>
+
 </mapper>

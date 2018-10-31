@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Resource;
 
 import com.nuoxin.virtual.rep.api.entity.v2_5.DynamicFieldResponse;
+import com.nuoxin.virtual.rep.api.utils.StringUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.*;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.*;
 import org.springframework.stereotype.Service;
@@ -70,21 +71,40 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
      * @return
      */
     private DoctorDynamicFieldValueListRequestBean getDoctorDynamicFieldValueList(DoctorBasicDynamicFieldValueListRequestBean bean) {
+        DoctorDynamicFieldValueListRequestBean doctorDynamicFieldValueListRequestBean = new DoctorDynamicFieldValueListRequestBean();
         Long doctorId = bean.getDoctorId();
         List<DoctorDynamicFieldValueRequestBean> list = new ArrayList<>();
         List<DoctorBasicDynamicFieldValueRequestBean> basic = bean.getBasic();
         if (CollectionsUtil.isNotEmptyList(basic)){
             basic.forEach(b->{
                 DoctorDynamicFieldValueRequestBean doctorDynamicFieldValueRequestBean = new DoctorDynamicFieldValueRequestBean();
-                //doctorDynamicFieldValueRequestBean.setClassification();
+                doctorDynamicFieldValueRequestBean.setClassification(ClassificationEnum.BASIC.getType());
+                doctorDynamicFieldValueRequestBean.setDynamicFieldId(b.getDynamicFieldId());
+                doctorDynamicFieldValueRequestBean.setDynamicFieldName(b.getDynamicFieldName());
+                doctorDynamicFieldValueRequestBean.setDynamicFieldValue(b.getDynamicFieldValue());
+                doctorDynamicFieldValueRequestBean.setDynamicExtendValue(b.getDynamicExtendValue());
+                list.add(doctorDynamicFieldValueRequestBean);
             });
         }
 
 
         List<DoctorBasicDynamicFieldValueRequestBean> hospital = bean.getHospital();
+        if (CollectionsUtil.isNotEmptyList(hospital)){
+            hospital.forEach(h->{
+                DoctorDynamicFieldValueRequestBean doctorDynamicFieldValueRequestBean = new DoctorDynamicFieldValueRequestBean();
+                doctorDynamicFieldValueRequestBean.setClassification(ClassificationEnum.HOSPITAL.getType());
+                doctorDynamicFieldValueRequestBean.setDynamicFieldId(h.getDynamicFieldId());
+                doctorDynamicFieldValueRequestBean.setDynamicFieldName(h.getDynamicFieldName());
+                doctorDynamicFieldValueRequestBean.setDynamicFieldValue(h.getDynamicFieldValue());
+                doctorDynamicFieldValueRequestBean.setDynamicExtendValue(h.getDynamicExtendValue());
+                list.add(doctorDynamicFieldValueRequestBean);
+            });
+        }
 
+        doctorDynamicFieldValueListRequestBean.setDoctorId(doctorId);
+        doctorDynamicFieldValueListRequestBean.setList(list);
 
-        return null;
+        return doctorDynamicFieldValueListRequestBean;
     }
 
     /**
@@ -102,17 +122,40 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
             return false;
         }
 
-        List<Long> requiredFieldId = dynamicFieldMapper.getRequiredFieldId(collectIdList);
-        if (requiredFieldId == null || requiredFieldId.isEmpty()){
-            return true;
-        }
 
-        requiredFieldId.forEach(id->{
-            List<DoctorDynamicFieldValueRequestBean> collect = list.stream().filter(k -> k.getDynamicFieldId().equals(id)).filter(k -> StringUtils.isEmpty(k.getDynamicFieldValue())).collect(Collectors.toList());
-            if (collect !=null && collect.size() > 0){
-                List<String> stringList = collect.stream().map(DoctorDynamicFieldValueRequestBean::getDynamicFieldName).distinct().collect(Collectors.toList());
-                throw new BusinessException(ErrorEnum.ERROR.getStatus(), "必填字段：" + stringList.toString() + " 不能为空！");
+        list.forEach(d->{
+            Long dynamicFieldId = d.getDynamicFieldId();
+            if (dynamicFieldId == null || dynamicFieldId <=0){
+                throw new BusinessException(ErrorEnum.ERROR.getStatus(), "dynamicFieldId 必须大于0");
             }
+
+            String dynamicFieldName = d.getDynamicFieldName();
+            if (StringUtil.isEmpty(dynamicFieldName)){
+                throw new BusinessException(ErrorEnum.ERROR.getStatus(), "dynamicFieldName 不能为空！");
+            }
+
+            DoctorBasicDynamicFieldValueResponseBean dynamicFieldNameById = dynamicFieldMapper.getDynamicFieldNameById(dynamicFieldId);
+            if (dynamicFieldNameById == null){
+                throw new BusinessException(ErrorEnum.ERROR.getStatus(), "无效的dynamicFieldId！");
+            }
+            if (!dynamicFieldName.equals(dynamicFieldNameById.getDynamicFieldName())){
+                throw new BusinessException(ErrorEnum.ERROR.getStatus(), "dynamicFieldId:"+ dynamicFieldId +" 和 dynamicFieldName:"+ dynamicFieldName +" 不匹配");
+            }
+
+            Integer classification = d.getClassification();
+            if (!classification.equals(dynamicFieldNameById.getClassification())){
+                throw new BusinessException(ErrorEnum.ERROR.getStatus(), "字段：" + dynamicFieldName +" 和类型不匹配");
+            }
+
+
+            Integer required = dynamicFieldNameById.getRequired();
+            if (required != null && required.equals(1)){
+                String dynamicFieldValue = d.getDynamicFieldValue();
+                if (StringUtil.isEmpty(dynamicFieldValue)){
+                    throw new BusinessException(ErrorEnum.ERROR.getStatus(), "必填字段:" + dynamicFieldName + " 输入的值不能为空！");
+                }
+            }
+
         });
 
         return true;
