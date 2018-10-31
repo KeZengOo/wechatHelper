@@ -227,6 +227,7 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
 
             //List<DoctorProductDynamicFieldValueResponseBean> doctorProductDynamicFieldValue = dynamicFieldMapper.getDoctorProductDynamicFieldValue(doctorId, product.getProductId());
 
+            // 动态字段
             List<DoctorProductDynamicFieldValueResponseBean> doctorProductDynamicFieldValue = dynamicFieldMapper.getDoctorProductDynamicField(product.getProductId());
             if (CollectionsUtil.isNotEmptyList(doctorProductDynamicFieldValue)){
                 doctorProductDynamicFieldValue.forEach(doctorProductDynamicField->{
@@ -240,7 +241,7 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
 
 
 
-
+            // 调查问卷
             if (CollectionsUtil.isNotEmptyList(doctorProductDynamicFieldValue)){
                 productDynamicFieldQuestionnaireResponseBean.setProductDynamicFieldList(doctorProductDynamicFieldValue);
                 List<ProductQuestionnaireResponseBean> productQuestionnaireList = dynamicFieldMapper.getProductQuestionnaireList(doctorId, product.getProductId());
@@ -250,6 +251,16 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
 
                 list.add(productDynamicFieldQuestionnaireResponseBean);
             }
+
+
+
+            // 添加上医生的处方信息和拜访记录信息
+            PrescriptionResponseBean prescription = dynamicFieldMapper.getPrescription(doctorId, product.getProductId());
+            VisitResponseBean visit = dynamicFieldMapper.getVisit(doctorId, product.getProductId());
+
+            productDynamicFieldQuestionnaireResponseBean.setPrescription(prescription);
+            productDynamicFieldQuestionnaireResponseBean.setVisit(visit);
+
         });
 
         return list;

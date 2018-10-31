@@ -264,4 +264,21 @@ public interface DynamicFieldMapper {
      * @return
      */
     DoctorBasicDynamicFieldValueResponseBean getDynamicFieldNameById(@Param(value = "id") Long id);
+
+    /**
+     * 根据产品ID 得到拜访记录信息
+     * @param productId
+     * @param doctorId
+     * @return
+     */
+    VisitResponseBean getVisit(@Param(value = "doctorId") Long doctorId, @Param(value = "productId") Long productId);
+
+    /**
+     * 根据产品ID得到处方信息
+     * @param productId
+     * @param doctorId
+     * @return
+     */
+    PrescriptionResponseBean getPrescription(@Param(value = "doctorId") Long doctorId, @Param(value = "productId") Long productId);
+
 }
