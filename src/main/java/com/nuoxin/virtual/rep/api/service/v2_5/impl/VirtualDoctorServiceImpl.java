@@ -84,6 +84,10 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 		if (virtualDoctorDO != null) {
 			String hospitalName = virtualDoctorDO.getHospitalName();
 			hospitalBean = hospitalMapper.getHospital(hospitalName);
+			List<String> doctorTelephone = doctorMapper.getDoctorTelephone(virtualDoctorId);
+			if (CollectionsUtil.isNotEmptyList(doctorTelephone)){
+				virtualDoctorDO.setMobiles(doctorTelephone);
+			}
 		}
 
 		VirtualDoctorBasicResponse virtualDoctorBasic = new VirtualDoctorBasicResponse();

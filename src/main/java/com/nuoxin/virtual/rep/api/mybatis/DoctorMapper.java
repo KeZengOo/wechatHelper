@@ -114,4 +114,12 @@ public interface DoctorMapper{
     void insertDoctorTelephone(List<SaveDoctorTelephoneRequestBean> list);
 
 
+    /**
+     * 得到医生的联系方式
+     * @param doctorId
+     * @return
+     */
+    List<String> getDoctorTelephone(@Param(value = "doctorId") Long doctorId);
+
+
 }

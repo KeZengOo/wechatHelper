@@ -6,6 +6,9 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @ApiModel("医生基本信息")
 @Data
 public class VirtualDoctorDO {
@@ -13,9 +16,9 @@ public class VirtualDoctorDO {
 	@ApiModelProperty(value = "姓名")
 	private String name;
 	@ApiModelProperty(value = "性别: 0男,1女,2未知")
-	private char gender;
+	private Integer gender;
 	@ApiModelProperty(value = "主手机号")
-	private String mobile;
+	private List<String> mobiles = new ArrayList<>();
 	@ApiModelProperty(value = "头衔")
 	private String title;
 	@ApiModelProperty(value = "科室")
