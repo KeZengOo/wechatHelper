@@ -6,8 +6,7 @@
 		SELECT 
 			name,
 			hospital_name AS hospitalName,
-			(CASE sex WHEN '男' THEN '0'  ELSE '1' END) AS gender,
-			telephone AS mobile,
+			sex AS gender,
 			positions AS title,
 			depart,
 			email,

@@ -257,4 +257,11 @@
 		</foreach>
 	</insert>
 
+	<!-- 得到医生的联系方式 -->
+	<select id="getDoctorTelephone" resultType="java.lang.String">
+		SELECT telephone FROM doctor WHERE id=#{doctorId} AND LEFT(telephone, 1)=1
+		UNION
+		SELECT telephone FROM doctor_telephone WHERE doctor_id=#{doctorId}
+	</select>
+
 </mapper>
