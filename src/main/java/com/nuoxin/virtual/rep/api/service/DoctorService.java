@@ -740,6 +740,8 @@ public class DoctorService extends BaseService {
             });
 
             doctors = doctorMapper.selectDoctorByMobiles(doctorAllTelephones);
+            // 补充上医生的多个联系方式
+            fillDoctorTelephoneList(doctors);
         }
         for (DoctorExcelBean excel:list) {
             Doctor doctor=new Doctor();
@@ -762,6 +764,22 @@ public class DoctorService extends BaseService {
         }
         doctorRepository.updateVirtualDoctorId();
         return true;
+    }
+
+    /**
+     * 填充上医生的多个联系方式
+     * @param doctors
+     */
+    private void fillDoctorTelephoneList(List<Doctor> doctors) {
+        if (CollectionsUtil.isEmptyList(doctors)){
+            return;
+        }
+
+        doctors.forEach(d->{
+            List<String> doctorTelephoneList = doctorMapper.getDoctorTelephone(d.getId());
+            d.setTelephoneList(doctorTelephoneList);
+        });
+
     }
 
     /**

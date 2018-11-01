@@ -4,6 +4,7 @@ import com.nuoxin.virtual.rep.api.common.entity.IdEntity;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by fenggang on 9/11/17.
@@ -32,6 +33,13 @@ public class Doctor extends IdEntity {
     private String department;
     @Column(name = "telephone")
     private String mobile;
+
+    /**
+     * 医生的多个联系方式
+     */
+    @Transient
+    private List<String> telephoneList;
+
     @Column(name = "positions")
     private String doctorLevel;
     @Column(name = "create_time")
@@ -167,5 +175,14 @@ public class Doctor extends IdEntity {
 
     public void setSex(Integer sex) {
         this.sex = sex;
+    }
+
+
+    public List<String> getTelephoneList() {
+        return telephoneList;
+    }
+
+    public void setTelephoneList(List<String> telephoneList) {
+        this.telephoneList = telephoneList;
     }
 }

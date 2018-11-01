@@ -13,8 +13,10 @@ import javax.transaction.Transactional.TxType;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.mybatis.*;
+import com.nuoxin.virtual.rep.api.service.v2_5.DoctorDynamicFieldService;
 import com.nuoxin.virtual.rep.api.utils.RegularUtils;
 import com.nuoxin.virtual.rep.api.utils.StringUtil;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorDynamicFieldValueListRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.SaveDoctorTelephoneRequestBean;
 import org.springframework.stereotype.Service;
 
@@ -55,6 +57,10 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 	@Resource
 	private CommonService commonService;
 
+	@Resource(name="dynamic")
+	private DoctorDynamicFieldService doctorDynamicFieldService;
+
+
 	@Override
 	@Transactional(value = TxType.REQUIRED, rollbackOn = Exception.class)
 	public Long saveVirtualDoctor(SaveVirtualDoctorRequest request, DrugUser user) {
@@ -69,6 +75,12 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 				this.saveDrugUserDoctorProductRelationShip(request, virtualDoctorId, user);
 			}
 		}
+
+
+		//保存医生基本信息和医院的动态字段
+		DoctorDynamicFieldValueListRequestBean doctorBasicDynamicField = request.getDoctorBasicDynamicField();
+		doctorBasicDynamicField.setDoctorId(virtualDoctorId);
+		doctorDynamicFieldService.addDoctorDynamicFieldValue(doctorBasicDynamicField);
 
 		return virtualDoctorId;
 	}

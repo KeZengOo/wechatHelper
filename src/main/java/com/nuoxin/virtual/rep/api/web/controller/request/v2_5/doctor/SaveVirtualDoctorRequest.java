@@ -55,4 +55,7 @@ public class SaveVirtualDoctorRequest {
 	
 	@ApiModelProperty(value = "第二页扩展信息")
 	List<SaveVirtualDoctorMendRequest> mends = new ArrayList<>();
+
+	@ApiModelProperty(value = "医生基本信息动态字段")
+	private DoctorDynamicFieldValueListRequestBean doctorBasicDynamicField;
 }
