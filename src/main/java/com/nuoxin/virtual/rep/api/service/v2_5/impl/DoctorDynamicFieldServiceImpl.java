@@ -88,7 +88,7 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
         }
 
 
-        List<DoctorBasicDynamicFieldValueRequestBean> hospital = bean.getHospital();
+        List<DoctorBasicDynamicFieldValueRequestBean> hospital = bean.getHospitalDynamic();
         if (CollectionsUtil.isNotEmptyList(hospital)){
             hospital.forEach(h->{
                 DoctorDynamicFieldValueRequestBean doctorDynamicFieldValueRequestBean = new DoctorDynamicFieldValueRequestBean();

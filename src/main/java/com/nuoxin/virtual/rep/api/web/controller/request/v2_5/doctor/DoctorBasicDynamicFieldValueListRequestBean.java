@@ -26,6 +26,6 @@ public class DoctorBasicDynamicFieldValueListRequestBean implements Serializable
 
 
     @ApiModelProperty(value = "医生动态字段基本信息填充的值")
-    private List<DoctorBasicDynamicFieldValueRequestBean> hospital;
+    private List<DoctorBasicDynamicFieldValueRequestBean> hospitalDynamic;
 
 }
