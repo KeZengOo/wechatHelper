@@ -17,7 +17,7 @@ public interface VirtualDoctorService {
 	 * @param user
 	 * @return
 	 */
-	boolean saveVirtualDoctor(SaveVirtualDoctorRequest request, DrugUser user);
+	Long saveVirtualDoctor(SaveVirtualDoctorRequest request, DrugUser user);
 	
 	/**
 	 * 获取客户医生基本信息

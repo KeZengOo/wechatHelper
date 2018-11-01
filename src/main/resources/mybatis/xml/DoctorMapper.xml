@@ -182,7 +182,7 @@
 	</select>
 
 	<select id="selectDoctorByMobiles" resultType="com.nuoxin.virtual.rep.api.entity.Doctor">
-		select id,email,name,hospital_id hospitalId,hospital_name hospitalName,provice,city,depart department,telephone mobile,positions doctorLevel,
+		select DISTINCT id,email,name,hospital_id hospitalId,hospital_name hospitalName,provice,city,depart department,telephone mobile,positions doctorLevel,
 		create_time createTime,status,master_data_id masterDataId
 		FROM doctor t
 		WHERE
@@ -190,6 +190,16 @@
 		<foreach collection="mobiles" item="mobile" open="(" close=")" separator=",">
 			#{mobile}
 		</foreach>
+
+		OR t.id IN
+		(
+		SELECT DISTINCT doctor_id FROM doctor_telephone
+		WHERE telphone IN
+		<foreach collection="mobiles" item="mobile" open="(" close=")" separator=",">
+			#{mobile}
+		</foreach>
+		)
+
 	</select>
 
 	<insert id="saveDoctor" keyProperty="id" useGeneratedKeys="true">

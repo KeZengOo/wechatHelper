@@ -724,7 +724,22 @@ public class DoctorService extends BaseService {
         List<Doctor> doctors = new ArrayList<>();
         if (!mobiles.isEmpty()) {
             //查询手机号在库里的数据
-            doctors =doctorMapper.selectDoctorByMobiles(mobiles);
+            List<String> doctorAllTelephones = new ArrayList<>();
+            mobiles.forEach(t->{
+                if (t.contains("，")){
+                    t = t.replaceAll("，", ",");
+                }
+
+                String[] telephoneArray = t.split(",");
+                if (CollectionsUtil.isNotEmptyArray(telephoneArray)){
+                    for (String telephone:telephoneArray){
+                        doctorAllTelephones.add(telephone);
+                    }
+                }
+
+            });
+
+            doctors = doctorMapper.selectDoctorByMobiles(doctorAllTelephones);
         }
         for (DoctorExcelBean excel:list) {
             Doctor doctor=new Doctor();
@@ -893,9 +908,37 @@ public class DoctorService extends BaseService {
             if(StringUtils.isBlank(excel.getDoctorName())){
                 throw new Exception("第（"+errorLine+"）行姓名为空");
             }
-            if (StringUtils.isEmpty(excel.getMobile())){
-                throw new Exception("第（"+ errorLine +"）行手机号为空");
+
+            String mobile = excel.getMobile();
+            if (StringUtils.isEmpty(mobile)){
+                throw new Exception("第（"+ errorLine +"）行联系方式为空");
             }
+
+            if (mobile.contains("，")){
+                mobile.replaceAll("，", ",");
+            }
+
+            String[] mobileArray = mobile.split(",");
+            if (CollectionsUtil.isEmptyArray(mobileArray)){
+                throw new BusinessException(ErrorEnum.ERROR, "第（"+ errorLine +"）行联系方式输入不合法！");
+            }
+
+            for (String telephone:mobileArray){
+                boolean mobileMatcher = RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, telephone);
+                if (!mobileMatcher){
+                    boolean fixPhoneMatch = RegularUtils.isMatcher(RegularUtils.MATCH_FIX_PHONE, telephone);
+                    if (!fixPhoneMatch){
+                        throw new BusinessException(ErrorEnum.ERROR, "第（"+ errorLine +"）行联系方式:" + telephone + " 输入不合法！");
+                    }
+                }
+            }
+
+            List<String> telephoneList = new ArrayList<>(Arrays.asList(mobileArray));
+            List<String> collectTelephoneList = telephoneList.stream().distinct().collect(Collectors.toList());
+            if (telephoneList.size() != collectTelephoneList.size()){
+                throw new BusinessException(ErrorEnum.ERROR, "第（"+ errorLine +"）行联系方式有重复！");
+            }
+
             if (StringUtils.isEmpty(excel.getHospitalName())){
                 throw new Exception("第（"+ errorLine +"）行医院为空");
             }

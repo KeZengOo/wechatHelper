@@ -57,21 +57,20 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 
 	@Override
 	@Transactional(value = TxType.REQUIRED, rollbackOn = Exception.class)
-	public boolean saveVirtualDoctor(SaveVirtualDoctorRequest request, DrugUser user) {
+	public Long saveVirtualDoctor(SaveVirtualDoctorRequest request, DrugUser user) {
 
+		long virtualDoctorId = 0;
 		checkSaveVirtualDoctorParam(request);
-
 		int hospitalId = this.getHospiTalId(request);
 		if (hospitalId > 0) {
 			// 保存医生信息
-			long virtualDoctorId = this.saveSingleDoctor(request, hospitalId);
+			virtualDoctorId = this.saveSingleDoctor(request, hospitalId);
 			if (virtualDoctorId > 0) {
 				this.saveDrugUserDoctorProductRelationShip(request, virtualDoctorId, user);
-				return true;
 			}
 		}
 
-		return false;
+		return virtualDoctorId;
 	}
 
 

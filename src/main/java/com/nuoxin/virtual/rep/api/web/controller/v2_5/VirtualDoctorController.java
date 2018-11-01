@@ -38,7 +38,7 @@ public class VirtualDoctorController extends NewBaseController {
 	@SuppressWarnings("unchecked")
 	@ApiOperation(value = "添加单个客户医生信息")
 	@RequestMapping(value = "/single/save", method = { RequestMethod.POST })
-	public DefaultResponseBean<Boolean> singleSave(HttpServletRequest request,
+	public DefaultResponseBean<Long> singleSave(HttpServletRequest request,
 			@RequestBody @Valid SaveVirtualDoctorRequest saveRequest, BindingResult bindingResult) {
 		DrugUser user = this.getDrugUser(request);
 		if (user == null) {
@@ -50,10 +50,10 @@ public class VirtualDoctorController extends NewBaseController {
 			return super.getParamsErrorResponse(bindingResult.getFieldError().getDefaultMessage());
 		}
 
-		boolean flag = virtualDoctorService.saveVirtualDoctor(saveRequest, user);
+		Long id = virtualDoctorService.saveVirtualDoctor(saveRequest, user);
 
-		DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<Boolean>();
-		responseBean.setData(flag);
+		DefaultResponseBean<Long> responseBean = new DefaultResponseBean<Long>();
+		responseBean.setData(id);
 		return responseBean;
 	}
 	
