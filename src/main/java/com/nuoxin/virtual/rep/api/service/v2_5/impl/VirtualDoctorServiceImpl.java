@@ -16,8 +16,7 @@ import com.nuoxin.virtual.rep.api.mybatis.*;
 import com.nuoxin.virtual.rep.api.service.v2_5.DoctorDynamicFieldService;
 import com.nuoxin.virtual.rep.api.utils.RegularUtils;
 import com.nuoxin.virtual.rep.api.utils.StringUtil;
-import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorDynamicFieldValueListRequestBean;
-import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.SaveDoctorTelephoneRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.*;
 import org.springframework.stereotype.Service;
 
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
@@ -34,8 +33,6 @@ import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorParams;
 import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualDoctorService;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
-import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.SaveVirtualDoctorMendRequest;
-import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.SaveVirtualDoctorRequest;
 
 /**
  * 医生业务实现类
@@ -75,9 +72,9 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 				this.saveDrugUserDoctorProductRelationShip(request, virtualDoctorId, user);
 
 				//保存医生基本信息和医院的动态字段
-				DoctorDynamicFieldValueListRequestBean doctorBasicDynamicField = request.getDoctorBasicDynamicField();
+				DoctorBasicDynamicFieldValueListRequestBean doctorBasicDynamicField = request.getDoctorBasicDynamicField();
 				doctorBasicDynamicField.setDoctorId(virtualDoctorId);
-				doctorDynamicFieldService.addDoctorDynamicFieldValue(doctorBasicDynamicField);
+				doctorDynamicFieldService.addDoctorBasicDynamicFieldValue(doctorBasicDynamicField);
 			}
 		}
 

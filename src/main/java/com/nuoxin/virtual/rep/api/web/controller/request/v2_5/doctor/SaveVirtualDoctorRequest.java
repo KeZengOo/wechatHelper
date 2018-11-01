@@ -57,5 +57,5 @@ public class SaveVirtualDoctorRequest {
 	List<SaveVirtualDoctorMendRequest> mends = new ArrayList<>();
 
 	@ApiModelProperty(value = "医生基本信息动态字段")
-	private DoctorDynamicFieldValueListRequestBean doctorBasicDynamicField;
+	private DoctorBasicDynamicFieldValueListRequestBean doctorBasicDynamicField;
 }
