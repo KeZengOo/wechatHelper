@@ -73,14 +73,16 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 			virtualDoctorId = this.saveSingleDoctor(request, hospitalId);
 			if (virtualDoctorId > 0) {
 				this.saveDrugUserDoctorProductRelationShip(request, virtualDoctorId, user);
+
+				//保存医生基本信息和医院的动态字段
+				DoctorDynamicFieldValueListRequestBean doctorBasicDynamicField = request.getDoctorBasicDynamicField();
+				doctorBasicDynamicField.setDoctorId(virtualDoctorId);
+				doctorDynamicFieldService.addDoctorDynamicFieldValue(doctorBasicDynamicField);
 			}
 		}
 
 
-		//保存医生基本信息和医院的动态字段
-		DoctorDynamicFieldValueListRequestBean doctorBasicDynamicField = request.getDoctorBasicDynamicField();
-		doctorBasicDynamicField.setDoctorId(virtualDoctorId);
-		doctorDynamicFieldService.addDoctorDynamicFieldValue(doctorBasicDynamicField);
+
 
 		return virtualDoctorId;
 	}
