@@ -719,36 +719,54 @@ public class DoctorService extends BaseService {
     public Boolean excelSaves(List<DoctorExcelBean> list, Long productId) throws Exception {
         //校验数据合法性,并返回销售map
         Map<String,Long> drugUserMap=checkData(list, productId);
-        //从集合中取出手机号列表
-        List<String> mobiles = list.stream().map(DoctorExcelBean::getMobile).collect(Collectors.toList());
-        List<Doctor> doctors = new ArrayList<>();
-        if (!mobiles.isEmpty()) {
-            //查询手机号在库里的数据
-            List<String> doctorAllTelephones = new ArrayList<>();
-            mobiles.forEach(t->{
-                if (t.contains("，")){
-                    t = t.replaceAll("，", ",");
-                }
-
-                String[] telephoneArray = t.split(",");
-                if (CollectionsUtil.isNotEmptyArray(telephoneArray)){
-                    for (String telephone:telephoneArray){
-                        doctorAllTelephones.add(telephone);
-                    }
-                }
-
-            });
-
-            doctors = doctorMapper.selectDoctorByMobiles(doctorAllTelephones);
-            // 补充上医生的多个联系方式
-            fillDoctorTelephoneList(doctors);
-        }
+//        //从集合中取出手机号列表
+//        List<String> mobiles = list.stream().map(DoctorExcelBean::getMobile).collect(Collectors.toList());
+//        List<Doctor> doctors = new ArrayList<>();
+//        if (!mobiles.isEmpty()) {
+//            //查询手机号在库里的数据
+//            List<String> doctorAllTelephones = new ArrayList<>();
+//            mobiles.forEach(t->{
+//                if (t.contains("，")){
+//                    t = t.replaceAll("，", ",");
+//                }
+//
+//                String[] telephoneArray = t.split(",");
+//                if (CollectionsUtil.isNotEmptyArray(telephoneArray)){
+//                    for (String telephone:telephoneArray){
+//                        doctorAllTelephones.add(telephone);
+//                    }
+//                }
+//
+//            });
+//
+//            doctors = doctorMapper.selectDoctorByMobiles(doctorAllTelephones);
+//            // 补充上医生的多个联系方式
+//            //fillDoctorTelephoneList(doctors);
+//        }
         for (DoctorExcelBean excel:list) {
             Doctor doctor=new Doctor();
-            Optional<Doctor> doctorOptional = doctors.stream().filter(x->x.getMobile().equals(excel.getMobile())).findFirst();
-            if(null!=doctorOptional&&doctorOptional.isPresent()){
-                doctor=doctorOptional.get();
+//            Optional<Doctor> doctorOptional = doctors.stream().filter(x->x.getMobile().equals(excel.getMobile())).findFirst();
+//            if(null!=doctorOptional&&doctorOptional.isPresent()){
+//                doctor=doctorOptional.get();
+//            }
+            String mobile = excel.getMobile();
+            if (mobile.contains("，")){
+                mobile = mobile.replaceAll("，",",");
             }
+            List<String> doctorAllTelephones = new ArrayList<>();
+            String[] telephoneArray = mobile.split(",");
+            if (CollectionsUtil.isNotEmptyArray(telephoneArray)){
+                for (String telephone:telephoneArray){
+                    doctorAllTelephones.add(telephone);
+                }
+            }
+
+            List<Doctor> doctors = doctorMapper.selectDoctorByMobiles(doctorAllTelephones);
+            if (CollectionsUtil.isNotEmptyList(doctors)) {
+                doctor = doctors.get(0);
+            }
+
+
             int type = (doctor.getId()==null||doctor.getId()==0L)?add:update;
             HospitalProvinceBean hos =this.saveHospital(excel);
             //保存医生信息
@@ -767,9 +785,11 @@ public class DoctorService extends BaseService {
     }
 
     /**
+     * 废弃，不在使用
      * 填充上医生的多个联系方式
      * @param doctors
      */
+    @Deprecated
     private void fillDoctorTelephoneList(List<Doctor> doctors) {
         if (CollectionsUtil.isEmptyList(doctors)){
             return;
@@ -790,7 +810,7 @@ public class DoctorService extends BaseService {
     private void saveDcotorMend(DoctorExcelBean excel, Long id) {
         VirtualDoctorMendParams virtualDoctorMendParams = new VirtualDoctorMendParams();
         virtualDoctorMendParams.setAddress(excel.getAddress());
-        virtualDoctorMendParams.setFixedPhone(excel.getFixedPhone());
+//        virtualDoctorMendParams.setFixedPhone(excel.getFixedPhone());
         virtualDoctorMendParams.setVirtualDoctorId(id);
         Long mendId=doctorMendMapper.getDoctorMend(virtualDoctorMendParams);
         if(null==mendId){
@@ -808,6 +828,9 @@ public class DoctorService extends BaseService {
      */
     private void saveDoctorTelephone(Doctor doctor, int type) {
         if (type==add){
+
+            doctorMapper.deleteDoctorTelephone(doctor.getId());
+
             doctorTelephoneRepository.deleteAllByDoctorId(doctor.getId());
             DoctorTelephone doctorTelephone = new DoctorTelephone();
             doctorTelephone.setDoctorId(doctor.getId());
@@ -850,7 +873,13 @@ public class DoctorService extends BaseService {
         doctor.setName(excel.getDoctorName());
         doctor.setHospitalName(excel.getHospitalName());
         doctor.setDepartment(excel.getDepartment());
-        doctor.setMobile(excel.getMobile());
+        String mobiles = excel.getMobile();
+        if (mobiles.contains("，")){
+            mobiles.replaceAll("，",",");
+        }
+
+        String[] mobileArray = mobiles.split(",");
+        doctor.setMobile(mobileArray[0]);
         doctor.setStatus(1);
         if(null!=excel.getSex()&&(excel.getSex().equals("男")||excel.getSex().equals("0"))){
             doctor.setSex(0);
@@ -929,7 +958,7 @@ public class DoctorService extends BaseService {
 
             String mobile = excel.getMobile();
             if (StringUtils.isEmpty(mobile)){
-                throw new Exception("第（"+ errorLine +"）行联系方式为空");
+                throw new Exception("第（"+ errorLine +"）行手机号为空");
             }
 
             if (mobile.contains("，")){
@@ -938,24 +967,34 @@ public class DoctorService extends BaseService {
 
             String[] mobileArray = mobile.split(",");
             if (CollectionsUtil.isEmptyArray(mobileArray)){
-                throw new BusinessException(ErrorEnum.ERROR, "第（"+ errorLine +"）行联系方式输入不合法！");
+                throw new BusinessException(ErrorEnum.ERROR, "第（"+ errorLine +"）行手机号输入不合法！");
             }
 
             for (String telephone:mobileArray){
                 boolean mobileMatcher = RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, telephone);
                 if (!mobileMatcher){
-                    boolean fixPhoneMatch = RegularUtils.isMatcher(RegularUtils.MATCH_FIX_PHONE, telephone);
-                    if (!fixPhoneMatch){
-                        throw new BusinessException(ErrorEnum.ERROR, "第（"+ errorLine +"）行联系方式:" + telephone + " 输入不合法！");
-                    }
+//                    boolean fixPhoneMatch = RegularUtils.isMatcher(RegularUtils.MATCH_FIX_PHONE, telephone);
+//                    if (!fixPhoneMatch){
+//                        throw new BusinessException(ErrorEnum.ERROR, "第（"+ errorLine +"）行联系方式:" + telephone + " 输入不合法！");
+//                    }
+
+
+
+                    throw new BusinessException(ErrorEnum.ERROR, "第（"+ errorLine +"）行手机号:" + telephone + " 输入不合法！");
                 }
             }
 
             List<String> telephoneList = new ArrayList<>(Arrays.asList(mobileArray));
             List<String> collectTelephoneList = telephoneList.stream().distinct().collect(Collectors.toList());
             if (telephoneList.size() != collectTelephoneList.size()){
-                throw new BusinessException(ErrorEnum.ERROR, "第（"+ errorLine +"）行联系方式有重复！");
+                throw new BusinessException(ErrorEnum.ERROR, "第（"+ errorLine +"）行手机号有重复！");
             }
+
+            List<Doctor> doctors = doctorMapper.selectDoctorByMobiles(telephoneList);
+            if (doctors != null && doctors.size() > 1){
+                throw new BusinessException(ErrorEnum.ERROR, "第（"+ errorLine +"）行手机号已经存在！");
+            }
+
 
             if (StringUtils.isEmpty(excel.getHospitalName())){
                 throw new Exception("第（"+ errorLine +"）行医院为空");

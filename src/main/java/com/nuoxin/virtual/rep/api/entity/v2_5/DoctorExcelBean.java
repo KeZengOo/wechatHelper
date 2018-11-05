@@ -15,7 +15,7 @@ public class DoctorExcelBean implements Serializable {
     private Integer customerCode;
     @Excel(name = "姓名",width=100)
     private String doctorName;
-    @Excel(name = "联系方式",width=100)
+    @Excel(name = "手机号",width=100)
     private String mobile;
     @Excel(name = "医院",width=100)
     private String hospitalName;
@@ -23,8 +23,6 @@ public class DoctorExcelBean implements Serializable {
     private String drugUserName;
     @Excel(name = "销售代表邮箱",width=500)
     private String drugUserEmail;
-    @Excel(name = "座机",width=500)
-    private String fixedPhone;
     @Excel(name = "性别",width=100)
     private String sex;
     @Excel(name = "地址",width=500)

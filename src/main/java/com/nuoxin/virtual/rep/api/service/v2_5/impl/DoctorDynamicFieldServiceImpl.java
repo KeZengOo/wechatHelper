@@ -257,9 +257,13 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
             // 添加上医生的处方信息和拜访记录信息
             PrescriptionResponseBean prescription = dynamicFieldMapper.getPrescription(doctorId, product.getProductId());
             VisitResponseBean visit = dynamicFieldMapper.getVisit(doctorId, product.getProductId());
+            if (prescription != null){
+                productDynamicFieldQuestionnaireResponseBean.setPrescription(prescription);
+            }
+           if (visit != null){
+               productDynamicFieldQuestionnaireResponseBean.setVisit(visit);
+           }
 
-            productDynamicFieldQuestionnaireResponseBean.setPrescription(prescription);
-            productDynamicFieldQuestionnaireResponseBean.setVisit(visit);
 
         });
 

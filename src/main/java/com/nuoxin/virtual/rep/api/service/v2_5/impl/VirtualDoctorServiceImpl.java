@@ -379,6 +379,9 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 			}else {
 				saveDoctorTelephoneRequestBean.setType(2);
 			}
+			if (telephone.contains("-")){
+				telephone.replaceAll("-","");
+			}
 
 			saveDoctorTelephoneRequestBean.setDoctorId(doctorId);
 			saveDoctorTelephoneRequestBean.setTelephone(telephone);
@@ -413,6 +416,10 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 				saveDoctorTelephoneRequestBean.setType(1);
 			}else {
 				saveDoctorTelephoneRequestBean.setType(2);
+			}
+
+			if (telephone.contains("-")){
+				telephone.replaceAll("-","");
 			}
 
 			saveDoctorTelephoneRequestBean.setDoctorId(doctorId);
