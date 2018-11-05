@@ -50,6 +50,8 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 	@Resource
 	private DrugUserDoctorMapper drugUserDoctorMapper;
 	@Resource
+	private VirtualDoctorCallInfoMapper virtualDoctorCallInfoMapper;
+	@Resource
 	private DoctorMapper doctorMapper;
 	@Resource
 	private DrugUserDoctorQuateMapper drugUserDoctorQuateMapper;
@@ -81,7 +83,8 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 				doctorBasicDynamicField.setDoctorId(virtualDoctorId);
 				doctorDynamicFieldService.addDoctorBasicDynamicFieldValue(doctorBasicDynamicField);
 
-				// TODO @tiancun 更新医生的电话拜访信息
+				// 更新医生的电话拜访信息
+				virtualDoctorCallInfoMapper.updateCallInfoDoctorId(request.getTelephones(), virtualDoctorId);
 			}
 		}
 
@@ -124,7 +127,30 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 		if (StringUtil.isNotEmpty(wechat)){
 			virtualDoctorMapper.updateDoctorWechat(request.getId(), wechat);
 		}
+
 		virtualDoctorMapper.updateIsAddWechat(request.getId(), user.getId(), request.getIsAddWechat());
+
+	}
+
+	@Override
+	public void updateDoctorProductFixField(PrescriptionRequestBean bean) {
+
+		this.checkPrescriptionRequest(bean);
+		virtualDoctorMapper.updateDoctorProductFixField(bean);
+	}
+
+	/**
+	 * 校验参数是否合法
+	 * @param bean
+	 */
+	private void checkPrescriptionRequest(PrescriptionRequestBean bean) {
+
+		Long productId = bean.getProductId();
+		Long doctorId = bean.getDoctorId();
+		Integer count = doctorMapper.doctorProductCount(doctorId, productId);
+		if (count == null || count == 0){
+			throw new BusinessException(ErrorEnum.ERROR, "医生不在选择产品下！");
+		}
 
 	}
 
@@ -468,6 +494,13 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 		virtualDoctorMapper.updateVirtualDoctor(param);
 		doctorMapper.deleteDoctorTelephone(id);
 		this.saveDoctorTelephones(request, id);
+
+		// 更新通话记录的医生ID
+		if (CollectionsUtil.isNotEmptyList(telephones)){
+			// 更新医生的电话拜访信息
+			virtualDoctorCallInfoMapper.updateCallInfoDoctorId(telephones, id);
+		}
+
 	}
 
 	/**

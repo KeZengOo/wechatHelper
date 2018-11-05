@@ -26,10 +26,10 @@ public class ProductDynamicFieldQuestionnaireResponseBean implements Serializabl
     private List<DoctorProductDynamicFieldValueResponseBean> productDynamicFieldList = new ArrayList<>();
 
     @ApiModelProperty(value = "处方信息")
-    private PrescriptionResponseBean prescription;
+    private PrescriptionResponseBean prescription = new PrescriptionResponseBean();
 
     @ApiModelProperty(value = "拜访记录")
-    private VisitResponseBean visit;
+    private VisitResponseBean visit = new VisitResponseBean();
 
 
     @ApiModelProperty(value = "产品问卷调查")

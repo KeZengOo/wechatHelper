@@ -135,4 +135,11 @@ public interface DoctorMapper{
      */
     void deleteDoctorTelephone(@Param(value = "doctorId") Long doctorId);
 
+    /**
+     * 查询总数，用于校验医生是否在指定产品下
+     * @param doctorId
+     * @param productId
+     * @return
+     */
+    Integer doctorProductCount(@Param(value = "doctorId") Long doctorId,@Param(value = "productId") Long productId);
 }

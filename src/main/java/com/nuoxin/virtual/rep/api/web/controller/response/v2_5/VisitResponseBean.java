@@ -17,6 +17,6 @@ public class VisitResponseBean implements Serializable {
     private static final long serialVersionUID = -7037155524193607542L;
 
     @ApiModelProperty(value = "拜访结果")
-    private String visitResult;
+    private String visitResult = "";
 
 }

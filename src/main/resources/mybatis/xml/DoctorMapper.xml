@@ -289,4 +289,10 @@
 		DELETE FROM doctor_telephone WHERE doctor_id=#{doctorId}
 	</delete>
 
+	<!-- 查询总数，用于校验医生是否在指定产品下 -->
+	<select id="doctorProductCount" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM drug_user_doctor WHERE doctor_id=#{doctorId} AND prod_id=#{productId}
+		AND is_available=1
+	</select>
+
 </mapper>

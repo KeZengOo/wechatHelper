@@ -52,7 +52,7 @@ public class RegularUtils {
 
     public static void main(String[] args) {
 
-        String s = "07712186087";
+        String s = "0101234567890";
         boolean matcher = RegularUtils.isMatcher(RegularUtils.MATCH_FIX_PHONE, s);
         System.out.println(matcher);
 

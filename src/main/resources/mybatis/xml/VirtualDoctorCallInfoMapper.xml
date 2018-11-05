@@ -150,5 +150,15 @@
 		call_dud.drugUserId
 
 	</select>
+
+	<!-- 更新打电话的医生ID -->
+	<update id="updateCallInfoDoctorId">
+		UPDATE virtual_doctor_call_info SET virtual_doctor_id=#{doctorId}
+		WHERE mobile IN
+		<foreach collection="telephoneList" item="telephone" open="(" close=")" separator=",">
+			#{telephone}
+		</foreach>
+		AND virtual_doctor_id IS NULL
+	</update>
 	
 </mapper>

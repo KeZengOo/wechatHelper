@@ -6,8 +6,10 @@ import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.v2_5.HospitalProvinceBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorBasicResponse;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorMiniResponse;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.PrescriptionRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.SaveVirtualDoctorRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.UpdateVirtualDoctorRequest;
+import org.apache.ibatis.annotations.Param;
 
 public interface VirtualDoctorService {
 
@@ -22,7 +24,14 @@ public interface VirtualDoctorService {
 
 
 	void updateVirtualDoctor(UpdateVirtualDoctorRequest request, DrugUser user);
-	
+
+	/**
+	 * 修改医生的产品的固定字段(比如：处方信息)
+	 * @param bean
+	 */
+	void updateDoctorProductFixField(PrescriptionRequestBean bean);
+
+
 	/**
 	 * 获取客户医生基本信息
 	 * @param virtualDoctorId  医生ID

@@ -9,6 +9,7 @@ import javax.validation.Valid;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.enums.RoleTypeEnum;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.PrescriptionRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.UpdateVirtualDoctorRequest;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -64,8 +65,8 @@ public class VirtualDoctorController extends NewBaseController {
 
 
 
-	@ApiOperation(value = "添加单个客户医生信息")
-	@RequestMapping(value = "/single/update", method = { RequestMethod.POST })
+	@ApiOperation(value = "修改单个医生基本信息固定字段")
+	@RequestMapping(value = "/basic/fix/field/update", method = { RequestMethod.POST })
 	public DefaultResponseBean<Boolean> singleUpdate(HttpServletRequest request,
 												@RequestBody @Valid UpdateVirtualDoctorRequest saveRequest) {
 		DrugUser user = this.getDrugUser(request);
@@ -82,8 +83,26 @@ public class VirtualDoctorController extends NewBaseController {
 	}
 
 
+	@ApiOperation(value = "修改医生产品信息固定字段")
+	@RequestMapping(value = "/product/fix/field/update", method = { RequestMethod.POST })
+	public DefaultResponseBean<Boolean> updateDoctorProductFixField(HttpServletRequest request,
+															@RequestBody @Valid PrescriptionRequestBean bean) {
+		DrugUser user = this.getDrugUser(request);
+		if (user == null) {
+			return super.getLoginErrorResponse();
+		}
 
-	
+
+		virtualDoctorService.updateDoctorProductFixField(bean);
+
+		DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<Boolean>();
+		responseBean.setData(true);
+		return responseBean;
+	}
+
+
+
+
 	@SuppressWarnings("unchecked")
 	@ApiOperation(value = "根据医院名模糊匹配")
 	@RequestMapping(value = "/hospitals/get", method = { RequestMethod.GET })

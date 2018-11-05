@@ -1,9 +1,10 @@
-package com.nuoxin.virtual.rep.api.web.controller.response.v2_5;
+package com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -13,12 +14,17 @@ import java.io.Serializable;
  */
 @ApiModel(value = "处方信息返回字段")
 @Data
-public class PrescriptionResponseBean implements Serializable {
+public class PrescriptionRequestBean implements Serializable {
     private static final long serialVersionUID = 5767741042064002760L;
 
-    /**
-     * 所有的都给了默认值
-     */
+    @ApiModelProperty(value = "医生ID")
+    @NotNull(message = "医生ID不能为空")
+    private Long doctorId;
+
+    @ApiModelProperty(value = "产品ID")
+    @NotNull(message = "产品ID不能为空")
+    private Long productId;
+
     @ApiModelProperty(value = "医生潜力:3高,2中,1低,-1未知")
     private Integer potential;
 
