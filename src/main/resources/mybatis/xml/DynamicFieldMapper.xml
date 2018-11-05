@@ -605,7 +605,7 @@
 
 
     <!-- 根据产品ID 得到拜访记录信息  -->
-    <select id="getVisit" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VisitResponseBean">
+    <select id="getVisit" resultType="java.lang.String">
         SELECT visit_result visitResult  FROM virtual_doctor_call_info_mend WHERE product_id=#{productId}
         AND virtual_doctor_id=#{doctorId}
         AND  visit_result !='' AND visit_result IS NOT NULL

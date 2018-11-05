@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 拜访记录返回数据
@@ -17,6 +19,6 @@ public class VisitResponseBean implements Serializable {
     private static final long serialVersionUID = -7037155524193607542L;
 
     @ApiModelProperty(value = "拜访结果")
-    private String visitResult = "";
+    private List<String> visitResult = new ArrayList<>();
 
 }

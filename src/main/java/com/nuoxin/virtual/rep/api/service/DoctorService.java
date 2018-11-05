@@ -774,7 +774,7 @@ public class DoctorService extends BaseService {
             //保存医生扩展表
             saveDcotorMend(excel,doctor.getId());
             //保存医生手机号关系表
-            saveDoctorTelephone(doctor, type);
+            saveDoctorTelephone(excel,doctor.getId());
             //保存医生级别关系表
             saveDoctorVirtual(doctor,productId);
             //添加关系到医生代表产品关系表
@@ -823,22 +823,21 @@ public class DoctorService extends BaseService {
 
     /**
      * 保存医生和手机号关系表
-     * @param doctor
-     * @param type
+     * @param excel
+     * @param doctorId
      */
-    private void saveDoctorTelephone(Doctor doctor, int type) {
-        if (type==add){
+    private void saveDoctorTelephone(DoctorExcelBean excel, Long doctorId) {
 
-            doctorMapper.deleteDoctorTelephone(doctor.getId());
-
-            doctorTelephoneRepository.deleteAllByDoctorId(doctor.getId());
-            DoctorTelephone doctorTelephone = new DoctorTelephone();
-            doctorTelephone.setDoctorId(doctor.getId());
-            doctorTelephone.setTelephone(doctor.getMobile());
-            doctorTelephone.setCreateTime(new Date());
-            doctorTelephone.setUpdateTime(new Date());
-            doctorTelephoneRepository.save(doctorTelephone);
+        doctorMapper.deleteDoctorTelephone(doctorId);
+        String mobiles = excel.getMobile();
+        if (StringUtil.isEmpty(mobiles)){
+            return;
         }
+
+        String[] mobileArray = mobiles.split(",");
+
+
+
     }
     /**
      * 保存医院信息

@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import com.alibaba.fastjson.JSONObject;
 import com.nuoxin.virtual.rep.api.entity.v2_5.DynamicFieldResponse;
 import com.nuoxin.virtual.rep.api.utils.StringUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.*;
@@ -253,15 +254,25 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
             }
 
 
-
             // 添加上医生的处方信息和拜访记录信息
             PrescriptionResponseBean prescription = dynamicFieldMapper.getPrescription(doctorId, product.getProductId());
-            VisitResponseBean visit = dynamicFieldMapper.getVisit(doctorId, product.getProductId());
+            String result = dynamicFieldMapper.getVisit(doctorId, product.getProductId());
             if (prescription != null){
                 productDynamicFieldQuestionnaireResponseBean.setPrescription(prescription);
             }
-           if (visit != null){
-               productDynamicFieldQuestionnaireResponseBean.setVisit(visit);
+           if (StringUtil.isNotEmpty(result)){
+               try {
+                   List<String> visit = JSONObject.parseArray(result, String.class);
+                   if (CollectionsUtil.isNotEmptyList(visit)){
+                       VisitResponseBean visitResponseBean = new VisitResponseBean();
+                       visitResponseBean.setVisitResult(visit);
+                       productDynamicFieldQuestionnaireResponseBean.setVisit(visitResponseBean);
+                   }
+
+               }catch (Exception e){
+                   e.printStackTrace();
+               }
+
            }
 
 
