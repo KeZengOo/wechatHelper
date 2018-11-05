@@ -15,7 +15,7 @@ import lombok.Data;
  */
 @ApiModel("保存单个医生信息对象")
 @Data
-public class SaveVirtualDoctorRequest {
+public class SaveVirtualDoctorRequest{
 
 	@NotNull(message = "name is null")
 	@ApiModelProperty(value = "医生姓名")

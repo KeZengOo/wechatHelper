@@ -76,6 +76,54 @@
 	</insert>
 
 
+	<update id="updateVirtualDoctor"
+			parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorParams">
+
+		update doctor
+		<set>
+			<if test="name !=null and name !=''">
+				name=#{name},
+			</if>
+
+			<if test="mobile!=null and mobile!=''">
+				telephone=#{mobile},
+			</if>
+			<if test="gender != null">
+				sex=#{gender},
+			</if>
+			<if test="email != null and email !=''">
+				email=#{email},
+			</if>
+			<if test="depart != null and depart!=''">
+				depart=#{depart},
+			</if>
+
+			<if test="title !=null and title !=''">
+				positions = #{title},
+			</if>
+
+			<if test="hospital !=null and hospital !=''">
+				hospital_name=#{hospital},
+			</if>
+
+			<if test="hospitalId !=null and hospitalId !=0">
+				hospital_id=#{hospitalId},
+			</if>
+
+			<if test="province !=null and province !=''">
+				provice=#{province},
+			</if>
+
+			<if test="city !=null and city !=''">
+				city = #{city}
+			</if>
+
+		</set>
+		where id=#{id}
+
+	</update>
+
+
 
 	<insert id="saveVirtualDoctorMends" >
 		INSERT INTO doctor_mend
@@ -100,4 +148,16 @@
 	<select id="maxTelephone" resultType="java.lang.String">
 		SELECT max(telephone) FROM doctor WHERE LEFT(telephone,1)=4
 	</select>
+
+	<!-- 更新医生的微信 -->
+	<update id="updateDoctorWechat">
+		update doctor_mend set wechat=#{wechat} WHERE virtual_doctor_id=#{doctorId}
+	</update>
+
+	<!-- 更新医生是否添加微信 -->
+	<update id="updateIsAddWechat">
+		update drug_user_doctor_one_to_one set is_add_wechat=#{addWechat} WHERE doctor_id=#{doctorId} AND
+		drug_user_id=#{drugUserId}
+	</update>
+
 </mapper>

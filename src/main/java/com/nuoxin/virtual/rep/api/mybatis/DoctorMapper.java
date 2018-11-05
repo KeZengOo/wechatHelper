@@ -108,6 +108,14 @@ public interface DoctorMapper{
 
 
     /**
+     * 根据手机号查询医生姓名，校验医生是否存在
+     * @param mobile
+     * @return
+     */
+    List<String> doctorNameCountByMobile(@Param(value = "mobile") String mobile);
+
+
+    /**
      * 保存医生的多个手机号
      * @param list
      */
@@ -121,5 +129,10 @@ public interface DoctorMapper{
      */
     List<String> getDoctorTelephone(@Param(value = "doctorId") Long doctorId);
 
+    /**
+     * 删除医生的多个手机号
+     * @param doctorId
+     */
+    void deleteDoctorTelephone(@Param(value = "doctorId") Long doctorId);
 
 }

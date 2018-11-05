@@ -6,6 +6,10 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
+import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
+import com.nuoxin.virtual.rep.api.enums.RoleTypeEnum;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.UpdateVirtualDoctorRequest;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,6 +38,7 @@ public class VirtualDoctorController extends NewBaseController {
 	
 	@Resource
 	private VirtualDoctorService virtualDoctorService;
+
 	
 	@SuppressWarnings("unchecked")
 	@ApiOperation(value = "添加单个客户医生信息")
@@ -56,6 +61,28 @@ public class VirtualDoctorController extends NewBaseController {
 		responseBean.setData(id);
 		return responseBean;
 	}
+
+
+
+	@ApiOperation(value = "添加单个客户医生信息")
+	@RequestMapping(value = "/single/update", method = { RequestMethod.POST })
+	public DefaultResponseBean<Boolean> singleUpdate(HttpServletRequest request,
+												@RequestBody @Valid UpdateVirtualDoctorRequest saveRequest) {
+		DrugUser user = this.getDrugUser(request);
+		if (user == null) {
+			return super.getLoginErrorResponse();
+		}
+
+
+		virtualDoctorService.updateVirtualDoctor(saveRequest, user);
+
+		DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<Boolean>();
+		responseBean.setData(true);
+		return responseBean;
+	}
+
+
+
 	
 	@SuppressWarnings("unchecked")
 	@ApiOperation(value = "根据医院名模糊匹配")

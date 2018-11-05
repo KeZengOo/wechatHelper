@@ -7,6 +7,7 @@ import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorDO;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorMendParams;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorMiniResponse;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorParams;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 客户医生 Mapper
@@ -43,6 +44,15 @@ public interface VirtualDoctorMapper {
 	 */
 	void saveVirtualDoctor(VirtualDoctorParams virtualDoctorParams);
 
+
+	/**
+	 * 更新单个客户医生
+	 * @param virtualDoctorParams
+	 * @return 返回影响条数
+	 */
+	void updateVirtualDoctor(VirtualDoctorParams virtualDoctorParams);
+
+
 	
 	/**
 	 * 批量添加客户医生扩展信息
@@ -64,5 +74,20 @@ public interface VirtualDoctorMapper {
 	 * @return
 	 */
 	String maxTelephone();
+
+	/**
+	 * 更新医生的微信
+	 * @param doctorId
+	 * @param wechat
+	 */
+	void updateDoctorWechat(@Param(value = "doctorId") Long doctorId,@Param(value = "wechat") String wechat);
+
+	/**
+	 * 更新医生是否添加微信状态
+	 * @param doctorId
+	 * @param drugUserId
+	 * @param addWechat
+	 */
+	void updateIsAddWechat(@Param(value = "doctorId") Long doctorId,@Param(value = "drugUserId") Long drugUserId,@Param(value = "addWechat") Integer addWechat);
 
 }

@@ -258,6 +258,16 @@
 		) t
 	</select>
 
+	<select id="doctorNameCountByMobile" resultType="java.lang.String">
+		SELECT DISTINCT d.name FROM doctor d
+		WHERE d.telephone=#{mobile}
+		OR d.id IN
+		(
+	  SELECT DISTINCT doctor_id FROM doctor_telephone WHERE telephone=#{mobile}
+
+		)
+	</select>
+
 	<!-- 保存医生的多个手机号 -->
 	<insert id="insertDoctorTelephone">
 		INSERT INTO doctor_telephone(doctor_id, telephone, type)
@@ -273,5 +283,10 @@
 		UNION
 		SELECT telephone FROM doctor_telephone WHERE doctor_id=#{doctorId}
 	</select>
+
+	<!-- 删除医生的多个联系方式 -->
+	<delete id="deleteDoctorTelephone">
+		DELETE FROM doctor_telephone WHERE doctor_id=#{doctorId}
+	</delete>
 
 </mapper>

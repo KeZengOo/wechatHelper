@@ -7,6 +7,7 @@ import com.nuoxin.virtual.rep.api.entity.v2_5.HospitalProvinceBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorBasicResponse;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorMiniResponse;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.SaveVirtualDoctorRequest;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.UpdateVirtualDoctorRequest;
 
 public interface VirtualDoctorService {
 
@@ -18,6 +19,9 @@ public interface VirtualDoctorService {
 	 * @return
 	 */
 	Long saveVirtualDoctor(SaveVirtualDoctorRequest request, DrugUser user);
+
+
+	void updateVirtualDoctor(UpdateVirtualDoctorRequest request, DrugUser user);
 	
 	/**
 	 * 获取客户医生基本信息
