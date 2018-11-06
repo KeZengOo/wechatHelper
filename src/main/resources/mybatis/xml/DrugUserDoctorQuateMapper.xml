@@ -155,5 +155,15 @@
 
 		LIMIT 2
 	</select>
+
+
+	<select id="getQuateCount" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM drug_user_doctor_quate WHERE doctor_id=#{doctorId}
+		<if test="drugUserId !=null and drugUserId!=0">
+			AND drug_user_id=#{drugUserId}
+		</if>
+		AND product_id=#{productId}
+		AND is_available=1
+	</select>
 		
 </mapper>

@@ -1,11 +1,14 @@
 package com.nuoxin.virtual.rep.api.service.v2_5;
 
+import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorBasicDynamicFieldValueListRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorDynamicFieldValueListRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorQuestionnaireDetailRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.questionnaire.ProductQuestionnaireRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorBasicDynamicFieldValueListResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DynamicFieldQuestionDetailResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ProductDynamicFieldQuestionnaireResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ProductQuestionnaireResponseBean;
 
 import java.util.List;
 
@@ -52,6 +55,14 @@ public interface DoctorDynamicFieldService {
      * @return
      */
     List<ProductDynamicFieldQuestionnaireResponseBean> getDoctorProductDynamicFieldValue(Long doctorId, Long drugUserId);
+
+
+    /**
+     * 医生详情产品信息问卷列表
+     * @param bean
+     * @return
+     */
+    PageResponseBean<ProductQuestionnaireResponseBean> getProductQuestionnairePage(ProductQuestionnaireRequestBean bean);
 
 
     /**

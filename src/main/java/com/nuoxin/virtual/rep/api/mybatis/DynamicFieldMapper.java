@@ -4,6 +4,7 @@ import com.nuoxin.virtual.rep.api.entity.v2_5.DynamicFieldResponse;
 import com.nuoxin.virtual.rep.api.entity.v2_5.DynamicFieldValueResponse;
 import com.nuoxin.virtual.rep.api.web.controller.request.hcp.HcpBasicFieldRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorDynamicFieldValueRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.questionnaire.ProductQuestionnaireRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DoctorDynamicFieldRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DynamicFieldProductRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.customer.DoctorDynamicFieldResponseBean;
@@ -222,11 +223,17 @@ public interface DynamicFieldMapper {
 
     /**
      * 得到医生指定产品下的问卷列表
-     * @param doctorId
-     * @param productId
+     * @param bean
      * @return
      */
-    List<ProductQuestionnaireResponseBean> getProductQuestionnaireList(@Param(value = "doctorId") Long doctorId,@Param(value = "productId") Long productId);
+    List<ProductQuestionnaireResponseBean> getProductQuestionnaireList(ProductQuestionnaireRequestBean bean);
+
+    /**
+     * 得到医生指定产品下的问卷列表总数
+     * @param bean
+     * @return
+     */
+    Integer getProductQuestionnaireListCount(ProductQuestionnaireRequestBean bean);
 
 
     /**

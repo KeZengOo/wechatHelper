@@ -10,6 +10,7 @@ import com.nuoxin.virtual.rep.api.common.util.StringUtils;
 import com.nuoxin.virtual.rep.api.dao.*;
 import com.nuoxin.virtual.rep.api.entity.*;
 import com.nuoxin.virtual.rep.api.entity.v2_5.DoctorExcelBean;
+import com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorQuateParams;
 import com.nuoxin.virtual.rep.api.entity.v2_5.HospitalProvinceBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorMendParams;
 import com.nuoxin.virtual.rep.api.mybatis.*;
@@ -20,6 +21,7 @@ import com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.doctor.DoctorRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.doctor.DoctorUpdateRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.doctor.RelationRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.SaveDoctorTelephoneRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorDetailsResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorStatResponseBean;
@@ -32,6 +34,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -63,6 +66,9 @@ public class DoctorService extends BaseService {
     private DoctorTelephoneRepository doctorTelephoneRepository;
 
     @Autowired
+    private DrugUserRepository drugUserRepository;
+
+    @Autowired
     private ProductLineService productLineService;
 
     @Autowired
@@ -79,6 +85,10 @@ public class DoctorService extends BaseService {
 
     @Autowired
     private DoctorMapper doctorMapper;
+
+    @Resource
+    private DrugUserDoctorQuateMapper drugUserDoctorQuateMapper;
+
 
     private int add=0;
     private int update=1;
@@ -779,10 +789,13 @@ public class DoctorService extends BaseService {
             saveDoctorVirtual(doctor,productId);
             //添加关系到医生代表产品关系表
             saveDrugUserDoctor(productId, drugUserMap, excel, doctor);
+
         }
         doctorRepository.updateVirtualDoctorId();
         return true;
     }
+
+
 
     /**
      * 废弃，不在使用
@@ -834,8 +847,34 @@ public class DoctorService extends BaseService {
             return;
         }
 
-        String[] mobileArray = mobiles.split(",");
+        if (mobiles.contains("，")){
+            mobiles = mobiles.replaceAll("，", ",");
+        }
 
+        String[] mobileArray = mobiles.split(",");
+        List<SaveDoctorTelephoneRequestBean> list = new ArrayList<>();
+        if (mobileArray != null && mobileArray.length > 0){
+            for (String telephone:mobileArray){
+                boolean matcher = RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, telephone);
+                SaveDoctorTelephoneRequestBean saveDoctorTelephoneRequestBean = new SaveDoctorTelephoneRequestBean();
+                if (matcher){
+                    saveDoctorTelephoneRequestBean.setType(1);
+                }else {
+                    saveDoctorTelephoneRequestBean.setType(2);
+                }
+                if (telephone.contains("-")){
+                    telephone = telephone.replaceAll("-","");
+                }
+
+                saveDoctorTelephoneRequestBean.setDoctorId(doctorId);
+                saveDoctorTelephoneRequestBean.setTelephone(telephone);
+                list.add(saveDoctorTelephoneRequestBean);
+            }
+        }
+
+        if (CollectionsUtil.isNotEmptyList(list)){
+            doctorMapper.insertDoctorTelephone(list);
+        }
 
 
     }
@@ -939,6 +978,34 @@ public class DoctorService extends BaseService {
             drugUserDoctorRepository.saveAndFlush(dud);
             doctorCallInfoRepository.updateDoctorIdAndDrugUserIdAndProductId(dud.getDoctorId(),dud.getDrugUserId(),dud.getProductId(),0);
         }
+
+
+        // 保存销售医生其他的关系信息
+        this.saveDrugUserDoctorQuate(drugUserId, doctor.getId(), productId);
+
+
+    }
+
+    /**
+     * 保存销售医生关联的其他的信息，新增给一个默认值，如果已经存在不做任何修改
+     * @param drugUserId
+     * @param doctorId
+     * @param productId
+     */
+    private void saveDrugUserDoctorQuate(Long drugUserId, Long doctorId, Long productId) {
+
+        Integer quateCount = drugUserDoctorQuateMapper.getQuateCount(drugUserId, doctorId, productId);
+        if (quateCount == null || quateCount == 0){
+            List<DrugUserDoctorQuateParams> list = new ArrayList<>();
+            DrugUserDoctorQuateParams drugUserDoctorQuateParam = new DrugUserDoctorQuateParams();
+            drugUserDoctorQuateParam.setProductLineId(productId.intValue());
+            drugUserDoctorQuateParam.setVirtualDrugUserId(drugUserId);
+            drugUserDoctorQuateParam.setDoctorId(doctorId);
+            list.add(drugUserDoctorQuateParam);
+
+            drugUserDoctorQuateMapper.saveDrugUserDoctorQuates(list);
+
+        }
     }
 
     /**
@@ -955,16 +1022,16 @@ public class DoctorService extends BaseService {
                 throw new Exception("第（"+errorLine+"）行姓名为空");
             }
 
-            String mobile = excel.getMobile();
-            if (StringUtils.isEmpty(mobile)){
+            String mobiles = excel.getMobile();
+            if (StringUtils.isEmpty(mobiles)){
                 throw new Exception("第（"+ errorLine +"）行手机号为空");
             }
 
-            if (mobile.contains("，")){
-                mobile.replaceAll("，", ",");
+            if (mobiles.contains("，")){
+                mobiles = mobiles.replaceAll("，", ",");
             }
 
-            String[] mobileArray = mobile.split(",");
+            String[] mobileArray = mobiles.split(",");
             if (CollectionsUtil.isEmptyArray(mobileArray)){
                 throw new BusinessException(ErrorEnum.ERROR, "第（"+ errorLine +"）行手机号输入不合法！");
             }
@@ -1004,10 +1071,7 @@ public class DoctorService extends BaseService {
             if(StringUtils.isBlank(excel.getDrugUserEmail())){
                 throw new Exception("第（"+errorLine+"）行销售邮箱为空");
             }
-            boolean matche = RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, excel.getMobile());
-            if (!matche){
-                throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "第("+ errorLine +")行医生手机号输入不合法，请检查是否是文本格式");
-            }
+
             String sex = excel.getSex();
             if (StringUtils.isNotEmtity(sex)){
                 if (!("男".equals(sex) || "女".equals(sex))){

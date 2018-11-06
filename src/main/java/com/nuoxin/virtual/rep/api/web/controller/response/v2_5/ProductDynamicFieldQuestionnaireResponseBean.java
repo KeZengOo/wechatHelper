@@ -32,6 +32,6 @@ public class ProductDynamicFieldQuestionnaireResponseBean implements Serializabl
     private VisitResponseBean visit = new VisitResponseBean();
 
 
-    @ApiModelProperty(value = "产品问卷调查")
-    private List<ProductQuestionnaireResponseBean> productQuestionnaireList = new ArrayList<>();
+//    @ApiModelProperty(value = "产品问卷调查")
+//    private List<ProductQuestionnaireResponseBean> productQuestionnaireList = new ArrayList<>();
 }

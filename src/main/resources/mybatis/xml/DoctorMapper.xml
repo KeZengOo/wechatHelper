@@ -194,7 +194,7 @@
 		OR t.id IN
 		(
 		SELECT DISTINCT doctor_id FROM doctor_telephone
-		WHERE telphone IN
+		WHERE telephone IN
 		<foreach collection="mobiles" item="mobile" open="(" close=")" separator=",">
 			#{mobile}
 		</foreach>

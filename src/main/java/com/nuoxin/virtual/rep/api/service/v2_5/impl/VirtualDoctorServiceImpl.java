@@ -152,6 +152,10 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 			throw new BusinessException(ErrorEnum.ERROR, "医生不在选择产品下！");
 		}
 
+		Integer quateCount = drugUserDoctorQuateMapper.getQuateCount(null, doctorId, productId);
+		if (quateCount == null || quateCount == 0){
+			throw new BusinessException(ErrorEnum.ERROR, "该医生在选择的产品下还没添加产品信息!");
+		}
 	}
 
 
@@ -216,8 +220,8 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 			throw new BusinessException(ErrorEnum.ERROR, "联系方式不能为空！");
 		}
 
-		List<String> collectTelphone = telephones.stream().map(String::trim).distinct().collect(Collectors.toList());
-		if (telephones.size() != collectTelphone.size()){
+		List<String> collectTelephone = telephones.stream().map(String::trim).distinct().collect(Collectors.toList());
+		if (telephones.size() != collectTelephone.size()){
 			throw new BusinessException(ErrorEnum.ERROR, "联系方式不能重复");
 		}
 
@@ -265,8 +269,8 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 				throw new BusinessException(ErrorEnum.ERROR, "联系方式不能为空！");
 			}
 
-			List<String> collectTelphone = telephones.stream().map(String::trim).distinct().collect(Collectors.toList());
-			if (telephones.size() != collectTelphone.size()){
+			List<String> collectTelephone = telephones.stream().map(String::trim).distinct().collect(Collectors.toList());
+			if (telephones.size() != collectTelephone.size()){
 				throw new BusinessException(ErrorEnum.ERROR, "联系方式不能重复");
 			}
 
@@ -380,7 +384,7 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 				saveDoctorTelephoneRequestBean.setType(2);
 			}
 			if (telephone.contains("-")){
-				telephone.replaceAll("-","");
+				telephone = telephone.replaceAll("-","");
 			}
 
 			saveDoctorTelephoneRequestBean.setDoctorId(doctorId);
@@ -419,7 +423,7 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 			}
 
 			if (telephone.contains("-")){
-				telephone.replaceAll("-","");
+				telephone = telephone.replaceAll("-","");
 			}
 
 			saveDoctorTelephoneRequestBean.setDoctorId(doctorId);

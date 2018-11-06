@@ -15,12 +15,19 @@ import java.util.List;
  */
 public interface DoctorRepository extends JpaRepository<Doctor, Long>, JpaSpecificationExecutor<Doctor> {
 
+    /**
+     * 废弃，使用DoctorMapper.findTopByMobile(String mobile);
+     * @param mobile
+     * @return
+     */
+    @Deprecated
     Doctor findTopByMobile(String mobile);
 
     Doctor findFirstById(Long id);
 
     List<Doctor> findByIdIn(Collection<Long> ids);
 
+    @Deprecated
     List<Doctor> findByMobileIn(Collection<String> mobiles);
 
     List<Doctor> findByEmailIn(Collection<String> emails);

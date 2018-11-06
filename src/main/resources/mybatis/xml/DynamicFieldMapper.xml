@@ -539,7 +539,27 @@
                     vq.id
             ) t
 
+            LIMIT #{currentSize},#{pageSize}
+
     </select>
+
+
+
+    <!-- 得到医生指定产品下的问卷列表总数 -->
+    <select id="getProductQuestionnaireListCount" resultType="java.lang.Integer">
+        SELECT
+            COUNT(DISTINCT vq.id)
+        FROM
+            virtual_questionnaire vq
+        INNER JOIN virtual_doctor_questionnaire vdq ON vq.id = vdq.virtual_questionnaire_id
+        WHERE
+            vq.product_id = #{productId}
+        AND vdq.virtual_doctor_id = #{doctorId}
+        AND vq.del_flag = 0
+
+    </select>
+
+
 
     <!-- 得到医生指定产品下的问卷列表 -->
     <select id="getProductDynamicFieldCount" resultType="java.lang.Integer">

@@ -7,9 +7,11 @@ import java.util.stream.Collectors;
 import javax.annotation.Resource;
 
 import com.alibaba.fastjson.JSONObject;
+import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.DynamicFieldResponse;
 import com.nuoxin.virtual.rep.api.utils.StringUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.*;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.questionnaire.ProductQuestionnaireRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -243,15 +245,15 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
 
 
             // 调查问卷
-            if (CollectionsUtil.isNotEmptyList(doctorProductDynamicFieldValue)){
-                productDynamicFieldQuestionnaireResponseBean.setProductDynamicFieldList(doctorProductDynamicFieldValue);
-                List<ProductQuestionnaireResponseBean> productQuestionnaireList = dynamicFieldMapper.getProductQuestionnaireList(doctorId, product.getProductId());
-                if (CollectionsUtil.isNotEmptyList(productQuestionnaireList)){
-                    productDynamicFieldQuestionnaireResponseBean.setProductQuestionnaireList(productQuestionnaireList);
-                }
-
-                list.add(productDynamicFieldQuestionnaireResponseBean);
-            }
+//            if (CollectionsUtil.isNotEmptyList(doctorProductDynamicFieldValue)){
+//                productDynamicFieldQuestionnaireResponseBean.setProductDynamicFieldList(doctorProductDynamicFieldValue);
+//                List<ProductQuestionnaireResponseBean> productQuestionnaireList = dynamicFieldMapper.getProductQuestionnaireList(doctorId, product.getProductId());
+//                if (CollectionsUtil.isNotEmptyList(productQuestionnaireList)){
+//                    productDynamicFieldQuestionnaireResponseBean.setProductQuestionnaireList(productQuestionnaireList);
+//                }
+//
+//                list.add(productDynamicFieldQuestionnaireResponseBean);
+//            }
 
 
             // 添加上医生的处方信息和拜访记录信息
@@ -279,6 +281,22 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
         });
 
         return list;
+    }
+
+    @Override
+    public PageResponseBean<ProductQuestionnaireResponseBean> getProductQuestionnairePage(ProductQuestionnaireRequestBean bean) {
+        Integer page = bean.getPage();
+        Integer pageSize = bean.getPageSize();
+        bean.setCurrentSize(page  * pageSize);
+
+        Integer count = dynamicFieldMapper.getProductQuestionnaireListCount(bean);
+        PageResponseBean<ProductQuestionnaireResponseBean> empty = new PageResponseBean<>();
+        if (count !=null && count > 0){
+            List<ProductQuestionnaireResponseBean> productQuestionnaireList = dynamicFieldMapper.getProductQuestionnaireList(bean);
+            PageResponseBean<ProductQuestionnaireResponseBean> pageResponseBean = new PageResponseBean<>(bean, count, productQuestionnaireList);
+            return pageResponseBean;
+        }
+        return empty;
     }
 
     @Override

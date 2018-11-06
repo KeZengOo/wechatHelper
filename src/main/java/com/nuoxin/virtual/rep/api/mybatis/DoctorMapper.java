@@ -53,6 +53,15 @@ public interface DoctorMapper{
     
 	Long getDoctorIdByMobile(@Param(value = "mobile") String mobile);
 
+
+    /**
+     * 根据手机号查找医生
+     * @param mobile
+     * @return
+     */
+    Doctor findTopByMobile(String mobile);
+
+
     /**
      * 根据过滤条件获取医生总条数
      * @param virtualDrugUserIds 虚拟代表 ID

@@ -2,16 +2,15 @@ package com.nuoxin.virtual.rep.api.web.controller.v2_5;
 
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 
+import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.v2_5.DoctorDynamicFieldService;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorBasicDynamicFieldValueListRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorDynamicFieldValueListRequestBean;
 
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorQuestionnaireDetailRequestBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorBasicDynamicFieldValueListResponseBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorProductDynamicFieldValueResponseBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DynamicFieldQuestionDetailResponseBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ProductDynamicFieldQuestionnaireResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.questionnaire.ProductQuestionnaireRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
@@ -98,6 +97,22 @@ public class DoctorDynamicFieldController extends NewBaseController{
         responseBean.setData(doctorProductDynamicFieldValue);
         return responseBean;
     }
+
+
+    @ApiOperation(value = "医生产品信息问卷列表", notes = "医生产品信息问卷列表")
+    @PostMapping(value = "/product/questionnaire/list")
+    public DefaultResponseBean<PageResponseBean<ProductQuestionnaireResponseBean>> getProductQuestionnairePage(HttpServletRequest request, @RequestBody ProductQuestionnaireRequestBean bean) {
+        DrugUser user = super.getDrugUser(request);
+        if(user == null) {
+            return super.getLoginErrorResponse();
+        }
+
+        PageResponseBean<ProductQuestionnaireResponseBean> productQuestionnairePage = doctorDynamicFieldService.getProductQuestionnairePage(bean);
+        DefaultResponseBean<PageResponseBean<ProductQuestionnaireResponseBean>> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(productQuestionnairePage);
+        return responseBean;
+    }
+
 
 
     @SuppressWarnings("unchecked")

@@ -58,5 +58,15 @@ public interface DrugUserDoctorQuateMapper {
 	 * @return
 	 */
 	List<ProductInfoResponse> getProductInfoListByProductIdList(@Param(value = "doctorId") Long doctorId,@Param(value = "productIdList") List<Long> productIdList);
+
+
+	/**
+	 * 查询总数，校验记录是否存在
+	 * @param drugUserId
+	 * @param doctorId
+	 * @param productId
+	 * @return
+	 */
+	Integer getQuateCount(@Param(value = "drugUserId") Long drugUserId,@Param(value = "doctorId") Long doctorId,@Param(value = "productId") Long productId);
 }
 
