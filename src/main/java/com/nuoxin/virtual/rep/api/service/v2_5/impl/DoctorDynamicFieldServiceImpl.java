@@ -240,6 +240,8 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
                         doctorProductDynamicField.setDynamicExtendValue(doctorDynamicFieldValue.getDynamicExtendValue());
                     }
                 });
+
+                productDynamicFieldQuestionnaireResponseBean.setProductDynamicFieldList(doctorProductDynamicFieldValue);
             }
 
 
@@ -277,7 +279,7 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
 
            }
 
-
+            list.add(productDynamicFieldQuestionnaireResponseBean);
         });
 
         return list;

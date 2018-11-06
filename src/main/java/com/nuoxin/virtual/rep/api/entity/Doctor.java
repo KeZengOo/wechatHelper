@@ -3,6 +3,7 @@ package com.nuoxin.virtual.rep.api.entity;
 import com.nuoxin.virtual.rep.api.common.entity.IdEntity;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -38,7 +39,7 @@ public class Doctor extends IdEntity {
      * 医生的多个联系方式
      */
     @Transient
-    private List<String> telephoneList;
+    private List<String> telephoneList = new ArrayList<>();
 
     @Column(name = "positions")
     private String doctorLevel;

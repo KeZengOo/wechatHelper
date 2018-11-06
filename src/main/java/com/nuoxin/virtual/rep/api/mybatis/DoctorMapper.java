@@ -59,7 +59,7 @@ public interface DoctorMapper{
      * @param mobile
      * @return
      */
-    Doctor findTopByMobile(String mobile);
+    Doctor findTopByMobile(@Param(value = "mobile") String mobile);
 
 
     /**

@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.Column;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,6 +37,10 @@ public class DoctorDetailsResponseBean implements Serializable {
     private String department;
     @ApiModelProperty(value = "电话")
     private String mobile;
+
+    @ApiModelProperty(value = "医生多个手机号")
+    private List<String> telephoneList = new ArrayList<>();
+
     @ApiModelProperty(value = "医生等级")
     private String doctorLevel;
     @ApiModelProperty(value = "客户等级")

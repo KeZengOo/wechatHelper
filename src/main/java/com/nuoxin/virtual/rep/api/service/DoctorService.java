@@ -14,6 +14,7 @@ import com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorQuateParams;
 import com.nuoxin.virtual.rep.api.entity.v2_5.HospitalProvinceBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorMendParams;
 import com.nuoxin.virtual.rep.api.mybatis.*;
+import com.nuoxin.virtual.rep.api.service.v2_5.NewDoctorService;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.utils.RegularUtils;
 import com.nuoxin.virtual.rep.api.utils.StringUtil;
@@ -89,6 +90,10 @@ public class DoctorService extends BaseService {
     @Resource
     private DrugUserDoctorQuateMapper drugUserDoctorQuateMapper;
 
+    @Resource(name="doctorServiceNew")
+    private NewDoctorService newDoctorService;
+
+
 
     private int add=0;
     private int update=1;
@@ -140,8 +145,11 @@ public class DoctorService extends BaseService {
     public DoctorDetailsResponseBean findByMobile(String mobile) {
 
         DoctorDetailsResponseBean responseBean = new DoctorDetailsResponseBean();
-        Doctor doctor = doctorRepository.findTopByMobile(mobile);
-        if(doctor==null){
+         Doctor doctor = doctorRepository.findTopByMobile(mobile);
+
+        //Doctor doctor = newDoctorService.findFirstByMobile(mobile);
+
+        if(doctor ==null){
             return null;
         }
         responseBean.setCity(doctor.getCity());
