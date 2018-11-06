@@ -14,6 +14,8 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import com.nuoxin.virtual.rep.api.service.v2_5.NewDoctorService;
+import com.nuoxin.virtual.rep.api.service.v2_5.VirtualDoctorCallInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -85,6 +87,13 @@ public class DoctorCallService extends BaseService {
     
     @Resource
     private FileService fileService;
+
+    @Resource
+    private NewDoctorService newDoctorService;
+
+    @Resource
+    private VirtualDoctorCallInfoService virtualDoctorCallInfoService;
+
     
     @Deprecated
     public String uploadUrl() throws Exception{
@@ -317,18 +326,24 @@ public class DoctorCallService extends BaseService {
         info.setDrugUserId(bean.getDrugUserId());
         info.setProductId(bean.getProductId());
         
-        Doctor doctor = doctorRepository.findTopByMobile(bean.getMobile());
+        //Doctor doctor = doctorRepository.findTopByMobile(bean.getMobile());
+        Doctor doctor = newDoctorService.findFirstByMobile(bean.getMobile());
         info.setDoctor(doctor);
         
         DrugUser drugUser = drugUserService.findById(bean.getDrugUserId());
         info.setDrugUser(drugUser);
-        doctorCallInfoRepository.saveAndFlush(info);
+        //doctorCallInfoRepository.saveAndFlush(info);
+        if (doctor != null){
+            bean.setDoctorId(doctor.getId());
+        }
+        virtualDoctorCallInfoService.saveCallInfo(bean);
         
-        Long infoId = info.getId();
-        bean.setId(infoId);
+//        Long infoId = info.getId();
+//        bean.setId(infoId);
         
         DoctorCallInfoDetails infoDetails = new DoctorCallInfoDetails();
-        infoDetails.setCallId(infoId);
+//        infoDetails.setCallId(infoId);
+        infoDetails.setCallId(bean.getId());
         infoDetails.setStatus(info.getStatus());
         infoDetails.setStatusName(info.getStatusName());
         infoDetails.setCreateTime(new Date());

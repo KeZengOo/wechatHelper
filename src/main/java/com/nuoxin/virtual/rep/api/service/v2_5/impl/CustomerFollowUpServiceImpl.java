@@ -209,17 +209,24 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	 */
 	private void alterCustomerFollowListBean(CustomerFollowListBean doctor) {
 		// 手机号s
-		List<String> mobiles = doctor.getMobiles();
-		mobiles.add(doctor.getDoctorMobile()); // 主要
-		String secondary = doctor.getSecondaryDoctorMobile(); // 次要
-		if(StringUtils.isNotBlank(secondary)) {
-			mobiles.add(doctor.getSecondaryDoctorMobile());
+//		List<String> mobiles = doctor.getMobiles();
+//		mobiles.add(doctor.getDoctorMobile()); // 主要
+//		String secondary = doctor.getSecondaryDoctorMobile(); // 次要
+//		if(StringUtils.isNotBlank(secondary)) {
+//			mobiles.add(doctor.getSecondaryDoctorMobile());
+//		}
+//		String thirdary = doctor.getThirdaryDoctorMobile();// 三要
+//		if(StringUtils.isNotBlank(thirdary)) {
+//			mobiles.add(doctor.getThirdaryDoctorMobile());
+//		}
+
+
+		List<String> doctorTelephoneList = doctorMapper.getDoctorTelephone(doctor.getDoctorId());
+		if (CollectionsUtil.isNotEmptyList(doctorTelephoneList)){
+			doctor.setMobiles(doctorTelephoneList);
 		}
-		String thirdary = doctor.getThirdaryDoctorMobile();// 三要
-		if(StringUtils.isNotBlank(thirdary)) {
-			mobiles.add(doctor.getThirdaryDoctorMobile());
-		}
-		
+
+
 		// (上次)拜访时间
 		Date visitTime = doctor.getVisitTime();
 		if (visitTime != null) {

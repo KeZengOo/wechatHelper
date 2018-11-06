@@ -130,41 +130,41 @@ public class DoctorController extends BaseController {
         return responseBean;
     }
 
-    @ApiOperation(value = "医生保存", notes = "医生保存")
-    @PostMapping("/save")
-    public DefaultResponseBean<Boolean> save(@RequestBody DoctorRequestBean bean,
-                                             HttpServletRequest request, HttpServletResponse response){
-        DefaultResponseBean responseBean = new DefaultResponseBean();
-        DrugUser user = super.getLoginUser(request);
-        if(user==null){
-            responseBean.setCode(300);
-            responseBean.setMessage("登录失效");
-            return responseBean;
-        }
-        bean.setDrugUserId(user.getId());
-        bean.setLeaderPath(user.getLeaderPath());
-        responseBean.setData(doctorService.save(bean));
-        return responseBean;
-    }
+//    @ApiOperation(value = "医生保存", notes = "医生保存")
+//    @PostMapping("/save")
+//    public DefaultResponseBean<Boolean> save(@RequestBody DoctorRequestBean bean,
+//                                             HttpServletRequest request, HttpServletResponse response){
+//        DefaultResponseBean responseBean = new DefaultResponseBean();
+//        DrugUser user = super.getLoginUser(request);
+//        if(user==null){
+//            responseBean.setCode(300);
+//            responseBean.setMessage("登录失效");
+//            return responseBean;
+//        }
+//        bean.setDrugUserId(user.getId());
+//        bean.setLeaderPath(user.getLeaderPath());
+//        responseBean.setData(doctorService.save(bean));
+//        return responseBean;
+//    }
 
-    @ApiOperation(value = "医生修改", notes = "医生修改")
-    @PostMapping("/update")
-    public DefaultResponseBean<Boolean> update(@RequestBody DoctorUpdateRequestBean bean,
-                                             HttpServletRequest request, HttpServletResponse response){
-        DefaultResponseBean responseBean = new DefaultResponseBean();
-        DrugUser user = super.getLoginUser(request);
-        if(user==null){
-            responseBean.setCode(300);
-            responseBean.setMessage("登录失效");
-            return responseBean;
-        }
-        if(bean.getDrugUserId()==null){
-            bean.setDrugUserId(user.getId());
-        }
-        bean.setLeaderPath(drugUserService.findById(bean.getDrugUserId()).getLeaderPath());
-        responseBean.setData(doctorService.update(bean));
-        return responseBean;
-    }
+//    @ApiOperation(value = "医生修改", notes = "医生修改")
+//    @PostMapping("/update")
+//    public DefaultResponseBean<Boolean> update(@RequestBody DoctorUpdateRequestBean bean,
+//                                             HttpServletRequest request, HttpServletResponse response){
+//        DefaultResponseBean responseBean = new DefaultResponseBean();
+//        DrugUser user = super.getLoginUser(request);
+//        if(user==null){
+//            responseBean.setCode(300);
+//            responseBean.setMessage("登录失效");
+//            return responseBean;
+//        }
+//        if(bean.getDrugUserId()==null){
+//            bean.setDrugUserId(user.getId());
+//        }
+//        bean.setLeaderPath(drugUserService.findById(bean.getDrugUserId()).getLeaderPath());
+//        responseBean.setData(doctorService.update(bean));
+//        return responseBean;
+//    }
 
     @ApiOperation(value = "医生excle导入", notes = "医生excle导入")
     @PostMapping("/excel")

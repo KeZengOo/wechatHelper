@@ -20,8 +20,8 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long>, JpaSpecif
      * @param mobile
      * @return
      */
-    @Deprecated
-    Doctor findTopByMobile(String mobile);
+//    @Deprecated
+//    Doctor findTopByMobile(String mobile);
 
     Doctor findFirstById(Long id);
 

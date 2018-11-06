@@ -5,6 +5,7 @@ import java.util.List;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitStatisticsBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.call.CallRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.CallInfoListRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.SaveCallInfoRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.SaveCallInfoUnConnectedRequest;
@@ -38,5 +39,15 @@ public interface VirtualDoctorCallInfoService {
 	 * @return
 	 */
 	boolean saveUnconnectedCallInfo(SaveCallInfoUnConnectedRequest saveRequest);
-	
+
+
+	/**
+	 * 保存电话记录
+	 * @param bean
+	 */
+	void saveCallInfo(CallRequestBean bean);
+
+
+
+
 }

@@ -170,4 +170,13 @@ public class DoctorDetailsResponseBean implements Serializable {
     public void setProductId(Long productId) {
         this.productId = productId;
     }
+
+
+    public List<String> getTelephoneList() {
+        return telephoneList;
+    }
+
+    public void setTelephoneList(List<String> telephoneList) {
+        this.telephoneList = telephoneList;
+    }
 }

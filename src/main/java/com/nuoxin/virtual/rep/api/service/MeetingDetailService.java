@@ -10,6 +10,7 @@ import com.nuoxin.virtual.rep.api.entity.MeetingDetail;
 import com.nuoxin.virtual.rep.api.enums.AttendMeetingDownloadEnum;
 import com.nuoxin.virtual.rep.api.enums.AttendMeetingTypeEnum;
 import com.nuoxin.virtual.rep.api.enums.AttendMeetingWayEnum;
+import com.nuoxin.virtual.rep.api.service.v2_5.NewDoctorService;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.utils.ExcelUtils;
 import com.nuoxin.virtual.rep.api.utils.RegularUtils;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -38,6 +40,9 @@ public class MeetingDetailService extends BaseService{
     private DoctorRepository doctorRepository;
     @Autowired
     private MeetingDetailRepository meetingDetailRepository;
+
+    @Resource
+    private NewDoctorService newDoctorService;
 
     /**
      * 导入会议详情记录
@@ -136,7 +141,8 @@ public class MeetingDetailService extends BaseService{
                     throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "手机号:" + telephone + "是否下载输入不合法");
                 }
 
-                Doctor doctor = doctorRepository.findTopByMobile(telephone);
+                //Doctor doctor = doctorRepository.findTopByMobile(telephone);
+                Doctor doctor = newDoctorService.findFirstByMobile(telephone);
                 if (doctor == null){
                     throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "手机号:" + telephone + "医生不存在");
                 }

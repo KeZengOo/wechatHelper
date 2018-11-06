@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse;
 import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsParams;
+import com.nuoxin.virtual.rep.api.web.controller.request.call.CallRequestBean;
 import org.apache.ibatis.annotations.Param;
 
 import com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitBean;
@@ -64,5 +65,14 @@ public interface VirtualDoctorCallInfoMapper {
 	 * @param doctorId
 	 */
 	void updateCallInfoDoctorId(@Param(value = "telephoneList") List<String> telephoneList,@Param(value = "doctorId") Long doctorId);
+
+
+	/**
+	 * 保存电话记录
+	 * @param bean
+	 */
+	void saveCallInfo(CallRequestBean bean);
+
+
 }
 

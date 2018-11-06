@@ -145,9 +145,9 @@ public class DoctorService extends BaseService {
     public DoctorDetailsResponseBean findByMobile(String mobile) {
 
         DoctorDetailsResponseBean responseBean = new DoctorDetailsResponseBean();
-         Doctor doctor = doctorRepository.findTopByMobile(mobile);
+//         Doctor doctor = doctorRepository.findTopByMobile(mobile);
 
-        //Doctor doctor = newDoctorService.findFirstByMobile(mobile);
+        Doctor doctor = newDoctorService.findFirstByMobile(mobile);
 
         if(doctor ==null){
             return null;
@@ -162,7 +162,8 @@ public class DoctorService extends BaseService {
         responseBean.setHospitalLevel(doctor.getDoctorVirtual().getHospitalLevel());
         responseBean.setHospitalName(doctor.getHospitalName());
         responseBean.setMasterDateId(doctor.getDoctorVirtual().getMasterDateId());
-        responseBean.setMobile(doctor.getMobile());
+//        responseBean.setMobile(doctor.getMobile());
+        responseBean.setTelephoneList(doctor.getTelephoneList());
         responseBean.setProvince(doctor.getProvince());
         responseBean.setList(DoctorDynamicFieldValueService.getDoctorDymamicFieldValueList(doctor.getId()));
         return responseBean;
@@ -268,204 +269,205 @@ public class DoctorService extends BaseService {
         return responseBean;
     }
 
-    /**
-     * 保存doctor
-     * @param bean
-     * @return
-     */
-    @Transactional(readOnly = false)
-    @CacheEvict(value = "virtual_rep_api_doctor", allEntries = true)
-    public Boolean save(DoctorRequestBean bean) {
-        Doctor doctor = doctorRepository.findTopByMobile(bean.getMobile());
-        DoctorVirtual virtual = new DoctorVirtual();
-        if (doctor == null) {
-            doctor = new Doctor();
-            virtual.setDrugUserIds(this.assembleLeaderPath(bean.getLeaderPath(), bean.getDrugUserId()));
-
-
-        } else {
-            virtual = doctor.getDoctorVirtual();
-            if(virtual==null){
-                virtual = new DoctorVirtual();
-            }
-            virtual.setDrugUserIds(this.assembleLeaderPath(this.assembleLeaderPath(virtual.getDrugUserIds(), bean.getDrugUserId()), bean.getDrugUserId()));
-        }
-//        BeanUtils.copyProperties(bean,doctor);
-        doctor.setCity(bean.getCity());
-        //doctor.setClientLevel(bean.getClientLevel());
-        doctor.setDepartment(bean.getDepartment());
-        doctor.setDoctorLevel(bean.getDoctorLevel());
-        // doctor.setHospitalLevel(bean.getHospitalLevel());
-        doctor.setHospitalName(bean.getHospitalName());
-        doctor.setMobile(bean.getMobile());
-        doctor.setName(bean.getName());
-        doctor.setStatus(1);
-        virtual.setClientLevel(bean.getClientLevel());
-        virtual.setHospitalLevel(bean.getHospitalLevel());
-        //TODO  获取主数据id
-        logger.info("保存【{}】医生时查询主数据对应的医生id写入数据库", doctor.getName());
-        if (StringUtils.isNotEmtity(bean.getHospitalName())) {
-            Hcp hcp = masterDataService.getHcpByHciIdAndHcpName(bean.getHospitalName(), bean.getName());
-            if (hcp != null) {
-                logger.info("保存【{}】医生时查询主数据对应的医生id写入数据库,写入成功", doctor.getName());
-                //doctor.setMasterDateId(hcp.getId());
-                virtual.setMasterDateId(hcp.getId());
-                doctor.setHospitalId(hcp.getHciId());
-            }
-        }
-
-        //TODO 营销数据
-//        DoctorVo vo = centerDataService.checkout(doctor);
-//        if(vo!=null){
-//            doctor.setEappId(vo.getId());
+//    /**
+//     * 保存doctor
+//     * @param bean
+//     * @return
+//     */
+//    @Deprecated
+//    @Transactional(readOnly = false)
+//    @CacheEvict(value = "virtual_rep_api_doctor", allEntries = true)
+//    public Boolean save(DoctorRequestBean bean) {
+//        Doctor doctor = doctorRepository.findTopByMobile(bean.getMobile());
+//        DoctorVirtual virtual = new DoctorVirtual();
+//        if (doctor == null) {
+//            doctor = new Doctor();
+//            virtual.setDrugUserIds(this.assembleLeaderPath(bean.getLeaderPath(), bean.getDrugUserId()));
+//
+//
+//        } else {
+//            virtual = doctor.getDoctorVirtual();
+//            if(virtual==null){
+//                virtual = new DoctorVirtual();
+//            }
+//            virtual.setDrugUserIds(this.assembleLeaderPath(this.assembleLeaderPath(virtual.getDrugUserIds(), bean.getDrugUserId()), bean.getDrugUserId()));
 //        }
-
-
-
-        //新增医生的多个手机号
-        boolean f = false;
-        Long id = doctor.getId();
-        if (id == null || id == 0L){
-            f = true;
-        }
-
-
-        doctor = doctorRepository.saveAndFlush(doctor);
-
-        if (doctor.getId() == null) {
-            throw new BusinessException(ErrorEnum.ERROR.getStatus(), "医生添加失败");
-        }
-
-        if (f){
-            //添加医生的多个手机号
-            DoctorTelephone doctorTelephone = new DoctorTelephone();
-            doctorTelephone.setDoctorId(doctor.getId());
-            doctorTelephone.setTelephone(doctor.getMobile());
-            doctorTelephone.setCreateTime(new Date());
-            doctorTelephone.setUpdateTime(new Date());
-            doctorTelephoneRepository.save(doctorTelephone);
-        }
-
-
-
-        virtual.setDoctorId(doctor.getId());
-        virtual.setClientLevel(bean.getClientLevel());
-        virtual.setHospitalLevel(bean.getHospitalLevel());
-        doctorVirtualService.save(virtual);
-        doctor.setDoctorVirtual(virtual);
-        doctorRepository.saveAndFlush(doctor);
-        //TODO 添加关系到关系表
-        List<DrugUserDoctor> list = drugUserDoctorRepository.findByDoctorIdAndDrugUserIdAndProductId(doctor.getId(), bean.getDrugUserId(), bean.getProductId());
-        if (list == null || list.isEmpty()) {
-            DrugUserDoctor dud = new DrugUserDoctor();
-            dud.setDoctorId(doctor.getId());
-            dud.setProductId(bean.getProductId());
-            dud.setDrugUserId(bean.getDrugUserId());
-
-            DrugUser drugUser = drugUserService.findById(bean.getDrugUserId());
-            if(drugUser!=null){
-                dud.setDrugUserName(drugUser.getName());
-            }
-            dud.setCreateTime(new Date());
-            drugUserDoctorRepository.saveAndFlush(dud);
-            doctorCallInfoRepository.updateDoctorIdAndDrugUserIdAndProductId(dud.getDoctorId(),dud.getDrugUserId(),dud.getProductId(),0);
-        }
-
-
-        Boolean flag = DoctorDynamicFieldValueService.add(doctor.getId(), bean.getList());
-        if (!flag) {
-            throw new BusinessException(ErrorEnum.ERROR.getStatus(), "医生动态属性数据添加修改");
-        }
-        return true;
-    }
-
-    /**
-     * 修改doctor
-     * @param bean
-     * @return
-     */
-    @Transactional(readOnly = false)
-    @CacheEvict(value = "virtual_rep_api_doctor", allEntries = true)
-    public Boolean update(DoctorUpdateRequestBean bean) {
-        Doctor doctor = doctorRepository.findTopByMobile(bean.getMobile());
-        DoctorVirtual virtual = new DoctorVirtual();
-        if (doctor == null) {
-            doctor = new Doctor();
-            virtual.setDrugUserIds(this.assembleLeaderPath(bean.getLeaderPath(), bean.getDrugUserId()));
-        } else {
-            virtual = doctor.getDoctorVirtual();
-            if(virtual==null){
-                virtual = new DoctorVirtual();
-            }
-            virtual.setDrugUserIds(this.assembleLeaderPath(this.assembleLeaderPath(virtual.getDrugUserIds(), bean.getDrugUserId()), bean.getDrugUserId()));
-        }
-//        BeanUtils.copyProperties(bean,doctor);
-        doctor.setCity(bean.getCity());
-        //doctor.setClientLevel(bean.getClientLevel());
-
-        //TODO 获取医院id
-        doctor.setDepartment(bean.getDepartment());
-        doctor.setDoctorLevel(bean.getDoctorLevel());
-        //doctor.setHospitalLevel(bean.getHospitalLevel());
-        doctor.setHospitalName(bean.getHospitalName());
-        doctor.setMobile(bean.getMobile());
-        doctor.setName(bean.getDoctorName());
-        virtual.setClientLevel(bean.getClientLevel());
-        virtual.setHospitalLevel(bean.getHospitalLevel());
-        //TODO  获取主数据id
-        if (StringUtils.isNotEmtity(bean.getHospitalName())) {
-            Hcp hcp = masterDataService.getHcpByHciIdAndHcpName(bean.getHospitalName(), bean.getDoctorName());
-            if (hcp != null) {
-//                doctor.setMasterDateId(hcp.getId());
-                virtual.setMasterDateId(hcp.getId());
-                doctor.setHospitalId(hcp.getHciId());
-            }
-        }
-
-        //TODO 营销数据
-//        DoctorVo vo = centerDataService.checkout(doctor);
-//        if(vo!=null){
-//            doctor.setEappId(vo.getId());
+////        BeanUtils.copyProperties(bean,doctor);
+//        doctor.setCity(bean.getCity());
+//        //doctor.setClientLevel(bean.getClientLevel());
+//        doctor.setDepartment(bean.getDepartment());
+//        doctor.setDoctorLevel(bean.getDoctorLevel());
+//        // doctor.setHospitalLevel(bean.getHospitalLevel());
+//        doctor.setHospitalName(bean.getHospitalName());
+//        doctor.setMobile(bean.getMobile());
+//        doctor.setName(bean.getName());
+//        doctor.setStatus(1);
+//        virtual.setClientLevel(bean.getClientLevel());
+//        virtual.setHospitalLevel(bean.getHospitalLevel());
+//        //TODO  获取主数据id
+//        logger.info("保存【{}】医生时查询主数据对应的医生id写入数据库", doctor.getName());
+//        if (StringUtils.isNotEmtity(bean.getHospitalName())) {
+//            Hcp hcp = masterDataService.getHcpByHciIdAndHcpName(bean.getHospitalName(), bean.getName());
+//            if (hcp != null) {
+//                logger.info("保存【{}】医生时查询主数据对应的医生id写入数据库,写入成功", doctor.getName());
+//                //doctor.setMasterDateId(hcp.getId());
+//                virtual.setMasterDateId(hcp.getId());
+//                doctor.setHospitalId(hcp.getHciId());
+//            }
 //        }
+//
+//        //TODO 营销数据
+////        DoctorVo vo = centerDataService.checkout(doctor);
+////        if(vo!=null){
+////            doctor.setEappId(vo.getId());
+////        }
+//
+//
+//
+//        //新增医生的多个手机号
+//        boolean f = false;
+//        Long id = doctor.getId();
+//        if (id == null || id == 0L){
+//            f = true;
+//        }
+//
+//
+//        doctor = doctorRepository.saveAndFlush(doctor);
+//
+//        if (doctor.getId() == null) {
+//            throw new BusinessException(ErrorEnum.ERROR.getStatus(), "医生添加失败");
+//        }
+//
+//        if (f){
+//            //添加医生的多个手机号
+//            DoctorTelephone doctorTelephone = new DoctorTelephone();
+//            doctorTelephone.setDoctorId(doctor.getId());
+//            doctorTelephone.setTelephone(doctor.getMobile());
+//            doctorTelephone.setCreateTime(new Date());
+//            doctorTelephone.setUpdateTime(new Date());
+//            doctorTelephoneRepository.save(doctorTelephone);
+//        }
+//
+//
+//
+//        virtual.setDoctorId(doctor.getId());
+//        virtual.setClientLevel(bean.getClientLevel());
+//        virtual.setHospitalLevel(bean.getHospitalLevel());
+//        doctorVirtualService.save(virtual);
+//        doctor.setDoctorVirtual(virtual);
+//        doctorRepository.saveAndFlush(doctor);
+//        //TODO 添加关系到关系表
+//        List<DrugUserDoctor> list = drugUserDoctorRepository.findByDoctorIdAndDrugUserIdAndProductId(doctor.getId(), bean.getDrugUserId(), bean.getProductId());
+//        if (list == null || list.isEmpty()) {
+//            DrugUserDoctor dud = new DrugUserDoctor();
+//            dud.setDoctorId(doctor.getId());
+//            dud.setProductId(bean.getProductId());
+//            dud.setDrugUserId(bean.getDrugUserId());
+//
+//            DrugUser drugUser = drugUserService.findById(bean.getDrugUserId());
+//            if(drugUser!=null){
+//                dud.setDrugUserName(drugUser.getName());
+//            }
+//            dud.setCreateTime(new Date());
+//            drugUserDoctorRepository.saveAndFlush(dud);
+//            doctorCallInfoRepository.updateDoctorIdAndDrugUserIdAndProductId(dud.getDoctorId(),dud.getDrugUserId(),dud.getProductId(),0);
+//        }
+//
+//
+//        Boolean flag = DoctorDynamicFieldValueService.add(doctor.getId(), bean.getList());
+//        if (!flag) {
+//            throw new BusinessException(ErrorEnum.ERROR.getStatus(), "医生动态属性数据添加修改");
+//        }
+//        return true;
+//    }
 
-        doctor = doctorRepository.saveAndFlush(doctor);
-        if (doctor.getId() == null) {
-            throw new BusinessException(ErrorEnum.ERROR.getStatus(), "医生修改失败");
-        }
-
-        virtual.setDoctorId(doctor.getId());
-        virtual.setClientLevel(bean.getClientLevel());
-        virtual.setHospitalLevel(bean.getHospitalLevel());
-        doctorVirtualService.save(virtual);
-
-        doctor.setDoctorVirtual(virtual);
-        doctorRepository.saveAndFlush(doctor);
-        //TODO 添加关系到关系表
-        drugUserDoctorRepository.deleteByDoctorIdAndDrugUserIdAndProductId(doctor.getId(), bean.getDrugUserId(), bean.getOldProductId());
-        doctorCallInfoRepository.updateDoctorIdAndDrugUserIdAndProductId(doctor.getId(), bean.getDrugUserId(), bean.getOldProductId(),1);
-        List<DrugUserDoctor> list = drugUserDoctorRepository.findByDoctorIdAndDrugUserIdAndProductId(doctor.getId(), bean.getDrugUserId(), bean.getProductId());
-        if (list == null || list.isEmpty()) {
-            DrugUserDoctor dud = new DrugUserDoctor();
-            dud.setDoctorId(doctor.getId());
-            dud.setProductId(bean.getProductId());
-            dud.setDrugUserId(bean.getDrugUserId());
-
-            DrugUser drugUser = drugUserService.findById(bean.getDrugUserId());
-            if(drugUser!=null){
-                dud.setDrugUserName(drugUser.getName());
-            }
-            dud.setCreateTime(new Date());
-            drugUserDoctorRepository.saveAndFlush(dud);
-            doctorCallInfoRepository.updateDoctorIdAndDrugUserIdAndProductId(dud.getDoctorId(),dud.getDrugUserId(),dud.getProductId(),0);
-        }
-
-
-        Boolean flag = DoctorDynamicFieldValueService.add(doctor.getId(), bean.getList());
-        if (!flag) {
-            throw new BusinessException(ErrorEnum.ERROR.getStatus(), "医生动态属性数据修改修改");
-        }
-        return true;
-    }
+//    /**
+//     * 修改doctor
+//     * @param bean
+//     * @return
+//     */
+//    @Transactional(readOnly = false)
+//    @CacheEvict(value = "virtual_rep_api_doctor", allEntries = true)
+//    public Boolean update(DoctorUpdateRequestBean bean) {
+//        Doctor doctor = doctorRepository.findTopByMobile(bean.getMobile());
+//        DoctorVirtual virtual = new DoctorVirtual();
+//        if (doctor == null) {
+//            doctor = new Doctor();
+//            virtual.setDrugUserIds(this.assembleLeaderPath(bean.getLeaderPath(), bean.getDrugUserId()));
+//        } else {
+//            virtual = doctor.getDoctorVirtual();
+//            if(virtual==null){
+//                virtual = new DoctorVirtual();
+//            }
+//            virtual.setDrugUserIds(this.assembleLeaderPath(this.assembleLeaderPath(virtual.getDrugUserIds(), bean.getDrugUserId()), bean.getDrugUserId()));
+//        }
+////        BeanUtils.copyProperties(bean,doctor);
+//        doctor.setCity(bean.getCity());
+//        //doctor.setClientLevel(bean.getClientLevel());
+//
+//        //TODO 获取医院id
+//        doctor.setDepartment(bean.getDepartment());
+//        doctor.setDoctorLevel(bean.getDoctorLevel());
+//        //doctor.setHospitalLevel(bean.getHospitalLevel());
+//        doctor.setHospitalName(bean.getHospitalName());
+//        doctor.setMobile(bean.getMobile());
+//        doctor.setName(bean.getDoctorName());
+//        virtual.setClientLevel(bean.getClientLevel());
+//        virtual.setHospitalLevel(bean.getHospitalLevel());
+//        //TODO  获取主数据id
+//        if (StringUtils.isNotEmtity(bean.getHospitalName())) {
+//            Hcp hcp = masterDataService.getHcpByHciIdAndHcpName(bean.getHospitalName(), bean.getDoctorName());
+//            if (hcp != null) {
+////                doctor.setMasterDateId(hcp.getId());
+//                virtual.setMasterDateId(hcp.getId());
+//                doctor.setHospitalId(hcp.getHciId());
+//            }
+//        }
+//
+//        //TODO 营销数据
+////        DoctorVo vo = centerDataService.checkout(doctor);
+////        if(vo!=null){
+////            doctor.setEappId(vo.getId());
+////        }
+//
+//        doctor = doctorRepository.saveAndFlush(doctor);
+//        if (doctor.getId() == null) {
+//            throw new BusinessException(ErrorEnum.ERROR.getStatus(), "医生修改失败");
+//        }
+//
+//        virtual.setDoctorId(doctor.getId());
+//        virtual.setClientLevel(bean.getClientLevel());
+//        virtual.setHospitalLevel(bean.getHospitalLevel());
+//        doctorVirtualService.save(virtual);
+//
+//        doctor.setDoctorVirtual(virtual);
+//        doctorRepository.saveAndFlush(doctor);
+//        //TODO 添加关系到关系表
+//        drugUserDoctorRepository.deleteByDoctorIdAndDrugUserIdAndProductId(doctor.getId(), bean.getDrugUserId(), bean.getOldProductId());
+//        doctorCallInfoRepository.updateDoctorIdAndDrugUserIdAndProductId(doctor.getId(), bean.getDrugUserId(), bean.getOldProductId(),1);
+//        List<DrugUserDoctor> list = drugUserDoctorRepository.findByDoctorIdAndDrugUserIdAndProductId(doctor.getId(), bean.getDrugUserId(), bean.getProductId());
+//        if (list == null || list.isEmpty()) {
+//            DrugUserDoctor dud = new DrugUserDoctor();
+//            dud.setDoctorId(doctor.getId());
+//            dud.setProductId(bean.getProductId());
+//            dud.setDrugUserId(bean.getDrugUserId());
+//
+//            DrugUser drugUser = drugUserService.findById(bean.getDrugUserId());
+//            if(drugUser!=null){
+//                dud.setDrugUserName(drugUser.getName());
+//            }
+//            dud.setCreateTime(new Date());
+//            drugUserDoctorRepository.saveAndFlush(dud);
+//            doctorCallInfoRepository.updateDoctorIdAndDrugUserIdAndProductId(dud.getDoctorId(),dud.getDrugUserId(),dud.getProductId(),0);
+//        }
+//
+//
+//        Boolean flag = DoctorDynamicFieldValueService.add(doctor.getId(), bean.getList());
+//        if (!flag) {
+//            throw new BusinessException(ErrorEnum.ERROR.getStatus(), "医生动态属性数据修改修改");
+//        }
+//        return true;
+//    }
 
 //    @Transactional(readOnly = false)
 //    public Boolean save(List<DraTable> list){

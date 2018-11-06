@@ -10,6 +10,7 @@ import javax.annotation.Resource;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
+import com.nuoxin.virtual.rep.api.web.controller.request.call.CallRequestBean;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -97,7 +98,14 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 
 		return false;
 	}
-	
+
+	@Override
+	public void saveCallInfo(CallRequestBean bean) {
+
+		callInfoMapper.saveCallInfo(bean);
+
+	}
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public PageResponseBean<List<CallVisitBean>> getCallVisitList(CallInfoListRequest request, String leaderPath) {

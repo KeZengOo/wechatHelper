@@ -16,6 +16,7 @@ import com.nuoxin.virtual.rep.api.enums.MessageTypeEnum;
 import com.nuoxin.virtual.rep.api.enums.UserTypeEnum;
 import com.nuoxin.virtual.rep.api.mybatis.DrugUserWechatMapper;
 import com.nuoxin.virtual.rep.api.mybatis.MessageMapper;
+import com.nuoxin.virtual.rep.api.service.v2_5.NewDoctorService;
 import com.nuoxin.virtual.rep.api.utils.*;
 import com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.vo.WechatMessageVo;
@@ -66,6 +67,11 @@ public class MessageService extends BaseService {
 
     @Resource
     private DrugUserWechatMapper drugUserWechatMapper;
+
+    @Resource
+    private NewDoctorService newDoctorService;
+
+
 
     public void downloadExcel(HttpServletResponse response) {
         response.setHeader("content-Type", "application/vnd.ms-excel");
@@ -299,7 +305,8 @@ public class MessageService extends BaseService {
         Matcher matcher = RegularUtils.getMatcher(RegularUtils.MATCH_ELEVEN_NUM, fileName);
         if (matcher.find()){
             String telephone = matcher.group();
-            Doctor doctor = doctorRepository.findTopByMobile(telephone);
+            //Doctor doctor = doctorRepository.findTopByMobile(telephone);
+            Doctor doctor = newDoctorService.findFirstByMobile(telephone);
             if (doctor == null){
                 throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "文件名中包含的手机号匹配不到医生！");
             }
