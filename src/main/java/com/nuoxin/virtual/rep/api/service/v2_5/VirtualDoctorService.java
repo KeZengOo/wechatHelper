@@ -37,7 +37,7 @@ public interface VirtualDoctorService {
 	 * @param virtualDoctorId  医生ID
 	 * @return 返回 VirtualDoctorBasicResponse 对象
 	 */
-	VirtualDoctorBasicResponse getVirtualDoctorBasic(Long virtualDoctorId);
+	VirtualDoctorBasicResponse getVirtualDoctorBasic(Long virtualDoctorId, String leaderPath);
 	
 	/**
 	 * 获取客户医生简要信息信息

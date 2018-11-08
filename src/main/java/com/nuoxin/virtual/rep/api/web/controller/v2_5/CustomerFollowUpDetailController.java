@@ -146,7 +146,7 @@ public class CustomerFollowUpDetailController extends NewBaseController {
 			virtualDoctorId = 0L;
 		}
 
-		VirtualDoctorBasicResponse virtualDoctorBasic = virtualDoctorService.getVirtualDoctorBasic(virtualDoctorId);
+		VirtualDoctorBasicResponse virtualDoctorBasic = virtualDoctorService.getVirtualDoctorBasic(virtualDoctorId, user.getLeaderPath());
 		DefaultResponseBean<VirtualDoctorBasicResponse> responseBean = new DefaultResponseBean<VirtualDoctorBasicResponse>();
 		responseBean.setData(virtualDoctorBasic);
 		return responseBean;

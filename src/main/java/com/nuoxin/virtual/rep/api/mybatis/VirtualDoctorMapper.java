@@ -21,7 +21,7 @@ public interface VirtualDoctorMapper {
 	 * @param virtualDoctorId
 	 * @return
 	 */
-	VirtualDoctorDO getVirtualDoctor(Long virtualDoctorId);
+	VirtualDoctorDO getVirtualDoctor(@Param(value="doctorId") Long virtualDoctorId,@Param(value="leaderPath") String leaderPath);
 	
 	/**
 	 * 根据 virtualDoctorId 获取医生简要信息
