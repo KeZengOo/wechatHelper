@@ -9,6 +9,7 @@ import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorMiniResponse;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.PrescriptionRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.SaveVirtualDoctorRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.UpdateVirtualDoctorRequest;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorDetailsResponseBean;
 import org.apache.ibatis.annotations.Param;
 
 public interface VirtualDoctorService {
@@ -53,4 +54,11 @@ public interface VirtualDoctorService {
 	 */
 	List<HospitalProvinceBean> getHospitals(String hospitalName);
 
+
+	/**
+	 * 根据联系方式获取详情
+	 * @param telephone
+	 * @return
+	 */
+	List<DoctorDetailsResponseBean> getDoctorListByTelephone(String telephone);
 }

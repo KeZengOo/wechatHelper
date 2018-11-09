@@ -172,31 +172,36 @@
 
 	<!-- 得到医生电话以及接通次数 -->
 	<select id="getTelephoneCallCount" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CallTelephoneReponseBean">
+		SELECT * FROM (
+		SELECT t.telephone,
+		(SELECT COUNT(*) FROM virtual_doctor_call_info WHERE mobile=t.telephone AND status_name = 'answer') callCount
+		 FROM (
+
 		SELECT
-			t.telephone,
-			IFNULL(COUNT(DISTINCT vdci.id), 0) callCount
-		FROM
-			(
-				SELECT
-					telephone
-				FROM
-					doctor
-				WHERE
-					id = #{doctorId}
-				AND LEFT (telephone, 1) = 1
-				UNION
-					SELECT
-						telephone
-					FROM
-						doctor_telephone
-					WHERE
-						doctor_id = #{doctorId}
-			) t
-		LEFT JOIN virtual_doctor_call_info vdci ON t.telephone = vdci.mobile
-		AND vdci.status_name = 'answer'
-		GROUP BY
-			vdci.mobile
-		ORDER BY callCount DESC
+							telephone
+						FROM
+							doctor
+						WHERE
+							id = #{doctorId}
+						AND LEFT (telephone, 1) = 1
+						UNION
+							SELECT
+								telephone
+							FROM
+								doctor_telephone
+							WHERE
+								doctor_id = #{doctorId}
+
+		) t
+		) a ORDER BY a.callCount DESC
+
 
 	</select>
+
+
+
+	<update id="updateCallProduct">
+		UPDATE virtual_doctor_call_info SET product_id=#{productId}
+		WHERE id = #{callId}
+	</update>
 </mapper>

@@ -80,5 +80,13 @@ public interface VirtualDoctorCallInfoMapper {
 	 * @return
 	 */
 	List<CallTelephoneReponseBean> getTelephoneCallCount(@Param(value = "doctorId") Long doctorId);
+
+	/**
+	 * 更新电话记录产品
+	 * @param callId
+	 * @param productId
+	 */
+	void updateCallProduct(@Param(value = "callId") Long callId,@Param(value = "productId") Long productId);
+
 }
 

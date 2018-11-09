@@ -3,6 +3,7 @@ package com.nuoxin.virtual.rep.api.web.controller.request.call;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -33,6 +34,7 @@ public class CallRequestBean implements Serializable {
     private Long productId;
     private Long drugUserId;
 
+    @NotNull(message = "医生ID不能为空")
     private Long doctorId;
 
     public String getMobile() {

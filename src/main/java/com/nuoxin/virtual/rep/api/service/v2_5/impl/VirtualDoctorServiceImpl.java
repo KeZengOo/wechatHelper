@@ -19,6 +19,7 @@ import com.nuoxin.virtual.rep.api.service.v2_5.DoctorDynamicFieldService;
 import com.nuoxin.virtual.rep.api.utils.RegularUtils;
 import com.nuoxin.virtual.rep.api.utils.StringUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.*;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorDetailsResponseBean;
 import org.springframework.stereotype.Service;
 
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
@@ -58,6 +59,9 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
     private DrugUserDoctorQuateMapper drugUserDoctorQuateMapper;
     @Resource
     private CommonService commonService;
+
+    @Resource
+    private DoctorMendMapper doctorMendMapper;
 
     @Resource(name = "dynamic")
     private DoctorDynamicFieldService doctorDynamicFieldService;
@@ -205,6 +209,17 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
     @Override
     public List<HospitalProvinceBean> getHospitals(String hospitalName) {
         return hospitalMapper.getHospitals(hospitalName);
+    }
+
+    @Override
+    public List<DoctorDetailsResponseBean> getDoctorListByTelephone(String telephone) {
+        List<DoctorDetailsResponseBean> list = new ArrayList<>();
+
+        List<DoctorDetailsResponseBean> doctorList = doctorMapper.getDoctorListByTelephone(telephone);
+        if (CollectionsUtil.isNotEmptyList(doctorList)){
+            list = doctorList;
+        }
+        return list;
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -521,6 +536,12 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
         if (CollectionsUtil.isNotEmptyList(telephones)) {
             // 更新医生的电话拜访信息
             virtualDoctorCallInfoMapper.updateCallInfoDoctorId(telephones, id);
+        }
+
+        String address = request.getAddress();
+        // 更新医生地址
+        if (StringUtil.isNotEmpty(address)){
+            doctorMendMapper.updateAddress(id, address);
         }
 
     }

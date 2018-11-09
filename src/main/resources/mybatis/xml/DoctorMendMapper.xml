@@ -16,5 +16,10 @@
 	<select id="getDoctorMend" resultType="java.lang.Long">
 		SELECT id FROM doctor_mend  WHERE virtual_doctor_id=#{virtualDoctorId}
 	</select>
+
+	<!-- 更新医生地址 -->
+	<update id="updateAddress">
+		UPDATE doctor_mend SET address=#{address} WHERE doctor_id=#{doctorId}
+	</update>
 	
 </mapper>

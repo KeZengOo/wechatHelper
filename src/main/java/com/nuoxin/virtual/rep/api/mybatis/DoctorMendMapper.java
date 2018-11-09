@@ -1,6 +1,7 @@
 package com.nuoxin.virtual.rep.api.mybatis;
 
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorMendParams;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;
 
 /**
@@ -29,4 +30,14 @@ public interface DoctorMendMapper {
 	 * @return
 	 */
 	Long getDoctorMend(VirtualDoctorMendParams virtualDoctorMendParams);
+
+
+	/**
+	 * 更新医生地址
+	 * @param doctorId
+	 * @param address
+	 */
+	void updateAddress(@Param(value = "doctorId") Long doctorId,@Param(value = "address") String address);
+
+
 }

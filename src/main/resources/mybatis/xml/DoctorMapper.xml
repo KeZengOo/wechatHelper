@@ -316,4 +316,36 @@
 		AND is_available=1
 	</select>
 
+	<!-- 根据联系方式获取医生列表 -->
+	<select id="getDoctorListByTelephone" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorDetailsResponseBean">
+		SELECT DISTINCT
+			d.id doctorId,
+			d.`name` doctorName,
+			h.id hospitalId,
+			d.hospital_name hospitalName,
+			h.`level` hospitalLevel,
+			h.province,
+			h.city,
+			d.depart department
+		FROM
+			doctor d
+		LEFT JOIN hospital h ON d.hospital_id = h.id
+		WHERE
+			d.id IN (
+				SELECT
+					id
+				FROM
+					doctor
+				WHERE
+					telephone = #{telephone}
+				UNION
+					SELECT
+						doctor_id
+					FROM
+						doctor_telephone
+					WHERE
+						telephone = #{telephone}
+			)
+	</select>
+
 </mapper>

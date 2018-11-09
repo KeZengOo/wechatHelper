@@ -149,8 +149,10 @@
 			</if>
 
 			<if test="city !=null and city !=''">
-				city = #{city}
+				city = #{city},
 			</if>
+
+			<if test=""></if>
 
 		</set>
 		where id=#{id}

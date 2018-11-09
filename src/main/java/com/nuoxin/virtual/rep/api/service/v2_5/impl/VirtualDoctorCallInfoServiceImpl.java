@@ -80,6 +80,10 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 			return true;
 		}
 
+		Integer productId = saveRequest.getProductId();
+
+		callInfoMapper.updateCallProduct(callId, productId.longValue());
+
 		return false;
 	}
 	
@@ -95,6 +99,9 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 
 			return true;
 		}
+
+		Integer productId = saveRequest.getProductId();
+		callInfoMapper.updateCallProduct(callId, productId.longValue());
 
 		return false;
 	}

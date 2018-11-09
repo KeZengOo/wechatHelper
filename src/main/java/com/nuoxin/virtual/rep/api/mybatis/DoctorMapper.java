@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.nuoxin.virtual.rep.api.entity.Doctor;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.SaveDoctorTelephoneRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorDetailsResponseBean;
 import org.apache.ibatis.annotations.Param;
 
 import com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean;
@@ -151,4 +152,12 @@ public interface DoctorMapper{
      * @return
      */
     Integer doctorProductCount(@Param(value = "doctorId") Long doctorId,@Param(value = "productId") Long productId);
+
+    /**
+     * 根据联系方式获取详情
+     * @param telephone
+     * @return
+     */
+    List<DoctorDetailsResponseBean> getDoctorListByTelephone(@Param(value = "telephone") String telephone);
+
 }

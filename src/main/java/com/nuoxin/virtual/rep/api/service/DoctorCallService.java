@@ -317,25 +317,26 @@ public class DoctorCallService extends BaseService {
      */
     @Transactional(readOnly = false)
     public CallRequestBean save(CallRequestBean bean){
-        DoctorCallInfo info = new DoctorCallInfo();
-        info.setSinToken(bean.getSinToken());
-        info.setStatus(bean.getStatus());
-        info.setStatusName(bean.getStatusName());
-        info.setMobile(bean.getMobile());
-        info.setType(bean.getType());
-        info.setDrugUserId(bean.getDrugUserId());
-        info.setProductId(bean.getProductId());
+//        DoctorCallInfo info = new DoctorCallInfo();
+//        info.setSinToken(bean.getSinToken());
+//        info.setStatus(bean.getStatus());
+//        info.setStatusName(bean.getStatusName());
+//        info.setMobile(bean.getMobile());
+//        info.setType(bean.getType());
+//        info.setDrugUserId(bean.getDrugUserId());
+//        info.setProductId(bean.getProductId());
+
         
         //Doctor doctor = doctorRepository.findTopByMobile(bean.getMobile());
-        Doctor doctor = newDoctorService.findFirstByMobile(bean.getMobile());
-        info.setDoctor(doctor);
-        
-        DrugUser drugUser = drugUserService.findById(bean.getDrugUserId());
-        info.setDrugUser(drugUser);
+//        Doctor doctor = newDoctorService.findFirstByMobile(bean.getMobile());
+//        info.setDoctor(doctor);
+//
+//        DrugUser drugUser = drugUserService.findById(bean.getDrugUserId());
+//        info.setDrugUser(drugUser);
         //doctorCallInfoRepository.saveAndFlush(info);
-        if (doctor != null){
-            bean.setDoctorId(doctor.getId());
-        }
+//        if (doctor != null){
+//            bean.setDoctorId(doctor.getId());
+//        }
         virtualDoctorCallInfoService.saveCallInfo(bean);
         
 //        Long infoId = info.getId();
@@ -344,8 +345,8 @@ public class DoctorCallService extends BaseService {
         DoctorCallInfoDetails infoDetails = new DoctorCallInfoDetails();
 //        infoDetails.setCallId(infoId);
         infoDetails.setCallId(bean.getId());
-        infoDetails.setStatus(info.getStatus());
-        infoDetails.setStatusName(info.getStatusName());
+        infoDetails.setStatus(bean.getStatus());
+        infoDetails.setStatusName(bean.getStatusName());
         infoDetails.setCreateTime(new Date());
         doctorCallInfoDetailsRepository.save(infoDetails);
         

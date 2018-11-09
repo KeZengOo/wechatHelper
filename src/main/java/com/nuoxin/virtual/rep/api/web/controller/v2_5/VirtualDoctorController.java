@@ -11,12 +11,9 @@ import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.enums.RoleTypeEnum;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.PrescriptionRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.UpdateVirtualDoctorRequest;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorDetailsResponseBean;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
@@ -119,4 +116,25 @@ public class VirtualDoctorController extends NewBaseController {
 		
 		return responseBean;
 	}
+
+
+
+	@SuppressWarnings("unchecked")
+	@ApiOperation(value = "新版根据联系方式获取医生接口")
+	@RequestMapping(value = "/details/{telephone}", method = { RequestMethod.GET })
+	public DefaultResponseBean<List<DoctorDetailsResponseBean>> getDoctorListByTelephone(HttpServletRequest request,@PathVariable(value = "telephone") String telephone
+																		) {
+		DrugUser user = this.getDrugUser(request);
+		if (user == null) {
+			return super.getLoginErrorResponse();
+		}
+
+		List<DoctorDetailsResponseBean> doctorList = virtualDoctorService.getDoctorListByTelephone(telephone);
+		DefaultResponseBean<List<DoctorDetailsResponseBean>> responseBean = new DefaultResponseBean<>();
+		responseBean.setData(doctorList);
+
+		return responseBean;
+	}
+
+
 }
