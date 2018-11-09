@@ -58,6 +58,11 @@
         	(#{virtualDoctorId}, #{virtualDrugUserId}, #{virtualQuestionnaireId}, #{callId}, 
         	#{item.virtualQuestionId}, #{item.answer}, NOW())
     	</foreach >
-	</insert> 
+	</insert>
+
+
+	<select id="getCountByCallId" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM virtual_doctor_questionnaire WHERE call_id=#{callId}
+	</select>
 	
 </mapper>

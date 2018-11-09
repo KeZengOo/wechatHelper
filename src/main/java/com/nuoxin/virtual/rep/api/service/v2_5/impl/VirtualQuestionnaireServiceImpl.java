@@ -63,8 +63,13 @@ public class VirtualQuestionnaireServiceImpl implements VirtualQuestionnaireServ
 		int effectNum = 0;
 		List<VirtualQuestionRequestBean> questions = request.getQuestions();
 		if (CollectionsUtil.isNotEmptyList(questions)) {
-			effectNum = questionnaireMapper.saveQuestionnaire(request.getVirtualDoctorId(), request.getVirtualDrugUserId(),
-					request.getVirtualQuestionaireId(), request.getCallId(), questions);
+			Integer count = questionnaireMapper.getCountByCallId(request.getCallId());
+			// 记录不存在的时候再进行保存，防止重复提交
+			if (count ==null || count == 0){
+				effectNum = questionnaireMapper.saveQuestionnaire(request.getVirtualDoctorId(), request.getVirtualDrugUserId(),
+						request.getVirtualQuestionaireId(), request.getCallId(), questions);
+			}
+
 		}
 		
 		return effectNum;

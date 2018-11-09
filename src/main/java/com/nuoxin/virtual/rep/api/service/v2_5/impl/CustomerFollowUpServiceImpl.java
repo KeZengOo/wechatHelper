@@ -7,6 +7,8 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorCallInfoMapper;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -23,10 +25,6 @@ import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.ListRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.ScreenRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.SearchRequestBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CustomerFollowListBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ProductInfoResponse;
-import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ProductTableHeader;
-import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.TableHeader;
 
 import shaded.org.apache.commons.lang3.StringUtils;
 
@@ -43,6 +41,10 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 
 	@Resource
 	private DrugUserDoctorQuateMapper drugUserDoctorQuateMapper;
+
+	@Resource
+	private VirtualDoctorCallInfoMapper virtualDoctorCallInfoMapper;
+
 
 	/**
 	 * 初始化表头信息
@@ -221,9 +223,15 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 //		}
 
 
-		List<String> doctorTelephoneList = doctorMapper.getDoctorTelephone(doctor.getDoctorId());
-		if (CollectionsUtil.isNotEmptyList(doctorTelephoneList)){
-			doctor.setMobiles(doctorTelephoneList);
+//		List<String> doctorTelephoneList = doctorMapper.getDoctorTelephone(doctor.getDoctorId());
+//		if (CollectionsUtil.isNotEmptyList(doctorTelephoneList)){
+//			doctor.setMobiles(doctorTelephoneList);
+//		}
+
+
+		List<CallTelephoneReponseBean> telephoneCallCount = virtualDoctorCallInfoMapper.getTelephoneCallCount(doctor.getDoctorId());
+		if (CollectionsUtil.isNotEmptyList(telephoneCallCount)){
+			doctor.setMobiles(telephoneCallCount);
 		}
 
 

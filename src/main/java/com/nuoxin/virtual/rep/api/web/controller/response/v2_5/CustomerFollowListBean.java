@@ -38,7 +38,9 @@ public class CustomerFollowListBean implements Serializable {
     private String thirdaryDoctorMobile;
     
     @ApiModelProperty(value = "手机号 1主,2次,3三")
-	private List<String> mobiles = new ArrayList<>(3);
+	//private List<String> mobiles = new ArrayList<>(3);
+
+    private List<CallTelephoneReponseBean> mobiles = new ArrayList<>(3);
     
     @ApiModelProperty(value = "医生所在医院名称")
     private String hospitalName;

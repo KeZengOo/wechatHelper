@@ -153,15 +153,15 @@ public class DoctorService extends BaseService {
             return null;
         }
         responseBean.setCity(doctor.getCity());
-        responseBean.setClientLevel(doctor.getDoctorVirtual().getClientLevel());
+//        responseBean.setClientLevel(doctor.getDoctorVirtual().getClientLevel());
         responseBean.setDepartment(doctor.getDepartment());
         responseBean.setDoctorId(doctor.getId());
         responseBean.setDoctorLevel(doctor.getDoctorLevel());
         responseBean.setDoctorName(doctor.getName());
         responseBean.setHospitalId(doctor.getHospitalId());
-        responseBean.setHospitalLevel(doctor.getDoctorVirtual().getHospitalLevel());
+//        responseBean.setHospitalLevel(doctor.getDoctorVirtual().getHospitalLevel());
         responseBean.setHospitalName(doctor.getHospitalName());
-        responseBean.setMasterDateId(doctor.getDoctorVirtual().getMasterDateId());
+//        responseBean.setMasterDateId(doctor.getDoctorVirtual().getMasterDateId());
 //        responseBean.setMobile(doctor.getMobile());
         responseBean.setTelephoneList(doctor.getTelephoneList());
         responseBean.setProvince(doctor.getProvince());

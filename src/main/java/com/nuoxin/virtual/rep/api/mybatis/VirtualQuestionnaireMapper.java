@@ -55,4 +55,14 @@ public interface VirtualQuestionnaireMapper {
 			                          @Param(value = "virtualQuestionnaireId") Integer virtualQuestionnaireId, 
 			                          @Param(value = "callId") Long callId,
 			                          @Param(value = "questions") List<VirtualQuestionRequestBean> questions);
+
+
+	/**
+	 * 查询总数,用于校验记录是否存在
+	 * @param callId
+	 * @return
+	 */
+	Integer getCountByCallId(@Param(value = "callId") Long callId);
+
+
 }
