@@ -127,7 +127,13 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 
         String wechat = request.getWechat();
         if (StringUtil.isNotEmpty(wechat)) {
-            virtualDoctorMapper.updateDoctorWechat(request.getId(), wechat);
+            Integer count = doctorMendMapper.getCountByDoctorId(request.getId());
+            if (count == null || count == 0){
+                doctorMendMapper.addWechat(request.getId(), wechat);
+            }else {
+                doctorMendMapper.updateWechat(request.getId(), wechat);
+            }
+//            virtualDoctorMapper.updateDoctorWechat(request.getId(), wechat);
         }
 
         virtualDoctorMapper.updateIsAddWechat(request.getId(), user.getId(), request.getIsAddWechat());
@@ -136,7 +142,15 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
         String address = request.getAddress();
         // 更新医生地址
         if (StringUtil.isNotEmpty(address)){
-            doctorMendMapper.updateAddress(request.getId(), address);
+//            doctorMendMapper.updateAddress(request.getId(), address);
+
+
+            Integer count = doctorMendMapper.getCountByDoctorId(request.getId());
+            if (count == null || count == 0){
+                doctorMendMapper.addAddress(request.getId(), address);
+            }else {
+                doctorMendMapper.updateAddress(request.getId(), address);
+            }
         }
 
     }

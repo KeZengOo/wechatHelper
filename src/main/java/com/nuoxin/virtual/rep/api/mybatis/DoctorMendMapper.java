@@ -31,6 +31,27 @@ public interface DoctorMendMapper {
 	 */
 	Long getDoctorMend(VirtualDoctorMendParams virtualDoctorMendParams);
 
+	/**
+	 * 新增医生微信
+	 * @param doctorId
+	 * @param wechat
+	 */
+	void addWechat(@Param(value = "doctorId") Long doctorId,@Param(value = "wechat") String wechat);
+
+	/**
+	 * 更新医生微信
+	 * @param doctorId
+	 * @param wechat
+	 */
+	void updateWechat(@Param(value = "doctorId") Long doctorId,@Param(value = "wechat") String wechat);
+
+
+	/**
+	 * 新增医生地址
+	 * @param doctorId
+	 * @param address
+	 */
+	void addAddress(@Param(value = "doctorId") Long doctorId,@Param(value = "address") String address);
 
 	/**
 	 * 更新医生地址
@@ -39,5 +60,11 @@ public interface DoctorMendMapper {
 	 */
 	void updateAddress(@Param(value = "doctorId") Long doctorId,@Param(value = "address") String address);
 
+	/**
+	 * 根据医生ID查询总数，校验数据是否存在
+	 * @param doctorId
+	 * @return
+	 */
+	Integer getCountByDoctorId(@Param(value = "doctorId") Long doctorId);
 
 }
