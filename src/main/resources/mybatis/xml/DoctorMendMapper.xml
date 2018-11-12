@@ -19,7 +19,7 @@
 
 	<!-- 更新医生地址 -->
 	<update id="updateAddress">
-		UPDATE doctor_mend SET address=#{address} WHERE doctor_id=#{doctorId}
+		UPDATE doctor_mend SET address=#{address} WHERE virtual_doctor_id=#{doctorId}
 	</update>
 	
 </mapper>

@@ -132,6 +132,13 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 
         virtualDoctorMapper.updateIsAddWechat(request.getId(), user.getId(), request.getIsAddWechat());
 
+
+        String address = request.getAddress();
+        // 更新医生地址
+        if (StringUtil.isNotEmpty(address)){
+            doctorMendMapper.updateAddress(request.getId(), address);
+        }
+
     }
 
     @Override
@@ -538,11 +545,7 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
             virtualDoctorCallInfoMapper.updateCallInfoDoctorId(telephones, id);
         }
 
-        String address = request.getAddress();
-        // 更新医生地址
-        if (StringUtil.isNotEmpty(address)){
-            doctorMendMapper.updateAddress(id, address);
-        }
+
 
     }
 
