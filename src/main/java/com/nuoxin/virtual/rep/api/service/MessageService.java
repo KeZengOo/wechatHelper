@@ -310,6 +310,7 @@ public class MessageService extends BaseService {
             if (doctor == null){
                 throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "文件名中包含的手机号匹配不到医生！");
             }
+            doctor.setMobile(telephone);
             return doctor;
         }else {
             throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "文件名中没有包含手机号！");

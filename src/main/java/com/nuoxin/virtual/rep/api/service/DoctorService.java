@@ -923,7 +923,7 @@ public class DoctorService extends BaseService {
         doctor.setDepartment(excel.getDepartment());
         String mobiles = excel.getMobile();
         if (mobiles.contains("，")){
-            mobiles.replaceAll("，",",");
+            mobiles = mobiles.replaceAll("，",",");
         }
 
         String[] mobileArray = mobiles.split(",");
