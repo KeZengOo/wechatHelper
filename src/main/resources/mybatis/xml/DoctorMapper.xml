@@ -141,7 +141,7 @@
 
 	</select>
 
-	
+
 	<!-- 根据过滤条件获取医生拜访列表信息(不含对应的产品信息) -->
 	<select id="getList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CustomerFollowListBean">
 		<!-- 根据 virtualDrugUserIds 获取对应医生基本信息 -->
@@ -297,6 +297,14 @@
 			(#{d.doctorId}, #{d.telephone}, #{d.type})
 		</foreach>
 	</insert>
+
+	<select id="doctorProductInfo" resultType="com.nuoxin.virtual.rep.api.web.controller.response.call.CallDoctorResponseBean">
+		SELECT t.id AS doctorId,t.name,t.telephone mobile,t.`positions` title,
+		t1.`name` hospital,t1.`level` AS hospitalLevel,t.subdivision_depart AS department
+		FROM doctor t
+		LEFT JOIN hospital t1 ON t.hospital_id=t1.`id`
+		WHERE t.id=#{doctorId}
+	</select>
 
 	<!-- 得到医生的联系方式 -->
 	<select id="getDoctorTelephone" resultType="java.lang.String">

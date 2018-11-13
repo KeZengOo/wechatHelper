@@ -8,6 +8,7 @@ import com.nuoxin.virtual.rep.api.web.controller.response.work.TodayStatisticsRe
 import org.apache.ibatis.annotations.Param;
 
 
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -74,4 +75,12 @@ public interface DoctorCallInfoMapper {
      * @return
      */
     int getDoctorVisitDetailListCount(StatisticsParams statisticsParams);
+
+    /**
+     * 代表跟医生的上一次拜访时间
+     * @param doctorId
+     * @param drugUserId
+     * @return
+     */
+    Date lastVisitTime(@Param(value = "drugUserId")Long drugUserId,@Param(value = "doctorId")Long doctorId);
 }

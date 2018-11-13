@@ -6,7 +6,9 @@ import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.mybatis.DrugUserMapper;
 import com.nuoxin.virtual.rep.api.mybatis.DynamicFieldMapper;
+import com.nuoxin.virtual.rep.api.mybatis.VirtualProductVisitResultMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.CustomerSetService;
+import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DoctorDynamicFieldRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DynamicFieldProductRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.customer.DoctorDynamicFieldResponseBean;
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 客户设置相关业务方法
@@ -31,6 +34,9 @@ public class CustomerSetServiceImpl implements CustomerSetService {
 
     @Resource
     private DrugUserMapper drugUserMapper;
+
+    @Resource
+    private VirtualProductVisitResultMapper virtualProductVisitResultMapper;
 
     @Override
     public List<DoctorDynamicFieldResponseBean> getBasicAndHospitalFieldList() {
@@ -93,18 +99,34 @@ public class CustomerSetServiceImpl implements CustomerSetService {
         Integer page = bean.getPage();
         Integer pageSize = bean.getPageSize();
         bean.setCurrentSize(page  * pageSize);
-
         PageResponseBean<DynamicFieldProductResponseBean> pageEmpty = new PageResponseBean<>();
         Integer dynamicFieldProductListCount = dynamicFieldMapper.getDynamicFieldProductListCount(bean);
         if (dynamicFieldProductListCount != null && dynamicFieldProductListCount > 0){
             List<DynamicFieldProductResponseBean> dynamicFieldProductList = dynamicFieldMapper.getDynamicFieldProductList(bean);
-            PageResponseBean<DynamicFieldProductResponseBean> pageResponseBean = new PageResponseBean<>(bean, dynamicFieldProductListCount, dynamicFieldProductList);
-            return pageResponseBean;
-
+            if(!CollectionsUtil.isEmptyList(dynamicFieldProductList)) {
+                //提取产品id列表
+                List<Long> productIds = dynamicFieldProductList.stream().map(DynamicFieldProductResponseBean::getProductId).collect(Collectors.toList());
+                //那些产品初始化过数据
+                List<Long> ps = virtualProductVisitResultMapper.selectProductVisitResult(productIds);
+                for (DynamicFieldProductResponseBean x : dynamicFieldProductList) {
+                    //默认没初始化
+                    x.setVisitStatus(2);
+                    if (!CollectionsUtil.isEmptyList(ps)) {
+                        for (Long x1 : ps) {
+                            //找到数据则认为是已经初始化的数据
+                            if (x.getProductId().equals(x1)) {
+                                x.setVisitStatus(1);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            pageEmpty = new PageResponseBean<>(bean, dynamicFieldProductListCount, dynamicFieldProductList);
+        }
+        return pageEmpty;
         }
 
-        return pageEmpty;
-    }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)

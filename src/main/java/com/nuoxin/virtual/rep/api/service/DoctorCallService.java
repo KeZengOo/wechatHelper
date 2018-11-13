@@ -14,6 +14,13 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import com.nuoxin.virtual.rep.api.entity.v2_5.ProductBean;
+import com.nuoxin.virtual.rep.api.enums.HospitalLevelEnum;
+import com.nuoxin.virtual.rep.api.mybatis.DoctorCallInfoMapper;
+import com.nuoxin.virtual.rep.api.mybatis.DoctorMapper;
+import com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorMapper;
+import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
+import com.nuoxin.virtual.rep.api.web.controller.response.call.CallDoctorResponseBean;
 import com.nuoxin.virtual.rep.api.service.v2_5.NewDoctorService;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualDoctorCallInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,9 +91,17 @@ public class DoctorCallService extends BaseService {
     private ProductLineService productLineService;
     @Autowired
     private OssService ossService;
-    
+    @Resource
+    private CommonService commonService;
     @Resource
     private FileService fileService;
+    @Resource
+    private DoctorMapper doctorMapper;
+    @Resource
+    private DoctorCallInfoMapper doctorCallInfoMapper;
+    @Resource
+    private DrugUserDoctorMapper drugUserDoctorMapper;
+
 
     @Resource
     private NewDoctorService newDoctorService;
@@ -94,7 +109,7 @@ public class DoctorCallService extends BaseService {
     @Resource
     private VirtualDoctorCallInfoService virtualDoctorCallInfoService;
 
-    
+
     @Deprecated
     public String uploadUrl() throws Exception{
         fileService.downLoadFromUrl("http://106.75.91.226/16?file=/app/clpms/record/20171211/103_nxclcc_8001_13799438628_20171211185149_1512989509171.wav","test.wav",path);
@@ -577,5 +592,34 @@ public class DoctorCallService extends BaseService {
         }
         return responseBean;
     }
-   
+
+    /**
+     * 医生产品列表及基本信息
+     * @param drugUserId
+     * @param doctorId
+     * @return
+     */
+    public CallDoctorResponseBean doctorProductInfo(Long drugUserId, Long doctorId) {
+        //获取医生基本信息
+        CallDoctorResponseBean bean =doctorMapper.doctorProductInfo(doctorId);
+        if(bean!=null){
+            //医院级别
+            if(bean.getHospitalLevel()!=null){
+                bean.setHospitalLevelStr(HospitalLevelEnum.getName(bean.getHospitalLevel()));
+            }
+            //产品列表
+            bean.setProducts(drugUserDoctorMapper.getProducts(drugUserId,bean.getDoctorId()));
+            //上次拜访时间
+            bean.setLastVisitTime(doctorCallInfoMapper.lastVisitTime(drugUserId,bean.getDoctorId()));
+            //上次拜访时间转化为几天前
+            if (bean.getLastVisitTime() != null) {
+                long visitTimeDelta = System.currentTimeMillis() - bean.getLastVisitTime().getTime();
+                String lastVisitTime = commonService.alterLastVisitTimeContent(visitTimeDelta);
+                bean.setVisitTimeStr(lastVisitTime);
+            } else {
+                bean.setVisitTimeStr("无");
+            }
+        }
+        return bean;
+    }
 }

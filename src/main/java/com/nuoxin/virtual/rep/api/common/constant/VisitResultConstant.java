@@ -15,6 +15,7 @@ public class VisitResultConstant {
 	public static final String SERVICEPHONE = "服务电话";
 	public static final String DOCTORREFUSED = "医生拒绝";
 	public static final String CALLLATER = "稍后致电";
+	public static final String NONCONTACT = "非联系人";
 
 	/**
 	 * 接触医生数参数
