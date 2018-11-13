@@ -3,20 +3,21 @@ package com.nuoxin.virtual.rep.api.web.controller.v2_5;
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
+import com.nuoxin.virtual.rep.api.entity.v2_5.ProductVisitResultParams;
+import com.nuoxin.virtual.rep.api.entity.v2_5.ProductVisitResultResponse;
 import com.nuoxin.virtual.rep.api.service.v2_5.CustomerSetService;
-import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.ListRequestBean;
+import com.nuoxin.virtual.rep.api.service.v2_5.VirtualProductVisitResultService;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DoctorDynamicFieldRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DynamicFieldProductRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.customer.DoctorDynamicFieldResponseBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CustomerFollowListBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DynamicFieldProductResponseBean;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -30,6 +31,9 @@ public class CustomerSetController extends NewBaseController{
 
     @Resource
     private CustomerSetService customerSetService;
+
+    @Resource
+    private VirtualProductVisitResultService virtualProductVisitResultService;
 
 
     @ApiOperation(value = "客户设置动态字段列表", notes = "客户设置动态字段列表")
@@ -174,5 +178,57 @@ public class CustomerSetController extends NewBaseController{
         responseBean.setData(true);
         return responseBean;
     }
+
+    @ApiOperation(value = "拜访结果列表", notes = "拜访结果列表")
+    @GetMapping(value = "/product/visit/result/list/{productId}")
+    public DefaultResponseBean<List<ProductVisitResultResponse>> visitResultList(@PathVariable(value = "productId") Long productId) {
+        List<ProductVisitResultResponse> res=virtualProductVisitResultService.selectVisitResultList(productId);
+        DefaultResponseBean<List<ProductVisitResultResponse>> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(res);
+        return responseBean;
+    }
+
+    @ApiOperation(value = "拜访结果新增", notes = "拜访结果新增")
+    @PostMapping(value = "/product/visit/result/add")
+    public DefaultResponseBean<?> visitResultAdd(@Valid @RequestBody ProductVisitResultParams param) {
+        int status=virtualProductVisitResultService.batchInsert(param);
+        if(status==0){
+            return super.getParamsErrorResponse("新增失败");
+        }else if(status==-1){
+            return super.getParamsErrorResponse("该产品下已经有此拜访结果");
+        }
+        DefaultResponseBean<Integer> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(status);
+        return responseBean;
+    }
+
+    @ApiOperation(value = "拜访结果编辑", notes = "拜访结果编辑")
+    @PostMapping(value = "/product/visit/result/update")
+    public DefaultResponseBean<Integer> visitResultUpdate(@Valid @RequestBody ProductVisitResultParams param) {
+        if(null!=param&&param.getId()==null){
+            return super.getParamsErrorResponse("id is null");
+        }
+        int status=virtualProductVisitResultService.update(param);
+        if(status==0){
+            return super.getParamsErrorResponse("修改失败");
+        }
+        DefaultResponseBean<Integer> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(status);
+        return responseBean;
+    }
+
+    @ApiOperation(value = "初始化拜访结果", notes = "初始化拜访结果")
+    @GetMapping(value = "/product/visit/result/initialization/{productId}")
+    public DefaultResponseBean<Integer> visitResultInitialization(@PathVariable(value = "productId") Long productId) {
+        int status=virtualProductVisitResultService.visitResultInitialization(productId);
+        if(status==0){
+            return super.getParamsErrorResponse("初始化失败");
+        }
+        DefaultResponseBean<Integer> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(status);
+        return responseBean;
+    }
+
+
 
 }

@@ -28,5 +28,8 @@ public class DynamicFieldProductResponseBean implements Serializable {
     @ApiModelProperty(value = "更新时间")
     private String updateTime;
 
+    @ApiModelProperty(value = "拜访结果初始化状态 1已初始化 2未初始化")
+    private Integer visitStatus;
+
 
 }

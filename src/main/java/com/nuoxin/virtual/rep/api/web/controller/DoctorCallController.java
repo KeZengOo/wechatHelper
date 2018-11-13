@@ -8,6 +8,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.nuoxin.virtual.rep.api.web.controller.response.call.CallDoctorResponseBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -130,6 +131,22 @@ public class DoctorCallController extends BaseController {
         responseBean.setData(result);
         return responseBean;
     }
+
+    @ApiOperation(value = "获取销售名下医生的产品及基本信息", notes = "获取销售名下医生的产品及基本信息")
+    @PostMapping("/druguser/doctor/info")
+    public DefaultResponseBean<CallDoctorResponseBean> drugUserDoctorInfo(HttpServletRequest request,@RequestBody Long doctorId) {
+        DefaultResponseBean<CallDoctorResponseBean> responseBean = new DefaultResponseBean();
+        DrugUser drugUser = this.getLoginUser(request);
+        if (drugUser == null) {
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
+        }
+        CallDoctorResponseBean bean=doctorCallService.doctorProductInfo(drugUser.getId(),doctorId);
+        responseBean.setData(bean);
+        return responseBean;
+    }
+
 
     @ApiOperation(value = "客户电话搜索列表", notes = "客户电话搜索列表")
     @PostMapping("/doctor/page")

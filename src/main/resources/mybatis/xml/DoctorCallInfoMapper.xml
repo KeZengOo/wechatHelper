@@ -429,4 +429,9 @@
 
     </select>
 
+    <select id="lastVisitTime" resultType="java.util.Date">
+        SELECT MAX(t.create_time) lastVisitTime FROM virtual_doctor_call_info t
+        WHERE virtual_drug_user_id =#{drugUserId} AND virtual_doctor_id=#{doctorId}
+    </select>
+
 </mapper>
