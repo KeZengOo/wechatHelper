@@ -290,7 +290,15 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 	private ConvertResult doBuildConvertResult(String sinToken, String calledNo, String monitorFilenameUrl,
 			String begin, String end, String callType, String statusName) {
 		ConvertResult convertResult = new ConvertResult();
-		
+
+		// 开始时间或者结束时间为空的一般都是电话未接通的，所以回调时间返回的是空
+		// 为了保证电话时间正确性，开始时间和结束时间都一样
+		if (StringUtil.isEmpty(begin)){
+			begin = DateUtil.getDateTimeString(new Date());
+			end = DateUtil.getDateTimeString(new Date());
+		}
+
+
 		convertResult.setSinToken(sinToken);
 		convertResult.setCalledNo(calledNo);
 		convertResult.setMonitorFilenameUrl(monitorFilenameUrl);
