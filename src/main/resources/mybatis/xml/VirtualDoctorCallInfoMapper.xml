@@ -204,4 +204,11 @@
 		UPDATE virtual_doctor_call_info SET product_id=#{productId}
 		WHERE id = #{callId}
 	</update>
+
+
+	<!-- 更新录音文本 -->
+	<insert id="updateCallUrlText">
+		REPLACE INTO virtual_doctor_call_text(sin_token, call_text) VALUES(#{sinToken}, #{callText})
+	</insert>
+
 </mapper>

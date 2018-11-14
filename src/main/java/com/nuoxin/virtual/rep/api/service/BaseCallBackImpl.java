@@ -5,6 +5,8 @@ import java.io.File;
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
 
+import com.nuoxin.virtual.rep.api.utils.SpeechRecognitionUtil;
+import com.nuoxin.virtual.rep.api.utils.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -65,10 +67,29 @@ public abstract class BaseCallBackImpl implements CallBackService {
 			this.updateUrl(callOssUrl, result.getStatus(), result.getStatusName(), callId, result.getCallTime());
 		}
 
+		this.updateCallUrlText(sinToken, callOssUrl);
 		logger.warn("回调执行成功! sinToken:{}, status:{}, statusName:{}, downloadUrl:{}", 
 				sinToken, result.getStatus(), result.getStatusName(), callOssUrl);
 	}
-	
+
+	/**
+	 * 更新电话录音地址
+	 * @param sinToken
+	 * @param callOssUrl
+	 */
+	protected void updateCallUrlText(String sinToken, String callOssUrl) {
+		if (StringUtil.isNotEmpty(sinToken) && StringUtil.isNotEmpty(callOssUrl)){
+			try {
+				String callText = SpeechRecognitionUtil.getSpeechRecognitionResult(callOssUrl);
+				callInfoMapper.updateCallUrlText(sinToken, callText);
+			}catch (Exception e){
+				logger.error("BaseCallBackImpl updateCallUrlText(String sinToken, String callOssUrl) error !!! sinToken={}, callOssUrl={}", sinToken, callOssUrl, e);
+			}
+
+		}
+
+	}
+
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**

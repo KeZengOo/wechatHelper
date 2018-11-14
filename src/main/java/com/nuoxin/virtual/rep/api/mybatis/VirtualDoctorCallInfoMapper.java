@@ -88,5 +88,13 @@ public interface VirtualDoctorCallInfoMapper {
 	 */
 	void updateCallProduct(@Param(value = "callId") Long callId,@Param(value = "productId") Long productId);
 
+
+	/**
+	 * 更新录音文本
+	 * @param sinToken
+	 * @param callText
+	 */
+	void updateCallUrlText(@Param(value = "sinToken") String sinToken,@Param(value = "callText") String callText);
+
 }
 

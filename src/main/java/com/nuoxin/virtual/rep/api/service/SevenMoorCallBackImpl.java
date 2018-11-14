@@ -156,7 +156,7 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 			return;
 		}
 
-		saveOrUpdateDealingCallList(dealingList);
+		this.saveOrUpdateDealingCallList(dealingList);
 
 	}
 
@@ -182,9 +182,10 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 					}catch (Exception e){
 						logger.error("sinToken={} 文件上传失败", call_sheet_id, e);
 					}
-					if (!StringUtils.isEmpty(originFilePath)){
+					if (!StringUtils.isEmpty(ossFilePath)){
 
 						doctorCallInfoMapper.updateCallUrlBySigToken(ossFilePath, call_sheet_id);
+						super.updateCallUrlText(call_sheet_id, ossFilePath);
 						logger.info("sinToken={} 的电话记录，没有call_url，更新成功！", call_sheet_id);
 					}
 				}else {
@@ -226,6 +227,7 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 				retryCallInfoRequestBean.setCreateTime(beginTime);
 				retryCallInfoRequestBean.setType(type);
 				doctorCallInfoMapper.addRetryCallInfo(retryCallInfoRequestBean);
+				super.updateCallUrlText(call_sheet_id, ossFilePath);
 				logger.info("sinToken={} 的电话记录，库里不存在，新增成功！", call_sheet_id);
 			}
 		}
