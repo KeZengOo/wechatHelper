@@ -128,4 +128,12 @@ public class CallRequestBean implements Serializable {
     public void setDoctorId(Long doctorId) {
         this.doctorId = doctorId;
     }
+
+    public Integer getVisitChannel() {
+        return visitChannel;
+    }
+
+    public void setVisitChannel(Integer visitChannel) {
+        this.visitChannel = visitChannel;
+    }
 }

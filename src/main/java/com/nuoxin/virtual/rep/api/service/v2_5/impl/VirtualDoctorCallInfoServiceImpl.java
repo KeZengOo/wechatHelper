@@ -3,6 +3,7 @@ package com.nuoxin.virtual.rep.api.service.v2_5.impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -108,6 +109,17 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 
 	@Override
 	public void saveCallInfo(CallRequestBean bean) {
+
+		Integer visitChannel = bean.getVisitChannel();
+		if (visitChannel == null || visitChannel == 0){
+			// 1 是电话
+			visitChannel = 1;
+		}
+
+		if (visitChannel != null){
+			String uuid = UUID.randomUUID().toString();
+			bean.setSinToken(uuid);
+		}
 
 		callInfoMapper.saveCallInfo(bean);
 
