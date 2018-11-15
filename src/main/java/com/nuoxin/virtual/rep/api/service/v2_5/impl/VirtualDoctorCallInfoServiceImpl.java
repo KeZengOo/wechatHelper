@@ -110,16 +110,6 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	@Override
 	public void saveCallInfo(CallRequestBean bean) {
 
-		Integer visitChannel = bean.getVisitChannel();
-		if (visitChannel == null || visitChannel == 0){
-			// 1 是电话
-			visitChannel = 1;
-		}
-
-		if (visitChannel != null){
-			String uuid = UUID.randomUUID().toString();
-			bean.setSinToken(uuid);
-		}
 
 		callInfoMapper.saveCallInfo(bean);
 

@@ -8,6 +8,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.nuoxin.virtual.rep.api.utils.StringUtil;
 import com.nuoxin.virtual.rep.api.web.controller.response.call.CallDoctorResponseBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -205,8 +206,13 @@ public class DoctorCallController extends BaseController {
             responseBean.setMessage("登录失效");
             return responseBean;
         }
-        
-        if(!StringUtils.isNotEmtity(bean.getSinToken())){
+
+        // 1是电话
+        Integer visitChannel = bean.getVisitChannel();
+        if (visitChannel == null || visitChannel == 0){
+            visitChannel = 1;
+        }
+        if(visitChannel !=null &&  visitChannel == 1 && StringUtil.isEmpty(bean.getSinToken())){
             responseBean.setCode(500);
             responseBean.setMessage("sinToken不能为空");
             return responseBean;
