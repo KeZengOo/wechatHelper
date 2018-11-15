@@ -164,9 +164,9 @@
 
 	<!-- 保存电话记录 -->
 	<insert id="saveCallInfo" keyProperty="id" useGeneratedKeys="true" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.call.CallRequestBean">
-		INSERT INTO virtual_doctor_call_info(sin_token, virtual_doctor_id, mobile, virtual_drug_user_id, status, status_name, call_time, call_url, type, product_id)
+		INSERT INTO virtual_doctor_call_info(sin_token,visit_channel, virtual_doctor_id, mobile, virtual_drug_user_id, status, status_name, call_time, call_url, type, product_id)
 		VALUES
-		(#{sinToken}, #{doctorId}, #{mobile}, #{drugUserId}, #{status}, #{statusName}, #{times}, #{url}, #{type}, #{productId})
+		(#{sinToken},#{visitChannel}, #{doctorId}, #{mobile}, #{drugUserId}, #{status}, #{statusName}, #{times}, #{url}, #{type}, #{productId})
 	</insert>
 
 

@@ -30,6 +30,9 @@ public class CallRequestBean implements Serializable {
     @ApiModelProperty(value = "录音文件url")
     private String url;
 
+    @ApiModelProperty(value = "拜访渠道，默认是电话1，2是微信，3是短信，4邮件，5面谈")
+    private Integer visitChannel = 1;
+
     @ApiModelProperty(value = "产品id")
     private Long productId;
     private Long drugUserId;
