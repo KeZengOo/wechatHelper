@@ -145,20 +145,21 @@
 	<!-- 根据过滤条件获取医生拜访列表信息(不含对应的产品信息) -->
 	<select id="getList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CustomerFollowListBean">
 		<!-- 根据 virtualDrugUserIds 获取对应医生基本信息 -->
-		SELECT 
-			d.id AS doctorId, d.name AS doctorName, d.telephone AS doctorMobile, 
+		SELECT
+			d.id AS doctorId, d.name AS doctorName, d.telephone AS doctorMobile,
 			d. sex AS gender, d.depart AS department, d.hospital_name AS hospitalName,d.email, d.positions AS title,IFNULL(h.level,0) hospitalLevel,
 			tel_visit.create_time AS visitTime,tel_visit.next_visit_time AS nextVisitTime,tel_visit.visit_result AS visitResult,
-			dm.wechat, dm.secondary_mobile AS secondaryDoctorMobile, dm.thirdary_mobile AS thirdaryDoctorMobile
+			dm.wechat, dm.secondary_mobile AS secondaryDoctorMobile, dm.thirdary_mobile AS thirdaryDoctorMobile,temp.doctorCreateTime
 		FROM doctor d
 		LEFT JOIN hospital h ON d.hospital_id=h.id
 		LEFT JOIN doctor_mend dm
 			ON d.id=dm.virtual_doctor_id
 		JOIN (
+
 			<!-- 根据 virtualDrugUserIds 获取对应的 doctorIds -->
-			SELECT 
-				DISTINCT doctor_id 
-			FROM drug_user_doctor 
+			SELECT
+				doctor_id,min(DATE_FORMAT(modify_time,'%Y-%m-%d %H:%i:%s')) doctorCreateTime
+			FROM drug_user_doctor
 			WHERE is_available=1 AND drug_user_id IN
 				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
 		   			#{virtualDrugUserId}
@@ -171,6 +172,7 @@
                   #{productLineId}
   				</foreach> 
 			</if>
+		   GROUP BY doctor_id
 	  	) temp  ON  d.id=temp.doctor_id
 	  	
 	  	<!-- 搜索 -->
@@ -199,7 +201,33 @@
 		) tel_visit ON tel_visit.virtual_doctor_id=d.id
 		
 		GROUP BY d.id
-		ORDER BY visitTime DESC <!-- OTHER ORDER BY TODO  -->
+		<if test="order ==null or order ==0">
+			ORDER BY tel_visit.next_visit_time ASC
+		</if>
+
+		<if test="order !=null and order !=0">
+			<if test="order == 1">
+				ORDER BY tel_visit.next_visit_time DESC
+			</if>
+
+			<if test="order == 2">
+				ORDER BY tel_visit.create_time DESC
+			</if>
+
+			<if test="order == 3">
+				ORDER BY tel_visit.create_time ASC
+			</if>
+
+			<if test="order == 4">
+				ORDER BY temp.doctorCreateTime DESC
+			</if>
+
+			<if test="order == 5">
+				ORDER BY temp.doctorCreateTime ASC
+			</if>
+		</if>
+
+
 		LIMIT #{currentSize},#{pageSize}
 	</select>
 

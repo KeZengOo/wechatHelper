@@ -30,5 +30,9 @@ public class ScreenRequestBean extends PageRequestBean {
 	 */
 	@ApiModelProperty(value="产品线ids")
 	private List<Long> productLineIds;
-	
+
+	@ApiModelProperty(value = "排序规则，默认是下次拜访时间由近及远排序，1下次拜访时间由远及近排序，" +
+			"2上次拜访时间由近及远，3是上次拜访时间由远及近，4是创建时间由近及远，5是创建时间由远及近")
+	private Integer order;
+
 }

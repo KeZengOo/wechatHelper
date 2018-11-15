@@ -69,7 +69,10 @@ public class CustomerFollowListBean implements Serializable {
 
     @ApiModelProperty(value = "下次拜访日期")
     private String nextVisitDateTime;
-    
+
+    @ApiModelProperty(value = "医生创建时间")
+    private String doctorCreateTime;
+
     @JsonIgnore
     private String visitResult; 
     @ApiModelProperty(value = "拜访结果")

@@ -82,13 +82,14 @@ public interface DoctorMapper{
      * @param pageSize offset
      * @param search  搜索内容(mobile,department,doctorName)
      * @param productLineIds 产品线 IDs
+     * @param order  排序规则
      * @return 返回符合过滤条件的医生列表信息
      */
     List<CustomerFollowListBean> getList(@Param(value = "virtualDrugUserIds") List<Long> virtualDrugUserIds,
     		                                                    @Param(value = "currentSize")int currentSize, 
     		                                                    @Param(value = "pageSize")int pageSize, 
     		                                                    @Param(value = "search")String search,
-    		                                                    @Param(value = "productLineIds") List<Long> productLineIds);
+    		                                                    @Param(value = "productLineIds") List<Long> productLineIds,@Param(value = "order") Integer order);
     /**
      * 根据手机号列表查询医生
      * @param mobiles
