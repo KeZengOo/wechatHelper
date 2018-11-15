@@ -126,12 +126,12 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 	public void repeatSaveOrUpdateCall(Call7mmorRequestBean bean) {
 
 		String beginTime = bean.getBeginTime();
-		// 如果没有开始时间，取当前时间前6天的时间
+		// 如果没有开始时间，取当前时间前天的时间
 		if (StringUtils.isEmpty(beginTime)){
 			Date date=new Date();
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTime(date);
-			calendar.add(Calendar.DAY_OF_MONTH, -6);
+			calendar.add(Calendar.DAY_OF_MONTH, -1);
 			date = calendar.getTime();
 			bean.setBeginTime(DateUtil.getDateTimeString(date));
 		}

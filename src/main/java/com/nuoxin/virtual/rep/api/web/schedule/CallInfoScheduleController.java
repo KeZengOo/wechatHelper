@@ -1,15 +1,12 @@
-package com.nuoxin.virtual.rep.api.web.controller.v2_5.schedule;
+package com.nuoxin.virtual.rep.api.web.schedule;
 
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
-import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.service.CallBackService;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.Call7mmorRequestBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ContentShareResponseBean;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
