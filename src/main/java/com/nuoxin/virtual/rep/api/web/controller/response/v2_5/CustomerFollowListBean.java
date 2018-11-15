@@ -29,6 +29,9 @@ public class CustomerFollowListBean implements Serializable {
     private Byte gender;
     @ApiModelProperty(value = "邮箱")
     private String email;
+    @ApiModelProperty(value = "医生职称")
+    private String title;
+
     
     @JsonIgnore
     private String doctorMobile;
@@ -44,6 +47,10 @@ public class CustomerFollowListBean implements Serializable {
     
     @ApiModelProperty(value = "医生所在医院名称")
     private String hospitalName;
+
+    @ApiModelProperty(value = "医院等级")
+    private Integer hospitalLevel;
+
     @ApiModelProperty(value = "医生所在科室")
     private String department;
     
@@ -51,11 +58,17 @@ public class CustomerFollowListBean implements Serializable {
     private String visitTimeStr;
     @JsonIgnore
     private Date visitTime;
+
+    @ApiModelProperty(value = "上次拜访日期")
+    private String beforeVisitDateTime;
     
     @JsonIgnore
     private Date nextVisitTime;
     @ApiModelProperty(value = "下次拜访时间")
     private String nextVisitTimeStr;
+
+    @ApiModelProperty(value = "下次拜访日期")
+    private String nextVisitDateTime;
     
     @JsonIgnore
     private String visitResult; 

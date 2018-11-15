@@ -8,6 +8,7 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorCallInfoMapper;
+import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -241,6 +242,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 			long visitTimeDelta = System.currentTimeMillis() - visitTime.getTime();
 			String lastVisitTime = commonService.alterLastVisitTimeContent(visitTimeDelta);
 			doctor.setVisitTimeStr(lastVisitTime);
+			doctor.setBeforeVisitDateTime(DateUtil.getDateTimeString(visitTime));
 		} else {
 			doctor.setVisitTimeStr("无");
 		}
@@ -250,6 +252,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		if (nextVisitTime != null) {
 			String nextVisitTimeStr = commonService.alterNextVisitTimeContent(nextVisitTime);
 			doctor.setNextVisitTimeStr(nextVisitTimeStr);
+			doctor.setNextVisitDateTime(DateUtil.getDateTimeString(nextVisitTime));
 		} else {
 			doctor.setNextVisitTimeStr("无");
 		}
