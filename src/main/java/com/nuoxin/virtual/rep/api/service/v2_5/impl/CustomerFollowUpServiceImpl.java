@@ -336,6 +336,13 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		nextVisitTime.setLabel("下次拜访时间");
 		nextVisitTime.setName("nextVisitTimeStr");
 		tableHeaders.add(nextVisitTime);
+
+
+		TableHeader doctorCreateTime = new TableHeader();
+		nextVisitTime.setLabel("医生创建时间");
+		nextVisitTime.setName("doctorCreateTime");
+		tableHeaders.add(doctorCreateTime);
+
 		
 		TableHeader isBreakOff = new TableHeader();
 		isBreakOff.setLabel("是否脱落");

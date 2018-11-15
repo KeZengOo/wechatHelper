@@ -17,6 +17,7 @@
                 inner join product_line pl
                 on dud.prod_id=pl.prod_id
                 where 1=1
+                and vdci.visit_channel=1
                 and dud.is_available=1
                 <if test="productId != null and productId !=0">
                     and dud.prod_id=#{productId}
@@ -42,6 +43,7 @@
                 on dud.prod_id=pl.prod_id
                 where 1=1
                 and dud.is_available=1
+                and vdci.visit_channel=1
                 <if test="productId!=null and productId !=0">
                     and dud.prod_id=#{productId}
                     and vdci.product_id = #{productId}
@@ -95,6 +97,7 @@
         on dud.prod_id=pl.prod_id
         where 1=1
         and dud.is_available=1
+        and vdci.visit_channel=1
         and dud.prod_id=#{productId}
         and vdci.product_id=#{productId}
 
@@ -111,7 +114,8 @@
 
     <!-- 测试的 -->
     <select id="getCallInfoList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.call.CallInfoResponseBean">
-          select id,sin_token sinToken,info_json infoJson from virtual_doctor_call_info where call_time > 0 and ( call_url is null or call_url='') order by create_time desc
+          select id,sin_token sinToken,info_json infoJson from virtual_doctor_call_info
+          where visit_channel=1 and call_time > 0 and ( call_url is null or call_url='') order by create_time desc
     </select>
 
     <update id="updateCallUrl">
@@ -219,6 +223,7 @@
         ON d.id=dv.doctor_id AND dv.product_id=#{productId}
         WHERE
         dud.is_available = 1
+        AND vdci.visit_channel=1
         AND dud.prod_id = #{productId}
 
         <if test="drugUserId!=null">
@@ -371,7 +376,7 @@
         ) call_dud ON vdci.virtual_doctor_id = call_dud.doctorId
         WHERE
         vdci.product_id=#{productId}
-
+        AND vdci.visit_channel=1
         <if test="startTime!=null and startTime!=''">
             and date_format(vdci.create_time,'%Y-%m-%d') &gt;=#{startTime}
         </if>
@@ -431,7 +436,7 @@
 
     <select id="lastVisitTime" resultType="java.util.Date">
         SELECT MAX(t.create_time) lastVisitTime FROM virtual_doctor_call_info t
-        WHERE virtual_drug_user_id =#{drugUserId} AND virtual_doctor_id=#{doctorId}
+        WHERE visit_channel=1 AND virtual_drug_user_id =#{drugUserId} AND virtual_doctor_id=#{doctorId}
     </select>
 
 </mapper>

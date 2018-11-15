@@ -48,7 +48,7 @@ public interface DoctorCallInfoRepository extends JpaRepository<DoctorCallInfo,L
      * @return
      */
     @Query(value = "select count(DISTINCT v1.id) num from virtual_doctor_call_info v1 join drug_user_doctor dud on dud.doctor_id=v1.virtual_doctor_id join virtual_doctor_call_info_details v2 on v1.id=v2.call_id join doctor_virtual d on d.doctor_id=v1.virtual_doctor_id join drug_user du on du.id=v1.virtual_drug_user_id " +
-            " where dud.is_available=1 and v1.type=:type and v1.del_flag=0 and du.leader_path like :drugUserIds and v2.status_name='answer'",nativeQuery = true)
+            " where dud.is_available=1 and v1.visit_channel=1 and v1.type=:type and v1.del_flag=0 and du.leader_path like :drugUserIds and v2.status_name='answer'",nativeQuery = true)
     Long statDrugUserIdsCount(@Param("drugUserIds") String drugUserIds,@Param("type") Integer type);
 
     /**
@@ -59,7 +59,7 @@ public interface DoctorCallInfoRepository extends JpaRepository<DoctorCallInfo,L
      * @return
      */
     @Query(value = "select count(DISTINCT v1.id) num from virtual_doctor_call_info v1 join drug_user_doctor dud on dud.doctor_id=v1.virtual_doctor_id join virtual_doctor_call_info_details v2 on v1.id=v2.call_id join doctor_virtual d on d.doctor_id=v1.virtual_doctor_id join drug_user du on du.id=v1.virtual_drug_user_id " +
-            " where dud.is_available=1 and v1.type=:type and v1.del_flag=0 and du.leader_path like :drugUserIds and v2.status_name=:statusName",nativeQuery = true)
+            " where dud.is_available=1 and v1.visit_channel=1 and v1.type=:type and v1.del_flag=0 and du.leader_path like :drugUserIds and v2.status_name=:statusName",nativeQuery = true)
     Long statDrugUserIdsCallCount(@Param("drugUserIds") String drugUserIds,@Param("type") Integer type,@Param("statusName") String statusName);
 
     DoctorCallInfo findBySinToken(String sinToken);
