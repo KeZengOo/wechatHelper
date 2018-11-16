@@ -223,7 +223,7 @@
         ON d.id=dv.doctor_id AND dv.product_id=#{productId}
         WHERE
         dud.is_available = 1
-        AND vdci.visit_channel=1
+
         AND dud.prod_id = #{productId}
 
         <if test="drugUserId!=null">
@@ -233,7 +233,7 @@
         ) call_dud ON vdci.virtual_doctor_id = call_dud.doctorId
         WHERE
         vdci.product_id=#{productId}
-
+        AND vdci.visit_channel=1
         <if test="startTime!=null and startTime!=''">
             and date_format(vdci.create_time,'%Y-%m-%d') &gt;=#{startTime}
         </if>
