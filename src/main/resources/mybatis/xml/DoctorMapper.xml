@@ -403,7 +403,7 @@
 			#{drugUserId}
 		</foreach>
 
-		LIMIT limitNum
+		LIMIT #{limitNum}
 
 	</select>
 

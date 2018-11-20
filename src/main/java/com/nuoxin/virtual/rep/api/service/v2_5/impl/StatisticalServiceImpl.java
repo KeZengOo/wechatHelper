@@ -3,10 +3,12 @@ package com.nuoxin.virtual.rep.api.service.v2_5.impl;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.constant.StatisticalConstant;
 import com.nuoxin.virtual.rep.api.common.constant.VisitResultConstant;
+import com.nuoxin.virtual.rep.api.dao.DrugUserRepository;
 import com.nuoxin.virtual.rep.api.entity.DoctorDynamicFieldValue;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.v2_5.*;
 import com.nuoxin.virtual.rep.api.enums.RoleTypeEnum;
+import com.nuoxin.virtual.rep.api.enums.SaleUserTypeEnum;
 import com.nuoxin.virtual.rep.api.enums.VisitResultTypeEnum;
 import com.nuoxin.virtual.rep.api.mybatis.*;
 import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
@@ -51,6 +53,8 @@ public class StatisticalServiceImpl implements StatisticalService {
     private DrugUserMapper drugUserMapper;
     @Resource
     private DoctorMapper doctorMapper;
+    @Resource
+    private DrugUserRepository drugUserRepository;
 
     /**
      * 医生拜访明细表·分页
@@ -322,19 +326,25 @@ public class StatisticalServiceImpl implements StatisticalService {
     }
 
     @Override
-    public List<DoctorDetailsResponseBean> getDoctorList(DrugUser drugUser, Long productId, Integer limitNum) {
+    public List<DoctorDetailsResponseBean> getDoctorList(Long drugUserId, Long productId, Integer limitNum) {
 
-        List<DoctorDetailsResponseBean> list = new ArrayList<>();
-        Long roleId = drugUser.getRoleId();
-        if (RoleTypeEnum.MANAGER.getType().equals(roleId)){
+        DrugUser drugUser = drugUserRepository.findFirstById(drugUserId);
+        Integer userType = drugUser.getUserType();
+        if (SaleUserTypeEnum.DRUG_USER.getUserType().equals(userType)){
             List<Long> drugUserIdList = drugUserMapper.getSubordinateIdsByLeaderPath(drugUser.getLeaderPath());
             if (CollectionsUtil.isNotEmptyList(drugUserIdList)){
                 List<DoctorDetailsResponseBean> doctorList = doctorMapper.getDoctorList(drugUserIdList, productId, limitNum);
+                if (CollectionsUtil.isNotEmptyList(doctorList)){
+                    return doctorList;
+                }
             }
-        }
-
-        if (RoleTypeEnum.SALE.getType().equals(roleId)){
-
+        }else {
+            List<Long> drugUserIdList = new ArrayList<>(1);
+            drugUserIdList.add(drugUser.getId());
+            List<DoctorDetailsResponseBean> doctorList = doctorMapper.getDoctorList(drugUserIdList, productId, limitNum);
+            if (CollectionsUtil.isNotEmptyList(doctorList)){
+                return doctorList;
+            }
         }
 
         return null;

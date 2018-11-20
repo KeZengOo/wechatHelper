@@ -54,10 +54,10 @@ public interface StatisticalService {
 
 	/**
 	 * 得到医生列表，用于下拉列表
-	 * @param drugUser
+	 * @param drugUserId
 	 * @param productId
 	 * @param limitNum
 	 * @return
 	 */
-	List<DoctorDetailsResponseBean> getDoctorList(DrugUser drugUser, Long productId, Integer limitNum);
+	List<DoctorDetailsResponseBean> getDoctorList(Long drugUserId, Long productId, Integer limitNum);
 }

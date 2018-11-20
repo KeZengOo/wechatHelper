@@ -49,4 +49,14 @@ public class StatisticsParams extends PageRequestBean {
 	 */
 	private Integer visitResultType;
 
+	/**
+	 * 拜访渠道
+	 */
+	private Integer visitChannel;
+
+	/**
+	 * 拜访结果ID
+	 */
+	private List<Long> visitResultIdList;
+
 }

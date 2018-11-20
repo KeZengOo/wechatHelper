@@ -15,6 +15,7 @@ import com.nuoxin.virtual.rep.api.service.v2_5.VirtualDoctorService;
 import com.nuoxin.virtual.rep.api.utils.ExportExcel;
 import com.nuoxin.virtual.rep.api.utils.ExportExcelTitle;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.SaveVirtualDoctorRequest;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorDetailsResponseBean;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -199,6 +200,29 @@ public class StatisticalController extends NewBaseController {
 		List<StatisticsResponse> data=drugUserDoctorMapper.getDrugUserIdByProductId(productId,user.getLeaderPath());
 		DefaultResponseBean<List<StatisticsResponse>> responseBean = new DefaultResponseBean<>();
 		responseBean.setData(data);
+		return responseBean;
+	}
+
+
+
+	@ApiOperation(value = "根据产品id查询销售列表")
+	@ResponseBody
+	@RequestMapping(value = "/doctor/list/{drugUserId}/{productId}/{limitNum}", method = { RequestMethod.GET })
+	public DefaultResponseBean<List<DoctorDetailsResponseBean>> getDoctorList(HttpServletRequest request,
+																				  @PathVariable(value = "drugUserId") Long drugUserId,
+																				  @PathVariable(value = "productId") Long productId,
+																				  @PathVariable(value = "limitNum") Integer limitNum) {
+		DrugUser user = this.getDrugUser(request);
+		if (user == null) {
+			return super.getLoginErrorResponse();
+		}
+		if(productId==null){
+			return super.getParamsErrorResponse("ProductId is null");
+		}
+
+		List<DoctorDetailsResponseBean> doctorList = statisticalService.getDoctorList(drugUserId, productId, limitNum);
+		DefaultResponseBean<List<DoctorDetailsResponseBean>> responseBean = new DefaultResponseBean<>();
+		responseBean.setData(doctorList);
 		return responseBean;
 	}
 
