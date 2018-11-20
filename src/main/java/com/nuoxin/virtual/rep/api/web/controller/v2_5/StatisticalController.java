@@ -15,6 +15,7 @@ import com.nuoxin.virtual.rep.api.service.v2_5.VirtualDoctorService;
 import com.nuoxin.virtual.rep.api.utils.ExportExcel;
 import com.nuoxin.virtual.rep.api.utils.ExportExcelTitle;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.SaveVirtualDoctorRequest;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CallTimeResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorDetailsResponseBean;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -129,6 +130,8 @@ public class StatisticalController extends NewBaseController {
 			return super.getParamsErrorResponse("ProductId is null");
 		}
 		Map<String,Object> map=new HashMap<>();
+		CallTimeResponseBean callTime = statisticalService.getCallTime(statisticsParams);
+		map.put("call",callTime);
 		List<DynamicFieldResponse> list=statisticalService.getDynamicFieldByProductId(statisticsParams.getProductId(),statisticsParams.getProductName());
 		map.put("lable",list);
 		statisticsParams.setType(page);

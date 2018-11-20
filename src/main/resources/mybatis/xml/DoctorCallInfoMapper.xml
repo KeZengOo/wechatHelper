@@ -466,8 +466,67 @@
 
     </select>
     
-    
-    <!--<select id=""></select>-->
+    <!-- 得到电话统计 -->
+    <select id="getCallTime" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CallTimeResponseBean">
+
+        SELECT
+        SUM(call_time) callTime,
+        COUNT(*) callCount
+        FROM virtual_doctor_call_info WHERE status_name='answer' AND  id IN (
+
+        SELECT
+        DISTINCT vdci.id
+        FROM
+        virtual_doctor_call_info vdci
+        LEFT JOIN virtual_doctor_call_info_mend vdcim ON vdci.id=vdcim.call_id
+
+        <if test="visitResultIdList !=null and visitResultIdList.size > 0">
+            LEFT JOIN virtual_doctor_call_info_result vdcir
+            ON vdcim.id=vdcir.mend_id
+        </if>
+
+
+        INNER JOIN (
+        SELECT DISTINCT
+        d.id doctorId,d.`name` doctorName,d.hospital_name hospitalName,IFNULL(dv.client_level,'') clientLevel,du.`name`
+        drugUserName
+        FROM
+        doctor d
+        INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+        INNER JOIN drug_user du ON dud.drug_user_id = du.id
+        LEFT JOIN doctor_virtual dv
+        ON d.id=dv.doctor_id AND dv.product_id=#{productId}
+        WHERE
+        dud.is_available = 1
+
+        AND dud.prod_id = #{productId}
+
+        <if test="drugUserId!=null">
+            and du.id=#{drugUserId}
+        </if>
+
+        ) call_dud ON vdci.virtual_doctor_id = call_dud.doctorId
+        WHERE
+        vdci.product_id=#{productId}
+        AND vdci.visit_channel=1
+
+        <if test="visitResultIdList !=null and visitResultIdList.size > 0">
+            AND vdcir.result_id IN
+            <foreach collection="visitResultIdList" item="visitResultId" open="(" close=")" separator=",">
+                #{visitResultId}
+            </foreach>
+        </if>
+
+
+        <if test="startTime!=null and startTime!=''">
+            and date_format(vdci.create_time,'%Y-%m-%d') &gt;=#{startTime}
+        </if>
+        <if test="endTime!=null  and endTime!=''">
+            and date_format(vdci.create_time,'%Y-%m-%d') &lt;=#{endTime}
+        </if>
+
+        )
+    </select>
     
 
     <select id="lastVisitTime" resultType="java.util.Date">

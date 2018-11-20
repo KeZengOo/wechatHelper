@@ -17,10 +17,10 @@ public class CallTimeResponseBean implements Serializable {
     private static final long serialVersionUID = -2311627192579683554L;
 
     @ApiModelProperty(value = "通话时长，单位秒")
-    private Integer callTime;
+    private Integer callTime = 0;
 
     @ApiModelProperty(value = "接通次数")
-    private Integer callCount;
+    private Integer callCount = 0;
 
 
 }

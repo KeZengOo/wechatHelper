@@ -75,9 +75,12 @@ public class StatisticalServiceImpl implements StatisticalService {
 
     @Override
     public CallTimeResponseBean getCallTime(StatisticsParams statisticsParams) {
-
-
-        return null;
+        CallTimeResponseBean callTimeResponseBean = new CallTimeResponseBean();
+        CallTimeResponseBean callTime = doctorCallInfoMapper.getCallTime(statisticsParams);
+        if (callTime != null){
+            callTimeResponseBean = callTime;
+        }
+        return callTimeResponseBean;
     }
 
     /**
