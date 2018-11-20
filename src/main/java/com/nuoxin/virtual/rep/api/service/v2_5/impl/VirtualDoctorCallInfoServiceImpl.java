@@ -1,9 +1,6 @@
 package com.nuoxin.virtual.rep.api.service.v2_5.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -11,6 +8,8 @@ import javax.annotation.Resource;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
+import com.nuoxin.virtual.rep.api.enums.RecruitEnum;
+import com.nuoxin.virtual.rep.api.mybatis.*;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.CallRequestBean;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
@@ -23,10 +22,6 @@ import com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitMendBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitStatisticsBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorQuateParams;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoParams;
-import com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorMapper;
-import com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorQuateMapper;
-import com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorCallInfoMapper;
-import com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorCallInfoMendMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualDoctorCallInfoService;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualQuestionnaireService;
@@ -56,6 +51,11 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	private VirtualDoctorCallInfoMendMapper callInfoMendMapper;
 	@Resource
 	private DrugUserDoctorQuateMapper drugUserDoctorQuateMapper;
+	@Resource
+	private DrugUserDoctorQuateResultMapper drugUserDoctorQuateResultMapper;
+
+	@Resource
+	private VirtualDoctorCallInfoResultMapper virtualDoctorCallInfoResultMapper;
 	
 	@Override
 	public CallVisitStatisticsBean getCallVisitListStatistics(Long virtualDoctorId, String leaderPath) {
@@ -125,6 +125,17 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 
 	}
 
+	@Override
+	public Integer getProductRecruit(Long productId, Long doctorId) {
+
+		Integer productRecruit = drugUserDoctorQuateMapper.getProductRecruit(productId, doctorId);
+		if (productRecruit == null){
+			productRecruit = RecruitEnum.UNKOWN.getType();
+		}
+
+		return productRecruit;
+	}
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public PageResponseBean<List<CallVisitBean>> getCallVisitList(CallInfoListRequest request, String leaderPath) {
@@ -159,22 +170,37 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 			saveRequest.setVirtualDoctorId(0L);
 		}
 
-		List<String> results = saveRequest.getVisitResult();
-		if (CollectionsUtil.isNotEmptyList(results)) {
-			results.forEach(result -> {
-				if (StringUtils.isNotBlank(result)) {
-					if ("成功招募".equals(result)) {
-						// 设置为成功招募
-						saveRequest.setIsRecruit(1);
-					}
-				}
-			});
-			
-			if (saveRequest.getIsRecruit() == null) {
-				// 未知
-				saveRequest.setIsRecruit(-1);
-			}
+//		List<String> results = saveRequest.getVisitResult();
+//		if (CollectionsUtil.isNotEmptyList(results)) {
+//			results.forEach(result -> {
+//				if (StringUtils.isNotBlank(result)) {
+//					if ("成功招募".equals(result)) {
+//						// 设置为成功招募
+//						saveRequest.setIsRecruit(1);
+//					}
+//				}
+//			});
+//
+//			if (saveRequest.getIsRecruit() == null) {
+//				// 未知
+//				saveRequest.setIsRecruit(-1);
+//			}
+//		}
+
+		Integer recruitStatus = saveRequest.getRecruitStatus();
+		if (recruitStatus == null){
+			recruitStatus = RecruitEnum.SUCCESS_RECRUIT.getType();
 		}
+
+		// 校验招募状态是否输入的合法
+		if (recruitStatus.equals(RecruitEnum.SUCCESS_RECRUIT.getType()) ||
+			recruitStatus.equals(RecruitEnum.DROP_OUT.getType())){
+			saveRequest.setIsRecruit(recruitStatus);
+		}else {
+			saveRequest.setIsRecruit(RecruitEnum.SUCCESS_RECRUIT.getType());
+		}
+
+
 	}
 	
 	private void configSaveCallInfoUnConnectedRequest(SaveCallInfoUnConnectedRequest saveRequest) {
@@ -236,8 +262,26 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 			callVisitParams.setNextVisitTime(null);
 		}
 		callInfoMendMapper.saveVirtualDoctorCallInfoMend(callVisitParams);
+
+		SaveCallInfoRequest saveCallInfoRequest = (SaveCallInfoRequest) saveRequest;
+		this.saveCallInfoResult(callVisitParams.getId(), saveCallInfoRequest.getVisitResultId());
+		
+
+
 	}
-	
+
+	/**
+	 * 保存通过记录拜访结果
+	 * @param id
+	 * @param visitResultId
+	 */
+	private void saveCallInfoResult(Long id, List<Long> visitResultId) {
+		if (id !=null && id > 0 && CollectionsUtil.isNotEmptyList(visitResultId)){
+			virtualDoctorCallInfoResultMapper.batchInsert(id, visitResultId);
+		}
+
+	}
+
 	/**
 	 * 保存问卷做题结果
 	 * @param saveRequest
@@ -263,7 +307,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		relationShipParams.setVirtualDrugUserId(request.getVirtualDrugUserId());
 		relationShipParams.setDoctorId(request.getVirtualDoctorId());
 		relationShipParams.setIsBreakOff(request.getIsBreakOff()); // 是否脱落来自页面传值(接通/未接通)
-
+		List<Long> visitResultId = null;
 		if (request instanceof SaveCallInfoRequest) {
 			SaveCallInfoRequest saveRequest = (SaveCallInfoRequest)request;
 			
@@ -272,7 +316,8 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 			relationShipParams.setIsTarget(saveRequest.getIsTarget()); // 是否目标客户
 			relationShipParams.setIsHasAe(saveRequest.getIsHasAe()); //是否AE
 			relationShipParams.setHcpPotential(saveRequest.getHcpPotential());
-	
+			visitResultId = saveRequest.getVisitResultId();
+
 			Integer productId = saveRequest.getProductId();
 			if (productId != null && productId > 0){
 				relationShipParams.setProductLineId(productId);
@@ -288,8 +333,21 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		
 		// 变更关系
 		drugUserDoctorQuateMapper.replaceRelationShipInfo(relationShipParams);
+		this.saveDrugUserDoctorQuateResult(relationShipParams.getId(), visitResultId);
 	}
-	
+
+	/**
+	 * 保存关系的拜访结果
+	 * @param id
+	 * @param visitResultId
+	 */
+	private void saveDrugUserDoctorQuateResult(Long id, List<Long> visitResultId) {
+
+		if (id !=null && id > 0 && CollectionsUtil.isNotEmptyList(visitResultId)){
+			drugUserDoctorQuateResultMapper.batchInsert(id, visitResultId);
+		}
+	}
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	private VirtualDoctorCallInfoParams getVirtualDoctorCallInfoParams (BaseCallInfoRequest saveRequest) {
@@ -326,9 +384,19 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 			callVisitParams.setIsHasDrug(saveCallInfoRequest.getIsHasDrug()); // 是否有药
 			callVisitParams.setIsTarget(saveCallInfoRequest.getIsTarget()); // 是否目标
 			callVisitParams.setHcpPotential(saveCallInfoRequest.getHcpPotential()); // 潜力
-			
-			String visitResult = JSONObject.toJSONString(saveCallInfoRequest.getVisitResult());
-			callVisitParams.setVisitResult(visitResult);
+
+			Integer recruit = saveCallInfoRequest.getIsRecruit();
+			if (RecruitEnum.SUCCESS_RECRUIT.getType().equals(recruit)){
+				callVisitParams.setRecruitTime(new Date());
+			}
+
+			if (RecruitEnum.DROP_OUT.getType().equals(recruit)){
+				callVisitParams.setDropOutTime(new Date());
+			}
+
+
+//			String visitResult = JSONObject.toJSONString(saveCallInfoRequest.getVisitResult());
+//			callVisitParams.setVisitResult(visitResult);
 			
 			if(type.equals(1)) { // 呼出
 				callVisitParams.setStatusName("answer"); // 状态名

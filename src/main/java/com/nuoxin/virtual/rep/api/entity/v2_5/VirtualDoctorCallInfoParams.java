@@ -3,11 +3,16 @@ package com.nuoxin.virtual.rep.api.entity.v2_5;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.Date;
+
 @Data
 public class VirtualDoctorCallInfoParams{
-	private long callId;
+
+
+	private Long id;
+	private Long callId;
 	private String sinToken;
-	private long virtualDrugUserId;
+	private Long virtualDrugUserId;
 	private Long virtualDoctorId;
 	private Integer doctorQuestionnaireId;
 	private Integer productId;
@@ -36,4 +41,11 @@ public class VirtualDoctorCallInfoParams{
 	private Integer isRecruit;
 	@ApiModelProperty(value = "是否脱落1.是,0.非,-1未知")
 	private Integer isBreakOff;
+
+	@ApiModelProperty(value = "成功招募时间")
+	private Date recruitTime;
+
+	@ApiModelProperty(value = "退出项目时间")
+	private Date dropOutTime;
+
 }

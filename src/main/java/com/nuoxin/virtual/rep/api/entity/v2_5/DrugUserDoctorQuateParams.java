@@ -4,6 +4,9 @@ import lombok.Data;
 
 @Data
 public class DrugUserDoctorQuateParams {
+
+	private Long id;
+
 	private Long virtualDrugUserId;
 	private Long doctorId;
 	// 默认给0，null会插入失败

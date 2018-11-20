@@ -48,6 +48,12 @@ public interface VirtualDoctorCallInfoService {
 	void saveCallInfo(CallRequestBean bean);
 
 
-
+	/**
+	 * 根据产品ID得到医生招募状态
+	 * @param productId
+	 * @param doctorId
+	 * @return
+	 */
+	Integer getProductRecruit(Long productId, Long doctorId);
 
 }

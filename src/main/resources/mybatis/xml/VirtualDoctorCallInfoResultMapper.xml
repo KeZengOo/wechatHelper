@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorCallInfoResultMapper">
+
+    <insert id="batchInsert">
+        INSERT INTO virtual_doctor_call_info_result (mend_id, result_id)
+        VALUES
+        <foreach collection ="resultIdList" item="resultId" separator =",">
+            (#{mendId}, #{resultId})
+        </foreach>
+    </insert>
+
+
+</mapper>

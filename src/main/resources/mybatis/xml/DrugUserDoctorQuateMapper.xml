@@ -16,7 +16,8 @@
 	</insert>	
 	
 	<!-- 使用 MYSQL 私有语法, 通过 drug_user_id, doctor_id, product_id 创建唯一约束 -->
-	<insert id="replaceRelationShipInfo">
+	<insert id="replaceRelationShipInfo" keyProperty="id" useGeneratedKeys="true"
+			parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorQuateParams">
 		REPLACE INTO drug_user_doctor_quate 
 		(drug_user_id,doctor_id,product_id, is_has_drug,is_target,is_recruit,
 		is_has_ae, is_break_off, hcp_potential)
@@ -165,5 +166,13 @@
 		AND product_id=#{productId}
 		AND is_available=1
 	</select>
-		
+
+	<!-- 根据产品ID得到招募结果 -->
+	<select id="getProductRecruit" resultType="java.lang.Integer">
+		SELECT is_recruit FROM drug_user_doctor_quate
+		WHERE product_id=#{productId}
+		AND doctor_id=#{doctorId}
+		AND is_available=1
+		ORDER BY create_time DESC LIMIT 1
+	</select>
 </mapper>

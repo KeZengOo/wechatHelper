@@ -4,16 +4,19 @@
 <mapper namespace="com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorCallInfoMendMapper">
 
 	<!-- 保存问卷作答 -->
-	<insert id="saveVirtualDoctorCallInfoMend" keyProperty="callId" useGeneratedKeys="true"
+	<insert id="saveVirtualDoctorCallInfoMend" keyProperty="id" useGeneratedKeys="true"
 		parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoParams">
 		INSERT INTO virtual_doctor_call_info_mend
 		(virtual_drug_user_id, virtual_doctor_id, doctor_questionnaire_id, product_id,
 		 next_visit_time, visit_result, call_id, attitude, create_time, 
-		 hcp_potential, is_break_off, is_has_ae, is_target,is_has_drug, is_recruit)
+		 hcp_potential, is_break_off, is_has_ae, is_target,is_has_drug, is_recruit, recruit_time, drop_out_time)
 		VALUES
 		(#{virtualDrugUserId}, #{virtualDoctorId}, #{doctorQuestionnaireId}, #{productId},
 		#{nextVisitTime}, #{visitResult}, #{callId}, #{attitude}, NOW(),
-		#{hcpPotential},#{isBreakOff},#{isHasAe},#{isTarget},#{isHasDrug}, #{isRecruit})
+		#{hcpPotential},#{isBreakOff},#{isHasAe},#{isTarget},#{isHasDrug}, #{isRecruit},
+		#{recruitTime},
+		#{dropOutTime}
+		)
 	</insert>
 	
 	<select id="getCallVisitMendList" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitMendBean">
@@ -94,6 +97,10 @@
 		call_dud.drugUserId
 
 	</select>
+
+
+
+
 
 </mapper>
 

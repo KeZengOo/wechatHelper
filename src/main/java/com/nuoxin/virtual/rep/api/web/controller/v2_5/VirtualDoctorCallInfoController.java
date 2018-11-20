@@ -5,10 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
@@ -74,4 +71,23 @@ public class VirtualDoctorCallInfoController extends NewBaseController{
 		
 		return responseBean;
 	}
+
+
+
+	@SuppressWarnings("unchecked")
+	@ApiOperation(value = "得到产品下某个医生的招募状态", notes = "得到产品下某个医生的招募状态")
+	@GetMapping(value = "/product/Recruit/{productId}/{doctorId}")
+	public DefaultResponseBean<Integer> getProductRecruit(HttpServletRequest request, @PathVariable(value = "productId") Long productId, @PathVariable(value = "doctorId") Long doctorId) {
+		DrugUser user = this.getDrugUser(request);
+		if(user == null) {
+			return super.getLoginErrorResponse();
+		}
+
+		Integer recruit = callInfoService.getProductRecruit(productId, doctorId);
+		DefaultResponseBean<Integer> responseBean = new DefaultResponseBean<Integer>();
+		responseBean.setData(recruit);
+
+		return responseBean;
+	}
+
 }
