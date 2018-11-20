@@ -14,7 +14,7 @@ public class StatisticsParams extends PageRequestBean {
 	 * 产品id
 	 */
 
-	private Integer productId;
+	private Long productId;
 	/**
 	 * 产品
 	 */
@@ -22,11 +22,11 @@ public class StatisticsParams extends PageRequestBean {
 	/**
 	 * 销售代表列表id
 	 */
-	private List<Integer> drugUserIds;
+	private List<Long> drugUserIds;
 	/**
 	 * 销售代表id
 	 */
-	private Integer drugUserId;
+	private Long drugUserId;
 	/**
 	 * 开始时间
 	 */
@@ -43,4 +43,10 @@ public class StatisticsParams extends PageRequestBean {
 	 * 1 列表 2 导出
 	 */
 	private Integer  type;
+
+	/**
+	 * 拜访结果类型
+	 */
+	private Integer visitResultType;
+
 }

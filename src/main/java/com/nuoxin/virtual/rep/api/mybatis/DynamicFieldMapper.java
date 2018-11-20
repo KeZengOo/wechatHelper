@@ -248,14 +248,14 @@ public interface DynamicFieldMapper {
      * @param productId
      * @return
      */
-    List<DynamicFieldResponse> getProductDynamicField(@Param(value = "productId") Integer productId);
+    List<DynamicFieldResponse> getProductDynamicField(@Param(value = "productId") Long productId);
 
     /**
      * 得到产品下动态字段
      * @param productId
      * @return
      */
-    List<DynamicFieldValueResponse> getProductDynamicFieldValue(@Param(value = "productId") Integer productId, @Param(value = "doctorIds") Set<Integer> doctorIds);
+    List<DynamicFieldValueResponse> getProductDynamicFieldValue(@Param(value = "productId") Long productId, @Param(value = "doctorIds") Set<Long> doctorIds);
 
     /**
      * 得到医生详情问卷问题列表

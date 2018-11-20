@@ -78,5 +78,12 @@ public interface DrugUserDoctorQuateMapper {
 	 */
 	Integer getProductRecruit(@Param(value = "productId") Long productId,@Param(value = "doctorId") Long doctorId);
 
+
+	/**
+	 * 得到成功招募的医生ID列表
+	 * @param statisticsParams
+	 * @return
+	 */
+	List<Long> getRecruitDoctorIdList(StatisticsParams statisticsParams);
 }
 

@@ -76,16 +76,16 @@ public class StatisticalController extends NewBaseController {
 	@ApiOperation(value = "医生拜访统计表导出")
 	@RequestMapping(value = "/visit/statisticsListExportExcel", method = { RequestMethod.GET })
 	public void statisticsListExportExcel( HttpServletRequest request, HttpServletResponse response,
-										  Integer productId,String drugUserIds,String startTime,String endTime) {
+										  Long productId,String drugUserIds,String startTime,String endTime) {
 		if(productId==null){
 			return ;
 		}
 		if(drugUserIds==null|| drugUserIds==""){
 			return ;
 		}
-		List<Integer> ids=new ArrayList<>();
+		List<Long> ids=new ArrayList<>();
 		for(String str : drugUserIds.split(",")) {
-			int i = Integer.valueOf(str);
+			Long i = Long.valueOf(str);
 			ids.add(i);
 		}
 		StatisticsParams statisticsParams=new StatisticsParams();
@@ -141,7 +141,7 @@ public class StatisticalController extends NewBaseController {
     @ApiOperation(value = "医生拜访明细表导出")
     @RequestMapping(value = "/visit/doctorVisitDetaiListExportExcel", method = { RequestMethod.GET })
     public void doctorVisitDetaiListExportExcel( HttpServletRequest request, HttpServletResponse response,
-                                           Integer productId,Integer drugUserId,String startTime,String endTime,String contents) {
+                                           Long productId,Long drugUserId,String startTime,String endTime,String contents) {
         if(productId==null){
             return ;
         }

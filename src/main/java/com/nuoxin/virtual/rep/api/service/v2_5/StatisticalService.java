@@ -47,5 +47,5 @@ public interface StatisticalService {
 	 * @param productName
 	 * @return
 	 */
-	List<DynamicFieldResponse> getDynamicFieldByProductId(Integer productId, String productName);
+	List<DynamicFieldResponse> getDynamicFieldByProductId(Long productId, String productName);
 }

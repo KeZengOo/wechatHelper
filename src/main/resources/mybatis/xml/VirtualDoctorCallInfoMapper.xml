@@ -151,6 +151,83 @@
 
 	</select>
 
+
+	<!-- 医生拜访数：医生ID列表 -->
+	<select id="geTelephoneDoctorVisitDoctorIdList" resultType="java.lang.Long">
+
+		SELECT
+		DISTINCT vdci.virtual_doctor_id
+		FROM
+		virtual_doctor_call_info vdci
+		INNER JOIN (
+		SELECT DISTINCT
+		d.id doctorId,
+		du.id drugUserId
+		FROM
+		doctor d
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		WHERE
+		dud.is_available = 1
+		AND dud.prod_id = #{productId}
+		AND du.id =#{drugUserId}
+		) call_dud ON vdci.virtual_doctor_id = call_dud.doctorId
+		WHERE
+		vdci.product_id
+		<if test="startTime!=null and startTime!=''">
+			AND DATE_FORMAT(create_time,'%Y-%m-%d') &gt;=#{startTime}
+		</if>
+		<if test="endTime!=null and endTime!=''">
+			AND DATE_FORMAT(create_time,'%Y-%m-%d') &lt;=#{endTime}
+		</if>
+
+
+	</select>
+
+
+	<!-- 医生拜访数(拜访结果为（类型=接触医生）)：医生ID列表 -->
+	<select id="getDoctorVisitContactDoctorIdList" resultType="java.lang.Long">
+
+		SELECT
+		DISTINCT vdci.virtual_doctor_id
+		FROM
+		virtual_doctor_call_info vdci
+		INNER JOIN (
+		SELECT DISTINCT
+		d.id doctorId,
+		du.id drugUserId
+		FROM
+		doctor d
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		WHERE
+		dud.is_available = 1
+		AND dud.prod_id = #{productId}
+		AND du.id =#{drugUserId}
+		) call_dud ON vdci.virtual_doctor_id = call_dud.doctorId
+		INNER JOIN virtual_doctor_call_info_mend m
+		ON vdci.id=m.call_id
+		INNER JOIN virtual_doctor_call_info_result r
+		ON m.id=r.mend_id
+		INNER JOIN virtual_product_visit_result re
+		ON r.result_id=re.id
+		WHERE
+		vdci.product_id=#{productId}
+		<if test="visitResultType!=null and visitResultType!=0">
+			AND re.visit_type LIKE CONCAT('%',#{visitResultType}, '%')
+		</if>
+
+		<if test="startTime!=null and startTime!=''">
+			AND DATE_FORMAT(vdci.create_time,'%Y-%m-%d') &gt;=#{startTime}
+		</if>
+		<if test="endTime!=null and endTime!=''">
+			AND DATE_FORMAT(vdci.create_time,'%Y-%m-%d') &lt;=#{endTime}
+		</if>
+
+
+	</select>
+
+
 	<!-- 更新打电话的医生ID -->
 	<update id="updateCallInfoDoctorId">
 		UPDATE virtual_doctor_call_info SET virtual_doctor_id=#{doctorId}

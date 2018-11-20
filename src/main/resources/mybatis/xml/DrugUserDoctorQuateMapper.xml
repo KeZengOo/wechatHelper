@@ -175,4 +175,37 @@
 		AND is_available=1
 		ORDER BY create_time DESC LIMIT 1
 	</select>
+
+	<!-- 得到成功招募的医生ID列表 -->
+	<select id="getRecruitDoctorIdList" resultType="java.lang.Long">
+		SELECT DISTINCT
+			q.doctor_id
+		FROM
+			drug_user_doctor_quate q
+		INNER JOIN (
+			SELECT DISTINCT
+				d.id doctorId
+			FROM
+				doctor d
+			INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+			INNER JOIN drug_user du ON dud.drug_user_id = du.id
+			WHERE
+				dud.is_available = 1
+			AND dud.prod_id = #{productId}
+			AND dud.drug_user_id = #{drugUserId}
+		) dud ON q.doctor_id = dud.doctorId
+		WHERE
+			q.product_id = #{productId}
+		AND q.is_recruit = 1
+
+		<if test="startTime!=null and startTime!=''">
+			AND DATE_FORMAT(q.create_time, '%Y-%m-%d') &gt;= #{startTime}
+		</if>
+
+		<if test="endTime!=null and endTime!=''">
+			AND DATE_FORMAT(q.create_time, '%Y-%m-%d') &lt;= #{endTime}
+		</if>
+
+	</select>
+
 </mapper>

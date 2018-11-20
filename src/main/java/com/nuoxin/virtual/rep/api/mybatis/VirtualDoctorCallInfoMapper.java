@@ -61,6 +61,23 @@ public interface VirtualDoctorCallInfoMapper {
 
 
 	/**
+	 * 医生拜访数：医生ID列表
+	 * @param statisticsParams
+	 * @return 返回记录总条数
+	 */
+	List<Long> geTelephoneDoctorVisitDoctorIdList(StatisticsParams statisticsParams);
+
+
+	/**
+	 * 医生拜访数(拜访结果为（类型=接触医生）)：医生ID列表
+	 * @param statisticsParams
+	 * @return 返回记录总条数
+	 */
+	List<Long> getDoctorVisitContactDoctorIdList(StatisticsParams statisticsParams);
+
+
+
+	/**
 	 * 更新打电话的医生ID
 	 * @param telephoneList
 	 * @param doctorId

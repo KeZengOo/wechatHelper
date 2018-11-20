@@ -24,11 +24,34 @@ public interface ActivityShareMapper {
 	List<StatisticsDrugNumResponse> getMessageDoctorVisitCount(StatisticsParams statisticsParams);
 
 	/**
-	 * 内容服务人数
+	 * 内容服务人数(内容分享的医生人数)
 	 * @param statisticsParams
 	 * @return 返回记录总条数
 	 */
 	List<StatisticsDrugNumResponse> getContentServiceCount(StatisticsParams statisticsParams);
+
+
+	/**
+	 * 内容服务人数(内容分享的医生人数)：医生ID列表
+	 * @param statisticsParams
+	 * @return
+	 */
+	List<Long> getContentServiceDoctorIdList(StatisticsParams statisticsParams);
+
+	/**
+	 * 内容服务人数(内容分享的医生人数，内容分享状态为服务的人数)
+	 * @param statisticsParams
+	 * @return 返回记录总条数
+	 */
+	List<StatisticsDrugNumResponse> getContentStatusServiceCount(StatisticsParams statisticsParams);
+
+	/**
+	 * 内容服务人数(内容分享的医生人数，内容分享状态为服务的人数):内容服务人数(内容分享的医生人数)：医生ID列表
+	 * @param statisticsParams
+	 * @return 返回记录总条数
+	 */
+	List<Long> getContentStatusServiceDoctorIdList(StatisticsParams statisticsParams);
+
 
 	/**
 	 * 内容发送人数

@@ -49,7 +49,6 @@
 
 		) content_dud ON a.share_person_id = content_dud.doctorId
 		WHERE
-		a.share_type=2 AND
 		a.data_id IN (
 		SELECT DISTINCT
 		tcp.content_id
@@ -144,6 +143,162 @@
 
 
 	</select>
+
+
+
+	<select id="getContentServiceDoctorIdList" resultType="java.lang.Long">
+
+
+		SELECT
+		DISTINCT a.share_person_id
+		FROM
+		activity_share a
+		INNER JOIN (
+		SELECT DISTINCT
+		d.id doctorId,
+		du.id drugUserId
+		FROM
+		doctor d
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		WHERE
+		dud.is_available = 1
+		AND dud.prod_id = #{productId}
+		AND du.id=#{drugUserId}
+
+		) content_dud ON a.share_person_id = content_dud.doctorId
+		WHERE
+		a.data_id IN (
+		SELECT DISTINCT
+		tcp.content_id
+		FROM
+		t_content_product tcp
+		INNER JOIN product_line pl ON tcp.product_id = pl.prod_id
+		INNER JOIN activity_info ai ON tcp.content_id = ai.id
+		WHERE
+		tcp.product_id = #{productId}
+		)
+
+		<if test="startTime!=null and startTime!=''">
+			AND DATE_FORMAT(a.create_time, '%Y-%m-%d') &gt;= #{startTime}
+		</if>
+
+		<if test="endTime!=null and endTime!=''">
+			AND DATE_FORMAT(a.create_time, '%Y-%m-%d') &lt;= #{endTime}
+		</if>
+
+
+	</select>
+
+
+
+
+	<select id="getContentStatusServiceCount" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse">
+
+		SELECT
+		content_dud.drugUserId,
+		COUNT(DISTINCT a.share_person_id) total
+		FROM
+		activity_share a
+		INNER JOIN activity_share_extend ase
+		ON a.id=ase.activity_share_id AND ase.share_status=2
+		INNER JOIN (
+		SELECT DISTINCT
+		d.id doctorId,
+		du.id drugUserId
+		FROM
+		doctor d
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		WHERE
+		dud.is_available = 1
+		AND dud.prod_id = #{productId}
+		AND du.id IN
+
+		<foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+
+		) content_dud ON a.share_person_id = content_dud.doctorId
+		WHERE
+		a.data_id IN (
+		SELECT DISTINCT
+		tcp.content_id
+		FROM
+		t_content_product tcp
+		INNER JOIN product_line pl ON tcp.product_id = pl.prod_id
+		INNER JOIN activity_info ai ON tcp.content_id = ai.id
+		WHERE
+		tcp.product_id = #{productId}
+		)
+
+		<if test="startTime!=null and startTime!=''">
+			AND DATE_FORMAT(a.create_time, '%Y-%m-%d') &gt;= #{startTime}
+		</if>
+
+		<if test="endTime!=null and endTime!=''">
+			AND DATE_FORMAT(a.create_time, '%Y-%m-%d') &lt;= #{endTime}
+		</if>
+
+		GROUP BY
+		content_dud.drugUserId
+
+
+
+
+	</select>
+
+
+	<!-- 内容服务人数(内容分享的医生人数，内容分享状态为服务的人数):内容服务人数(内容分享的医生人数)：医生ID列表 -->
+	<select id="getContentStatusServiceDoctorIdList" resultType="java.lang.Long">
+
+		SELECT
+		DISTINCT a.share_person_id
+		FROM
+		activity_share a
+		INNER JOIN activity_share_extend ase
+		ON a.id=ase.activity_share_id AND ase.share_status=2
+		INNER JOIN (
+		SELECT DISTINCT
+		d.id doctorId,
+		du.id drugUserId
+		FROM
+		doctor d
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		WHERE
+		dud.is_available = 1
+		AND dud.prod_id = #{productId}
+		AND du.id IN
+
+		<foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+
+		) content_dud ON a.share_person_id = content_dud.doctorId
+		WHERE
+		a.data_id IN (
+		SELECT DISTINCT
+		tcp.content_id
+		FROM
+		t_content_product tcp
+		INNER JOIN product_line pl ON tcp.product_id = pl.prod_id
+		INNER JOIN activity_info ai ON tcp.content_id = ai.id
+		WHERE
+		tcp.product_id = #{productId}
+		)
+
+		<if test="startTime!=null and startTime!=''">
+			AND DATE_FORMAT(a.create_time, '%Y-%m-%d') &gt;= #{startTime}
+		</if>
+
+		<if test="endTime!=null and endTime!=''">
+			AND DATE_FORMAT(a.create_time, '%Y-%m-%d') &lt;= #{endTime}
+		</if>
+
+
+	</select>
+
 
 	<select id="getContentSendCount" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse">
 

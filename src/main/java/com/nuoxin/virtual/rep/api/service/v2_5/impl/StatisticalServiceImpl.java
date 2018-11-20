@@ -5,10 +5,12 @@ import com.nuoxin.virtual.rep.api.common.constant.StatisticalConstant;
 import com.nuoxin.virtual.rep.api.common.constant.VisitResultConstant;
 import com.nuoxin.virtual.rep.api.entity.DoctorDynamicFieldValue;
 import com.nuoxin.virtual.rep.api.entity.v2_5.*;
+import com.nuoxin.virtual.rep.api.enums.VisitResultTypeEnum;
 import com.nuoxin.virtual.rep.api.mybatis.*;
 import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v2_5.StatisticalService;
 import com.nuoxin.virtual.rep.api.utils.ArithUtil;
+import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,9 +81,9 @@ public class StatisticalServiceImpl implements StatisticalService {
     private List<LinkedHashMap<String, Object>> getDoctorVisitDetailList(StatisticsParams statisticsParams) {
         List<LinkedHashMap<String, Object>> list = doctorCallInfoMapper.getDoctorVisitDetailList(statisticsParams);
         if(null!=list&&list.size()>0){
-            Set<Integer> ids = new HashSet<>();
+            Set<Long> ids = new HashSet<>();
             list.forEach(x -> {
-                ids.add(Integer.parseInt(x.get("doctorId").toString()));
+                ids.add(Long.parseLong(x.get("doctorId").toString()));
                 x.put("hcpPotential", getLevel((String) x.get("hcpPotential")));
                 x.put("isHasDrug", getValue((String) x.get("isHasDrug")));
                 x.put("isTarget", getValue((String) x.get("isTarget")));
@@ -140,19 +142,90 @@ public class StatisticalServiceImpl implements StatisticalService {
      */
     private List<StatisticsResponse> getStatisticsList(StatisticsParams statisticsParams) {
 
+        // 根据筛选条件查询出销售列表
         List<StatisticsResponse> list = drugUserDoctorMapper.selectDrugUserDoctors(statisticsParams);
-        //内容服务人数
-        List<StatisticsDrugNumResponse> contentServiceTotal = activityShareMapper.getContentServiceCount(statisticsParams);
-        //设置拜访医生数
-        setVisitDoctorNum(statisticsParams, list);
-        //设置接触医生数
-        setContactDoctorNum(statisticsParams, list, contentServiceTotal);
-        //设置成功医生数
-        setSuccessDoctorNum(statisticsParams, list, contentServiceTotal);
-        //设置招募医生数
-        setRecruitmentDoctorNum(statisticsParams, list);
-        //设置覆盖医生数
-        setCoverDoctorNum(statisticsParams, list, contentServiceTotal);
+        if (CollectionsUtil.isEmptyList(list)){
+            return list;
+        }
+
+        // 遍历每个代表的
+        list.forEach(s->{
+            statisticsParams.setDrugUserId(s.getDrugUserId());
+
+            // 内容服务医生人数
+            List<Long> contentDoctorIdList = activityShareMapper.getContentServiceDoctorIdList(statisticsParams);
+
+            // 内容分享状态是服务的医生人数
+            List<Long> contentStatusDoctorIdList = activityShareMapper.getContentStatusServiceDoctorIdList(statisticsParams);
+
+            // 非内容拜访的医生人数(电话、面谈、邮件、短信 等方式)
+            List<Long> visitDoctorIdList = virtualDoctorCallInfoMapper.geTelephoneDoctorVisitDoctorIdList(statisticsParams);
+
+            // 招募成功的医生人数
+            List<Long> recruitDoctorIdList = drugUserDoctorQuateMapper.getRecruitDoctorIdList(statisticsParams);
+
+            // 拜访结果为（类型=接触医生）
+            statisticsParams.setVisitResultType(VisitResultTypeEnum.CONTACT.getType());
+            List<Long> visitContactDoctorIdList = virtualDoctorCallInfoMapper.getDoctorVisitContactDoctorIdList(statisticsParams);
+
+            // 拜访结果为（类型=成功医生）
+            statisticsParams.setVisitResultType(VisitResultTypeEnum.SUCCESS.getType());
+            List<Long> visitSuccessDoctorIdList = virtualDoctorCallInfoMapper.getDoctorVisitContactDoctorIdList(statisticsParams);
+
+
+            // 拜访结果为（类型=覆盖医生）
+            statisticsParams.setVisitResultType(VisitResultTypeEnum.COVER.getType());
+            List<Long> visitCoverDoctorIdList = virtualDoctorCallInfoMapper.getDoctorVisitContactDoctorIdList(statisticsParams);
+
+
+
+            // 拜访医生数：拨打电话的医生人数+拜访登记的医生人数+内容分享的医生人数
+            Integer visitDoctorNum = getDoctorNum(visitDoctorIdList, contentDoctorIdList);
+
+            //接触医生数：招募成功的医生人数 +【拜访结果为（类型=接触医生）的电话拜访医生人数】
+            // +【拜访结果为（类型=接触医生）的拜访登记医生人数】+【内容分享的状态为服务的医生人数】
+            Integer contactDoctorNum = getDoctorNum(recruitDoctorIdList, visitContactDoctorIdList, contentStatusDoctorIdList);
+
+            //成功医生：招募成功的医生人数 +【拜访结果为（类型=成功医生）的电话拜访医生人数】
+            // +【拜访结果为（类型=成功医生）的拜访登记医生人数】+【内容分享的状态为服务的医生人数】
+            Integer successDoctorNum = getDoctorNum(recruitDoctorIdList,visitSuccessDoctorIdList, contentStatusDoctorIdList);
+
+
+            // 覆盖：招募成功的医生人数 +【拜访结果为（类型=覆盖医生）的电话拜访医生人数】
+            // +【拜访结果为（类型=覆盖医生）的拜访登记医生人数】+【内容分享的状态为服务的医生人数】
+
+            Integer coverDoctorNum = getDoctorNum(recruitDoctorIdList,visitCoverDoctorIdList, contentStatusDoctorIdList);
+
+            s.setVisitDoctorNum(visitDoctorNum);
+            s.setContactDoctorNum(contactDoctorNum);
+            s.setSuccessDoctorNum(successDoctorNum);
+            s.setRecruitDoctorNum(getDoctorNum(recruitDoctorIdList));
+            s.setCoverDoctorNum(coverDoctorNum);
+
+        });
+
+
+
+        //内容服务人数(内容分享的医生人数)
+//        List<StatisticsDrugNumResponse> contentServiceTotal = activityShareMapper.getContentServiceCount(statisticsParams);
+
+
+
+
+        // 内容分享状态是服务的医生人数
+//        List<StatisticsDrugNumResponse> contentStatusServiceTotal = activityShareMapper.getContentStatusServiceCount(statisticsParams);
+
+
+        //设置拜访医生数,这些医生没有去重，所以替换掉
+//        setVisitDoctorNum(statisticsParams, list, contentServiceTotal);
+//        //设置接触医生数
+//        setContactDoctorNum(statisticsParams, list, contentServiceTotal);
+//        //设置成功医生数
+//        setSuccessDoctorNum(statisticsParams, list, contentServiceTotal);
+//        //设置招募医生数
+//        setRecruitmentDoctorNum(statisticsParams, list);
+//        //设置覆盖医生数
+//        setCoverDoctorNum(statisticsParams, list, contentServiceTotal);
         //设置高潜力医生
         setPotentialDoctor(statisticsParams, list, StatisticalConstant.HIGH);
         //设置中潜力医生
@@ -176,13 +249,40 @@ public class StatisticalServiceImpl implements StatisticalService {
         return list;
     }
 
+
+    /**
+     * 去重得到医生ID总数
+     * @param doctorIdAllList
+     * @return
+     */
+    private Integer getDoctorNum(List<Long>...doctorIdAllList){
+        List<Long> list = new ArrayList<>();
+        for (List<Long> doctorIdList:doctorIdAllList){
+            if (CollectionsUtil.isEmptyList(doctorIdList)){
+                continue;
+            }
+
+            list.addAll(doctorIdList);
+        }
+
+
+        List<Long> collect = list.stream().distinct().collect(Collectors.toList());
+        if (CollectionsUtil.isEmptyList(collect)){
+            return 0;
+        }
+        return collect.size();
+    }
+
+
+
+
     /**
      * @param productId
      * @param productName
      * @return
      */
     @Override
-    public List<DynamicFieldResponse> getDynamicFieldByProductId(Integer productId, String productName) {
+    public List<DynamicFieldResponse> getDynamicFieldByProductId(Long productId, String productName) {
         Map<String, String> map = new LinkedHashMap<>();
         map.put("drugUserName", "代表");
         map.put("visitTime", "拜访时间");
@@ -363,15 +463,15 @@ public class StatisticalServiceImpl implements StatisticalService {
      * @param statisticsParams
      * @param list
      */
-    private void setVisitDoctorNum(StatisticsParams statisticsParams, List<StatisticsResponse> list) {
-        //医生电话拜访记录
+    private void setVisitDoctorNum(StatisticsParams statisticsParams, List<StatisticsResponse> list,  List<StatisticsDrugNumResponse> contentServiceTotal) {
+        //医生电话拜访记录,包括拜访登记的医生人数现在放到了一张表里，所以不需要改动
         List<StatisticsDrugNumResponse> telephoneTotal = virtualDoctorCallInfoMapper.geTelephoneDoctorVisitCount(statisticsParams);
-        //医生微信拜访记录
-        List<StatisticsDrugNumResponse> weiXinTotal = messageMapper.getWeiXinDoctorVisitCount(statisticsParams);
+        //去掉医生微信拜访记录
+        //List<StatisticsDrugNumResponse> weiXinTotal = messageMapper.getWeiXinDoctorVisitCount(statisticsParams);
         //医生短信拜访记录
-        List<StatisticsDrugNumResponse> messageTotal = activityShareMapper.getMessageDoctorVisitCount(statisticsParams);
+        //去掉List<StatisticsDrugNumResponse> messageTotal = activityShareMapper.getMessageDoctorVisitCount(statisticsParams);
         //医生拜访数赋值
-        this.setFieldValue(list, StatisticalConstant.VISITDOCTORNUM, telephoneTotal, weiXinTotal, messageTotal);
+        this.setFieldValue(list, StatisticalConstant.VISITDOCTORNUM, telephoneTotal, contentServiceTotal);
     }
 
     /**
@@ -428,21 +528,21 @@ public class StatisticalServiceImpl implements StatisticalService {
                 sumTotal += getTotal(t, l.getDrugUserId());
             }
             switch (type) {
-                case StatisticalConstant.VISITDOCTORNUM:
-                    l.setVisitDoctorNum(sumTotal);
-                    break;
-                case StatisticalConstant.CONTACTDOCTORNUM:
-                    l.setContactDoctorNum(sumTotal);
-                    break;
-                case StatisticalConstant.RECRUITDOCTORNUM:
-                    l.setRecruitDoctorNum(sumTotal);
-                    break;
-                case StatisticalConstant.SUCCESSDOCTORNUM:
-                    l.setSuccessDoctorNum(sumTotal);
-                    break;
-                case StatisticalConstant.COVERDOCTORNUM:
-                    l.setCoverDoctorNum(sumTotal);
-                    break;
+//                case StatisticalConstant.VISITDOCTORNUM:
+//                    l.setVisitDoctorNum(sumTotal);
+//                    break;
+//                case StatisticalConstant.CONTACTDOCTORNUM:
+//                    l.setContactDoctorNum(sumTotal);
+//                    break;
+//                case StatisticalConstant.RECRUITDOCTORNUM:
+//                    l.setRecruitDoctorNum(sumTotal);
+//                    break;
+//                case StatisticalConstant.SUCCESSDOCTORNUM:
+//                    l.setSuccessDoctorNum(sumTotal);
+//                    break;
+//                case StatisticalConstant.COVERDOCTORNUM:
+//                    l.setCoverDoctorNum(sumTotal);
+//                    break;
                 case StatisticalConstant.POTENTIALDOCTORHIGHNUM:
                     l.setPotentialDoctorHighNum(sumTotal);
                     break;
@@ -478,7 +578,7 @@ public class StatisticalServiceImpl implements StatisticalService {
      * @param drugUserId
      * @return
      */
-    private Integer getTotal(List<StatisticsDrugNumResponse> total, Integer drugUserId) {
+    private Integer getTotal(List<StatisticsDrugNumResponse> total, Long drugUserId) {
         for (StatisticsDrugNumResponse t : total) {
             if (drugUserId.equals(t.getDrugUserId())) {
                 Integer total1 = t.getTotal();
