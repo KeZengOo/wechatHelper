@@ -1,9 +1,11 @@
 package com.nuoxin.virtual.rep.api.service.v2_5;
 
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
+import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.v2_5.DynamicFieldResponse;
 import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsParams;
 import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorDetailsResponseBean;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -48,4 +50,14 @@ public interface StatisticalService {
 	 * @return
 	 */
 	List<DynamicFieldResponse> getDynamicFieldByProductId(Long productId, String productName);
+
+
+	/**
+	 * 得到医生列表，用于下拉列表
+	 * @param drugUser
+	 * @param productId
+	 * @param limitNum
+	 * @return
+	 */
+	List<DoctorDetailsResponseBean> getDoctorList(DrugUser drugUser, Long productId, Integer limitNum);
 }

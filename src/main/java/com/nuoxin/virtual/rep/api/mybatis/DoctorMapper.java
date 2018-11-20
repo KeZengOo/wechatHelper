@@ -172,12 +172,12 @@ public interface DoctorMapper{
 
     /**
      * 根据销售代表和产品获得医生列表
-     * @param drugUserId
+     * @param drugUserIdList
      * @param productId
      * @param limitNum 限制条数
      * @return
      */
-    List<DoctorDetailsResponseBean> getDoctorList(Long drugUserId, Long productId, Integer limitNum);
+    List<DoctorDetailsResponseBean> getDoctorList(List<Long> drugUserIdList, Long productId, Integer limitNum);
 
 
 }

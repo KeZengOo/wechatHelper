@@ -4,7 +4,9 @@ import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.constant.StatisticalConstant;
 import com.nuoxin.virtual.rep.api.common.constant.VisitResultConstant;
 import com.nuoxin.virtual.rep.api.entity.DoctorDynamicFieldValue;
+import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.v2_5.*;
+import com.nuoxin.virtual.rep.api.enums.RoleTypeEnum;
 import com.nuoxin.virtual.rep.api.enums.VisitResultTypeEnum;
 import com.nuoxin.virtual.rep.api.mybatis.*;
 import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
@@ -12,6 +14,7 @@ import com.nuoxin.virtual.rep.api.service.v2_5.StatisticalService;
 import com.nuoxin.virtual.rep.api.utils.ArithUtil;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorDetailsResponseBean;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,6 +47,10 @@ public class StatisticalServiceImpl implements StatisticalService {
     private DoctorCallInfoMapper doctorCallInfoMapper;
     @Resource
     private DynamicFieldMapper dynamicFieldMapper;
+    @Resource
+    private DrugUserMapper drugUserMapper;
+    @Resource
+    private DoctorMapper doctorMapper;
 
     /**
      * 医生拜访明细表·分页
@@ -312,6 +319,25 @@ public class StatisticalServiceImpl implements StatisticalService {
         t.setChildren(dynamicFieldMapper.getProductDynamicField(productId));
         list.add(t);
         return list;
+    }
+
+    @Override
+    public List<DoctorDetailsResponseBean> getDoctorList(DrugUser drugUser, Long productId, Integer limitNum) {
+
+        List<DoctorDetailsResponseBean> list = new ArrayList<>();
+        Long roleId = drugUser.getRoleId();
+        if (RoleTypeEnum.MANAGER.getType().equals(roleId)){
+            List<Long> drugUserIdList = drugUserMapper.getSubordinateIdsByLeaderPath(drugUser.getLeaderPath());
+            if (CollectionsUtil.isNotEmptyList(drugUserIdList)){
+                List<DoctorDetailsResponseBean> doctorList = doctorMapper.getDoctorList(drugUserIdList, productId, limitNum);
+            }
+        }
+
+        if (RoleTypeEnum.SALE.getType().equals(roleId)){
+
+        }
+
+        return null;
     }
 
     private String getValue(String value) {

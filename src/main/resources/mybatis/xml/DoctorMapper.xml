@@ -385,4 +385,26 @@
 			)
 	</select>
 
+
+	<select id="getDoctorList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorDetailsResponseBean">
+		SELECT DISTINCT
+		d.id doctorId,
+		d.name doctorName,
+		d.hospital_name hospitalName
+		FROM doctor d
+		INNER JOIN drug_user_doctor dud
+		ON d.id=dud.doctor_id
+		INNER JOIN drug_user du
+		ON dud.drug_user_id=du.id
+		WHERE dud.is_available=1
+		AND dud.prod_id=#{productId}
+		AND du.id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+
+		LIMIT limitNum
+
+	</select>
+
 </mapper>

@@ -23,9 +23,7 @@ public class BaseCallInfoRequest {
 	@NotNull(message = "mobile is null")
 	@ApiModelProperty(value = "拨打的医生手机号")
 	private String mobile;
-	
-	@Min(value=1,message = "min is 1")
-	@Max(value=2, message = "max is 2")
+
 	@NotNull(message = "type is null")
 	@ApiModelProperty(value = "呼叫类型 1.呼出,2.呼入")
 	private Integer type;
