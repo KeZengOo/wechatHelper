@@ -4,6 +4,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import com.nuoxin.virtual.rep.api.web.controller.response.product.ProductResponseBean;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +16,8 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.SaveCallI
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+
+import java.util.List;
 
 /**
  * 电话拜访 Controller 类
@@ -89,5 +92,22 @@ public class VirtualDoctorCallInfoController extends NewBaseController{
 
 		return responseBean;
 	}
+
+	@SuppressWarnings("unchecked")
+	@ApiOperation(value = "得到当前登录用户下负责的产品", notes = "得到当前登录用户下负责的产品")
+	@GetMapping(value = "/product/list")
+	public DefaultResponseBean<List<ProductResponseBean>> getProductList(HttpServletRequest request) {
+		DrugUser user = this.getDrugUser(request);
+		if(user == null) {
+			return super.getLoginErrorResponse();
+		}
+
+		List<ProductResponseBean> productList = callInfoService.getProductList(user);
+		DefaultResponseBean<List<ProductResponseBean>> responseBean = new DefaultResponseBean<>();
+		responseBean.setData(productList);
+
+		return responseBean;
+	}
+
 
 }

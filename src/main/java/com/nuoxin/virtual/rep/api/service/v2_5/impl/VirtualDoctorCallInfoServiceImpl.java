@@ -8,9 +8,13 @@ import javax.annotation.Resource;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
+import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.enums.RecruitEnum;
+import com.nuoxin.virtual.rep.api.enums.RoleTypeEnum;
+import com.nuoxin.virtual.rep.api.enums.UserTypeEnum;
 import com.nuoxin.virtual.rep.api.mybatis.*;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.CallRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.product.ProductResponseBean;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -56,6 +60,11 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 
 	@Resource
 	private VirtualDoctorCallInfoResultMapper virtualDoctorCallInfoResultMapper;
+
+	@Resource
+	private DrugUserMapper drugUserMapper;
+	@Resource
+	private ProductLineMapper productLineMapper;
 	
 	@Override
 	public CallVisitStatisticsBean getCallVisitListStatistics(Long virtualDoctorId, String leaderPath) {
@@ -134,6 +143,35 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		}
 
 		return productRecruit;
+	}
+
+	@Override
+	public List<ProductResponseBean> getProductList(DrugUser drugUser) {
+
+
+		Long roleId = drugUser.getRoleId();
+		Long drugUserId = drugUser.getId();
+		if (RoleTypeEnum.SALE.getType().equals(roleId)){
+			List<Long> idList = new ArrayList<>(1);
+			idList.add(drugUserId);
+			List<ProductResponseBean> productList = productLineMapper.getListByDrugUserId(idList);
+			if (CollectionsUtil.isNotEmptyList(productList)){
+				return productList;
+			}
+		}
+
+		if (RoleTypeEnum.MANAGER.getType().equals(roleId)){
+			List<Long> drugUserIdList = drugUserMapper.getSubordinateIdsByLeaderPath(drugUser.getLeaderPath());
+			if (CollectionsUtil.isNotEmptyList(drugUserIdList)){
+				List<ProductResponseBean> productList = productLineMapper.getListByDrugUserId(drugUserIdList);
+				if (CollectionsUtil.isNotEmptyList(productList)){
+					return productList;
+				}
+			}
+		}
+
+		List<ProductResponseBean> list = new ArrayList<>();
+		return list;
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
