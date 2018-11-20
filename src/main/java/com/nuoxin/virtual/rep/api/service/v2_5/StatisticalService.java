@@ -5,6 +5,7 @@ import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.v2_5.DynamicFieldResponse;
 import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsParams;
 import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CallTimeResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorDetailsResponseBean;
 
 import java.util.LinkedHashMap;
@@ -43,6 +44,14 @@ public interface StatisticalService {
 	 */
 	PageResponseBean<List<LinkedHashMap<String,Object>>> doctorVisitDetailPage(StatisticsParams statisticsParams);
 
+
+	/**
+	 * 得到电话统计
+	 * @param statisticsParams
+	 * @return
+	 */
+	CallTimeResponseBean getCallTime(StatisticsParams statisticsParams);
+
 	/**
 	 * 动态字段获取
 	 * @param productId
@@ -56,8 +65,9 @@ public interface StatisticalService {
 	 * 得到医生列表，用于下拉列表
 	 * @param drugUserId
 	 * @param productId
+	 * @param doctorName
 	 * @param limitNum
 	 * @return
 	 */
-	List<DoctorDetailsResponseBean> getDoctorList(Long drugUserId, Long productId, Integer limitNum);
+	List<DoctorDetailsResponseBean> getDoctorList(Long drugUserId, Long productId,String doctorName, Integer limitNum);
 }

@@ -16,6 +16,7 @@ import com.nuoxin.virtual.rep.api.service.v2_5.StatisticalService;
 import com.nuoxin.virtual.rep.api.utils.ArithUtil;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CallTimeResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorDetailsResponseBean;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +71,13 @@ public class StatisticalServiceImpl implements StatisticalService {
             list = getDoctorVisitDetailList(statisticsParams);
         }
         return new PageResponseBean(statisticsParams, total, list);
+    }
+
+    @Override
+    public CallTimeResponseBean getCallTime(StatisticsParams statisticsParams) {
+
+
+        return null;
     }
 
     /**
@@ -325,15 +333,17 @@ public class StatisticalServiceImpl implements StatisticalService {
         return list;
     }
 
+
+
     @Override
-    public List<DoctorDetailsResponseBean> getDoctorList(Long drugUserId, Long productId, Integer limitNum) {
+    public List<DoctorDetailsResponseBean> getDoctorList(Long drugUserId, Long productId,String doctorName, Integer limitNum) {
 
         DrugUser drugUser = drugUserRepository.findFirstById(drugUserId);
         Integer userType = drugUser.getUserType();
         if (SaleUserTypeEnum.DRUG_USER.getUserType().equals(userType)){
             List<Long> drugUserIdList = drugUserMapper.getSubordinateIdsByLeaderPath(drugUser.getLeaderPath());
             if (CollectionsUtil.isNotEmptyList(drugUserIdList)){
-                List<DoctorDetailsResponseBean> doctorList = doctorMapper.getDoctorList(drugUserIdList, productId, limitNum);
+                List<DoctorDetailsResponseBean> doctorList = doctorMapper.getDoctorList(drugUserIdList, productId,doctorName, limitNum);
                 if (CollectionsUtil.isNotEmptyList(doctorList)){
                     return doctorList;
                 }
@@ -341,7 +351,7 @@ public class StatisticalServiceImpl implements StatisticalService {
         }else {
             List<Long> drugUserIdList = new ArrayList<>(1);
             drugUserIdList.add(drugUser.getId());
-            List<DoctorDetailsResponseBean> doctorList = doctorMapper.getDoctorList(drugUserIdList, productId, limitNum);
+            List<DoctorDetailsResponseBean> doctorList = doctorMapper.getDoctorList(drugUserIdList, productId,doctorName, limitNum);
             if (CollectionsUtil.isNotEmptyList(doctorList)){
                 return doctorList;
             }

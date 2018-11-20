@@ -398,6 +398,7 @@
 		ON dud.drug_user_id=du.id
 		WHERE dud.is_available=1
 		AND dud.prod_id=#{productId}
+		AND d.name LIKE CONCAT('%', #{doctorName}, '%')
 		AND du.id IN
 		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
 			#{drugUserId}

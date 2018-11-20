@@ -177,7 +177,10 @@ public interface DoctorMapper{
      * @param limitNum 限制条数
      * @return
      */
-    List<DoctorDetailsResponseBean> getDoctorList(@Param(value = "drugUserIdList") List<Long> drugUserIdList,@Param(value = "productId") Long productId,@Param(value = "limitNum") Integer limitNum);
+    List<DoctorDetailsResponseBean> getDoctorList(@Param(value = "drugUserIdList") List<Long> drugUserIdList,
+                                                  @Param(value = "productId") Long productId,
+                                                  @Param(value = "doctorName") String doctorName,
+                                                  @Param(value = "limitNum") Integer limitNum);
 
 
 }

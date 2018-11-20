@@ -207,10 +207,11 @@ public class StatisticalController extends NewBaseController {
 
 	@ApiOperation(value = "根据产品id查询销售列表")
 	@ResponseBody
-	@RequestMapping(value = "/doctor/list/{drugUserId}/{productId}/{limitNum}", method = { RequestMethod.GET })
+	@RequestMapping(value = "/doctor/list/{drugUserId}/{productId}/{doctorName}/{limitNum}", method = { RequestMethod.GET })
 	public DefaultResponseBean<List<DoctorDetailsResponseBean>> getDoctorList(HttpServletRequest request,
 																				  @PathVariable(value = "drugUserId") Long drugUserId,
 																				  @PathVariable(value = "productId") Long productId,
+																			  		@PathVariable(value = "doctorName") String doctorName,
 																				  @PathVariable(value = "limitNum") Integer limitNum) {
 		DrugUser user = this.getDrugUser(request);
 		if (user == null) {
@@ -220,7 +221,7 @@ public class StatisticalController extends NewBaseController {
 			return super.getParamsErrorResponse("ProductId is null");
 		}
 
-		List<DoctorDetailsResponseBean> doctorList = statisticalService.getDoctorList(drugUserId, productId, limitNum);
+		List<DoctorDetailsResponseBean> doctorList = statisticalService.getDoctorList(drugUserId, productId,doctorName, limitNum);
 		DefaultResponseBean<List<DoctorDetailsResponseBean>> responseBean = new DefaultResponseBean<>();
 		responseBean.setData(doctorList);
 		return responseBean;
