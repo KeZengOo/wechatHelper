@@ -343,8 +343,8 @@ public class StatisticalServiceImpl implements StatisticalService {
 
         DrugUser drugUser = drugUserRepository.findFirstById(drugUserId);
         Integer userType = drugUser.getUserType();
-        if (SaleUserTypeEnum.DRUG_USER.getUserType().equals(userType)){
-            List<Long> drugUserIdList = drugUserMapper.getSubordinateIdsByLeaderPath(drugUser.getLeaderPath());
+        if (!SaleUserTypeEnum.DRUG_USER.getUserType().equals(userType)){
+            List<Long> drugUserIdList = drugUserMapper.getSubordinateIdsByLeaderPath(drugUser.getLeaderPath() + "%");
             if (CollectionsUtil.isNotEmptyList(drugUserIdList)){
                 List<DoctorDetailsResponseBean> doctorList = doctorMapper.getDoctorList(drugUserIdList, productId,doctorName, limitNum);
                 if (CollectionsUtil.isNotEmptyList(doctorList)){
