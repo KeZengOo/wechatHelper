@@ -207,17 +207,20 @@
         SELECT * FROM (
         SELECT
         DISTINCT vdci.id,call_dud.drugUserName,IFNULL(date_format(vdci.create_time, '%Y-%m-%d %H:%i:%s'),'')  visitTime,call_dud.doctorId,call_dud.doctorName,
-        call_dud.hospitalName,"电话" visitType,vdci.visit_channel visitChannel,"" shareContent,IFNULL(vdcim.`visit_result`,'') visitResult,IFNULL(vdcim.`attitude`,'') attitude,IFNULL(date_format(vdcim.`next_visit_time`, '%Y-%m-%d %H:%i:%s'),'') nextVisitTime
+        call_dud.hospitalName,
+        CASE WHEN vdci.visit_channel=1 THEN "电话" WHEN vdci.visit_channel=2 THEN "微信" WHEN vdci.visit_channel=3 THEN "短信"
+        WHEN vdci.visit_channel=4 THEN "邮件"
+        WHEN vdci.visit_channel=5 THEN "面谈"
+        else "" END visitType,vdci.visit_channel visitChannel,"" shareContent,IFNULL(vppvr.visit_result,'') visitResult,IFNULL(vdcim.`attitude`,'') attitude,IFNULL(date_format(vdcim.`next_visit_time`, '%Y-%m-%d %H:%i:%s'),'') nextVisitTime
         ,call_dud.clientLevel,IFNULL(vdcim.`hcp_potential`,'未知') hcpPotential,IFNULL(vdcim.is_has_drug,'未知') isHasDrug,IFNULL(vdcim.`is_target`,'未知') isTarget,IFNULL(vdcim.`is_has_ae`,'未知')  isHasAe
         FROM
         virtual_doctor_call_info vdci
         LEFT JOIN virtual_doctor_call_info_mend vdcim ON vdci.id=vdcim.call_id
 
-        <if test="visitResultIdList !=null and visitResultIdList.size > 0">
-            LEFT JOIN virtual_doctor_call_info_result vdcir
-            ON vdcim.id=vdcir.mend_id
-        </if>
-
+        LEFT JOIN virtual_doctor_call_info_result vdcir
+        ON vdcim.id=vdcir.mend_id
+        LEFT JOIN virtual_product_visit_result vppvr
+        ON vdcir.result_id=vppvr.id
 
         INNER JOIN (
         SELECT DISTINCT
@@ -278,7 +281,7 @@
             UNION ALL
             SELECT
             DISTINCT a.id,content_dud.drugUserName,IFNULL(date_format(a.`create_time`, '%Y-%m-%d %H:%i:%s'),'') visitTime,content_dud.doctorId,content_dud.doctorName,
-            content_dud.hospitalName,CASE WHEN a.share_type=1 THEN "微信" WHEN a.share_type=2 THEN "短信" WHEN a.share_type=3 THEN "邮件" else "" END  visitType,
+            content_dud.hospitalName,'内容分享' visitType,
             6 visitChannel,
             IFNULL(ai.title,'') shareContent,"" visitResult,"" attitude,"" nextVisitTime
             ,content_dud.clientLevel,'未知' hcpPotential,'未知' isHasDrug,'未知' isTarget,'未知'  isHasAe

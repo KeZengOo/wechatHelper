@@ -117,6 +117,8 @@ public class StatisticalServiceImpl implements StatisticalService {
      */
     @Override
     public List<LinkedHashMap<String, Object>> doctorVisitDetailList(StatisticsParams statisticsParams) {
+        this.fillDrugUserIdList(statisticsParams);
+
         return getDoctorVisitDetailList(statisticsParams);
     }
 
