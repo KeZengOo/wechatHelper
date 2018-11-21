@@ -20,7 +20,7 @@
 			AND dud.is_available=1
 		) temp 
 		ON v.virtual_doctor_id=temp.id
-	    WHERE v.product_id IN (
+	    WHERE v.visit_channel=1 AND v.product_id IN (
 	    	SELECT DISTINCT prod_id 
 	    	FROM product_user pu
 	    	JOIN drug_user du
@@ -52,7 +52,7 @@
 		) temp 
 		ON v.virtual_doctor_id=temp.id
 		<!-- END -->
-	    WHERE v.product_id IN (
+	    WHERE v.visit_channel=1 AND v.product_id IN (
 	    	SELECT DISTINCT prod_id 
 	    	FROM product_user pu
 	    	JOIN drug_user du
