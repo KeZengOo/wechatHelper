@@ -35,7 +35,6 @@ public class SaveCallInfoRequest  extends BaseCallInfoRequest{
 	/**
 	 * 保存问卷的时候必须选择
  	 */
-	@NotNull(message = "请选择产品！")
 	@ApiModelProperty(value = "产品ID")
 	private Integer productId;
 	
