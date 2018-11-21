@@ -254,7 +254,6 @@
         ) call_dud ON vdci.virtual_doctor_id = call_dud.doctorId
         WHERE
         vdci.product_id=#{productId}
-        AND vdci.visit_channel=1
 
         <if test="visitResultIdList !=null and visitResultIdList.size > 0">
             AND vdcir.result_id IN
@@ -444,7 +443,6 @@
         ) call_dud ON vdci.virtual_doctor_id = call_dud.doctorId
         WHERE
         vdci.product_id=#{productId}
-        AND vdci.visit_channel=1
 
         <if test="visitResultIdList !=null and visitResultIdList.size > 0">
             AND vdcir.result_id IN

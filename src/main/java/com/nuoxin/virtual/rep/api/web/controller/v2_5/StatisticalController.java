@@ -12,6 +12,7 @@ import com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorMapper;
 import com.nuoxin.virtual.rep.api.mybatis.DynamicFieldMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.StatisticalService;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualDoctorService;
+import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.utils.ExportExcel;
 import com.nuoxin.virtual.rep.api.utils.ExportExcelTitle;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.SaveVirtualDoctorRequest;
@@ -145,7 +146,7 @@ public class StatisticalController extends NewBaseController {
     @ApiOperation(value = "医生拜访明细表导出")
     @RequestMapping(value = "/visit/doctorVisitDetaiListExportExcel", method = { RequestMethod.GET })
     public void doctorVisitDetaiListExportExcel( HttpServletRequest request, HttpServletResponse response,
-                                           Long productId,Long drugUserId,String startTime,String endTime,String contents) {
+                                           Long productId,Long drugUserId,String startTime,String endTime,Integer visitChannel,Long doctorId,String visitResultIdList) {
         if(productId==null){
             return ;
         }
@@ -153,9 +154,22 @@ public class StatisticalController extends NewBaseController {
         statisticsParams.setEndTime(endTime);
         statisticsParams.setStartTime(startTime);
         statisticsParams.setType(list);
-        if(StringUtils.isNotEmtity(contents)){
-            List<String> contentList=Arrays.asList(contents.split(","));
-            statisticsParams.setContents(contentList);
+        statisticsParams.setDoctorId(doctorId);
+        statisticsParams.setVisitChannel(visitChannel);
+        if(StringUtils.isNotEmtity(visitResultIdList)){
+        	if (visitResultIdList.contains("，")){
+				visitResultIdList = visitResultIdList.replaceAll("，", ",");
+			}
+            List<String> contentList=Arrays.asList(visitResultIdList.split(","));
+        	if (CollectionsUtil.isNotEmptyList(contentList)){
+        		List<Long> visitIdList = new ArrayList<>(contentList.size());
+				for (String s : contentList) {
+					long l = Long.parseLong(s);
+					visitIdList.add(l);
+				}
+				statisticsParams.setVisitResultIdList(visitIdList);
+			}
+
         }
         statisticsParams.setProductId(productId);
         statisticsParams.setDrugUserId(drugUserId);
