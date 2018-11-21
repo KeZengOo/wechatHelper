@@ -239,6 +239,9 @@
         </if>
         -->
 
+        <if test="doctorId !=null and doctorId !=0">
+            and d.id = #{doctorId}
+        </if>
 
         AND du.id IN
         <foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
@@ -483,6 +486,9 @@
             </if>
             -->
 
+            <if test="doctorId !=null and doctorId !=0">
+                and d.id = #{doctorId}
+            </if>
 
             AND du.id IN
             <foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
@@ -552,6 +558,9 @@
         WHERE
         dud.is_available = 1
 
+        <if test="doctorId !=null and doctorId !=0">
+            and d.id = #{doctorId}
+        </if>
         AND dud.prod_id = #{productId}
 
         AND du.id IN
