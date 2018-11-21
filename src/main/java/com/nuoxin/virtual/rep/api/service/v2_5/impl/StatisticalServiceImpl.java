@@ -15,6 +15,7 @@ import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v2_5.StatisticalService;
 import com.nuoxin.virtual.rep.api.utils.ArithUtil;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
+import com.nuoxin.virtual.rep.api.utils.StringUtil;
 import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CallTimeResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorDetailsResponseBean;
@@ -65,6 +66,9 @@ public class StatisticalServiceImpl implements StatisticalService {
      */
     @Override
     public PageResponseBean<List<LinkedHashMap<String, Object>>> doctorVisitDetailPage(StatisticsParams statisticsParams) {
+
+        this.fillDrugUserIdList(statisticsParams);
+
         int total = doctorCallInfoMapper.getDoctorVisitDetailListCount(statisticsParams);
         List<LinkedHashMap<String, Object>> list = new ArrayList<>();
         if (total > 0) {
@@ -73,13 +77,35 @@ public class StatisticalServiceImpl implements StatisticalService {
         return new PageResponseBean(statisticsParams, total, list);
     }
 
+    private void fillDrugUserIdList(StatisticsParams statisticsParams) {
+        Long drugUserId = statisticsParams.getDrugUserId();
+        String roleId = drugUserMapper.getRoleIdByDrugUserId(drugUserId);
+        if (StringUtil.isNotEmpty(roleId) && roleId.contains(RoleTypeEnum.MANAGER.getType() + "")){
+            String leaderPath = drugUserMapper.getLeaderPathById(drugUserId);
+            List<Long> drugUserIdList = drugUserMapper.getSubordinateIdsByLeaderPath(leaderPath);
+            statisticsParams.setDrugUserIds(drugUserIdList);
+
+        }else {
+            List<Long> drugUserIdList = new ArrayList<>(1);
+            drugUserIdList.add(drugUserId);
+            statisticsParams.setDrugUserIds(drugUserIdList);
+        }
+    }
+
     @Override
     public CallTimeResponseBean getCallTime(StatisticsParams statisticsParams) {
         CallTimeResponseBean callTimeResponseBean = new CallTimeResponseBean();
-        CallTimeResponseBean callTime = doctorCallInfoMapper.getCallTime(statisticsParams);
-        if (callTime != null){
-            callTimeResponseBean = callTime;
+
+        Integer visitChannel = statisticsParams.getVisitChannel();
+        // 1是电话
+        if (visitChannel != null && visitChannel == 1){
+            this.fillDrugUserIdList(statisticsParams);
+            CallTimeResponseBean callTime = doctorCallInfoMapper.getCallTime(statisticsParams);
+            if (callTime != null){
+                callTimeResponseBean = callTime;
+            }
         }
+
         return callTimeResponseBean;
     }
 
@@ -170,9 +196,26 @@ public class StatisticalServiceImpl implements StatisticalService {
             return list;
         }
 
+        List<Long> drugUserIds = statisticsParams.getDrugUserIds();
         // 遍历每个代表的
         list.forEach(s->{
-            statisticsParams.setDrugUserId(s.getDrugUserId());
+            // 判断用户是不是管理员，如果是管理员就查询包含全部下级的，如果不是管理员就查询自己的
+            Long drugUserId = s.getDrugUserId();
+            statisticsParams.setDrugUserId(drugUserId);
+            String roleId = drugUserMapper.getRoleIdByDrugUserId(drugUserId);
+            if (StringUtil.isNotEmpty(roleId) && roleId.contains(RoleTypeEnum.MANAGER.getType()+"")){
+                String leaderPath = drugUserMapper.getLeaderPathById(drugUserId);
+                List<Long> drugUserIdList = drugUserMapper.getSubordinateIdsByLeaderPath(leaderPath);
+                if (CollectionsUtil.isNotEmptyList(drugUserIdList)){
+                    statisticsParams.setDrugUserIds(drugUserIdList);
+                }
+            }else{
+                List<Long> drugUserIdList = new ArrayList<>(1);
+                drugUserIdList.add(s.getDrugUserId());
+                statisticsParams.setDrugUserIds(drugUserIdList);
+            }
+
+
 
             // 内容服务医生人数
             List<Long> contentDoctorIdList = activityShareMapper.getContentServiceDoctorIdList(statisticsParams);
@@ -226,6 +269,8 @@ public class StatisticalServiceImpl implements StatisticalService {
 
         });
 
+        // 防止变量被修改，再还原
+        statisticsParams.setDrugUserIds(drugUserIds);
 
 
         //内容服务人数(内容分享的医生人数)

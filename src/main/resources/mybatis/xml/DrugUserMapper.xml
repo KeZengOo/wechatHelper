@@ -186,5 +186,10 @@
         ON pu.user_id=du.id
         WHERE du.email=#{email}
     </select>
+
+
+    <select id="getRoleIdByDrugUserId" resultType="java.lang.String">
+        SELECT GROUP_CONCAT(role_id) FROM role_user WHERE user_id=#{drugUserId}
+    </select>
     
 </mapper>

@@ -170,7 +170,10 @@
 		WHERE
 		dud.is_available = 1
 		AND dud.prod_id = #{productId}
-		AND du.id =#{drugUserId}
+		AND du.id IN
+		<foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
 		) call_dud ON vdci.virtual_doctor_id = call_dud.doctorId
 		WHERE
 		vdci.product_id
@@ -203,7 +206,11 @@
 		WHERE
 		dud.is_available = 1
 		AND dud.prod_id = #{productId}
-		AND du.id =#{drugUserId}
+		AND du.id IN
+		<foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+
 		) call_dud ON vdci.virtual_doctor_id = call_dud.doctorId
 		INNER JOIN virtual_doctor_call_info_mend m
 		ON vdci.id=m.call_id

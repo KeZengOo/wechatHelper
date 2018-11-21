@@ -86,5 +86,13 @@ public interface DrugUserMapper extends MyMapper<DrugUser> {
      * @return
      */
 	List<Long> getProductIdListByEmail(@Param(value = "email") String email);
+
+
+    /**
+     * 根据销售代表ID查询角色ID
+     * @param drugUserId
+     * @return
+     */
+	String getRoleIdByDrugUserId(@Param(value = "drugUserId") Long drugUserId);
     
 }

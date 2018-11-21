@@ -233,9 +233,17 @@
 
         AND dud.prod_id = #{productId}
 
+        <!--
         <if test="drugUserId!=null">
             and du.id=#{drugUserId}
         </if>
+        -->
+
+
+        AND du.id IN
+        <foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+            #{drugUserId}
+        </foreach>
 
         ) call_dud ON vdci.virtual_doctor_id = call_dud.doctorId
         WHERE
@@ -286,9 +294,16 @@
             dud.is_available = 1
             AND dud.prod_id = #{productId}
 
+            <!--
             <if test="drugUserId!=null">
                 and du.id=#{drugUserId}
             </if>
+            -->
+
+            AND du.id IN
+            <foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+                #{drugUserId}
+            </foreach>
 
 
             <if test="doctorId !=null and doctorId !=0">
@@ -318,7 +333,13 @@
 
         </if>
         ) b
-        WHERE visitChannel=#{visitChannel}
+        WHERE 1=1
+
+        <if test="visitChannel !=null and visitChannel!=0">
+            and visitChannel=#{visitChannel}
+        </if>
+
+
         ORDER BY b.visitTime DESC
         <if test="type==1">
             LIMIT #{currentSize},#{pageSize}
@@ -398,9 +419,16 @@
         dud.is_available = 1
         AND dud.prod_id = #{productId}
 
+        <!--
         <if test="drugUserId!=null">
             and du.id=#{drugUserId}
         </if>
+        -->
+
+        AND du.id IN
+        <foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+            #{drugUserId}
+        </foreach>
 
         <if test="doctorId !=null and doctorId !=0">
             and d.id = #{doctorId}
@@ -449,9 +477,18 @@
             dud.is_available = 1
             AND dud.prod_id = #{productId}
 
+            <!--
             <if test="drugUserId!=null">
                 and du.id=#{drugUserId}
             </if>
+            -->
+
+
+            AND du.id IN
+            <foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+                #{drugUserId}
+            </foreach>
+
             ) content_dud ON a.share_person_id = content_dud.doctorId
             WHERE
             a.data_id IN (
@@ -473,7 +510,12 @@
 
         </if>
         ) b
-        WHERE visitChannel=#{visitChannel}
+        WHERE 1=1
+
+        <if test="visitChannel !=null and visitChannel!=0">
+            and visitChannel=#{visitChannel}
+        </if>
+
 
     </select>
     
@@ -512,9 +554,10 @@
 
         AND dud.prod_id = #{productId}
 
-        <if test="drugUserId!=null">
-            and du.id=#{drugUserId}
-        </if>
+        AND du.id IN
+        <foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+            #{drugUserId}
+        </foreach>
 
         ) call_dud ON vdci.virtual_doctor_id = call_dud.doctorId
         WHERE

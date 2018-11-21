@@ -18,6 +18,8 @@ public class StatisticsResponse {
 	private String drugUserName;
 
 
+
+
 	@ApiModelProperty(value = "拜访医生数")
 	private Integer visitDoctorNum=0;
 

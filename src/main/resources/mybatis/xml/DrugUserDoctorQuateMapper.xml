@@ -192,7 +192,13 @@
 			WHERE
 				dud.is_available = 1
 			AND dud.prod_id = #{productId}
-			AND dud.drug_user_id = #{drugUserId}
+
+			AND dud.drug_user_id IN
+
+			<foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+				#{drugUserId}
+			</foreach>
+
 		) dud ON q.doctor_id = dud.doctorId
 		WHERE
 			q.product_id = #{productId}
