@@ -206,7 +206,7 @@
         <!-- 2018-09-29 修改后 -->
         SELECT * FROM (
         SELECT
-        DISTINCT vdci.id,call_dud.drugUserName,IFNULL(date_format(vdci.create_time, '%Y-%m-%d %H:%i:%s'),'')  visitTime,call_dud.doctorId,call_dud.doctorName,
+        vdci.id,call_dud.drugUserName,IFNULL(date_format(vdci.create_time, '%Y-%m-%d %H:%i:%s'),'')  visitTime,call_dud.doctorId,call_dud.doctorName,
         call_dud.hospitalName,
         CASE WHEN vdci.visit_channel=1 THEN "电话" WHEN vdci.visit_channel=2 THEN "微信" WHEN vdci.visit_channel=3 THEN "短信"
         WHEN vdci.visit_channel=4 THEN "邮件"
@@ -276,10 +276,12 @@
             </foreach>
         </if>
 
+        GROUP BY vdci.id
+
         <if test="contents==null or contents.size==0">
             UNION ALL
             SELECT
-            DISTINCT a.id,content_dud.drugUserName,IFNULL(date_format(a.`create_time`, '%Y-%m-%d %H:%i:%s'),'') visitTime,content_dud.doctorId,content_dud.doctorName,
+            a.id,content_dud.drugUserName,IFNULL(date_format(a.`create_time`, '%Y-%m-%d %H:%i:%s'),'') visitTime,content_dud.doctorId,content_dud.doctorName,
             content_dud.hospitalName,'内容分享' visitType,
             6 visitChannel,
             IFNULL(ai.title,'') shareContent,"" visitResult,"" attitude,"" nextVisitTime
@@ -335,6 +337,8 @@
             <if test="endTime!=null and endTime!=''">
                 and date_format(a.create_time,'%Y-%m-%d') &lt;=#{endTime}
             </if>
+
+            GROUP BY a.id
 
         </if>
         ) b
@@ -404,24 +408,28 @@
         <!-- 2018-09-29 修改后 -->
         SELECT COUNT(*) FROM (
         SELECT
-        DISTINCT vdci.id,vdci.visit_channel visitChannel
+        DISTINCT vdci.id
         FROM
         virtual_doctor_call_info vdci
         LEFT JOIN virtual_doctor_call_info_mend vdcim ON vdci.id=vdcim.call_id
-        <if test="visitResultIdList !=null and visitResultIdList.size > 0">
-            LEFT JOIN virtual_doctor_call_info_result vdcir
-            ON vdcim.id=vdcir.mend_id
-        </if>
+
+        LEFT JOIN virtual_doctor_call_info_result vdcir
+        ON vdcim.id=vdcir.mend_id
+        LEFT JOIN virtual_product_visit_result vppvr
+        ON vdcir.result_id=vppvr.id
 
         INNER JOIN (
         SELECT DISTINCT
-        d.id doctorId
+        d.id doctorId,d.`name` doctorName,d.hospital_name hospitalName,IFNULL(dv.client_level,'') clientLevel,du.`name` drugUserName
         FROM
         doctor d
         INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
         INNER JOIN drug_user du ON dud.drug_user_id = du.id
+        LEFT JOIN doctor_virtual dv
+        ON d.id=dv.doctor_id AND dv.product_id=#{productId}
         WHERE
         dud.is_available = 1
+
         AND dud.prod_id = #{productId}
 
         <!--
@@ -430,15 +438,14 @@
         </if>
         -->
 
-        AND du.id IN
-        <foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
-            #{drugUserId}
-        </foreach>
-
         <if test="doctorId !=null and doctorId !=0">
             and d.id = #{doctorId}
         </if>
 
+        AND du.id IN
+        <foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+            #{drugUserId}
+        </foreach>
 
         ) call_dud ON vdci.virtual_doctor_id = call_dud.doctorId
         WHERE
@@ -450,6 +457,7 @@
                 #{visitResultId}
             </foreach>
         </if>
+
 
         <if test="startTime!=null and startTime!=''">
             and date_format(vdci.create_time,'%Y-%m-%d') &gt;=#{startTime}
@@ -467,16 +475,18 @@
         <if test="contents==null or contents.size==0">
             UNION ALL
             SELECT
-            DISTINCT a.id, 6 visitChannel
+            DISTINCT a.id
             FROM
             activity_share a
             INNER JOIN (
             SELECT DISTINCT
-            d.id doctorId
+            d.id doctorId,d.`name` doctorName,d.hospital_name hospitalName,IFNULL(dv.client_level,'') clientLevel,du.`name` drugUserName
             FROM
             doctor d
             INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
             INNER JOIN drug_user du ON dud.drug_user_id = du.id
+            LEFT JOIN doctor_virtual dv
+            ON d.id=dv.doctor_id AND dv.product_id=#{productId}
             WHERE
             dud.is_available = 1
             AND dud.prod_id = #{productId}
@@ -487,16 +497,19 @@
             </if>
             -->
 
-            <if test="doctorId !=null and doctorId !=0">
-                and d.id = #{doctorId}
-            </if>
-
             AND du.id IN
             <foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
                 #{drugUserId}
             </foreach>
 
+
+            <if test="doctorId !=null and doctorId !=0">
+                and d.id = #{doctorId}
+            </if>
+
+
             ) content_dud ON a.share_person_id = content_dud.doctorId
+            INNER JOIN activity_info ai ON ai.id=a.data_id
             WHERE
             a.data_id IN (
             SELECT DISTINCT
