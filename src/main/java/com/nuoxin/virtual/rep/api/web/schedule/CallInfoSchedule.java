@@ -28,7 +28,7 @@ public class CallInfoSchedule {
 
     @ApiOperation(value = "没有回调的电话记录重试", notes = "没有回调的电话记录重试")
     @PostMapping(value = "/retry")
-    @Scheduled(cron = "0 0 */1 * * ?") // 暂定每隔1小时执行一次
+    @Scheduled(cron = "0 0 */4 * * ?") // 暂定每隔4小时执行一次
     public void repeatSaveOrUpdateCall() {
         logger.info("CallInfoSchedule repeatSaveOrUpdateCall start....");
         long starTime = System.currentTimeMillis();
