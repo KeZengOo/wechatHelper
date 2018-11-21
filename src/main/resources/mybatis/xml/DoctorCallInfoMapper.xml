@@ -290,6 +290,12 @@
                 and du.id=#{drugUserId}
             </if>
 
+
+            <if test="doctorId !=null and doctorId !=0">
+                and d.id = #{doctorId}
+            </if>
+
+
             ) content_dud ON a.share_person_id = content_dud.doctorId
             INNER JOIN activity_info ai ON ai.id=a.data_id
             WHERE
@@ -395,6 +401,11 @@
         <if test="drugUserId!=null">
             and du.id=#{drugUserId}
         </if>
+
+        <if test="doctorId !=null and doctorId !=0">
+            and d.id = #{doctorId}
+        </if>
+
 
         ) call_dud ON vdci.virtual_doctor_id = call_dud.doctorId
         WHERE

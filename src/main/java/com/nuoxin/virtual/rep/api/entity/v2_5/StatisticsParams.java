@@ -27,6 +27,12 @@ public class StatisticsParams extends PageRequestBean {
 	 * 销售代表id
 	 */
 	private Long drugUserId;
+
+	/**
+	 * 医生ID
+	 */
+	private Long doctorId;
+
 	/**
 	 * 开始时间
 	 */
