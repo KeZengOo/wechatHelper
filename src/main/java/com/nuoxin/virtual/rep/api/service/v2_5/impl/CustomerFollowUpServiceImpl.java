@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorQuateResultMapper;
 import com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorCallInfoMapper;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.*;
@@ -46,6 +47,8 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	@Resource
 	private VirtualDoctorCallInfoMapper virtualDoctorCallInfoMapper;
 
+	@Resource
+	private DrugUserDoctorQuateResultMapper drugUserDoctorQuateResultMapper;
 
 	/**
 	 * 初始化表头信息
@@ -150,7 +153,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		final List<CustomerFollowListBean> customerFollowListBeanList = list;
 		if (CollectionsUtil.isNotEmptyList(list)) {
 			list.forEach(doctor -> {
-				this.alterCustomerFollowListBean(doctor);
+				this.alterCustomerFollowListBean(doctor, productLineIds);
 				// TODO 补充对应的产品信息 @田存
 				if (CollectionsUtil.isNotEmptyList(productLineIds)){
 					this.fillProductInfos(customerFollowListBeanList, productLineIds);
@@ -209,8 +212,9 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	/**
 	 * 修正列表信息
 	 * @param doctor
+	 * @param productLineIds
 	 */
-	private void alterCustomerFollowListBean(CustomerFollowListBean doctor) {
+	private void alterCustomerFollowListBean(CustomerFollowListBean doctor, List<Long> productLineIds) {
 		// 手机号s
 //		List<String> mobiles = doctor.getMobiles();
 //		mobiles.add(doctor.getDoctorMobile()); // 主要
@@ -258,12 +262,18 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		}
 		
 		// 拜访结果
-		String visitResult = doctor.getVisitResult();
-		if (StringUtils.isNotBlank(visitResult)) {
-			JSONArray jsonArr = JSONObject.parseArray(visitResult);
-			doctor.setVisitResultObj(jsonArr);
+//		String visitResult = doctor.getVisitResult();
+//		if (StringUtils.isNotBlank(visitResult)) {
+//			JSONArray jsonArr = JSONObject.parseArray(visitResult);
+//			doctor.setVisitResultObj(jsonArr);
+//		}
+
+		List<String> visitResult = drugUserDoctorQuateResultMapper.getVisitResult(doctor.getDoctorId(), productLineIds);
+		if (CollectionsUtil.isNotEmptyList(visitResult)){
+			doctor.setVisitResultList(visitResult);
 		}
-		
+
+
 		// 是否有微信
 		String wechat = doctor.getWechat();
 		if (StringUtils.isNotBlank(wechat)) {
@@ -329,7 +339,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		
 		TableHeader visitResult = new TableHeader();
 		visitResult.setLabel("拜访结果");
-		visitResult.setName("visitResultObj");
+		visitResult.setName("visitResultList");
 		tableHeaders.add(visitResult);
 		
 		TableHeader nextVisitTime = new TableHeader();
@@ -339,19 +349,19 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 
 
 		TableHeader doctorCreateTime = new TableHeader();
-		nextVisitTime.setLabel("医生创建时间");
-		nextVisitTime.setName("doctorCreateTime");
+		doctorCreateTime.setLabel("医生创建时间");
+		doctorCreateTime.setName("doctorCreateTime");
 		tableHeaders.add(doctorCreateTime);
 
-		
-		TableHeader isBreakOff = new TableHeader();
-		isBreakOff.setLabel("是否脱落");
-		isBreakOff.setName("isBreakOff");
+//
+//		TableHeader isBreakOff = new TableHeader();
+//		isBreakOff.setLabel("是否脱落");
+//		isBreakOff.setName("isBreakOff");
 //		tableHeaders.add(isBreakOff);
 		
-		TableHeader isTarget = new TableHeader();
-		isTarget.setLabel("是否是目标客户");
-		isTarget.setName("isTarget");
+//		TableHeader isTarget = new TableHeader();
+//		isTarget.setLabel("是否是目标客户");
+//		isTarget.setName("isTarget");
 //		tableHeaders.add(isTarget);
 		
 		//////产品信息//////

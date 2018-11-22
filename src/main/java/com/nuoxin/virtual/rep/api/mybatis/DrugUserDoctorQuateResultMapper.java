@@ -21,5 +21,14 @@ public interface DrugUserDoctorQuateResultMapper {
 	 */
 	void batchInsert(@Param(value = "quateId") Long quateId,@Param(value = "resultIdList") List<Long> resultIdList);
 
+	/**
+	 * 获取拜访结果
+	 * @param doctorId
+	 * @param productList
+	 * @return
+	 */
+	List<String> getVisitResult(@Param(value = "doctorId") Long doctorId,@Param(value = "productList") List<Long> productList);
+
+
 }
 

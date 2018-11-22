@@ -11,4 +11,31 @@
         </foreach>
     </insert>
 
+    <select id="getVisitResult" resultType="java.lang.String">
+        SELECT
+            DISTINCT b.visit_result
+        FROM
+            drug_user_doctor_quate_result a
+        INNER JOIN virtual_product_visit_result b ON a.result_id = b.id
+        WHERE
+            a.quate_id = (
+                SELECT
+                    id
+                FROM
+                    drug_user_doctor_quate
+                WHERE
+                doctor_id = #{doctorId}
+                <if test="productList !=null and productList.size > 0">
+                    AND product_id IN
+                    <foreach collection="productList" item="productId" open="(" close=")" separator=",">
+                        #{productId}
+                    </foreach>
+                </if>
+
+
+                ORDER BY
+                    create_time DESC
+                LIMIT 1
+            )
+    </select>
 </mapper>

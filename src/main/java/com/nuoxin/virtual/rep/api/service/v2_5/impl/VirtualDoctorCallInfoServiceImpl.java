@@ -278,9 +278,13 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 				CallVisitMendBean mend = map.get(callId);
 				if (mend != null) {
 					visit.setAttitude(mend.getAttitude()); // 医生态度
-					String visitResultStr = mend.getVisitResult(); // 拜访结果
-					JSONArray visitResult = JSONObject.parseArray(visitResultStr);
-					visit.setVisitResult(visitResult);
+//					String visitResultStr = mend.getVisitResult(); // 拜访结果
+//					JSONArray visitResult = JSONObject.parseArray(visitResultStr);
+					List<String> visitResultList = virtualDoctorCallInfoResultMapper.getVisitResultByCallId(callId);
+					if (CollectionsUtil.isNotEmptyList(visitResultList)){
+						visit.setVisitResultList(visitResultList);
+					}
+
 				}
 			});
 		}

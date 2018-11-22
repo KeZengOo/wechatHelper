@@ -76,7 +76,7 @@ public class CustomerFollowListBean implements Serializable {
     @JsonIgnore
     private String visitResult; 
     @ApiModelProperty(value = "拜访结果")
-    private Object visitResultObj;
+    private List<String> visitResultList = new ArrayList<>();
     
     @JsonIgnore
     private String wechat;

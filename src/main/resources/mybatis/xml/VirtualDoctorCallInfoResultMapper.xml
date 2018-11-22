@@ -12,4 +12,13 @@
     </insert>
 
 
+    <select id="getVisitResultByCallId" resultType="java.lang.String">
+        SELECT DISTINCT c.visit_result FROM virtual_doctor_call_info_mend a
+        INNER JOIN virtual_doctor_call_info_result b
+        ON a.id=b.mend_id
+        INNER JOIN virtual_product_visit_result c
+        ON b.result_id=c.id
+        WHERE a.call_id=#{callId}
+    </select>
+
 </mapper>

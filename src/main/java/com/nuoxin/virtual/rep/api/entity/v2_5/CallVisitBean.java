@@ -6,6 +6,9 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 电话拜访
  * @author xiekaiyu
@@ -27,7 +30,8 @@ public class CallVisitBean {
 	@ApiModelProperty(value = "医生态度")
 	private Integer attitude;
 	@ApiModelProperty(value = "拜访结果")
-	private JSONArray visitResult;
+//	private JSONArray visitResult;
+	private List<String> visitResultList = new ArrayList<>();
 	@ApiModelProperty(value = "备注")
 	private String remark;
 	@ApiModelProperty(value = "电话拜访时间")

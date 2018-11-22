@@ -19,5 +19,13 @@ public interface VirtualDoctorCallInfoResultMapper {
 	 */
 	void batchInsert(@Param(value = "mendId") Long mendId,@Param(value = "resultIdList") List<Long> resultIdList);
 
+
+	/**
+	 * 获取拜访结果
+	 * @param callId
+	 * @return
+	 */
+	List<String> getVisitResultByCallId(@Param(value = "callId") Long callId);
+
 }
 
