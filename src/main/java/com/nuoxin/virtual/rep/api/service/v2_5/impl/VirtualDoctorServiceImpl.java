@@ -427,9 +427,7 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
             } else {
                 saveDoctorTelephoneRequestBean.setType(2);
             }
-            if (telephone.contains("-")) {
-                telephone = telephone.replaceAll("-", "");
-            }
+
 
             saveDoctorTelephoneRequestBean.setDoctorId(doctorId);
             saveDoctorTelephoneRequestBean.setTelephone(telephone);
@@ -467,9 +465,7 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
                 saveDoctorTelephoneRequestBean.setType(2);
             }
 
-            if (telephone.contains("-")) {
-                telephone = telephone.replaceAll("-", "");
-            }
+
 
             saveDoctorTelephoneRequestBean.setDoctorId(doctorId);
             saveDoctorTelephoneRequestBean.setTelephone(telephone);
