@@ -8,6 +8,7 @@ import com.nuoxin.virtual.rep.api.entity.v2_5.DynamicFieldResponse;
 import com.nuoxin.virtual.rep.api.entity.v2_5.HospitalProvinceBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsParams;
 import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsResponse;
+import com.nuoxin.virtual.rep.api.enums.RoleTypeEnum;
 import com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorMapper;
 import com.nuoxin.virtual.rep.api.mybatis.DynamicFieldMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.StatisticalService;
@@ -214,7 +215,19 @@ public class StatisticalController extends NewBaseController {
 		if(productId==null){
 			return super.getParamsErrorResponse("ProductId is null");
 		}
-		List<StatisticsResponse> data=drugUserDoctorMapper.getDrugUserIdByProductId(productId,user.getLeaderPath());
+		List<StatisticsResponse> data = new ArrayList<>();
+		if (RoleTypeEnum.MANAGER.getType().equals(user.getRoleId())){
+			List<StatisticsResponse> list =drugUserDoctorMapper.getDrugUserIdByProductId(productId,user.getLeaderPath());
+			if (CollectionsUtil.isNotEmptyList(list)){
+				data = list;
+			}
+		}else {
+			StatisticsResponse statisticsResponse = new StatisticsResponse();
+			statisticsResponse.setDrugUserId(user.getId());
+			statisticsResponse.setDrugUserName(user.getName());
+			data.add(statisticsResponse);
+		}
+
 		DefaultResponseBean<List<StatisticsResponse>> responseBean = new DefaultResponseBean<>();
 		responseBean.setData(data);
 		return responseBean;
