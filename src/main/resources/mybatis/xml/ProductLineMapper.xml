@@ -19,7 +19,15 @@
 
     <select id="getList" parameterType="java.lang.String"
             resultType="com.nuoxin.virtual.rep.api.web.controller.response.product.ProductResponseBean">
-        select distinct  pl.prod_id productId, pl.prod_name productName from product_line pl inner join product_user pu on pu.prod_id=pl.prod_id join drug_user du on du.id=pu.user_id where du.leader_path like #{leaderPath}  group by pl.prod_id
+        select distinct  pl.prod_id productId, pl.prod_name productName
+        from product_line pl inner join product_user pu
+        on pu.prod_id=pl.prod_id
+        join drug_user du on du.id=pu.user_id
+        <if test="doctorId != null and doctorId !=0">
+            INNER JOIN drug_user_doctor dud
+            ON dud.prod_id=pl.prod_id AND dud.drug_user_id=du.id AND dud.is_available=1 AND dud.doctor_id=#{doctorId}
+        </if>
+        where du.leader_path like #{leaderPath}  group by pl.prod_id
     </select>
 
     <select id="findByLeaderPath" resultMap="productResultMap">

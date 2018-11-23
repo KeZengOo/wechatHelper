@@ -50,7 +50,7 @@ public class ProductLineService {
      * @param drugUserId
      * @return
      */
-    public List<ProductResponseBean> getList(Long drugUserId){
+    public List<ProductResponseBean> getList(Long drugUserId, Long doctorId){
         DrugUser drugUser = drugUserRepository.findFirstById(drugUserId);
         String leaderPath = drugUser.getLeaderPath();
         if (leaderPath == null){
@@ -58,7 +58,7 @@ public class ProductLineService {
         }
         leaderPath = leaderPath + "%";
 
-        return productLineMapper.getList(leaderPath);
+        return productLineMapper.getList(leaderPath, doctorId);
     }
 
 }

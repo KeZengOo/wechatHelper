@@ -34,9 +34,10 @@ public interface ProductLineMapper extends MyMapper<ProductLine> {
     /**
      * 根据leaderpath获取产品列表
      * @param leaderPath
+     * @param doctorId
      * @return
      */
-    List<ProductResponseBean> getList(@Param(value = "leaderPath") String leaderPath);
+    List<ProductResponseBean> getList(@Param(value = "leaderPath") String leaderPath,@Param(value = "doctorId") Long doctorId);
     
 	List<ProductResponseBean> getListByDrugUserId(@Param(value = "virtualDrugUserIds") List<Long> virtualDrugUserIds);
 
