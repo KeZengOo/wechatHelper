@@ -408,7 +408,7 @@
         <!-- 2018-09-29 修改后 -->
         SELECT COUNT(*) FROM (
         SELECT
-        DISTINCT vdci.id
+        DISTINCT vdci.id, vdci.visit_channel visitChannel
         FROM
         virtual_doctor_call_info vdci
         LEFT JOIN virtual_doctor_call_info_mend vdcim ON vdci.id=vdcim.call_id
@@ -475,7 +475,7 @@
         <if test="contents==null or contents.size==0">
             UNION ALL
             SELECT
-            DISTINCT a.id
+            DISTINCT a.id, 6 visitChannel
             FROM
             activity_share a
             INNER JOIN (
