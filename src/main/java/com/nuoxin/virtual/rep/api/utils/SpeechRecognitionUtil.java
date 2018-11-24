@@ -217,7 +217,7 @@ public class SpeechRecognitionUtil {
 	
     public static void main(String args[]) throws Exception {
         // naxions 音频地址
-        String fileUrl = "https://nuoxin-virtual-rep-storage.oss-cn-beijing.aliyuncs.com/virtual/2018111511/181bb0e2-6887-48fd-88e3-f1c37790182e.mp3";
+        String fileUrl = "https://nuoxin-virtual-rep-storage.oss-cn-beijing.aliyuncs.com/virtual/2018112317/42b7f644-4199-4d8d-9a55-41eeb1d97585.mp3";
 		System.out.println("识别结果：" + SpeechRecognitionUtil.getSpeechRecognitionResult(fileUrl));
     }
 

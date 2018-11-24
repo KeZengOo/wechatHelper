@@ -148,7 +148,9 @@
 		SELECT
 			d.id AS doctorId, d.name AS doctorName, d.telephone AS doctorMobile,
 			d. sex AS gender, d.depart AS department, d.hospital_name AS hospitalName,d.email, d.positions AS title,IFNULL(h.level,0) hospitalLevel,
-			tel_visit.create_time AS visitTime,tel_visit.next_visit_time AS nextVisitTime,tel_visit.visit_result AS visitResult,
+			tel_visit.create_time AS visitTime,tel_visit.next_visit_time AS nextVisitTime,
+			TIMESTAMPDIFF(SECOND,NOW(), tel_visit.next_visit_time) orderNextVisitTime,
+			tel_visit.visit_result AS visitResult,
 			dm.wechat, dm.secondary_mobile AS secondaryDoctorMobile, dm.thirdary_mobile AS thirdaryDoctorMobile,temp.doctorCreateTime
 		FROM doctor d
 		LEFT JOIN hospital h ON d.hospital_id=h.id
@@ -202,12 +204,12 @@
 		
 		GROUP BY d.id
 		<if test="order ==null or order ==0">
-			ORDER BY tel_visit.next_visit_time ASC
+			ORDER BY sign(orderNextVisitTime) DESC,abs(orderNextVisitTime)
 		</if>
 
 		<if test="order !=null and order !=0">
 			<if test="order == 1">
-				ORDER BY tel_visit.next_visit_time DESC
+				ORDER BY sign(orderNextVisitTime) ASC,abs(orderNextVisitTime) DESC
 			</if>
 
 			<if test="order == 2">

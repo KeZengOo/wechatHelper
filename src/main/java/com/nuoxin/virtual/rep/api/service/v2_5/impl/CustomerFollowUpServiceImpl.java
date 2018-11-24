@@ -387,10 +387,10 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		hcpPotential.setName("hcpPotential");
 		info.add(hcpPotential);
 		
-		TableHeader hcpLevel = new TableHeader();
-		hcpLevel.setLabel("客户等级");
-		hcpLevel.setName("hcpLevel");
-		info.add(hcpLevel);
+//		TableHeader hcpLevel = new TableHeader();
+//		hcpLevel.setLabel("客户等级");
+//		hcpLevel.setName("hcpLevel");
+//		info.add(hcpLevel);
 		
 		TableHeader isHasDrug = new TableHeader();
 		isHasDrug.setLabel("是否有药");
