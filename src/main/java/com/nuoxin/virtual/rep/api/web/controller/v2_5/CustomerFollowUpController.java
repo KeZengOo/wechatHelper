@@ -58,6 +58,7 @@ public class CustomerFollowUpController extends NewBaseController {
 
 		// 从会话变量中获取 leaderPath
 		String leaderPath = user.getLeaderPath();
+		indexRequest.setDrugUserId(user.getId());
 		CustomerFollowUpPageResponseBean<List<CustomerFollowListBean>> pageResponse = customerFollowService.list(indexRequest,
 				leaderPath);
 		DefaultResponseBean<CustomerFollowUpPageResponseBean<List<CustomerFollowListBean>>> responseBean = new DefaultResponseBean<>();
@@ -103,6 +104,7 @@ public class CustomerFollowUpController extends NewBaseController {
 			searchRequest.setProductLineIds(productLineIds);
 		}
 
+		searchRequest.setDrugUserId(user.getId());
 		CustomerFollowUpPageResponseBean<List<CustomerFollowListBean>> pageResponse = customerFollowService.search(searchRequest,
 				user.getLeaderPath());
 		DefaultResponseBean<CustomerFollowUpPageResponseBean<List<CustomerFollowListBean>>> responseBean = new DefaultResponseBean<>();
@@ -153,7 +155,8 @@ public class CustomerFollowUpController extends NewBaseController {
 				screenRequest.setProductLineIds(productLineIds);
 			}
 		}
-		
+
+		screenRequest.setDrugUserId(user.getId());
 		CustomerFollowUpPageResponseBean<List<CustomerFollowListBean>> pageResponse = customerFollowService.screen(screenRequest);
 		DefaultResponseBean<CustomerFollowUpPageResponseBean<List<CustomerFollowListBean>>> responseBean = new DefaultResponseBean<>();
 		responseBean.setData(pageResponse);

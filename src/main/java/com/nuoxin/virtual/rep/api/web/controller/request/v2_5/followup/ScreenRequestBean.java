@@ -19,7 +19,10 @@ import lombok.EqualsAndHashCode;
 public class ScreenRequestBean extends PageRequestBean {
 
 	private static final long serialVersionUID = 8545014227620171255L;
-	
+
+	@ApiModelProperty(value = "销售代表ID")
+	private Long drugUserId;
+
 	/**
 	 * 虚拟代表 ids
 	 */

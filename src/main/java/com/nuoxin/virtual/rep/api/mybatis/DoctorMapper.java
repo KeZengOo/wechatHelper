@@ -90,7 +90,9 @@ public interface DoctorMapper{
     		                                                    @Param(value = "pageSize")int pageSize, 
     		                                                    @Param(value = "search")String search,
     		                                                    @Param(value = "productLineIds") List<Long> productLineIds,
-                                                                @Param(value = "order") Integer order,@Param(value = "minValue") Integer minValue);
+                                                                @Param(value = "order") Integer order,
+                                         @Param(value = "minValue") Integer minValue,
+                                         @Param(value = "drugUserId") Long drugUserId);
     /**
      * 根据手机号列表查询医生
      * @param mobiles

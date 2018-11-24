@@ -32,6 +32,8 @@ public class CustomerFollowListBean implements Serializable {
     @ApiModelProperty(value = "医生职称")
     private String title;
 
+    @ApiModelProperty(value = "是否能点击，如果不是自己名下的医生不能点击拜访登记")
+    private Integer click;
     
     @JsonIgnore
     private String doctorMobile;

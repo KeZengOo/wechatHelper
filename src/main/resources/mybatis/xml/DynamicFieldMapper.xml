@@ -626,10 +626,15 @@
 
     <!-- 根据产品ID 得到拜访记录信息  -->
     <select id="getVisit" resultType="java.lang.String">
-        SELECT visit_result visitResult  FROM virtual_doctor_call_info_mend WHERE product_id=#{productId}
-        AND virtual_doctor_id=#{doctorId}
-        AND  visit_result !='' AND visit_result IS NOT NULL
-         ORDER BY create_time DESC LIMIT 1
+        SELECT
+            GROUP_CONCAT(DISTINCT c.visit_result)
+        FROM
+            drug_user_doctor_quate a
+        INNER JOIN drug_user_doctor_quate_result b ON a.id = b.quate_id
+        INNER JOIN virtual_product_visit_result c ON b.result_id = c.id
+        WHERE
+            a.doctor_id = #{doctorId}
+        AND a.product_id = #{productId}
     </select>
 
 </mapper>

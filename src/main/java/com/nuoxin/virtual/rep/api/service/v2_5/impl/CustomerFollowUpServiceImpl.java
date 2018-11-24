@@ -76,7 +76,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 				int pageSize = pageRequest.getPageSize();
 				long startTime = System.currentTimeMillis();
 				Integer minValue = Integer.MIN_VALUE;
-				List<CustomerFollowListBean> list = doctorMapper.getList(virtualDrugUserIds, currentSize, pageSize, null, null, pageRequest.getOrder(), minValue);
+				List<CustomerFollowListBean> list = doctorMapper.getList(virtualDrugUserIds, currentSize, pageSize, null, null, pageRequest.getOrder(), minValue, pageRequest.getDrugUserId());
 				if (CollectionsUtil.isNotEmptyList(list)){
 					// 填充产品信息
 					this.fillProductInfos(list, leaderPath);
@@ -108,7 +108,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 				int currentSize = request.getCurrentSize();
 				int pageSize = request.getPageSize();
 				Integer minValue = Integer.MIN_VALUE;
-				List<CustomerFollowListBean> list = doctorMapper.getList(virtualDrugUserIds, currentSize, pageSize, search, null, request.getOrder(), minValue);
+				List<CustomerFollowListBean> list = doctorMapper.getList(virtualDrugUserIds, currentSize, pageSize, search, null, request.getOrder(), minValue,request.getDrugUserId());
 				// TODO 填充上产品
 				pageResponseBean = this.getDoctorsList(count, list, request);
 				this.fillProductInfos(list, productLineIds);
@@ -132,7 +132,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 			int pageSize = request.getPageSize();
 			Integer minValue = Integer.MIN_VALUE;
 			List<CustomerFollowListBean> list = doctorMapper.getList(virtualDrugUserIds, currentSize, pageSize, null,
-					productLineIds, request.getOrder(), minValue);
+					productLineIds, request.getOrder(), minValue, request.getDrugUserId());
 			pageResponseBean = this.getDoctorsList(count, list, request);
 		}
 		
