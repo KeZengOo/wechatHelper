@@ -44,7 +44,7 @@ public class ExportExcelTitle {
         map.put("visitResult","拜访结果");
         map.put("attitude","医生态度");
         map.put("nextVisitTime","下次拜访时间");
-        map.put("clientLevel","客户等级");
+//        map.put("clientLevel","客户等级");
         map.put("hcpPotential","医生潜力");
         map.put("isHasDrug","是否有药");
         map.put("isTarget","是否是目标客户");
