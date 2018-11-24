@@ -133,12 +133,12 @@
 
 	<!-- 医生的产品信息，每个医生只取两条 -->
 	<select id="getProductInfoListByProductIdList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ProductInfoResponse">
+		<!-- 2018-11-24 修改前
 		SELECT
 		DISTINCT
 			a.prod_name productName,
 			qudq.is_recruit isRecruit,
 			qudq.hcp_potential doctorPotential,
-			dv.client_level doctorLevel,
 			qudq.is_has_drug isHasDrug
 		FROM
 			product_line a
@@ -155,6 +155,58 @@
 		</foreach>
 
 		LIMIT 2
+
+		-->
+
+
+
+
+
+		SELECT DISTINCT
+		a.prod_name productName,
+		qudq.is_recruit isRecruit,
+		qudq.hcp_potential doctorPotential,
+		qudq.is_has_drug isHasDrug,
+		qudq.create_time
+		FROM
+		product_line a
+		INNER JOIN drug_user_doctor dud ON a.prod_id = dud.prod_id
+		AND dud.is_available = 1
+		AND dud.doctor_id = #{doctorId}
+		LEFT JOIN (
+		SELECT
+		*
+		FROM
+		drug_user_doctor_quate
+		WHERE
+		id IN (
+		SELECT
+		max(id)
+		FROM
+		drug_user_doctor_quate
+		WHERE
+		doctor_id = #{doctorId}
+		AND product_id IN
+
+		<foreach item="id" index="index" collection="productIdList"
+				 open="(" separator="," close=")">
+			#{id}
+		</foreach>
+
+		GROUP BY
+		product_id
+		)
+		) qudq ON a.prod_id = qudq.product_id
+		WHERE
+		dud.prod_id IN
+
+		<foreach item="id" index="index" collection="productIdList"
+				 open="(" separator="," close=")">
+			#{id}
+		</foreach>
+
+		LIMIT 2
+
 	</select>
 
 
