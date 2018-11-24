@@ -149,7 +149,7 @@
 			d.id AS doctorId, d.name AS doctorName, d.telephone AS doctorMobile,
 			d. sex AS gender, d.depart AS department, d.hospital_name AS hospitalName,d.email, d.positions AS title,IFNULL(h.level,0) hospitalLevel,
 			tel_visit.create_time AS visitTime,tel_visit.next_visit_time AS nextVisitTime,
-			TIMESTAMPDIFF(SECOND,NOW(), tel_visit.next_visit_time) orderNextVisitTime,
+			IFNULL(TIMESTAMPDIFF(SECOND,NOW(), tel_visit.next_visit_time), #{minValue}) orderNextVisitTime,
 			tel_visit.visit_result AS visitResult,
 			dm.wechat, dm.secondary_mobile AS secondaryDoctorMobile, dm.thirdary_mobile AS thirdaryDoctorMobile,temp.doctorCreateTime
 		FROM doctor d

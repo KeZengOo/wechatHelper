@@ -90,4 +90,6 @@ public class CustomerFollowListBean implements Serializable {
     private Integer isTarget;
     @ApiModelProperty(value = "是否是脱落客户 1是,0否,-1/null 未知")
     private Integer isBreakOff;
+
+
 }
