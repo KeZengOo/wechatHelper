@@ -627,7 +627,7 @@
     <!-- 根据产品ID 得到拜访记录信息  -->
     <select id="getVisit" resultType="java.lang.String">
         SELECT
-            GROUP_CONCAT(DISTINCT c.visit_result)
+            DISTINCT c.visit_result
         FROM
             drug_user_doctor_quate a
         INNER JOIN drug_user_doctor_quate_result b ON a.id = b.quate_id

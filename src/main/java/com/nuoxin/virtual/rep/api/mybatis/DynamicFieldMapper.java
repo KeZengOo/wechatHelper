@@ -278,7 +278,7 @@ public interface DynamicFieldMapper {
      * @param doctorId
      * @return
      */
-    String getVisit(@Param(value = "doctorId") Long doctorId, @Param(value = "productId") Long productId);
+    List<String> getVisit(@Param(value = "doctorId") Long doctorId, @Param(value = "productId") Long productId);
 
     /**
      * 根据产品ID得到处方信息

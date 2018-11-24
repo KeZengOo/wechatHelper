@@ -134,7 +134,7 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 			Date date=new Date();
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTime(date);
-			calendar.add(Calendar.DAY_OF_MONTH, -1);
+			calendar.add(Calendar.DAY_OF_MONTH, -3);
 			date = calendar.getTime();
 			bean.setBeginTime(DateUtil.getDateTimeString(date));
 		}

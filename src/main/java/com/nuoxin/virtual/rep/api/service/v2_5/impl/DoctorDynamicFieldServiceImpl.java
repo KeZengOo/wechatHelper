@@ -1,6 +1,7 @@
 package com.nuoxin.virtual.rep.api.service.v2_5.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -260,22 +261,16 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
 
             // 添加上医生的处方信息和拜访记录信息
             PrescriptionResponseBean prescription = dynamicFieldMapper.getPrescription(doctorId, product.getProductId());
-            String result = dynamicFieldMapper.getVisit(doctorId, product.getProductId());
+
             if (prescription != null){
                 productDynamicFieldQuestionnaireResponseBean.setPrescription(prescription);
             }
-           if (StringUtil.isNotEmpty(result)){
-               try {
-                   List<String> visit = JSONObject.parseArray(result, String.class);
-                   if (CollectionsUtil.isNotEmptyList(visit)){
-                       VisitResponseBean visitResponseBean = new VisitResponseBean();
-                       visitResponseBean.setVisitResult(visit);
-                       productDynamicFieldQuestionnaireResponseBean.setVisit(visitResponseBean);
-                   }
 
-               }catch (Exception e){
-                   e.printStackTrace();
-               }
+            List<String> result = dynamicFieldMapper.getVisit(doctorId, product.getProductId());
+           if (CollectionsUtil.isNotEmptyList(result)){
+               VisitResponseBean visitResponseBean = new VisitResponseBean();
+               visitResponseBean.setVisitResult(result);
+               productDynamicFieldQuestionnaireResponseBean.setVisit(visitResponseBean);
 
            }
 
