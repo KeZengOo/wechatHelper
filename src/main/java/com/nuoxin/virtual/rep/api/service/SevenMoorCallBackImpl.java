@@ -111,7 +111,10 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
                     try {
                         String ossUrl = super.processFile(url, id);
                         if (!StringUtils.isEmpty(ossUrl)){
-                            doctorCallInfoMapper.updateCallUrlBySigToken(ossUrl, id);
+                            String beginTime = call7mmorResponseBean.getBEGIN_TIME();
+                            String endTime = call7mmorResponseBean.getEND_TIME();
+                            int callTime = DateUtil.calLastedTime(beginTime, endTime);
+                            doctorCallInfoMapper.updateCallUrlBySigToken(ossUrl, id, callTime);
                             logger.info("重新上传录音文件更新完毕！callUrl={}, sinToken={}", callUrl, id);
                         }
                     }catch (Exception e){
@@ -172,7 +175,7 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 			CallInfoResponseBean callInfo = doctorCallInfoMapper.getCallInfoBySinToken(call_sheet_id);
 			if (callInfo != null){
 				String callUrl = callInfo.getCallUrl();
-				if (StringUtils.isEmpty(callUrl)){
+				if (StringUtils.isEmpty(callUrl) || callInfo.getCallTime()==null || callInfo.getCallTime() == 0 || (!"answer".equals(callInfo.getStatusName()))){
 					String record_file_name = call7mmorResponseBean.getRECORD_FILE_NAME();
 					String file_server = call7mmorResponseBean.getFILE_SERVER();
 					String originFilePath = file_server +"/" +  record_file_name;
@@ -184,7 +187,11 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 					}
 					if (!StringUtils.isEmpty(ossFilePath)){
 
-						doctorCallInfoMapper.updateCallUrlBySigToken(ossFilePath, call_sheet_id);
+						String beginTime = call7mmorResponseBean.getBEGIN_TIME();
+						String endTime = call7mmorResponseBean.getEND_TIME();
+						int callTime = DateUtil.calLastedTime(beginTime, endTime);
+						doctorCallInfoMapper.updateCallUrlBySigToken(ossFilePath, call_sheet_id, callTime);
+
 						super.updateCallUrlText(call_sheet_id, ossFilePath);
 						logger.info("sinToken={} 的电话记录，没有call_url，更新成功！", call_sheet_id);
 					}

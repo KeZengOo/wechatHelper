@@ -129,7 +129,7 @@
 
     <!-- 根据sinToken查询电话记录信息 -->
     <select id="getCallInfoBySinToken" resultType="com.nuoxin.virtual.rep.api.web.controller.response.call.CallInfoResponseBean">
-        SELECT id, call_url FROM virtual_doctor_call_info WHERE sin_token = #{sinToken}
+        SELECT id, call_url callUrl, call_time callTime, status_name statusName  FROM virtual_doctor_call_info WHERE sin_token = #{sinToken}
     </select>
 
     <!-- 新增重试的电话记录 -->
@@ -140,7 +140,8 @@
 
 
     <update id="updateCallUrlBySigToken">
-        update virtual_doctor_call_info set call_url = #{callUrl} where sin_token = #{sinToken}
+        update virtual_doctor_call_info set is_retry=1, call_url = #{callUrl}, call_time=#{callTime}, status_name='answer'
+        where sin_token = #{sinToken}
     </update>
 
     <select id="getDoctorVisitDetailList" resultType="java.util.LinkedHashMap">

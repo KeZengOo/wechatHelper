@@ -227,7 +227,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 
 		Integer recruitStatus = saveRequest.getRecruitStatus();
 		if (recruitStatus == null){
-			recruitStatus = RecruitEnum.SUCCESS_RECRUIT.getType();
+			recruitStatus = RecruitEnum.UNKOWN.getType();
 		}
 
 		// 校验招募状态是否输入的合法
@@ -235,7 +235,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 			recruitStatus.equals(RecruitEnum.DROP_OUT.getType())){
 			saveRequest.setIsRecruit(recruitStatus);
 		}else {
-			saveRequest.setIsRecruit(RecruitEnum.SUCCESS_RECRUIT.getType());
+			saveRequest.setIsRecruit(RecruitEnum.UNKOWN.getType());
 		}
 
 

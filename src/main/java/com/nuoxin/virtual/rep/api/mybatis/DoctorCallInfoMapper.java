@@ -61,7 +61,7 @@ public interface DoctorCallInfoMapper {
      * @param callUrl
      * @param signToken
      */
-    void updateCallUrlBySigToken(@Param(value = "callUrl") String callUrl, @Param(value = "sinToken") String signToken);
+    void updateCallUrlBySigToken(@Param(value = "callUrl") String callUrl, @Param(value = "sinToken") String signToken, @Param(value = "callTime") Integer callTime);
 
     /**
      * 医生拜访明细表
