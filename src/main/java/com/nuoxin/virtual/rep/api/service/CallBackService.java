@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentMap;
 
 import com.nuoxin.virtual.rep.api.web.controller.request.call.Call7mmorRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.call.IdentifyCallUrlRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.call.Call7mmorResponseBean;
 
 /**
@@ -36,4 +37,11 @@ public interface CallBackService {
 	 * @param bean
 	 */
 	void repeatSaveOrUpdateCall(Call7mmorRequestBean bean);
+
+	/**
+	 * 录音识别
+	 * @param bean
+	 */
+	void identifyCallUrl(IdentifyCallUrlRequestBean bean);
+
 }

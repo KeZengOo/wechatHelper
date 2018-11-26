@@ -612,4 +612,20 @@
         WHERE visit_channel=1 AND virtual_drug_user_id =#{drugUserId} AND virtual_doctor_id=#{doctorId}
     </select>
 
+    <!-- 查询需要识别的录音url -->
+    <select id="getIdentifyCallUrl" resultType="com.nuoxin.virtual.rep.api.web.controller.response.call.CallInfoResponseBean">
+        SELECT
+            a.sin_token sinToken,
+            a.call_url callUrl
+        FROM
+            virtual_doctor_call_info a
+        LEFT JOIN virtual_doctor_call_text b ON a.sin_token = b.sin_token
+        WHERE
+            a.call_url IS NOT NULL
+        AND a.call_url != ''
+        AND b.sin_token IS NULL
+        ORDER BY a.create_time DESC
+        LIMIT #{limitNum}
+    </select>
+
 </mapper>

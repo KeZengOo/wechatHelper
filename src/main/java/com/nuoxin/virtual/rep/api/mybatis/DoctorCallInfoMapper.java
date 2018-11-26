@@ -2,6 +2,7 @@ package com.nuoxin.virtual.rep.api.mybatis;
 
 import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsParams;
 import com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.call.IdentifyCallUrlRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.RetryCallInfoRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.call.CallInfoResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CallTimeResponseBean;
@@ -93,4 +94,13 @@ public interface DoctorCallInfoMapper {
      * @return
      */
     Date lastVisitTime(@Param(value = "drugUserId")Long drugUserId,@Param(value = "doctorId")Long doctorId);
+
+
+    /**
+     * 查询需要识别的录音url
+     * @param bean
+     * @return
+     */
+    List<CallInfoResponseBean> getIdentifyCallUrl(IdentifyCallUrlRequestBean bean);
+
 }

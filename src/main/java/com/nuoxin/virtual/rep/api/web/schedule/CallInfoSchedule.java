@@ -2,6 +2,7 @@ package com.nuoxin.virtual.rep.api.web.schedule;
 
 import com.nuoxin.virtual.rep.api.service.CallBackService;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.Call7mmorRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.call.IdentifyCallUrlRequestBean;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -37,5 +38,23 @@ public class CallInfoSchedule {
         long endTime = System.currentTimeMillis();
         logger.info("CallInfoSchedule repeatSaveOrUpdateCall end , cost {}s", (endTime-starTime)/1000);
     }
+
+
+    @ApiOperation(value = "录音识别", notes = "录音识别")
+    @PostMapping(value = "/url/identify")
+    @Scheduled(cron = "0 0 */5 * * ?") // 暂定每隔5小时执行一次
+    public void identifyCallUrl() {
+        logger.info("CallInfoSchedule identifyCallUrl start....");
+        long starTime = System.currentTimeMillis();
+
+        IdentifyCallUrlRequestBean bean  = new IdentifyCallUrlRequestBean();
+        // 限制处理300
+        bean.setLimitNum(300);
+        callBackService.identifyCallUrl(bean);
+        long endTime = System.currentTimeMillis();
+        logger.info("CallInfoSchedule identifyCallUrl end , cost {}s", (endTime-starTime)/1000);
+
+    }
+
 
 }

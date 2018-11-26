@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import com.nuoxin.virtual.rep.api.web.controller.request.call.IdentifyCallUrlRequestBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -160,6 +161,20 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 		}
 
 		this.saveOrUpdateDealingCallList(dealingList);
+
+	}
+
+	@Override
+	public void identifyCallUrl(IdentifyCallUrlRequestBean bean) {
+
+		List<CallInfoResponseBean> identifyCallUrlList = doctorCallInfoMapper.getIdentifyCallUrl(bean);
+		if (CollectionsUtil.isEmptyList(identifyCallUrlList)){
+			return;
+		}
+
+		for (CallInfoResponseBean callInfo : identifyCallUrlList) {
+			super.updateCallUrlText(callInfo.getSinToken(), callInfo.getCallUrl());
+		}
 
 	}
 

@@ -3,6 +3,7 @@ package com.nuoxin.virtual.rep.api.web.schedule;
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.service.CallBackService;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.Call7mmorRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.call.IdentifyCallUrlRequestBean;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -42,5 +43,28 @@ public class CallInfoScheduleController {
         responseBean.setData("success");
         return responseBean;
     }
+
+
+
+    @ApiOperation(value = "识别录音文件", notes = "识别录音文件")
+    @PostMapping(value = "/url/identify")
+    public DefaultResponseBean<String> identifyCallUrl(@RequestBody IdentifyCallUrlRequestBean bean) {
+        logger.info("CallInfoScheduleController identifyCallUrl start....");
+        long starTime = System.currentTimeMillis();
+        Integer limitNum = bean.getLimitNum();
+        if (limitNum == null){
+            // 如果没有就设置300
+            bean.setLimitNum(300);
+        }
+
+        callBackService.identifyCallUrl(bean);
+        long endTime = System.currentTimeMillis();
+        logger.info("CallInfoScheduleController identifyCallUrl end , cost {}s", (endTime-starTime)/1000);
+
+        DefaultResponseBean<String> responseBean = new DefaultResponseBean<>();
+        responseBean.setData("success");
+        return responseBean;
+    }
+
 
 }
