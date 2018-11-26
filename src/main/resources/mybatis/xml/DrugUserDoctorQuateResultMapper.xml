@@ -44,7 +44,7 @@
 
     <select id="getVisitResultList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VisitResultResponseBean">
         SELECT DISTINCT
-            b.visit_result,
+            b.visit_result visitResult,
             quate.doctorId
         FROM
             drug_user_doctor_quate_result a
@@ -75,6 +75,7 @@
             GROUP BY
                 doctor_id
         ) quate ON a.quate_id = quate.quateId
+        WHERE b.visit_result IS NOT NULL AND b.visit_result !=''
     </select>
 
 </mapper>
