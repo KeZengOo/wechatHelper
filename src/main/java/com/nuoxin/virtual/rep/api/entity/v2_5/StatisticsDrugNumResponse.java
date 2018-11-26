@@ -12,7 +12,7 @@ import lombok.Data;
 public class StatisticsDrugNumResponse {
 
 	@ApiModelProperty(value = "销售代表id")
-	private Integer drugUserId;
+	private Long drugUserId;
 
 	@ApiModelProperty(value = "业务数量")
 	private Integer total;
