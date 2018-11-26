@@ -125,7 +125,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 			visitChannel = 1;
 		}
 
-		if (visitChannel != null){
+		if (visitChannel != null && visitChannel !=1){
 			String uuid = UUID.randomUUID().toString();
 			bean.setSinToken(uuid);
 		}
