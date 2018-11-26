@@ -61,6 +61,16 @@ public interface DrugUserDoctorQuateMapper {
 
 
 	/**
+	 * 所有医生的产品信息，每个医生只取两条
+	 * @param doctorIdList
+	 * @param productIdList
+	 * @return
+	 */
+	List<ProductInfoResponse> getAllProductInfoListByProductIdList(@Param(value = "doctorIdList") List<Long> doctorIdList,@Param(value = "productIdList") List<Long> productIdList);
+
+
+
+	/**
 	 * 查询总数，校验记录是否存在
 	 * @param drugUserId
 	 * @param doctorId

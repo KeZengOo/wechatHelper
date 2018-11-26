@@ -29,7 +29,7 @@ public class CallInfoSchedule {
 
     @ApiOperation(value = "没有回调的电话记录重试", notes = "没有回调的电话记录重试")
     @PostMapping(value = "/retry")
-    @Scheduled(cron = "0 0 */4 * * ?") // 暂定每隔4小时执行一次
+    @Scheduled(cron = "0 0 0 * * ?") // 每天晚上12点执行
     public void repeatSaveOrUpdateCall() {
         logger.info("CallInfoSchedule repeatSaveOrUpdateCall start....");
         long starTime = System.currentTimeMillis();
@@ -42,14 +42,14 @@ public class CallInfoSchedule {
 
     @ApiOperation(value = "录音识别", notes = "录音识别")
     @PostMapping(value = "/url/identify")
-    @Scheduled(cron = "0 0 */5 * * ?") // 暂定每隔5小时执行一次
+    @Scheduled(cron = "0 0 23 * * ?") // 每天23点执行
     public void identifyCallUrl() {
         logger.info("CallInfoSchedule identifyCallUrl start....");
         long starTime = System.currentTimeMillis();
 
         IdentifyCallUrlRequestBean bean  = new IdentifyCallUrlRequestBean();
         // 限制处理300
-        bean.setLimitNum(300);
+        bean.setLimitNum(1000);
         callBackService.identifyCallUrl(bean);
         long endTime = System.currentTimeMillis();
         logger.info("CallInfoSchedule identifyCallUrl end , cost {}s", (endTime-starTime)/1000);

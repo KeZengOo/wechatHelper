@@ -1,12 +1,11 @@
 package com.nuoxin.virtual.rep.api.service.v2_5.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import com.nuoxin.virtual.rep.api.entity.Doctor;
 import com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorQuateResultMapper;
 import com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorCallInfoMapper;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
@@ -155,12 +154,16 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		List<Long> productLineIds = pageRequestBean.getProductLineIds();
 		final List<CustomerFollowListBean> customerFollowListBeanList = list;
 		if (CollectionsUtil.isNotEmptyList(list)) {
+
+			this.fillOtherDoctorInfo(list, productLineIds);
+
+
 			list.forEach(doctor -> {
 				this.alterCustomerFollowListBean(doctor, productLineIds);
 				// TODO 补充对应的产品信息 @田存
-				if (CollectionsUtil.isNotEmptyList(productLineIds)){
-					this.fillProductInfos(customerFollowListBeanList, productLineIds);
-				}
+//				if (CollectionsUtil.isNotEmptyList(productLineIds)){
+//					this.fillProductInfos(customerFollowListBeanList, productLineIds);
+//				}
 
 			});
 		}
@@ -170,6 +173,104 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		}
 
 		return new CustomerFollowUpPageResponseBean(pageRequestBean, count, list);
+	}
+
+	private void fillOtherDoctorInfo(List<CustomerFollowListBean> list, List<Long> productLineIds) {
+		if (CollectionsUtil.isEmptyList(list)){
+			return;
+		}
+
+
+		List<Long> doctorIdList = list.stream().map(CustomerFollowListBean::getDoctorId).distinct().collect(Collectors.toList());
+		if (CollectionsUtil.isEmptyList(doctorIdList)){
+			return;
+		}
+
+
+		// 医生的手机号
+		Map<Long, List<CallTelephoneReponseBean>> telephoneMap = new HashMap<>();
+		List<CallTelephoneReponseBean> allTelephoneCallCount = virtualDoctorCallInfoMapper.getAllTelephoneCallCount(doctorIdList);
+		if (CollectionsUtil.isNotEmptyList(allTelephoneCallCount)){
+			Map<Long, List<CallTelephoneReponseBean>> groupByList = allTelephoneCallCount.stream().collect(Collectors.groupingBy(CallTelephoneReponseBean::getDoctorId));
+			this.orderByCallCountDesc(groupByList);
+
+			if (CollectionsUtil.isNotEmptyMap(groupByList)){
+				telephoneMap = groupByList;
+			}
+
+		}
+
+
+		// 医生拜访结果
+		Map<Long, List<VisitResultResponseBean>> visitResultListMap = new HashMap<>();
+		List<VisitResultResponseBean> visitResultList = drugUserDoctorQuateResultMapper.getVisitResultList(doctorIdList, productLineIds);
+		if (CollectionsUtil.isNotEmptyList(visitResultList)){
+			Map<Long, List<VisitResultResponseBean>> groupByVisitResultList = visitResultList.stream().collect(Collectors.groupingBy(VisitResultResponseBean::getDoctorId));
+			if (CollectionsUtil.isNotEmptyMap(groupByVisitResultList)){
+				visitResultListMap = groupByVisitResultList;
+			}
+		}
+
+
+		Map<Long, List<ProductInfoResponse>> productMap = new HashMap<>();
+		List<ProductInfoResponse> productInfoList = drugUserDoctorQuateMapper.getAllProductInfoListByProductIdList(doctorIdList,productLineIds);
+		if (CollectionsUtil.isNotEmptyList(productInfoList)){
+			Map<Long, List<ProductInfoResponse>> collect = productInfoList.stream().collect(Collectors.groupingBy(ProductInfoResponse::getDoctorId));
+			if (CollectionsUtil.isNotEmptyMap(collect)){
+				productMap = collect;
+			}
+		}
+
+
+
+		for (CustomerFollowListBean doctor:list){
+			Long doctorId = doctor.getDoctorId();
+			List<CallTelephoneReponseBean> callTelephoneList = telephoneMap.get(doctorId);
+			if (CollectionsUtil.isNotEmptyList(callTelephoneList)){
+				doctor.setMobiles(callTelephoneList);
+			}
+
+			List<VisitResultResponseBean> visitResultResponseBeanList = visitResultListMap.get(doctorId);
+			if (CollectionsUtil.isNotEmptyList(visitResultResponseBeanList)){
+				List<String> getVisitResult = visitResultResponseBeanList.stream().map(VisitResultResponseBean::getVisitResult).collect(Collectors.toList());
+				doctor.setVisitResultList(getVisitResult);
+			}
+
+
+			List<ProductInfoResponse> productInfoResponses = productMap.get(doctorId);
+			if (CollectionsUtil.isNotEmptyList(productInfoResponses)){
+				// 超过两个则只去两个
+				int size = productInfoResponses.size();
+				if (size > 2){
+					List<ProductInfoResponse> productInfoResponseList = new ArrayList<>(2);
+					productInfoResponseList.add(productInfoResponses.get(0));
+					productInfoResponseList.add(productInfoResponses.get(1));
+					productInfoResponses = productInfoResponseList;
+				}
+
+				doctor.setProductInfos(productInfoResponses);
+			}
+		}
+
+	}
+
+	/**
+	 * 根据接通次数降序排列
+	 * @param groupByList
+	 */
+	private void orderByCallCountDesc(Map<Long, List<CallTelephoneReponseBean>> groupByList) {
+		if (CollectionsUtil.isEmptyMap(groupByList)){
+			return;
+		}
+
+		for (Map.Entry<Long, List<CallTelephoneReponseBean>> entry:groupByList.entrySet()){
+			List<CallTelephoneReponseBean> value = entry.getValue();
+			if (CollectionsUtil.isEmptyList(value)){
+				continue;
+			}
+			Collections.sort(value, Comparator.comparing(CallTelephoneReponseBean::getCallCount).reversed());
+		}
+
 	}
 
 	/**
@@ -237,10 +338,10 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 //		}
 
 
-		List<CallTelephoneReponseBean> telephoneCallCount = virtualDoctorCallInfoMapper.getTelephoneCallCount(doctor.getDoctorId());
-		if (CollectionsUtil.isNotEmptyList(telephoneCallCount)){
-			doctor.setMobiles(telephoneCallCount);
-		}
+//		List<CallTelephoneReponseBean> telephoneCallCount = virtualDoctorCallInfoMapper.getTelephoneCallCount(doctor.getDoctorId());
+//		if (CollectionsUtil.isNotEmptyList(telephoneCallCount)){
+//			doctor.setMobiles(telephoneCallCount);
+//		}
 
 
 		// (上次)拜访时间
@@ -271,10 +372,10 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 //			doctor.setVisitResultObj(jsonArr);
 //		}
 
-		List<String> visitResult = drugUserDoctorQuateResultMapper.getVisitResult(doctor.getDoctorId(), productLineIds);
-		if (CollectionsUtil.isNotEmptyList(visitResult)){
-			doctor.setVisitResultList(visitResult);
-		}
+//		List<String> visitResult = drugUserDoctorQuateResultMapper.getVisitResult(doctor.getDoctorId(), productLineIds);
+//		if (CollectionsUtil.isNotEmptyList(visitResult)){
+//			doctor.setVisitResultList(visitResult);
+//		}
 
 
 		// 是否有微信

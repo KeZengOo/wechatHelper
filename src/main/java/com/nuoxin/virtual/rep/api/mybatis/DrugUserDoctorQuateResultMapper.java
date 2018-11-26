@@ -4,6 +4,7 @@ import com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorQuateParams;
 import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse;
 import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsParams;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ProductInfoResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VisitResultResponseBean;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -29,6 +30,15 @@ public interface DrugUserDoctorQuateResultMapper {
 	 */
 	List<String> getVisitResult(@Param(value = "doctorId") Long doctorId,@Param(value = "productList") List<Long> productList);
 
+
+
+	/**
+	 * 获取拜访结果list
+	 * @param doctorIdList
+	 * @param productList
+	 * @return
+	 */
+	List<VisitResultResponseBean> getVisitResultList(@Param(value = "doctorIdList") List<Long> doctorIdList, @Param(value = "productList") List<Long> productList);
 
 }
 

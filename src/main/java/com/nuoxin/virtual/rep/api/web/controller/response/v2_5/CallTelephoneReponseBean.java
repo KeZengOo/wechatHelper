@@ -16,6 +16,9 @@ import java.io.Serializable;
 public class CallTelephoneReponseBean implements Serializable {
     private static final long serialVersionUID = -6067308964496961547L;
 
+    @ApiModelProperty(value = "医生ID")
+    private Long doctorId;
+
     @ApiModelProperty(value = "医生联系方式")
     private String telephone;
 

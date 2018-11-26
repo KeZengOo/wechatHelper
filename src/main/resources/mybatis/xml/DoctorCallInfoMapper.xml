@@ -628,4 +628,24 @@
         LIMIT #{limitNum}
     </select>
 
+
+    <select id="getNotAliyunCallUrl" resultType="com.nuoxin.virtual.rep.api.web.controller.response.call.CallInfoResponseBean">
+        SELECT
+            sin_token sinToken,
+            call_url callUrl
+        FROM
+            virtual_doctor_call_info
+        WHERE
+            call_url IS NOT NULL
+        AND call_url != ''
+        AND call_url NOT LIKE '%aliyun%'
+    </select>
+
+    <update id="updateNotAliyunCallUrl">
+        UPDATE virtual_doctor_call_info
+        SET call_url=#{callUrl}
+        WHERE sin_token = #{sinToken}
+
+    </update>
+
 </mapper>

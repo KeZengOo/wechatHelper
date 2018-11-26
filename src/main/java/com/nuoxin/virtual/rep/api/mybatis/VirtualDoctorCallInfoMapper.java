@@ -98,6 +98,14 @@ public interface VirtualDoctorCallInfoMapper {
 	 */
 	List<CallTelephoneReponseBean> getTelephoneCallCount(@Param(value = "doctorId") Long doctorId);
 
+
+	/**
+	 * 得到医生电话以及接通次数
+	 * @param doctorIdList
+	 * @return
+	 */
+	List<CallTelephoneReponseBean> getAllTelephoneCallCount(@Param(value = "doctorIdList") List<Long> doctorIdList);
+
 	/**
 	 * 更新电话记录产品
 	 * @param callId

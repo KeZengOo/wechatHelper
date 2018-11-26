@@ -1,5 +1,6 @@
 package com.nuoxin.virtual.rep.api.service;
 
+import java.io.FileNotFoundException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -175,6 +176,36 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 		for (CallInfoResponseBean callInfo : identifyCallUrlList) {
 			super.updateCallUrlText(callInfo.getSinToken(), callInfo.getCallUrl());
 		}
+
+	}
+
+	@Override
+	public void handleNotAliyunCallUrl() {
+
+		List<CallInfoResponseBean> notAliyunCallUrlList = doctorCallInfoMapper.getNotAliyunCallUrl();
+		if (CollectionsUtil.isEmptyList(notAliyunCallUrlList)){
+			return;
+		}
+
+
+		notAliyunCallUrlList.forEach(callUrl->{
+			try {
+				String url = callUrl.getCallUrl();
+				String sinToken = callUrl.getSinToken();
+				String ossUrl = super.processFile(url, sinToken);
+				if (StringUtil.isNotEmpty(ossUrl)) {
+					doctorCallInfoMapper.updateNotAliyunCallUrl(sinToken, url);
+					logger.info("sinToken={}, 更新非阿里云录音url成功！", sinToken);
+				}
+			} catch (Exception e){
+				if (e instanceof FileNotFoundException){
+					logger.warn("文件没有找到：url=" + callUrl.getCallUrl());
+				}else {
+					e.printStackTrace();
+				}
+
+			}
+		});
 
 	}
 

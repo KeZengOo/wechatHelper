@@ -103,4 +103,17 @@ public interface DoctorCallInfoMapper {
      */
     List<CallInfoResponseBean> getIdentifyCallUrl(IdentifyCallUrlRequestBean bean);
 
+    /**
+     * 查询非阿里云录音url
+     * @return
+     */
+    List<CallInfoResponseBean> getNotAliyunCallUrl();
+
+    /**
+     * 更新非阿里云的录音url
+     * @param sinToken
+     * @param callUrl
+     */
+    void updateNotAliyunCallUrl(@Param(value = "sinToken") String sinToken,@Param(value = "callUrl") String callUrl);
+
 }

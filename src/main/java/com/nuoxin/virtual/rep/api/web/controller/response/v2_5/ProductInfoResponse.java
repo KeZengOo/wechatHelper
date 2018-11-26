@@ -17,4 +17,6 @@ public class ProductInfoResponse {
 	private String doctorLevel;
 	@ApiModelProperty(value = "是否有药:1是,0否,-1未知")
 	private Integer isHasDrug;
+	@ApiModelProperty(value = "医生ID")
+	private Long doctorId;
 }

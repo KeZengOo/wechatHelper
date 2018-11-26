@@ -133,34 +133,6 @@
 
 	<!-- 医生的产品信息，每个医生只取两条 -->
 	<select id="getProductInfoListByProductIdList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ProductInfoResponse">
-		<!-- 2018-11-24 修改前
-		SELECT
-		DISTINCT
-			a.prod_name productName,
-			qudq.is_recruit isRecruit,
-			qudq.hcp_potential doctorPotential,
-			qudq.is_has_drug isHasDrug
-		FROM
-			product_line a
-		INNER JOIN drug_user_doctor dud
-		ON a.prod_id=dud.prod_id AND dud.is_available=1 AND dud.doctor_id=#{doctorId}
-		LEFT JOIN drug_user_doctor_quate qudq ON a.prod_id = qudq.product_id
-		AND qudq.doctor_id = #{doctorId}
-		LEFT JOIN doctor_virtual dv ON a.prod_id = dv.product_id
-		AND dv.doctor_id = #{doctorId}
-		WHERE a.prod_id IN
-		<foreach item="id" index="index" collection="productIdList"
-				 open="(" separator="," close=")">
-			#{id}
-		</foreach>
-
-		LIMIT 2
-
-		-->
-
-
-
-
 
 		SELECT DISTINCT
 		a.prod_name productName,
@@ -208,6 +180,68 @@
 		LIMIT 2
 
 	</select>
+
+
+
+
+
+	<!-- 全部医生的产品信息 -->
+	<select id="getAllProductInfoListByProductIdList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ProductInfoResponse">
+
+		SELECT
+			tt.prod_name productName,
+			tt.doctor_id doctorId,
+			qu.is_recruit isRecruit,
+			qu.hcp_potential doctorPotential,
+			qu.is_has_drug isHasDrug,
+			qu.create_time
+		FROM
+			drug_user_doctor_quate qu
+		INNER JOIN (
+			SELECT
+				t.doctor_id,
+				t.prod_name,
+				max(q.id) quateId
+			FROM
+				drug_user_doctor_quate q
+			INNER JOIN (
+				SELECT
+					dud.doctor_id,
+					dud.prod_id,
+					pl.prod_name
+				FROM
+					drug_user_doctor dud
+				INNER JOIN product_line pl ON dud.prod_id = pl.prod_id
+				WHERE
+					dud.is_available = 1
+				AND dud.doctor_id
+				IN
+
+		<foreach item="doctorId" index="index" collection="doctorIdList"
+				 open="(" separator="," close=")">
+			#{doctorId}
+		</foreach>
+
+				AND dud.prod_id IN
+			<foreach item="id" index="index" collection="productIdList"
+					 open="(" separator="," close=")">
+				#{id}
+			</foreach>
+
+
+			GROUP BY
+						dud.prod_id,
+						dud.doctor_id
+				) t ON q.doctor_id = t.doctor_id
+				AND q.product_id = t.prod_id
+				GROUP BY
+					q.doctor_id,
+					q.product_id
+			) tt ON qu.id = tt.quateId
+
+	</select>
+
+
 
 
 	<select id="getQuateCount" resultType="java.lang.Integer">

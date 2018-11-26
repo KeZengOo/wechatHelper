@@ -44,4 +44,9 @@ public interface CallBackService {
 	 */
 	void identifyCallUrl(IdentifyCallUrlRequestBean bean);
 
+	/**
+	 * 处理非阿里云录音url，转成阿里云url,再上传
+	 */
+	void handleNotAliyunCallUrl();
+
 }

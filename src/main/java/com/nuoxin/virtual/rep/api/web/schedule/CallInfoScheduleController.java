@@ -8,10 +8,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -60,6 +57,21 @@ public class CallInfoScheduleController {
         callBackService.identifyCallUrl(bean);
         long endTime = System.currentTimeMillis();
         logger.info("CallInfoScheduleController identifyCallUrl end , cost {}s", (endTime-starTime)/1000);
+
+        DefaultResponseBean<String> responseBean = new DefaultResponseBean<>();
+        responseBean.setData("success");
+        return responseBean;
+    }
+
+
+    @ApiOperation(value = "识别录音文件", notes = "识别录音文件")
+    @GetMapping(value = "/not/aliyun/url/update")
+    public DefaultResponseBean<String> handleNotAliyunCallUrl() {
+        logger.info("CallInfoScheduleController handleNotAliyunCallUrl start....");
+        long starTime = System.currentTimeMillis();
+        callBackService.handleNotAliyunCallUrl();
+        long endTime = System.currentTimeMillis();
+        logger.info("CallInfoScheduleController handleNotAliyunCallUrl end , cost {}s", (endTime-starTime)/1000);
 
         DefaultResponseBean<String> responseBean = new DefaultResponseBean<>();
         responseBean.setData("success");
