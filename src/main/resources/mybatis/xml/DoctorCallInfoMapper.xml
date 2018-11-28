@@ -208,6 +208,7 @@
         SELECT * FROM (
         SELECT
         vdci.id,call_dud.drugUserName,IFNULL(date_format(vdci.create_time, '%Y-%m-%d %H:%i:%s'),'')  visitTime,call_dud.doctorId,call_dud.doctorName,
+        call_dud.hospitalId,
         call_dud.hospitalName,
         CASE WHEN vdci.visit_channel=1 THEN "电话" WHEN vdci.visit_channel=2 THEN "微信" WHEN vdci.visit_channel=3 THEN "短信"
         WHEN vdci.visit_channel=4 THEN "邮件"
@@ -225,7 +226,7 @@
 
         INNER JOIN (
         SELECT DISTINCT
-        d.id doctorId,d.`name` doctorName,d.hospital_name hospitalName,IFNULL(dv.client_level,'') clientLevel,du.`name` drugUserName
+        d.id doctorId,d.`name` doctorName,d.hospital_id hospitalId, d.hospital_name hospitalName,IFNULL(dv.client_level,'') clientLevel,du.`name` drugUserName
         FROM
         doctor d
         INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
@@ -283,6 +284,7 @@
             UNION ALL
             SELECT
             a.id,content_dud.drugUserName,IFNULL(date_format(a.`create_time`, '%Y-%m-%d %H:%i:%s'),'') visitTime,content_dud.doctorId,content_dud.doctorName,
+            content_dud.hospitalId,
             content_dud.hospitalName,'内容分享' visitType,
             6 visitChannel,
             IFNULL(ai.title,'') shareContent,"" visitResult,"" attitude,"" nextVisitTime
@@ -291,7 +293,7 @@
             activity_share a
             INNER JOIN (
             SELECT DISTINCT
-            d.id doctorId,d.`name` doctorName,d.hospital_name hospitalName,IFNULL(dv.client_level,'') clientLevel,du.`name` drugUserName
+            d.id doctorId,d.`name` doctorName,d.hospital_id hospitalId, d.hospital_name hospitalName,IFNULL(dv.client_level,'') clientLevel,du.`name` drugUserName
             FROM
             doctor d
             INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
