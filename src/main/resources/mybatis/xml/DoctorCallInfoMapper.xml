@@ -205,7 +205,27 @@
 
 
         <!-- 2018-09-29 修改后 -->
-        SELECT * FROM (
+        SELECT id,drugUserName,visitTime,doctorId,doctorName,hospitalId,hospitalName,isRecruit,visitType,
+        visitChannel,
+        shareContent,
+        CASE WHEN visitResultStr='cancelmakecall' THEN '无响应'
+        WHEN visitResultStr='poweroff' THEN '关机'
+        WHEN visitResultStr='reject' THEN '拒接'
+        WHEN visitResultStr='emptynumber' THEN '空号/错号'
+        WHEN visitResultStr='busy' THEN '忙音'
+        WHEN visitResultStr='stop' THEN '停机'
+        WHEN visitResultStr='noanswer' THEN '无人接听'
+        WHEN visitResultStr='makecall' THEN '忙音'
+        ELSE visitResultStr
+        END visitResult,
+        attitude,
+        nextVisitTime,
+        clientLevel,
+        hcpPotential,
+        isHasDrug,
+        isTarget,
+        isHasAe
+        FROM (
         SELECT
         vdci.id,call_dud.drugUserName,IFNULL(date_format(vdci.create_time, '%Y-%m-%d %H:%i:%s'),'')  visitTime,call_dud.doctorId,call_dud.doctorName,
         call_dud.hospitalId,
@@ -214,7 +234,7 @@
         CASE WHEN vdci.visit_channel=1 THEN "电话" WHEN vdci.visit_channel=2 THEN "微信" WHEN vdci.visit_channel=3 THEN "短信"
         WHEN vdci.visit_channel=4 THEN "邮件"
         WHEN vdci.visit_channel=5 THEN "面谈"
-        else "" END visitType,vdci.visit_channel visitChannel,"" shareContent,IFNULL(GROUP_CONCAT(vppvr.visit_result),vdci.status_name) visitResult,IFNULL(vdcim.`attitude`,'') attitude,IFNULL(date_format(vdcim.`next_visit_time`, '%Y-%m-%d %H:%i:%s'),'') nextVisitTime
+        else "" END visitType,vdci.visit_channel visitChannel,"" shareContent,IFNULL(GROUP_CONCAT(vppvr.visit_result),vdci.status_name) visitResultStr,IFNULL(vdcim.`attitude`,'') attitude,IFNULL(date_format(vdcim.`next_visit_time`, '%Y-%m-%d %H:%i:%s'),'') nextVisitTime
         ,call_dud.clientLevel,IFNULL(vdcim.`hcp_potential`,'未知') hcpPotential,IFNULL(vdcim.is_has_drug,'未知') isHasDrug,IFNULL(vdcim.`is_target`,'未知') isTarget,IFNULL(vdcim.`is_has_ae`,'未知')  isHasAe
         FROM
         virtual_doctor_call_info vdci
@@ -290,7 +310,7 @@
             '' isRecruit,
             '内容分享' visitType,
             6 visitChannel,
-            IFNULL(ai.title,'') shareContent,"" visitResult,"" attitude,"" nextVisitTime
+            IFNULL(ai.title,'') shareContent,"" visitResultStr,"" attitude,"" nextVisitTime
             ,content_dud.clientLevel,'未知' hcpPotential,'未知' isHasDrug,'未知' isTarget,'未知'  isHasAe
             FROM
             activity_share a
