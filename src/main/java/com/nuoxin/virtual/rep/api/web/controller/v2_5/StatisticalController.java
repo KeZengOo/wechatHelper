@@ -99,7 +99,7 @@ public class StatisticalController extends NewBaseController {
 		statisticsParams.setDrugUserIds(ids);
 		statisticsParams.setProductId(productId);
 		StringBuffer fileName=new StringBuffer();
-		fileName.append("医生拜访统计表 ").append(".xls");
+		fileName.append("医生拜访统计表.xls ");
 		List<StatisticsResponse> list=statisticalService.visitStatisticsList(statisticsParams);
 		HSSFWorkbook wb=ExportExcel.excelExport(list, ExportExcelTitle.getStatisticsListTitleMap(),"医生拜访统计表");
 		OutputStream ouputStream = null;
@@ -175,7 +175,7 @@ public class StatisticalController extends NewBaseController {
         statisticsParams.setProductId(productId);
         statisticsParams.setDrugUserId(drugUserId);
         StringBuffer fileName=new StringBuffer();
-        fileName.append("医生拜访明细表 ").append(".xls");
+        fileName.append("医生拜访明细表.xls ");
         //固定字段对应的值
         List<LinkedHashMap<String,Object>> list=statisticalService.doctorVisitDetailList(statisticsParams);
         //产品的动态字段
