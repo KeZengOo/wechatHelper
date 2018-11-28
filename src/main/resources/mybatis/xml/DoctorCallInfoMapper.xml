@@ -286,8 +286,9 @@
             SELECT
             a.id,content_dud.drugUserName,IFNULL(date_format(a.`create_time`, '%Y-%m-%d %H:%i:%s'),'') visitTime,content_dud.doctorId,content_dud.doctorName,
             content_dud.hospitalId,
+            content_dud.hospitalName,
             '' isRecruit,
-            content_dud.hospitalName,'内容分享' visitType,
+            '内容分享' visitType,
             6 visitChannel,
             IFNULL(ai.title,'') shareContent,"" visitResult,"" attitude,"" nextVisitTime
             ,content_dud.clientLevel,'未知' hcpPotential,'未知' isHasDrug,'未知' isTarget,'未知'  isHasAe
