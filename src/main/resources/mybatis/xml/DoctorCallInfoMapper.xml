@@ -210,6 +210,7 @@
         vdci.id,call_dud.drugUserName,IFNULL(date_format(vdci.create_time, '%Y-%m-%d %H:%i:%s'),'')  visitTime,call_dud.doctorId,call_dud.doctorName,
         call_dud.hospitalId,
         call_dud.hospitalName,
+        CASE WHEN vdcim.is_recruit=0 THEN '否' WHEN vdcim.is_recruit=1 THEN '是' WHEN vdcim.is_recruit=2 THEN '退出项目' ELSE '' END isRecruit,
         CASE WHEN vdci.visit_channel=1 THEN "电话" WHEN vdci.visit_channel=2 THEN "微信" WHEN vdci.visit_channel=3 THEN "短信"
         WHEN vdci.visit_channel=4 THEN "邮件"
         WHEN vdci.visit_channel=5 THEN "面谈"
@@ -285,6 +286,7 @@
             SELECT
             a.id,content_dud.drugUserName,IFNULL(date_format(a.`create_time`, '%Y-%m-%d %H:%i:%s'),'') visitTime,content_dud.doctorId,content_dud.doctorName,
             content_dud.hospitalId,
+            '' isRecruit,
             content_dud.hospitalName,'内容分享' visitType,
             6 visitChannel,
             IFNULL(ai.title,'') shareContent,"" visitResult,"" attitude,"" nextVisitTime
