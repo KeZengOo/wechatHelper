@@ -21,6 +21,8 @@ public class CallVisitBean {
 	private String drugUserName;
 	@ApiModelProperty(value = "callId")
 	private Long callId;
+	@ApiModelProperty(value = "拜访渠道")
+	private Integer visitChannel;
 	@ApiModelProperty(value = "通话时长")
 	private Integer callTime;
 	@ApiModelProperty(value = "通话状态")

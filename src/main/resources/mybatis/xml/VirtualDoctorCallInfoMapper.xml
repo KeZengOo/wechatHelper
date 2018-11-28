@@ -31,7 +31,7 @@
 	
 	<select id="getCallVisitList" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitBean">
 		SELECT 
-			v.id AS callId, call_time AS callTime, status_name AS statusName, call_url AS callUrl, v.type,
+			v.id AS callId, call_time AS callTime,v.visit_channel visitChannel, v.status_name AS statusName, call_url AS callUrl, v.type,
 			date_format(v.create_time, '%Y-%m-%d %H:%i:%S') AS createTime,
 			remark,du.name AS drugUserName 
 		FROM virtual_doctor_call_info v
