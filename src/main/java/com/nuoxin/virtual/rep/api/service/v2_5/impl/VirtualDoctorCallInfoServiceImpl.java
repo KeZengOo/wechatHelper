@@ -3,6 +3,7 @@ package com.nuoxin.virtual.rep.api.service.v2_5.impl;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
@@ -15,6 +16,7 @@ import com.nuoxin.virtual.rep.api.enums.UserTypeEnum;
 import com.nuoxin.virtual.rep.api.mybatis.*;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.CallRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.product.ProductResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VisitResultResponseBean;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -242,7 +244,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	}
 	
 	private void configSaveCallInfoUnConnectedRequest(SaveCallInfoUnConnectedRequest saveRequest) {
-		// 如果没有传状态值则设置为 cancelmakecall
+		// 如果没有传状态值则设置为 cancelmakecall 无响应
 		if (StringUtils.isBlank(saveRequest.getStatuaName())) {
 			saveRequest.setStatuaName("cancelmakecall");
 		}
@@ -267,27 +269,45 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		
 		// 补充 VirtualDoctorCallInfoMend 信息
 		List<CallVisitMendBean> callInfoMends = callInfoMendMapper.getCallVisitMendList(callIds);
+
+		// 补充拜访结果
+		Map<Long, List<VisitResultResponseBean>> resultMap = new HashMap<>();
+		if (CollectionsUtil.isNotEmptyList(callIds)){
+			List<VisitResultResponseBean> visitResultList = virtualDoctorCallInfoResultMapper.getVisitResultList(callIds);
+			if (CollectionsUtil.isNotEmptyList(visitResultList)){
+				Map<Long, List<VisitResultResponseBean>> result = visitResultList.stream().collect(Collectors.groupingBy(VisitResultResponseBean::getCallId));
+				if (CollectionsUtil.isNotEmptyMap(result)){
+					resultMap = result;
+				}
+			}
+		}
+
+		ConcurrentMap<Long, CallVisitMendBean> map = new ConcurrentHashMap<>();
 		if (CollectionsUtil.isNotEmptyList(callInfoMends)) {
-			ConcurrentMap<Long, CallVisitMendBean> map = new ConcurrentHashMap<>(callInfoMends.size());
 			callInfoMends.forEach(mend -> {
 				map.put(mend.getCallId(), mend);
 			});
-
-			list.forEach(visit -> {
-				Long callId = visit.getCallId();
-				CallVisitMendBean mend = map.get(callId);
-				if (mend != null) {
-					visit.setAttitude(mend.getAttitude()); // 医生态度
-//					String visitResultStr = mend.getVisitResult(); // 拜访结果
-//					JSONArray visitResult = JSONObject.parseArray(visitResultStr);
-					List<String> visitResultList = virtualDoctorCallInfoResultMapper.getVisitResultByCallId(callId);
-					if (CollectionsUtil.isNotEmptyList(visitResultList)){
-						visit.setVisitResultList(visitResultList);
-					}
-
-				}
-			});
 		}
+
+
+		for (CallVisitBean visit:list){
+			Long callId = visit.getCallId();
+			CallVisitMendBean mend = map.get(callId);
+			if (mend != null) {
+				visit.setAttitude(mend.getAttitude()); // 医生态度
+			}
+
+
+			List<VisitResultResponseBean> visitResultResponseBeans = resultMap.get(callId);
+			if (CollectionsUtil.isNotEmptyList(visitResultResponseBeans)){
+				List<String> collectVisitResultList = visitResultResponseBeans.stream().map(VisitResultResponseBean::getVisitResult).distinct().collect(Collectors.toList());
+				if (CollectionsUtil.isNotEmptyList(collectVisitResultList)){
+					visit.setVisitResultList(collectVisitResultList);
+				}
+			}
+
+		}
+
 	}
 	
 	/**

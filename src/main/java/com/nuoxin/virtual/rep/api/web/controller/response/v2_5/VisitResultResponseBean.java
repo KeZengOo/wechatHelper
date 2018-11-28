@@ -19,6 +19,9 @@ public class VisitResultResponseBean implements Serializable {
     @ApiModelProperty(value = "医生ID")
     private Long doctorId;
 
+    @ApiModelProperty(value = "拜访ID")
+    private Long callId;
+
 
     @ApiModelProperty(value = "拜访结果")
     private String visitResult;

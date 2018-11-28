@@ -210,11 +210,11 @@
         vdci.id,call_dud.drugUserName,IFNULL(date_format(vdci.create_time, '%Y-%m-%d %H:%i:%s'),'')  visitTime,call_dud.doctorId,call_dud.doctorName,
         call_dud.hospitalId,
         call_dud.hospitalName,
-        CASE WHEN vdcim.is_recruit=0 THEN '否' WHEN vdcim.is_recruit=1 THEN '是' WHEN vdcim.is_recruit=2 THEN '退出项目' ELSE '' END isRecruit,
+        CASE WHEN vdcim.is_recruit IS NULL THEN '未知' WHEN vdcim.is_recruit=0 THEN '否' WHEN vdcim.is_recruit=1 THEN '是' WHEN vdcim.is_recruit=2 THEN '退出项目' ELSE '' END isRecruit,
         CASE WHEN vdci.visit_channel=1 THEN "电话" WHEN vdci.visit_channel=2 THEN "微信" WHEN vdci.visit_channel=3 THEN "短信"
         WHEN vdci.visit_channel=4 THEN "邮件"
         WHEN vdci.visit_channel=5 THEN "面谈"
-        else "" END visitType,vdci.visit_channel visitChannel,"" shareContent,IFNULL(GROUP_CONCAT(vppvr.visit_result),'') visitResult,IFNULL(vdcim.`attitude`,'') attitude,IFNULL(date_format(vdcim.`next_visit_time`, '%Y-%m-%d %H:%i:%s'),'') nextVisitTime
+        else "" END visitType,vdci.visit_channel visitChannel,"" shareContent,IFNULL(GROUP_CONCAT(vppvr.visit_result),vdci.status_name) visitResult,IFNULL(vdcim.`attitude`,'') attitude,IFNULL(date_format(vdcim.`next_visit_time`, '%Y-%m-%d %H:%i:%s'),'') nextVisitTime
         ,call_dud.clientLevel,IFNULL(vdcim.`hcp_potential`,'未知') hcpPotential,IFNULL(vdcim.is_has_drug,'未知') isHasDrug,IFNULL(vdcim.`is_target`,'未知') isTarget,IFNULL(vdcim.`is_has_ae`,'未知')  isHasAe
         FROM
         virtual_doctor_call_info vdci

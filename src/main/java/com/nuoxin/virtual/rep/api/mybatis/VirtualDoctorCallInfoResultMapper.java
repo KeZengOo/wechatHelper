@@ -1,6 +1,7 @@
 package com.nuoxin.virtual.rep.api.mybatis;
 
 
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VisitResultResponseBean;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -26,6 +27,13 @@ public interface VirtualDoctorCallInfoResultMapper {
 	 * @return
 	 */
 	List<String> getVisitResultByCallId(@Param(value = "callId") Long callId);
+
+	/**
+	 * 获取所有的拜访结果
+	 * @param callIdList
+	 * @return
+	 */
+	List<VisitResultResponseBean> getVisitResultList(@Param(value = "callIdList") List<Long> callIdList);
 
 }
 
