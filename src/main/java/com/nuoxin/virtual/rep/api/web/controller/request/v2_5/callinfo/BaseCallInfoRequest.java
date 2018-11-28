@@ -36,7 +36,7 @@ public class BaseCallInfoRequest {
 	@ApiModelProperty(value = "通话状态:1.接通,0未接通")
 	private int status;
 	@ApiModelProperty(value = "未接通原因,由前端传过来,英文单词形式,如:noanswer,emptynumber等")
-	private String statuaName;
+	private String statusName;
 	@ApiModelProperty(value = "备注")
 	private String remark;
 	

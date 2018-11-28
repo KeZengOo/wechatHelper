@@ -245,12 +245,12 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	
 	private void configSaveCallInfoUnConnectedRequest(SaveCallInfoUnConnectedRequest saveRequest) {
 		// 如果没有传状态值则设置为 cancelmakecall 无响应
-		if (StringUtils.isBlank(saveRequest.getStatuaName())) {
-			saveRequest.setStatuaName("cancelmakecall");
+		if (StringUtils.isBlank(saveRequest.getStatusName())) {
+			saveRequest.setStatusName("cancelmakecall");
 		}
 
 		// statusName 为 emptynumber 时将 isBreakOff 设置为1
-		if ("emptynumber".equalsIgnoreCase(saveRequest.getStatuaName())) {
+		if ("emptynumber".equalsIgnoreCase(saveRequest.getStatusName())) {
 			saveRequest.setIsBreakOff(1);
 		} else {
 			saveRequest.setIsBreakOff(0);
@@ -425,7 +425,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		callVisitParams.setMobile(saveRequest.getMobile());
 		callVisitParams.setRemark(saveRequest.getRemark());
 		callVisitParams.setStatus(saveRequest.getStatus());
-		callVisitParams.setStatusName(saveRequest.getStatuaName());
+		callVisitParams.setStatusName(saveRequest.getStatusName());
 		callVisitParams.setIsBreakOff(saveRequest.getIsBreakOff()); // 是否脱落来自页面传值(接通/未接通)
 		
 		String nextVisitTime = saveRequest.getNextVisitTime();
@@ -472,7 +472,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 			SaveCallInfoUnConnectedRequest saveCallInfoRequest = (SaveCallInfoUnConnectedRequest) saveRequest;
 			virtualQuestinairedId = 0;
 			callVisitParams.setStatus(0); // 未接通
-			callVisitParams.setStatusName(saveCallInfoRequest.getStatuaName()); // 状态名
+			callVisitParams.setStatusName(saveCallInfoRequest.getStatusName()); // 状态名
 			callVisitParams.setProductId(saveCallInfoRequest.getProductId());
 		}
 		
