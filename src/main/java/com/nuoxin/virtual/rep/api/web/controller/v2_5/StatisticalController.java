@@ -98,14 +98,14 @@ public class StatisticalController extends NewBaseController {
 		statisticsParams.setType(list);
 		statisticsParams.setDrugUserIds(ids);
 		statisticsParams.setProductId(productId);
-		StringBuffer fileName=new StringBuffer();
-		fileName.append("医生拜访统计表.xls ");
+//		StringBuffer fileName=new StringBuffer();
+//		fileName.append("医生拜访统计表").append(".xls");
 		List<StatisticsResponse> list=statisticalService.visitStatisticsList(statisticsParams);
 		HSSFWorkbook wb=ExportExcel.excelExport(list, ExportExcelTitle.getStatisticsListTitleMap(),"医生拜访统计表");
 		OutputStream ouputStream = null;
 		try {
 			response.setContentType("application/vnd.ms-excel");
-			response.setHeader("Content-disposition", "attachment;filename=" + URLEncoder.encode(fileName.toString(),"UTF-8"));
+			response.setHeader("Content-disposition", "attachment;filename=" + URLEncoder.encode("医生拜访统计表.xls","UTF-8"));
 			response.setHeader("Pragma", "No-cache");
 			ouputStream = response.getOutputStream();
 			if(ouputStream!=null){
@@ -174,8 +174,8 @@ public class StatisticalController extends NewBaseController {
         }
         statisticsParams.setProductId(productId);
         statisticsParams.setDrugUserId(drugUserId);
-        StringBuffer fileName=new StringBuffer();
-        fileName.append("医生拜访明细表.xls ");
+//        StringBuffer fileName=new StringBuffer();
+//        fileName.append("医生拜访明细表").append(".xls");
         //固定字段对应的值
         List<LinkedHashMap<String,Object>> list=statisticalService.doctorVisitDetailList(statisticsParams);
         //产品的动态字段
@@ -184,7 +184,7 @@ public class StatisticalController extends NewBaseController {
         OutputStream ouputStream = null;
         try {
             response.setContentType("application/vnd.ms-excel");
-            response.setHeader("Content-disposition", "attachment;filename=" + URLEncoder.encode(fileName.toString(),"UTF-8"));
+            response.setHeader("Content-disposition", "attachment;filename=" + URLEncoder.encode("医生拜访明细表.xls","UTF-8"));
             response.setHeader("Pragma", "No-cache");
             ouputStream = response.getOutputStream();
             if(ouputStream!=null){
