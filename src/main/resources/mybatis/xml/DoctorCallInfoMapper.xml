@@ -220,6 +220,7 @@
         WHEN visitResultStr='makecall' THEN '忙音'
         ELSE visitResultStr
         END visitResult,
+        remark,
         attitude,
         nextVisitTime,
         clientLevel,
