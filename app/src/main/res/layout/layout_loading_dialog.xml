@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="205dp"
+    android:gravity="center_horizontal"
+    android:layout_height="175dp"
+    android:background="@drawable/bg_loading"
+    android:orientation="vertical">
+
+    <com.wang.avi.AVLoadingIndicatorView
+        android:id="@+id/loadingView"
+        android:layout_marginTop="25dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        app:indicator="BallSpinFadeLoader"
+        app:indicator_color="#4290f7"
+        />
+
+    <TextView
+        android:id="@+id/text"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:textColor="#FFFFFF"
+        android:layout_marginTop="30dp"
+        android:text="正在从微信中导出聊天记录,请稍后"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+</LinearLayout>
