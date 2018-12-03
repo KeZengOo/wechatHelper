@@ -222,15 +222,21 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 			if (callInfo != null){
 				String callUrl = callInfo.getCallUrl();
 				if (StringUtils.isEmpty(callUrl) || callInfo.getCallTime()==null || callInfo.getCallTime() == 0 || (!"answer".equals(callInfo.getStatusName()))){
-					String record_file_name = call7mmorResponseBean.getRECORD_FILE_NAME();
-					String file_server = call7mmorResponseBean.getFILE_SERVER();
-					String originFilePath = file_server +"/" +  record_file_name;
 					String ossFilePath = null;
-					try {
-						ossFilePath = super.processFile(originFilePath, call_sheet_id);
-					}catch (Exception e){
-						logger.error("sinToken={} 文件上传失败", call_sheet_id, e);
+					if (StringUtil.isNotEmpty(callUrl)){
+						ossFilePath = callUrl;
+					}else{
+						String record_file_name = call7mmorResponseBean.getRECORD_FILE_NAME();
+						String file_server = call7mmorResponseBean.getFILE_SERVER();
+						String originFilePath = file_server +"/" +  record_file_name;
+						try {
+							ossFilePath = super.processFile(originFilePath, call_sheet_id);
+						}catch (Exception e){
+							logger.error("sinToken={} 文件上传失败", call_sheet_id, e);
+						}
 					}
+
+
 					if (!StringUtils.isEmpty(ossFilePath)){
 
 						String beginTime = call7mmorResponseBean.getBEGIN_TIME();
