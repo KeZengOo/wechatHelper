@@ -11,9 +11,13 @@ import java.util.regex.Pattern;
 public class RegularUtils {
 
     //excel文件扩展名校验
-    public static final String EXTENSION_XLS = "xls";
+    public static final String EXTENSION_XLS = ".xls";
 
-    public static final String EXTENSION_XLSX = "xlsx";
+    public static final String EXTENSION_XLSX = ".xlsx";
+
+
+    public static final String EXTENSION_CSV = ".csv";
+
 
     //手机号验证
     public static final String MATCH_TELEPHONE = "^1\\d{10}$";

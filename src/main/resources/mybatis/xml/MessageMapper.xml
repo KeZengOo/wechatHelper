@@ -831,4 +831,22 @@
         AND DATE_FORMAT(message_time,'%Y-%m-%d %H:%i:%s')=DATE_FORMAT(#{wechatTime},'%Y-%m-%d %H:%i:%s')
     </select>
 
+
+
+    <insert id="batchInsertWechatMessage">
+        INSERT INTO virtual_message(user_id, user_type, nickname, drug_user_id, upload_time, doctor_id, wechat_number, telephone,
+        wechat_message_status, message, img_path, wechat_message_type,message_time)
+        VALUES
+        <foreach collection="list" item="c" separator=",">
+            (#{c.userId},#{c.userType},#{c.nickname},#{c.drugUserId}, #{c.uploadTime},
+            #{c.doctorId}, #{c.wechatNumber},
+            #{c.telephone},#{c.wechatMessageStatus},
+            #{c.message},
+            #{c.imgPath},#{c.wechatMessageType},
+            #{c.messageTime}
+            )
+        </foreach>
+
+    </insert>
+
 </mapper>

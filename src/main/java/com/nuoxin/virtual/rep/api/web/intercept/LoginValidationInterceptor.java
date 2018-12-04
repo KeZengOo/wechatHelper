@@ -5,6 +5,7 @@ import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.config.SessionConfig;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.SecurityService;
+import com.nuoxin.virtual.rep.api.utils.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,8 @@ public class LoginValidationInterceptor extends HandlerInterceptorAdapter {
 //			throw new BusinessException(ErrorEnum.ERROR);
 //		}
 //
-		logger.info("接口【{}】请求开始登录验证",request.getServletPath());
+		String servletPath = request.getServletPath();
+		logger.info("接口【{}】请求开始登录验证",servletPath);
 		sercurityService.sessionValidation(request);
 		DrugUser user = sercurityService.getDrugUser(request);
 		logger.info("用户【"+user.getName()+"】操作了接口：【{}】",request.getServletPath());

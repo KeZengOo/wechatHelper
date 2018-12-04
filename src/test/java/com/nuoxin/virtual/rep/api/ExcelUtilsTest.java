@@ -2,9 +2,7 @@ package com.nuoxin.virtual.rep.api;
 
 import org.apache.poi.ss.usermodel.*;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,87 +12,27 @@ import java.util.List;
 public class ExcelUtilsTest {
 
     public static void main(String [] args){
-        BigDecimal bd = new BigDecimal("1.5712905821E10");
-        String str = bd.toPlainString();
-        Long i = Long.parseLong(str);
-        String telephone = i + "";
-        System.out.println(telephone.length());
+        File csv = new File("C:\\Users\\27168\\Desktop\\短信推送\\第4次补推.csv");  // CSV文件路径
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new FileReader(csv));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        String line = "";
+        String everyLine = "";
+        try {
+            List<String> allString = new ArrayList<>();
+            while ((line = br.readLine()) != null){  //读取到的内容给line变量
+                everyLine = line;
+                System.out.println(everyLine);
+                allString.add(everyLine);
+            }
 
+            System.out.println("csv表格中所有行数："+allString.size());
+        } catch (IOException e){
+            e.printStackTrace();
+        }
     }
-
-
-
-
-
-
-
-
-
-    public static List<List<String>> testReadExcel(){
-        List<List<String>> result = new ArrayList<>();
-       try {
-           InputStream inp = new FileInputStream("C:\\Users\\27168\\Desktop\\hh.xls");
-           //InputStream inp = new FileInputStream("workbook.xlsx");
-
-           Workbook wb = WorkbookFactory.create(inp);
-           Sheet sheet = wb.getSheetAt(0);
-           if (sheet == null){
-               System.out.println("文档为空。。。。。。。。。。。。。。。。。");
-               return null;
-           }
-           int lastRowNum = sheet.getLastRowNum();
-           int firstRowNum = sheet.getFirstRowNum();
-           //总行数
-           int rows = lastRowNum + 1 - firstRowNum;
-           
-           if (rows > 0){
-               for (int i = 2; i< rows; i++){
-                   Row row = sheet.getRow(i);
-                   if (null == row){
-                       continue;
-                   }
-
-
-                   //int firstCellNum = row.getFirstCellNum();
-                   int lastCellNum = row.getLastCellNum();
-                   //总列数
-                   //int cells = lastCellNum + 1 - firstCellNum;
-                   if (lastCellNum > 0){
-                       List<String> cellList = new ArrayList<>();
-                       for (int j = 0; j < lastCellNum; j++){
-                           Cell cell = row.getCell(j);
-                           if (null != cell){
-                               String stringCellValue = cell.getStringCellValue();
-                               cellList.add(stringCellValue);
-                           }
-                       }
-
-                       result.add(cellList);
-
-                   }
-
-               }
-           }
-
-           System.out.println(result);
-           inp.close();
-//           Row row = sheet.getRow(2);
-//           Cell cell = row.getCell(3);
-//           if (cell == null)
-//               cell = row.createCell(3);
-//           cell.setCellType(CellType.STRING);
-//           cell.setCellValue("a test");
-//
-//           // Write the output to a file
-//           FileOutputStream fileOut = new FileOutputStream("workbook.xls");
-//           wb.write(fileOut);
-//           fileOut.close();
-       }catch (Exception e){
-           e.printStackTrace();
-       }
-
-        return result;
-    }
-
 
 }

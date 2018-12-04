@@ -60,10 +60,10 @@ public class WebLogAop {
         //处理完请求，返回内容
         logger.info("response:" + JSON.toJSONString(ret));
         long endTime = System.currentTimeMillis();
-        long start = startTime.get();
+        long start = System.currentTimeMillis();
         
         logger.warn("spend time {}ms", ((endTime - start)) );
-        startTime.remove();
+       // startTime.remove();
     }
     
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
