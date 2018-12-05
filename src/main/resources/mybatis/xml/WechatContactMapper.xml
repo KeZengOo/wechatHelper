@@ -29,7 +29,7 @@
 
     <update id="updateWechatContact">
         UPDATE virtual_wechat_contact
-        SET drug_user_id=#{drugUserId},nickname=#{bean.nickName},alias=#{bean.alias},con_remark=#{bean.conRemark}, doctor_id=#{doctorId}
+        SET drug_user_id=#{drugUserId},nickname=#{bean.nickName},alias=#{bean.alias},con_remark=#{bean.conRemark}, doctor_id=#{bean.doctorId}
         WHERE user_name=#{bean.userName}
     </update>
 
