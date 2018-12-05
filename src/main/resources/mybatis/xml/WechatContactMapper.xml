@@ -43,10 +43,7 @@
         SELECT
             (
                 SELECT
-                    DATE_FORMAT(
-                        MAX(upload_time),
-                        '%Y-%m-%d %H:%i:%s'
-                    )
+                    MAX(upload_time)
                 FROM
                     virtual_wechat_contact
                 WHERE
@@ -59,13 +56,10 @@
                             wechat_number = #{wechatNumber}
                         LIMIT 1
                     )
-            ) AS contactUploadTime,
+            ) AS contactUploadTimeValue,
             (
                 SELECT
-                    DATE_FORMAT(
-                        MAX(upload_time),
-                        '%Y-%m-%d %H:%i:%s'
-                    )
+                    MAX(upload_time)
                 FROM
                     virtual_message
                 WHERE
@@ -78,7 +72,7 @@
                             wechat_number = #{wechatNumber}
                         LIMIT 1
                     )
-            ) AS messageUploadTime
+            ) AS messageUploadTimeValue
     </select>
 
 </mapper>

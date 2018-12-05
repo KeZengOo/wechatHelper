@@ -3,6 +3,7 @@ package com.nuoxin.virtual.rep.api.web.controller.request.v2_5.wechat;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 微信消息请求
@@ -23,7 +24,7 @@ public class WechatMessageRequestBean implements Serializable {
 
     private Long drugUserId;
 
-    private String uploadTime;
+    private Long uploadTime;
 
     private Long doctorId;
 
@@ -42,5 +43,7 @@ public class WechatMessageRequestBean implements Serializable {
     private String wechatMessageType;
 
     private String messageTime;
+
+    private Long messageTimestamp;
 
 }

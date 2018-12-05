@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
@@ -120,6 +121,23 @@ public class WechatServiceImpl implements WechatService {
         if (uploadTime == null){
             return wechatAndroidUploadTimeResponseBean;
         }
+
+
+        Long contactUploadTimeValue = uploadTime.getContactUploadTimeValue();
+        Long messageUploadTimeValue = uploadTime.getMessageUploadTimeValue();
+        if (contactUploadTimeValue != null && contactUploadTimeValue > 0){
+            Date contactDate = new Date(contactUploadTimeValue);
+            String contactDateMillisecond = DateUtil.getDateMillisecondString(contactDate);
+            uploadTime.setContactUploadTime(contactDateMillisecond);
+        }
+
+        if (messageUploadTimeValue != null && messageUploadTimeValue > 0){
+            Date messageDate = new Date(messageUploadTimeValue);
+            String messageDateMillisecond = DateUtil.getDateMillisecondString(messageDate);
+            uploadTime.setMessageUploadTime(messageDateMillisecond);
+        }
+
+
         return uploadTime;
     }
 
@@ -251,7 +269,9 @@ public class WechatServiceImpl implements WechatService {
             wechatMessage.setUserType(userType);
             wechatMessage.setNickname(nickname);
             wechatMessage.setDrugUserId(drugUserId);
-            wechatMessage.setUploadTime(uploadTime);
+            Date date = DateUtil.stringToDate(uploadTime, DateUtil.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS__SSS);
+            long time = date.getTime();
+            wechatMessage.setUploadTime(time);
             wechatMessage.setDoctorId(doctorId);
             wechatMessage.setWechatNumber(talker);
             wechatMessage.setTelephone(telephone);
@@ -259,7 +279,13 @@ public class WechatServiceImpl implements WechatService {
             wechatMessage.setMessage(content);
             wechatMessage.setImgPath(imgPath);
             wechatMessage.setWechatMessageType(type);
-            wechatMessage.setMessageTime(createTime);
+
+            Date sd = DateUtil.stringToDate(createTime, DateUtil.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS__SSS);
+            String dateTimeString = DateUtil.getDateTimeString(sd);
+            wechatMessage.setMessageTime(dateTimeString);
+            Date messageDate = DateUtil.stringToDate(createTime, DateUtil.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS__SSS);
+            long messageDateTime = messageDate.getTime();
+            wechatMessage.setMessageTimestamp(messageDateTime);
 
             list.add(wechatMessage);
 
@@ -304,8 +330,10 @@ public class WechatServiceImpl implements WechatService {
         }
 
 
+        Date date = DateUtil.stringToDate(uploadTime, DateUtil.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS__SSS);
+        long time = date.getTime();
         if (CollectionsUtil.isNotEmptyList(addContactList)){
-            wechatContactMapper.batchInsert(id, uploadTime,addContactList);
+            wechatContactMapper.batchInsert(id, time, addContactList);
         }
 
 

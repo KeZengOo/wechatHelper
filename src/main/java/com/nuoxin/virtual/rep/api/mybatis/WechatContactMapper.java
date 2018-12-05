@@ -6,6 +6,7 @@ import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.wechat.WechatAndr
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -29,7 +30,7 @@ public interface WechatContactMapper {
      * @param uploadTime
      * @param list
      */
-    void batchInsert(@Param(value = "drugUserId") Long drugUserId,@Param(value = "uploadTime") String uploadTime,
+    void batchInsert(@Param(value = "drugUserId") Long drugUserId,@Param(value = "uploadTime") Long uploadTime,
                      @Param(value = "list") List<WechatAndroidContactRequestBean> list);
 
     /**

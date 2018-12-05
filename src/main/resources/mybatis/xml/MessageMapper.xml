@@ -835,7 +835,7 @@
 
     <insert id="batchInsertWechatMessage">
         INSERT INTO virtual_message(user_id, user_type, nickname, drug_user_id, upload_time, doctor_id, wechat_number, telephone,
-        wechat_message_status, message, img_path, wechat_message_type,message_time)
+        wechat_message_status, message, img_path, wechat_message_type,message_time, message_time_stamp)
         VALUES
         <foreach collection="list" item="c" separator=",">
             (#{c.userId},#{c.userType},#{c.nickname},#{c.drugUserId}, #{c.uploadTime},
@@ -843,7 +843,8 @@
             #{c.telephone},#{c.wechatMessageStatus},
             #{c.message},
             #{c.imgPath},#{c.wechatMessageType},
-            #{c.messageTime}
+            #{c.messageTime},
+            #{c.messageTimestamp}
             )
         </foreach>
 

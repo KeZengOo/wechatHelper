@@ -1,5 +1,8 @@
 package com.nuoxin.virtual.rep.api.utils;
 
+import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
+import com.nuoxin.virtual.rep.api.common.exception.FileFormatException;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -24,12 +27,15 @@ public final class DateUtil {
     public static final String DATE_FORMAT_YYYY_MM_DD = "yyyy-MM-dd";
     public static final String DATE_FORMAT_YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
     public static final String DATE_FORMAT_YYYY_MM_DD_HH_MM_SS_SSS = "yyyy-MM-dd HH:mm:ss.SSS";
+    public static final String DATE_FORMAT_YYYY_MM_DD_HH_MM_SS__SSS = "yyyy-MM-dd HH:mm:ss:SSS";
 
     public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public static final DateFormat DATE_FORMAT_YMR = new SimpleDateFormat("yyyy-MM-dd");
 
     public static final DateFormat DATE_FORMAT_TIME = new SimpleDateFormat("yyyyMMddHHmmss");
+
+    public static final DateFormat DATE_FORMAT_MILLISECONDTIME = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
 
     public static final DateFormat DATE_FORMAT_YM = new SimpleDateFormat("yyyy-MM");
 
@@ -80,7 +86,7 @@ public final class DateUtil {
      * @return
      */
     public static String getDateMillisecondString(Date date) {
-        return DATE_FORMAT_TIME.format(date);
+        return DATE_FORMAT_MILLISECONDTIME.format(date);
     }
 
     /**
@@ -237,8 +243,8 @@ public final class DateUtil {
             return sdf.parse(dateString);
         } catch (Exception e) {
             e.printStackTrace();
+            throw new FileFormatException(ErrorEnum.ERROR, "传入的日期不合法");
         }
-        return null;
     }
 
     /**
