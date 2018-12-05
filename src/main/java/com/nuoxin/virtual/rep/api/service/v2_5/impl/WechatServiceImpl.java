@@ -20,6 +20,7 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.wechat.WechatMessa
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.wechat.WechatAndroidContactResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.wechat.WechatAndroidUploadTimeResponseBean;
 import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
+import org.apache.commons.csv.CSVRecord;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -82,7 +83,7 @@ public class WechatServiceImpl implements WechatService {
             e.printStackTrace();
         }
         // 格式 userName,nickName,alias,conRemark,type
-        List<String> contactStrList = this.handleCsvFile(inputStream, 5);
+        List<CSVRecord> contactStrList = this.handleCsvFile(inputStream, new String[]{"userName","nickName","alias","conRemark","type"});
         List<WechatAndroidContactRequestBean> contactList = this.getWechatContactList(contactStrList);
 
         if (CollectionsUtil.isNotEmptyList(contactList)){
@@ -94,6 +95,7 @@ public class WechatServiceImpl implements WechatService {
 
     @Override
     public void handleWechatMessageFile(MultipartFile file, WechatAndroidMessageRequestBean bean) {
+
         Long drugUserId = this.checkWechatUserFile(file);
         InputStream inputStream = null;
         try {
@@ -103,7 +105,7 @@ public class WechatServiceImpl implements WechatService {
         }
 
         // 格式 talker,content,createTime,imgPath,isSend,type
-        List<String> contactStrList = this.handleCsvFile(inputStream, 6);
+        List<CSVRecord> contactStrList = this.handleCsvFile(inputStream, new String[]{"talker","content","createTime","imgPath","isSend","type"});
 
         List<WechatMessageRequestBean> wechatMessageList = this.getWechatMessageList(drugUserId,bean.getUploadFileTime(),contactStrList);
         this.saveOrUpdateWechatMessageList(wechatMessageList);
@@ -178,8 +180,8 @@ public class WechatServiceImpl implements WechatService {
         return list;
     }
 
-    private List<WechatMessageRequestBean> getWechatMessageList(Long drugUserId,String uploadTime, List<String> contactStrList) {
-        if (CollectionsUtil.isEmptyList(contactStrList)){
+    private List<WechatMessageRequestBean> getWechatMessageList(Long drugUserId,String uploadTime, List<CSVRecord> contactList) {
+        if (CollectionsUtil.isEmptyList(contactList)){
             return null;
         }
 
@@ -193,29 +195,19 @@ public class WechatServiceImpl implements WechatService {
 
         DrugUser drugUser = drugUserRepository.findFirstById(drugUserId);
 
-        for (int i = 0; i < contactStrList.size(); i++){
+        for (int i = 0; i < contactList.size(); i++){
             if (i == 0){
                 continue;// 标题过滤
             }
 
-            String str = contactStrList.get(i);
-            if (StringUtil.isEmpty(str)){
-                continue;
-            }
-
-            String[] contactListSplit = str.split(",");
             // 格式：talker,content,createTime,imgPath,isSend,type
-            if (CollectionsUtil.isEmptyArray(contactListSplit) || contactListSplit.length !=6){
-                //throw new FileFormatException(ErrorEnum.ERROR, "微信联系人CSV格式错误");
-                continue;
-            }
 
-            String talker = contactListSplit[0];
-            String content = contactListSplit[1];
-            String createTime = contactListSplit[2];
-            String imgPath = contactListSplit[3];
-            String isSend = contactListSplit[4];
-            String type = contactListSplit[5];
+            String talker = contactList.get(i).get("talker");
+            String content = contactList.get(i).get("content");
+            String createTime =contactList.get(i).get("createTime");
+            String imgPath = contactList.get(i).get("imgPath");
+            String isSend = contactList.get(i).get("isSend");
+            String type = contactList.get(i).get("type");
 
             Long userId = 0L;
             Integer userType = 0;
@@ -325,48 +317,40 @@ public class WechatServiceImpl implements WechatService {
     }
 
 
-    private List<WechatAndroidContactRequestBean> getWechatContactList(List<String> contactStrList) {
-        if (CollectionsUtil.isEmptyList(contactStrList)){
+    private List<WechatAndroidContactRequestBean> getWechatContactList(List<CSVRecord> contactList) {
+        if (CollectionsUtil.isEmptyList(contactList)){
             return null;
         }
 
         List<WechatAndroidContactRequestBean> wechatContactList = new ArrayList<>();
-        for (int i = 0; i < contactStrList.size(); i++){
+        for (int i = 0; i < contactList.size(); i++){
             if (i == 0){
                 continue;// 标题过滤
             }
 
-            String str = contactStrList.get(i);
-            if (StringUtil.isEmpty(str)){
-                continue;
-            }
 
-            String[] contactListSplit = str.split(",");
-            // 格式：userName,nickName,alias,conRemark,type
-            if (CollectionsUtil.isEmptyArray(contactListSplit) || contactListSplit.length !=5){
-                throw new FileFormatException(ErrorEnum.ERROR, "微信联系人CSV格式错误");
-            }
-
+            // userName,nickName,alias,conRemark,type
             WechatAndroidContactRequestBean wechatAndroidContact = new WechatAndroidContactRequestBean();
-            wechatAndroidContact.setUserName(contactListSplit[0]);
-            wechatAndroidContact.setNickName(contactListSplit[1]);
-            wechatAndroidContact.setAlias(contactListSplit[2]);
+            String userName = contactList.get(i).get("userName");
+            wechatAndroidContact.setUserName(userName);
+            wechatAndroidContact.setNickName(contactList.get(i).get("nickName"));
+            wechatAndroidContact.setAlias(contactList.get(i).get("alias"));
 
-            String conRemark = contactListSplit[3];
+            String conRemark = contactList.get(i).get("conRemark");
             Matcher matcher = RegularUtils.getMatcher(RegularUtils.MATCH_ELEVEN_NUM, conRemark);
             if (!matcher.find()){
-                throw new FileFormatException(ErrorEnum.ERROR, "微信号为："+ contactListSplit[0] + "联系人备注中没有包含手机号");
+                throw new FileFormatException(ErrorEnum.ERROR, "微信号为："+ userName + "联系人备注中没有包含手机号");
             }else {
                 String telephone = matcher.group();
                 Long doctorId = doctorMapper.getDoctorIdByMobile(telephone);
                 if (doctorId == null || doctorId == 0){
-                    throw new FileFormatException(ErrorEnum.ERROR, "微信号为："+ contactListSplit[0] + "联系人备注中包含的手机号对应医生不存在");
+                    throw new FileFormatException(ErrorEnum.ERROR, "微信号为："+ userName + "联系人备注中包含的手机号对应医生不存在");
                 }
                 wechatAndroidContact.setDoctorId(doctorId);
             }
 
             wechatAndroidContact.setConRemark(conRemark);
-            wechatAndroidContact.setType(contactListSplit[4]);
+            wechatAndroidContact.setType(contactList.get(i).get("type"));
             wechatContactList.add(wechatAndroidContact);
         }
 
@@ -379,6 +363,8 @@ public class WechatServiceImpl implements WechatService {
      * @return 成功返回代表ID
      */
     private Long checkWechatUserFile(MultipartFile file) {
+
+
         String originalFilename = file.getOriginalFilename();
         if (StringUtil.isEmpty(originalFilename)){
             throw new FileFormatException(ErrorEnum.ERROR, "文件名称不能为空");
@@ -412,49 +398,16 @@ public class WechatServiceImpl implements WechatService {
     /**
      * CSV文件InputStream转成字符串list
      * @param inputStream
-     * @param column 字段列数
+     * @param headers 表头
      * @return
      */
-    private List<String> handleCsvFile(InputStream inputStream, Integer column){
-
+    private List<CSVRecord> handleCsvFile(InputStream inputStream, String[] headers){
         if (inputStream == null){
             return null;
         }
 
-        List<String> allString = new ArrayList<>();
-        BufferedReader bufferedReader = new BufferedReader(
-                new InputStreamReader(inputStream));
-        String line = "";
-        String everyLine = "";
-        StringBuffer mulLine = new StringBuffer("");
-        try {
-            while ((line = bufferedReader.readLine()) != null){  //读取到的内容给line变量
-
-                if (StringUtil.isEmpty(line)){
-                    continue;
-                }
-                // 判断是否有换行的
-                everyLine = line;
-                String[] split = everyLine.split(",");
-                if (CollectionsUtil.isEmptyArray(split) || split.length != column){
-                    while (true){
-                        everyLine = everyLine + bufferedReader.readLine();
-                        String[] splitStr = everyLine.split(",");
-                        if (splitStr.length >= column){
-                            break;
-                        }
-                    }
-
-
-                }
-                allString.add(everyLine);
-            }
-            System.out.println("csv表格中所有行数："+allString.size());
-        } catch (IOException e){
-            e.printStackTrace();
-        }
-
-        return allString;
+        List<CSVRecord> records = CSVUtils.readCSV(inputStream, headers);
+        return records;
     }
 
 }
