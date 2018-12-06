@@ -20,6 +20,7 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.wechat.WechatMessa
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.wechat.WechatAndroidContactResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.wechat.WechatAndroidUploadTimeResponseBean;
 import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
+import com.vdurmont.emoji.EmojiParser;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -69,8 +70,11 @@ public class WechatServiceImpl implements WechatService {
     public static final int BATCH_INSERT_SIZE = 1000;
 
 
+    private static List<String> filterCharList = new ArrayList<>();
 
-
+    static {
+        filterCharList.add("\uD83E\uDDE7");
+    }
 
 
     @Override
@@ -183,10 +187,13 @@ public class WechatServiceImpl implements WechatService {
         for (WechatMessageRequestBean wechatMessage:wechatMessageList){
             // 处理emoji表情
             String message = wechatMessage.getMessage();
-            if (EmojiUtil.containsEmoji(message)){
-                final String s = EmojiUtil.handleEmojiStr(message);
-                wechatMessage.setMessage(s);
-            }
+//            if (EmojiUtil.containsEmoji(message)){
+//                String s1 = EmojiParser.removeAllEmojis(message);
+//                final String s = EmojiUtil.handleEmojiStr(message);
+//                wechatMessage.setMessage(s);
+//            }
+            String s = EmojiParser.removeAllEmojis(message);
+            wechatMessage.setMessage(s);
             Integer count = messageMapper.getCountByTypeAndWechatNumAndTime(MessageTypeEnum.WECHAT.getMessageType(), wechatMessage.getWechatNumber(), wechatMessage.getMessageTime());
             if (count !=null && count > 0){
                 continue;
@@ -276,7 +283,15 @@ public class WechatServiceImpl implements WechatService {
             wechatMessage.setWechatNumber(talker);
             wechatMessage.setTelephone(telephone);
             wechatMessage.setWechatMessageStatus(wechatMessageStatus);
-            wechatMessage.setMessage(content);
+//            if (EmojiUtil.containsEmoji(content)){
+//                String s = EmojiUtil.handleEmojiStr(content);
+//                wechatMessage.setMessage(s);
+//            }else {
+//                wechatMessage.setMessage(content);
+//            }
+
+            String s = EmojiParser.removeAllEmojis(content);
+            wechatMessage.setMessage(s);
             wechatMessage.setImgPath(imgPath);
             wechatMessage.setWechatMessageType(type);
 
