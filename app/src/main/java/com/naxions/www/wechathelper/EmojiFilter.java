@@ -18,7 +18,9 @@ public class EmojiFilter {
      * @return
      */
     public static String filterEmoji(String source) {
-
+        if(source.equals("")||source.equals("null")||source==null){
+          return "";
+        }
         StringBuilder buf = null;
         int len = source.length();
         for (int i = 0; i < len; i++) {

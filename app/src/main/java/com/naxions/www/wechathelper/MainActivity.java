@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     private File file1;
     private File file2;
-
+    
     /**
      * 点击上传按钮时的时时间戳
      */
@@ -544,6 +544,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             //查询聊天记录
             String query = "select * from message where  createTime > "+longLastUpdateTime;
+           // String query = "select * from message where  createTime > 0";
             Log.e("query查询分割时间",DateUtil.timeStamp2Date(longLastUpdateTime+""));
 
             c2 = db.rawQuery(query, null);
@@ -555,43 +556,46 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 int imgPath = c2.getInt(c2.getColumnIndex("imgPath"));
                 int type = c2.getInt(c2.getColumnIndex("type"));
                 //Log.e(longLastUpdateTime+"",createTime);
-                Log.e("chatInfo", "talker=" + talker + "createTime=" + DateUtil.timeStamp2Date(createTime.toString()) + "content=" + content + "imgPath=" + imgPath + "isSend=" + isSend + "type=" + type);
-                //将聊天记录写入 csv 文件
-                String messageType;
-                switch (type) {
-                    case 1:
-                        messageType = "文字消息";
-                        break;
-                    case 47:
-                        messageType = "表情消息";
-                        break;
-                    case 43:
-                        messageType = "视频消息";
-                        break;
-                    case 49:
-                        messageType = "链接/小程序/聊天记录";
-                        break;
-                    case 50:
-                        messageType = "语音视频通话";
-                        break;
-                    case 3:
-                        messageType = "图片消息";
-                        break;
-                    case 34:
-                        messageType = "语音消息";
-                        break;
-                    case 48:
-                        messageType = "地图消息";
-                        break;
-                    case 10000:
-                        messageType = "撤回提醒";
-                        break;
-                    default:
-                        messageType = "其他消息";
-                        break;
+                if(content!=null){
+                    Log.e("chatInfo", "talker=" + talker + "createTime=" + DateUtil.timeStamp2Date(createTime.toString()) + "content=" + content + "imgPath=" + imgPath + "isSend=" + isSend + "type=" + type);
+                    //将聊天记录写入 csv 文件
+                    String messageType;
+                    switch (type) {
+                        case 1:
+                            messageType = "文字消息";
+                            break;
+                        case 47:
+                            messageType = "表情消息";
+                            break;
+                        case 43:
+                            messageType = "视频消息";
+                            break;
+                        case 49:
+                            messageType = "链接/小程序/聊天记录";
+                            break;
+                        case 50:
+                            messageType = "语音视频通话";
+                            break;
+                        case 3:
+                            messageType = "图片消息";
+                            break;
+                        case 34:
+                            messageType = "语音消息";
+                            break;
+                        case 48:
+                            messageType = "地图消息";
+                            break;
+                        case 10000:
+                            messageType = "撤回提醒";
+                            break;
+                        default:
+                            messageType = "其他消息";
+                            break;
+
+                    }
+                    messageCsvPrinter.printRecord(talker, EmojiFilter.filterEmoji(content), DateUtil.timeStamp2Date(createTime.toString()), imgPath, isSend, messageType);
 
                 }
-                messageCsvPrinter.printRecord(talker, EmojiFilter.filterEmoji(content), DateUtil.timeStamp2Date(createTime.toString()), imgPath, isSend, messageType);
             }
             messageCsvPrinter.printRecord();
             messageCsvPrinter.flush();
@@ -627,7 +631,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     private void upLoadFiles(String url, File file , String name, final boolean isSave) {
         Log.e("query网站", url+file.getName());
-        OkHttpClient client = new OkHttpClient();
+        OkHttpClient client = new OkHttpClient.Builder()
+                .readTimeout(60, TimeUnit.SECONDS)
+                .build();
         MultipartBody.Builder builder = new MultipartBody.Builder();
         if (file.exists()) {
 
@@ -759,7 +765,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
 
-        List<String> regexList = new ArrayList<String>();
+        List<String> regexList = new ArrayList<>();
         /**
          * 手机号码
          * 移动：134[0-8],135,136,137,138,139,150,151,157,158,159,182,187,188
