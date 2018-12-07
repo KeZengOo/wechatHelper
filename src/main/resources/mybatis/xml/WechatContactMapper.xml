@@ -18,10 +18,10 @@
 
     <insert id="batchInsert">
 
-        INSERT INTO virtual_wechat_contact(drug_user_id, upload_time, user_name,nickname,alias,con_remark, doctor_id)
+        INSERT INTO virtual_wechat_contact(drug_user_id, upload_time, user_name,nickname,alias,con_remark, doctor_id, telephone)
         VALUES
         <foreach collection="list" item="c" separator=",">
-            (#{drugUserId},#{uploadTime},#{c.userName},#{c.nickName}, #{c.alias}, #{c.conRemark}, #{c.doctorId})
+            (#{drugUserId},#{uploadTime},#{c.userName},#{c.nickName}, #{c.alias}, #{c.conRemark}, #{c.doctorId}, #{c.telephone})
         </foreach>
 
     </insert>
@@ -29,7 +29,8 @@
 
     <update id="updateWechatContact">
         UPDATE virtual_wechat_contact
-        SET drug_user_id=#{drugUserId},nickname=#{bean.nickName},alias=#{bean.alias},con_remark=#{bean.conRemark}, doctor_id=#{bean.doctorId}
+        SET drug_user_id=#{drugUserId},nickname=#{bean.nickName},alias=#{bean.alias},con_remark=#{bean.conRemark},
+        doctor_id=#{bean.doctorId}, telephone=#{bean.telephone}
         WHERE user_name=#{bean.userName}
     </update>
 

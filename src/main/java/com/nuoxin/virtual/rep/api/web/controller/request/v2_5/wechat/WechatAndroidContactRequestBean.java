@@ -29,4 +29,6 @@ public class WechatAndroidContactRequestBean {
 
     private Long doctorId;
 
+    private String telephone;
+
 }

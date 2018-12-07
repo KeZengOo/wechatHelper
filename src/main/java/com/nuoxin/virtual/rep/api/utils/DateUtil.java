@@ -37,6 +37,8 @@ public final class DateUtil {
 
     public static final DateFormat DATE_FORMAT_MILLISECONDTIME = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
 
+    public static final DateFormat DATE_FORMAT_SECONDTIME = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
     public static final DateFormat DATE_FORMAT_YM = new SimpleDateFormat("yyyy-MM");
 
     public static final DateFormat DATE_FORMAT_MONTH = new SimpleDateFormat("yyyyMM");
@@ -88,6 +90,18 @@ public final class DateUtil {
     public static String getDateMillisecondString(Date date) {
         return DATE_FORMAT_MILLISECONDTIME.format(date);
     }
+
+
+    /**
+     * 返回日期格式：yyyyMMddHHmmssSSS
+     *
+     * @param date
+     * @return
+     */
+    public static String getDateSecondString(Date date) {
+        return DATE_FORMAT_TIME.format(date);
+    }
+
 
     /**
      * 将Date转化为指定格式的字符串

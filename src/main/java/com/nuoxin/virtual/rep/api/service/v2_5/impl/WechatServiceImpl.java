@@ -259,16 +259,16 @@ public class WechatServiceImpl implements WechatService {
 
             }else {
                 Long doctorIdByTalker = wechatContactMapper.getDoctorIdByWechatNumber(talker);
-                Doctor doctor = doctorRepository.findFirstById(doctorId);
-                if (doctor != null){
-                    userId = doctorIdByTalker;
-                    userType = UserTypeEnum.DOCTOR.getUserType();
-                    nickname = doctor.getName();
-                    doctorId = doctorIdByTalker;
-                    telephone = doctor.getMobile();
+                if (doctorIdByTalker != null && doctorIdByTalker > 0){
+                    Doctor doctor = doctorRepository.findFirstById(doctorIdByTalker);
+                    if (doctor != null){
+                        userId = doctorIdByTalker;
+                        userType = UserTypeEnum.DOCTOR.getUserType();
+                        nickname = doctor.getName();
+                        doctorId = doctorIdByTalker;
+                        telephone = doctor.getMobile();
+                    }
                 }
-
-
             }
 
             WechatMessageRequestBean wechatMessage = new WechatMessageRequestBean();
@@ -382,7 +382,10 @@ public class WechatServiceImpl implements WechatService {
             String conRemark = contactList.get(i).get("conRemark");
             Matcher matcher = RegularUtils.getMatcher(RegularUtils.MATCH_ELEVEN_NUM, conRemark);
             if (!matcher.find()){
-                throw new FileFormatException(ErrorEnum.ERROR, "微信号为："+ userName + "联系人备注中没有包含手机号");
+                // 先去掉异常，因为现在好多医生还没有备注上手机号
+                //throw new FileFormatException(ErrorEnum.ERROR, "微信号为："+ userName + "联系人备注中没有包含手机号");
+                wechatAndroidContact.setDoctorId(0L);
+                wechatAndroidContact.setTelephone("");
             }else {
                 String telephone = matcher.group();
                 Long doctorId = doctorMapper.getDoctorIdByMobile(telephone);
@@ -390,6 +393,7 @@ public class WechatServiceImpl implements WechatService {
                     throw new FileFormatException(ErrorEnum.ERROR, "微信号为："+ userName + "联系人备注中包含的手机号对应医生不存在");
                 }
                 wechatAndroidContact.setDoctorId(doctorId);
+                wechatAndroidContact.setTelephone(telephone);
             }
 
             wechatAndroidContact.setConRemark(conRemark);

@@ -71,7 +71,7 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 		//帐号APISecret： 	e7ac57d0-80ce-11e8-ab50-3f649a8c117a
 		String url = "http://apis.7moor.com/v20170704/cdr/getCCCdr/ACCOUNTID?sig=sigKey";
 		url = url.replace("ACCOUNTID", "N00000028346");
-		String timestamp = DateUtil.getDateMillisecondString(new Date());
+		String timestamp = DateUtil.getDateSecondString(new Date());
 
 		String sigKey = "N00000028346e7ac57d0-80ce-11e8-ab50-3f649a8c117a" + timestamp;
 		String md5SigKey = StringUtil.md5Password(sigKey);
