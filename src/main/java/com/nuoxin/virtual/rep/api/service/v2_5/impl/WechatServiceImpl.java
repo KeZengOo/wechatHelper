@@ -389,8 +389,11 @@ public class WechatServiceImpl implements WechatService {
             }else {
                 String telephone = matcher.group();
                 Long doctorId = doctorMapper.getDoctorIdByMobile(telephone);
-                if (doctorId == null || doctorId == 0){
-                    throw new FileFormatException(ErrorEnum.ERROR, "微信号为："+ userName + "联系人备注中包含的手机号对应医生不存在");
+//                if (doctorId == null || doctorId == 0){
+//                    throw new FileFormatException(ErrorEnum.ERROR, "微信号为："+ userName + "联系人备注中包含的手机号对应医生不存在");
+//                }
+                if (doctorId == null){
+                    doctorId = 0L;
                 }
                 wechatAndroidContact.setDoctorId(doctorId);
                 wechatAndroidContact.setTelephone(telephone);
