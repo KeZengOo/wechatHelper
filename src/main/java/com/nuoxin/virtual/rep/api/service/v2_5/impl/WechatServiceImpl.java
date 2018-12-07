@@ -376,7 +376,14 @@ public class WechatServiceImpl implements WechatService {
             WechatAndroidContactRequestBean wechatAndroidContact = new WechatAndroidContactRequestBean();
             String userName = contactList.get(i).get("userName");
             wechatAndroidContact.setUserName(userName);
-            wechatAndroidContact.setNickName(contactList.get(i).get("nickName"));
+            String nickName = contactList.get(i).get("nickName");
+            if (EmojiUtil.containsEmoji(nickName)){
+                String s = EmojiUtil.handleEmojiStr(nickName);
+                wechatAndroidContact.setNickName(s);
+            }else {
+                wechatAndroidContact.setNickName(nickName);
+            }
+
             wechatAndroidContact.setAlias(contactList.get(i).get("alias"));
 
             String conRemark = contactList.get(i).get("conRemark");
