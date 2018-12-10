@@ -1,6 +1,8 @@
 package com.nuoxin.virtual.rep.api.entity;
 
 import com.nuoxin.virtual.rep.api.common.entity.IdEntity;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -56,6 +58,7 @@ public class Doctor extends IdEntity {
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH},fetch = FetchType.EAGER)
     @JoinColumn(name = "virtual_doctor_id")
 //    @Transient
+    @NotFound(action= NotFoundAction.IGNORE)
     private DoctorVirtual doctorVirtual;
 
     public Long getEappId() {

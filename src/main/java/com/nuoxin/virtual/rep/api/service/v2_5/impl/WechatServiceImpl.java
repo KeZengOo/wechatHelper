@@ -258,8 +258,18 @@ public class WechatServiceImpl implements WechatService {
                 nickname = drugUser.getName();
 
             }else {
+
+                if ("ahliangzl".equals(talker)){
+                    System.out.println("hhh");
+                }
                 Long doctorIdByTalker = wechatContactMapper.getDoctorIdByWechatNumber(talker);
+
+                if (doctorIdByTalker != null && doctorIdByTalker > 0 && doctorIdByTalker==601619){
+                    System.out.println("haha");
+                }
+
                 if (doctorIdByTalker != null && doctorIdByTalker > 0){
+
                     Doctor doctor = doctorRepository.findFirstById(doctorIdByTalker);
                     if (doctor != null){
                         userId = doctorIdByTalker;
