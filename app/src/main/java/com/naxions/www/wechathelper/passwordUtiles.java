@@ -1,9 +1,11 @@
 package com.naxions.www.wechathelper;
 
+import android.app.Activity;
 import android.content.Context;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -28,14 +30,20 @@ public class passwordUtiles {
    *
    * @return
    */
-  public static String initDbPassword(Context mContext) {
+  public static String initDbPassword(final Activity mContext) {
     String imei = initPhoneIMEI(mContext);
-    String uin = initCurrWxUin();
+    String uin = initCurrWxUin(mContext);
     Log.e("initDbPassword","imei==="+imei);
     Log.e("initDbPassword","uin==="+uin);
     try {
       if (TextUtils.isEmpty(imei) || TextUtils.isEmpty(uin)) {
         Log.e("initDbPassword","初始化数据库密码失败：imei或uid为空");
+        mContext.runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            Toast.makeText(mContext,"请确认是否授权root权限,并登录微信",Toast.LENGTH_SHORT).show();
+          }
+        });
         return "";
       }
       String md5 = Md5Utils.md5Encode(imei + uin);
@@ -95,7 +103,7 @@ public class passwordUtiles {
    * 获取微信的uid
    * 微信的uid存储在SharedPreferences里面
    */
-  public static String initCurrWxUin() {
+  public static String initCurrWxUin(final Activity context) {
     String   mCurrWxUin = null;
     //存储位置为\data\data\com.tencent.mm\shared_prefs\auth_info_key_prefs.xml
     File file = new File(WX_SP_UIN_PATH);
@@ -114,6 +122,13 @@ public class passwordUtiles {
     } catch (Exception e) {
       e.printStackTrace();
       Log.e("initCurrWxUin","获取微信uid失败，请检查auth_info_key_prefs文件权限");
+      context.runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          Toast.makeText(context,"请确认是否授权root权限,并登录微信",Toast.LENGTH_SHORT).show();
+        }
+      });
+
     }
     return "";
   }
