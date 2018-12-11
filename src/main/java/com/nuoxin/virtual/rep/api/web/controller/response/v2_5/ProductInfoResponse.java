@@ -7,6 +7,9 @@ import lombok.Data;
 @ApiModel("产品信息")
 @Data
 public class ProductInfoResponse {
+
+	@ApiModelProperty(value = "产品ID")
+	private String productId;
 	@ApiModelProperty(value = "产品名")
 	private String productName;
 	@ApiModelProperty(value = "是否招募:1是,0否,-1未知")

@@ -189,6 +189,7 @@
 	<select id="getAllProductInfoListByProductIdList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ProductInfoResponse">
 
 		SELECT
+			tt.prod_id productId,
 			tt.prod_name productName,
 			tt.doctor_id doctorId,
 			qu.is_recruit isRecruit,
@@ -201,6 +202,7 @@
 			SELECT
 				t.doctor_id,
 				t.prod_name,
+				t.prod_id,
 				max(q.id) quateId
 			FROM
 				drug_user_doctor_quate q
