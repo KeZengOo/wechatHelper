@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     String copyFilePath = mCcopyPath + COPY_WX_DATA_DB;
 
     private String USERNAME = "userName";
-    private String LASTUPDATETIME = "lastUpdateTime";
+    private String LASTUPDATETIME = "";
     private String USERINFO = "userInfo";
 
     private SharedPreferences preferences;
@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     private File file1;
     private File file2;
-
+   
     /**
      * 点击上传按钮时的时时间戳
      */
@@ -166,11 +166,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // sp中获取销售代表名字和上次上传时间
         preferences = getSharedPreferences(USERINFO, Context.MODE_PRIVATE);
         userName = preferences.getString(USERNAME, "");
+        //多账号切换时,key不同,要拿的时间也不同
+        LASTUPDATETIME = userName;
         lastUpdateTime = preferences.getString(LASTUPDATETIME, "");
         //赋值
         et_name.setText(userName.toCharArray(), 0, userName.length());
         longLastUpdateTime = Long.valueOf(DateUtil.date2Timestamp(lastUpdateTime));
         tv_updateTime.setText(lastUpdateTime);
+        if(et_name.getText().toString().equals("")){
+            tv_updateTime.setText("暂无上传时间");
+        }
         //获取上次上传的时间
         if (lastUpdateTime.equals("") || lastUpdateTime.equals("0")) {
             //既没有微信号也没有上次上传时间(第一次安装),将时间重置为0
@@ -200,10 +205,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (preferences == null) {
                     preferences = getSharedPreferences(USERINFO, Context.MODE_PRIVATE);
                 }
+                //可能修改过用户 更新userName和上传时间;
+                userName = et_name.getText().toString().trim();
+                LASTUPDATETIME = userName;
+                if (preferences == null) {
+                    preferences = getSharedPreferences(USERINFO, Context.MODE_PRIVATE);
+                }
+                lastUpdateTime = preferences.getString(LASTUPDATETIME, "");
+                //赋值
+                if(lastUpdateTime.equals("")){
+                    tv_updateTime.setText("暂无上传时间");
+                    longLastUpdateTime = Long.valueOf(0);
+                }else{
+                    longLastUpdateTime = Long.valueOf(DateUtil.date2Timestamp(lastUpdateTime));
+                    tv_updateTime.setText(lastUpdateTime);
+                }
+                et_name.setText(userName.toCharArray(), 0, userName.length());
+
+                //保存姓名
                 SharedPreferences.Editor edit = preferences.edit();
                 edit.putString(USERNAME, et_name.getText().toString().trim());
                 edit.commit();
-
                 //判断是否安装了微信
                 if (isWeixinAvilible()) {
                     if (closeWxDialog == null) {
@@ -223,12 +245,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     });
                     tv_updateData.setOnClickListener(new View.OnClickListener() {
 
-
                         //点击上传文件
                         @Override
                         public void onClick(View view) {
-                            //可能修改过 userName;
-                            userName = et_name.getText().toString().trim();
 
                             //显示 loadingView
                             if (loadingDialog == null) {
@@ -328,8 +347,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                     }
-
-
                                 }
                             });
                         }
@@ -346,24 +363,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             default:
                 break;
         }
-    }
-
-    /**
-     * 请求失败的弹窗处理
-     *
-     * @param s
-     */
-    private void getUploadTimeError(final String s) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                loadingDialog.setCancelable(true);
-                mRemindText.setText(s);
-                loadingView.setVisibility(View.INVISIBLE);
-                iv_success.setVisibility(View.INVISIBLE);
-                iv_fail.setVisibility(View.VISIBLE);
-            }
-        });
     }
 
     /**
@@ -438,6 +437,223 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     /**
+     * 获取当前用户的微信所有联系人
+     */
+    private void getRecontactDate(SQLiteDatabase db, Context mContext) {
+        Cursor c1 = null;
+        Cursor c2 = null;
+        try {
+            //新建文件保存联系人信息
+            file1 = new File(Environment.getExternalStorageDirectory().getPath() + "/" + et_name.getText().toString().trim() + "_contact_file" + ".csv");
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file1), "UTF-8"));
+            contactCsvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader("userName", "nickName", "alias", "conRemark", "type"));
+            //新建文件保存聊天记录
+            file2 = new File(Environment.getExternalStorageDirectory().getPath() + "/" + et_name.getText().toString().trim() + "_message_file" + ".csv");
+            BufferedWriter writer2 = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file2), "UTF-8"));  // 防止出现乱码
+            messageCsvPrinter = new CSVPrinter(writer2, CSVFormat.DEFAULT.withHeader("talker", "content", "createTime", "imgPath", "isSend", "type"));
+
+            // 查询所有联系人verifyFlag!=0:公众号等类型，群里面非好友的类型为4，未知类型2）
+            c1 = db.rawQuery(
+                    "select * from rcontact where verifyFlag = 0 and type != 4 and type != 2 and type != 0 and type != 33 and nickname != ''and nickname != '文件传输助手'",
+                    null);
+            while (c1.moveToNext()) {
+
+                String userName = c1.getString(c1.getColumnIndex("username"));
+                String nickName = c1.getString(c1.getColumnIndex("nickname"));
+                String alias = c1.getString(c1.getColumnIndex("alias"));
+                String conRemark = c1.getString(c1.getColumnIndex("conRemark"));
+                String type = c1.getString(c1.getColumnIndex("type"));
+                boolean b = checkNickName(conRemark);
+                if (b) {
+                    Log.e("contact", "userName=" + userName + "nickName=" + nickName + "alias=" + alias + "conRemark=" + conRemark + "type=" + type);
+                    //将联系人信息写入 csv 文件
+                    contactCsvPrinter.printRecord(EmojiFilter.filterEmoji(userName), EmojiFilter.filterEmoji(nickName), EmojiFilter.filterEmoji(alias), EmojiFilter.filterEmoji(conRemark), type);
+                }
+            }
+            contactCsvPrinter.printRecord();
+            contactCsvPrinter.flush();
+
+            //查询聊天记录
+//            String query = "select * from message where  createTime > " + longLastUpdateTime;
+            String query = "select * from message where  createTime > 1544609802000";
+            Log.e("query查询分割时间", DateUtil.timeStamp2Date(longLastUpdateTime + ""));
+
+            c2 = db.rawQuery(query, null);
+            while (c2.moveToNext()) {
+                String content = c2.getString(c2.getColumnIndex("content"));
+                String talker = c2.getString(c2.getColumnIndex("talker"));
+                String createTime = c2.getString(c2.getColumnIndex("createTime"));
+                int isSend = c2.getInt(c2.getColumnIndex("isSend"));
+                int imgPath = c2.getInt(c2.getColumnIndex("imgPath"));
+                int type = c2.getInt(c2.getColumnIndex("type"));
+                //Log.e(longLastUpdateTime+"",createTime);
+                if (content != null) {
+                    Log.e("chatInfo", "talker=" + talker + "createTime=" + DateUtil.timeStamp2Date(createTime.toString()) + "content=" + content + "imgPath=" + imgPath + "isSend=" + isSend + "type=" + type);
+                    //将聊天记录写入 csv 文件
+                    String messageType;
+                    switch (type) {
+                        case 1:
+                            messageType = "文字消息";
+                            break;
+                        case 47:
+                            messageType = "表情消息";
+                            break;
+                        case 43:
+                            messageType = "视频消息";
+                            break;
+                        case 49:
+                            messageType = "链接/小程序/聊天记录";
+                            break;
+                        case 50:
+                            messageType = "语音视频通话";
+                            break;
+                        case 3:
+                            messageType = "图片消息";
+                            break;
+                        case 34:
+                            messageType = "语音消息";
+                            break;
+                        case 48:
+                            messageType = "地图消息";
+                            break;
+                        case 10000:
+                            messageType = "撤回提醒";
+                            break;
+                        default:
+                            messageType = "其他消息";
+                            break;
+
+                    }
+                    messageCsvPrinter.printRecord(talker, EmojiFilter.filterEmoji(content), DateUtil.timeStamp2Date(createTime.toString()), imgPath, isSend, messageType);
+                }
+            }
+            messageCsvPrinter.printRecord();
+            messageCsvPrinter.flush();
+
+            c1.close();
+            c2.close();
+            db.close();
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mRemindText.setText("正在向工作台上传聊天记录,请稍候");
+                }
+            });
+
+            //上传联系人
+            upLoadFiles(baseUrl + "contact/import?uploadTime=" + currentTime, file1, et_name.getText().toString().trim() + "_contact_file.cvs", false);
+            //上传聊天记录
+            upLoadFiles(baseUrl + "message/import?uploadTime=" + currentTime, file2, et_name.getText().toString().trim() + "_message_file.cvs", true);
+
+        } catch (Exception e) {
+
+            Log.e("openWxDb", "读取数据库信息失败" + e.toString());
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    getUploadTimeError("读取数据库信息失败");
+                }
+            });
+        }
+    }
+
+    /**
+     * @param url
+     * @throws Exception isSave 用来表示只有消息表上传成功时,才保存上传时间到 sp
+     */
+    private void upLoadFiles(String url, File file, String name, final boolean isSave) {
+        Log.e("query网站", url + file.getName());
+        OkHttpClient client = new OkHttpClient.Builder()
+                .readTimeout(60, TimeUnit.MINUTES)
+                .build();
+        MultipartBody.Builder builder = new MultipartBody.Builder();
+        if (file.exists()) {
+
+            String TYPE = "application/octet-stream";
+            RequestBody fileBody = RequestBody.create(MediaType.parse(TYPE), file);
+
+            RequestBody requestBody = builder
+                    .setType(MultipartBody.FORM)
+                    .addFormDataPart("file", file.getName(), fileBody)
+                    .build();
+
+            Request request = new Request.Builder()
+                    .url(url)
+                    .post(requestBody)
+                    .build();
+
+            client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    Log.e("query上传文件失败的返回错误", e.toString());
+                    //上传失败
+                    if (isSave) {
+                        getUploadTimeError("聊天记录上传失败请联系开发人员");
+                    } else {
+                        getUploadTimeError("联系人上传失败请联系开发人员");
+                    }
+
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    String string = response.body().string();
+                    //Log.e("query上传文件的返回值", string);
+                    try {
+                        JSONObject objects = new JSONObject(string);
+                        updateCode = objects.get("code");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    if (isSave) {
+                        Log.e("query上传聊天文件的返回值", string);
+                    } else {
+                        Log.e("query上传联系人文件的返回值", string);
+                    }
+                    if (updateCode.toString().equals("200")) {
+                        //上传成功,重新赋值时间并保存sp是
+                        if (isSave) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    loadingDialog.setCancelable(true);
+                                    loadingView.setVisibility(View.INVISIBLE);
+                                    iv_fail.setVisibility(View.INVISIBLE);
+                                    iv_success.setVisibility(View.VISIBLE);
+                                    mRemindText.setText("上传成功");
+                                    tv_updateTime.setText(currentTime);
+                                    if (preferences == null) {
+                                        preferences = getSharedPreferences(USERINFO, Context.MODE_PRIVATE);
+                                    }
+                                    SharedPreferences.Editor edit = preferences.edit();
+                                    edit.putString(LASTUPDATETIME, currentTime);
+                                    edit.commit();
+                                    //重新赋值本次上传时间
+                                    longLastUpdateTime = Long.valueOf(mTimeStamp);
+                                    Log.e("query聊天记录上传成功后更新的时间", DateUtil.timeStamp2Date(longLastUpdateTime + ""));
+                                }
+                            });
+                        } else {
+                            Log.e("query联系人上传成功", "");
+                        }
+
+                    } else {
+
+                        if (isSave) {
+                            getUploadTimeError("聊天记录上传失败请联系开发人员");
+                        } else {
+                            getUploadTimeError("联系人上传失败请联系开发人员");
+                        }
+
+                    }
+
+                }
+            });
+        }
+    }
+
+    /**
      * 复制单个文件
      *
      * @param oldPath String 原文件路径 如：c:/fqf.txt
@@ -505,230 +721,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }).run();
     }
 
-
     /**
-     * 获取当前用户的微信所有联系人
+     * 请求失败的弹窗处理
+     *
+     * @param s
      */
-    private void getRecontactDate(SQLiteDatabase db, Context mContext) {
-        Cursor c1 = null;
-        Cursor c2 = null;
-        try {
-            //新建文件保存联系人信息
-            file1 = new File(Environment.getExternalStorageDirectory().getPath() + "/" + et_name.getText().toString().trim() + "_contact_file" + ".csv");
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file1), "UTF-8"));
-            contactCsvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader("userName", "nickName", "alias", "conRemark", "type"));
-            //新建文件保存聊天记录
-            file2 = new File(Environment.getExternalStorageDirectory().getPath() + "/" + et_name.getText().toString().trim() + "_message_file" + ".csv");
-            BufferedWriter writer2 = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file2), "UTF-8"));  // 防止出现乱码
-            messageCsvPrinter = new CSVPrinter(writer2, CSVFormat.DEFAULT.withHeader("talker", "content", "createTime", "imgPath", "isSend", "type"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            // 查询所有联系人verifyFlag!=0:公众号等类型，群里面非好友的类型为4，未知类型2）
-            c1 = db.rawQuery(
-                    "select * from rcontact where verifyFlag = 0 and type != 4 and type != 2 and type != 0 and type != 33 and nickname != ''and nickname != '文件传输助手'",
-                    null);
-            while (c1.moveToNext()) {
-                String userName = c1.getString(c1.getColumnIndex("username"));
-                String nickName = c1.getString(c1.getColumnIndex("nickname"));
-                String alias = c1.getString(c1.getColumnIndex("alias"));
-                String conRemark = c1.getString(c1.getColumnIndex("conRemark"));
-                String type = c1.getString(c1.getColumnIndex("type"));
-                boolean b = checkNickName(conRemark);
-                if (b) {
-                    Log.e("contact", "userName=" + userName + "nickName=" + nickName + "alias=" + alias + "conRemark=" + conRemark + "type=" + type);
-                    //将联系人信息写入 csv 文件
-                    contactCsvPrinter.printRecord(userName, nickName, alias, conRemark, type);
-                }
-
+    private void getUploadTimeError(final String s) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                loadingDialog.setCancelable(true);
+                mRemindText.setText(s);
+                loadingView.setVisibility(View.INVISIBLE);
+                iv_success.setVisibility(View.INVISIBLE);
+                iv_fail.setVisibility(View.VISIBLE);
             }
-            contactCsvPrinter.printRecord();
-            contactCsvPrinter.flush();
-
-            //查询聊天记录
-              String query = "select * from message where  createTime > "+longLastUpdateTime;
-//            String query = "select * from message where  createTime > 1541830222000";
-            Log.e("query查询分割时间", DateUtil.timeStamp2Date(longLastUpdateTime + ""));
-
-            c2 = db.rawQuery(query, null);
-            while (c2.moveToNext()) {
-                String content = c2.getString(c2.getColumnIndex("content"));
-                String talker = c2.getString(c2.getColumnIndex("talker"));
-                String createTime = c2.getString(c2.getColumnIndex("createTime"));
-                int isSend = c2.getInt(c2.getColumnIndex("isSend"));
-                int imgPath = c2.getInt(c2.getColumnIndex("imgPath"));
-                int type = c2.getInt(c2.getColumnIndex("type"));
-                //Log.e(longLastUpdateTime+"",createTime);
-                if (content != null) {
-                    Log.e("chatInfo", "talker=" + talker + "createTime=" + DateUtil.timeStamp2Date(createTime.toString()) + "content=" + content + "imgPath=" + imgPath + "isSend=" + isSend + "type=" + type);
-                    //将聊天记录写入 csv 文件
-                    String messageType;
-                    switch (type) {
-                        case 1:
-                            messageType = "文字消息";
-                            break;
-                        case 47:
-                            messageType = "表情消息";
-                            break;
-                        case 43:
-                            messageType = "视频消息";
-                            break;
-                        case 49:
-                            messageType = "链接/小程序/聊天记录";
-                            break;
-                        case 50:
-                            messageType = "语音视频通话";
-                            break;
-                        case 3:
-                            messageType = "图片消息";
-                            break;
-                        case 34:
-                            messageType = "语音消息";
-                            break;
-                        case 48:
-                            messageType = "地图消息";
-                            break;
-                        case 10000:
-                            messageType = "撤回提醒";
-                            break;
-                        default:
-                            messageType = "其他消息";
-                            break;
-
-                    }
-                    messageCsvPrinter.printRecord(talker, EmojiFilter.filterEmoji(content), DateUtil.timeStamp2Date(createTime.toString()), imgPath, isSend, messageType);
-
-                }
-            }
-            messageCsvPrinter.printRecord();
-            messageCsvPrinter.flush();
-
-            c1.close();
-            c2.close();
-            db.close();
-
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mRemindText.setText("正在向工作台上传聊天记录,请稍候");
-                }
-            });
-
-            //上传联系人
-            upLoadFiles(baseUrl + "contact/import?uploadTime=" + currentTime, file1, et_name.getText().toString().trim() + "_contact_file.cvs", false);
-            //上传聊天记录
-            upLoadFiles(baseUrl + "message/import?uploadTime=" + currentTime, file2, et_name.getText().toString().trim() + "_message_file.cvs", true);
-            c1.close();
-            c2.close();
-            db.close();
-
-        } catch (Exception e) {
-            Log.e("openWxDb", "读取数据库信息失败" + e.toString());
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    getUploadTimeError("读取数据库信息失败");
-                }
-            });
-        }
-    }
-
-    /**
-     * @param url
-     * @throws Exception isSave 用来表示只有消息表上传成功时,才保存上传时间到 sp
-     */
-    private void upLoadFiles(String url, File file, String name, final boolean isSave) {
-        Log.e("query网站", url + file.getName());
-        OkHttpClient client = new OkHttpClient.Builder()
-                .readTimeout(60, TimeUnit.MINUTES)
-                .build();
-        MultipartBody.Builder builder = new MultipartBody.Builder();
-        if (file.exists()) {
-
-            String TYPE = "application/octet-stream";
-            RequestBody fileBody = RequestBody.create(MediaType.parse(TYPE), file);
-
-            RequestBody requestBody = builder
-                    .setType(MultipartBody.FORM)
-                    .addFormDataPart("file", file.getName(), fileBody)
-                    .build();
-
-            Request request = new Request.Builder()
-                    .url(url)
-                    .post(requestBody)
-                    .build();
-
-            client.newCall(request).enqueue(new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    Log.e("query上传文件失败的返回错误", e.toString());
-                    //上传失败
-                    if (isSave) {
-                        getUploadTimeError("聊天记录上传失败请联系开发人员");
-                    } else {
-                        getUploadTimeError("联系人上传失败请联系开发人员");
-                    }
-
-                }
-
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    String string = response.body().string();
-                    //Log.e("query上传文件的返回值", string);
-                    try {
-                        JSONObject objects = new JSONObject(string);
-                        updateCode = objects.get("code");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    if (isSave) {
-                        Log.e("query上传聊天文件的返回值",string);
-                    } else {
-                        Log.e("query上传联系人文件的返回值",string);
-                    }
-                    if (updateCode.toString().equals("200")) {
-                        //上传成功,重新赋值时间并保存sp是
-                        if (isSave) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    loadingDialog.setCancelable(true);
-                                    loadingView.setVisibility(View.INVISIBLE);
-                                    iv_fail.setVisibility(View.INVISIBLE);
-                                    iv_success.setVisibility(View.VISIBLE);
-                                    mRemindText.setText("上传成功");
-                                    tv_updateTime.setText(currentTime);
-                                    if (preferences == null) {
-                                        preferences = getSharedPreferences(USERINFO, Context.MODE_PRIVATE);
-                                    }
-                                    SharedPreferences.Editor edit = preferences.edit();
-                                    edit.putString(LASTUPDATETIME, currentTime);
-                                    edit.commit();
-                                    //重新赋值本次上传时间
-                                    longLastUpdateTime = Long.valueOf(mTimeStamp);
-                                    Log.e("query聊天记录上传成功后更新的时间", DateUtil.timeStamp2Date(longLastUpdateTime + ""));
-                                }
-                            });
-                        } else {
-                            Log.e("query联系人上传成功", "");
-                        }
-
-                    } else {
-
-                        if (isSave) {
-                            getUploadTimeError("聊天记录上传失败请联系开发人员");
-                        } else {
-                            getUploadTimeError("联系人上传失败请联系开发人员");
-                        }
-
-
-                    }
-
-
-                }
-            });
-        }
+        });
     }
 
     /**
