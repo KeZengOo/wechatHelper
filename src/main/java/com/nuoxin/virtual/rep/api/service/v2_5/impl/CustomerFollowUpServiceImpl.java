@@ -75,7 +75,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 				int pageSize = pageRequest.getPageSize();
 				long startTime = System.currentTimeMillis();
 				Integer minValue = Integer.MIN_VALUE;
-				List<CustomerFollowListBean> list = doctorMapper.getList(virtualDrugUserIds, currentSize, pageSize, null, null, pageRequest.getOrder(), minValue, pageRequest.getDrugUserId());
+				List<CustomerFollowListBean> list = doctorMapper.getList(virtualDrugUserIds, currentSize, pageSize, null, pageRequest.getProductLineIds(), pageRequest.getOrder(), minValue, pageRequest.getDrugUserId());
 				if (CollectionsUtil.isNotEmptyList(list)){
 					// 填充产品信息
 					this.fillProductInfos(list, leaderPath);
@@ -107,10 +107,10 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 				int currentSize = request.getCurrentSize();
 				int pageSize = request.getPageSize();
 				Integer minValue = Integer.MIN_VALUE;
-				List<CustomerFollowListBean> list = doctorMapper.getList(virtualDrugUserIds, currentSize, pageSize, search, null, request.getOrder(), minValue,request.getDrugUserId());
+				List<CustomerFollowListBean> list = doctorMapper.getList(virtualDrugUserIds, currentSize, pageSize, search, productLineIds, request.getOrder(), minValue,request.getDrugUserId());
 				// TODO 填充上产品
 				pageResponseBean = this.getDoctorsList(count, list, request);
-				this.fillProductInfos(list, productLineIds);
+//				this.fillProductInfos(list, productLineIds);
 			}
 		} 
 		
@@ -211,7 +211,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 			}
 		}
 
-
+		// 医生产品信息
 		Map<Long, List<ProductInfoResponse>> productMap = new HashMap<>();
 		List<ProductInfoResponse> productInfoList = drugUserDoctorQuateMapper.getAllProductInfoListByProductIdList(doctorIdList,productLineIds);
 		if (CollectionsUtil.isNotEmptyList(productInfoList)){
