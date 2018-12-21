@@ -20,6 +20,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.naxions.www.wechathelper.util.DateUtil;
+import com.naxions.www.wechathelper.util.FileUtil;
+import com.naxions.www.wechathelper.util.FilterUtil;
+import com.naxions.www.wechathelper.util.Md5Utils;
+import com.naxions.www.wechathelper.util.PasswordUtiles;
 import com.threekilogram.objectbus.bus.ObjectBus;
 import com.wang.avi.AVLoadingIndicatorView;
 
@@ -34,16 +39,11 @@ import org.json.JSONObject;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -56,34 +56,34 @@ import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private Activity mActivity;
+    public MainActivity mActivity;
 
-    String WXPackageName = "com.tencent.mm";
-
-    private static final ObjectBus task = com.threekilogram.objectbus.bus.ObjectBus.newList();
-
-    //微信数据库路径
-    public final String WX_ROOT_PATH = "/data/data/com.tencent.mm/";
-    private final String WX_DB_DIR_PATH = WX_ROOT_PATH + "MicroMsg";
-    private final String WX_DB_FILE_NAME = "EnMicroMsg.db";
-
-    //拷贝到sd 卡的路径
-    private String mCcopyPath = Environment.getExternalStorageDirectory().getPath() + "/";
-    private final String COPY_WX_DATA_DB = "wx_data.db";
-    String copyFilePath = mCcopyPath + COPY_WX_DATA_DB;
-
-    private String USERNAME = "userName";
-    private String LASTUPDATETIME = "";
-    private String USERINFO = "userInfo";
 
     private SharedPreferences preferences;
     private static CSVPrinter contactCsvPrinter;
     private static CSVPrinter messageCsvPrinter;
+    private static final ObjectBus task = com.threekilogram.objectbus.bus.ObjectBus.newList();
+    static String WXPackageName = "com.tencent.mm";
+
+    //微信数据库路径
+    public final String WX_ROOT_PATH = "/data/data/com.tencent.mm/";
+    public final String WX_DB_DIR_PATH = WX_ROOT_PATH + "MicroMsg";
+    public final String WX_DB_FILE_NAME = "EnMicroMsg.db";
+
+    //拷贝到sd 卡的路径
+    public String mCcopyPath = Environment.getExternalStorageDirectory().getPath() + "/";
+    public final String COPY_WX_DATA_DB = "wx_data.db";
+    String copyFilePath = mCcopyPath + COPY_WX_DATA_DB;
+
+    public String USERNAME = "userName";
+    public String LASTUPDATETIME = "";
+    public String USERINFO = "userInfo";
 
     /**
-     * 上传按钮
+     * 上传导出按钮
      */
     private Button btn_update;
+    private Button btn_export;
     /**
      * 上次上传时间
      */
@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     private File file1;
     private File file2;
-   
+
     /**
      * 点击上传按钮时的时时间戳
      */
@@ -156,9 +156,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void initView() {
         btn_update = findViewById(R.id.btn_update);
+        btn_export = findViewById(R.id.btn_export);
         tv_updateTime = findViewById(R.id.tv_updateTime);
         et_name = findViewById(R.id.et_name);
         btn_update.setOnClickListener(this);
+        btn_export.setOnClickListener(this);
 
     }
 
@@ -173,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         et_name.setText(userName.toCharArray(), 0, userName.length());
         longLastUpdateTime = Long.valueOf(DateUtil.date2Timestamp(lastUpdateTime));
         tv_updateTime.setText(lastUpdateTime);
-        if(et_name.getText().toString().equals("")){
+        if (et_name.getText().toString().equals("")) {
             tv_updateTime.setText("暂无上传时间");
         }
         //获取上次上传的时间
@@ -187,182 +189,195 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             longLastUpdateTime = Long.valueOf(DateUtil.date2Timestamp(lastUpdateTime));
             Log.e("query sp中保存的上次上传时间", DateUtil.timeStamp2Date(longLastUpdateTime + ""));
         }
-
     }
-
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case (R.id.btn_update):
-                Log.e("query================", "=========");
-                //判断姓名是否为空
-                if (et_name.getText().toString().trim().equals("")) {
-                    Toast.makeText(mActivity, "请先输入您的微信号!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                //保存姓名
-                if (preferences == null) {
-                    preferences = getSharedPreferences(USERINFO, Context.MODE_PRIVATE);
-                }
-                //可能修改过用户 更新userName和上传时间;
-                userName = et_name.getText().toString().trim();
-                LASTUPDATETIME = userName;
-                if (preferences == null) {
-                    preferences = getSharedPreferences(USERINFO, Context.MODE_PRIVATE);
-                }
-                lastUpdateTime = preferences.getString(LASTUPDATETIME, "");
-                //赋值
-                if(lastUpdateTime.equals("")){
-                    tv_updateTime.setText("暂无上传时间");
-                    longLastUpdateTime = Long.valueOf(0);
-                }else{
-                    longLastUpdateTime = Long.valueOf(DateUtil.date2Timestamp(lastUpdateTime));
-                    tv_updateTime.setText(lastUpdateTime);
-                }
-                et_name.setText(userName.toCharArray(), 0, userName.length());
-
-                //保存姓名
-                SharedPreferences.Editor edit = preferences.edit();
-                edit.putString(USERNAME, et_name.getText().toString().trim());
-                edit.commit();
-                //判断是否安装了微信
-                if (isWeixinAvilible()) {
-                    if (closeWxDialog == null) {
-                        closeWxDialog = new CustomDialog(this, R.style.customDialog, R.layout.layout_closewx_dialog);
-                    }
-                    closeWxDialog.show();
-                    TextView tv_updateData = closeWxDialog.findViewById(R.id.tv_updateData);
-                    TextView tv_closeWX = closeWxDialog.findViewById(R.id.tv_closeWX);
-                    tv_closeWX.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            //跳转到微信设置界面,关闭微信,避免操作同一数据库崩溃冲突
-                            Uri packageURI = Uri.parse("package:" + WXPackageName);
-                            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, packageURI);
-                            startActivity(intent);
-                        }
-                    });
-                    tv_updateData.setOnClickListener(new View.OnClickListener() {
-
-                        //点击上传文件
-                        @Override
-                        public void onClick(View view) {
-
-                            //显示 loadingView
-                            if (loadingDialog == null) {
-                                loadingDialog = new CustomDialog(mActivity, R.style.customDialog, R.layout.layout_loading_dialog);
-                            }
-                            loadingDialog.setCancelable(false);
-                            closeWxDialog.dismiss();
-                            loadingDialog.show();
-                            loadingView = loadingDialog.findViewById(R.id.loadingView);
-                            mRemindText = loadingDialog.findViewById(R.id.text);
-                            iv_success = loadingDialog.findViewById(R.id.iv_success);
-                            iv_fail = loadingDialog.findViewById(R.id.iv_fail);
-                            mRemindText.setText("正在从微信中导出聊天记录,请稍候");
-                            loadingView.setVisibility(View.VISIBLE);
-                            iv_success.setVisibility(View.INVISIBLE);
-                            iv_fail.setVisibility(View.INVISIBLE);
-
-                            // 请求网络获取上一次的上传时间,创建网络处理的对象
-                            OkHttpClient client = new OkHttpClient.Builder()
-                                    .readTimeout(50, TimeUnit.SECONDS)
-                                    .build();
-
-                            //创建一个请求对象，传入URL地址和相关数据的键值对的对象
-                            Request request = new Request.Builder()
-                                    .url(baseUrl + "upload/time/get/" + userName)
-                                    .get().build();
-
-                            //创建一个能处理请求数据的操作类
-                            Call call = client.newCall(request);
-
-                            //使用异步任务的模式请求数据
-                            call.enqueue(new Callback() {
-                                @Override
-                                public void onFailure(Call call, final IOException e) {
-
-                                    Log.e("query获取上次的上传时间的 错误信息", e.toString());
-
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            //请求失败直接不让上传,显示失败
-                                            getUploadTimeError("无法获取您的上传时间,请联系开发人员");
-                                            Toast.makeText(mActivity, e.toString(), Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-                                }
-
-                                @Override
-                                public void onResponse(Call call, Response response) throws IOException {
-
-                                    String time = response.body().string();
-                                    Log.e("query 获取上次的上传时间==", time);
-                                    try {
-                                        JSONObject jsonOtimebject = new JSONObject(time);
-                                        Object code = jsonOtimebject.get("code");
-                                        final Object description = jsonOtimebject.get("description");
-                                        //  Log.e("query 获取上次的上传时间的code", code.toString());
-                                        if (code.toString().equals("200")) {
-                                            Object data = jsonOtimebject.get("data");
-                                            JSONObject jsondata = new JSONObject(data.toString());
-                                            final String messageUploadTime = jsondata.getString("messageUploadTime");
-                                            Log.e("query 获取上次的上传时间==", messageUploadTime);
-
-                                            //返回的时间不为空再复制,保存,不然就不处理,直接获取sp 的时间
-                                            if (!messageUploadTime.equals("") && !messageUploadTime.equals("0")) {
-                                                //赋值上次上传时间
-                                                runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        tv_updateTime.setText(messageUploadTime);
-                                                        longLastUpdateTime = Long.valueOf(DateUtil.date2Timestamp(messageUploadTime));
-                                                        //保存到 sp
-                                                        if (preferences == null) {
-                                                            preferences = getSharedPreferences(USERINFO, Context.MODE_PRIVATE);
-                                                        }
-                                                        SharedPreferences.Editor edit = preferences.edit();
-                                                        edit.putString(LASTUPDATETIME, messageUploadTime);
-                                                        edit.commit();
-                                                        go2GetData();
-                                                    }
-                                                });
-                                            } else {
-                                                go2GetData();
-                                            }
-
-                                        } else {
-                                            getUploadTimeError("你无法获取上传时间,请联系开发人员");
-                                            runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    Toast.makeText(mActivity, description.toString(), Toast.LENGTH_SHORT).show();
-                                                }
-                                            });
-
-                                        }
-
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            });
-                        }
-                    });
-                } else {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(mActivity, "请先安装微信", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
+                uploadData();
+                break;
+            case (R.id.btn_export):
+                startActivity(new Intent(mActivity, ExportActivity.class));
+                break;
 
             default:
                 break;
         }
+    }
+
+    private void uploadData() {
+        Log.e("query================", "=========");
+        //判断姓名是否为空
+        if (et_name.getText().toString().trim().equals("")) {
+            Toast.makeText(mActivity, "请先输入您的微信号!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        //保存姓名
+        if (preferences == null) {
+            preferences = getSharedPreferences(USERINFO, Context.MODE_PRIVATE);
+        }
+        //可能修改过用户 更新userName和上传时间;
+        userName = et_name.getText().toString().trim();
+        LASTUPDATETIME = userName;
+        if (preferences == null) {
+            preferences = getSharedPreferences(USERINFO, Context.MODE_PRIVATE);
+        }
+        lastUpdateTime = preferences.getString(LASTUPDATETIME, "");
+        //赋值
+        if (lastUpdateTime.equals("")) {
+            tv_updateTime.setText("暂无上传时间");
+            longLastUpdateTime = Long.valueOf(0);
+        } else {
+            longLastUpdateTime = Long.valueOf(DateUtil.date2Timestamp(lastUpdateTime));
+            tv_updateTime.setText(lastUpdateTime);
+        }
+        et_name.setText(userName.toCharArray(), 0, userName.length());
+
+        //保存姓名
+        SharedPreferences.Editor edit = preferences.edit();
+        edit.putString(USERNAME, et_name.getText().toString().trim());
+        edit.commit();
+        //判断是否安装了微信
+        if (isWeixinAvilible()) {
+            if (closeWxDialog == null) {
+                closeWxDialog = new CustomDialog(this, R.style.customDialog, R.layout.layout_closewx_dialog);
+            }
+            closeWxDialog.show();
+            TextView tv_updateData = closeWxDialog.findViewById(R.id.tv_updateData);
+            TextView tv_closeWX = closeWxDialog.findViewById(R.id.tv_closeWX);
+            tv_closeWX.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    //跳转到微信设置界面,关闭微信,避免操作同一数据库崩溃冲突
+                    Uri packageURI = Uri.parse("package:" + WXPackageName);
+                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, packageURI);
+                    startActivity(intent);
+                }
+            });
+            tv_updateData.setOnClickListener(new View.OnClickListener() {
+
+                //点击上传文件
+                @Override
+                public void onClick(View view) {
+
+                    //显示 loadingView
+                    if (loadingDialog == null) {
+                        loadingDialog = new CustomDialog(mActivity, R.style.customDialog, R.layout.layout_loading_dialog);
+                    }
+                    loadingDialog.setCancelable(false);
+                    closeWxDialog.dismiss();
+                    loadingDialog.show();
+                    loadingView = loadingDialog.findViewById(R.id.loadingView);
+                    mRemindText = loadingDialog.findViewById(R.id.text);
+                    iv_success = loadingDialog.findViewById(R.id.iv_success);
+                    iv_fail = loadingDialog.findViewById(R.id.iv_fail);
+                    mRemindText.setText("正在从微信中导出聊天记录,请稍候");
+                    loadingView.setVisibility(View.VISIBLE);
+                    iv_success.setVisibility(View.INVISIBLE);
+                    iv_fail.setVisibility(View.INVISIBLE);
+
+                    getLastUploadTime();
+
+                }
+            });
+        } else {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(mActivity, "请先安装微信", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+    /**
+     * 请求网络获取上一次的上传时间,
+     */
+    private void getLastUploadTime() {
+        // 创建网络处理的对象
+        OkHttpClient client = new OkHttpClient.Builder()
+                .readTimeout(50, TimeUnit.SECONDS)
+                .build();
+
+        //创建一个请求对象，传入URL地址和相关数据的键值对的对象
+        Request request = new Request.Builder()
+                .url(baseUrl + "upload/time/get/" + userName)
+                .get().build();
+
+        //创建一个能处理请求数据的操作类
+        Call call = client.newCall(request);
+
+        //使用异步任务的模式请求数据
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, final IOException e) {
+
+                Log.e("query获取上次的上传时间的 错误信息", e.toString());
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        //请求失败直接不让上传,显示失败
+                        getUploadTimeError("无法获取您的上传时间,请联系开发人员");
+                        Toast.makeText(mActivity, e.toString(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+
+                String time = response.body().string();
+                Log.e("query 获取上次的上传时间==", time);
+                try {
+                    JSONObject jsonOtimebject = new JSONObject(time);
+                    Object code = jsonOtimebject.get("code");
+                    final Object description = jsonOtimebject.get("description");
+                    //  Log.e("query 获取上次的上传时间的code", code.toString());
+                    if (code.toString().equals("200")) {
+                        Object data = jsonOtimebject.get("data");
+                        JSONObject jsondata = new JSONObject(data.toString());
+                        final String messageUploadTime = jsondata.getString("messageUploadTime");
+                        Log.e("query 获取上次的上传时间==", messageUploadTime);
+
+                        //返回的时间不为空再复制,保存,不然就不处理,直接获取sp 的时间
+                        if (!messageUploadTime.equals("") && !messageUploadTime.equals("0")) {
+                            //赋值上次上传时间
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    tv_updateTime.setText(messageUploadTime);
+                                    longLastUpdateTime = Long.valueOf(DateUtil.date2Timestamp(messageUploadTime));
+                                    //保存到 sp
+                                    if (preferences == null) {
+                                        preferences = getSharedPreferences(USERINFO, Context.MODE_PRIVATE);
+                                    }
+                                    SharedPreferences.Editor edit = preferences.edit();
+                                    edit.putString(LASTUPDATETIME, messageUploadTime);
+                                    edit.commit();
+                                    go2GetData();
+                                }
+                            });
+                        } else {
+                            go2GetData();
+                        }
+
+                    } else {
+                        getUploadTimeError("你无法获取上传时间,请联系开发人员");
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(mActivity, description.toString(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     /**
@@ -394,12 +409,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         protected String doInBackground(String... strings) {
             //获取root权限
-            passwordUtiles.execRootCmd("chmod 777 -R " + WX_ROOT_PATH);
+            PasswordUtiles.execRootCmd("chmod 777 -R " + WX_ROOT_PATH);
             //获取root权限
-            passwordUtiles.execRootCmd("chmod 777 -R " + copyFilePath);
+            PasswordUtiles.execRootCmd("chmod 777 -R " + copyFilePath);
 
-            String password = passwordUtiles.initDbPassword(mActivity);
-            String uid = passwordUtiles.initCurrWxUin(mActivity);
+            String password = PasswordUtiles.initDbPassword(mActivity);
+            String uid = PasswordUtiles.initCurrWxUin(mActivity);
             try {
                 String path = WX_DB_DIR_PATH + "/" + Md5Utils.md5Encode("mm" + uid) + "/" + WX_DB_FILE_NAME;
                 Log.e("path", copyFilePath);
@@ -411,16 +426,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //微信原始数据库的地址
                 File wxDataDir = new File(path);
 
-//                runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                    }
-//                });
-
                 //将微信数据库拷贝出来，因为直接连接微信的db，会导致微信崩溃
-                copyFile(wxDataDir.getAbsolutePath(), copyFilePath);
+                FileUtil.copyFile(wxDataDir.getAbsolutePath(), copyFilePath);
                 //将微信数据库导出到sd卡操作sd卡上数据库
-                openWxDb(new File(copyFilePath), mActivity, password);
+                openWxDb(new File(copyFilePath), mActivity, password,1);
             } catch (Exception e) {
                 Log.e("path", e.getMessage());
                 e.printStackTrace();
@@ -437,9 +446,50 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     /**
+     * 连接数据库
+     */
+    public  void openWxDb(File dbFile, final Activity mContext, String mDbPassword , int ActivityYype) {
+        SQLiteDatabase.loadLibs(mContext);
+        SQLiteDatabaseHook hook = new SQLiteDatabaseHook() {
+            @Override
+            public void preKey(SQLiteDatabase database) {
+            }
+
+            @Override
+            public void postKey(SQLiteDatabase database) {
+                database.rawExecSQL("PRAGMA cipher_migrate;");
+            }
+        };
+        //打开数据库连接
+        final SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(dbFile, mDbPassword, null, hook);
+        runRecontact(mContext, db);
+    }
+
+    /**
+     * 微信好友信息
+     *
+     * @param mContext
+     * @param db
+     */
+    public  void runRecontact(final Activity mContext, final SQLiteDatabase db) {
+
+        task.toPool(new Runnable() {
+            @Override
+            public void run() {
+                getRecontactDate(db, mContext);
+            }
+        }).toMain(new Runnable() {
+            @Override
+            public void run() {
+                //Toast.makeText(mContext, "文件导出完毕完毕", Toast.LENGTH_LONG).show();
+            }
+        }).run();
+    }
+
+    /**
      * 获取当前用户的微信所有联系人
      */
-    private void getRecontactDate(SQLiteDatabase db, Context mContext) {
+    public void getRecontactDate(SQLiteDatabase db, Context mContext) {
         Cursor c1 = null;
         Cursor c2 = null;
         try {
@@ -463,21 +513,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 String alias = c1.getString(c1.getColumnIndex("alias"));
                 String conRemark = c1.getString(c1.getColumnIndex("conRemark"));
                 String type = c1.getString(c1.getColumnIndex("type"));
-                boolean b = checkNickName(conRemark);
+                boolean b = FilterUtil.filterPhoneNumber(conRemark);
                 if (b) {
                     Log.e("contact", "userName=" + userName + "nickName=" + nickName + "alias=" + alias + "conRemark=" + conRemark + "type=" + type);
                     //将联系人信息写入 csv 文件
-                    contactCsvPrinter.printRecord(EmojiFilter.filterEmoji(userName), EmojiFilter.filterEmoji(nickName), EmojiFilter.filterEmoji(alias), EmojiFilter.filterEmoji(conRemark), type);
+                    contactCsvPrinter.printRecord(FilterUtil.filterEmoji(userName), FilterUtil.filterEmoji(nickName), FilterUtil.filterEmoji(alias), FilterUtil.filterEmoji(conRemark), type);
                 }
             }
             contactCsvPrinter.printRecord();
             contactCsvPrinter.flush();
 
             //查询聊天记录
-//            String query = "select * from message where  createTime > " + longLastUpdateTime;
-            String query = "select * from message where  createTime > 1544609802000";
+            String query = "select * from message where  createTime > " + longLastUpdateTime;
+//            String query = "select * from message where  createTime > 0";
             Log.e("query查询分割时间", DateUtil.timeStamp2Date(longLastUpdateTime + ""));
-
             c2 = db.rawQuery(query, null);
             while (c2.moveToNext()) {
                 String content = c2.getString(c2.getColumnIndex("content"));
@@ -524,7 +573,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             break;
 
                     }
-                    messageCsvPrinter.printRecord(talker, EmojiFilter.filterEmoji(content), DateUtil.timeStamp2Date(createTime.toString()), imgPath, isSend, messageType);
+                    messageCsvPrinter.printRecord(talker, FilterUtil.filterEmoji(content), DateUtil.timeStamp2Date(createTime.toString()), imgPath, isSend, messageType);
                 }
             }
             messageCsvPrinter.printRecord();
@@ -553,6 +602,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void run() {
                     getUploadTimeError("读取数据库信息失败");
+
                 }
             });
         }
@@ -584,6 +634,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     .build();
 
             client.newCall(request).enqueue(new Callback() {
+
+                private String description;
+
                 @Override
                 public void onFailure(Call call, IOException e) {
                     Log.e("query上传文件失败的返回错误", e.toString());
@@ -603,6 +656,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     try {
                         JSONObject objects = new JSONObject(string);
                         updateCode = objects.get("code");
+                        Object description = objects.get("description");
+                        this.description = description.toString();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -612,7 +667,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         Log.e("query上传联系人文件的返回值", string);
                     }
                     if (updateCode.toString().equals("200")) {
-                        //上传成功,重新赋值时间并保存sp是
+                        //上传成功,重新赋值时间并保存sp时间
                         if (isSave) {
                             runOnUiThread(new Runnable() {
                                 @Override
@@ -645,80 +700,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         } else {
                             getUploadTimeError("联系人上传失败请联系开发人员");
                         }
-
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getApplicationContext(), description, Toast.LENGTH_LONG).show();
+                            }
+                        });
                     }
 
                 }
             });
         }
-    }
-
-    /**
-     * 复制单个文件
-     *
-     * @param oldPath String 原文件路径 如：c:/fqf.txt
-     * @param newPath String 复制后路径 如：f:/fqf.txt
-     * @return boolean
-     */
-    public void copyFile(String oldPath, String newPath) {
-        try {
-            int byteRead = 0;
-            File oldFile = new File(oldPath);
-            if (oldFile.exists()) { //文件存在时
-                InputStream inStream = new FileInputStream(oldPath); //读入原文件
-                FileOutputStream fs = new FileOutputStream(newPath);
-                byte[] buffer = new byte[1444];
-                while ((byteRead = inStream.read(buffer)) != -1) {
-                    fs.write(buffer, 0, byteRead);
-                }
-                inStream.close();
-            }
-        } catch (Exception e) {
-            Log.e("copyFile", "复制单个文件操作出错");
-            e.printStackTrace();
-        }
-
-    }
-
-    /**
-     * 连接数据库
-     */
-    public void openWxDb(File dbFile, final Context mContext, String mDbPassword) {
-        SQLiteDatabase.loadLibs(mContext);
-        SQLiteDatabaseHook hook = new SQLiteDatabaseHook() {
-            @Override
-            public void preKey(SQLiteDatabase database) {
-            }
-
-            @Override
-            public void postKey(SQLiteDatabase database) {
-                database.rawExecSQL("PRAGMA cipher_migrate;");
-            }
-        };
-        //打开数据库连接
-        final SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(dbFile, mDbPassword, null, hook);
-        runRecontact(mContext, db);
-    }
-
-
-    /**
-     * 微信好友信息
-     *
-     * @param mContext
-     * @param db
-     */
-    private void runRecontact(final Context mContext, final SQLiteDatabase db) {
-        task.toPool(new Runnable() {
-            @Override
-            public void run() {
-                getRecontactDate(db, mContext);
-            }
-        }).toMain(new Runnable() {
-            @Override
-            public void run() {
-                //Toast.makeText(mContext, "文件导出完毕完毕", Toast.LENGTH_LONG).show();
-            }
-        }).run();
     }
 
     /**
@@ -755,71 +747,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         }
-        return false;
-    }
-
-    /**
-     * 过滤联系人,只获取备注有电话号码的联系人并写入 csv 上传
-     *
-     * @param nickName
-     * @return
-     */
-    public static boolean checkNickName(String nickName) {
-
-        // 过滤出纯数字
-        nickName = Pattern.compile("[^0-9]").matcher(nickName.trim()).replaceAll("");
-        if (nickName.length() < 11) {
-            return false;
-        }
-        char[] chars = nickName.toCharArray();
-        ArrayList<String> phoneList = new ArrayList<>();//所有11位数字的集合
-        for (int i = 0; i < chars.length; i++) {
-            StringBuilder stringBuilder = new StringBuilder();
-            for (int j = 0; j < 11; j++) {
-                if (i + j < chars.length) {
-                    stringBuilder.append(chars[i + j]);
-                }
-            }
-            if (stringBuilder.length() == 11) {
-                phoneList.add(stringBuilder.toString());
-            }
-        }
-
-
-        List<String> regexList = new ArrayList<>();
-        /**
-         * 手机号码
-         * 移动：134[0-8],135,136,137,138,139,150,151,157,158,159,182,187,188
-         * 联通：130,131,132,152,155,156,185,186
-         * 电信：133,1349,153,180,189,181(增加)
-         */
-        regexList.add("^1(3[0-9]|5[0-35-9]|8[025-9])\\d{8}$");
-        /**
-         * 中国移动：China Mobile
-         * 134[0-8],135,136,137,138,139,150,151,157,158,159,182,187,188
-         */
-        regexList.add("^1(34[0-8]|(3[5-9]|5[017-9]|8[2378])\\d)\\d{7}$");
-        /**
-         * 中国联通：China Unicom
-         * 130,131,132,152,155,156,185,186
-         */
-        regexList.add("^1(3[0-2]|5[256]|8[56])\\d{8}$");
-        /**
-         * 中国电信：China Telecom
-         * 133,1349,153,180,189,181(增加)
-         */
-        regexList.add("^1((33|53|8[019])[0-9]|349)\\d{7}$");
-        for (String phone : phoneList) {
-            for (String regex : regexList) {
-                Pattern pattern = Pattern.compile(regex);
-                Matcher matcher = pattern.matcher(phone);
-                if (matcher.matches()) {
-                    return true;
-                }
-            }
-        }
-
-
         return false;
     }
 

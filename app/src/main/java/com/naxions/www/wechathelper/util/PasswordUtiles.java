@@ -1,4 +1,4 @@
-package com.naxions.www.wechathelper;
+package com.naxions.www.wechathelper.util;
 
 import android.app.Activity;
 import android.content.Context;
@@ -18,7 +18,7 @@ import java.io.OutputStream;
 import java.util.List;
 
 
-public class passwordUtiles {
+public class PasswordUtiles {
 
   public static final String WX_ROOT_PATH = "/data/data/com.tencent.mm/";
 

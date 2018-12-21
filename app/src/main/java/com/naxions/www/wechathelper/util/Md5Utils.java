@@ -1,4 +1,4 @@
-package com.naxions.www.wechathelper;
+package com.naxions.www.wechathelper.util;
 
 import android.text.TextUtils;
 
