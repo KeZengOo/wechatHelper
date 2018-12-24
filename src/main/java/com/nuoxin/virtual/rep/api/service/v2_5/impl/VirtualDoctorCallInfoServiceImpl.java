@@ -15,6 +15,7 @@ import com.nuoxin.virtual.rep.api.enums.RoleTypeEnum;
 import com.nuoxin.virtual.rep.api.enums.UserTypeEnum;
 import com.nuoxin.virtual.rep.api.mybatis.*;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.CallRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.call.VisitHistoryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.product.ProductResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VisitResultResponseBean;
 import org.apache.commons.lang.StringUtils;
@@ -174,6 +175,21 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 
 		List<ProductResponseBean> list = new ArrayList<>();
 		return list;
+	}
+
+	@Override
+	@Transactional(value = TxType.REQUIRED, rollbackOn = Exception.class)
+	public void test() {
+
+		List<VisitHistoryRequestBean> visitHistoryList = callInfoMapper.getVisitHistoryList();
+		int i = 0;
+		for (VisitHistoryRequestBean visitHistoryRequestBean : visitHistoryList) {
+			callInfoMapper.insertVisitHistory(visitHistoryRequestBean);
+			callInfoMapper.insertVisitHistoryMend(visitHistoryRequestBean);
+			callInfoMapper.insertVisitHistoryMendResult(visitHistoryRequestBean);
+			System.out.println("已经处理了第 " + (i + 1) +  "条数据" );
+		}
+
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })

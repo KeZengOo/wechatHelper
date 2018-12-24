@@ -221,6 +221,7 @@
         ELSE visitResultStr
         END visitResult,
         remark,
+        callText,
         attitude,
         nextVisitTime,
         clientLevel,
@@ -239,10 +240,12 @@
         WHEN vdci.visit_channel=5 THEN "面谈"
         else "" END visitType,vdci.visit_channel visitChannel,
         vdci.remark,
+        vdct.callText,
         "" shareContent,IFNULL(GROUP_CONCAT(vppvr.visit_result),vdci.status_name) visitResultStr,IFNULL(vdcim.`attitude`,'') attitude,IFNULL(date_format(vdcim.`next_visit_time`, '%Y-%m-%d %H:%i:%s'),'') nextVisitTime
         ,call_dud.clientLevel,IFNULL(vdcim.`hcp_potential`,'未知') hcpPotential,IFNULL(vdcim.is_has_drug,'未知') isHasDrug,IFNULL(vdcim.`is_target`,'未知') isTarget,IFNULL(vdcim.`is_has_ae`,'未知')  isHasAe
         FROM
         virtual_doctor_call_info vdci
+        LEFT JOIN virtual_doctor_call_text vdct ON vdci.sin_token=vdct.sin_token
         LEFT JOIN virtual_doctor_call_info_mend vdcim ON vdci.id=vdcim.call_id
 
         LEFT JOIN virtual_doctor_call_info_result vdcir
@@ -316,6 +319,7 @@
             '内容分享' visitType,
             6 visitChannel,
             '' remark,
+            '' callText,
             IFNULL(ai.title,'') shareContent,"" visitResultStr,"" attitude,"" nextVisitTime
             ,content_dud.clientLevel,'未知' hcpPotential,'未知' isHasDrug,'未知' isTarget,'未知'  isHasAe
             FROM

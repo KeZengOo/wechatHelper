@@ -66,4 +66,9 @@ public interface VirtualDoctorCallInfoService {
 	 */
 	List<ProductResponseBean> getProductList(DrugUser drugUser);
 
+	/**
+	 * 临时功能
+	 */
+	void test();
+
 }

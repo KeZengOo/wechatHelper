@@ -30,7 +30,21 @@ public class VirtualDoctorCallInfoController extends NewBaseController{
 	
 	@Resource
 	private VirtualDoctorCallInfoService callInfoService;
-	
+
+
+	@SuppressWarnings("unchecked")
+	@ApiOperation(value = "测试", notes = "测试")
+	@RequestMapping(value = "/test", method = { RequestMethod.GET })
+	public DefaultResponseBean<Boolean> test() {
+		callInfoService.test();
+		DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<Boolean>();
+		responseBean.setData(true);
+
+		return responseBean;
+	}
+
+
+
 	@SuppressWarnings("unchecked")
 	@ApiOperation(value = "保存电话接通拜访信息", notes = "保存电话接通拜访信息")
 	@RequestMapping(value = "/connected/save", method = { RequestMethod.POST })

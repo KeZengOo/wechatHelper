@@ -364,6 +364,7 @@ public class StatisticalServiceImpl implements StatisticalService {
 
         map.put("visitResult", "拜访结果");
         map.put("remark", "备注");
+        map.put("callText", "录音识别文本");
         map.put("attitude", "医生态度");
         map.put("nextVisitTime", "下次拜访时间");
 //        map.put("clientLevel", "客户等级");

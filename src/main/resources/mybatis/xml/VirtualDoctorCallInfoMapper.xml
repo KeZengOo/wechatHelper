@@ -339,4 +339,50 @@
 		REPLACE INTO virtual_doctor_call_text(sin_token, call_text) VALUES(#{sinToken}, #{callText})
 	</insert>
 
+
+	<!-- 临时功能 -->
+	<select id="getVisitHistoryList" resultType="com.nuoxin.virtual.rep.api.web.controller.request.call.VisitHistoryRequestBean">
+		SELECT
+			doctor_id doctorId,
+			old_drug_user_id drugUserId,
+			mobile,
+			visit_channel visitChannel,
+			visit_time visitTime,
+			remark,
+			150 productId,
+			UUID() sinToken,
+			visit_result visitResult,
+			attitude,
+			have_drug haveDrug,
+			recruit,
+			have_ae haveAe,
+			is_target target
+
+
+		FROM
+			a_ahistory_sfl
+		WHERE
+			doctor_id IS NOT NULL
+		AND doctor_id != 0
+	</select>
+
+	<insert id="insertVisitHistory" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.call.VisitHistoryRequestBean"
+			keyProperty="callId" useGeneratedKeys="true">
+		INSERT INTO virtual_doctor_call_info(sin_token, virtual_doctor_id,virtual_drug_user_id, mobile, visit_channel, create_time, remark, product_id)
+		VALUES (#{sinToken}, #{doctorId}, #{drugUserId}, #{mobile}, #{visitChannel}, #{visitTime}, #{remark}, #{productId})
+	</insert>
+
+
+	<insert id="insertVisitHistoryMend" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.call.VisitHistoryRequestBean"
+			keyProperty="mendId" useGeneratedKeys="true">
+		INSERT INTO virtual_doctor_call_info_mend(virtual_drug_user_id, virtual_doctor_id, product_id, call_id, attitude, hcp_potential, is_break_off, is_has_ae, is_target, is_has_drug, is_recruit, recruit_time)
+		VALUES (#{drugUserId}, #{doctorId}, #{productId}, #{callId}, #{attitude}, -1, 0, #{haveAe}, #{target}, #{haveDrug}, #{recruit}, #{visitTime})
+	</insert>
+
+	<insert id="insertVisitHistoryMendResult" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.call.VisitHistoryRequestBean">
+		INSERT INTO virtual_doctor_call_info_result(mend_id, result_id)
+		VALUES(#{mendId},#{visitResult})
+	</insert>
+
+
 </mapper>

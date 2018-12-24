@@ -5,6 +5,7 @@ import java.util.List;
 import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse;
 import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsParams;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.CallRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.call.VisitHistoryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CallTelephoneReponseBean;
 import org.apache.ibatis.annotations.Param;
 
@@ -120,6 +121,22 @@ public interface VirtualDoctorCallInfoMapper {
 	 * @param callText
 	 */
 	void updateCallUrlText(@Param(value = "sinToken") String sinToken,@Param(value = "callText") String callText);
+
+	/**
+	 * 临时功能，导入森福罗历史拜访记录
+	 * @return
+	 */
+	List<VisitHistoryRequestBean> getVisitHistoryList();
+
+	void insertVisitHistory(VisitHistoryRequestBean bean);
+
+	void insertVisitHistoryMend(VisitHistoryRequestBean bean);
+
+	void insertVisitHistoryMendResult(VisitHistoryRequestBean bean);
+
+
+
+
 
 }
 
