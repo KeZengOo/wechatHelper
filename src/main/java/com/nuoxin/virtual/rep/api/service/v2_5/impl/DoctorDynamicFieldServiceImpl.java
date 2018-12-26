@@ -53,11 +53,28 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
             List<Integer> collectClassification = list.stream().map(DoctorDynamicFieldValueRequestBean::getClassification).distinct().collect(Collectors.toList());
             if (CollectionsUtil.isNotEmptyList(collectClassification)){
                 collectClassification.forEach(classification->{
-                    deleteDoctorDynamicFieldValue(doctorId, classification);
+                    this.deleteDoctorDynamicFieldValue(doctorId, classification);
                 });
             }
 
             dynamicFieldMapper.addDoctorBasicDynamicFieldValue(doctorId, list);
+        }
+    }
+
+    @Override
+    public void addDoctorCallDynamicFieldValue(DoctorDynamicFieldValueListRequestBean bean) {
+        Long doctorId = bean.getDoctorId();
+        Long callId = bean.getCallId();
+        List<DoctorDynamicFieldValueRequestBean> list = bean.getList();
+        if(checkRequiredDoctorDynamicFieldValueList(list)){
+            List<Integer> collectClassification = list.stream().map(DoctorDynamicFieldValueRequestBean::getClassification).distinct().collect(Collectors.toList());
+            if (CollectionsUtil.isNotEmptyList(collectClassification)){
+                collectClassification.forEach(classification->{
+                    this.deleteDoctorCallDynamicFieldValue(doctorId, classification, callId);
+                });
+            }
+
+            dynamicFieldMapper.addDoctorCallBasicDynamicFieldValue(doctorId, callId, list);
         }
     }
 
@@ -69,6 +86,12 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
 
     }
 
+    @Override
+    public void addDoctorBasicCallDynamicFieldValue(DoctorBasicDynamicFieldValueListRequestBean bean) {
+        DoctorDynamicFieldValueListRequestBean doctorDynamicFieldValueListRequestBean = getDoctorDynamicFieldValueList(bean);
+        this.addDoctorCallDynamicFieldValue(doctorDynamicFieldValueListRequestBean);
+    }
+
     /**
      * 将 DoctorBasicDynamicFieldValueListRequestBean 转为 DoctorDynamicFieldValueListRequestBean
      * @param bean
@@ -77,6 +100,7 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
     private DoctorDynamicFieldValueListRequestBean getDoctorDynamicFieldValueList(DoctorBasicDynamicFieldValueListRequestBean bean) {
         DoctorDynamicFieldValueListRequestBean doctorDynamicFieldValueListRequestBean = new DoctorDynamicFieldValueListRequestBean();
         Long doctorId = bean.getDoctorId();
+        Long callId = bean.getCallId();
         List<DoctorDynamicFieldValueRequestBean> list = new ArrayList<>();
         List<DoctorBasicDynamicFieldValueRequestBean> basic = bean.getBasic();
         if (CollectionsUtil.isNotEmptyList(basic)){
@@ -106,6 +130,7 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
         }
 
         doctorDynamicFieldValueListRequestBean.setDoctorId(doctorId);
+        doctorDynamicFieldValueListRequestBean.setCallId(callId);
         doctorDynamicFieldValueListRequestBean.setList(list);
 
         return doctorDynamicFieldValueListRequestBean;
@@ -168,6 +193,11 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
     @Override
     public void deleteDoctorDynamicFieldValue(Long doctorId, Integer classification) {
         dynamicFieldMapper.deleteDoctorDynamicFieldValue(doctorId, classification);
+    }
+
+    @Override
+    public void deleteDoctorCallDynamicFieldValue(Long doctorId, Integer classification, Long callId) {
+        dynamicFieldMapper.deleteDoctorCallDynamicFieldValue(doctorId, classification, callId);
     }
 
     @Override

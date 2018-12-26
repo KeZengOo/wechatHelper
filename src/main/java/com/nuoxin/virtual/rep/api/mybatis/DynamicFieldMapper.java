@@ -175,12 +175,29 @@ public interface DynamicFieldMapper {
      */
     void addDoctorBasicDynamicFieldValue(@Param(value="doctorId") Long doctorId,@Param(value = "list") List<DoctorDynamicFieldValueRequestBean> list);
 
+
+    /**
+     * 新增医生动态字段填充的值
+     * @param doctorId
+     * @param callId
+     * @param list
+     */
+    void addDoctorCallBasicDynamicFieldValue(@Param(value="doctorId") Long doctorId,@Param(value = "callId") Long callId,@Param(value = "list") List<DoctorDynamicFieldValueRequestBean> list);
+
+
     /**
      * 删除医生动态字段填充的值
      * @param doctorId 医生id
      * @param classification 分类：目前1基本信息，2医生的处方信息，3之前拜访记录，4分析，5是医院信息
      */
     void deleteDoctorDynamicFieldValue(@Param(value="doctorId") Long doctorId,@Param(value="classification") Integer classification);
+
+    /**
+     * 删除医生动态字段填充的值，关联每次拜访的的callId
+     * @param doctorId 医生id
+     * @param classification 分类：目前1基本信息，2医生的处方信息，3之前拜访记录，4分析，5是医院信息
+     */
+    void deleteDoctorCallDynamicFieldValue(@Param(value="doctorId") Long doctorId,@Param(value="classification") Integer classification,@Param(value = "callId") Long callId);
 
 
     /**

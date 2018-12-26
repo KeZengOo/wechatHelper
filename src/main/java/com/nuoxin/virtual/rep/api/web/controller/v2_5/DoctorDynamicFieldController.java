@@ -50,8 +50,26 @@ public class DoctorDynamicFieldController extends NewBaseController{
 
 
     @SuppressWarnings("unchecked")
+    @ApiOperation(value = "产品信息录入字段的对应的值,关联拜访的callId", notes = "产品信息录入字段的对应的值,关联拜访的callId")
+    @PostMapping(value = "/call/value/add")
+    public DefaultResponseBean<Boolean> addDoctorCallDynamicFieldValue(HttpServletRequest request, @RequestBody DoctorDynamicFieldValueListRequestBean bean) {
+        DrugUser user = super.getDrugUser(request);
+        if(user == null) {
+            return super.getLoginErrorResponse();
+        }
+
+        doctorDynamicFieldService.addDoctorCallDynamicFieldValue(bean);
+
+        DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(true);
+
+        return responseBean;
+    }
+
+
+    @SuppressWarnings("unchecked")
     @ApiOperation(value = "基本信息录入字段的对应的值", notes = "基本信息录入字段的对应的值")
-    @PostMapping(value = "/basic/value/add")
+    @PostMapping(value = "/call/basic/value/add")
     public DefaultResponseBean<Boolean> addBasicDoctorDynamicFieldValue(HttpServletRequest request, @RequestBody DoctorBasicDynamicFieldValueListRequestBean bean) {
         DrugUser user = super.getDrugUser(request);
         if(user == null) {
@@ -65,6 +83,25 @@ public class DoctorDynamicFieldController extends NewBaseController{
 
         return responseBean;
     }
+
+
+    @SuppressWarnings("unchecked")
+    @ApiOperation(value = "基本信息录入字段的对应的值,关联拜访的callId", notes = "基本信息录入字段的对应的值,关联拜访的callId")
+    @PostMapping(value = "/basic/value/add")
+    public DefaultResponseBean<Boolean> addBasicDoctorCallDynamicFieldValue(HttpServletRequest request, @RequestBody DoctorBasicDynamicFieldValueListRequestBean bean) {
+        DrugUser user = super.getDrugUser(request);
+        if(user == null) {
+            return super.getLoginErrorResponse();
+        }
+
+        doctorDynamicFieldService.addDoctorBasicCallDynamicFieldValue(bean);
+
+        DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(true);
+
+        return responseBean;
+    }
+
 
 
     @SuppressWarnings("unchecked")

@@ -25,6 +25,13 @@ public interface DoctorDynamicFieldService {
      */
     void addDoctorDynamicFieldValue(DoctorDynamicFieldValueListRequestBean bean);
 
+
+    /**
+     * 新增医生的动态字段填充的值，关联上每次拜访的callId
+     * @param bean
+     */
+    void addDoctorCallDynamicFieldValue(DoctorDynamicFieldValueListRequestBean bean);
+
     /**
      * 新增医生的基本信息医院信息动态字段填充的值
      * @param bean
@@ -33,11 +40,27 @@ public interface DoctorDynamicFieldService {
 
 
     /**
+     * 新增医生的基本信息医院信息动态字段填充的值,关联上每次拜访的callId
+     * @param bean
+     */
+    void addDoctorBasicCallDynamicFieldValue(DoctorBasicDynamicFieldValueListRequestBean bean);
+
+
+    /**
      * 删除医生动态字段填充的值
      * @param doctorId
      * @param classification
      */
     void deleteDoctorDynamicFieldValue(Long doctorId, Integer classification);
+
+
+    /**
+     * 删除医生动态字段填充的值，关联上
+     * @param doctorId
+     * @param classification
+     * @param callId
+     */
+    void deleteDoctorCallDynamicFieldValue(Long doctorId, Integer classification, Long callId);
 
 
     /**

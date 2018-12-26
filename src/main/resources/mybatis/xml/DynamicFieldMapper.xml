@@ -361,6 +361,20 @@
 
     </insert>
 
+
+
+    <insert id="addDoctorCallBasicDynamicFieldValue">
+        INSERT INTO
+        virtual_doctor_call_dynamic_field_value(doctor_id,call_id, dynamic_field_id, dynamic_field_name, dynamic_field_value,dynamic_extend_value)
+        VALUES
+        <foreach collection="list" item="d" separator=",">
+            (#{doctorId},#{callId}, #{d.dynamicFieldId}, #{d.dynamicFieldName}, #{d.dynamicFieldValue}, #{d.dynamicExtendValue})
+        </foreach>
+
+    </insert>
+
+
+
     <delete id="deleteDoctorDynamicFieldValue">
         DELETE
         FROM
@@ -376,6 +390,24 @@
                 classification = #{classification}
         )
     </delete>
+
+    <delete id="deleteDoctorCallDynamicFieldValue">
+        DELETE
+        FROM
+            virtual_doctor_call_dynamic_field_value
+        WHERE
+            doctor_id = #{doctorId}
+            AND call_id=#{callId}
+        AND dynamic_field_id IN (
+            SELECT
+                id
+            FROM
+                virtual_doctor_dynamic_field
+            WHERE
+                classification = #{classification}
+        )
+    </delete>
+
 
 
     <!-- 找出填的字段中的必填字段 -->
