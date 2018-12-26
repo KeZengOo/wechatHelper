@@ -23,6 +23,8 @@ public class LoginResponseBean implements Serializable {
     private Long roleId;
     @ApiModelProperty(value = "虚拟代表ID")
     private Long virtualDrugUserId;
+    @ApiModelProperty(value = "销售类型，0是没有类型为经理的，1是线上销售，2是线下销售")
+    private Integer saleType;
 
     private DrugUserCallDetaiBean callBean;
 
