@@ -189,6 +189,13 @@
 			AND DATE_FORMAT(create_time,'%Y-%m-%d') &lt;=#{endTime}
 		</if>
 
+		<if test="self != null and self==1">
+			AND vdci.virtual_drug_user_id IN
+			<foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+				#{drugUserId}
+			</foreach>
+		</if>
+
 
 	</select>
 
@@ -236,6 +243,12 @@
 			AND DATE_FORMAT(vdci.create_time,'%Y-%m-%d') &lt;=#{endTime}
 		</if>
 
+		<if test="self!=null and self==1">
+			AND vdci.virtual_drug_user_id IN
+			<foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+				#{drugUserId}
+			</foreach>
+		</if>
 
 	</select>
 

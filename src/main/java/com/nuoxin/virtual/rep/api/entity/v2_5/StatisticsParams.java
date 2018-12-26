@@ -65,4 +65,10 @@ public class StatisticsParams extends PageRequestBean {
 	 */
 	private List<Long> visitResultIdList;
 
+
+	/**
+	 * 是否是本人互动的，1是本人，其他是全部(自己和转移过来的)
+	 */
+	private Integer self;
+
 }

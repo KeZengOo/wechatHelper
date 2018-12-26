@@ -307,6 +307,15 @@
             </foreach>
         </if>
 
+        <if test="self!=null and self==1">
+            AND vdci.virtual_drug_user_id IN
+            <foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+                #{drugUserId}
+            </foreach>
+        </if>
+
+
+
         GROUP BY vdci.id
 
         <if test="contents==null or contents.size==0">
@@ -374,7 +383,16 @@
                 and date_format(a.create_time,'%Y-%m-%d') &lt;=#{endTime}
             </if>
 
+            <if test="self!=null and self==1">
+                AND a.drug_user_id IN
+                <foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+                    #{drugUserId}
+                </foreach>
+            </if>
+
             GROUP BY a.id
+
+
 
         </if>
         ) b
@@ -508,6 +526,14 @@
             </foreach>
         </if>
 
+        <if test="self!=null and self==1">
+            AND vdci.virtual_drug_user_id IN
+            <foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+                #{drugUserId}
+            </foreach>
+        </if>
+
+
         <if test="contents==null or contents.size==0">
             UNION ALL
             SELECT
@@ -562,6 +588,13 @@
             </if>
             <if test="endTime!=null and endTime!=''">
                 and date_format(a.create_time,'%Y-%m-%d') &lt;=#{endTime}
+            </if>
+
+            <if test="self!=null and self==1">
+                AND a.drug_user_id IN
+                <foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+                    #{drugUserId}
+                </foreach>
             </if>
 
         </if>
@@ -636,6 +669,14 @@
         </if>
         <if test="endTime!=null  and endTime!=''">
             and date_format(vdci.create_time,'%Y-%m-%d') &lt;=#{endTime}
+        </if>
+
+
+        <if test="self!=null and self==1">
+            AND vdci.virtual_drug_user_id IN
+            <foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+                #{drugUserId}
+            </foreach>
         </if>
 
         )

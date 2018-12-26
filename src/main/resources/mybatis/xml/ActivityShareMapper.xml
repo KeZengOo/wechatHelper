@@ -183,6 +183,14 @@
 		tcp.product_id = #{productId}
 		)
 
+		<if test="self !=null and self==1">
+			AND a.drug_user_id IN
+			<foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+				#{drugUserId}
+			</foreach>
+		</if>
+
+
 		<if test="startTime!=null and startTime!=''">
 			AND DATE_FORMAT(a.create_time, '%Y-%m-%d') &gt;= #{startTime}
 		</if>
@@ -291,6 +299,13 @@
 		WHERE
 		tcp.product_id = #{productId}
 		)
+
+		<if test="self !=null and self==1">
+			AND a.drug_user_id IN
+			<foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+				#{drugUserId}
+			</foreach>
+		</if>
 
 		<if test="startTime!=null and startTime!=''">
 			AND DATE_FORMAT(a.create_time, '%Y-%m-%d') &gt;= #{startTime}

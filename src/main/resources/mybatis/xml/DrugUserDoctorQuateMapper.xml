@@ -300,6 +300,13 @@
 			AND DATE_FORMAT(q.create_time, '%Y-%m-%d') &lt;= #{endTime}
 		</if>
 
+		<if test="self!=null and self==1">
+			AND q.drug_user_id IN
+			<foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+				#{drugUserId}
+			</foreach>
+		</if>
+
 	</select>
 
 </mapper>

@@ -80,7 +80,7 @@ public class StatisticalController extends NewBaseController {
 	@ApiOperation(value = "医生拜访统计表导出")
 	@RequestMapping(value = "/visit/statisticsListExportExcel", method = { RequestMethod.GET })
 	public void statisticsListExportExcel( HttpServletRequest request, HttpServletResponse response,
-										  Long productId,String drugUserIds,String startTime,String endTime) {
+										  Long productId,String drugUserIds,String startTime,String endTime, Integer self) {
 		if(productId==null){
 			return ;
 		}
@@ -98,6 +98,7 @@ public class StatisticalController extends NewBaseController {
 		statisticsParams.setType(list);
 		statisticsParams.setDrugUserIds(ids);
 		statisticsParams.setProductId(productId);
+		statisticsParams.setSelf(self);
 //		StringBuffer fileName=new StringBuffer();
 //		fileName.append("医生拜访统计表").append(".xls");
 		List<StatisticsResponse> list=statisticalService.visitStatisticsList(statisticsParams);
@@ -147,7 +148,7 @@ public class StatisticalController extends NewBaseController {
     @ApiOperation(value = "医生拜访明细表导出")
     @RequestMapping(value = "/visit/doctorVisitDetaiListExportExcel", method = { RequestMethod.GET })
     public void doctorVisitDetaiListExportExcel( HttpServletRequest request, HttpServletResponse response,
-                                           Long productId,Long drugUserId,String startTime,String endTime,Integer visitChannel,Long doctorId,String visitResultIdList) {
+                                           Long productId,Long drugUserId,String startTime,String endTime,Integer visitChannel,Long doctorId,String visitResultIdList, Integer self) {
         if(productId==null){
             return ;
         }
@@ -157,6 +158,7 @@ public class StatisticalController extends NewBaseController {
         statisticsParams.setType(list);
         statisticsParams.setDoctorId(doctorId);
         statisticsParams.setVisitChannel(visitChannel);
+		statisticsParams.setSelf(self);
         if(StringUtils.isNotEmtity(visitResultIdList)){
         	if (visitResultIdList.contains("，")){
 				visitResultIdList = visitResultIdList.replaceAll("，", ",");
