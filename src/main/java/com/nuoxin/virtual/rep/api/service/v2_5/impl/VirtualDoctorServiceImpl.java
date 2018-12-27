@@ -62,6 +62,8 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 
     @Resource
     private DoctorMendMapper doctorMendMapper;
+    @Resource
+    private VirtualCallDoctorFiexFieldMapper virtualCallDoctorFiexFieldMapper;
 
     @Resource(name = "dynamic")
     private DoctorDynamicFieldService doctorDynamicFieldService;
@@ -153,6 +155,23 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
             }
         }
 
+
+
+        // 如果是通过拜访记录的，保存一下拜访ID
+        this.saveVirtualCallDoctorFixField(request);
+
+
+
+    }
+
+    private void saveVirtualCallDoctorFixField(UpdateVirtualDoctorRequest request) {
+        Long callId = request.getCallId();
+        if (callId == null || callId == 0){
+            return;
+        }
+
+        virtualCallDoctorFiexFieldMapper.deleteByCallId(callId);
+        virtualCallDoctorFiexFieldMapper.add(request);
     }
 
     @Override

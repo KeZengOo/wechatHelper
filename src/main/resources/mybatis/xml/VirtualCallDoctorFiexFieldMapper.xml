@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.VirtualCallDoctorFiexFieldMapper">
+
+    <delete id="deleteByCallId">
+        DELETE FROM virtual_call_doctor_fix_field WHERE call_id=#{callId}
+    </delete>
+
+    <!-- 新增 -->
+    <insert id="add" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.UpdateVirtualDoctorRequest">
+        INSERT INTO virtual_call_doctor_fix_field(call_id, doctor_id, doctor_name,gender, telephones,is_add_wechat,wechat,email,address,depart,title,hospital, province,city,hospital_level)
+        VALUES(#{callId}, #{doctorId}, #{doctorName},#{gender},#{telephoneStr}, #{isAddWechat},#{wechat}, #{email}, #{address}, #{depart}, #{title,}, #{hospital}, #{province}, #{city},#{hciLevel})
+    </insert>
+</mapper>

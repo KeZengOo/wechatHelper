@@ -1,5 +1,6 @@
 package com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -49,5 +50,11 @@ public class UpdateVirtualDoctorRequest {
 	private String city;
 	@ApiModelProperty(value = "医院等级")
 	private Integer hciLevel;
+
+	@ApiModelProperty(value = "每次拜访的ID，如果是拜访修改的则需要传，否则不需要")
+	private Long callId;
+
+	@JsonIgnore
+	private String telephoneStr;
 
 }

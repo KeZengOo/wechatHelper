@@ -40,4 +40,6 @@ public class PrescriptionRequestBean implements Serializable {
     @ApiModelProperty(value = "是否脱落:1是,0否,-1未知")
     private Integer breakOff;
 
+
+
 }
