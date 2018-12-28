@@ -205,7 +205,7 @@
 
 
         <!-- 2018-09-29 修改后 -->
-        SELECT id,drugUserName,visitTime,doctorId,doctorName,hospitalId,hospitalName,
+        SELECT callId,drugUserName,visitTime,doctorId,doctorName,hospitalId,hospitalName,
         depart,
         hospitalLevel,
         CASE
@@ -220,6 +220,7 @@
         WHEN hospitalLevel='33' THEN '三级丙等'
         WHEN hospitalLevel='40' THEN '特级医院'
         WHEN hospitalLevel='50' THEN '民营医院'
+        ELSE '未知'
         END hospitalLevel
         isRecruit,visitType,
         visitChannel,
@@ -247,7 +248,7 @@
         isHasAe
         FROM (
         SELECT
-        vdci.id,call_dud.drugUserName,IFNULL(date_format(vdci.create_time, '%Y-%m-%d %H:%i:%s'),'')  visitTime,call_dud.doctorId,call_dud.doctorName,
+        vdci.id callId,call_dud.drugUserName,IFNULL(date_format(vdci.create_time, '%Y-%m-%d %H:%i:%s'),'')  visitTime,call_dud.doctorId,call_dud.doctorName,
         call_dud.hospitalId,
         call_dud.hospitalName,
         call_dud.depart,
@@ -340,7 +341,7 @@
         <if test="contents==null or contents.size==0">
             UNION ALL
             SELECT
-            a.id,content_dud.drugUserName,IFNULL(date_format(a.`create_time`, '%Y-%m-%d %H:%i:%s'),'') visitTime,content_dud.doctorId,content_dud.doctorName,
+            a.id callId,content_dud.drugUserName,IFNULL(date_format(a.`create_time`, '%Y-%m-%d %H:%i:%s'),'') visitTime,content_dud.doctorId,content_dud.doctorName,
             content_dud.hospitalId,
             content_dud.hospitalName,
             content_dud.depart,

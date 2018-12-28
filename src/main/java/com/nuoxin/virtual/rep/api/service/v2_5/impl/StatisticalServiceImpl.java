@@ -133,6 +133,7 @@ public class StatisticalServiceImpl implements StatisticalService {
         if(null!=list&&list.size()>0){
             Set<Long> ids = new HashSet<>();
             list.forEach(x -> {
+
                 ids.add(Long.parseLong(x.get("doctorId").toString()));
                 x.put("hcpPotential", getLevel((String) x.get("hcpPotential")));
                 x.put("isHasDrug", getValue((String) x.get("isHasDrug")));
