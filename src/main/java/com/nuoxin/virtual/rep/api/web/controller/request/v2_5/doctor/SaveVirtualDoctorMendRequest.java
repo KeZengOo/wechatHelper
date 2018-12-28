@@ -18,4 +18,7 @@ public class SaveVirtualDoctorMendRequest {
 	private Integer isHasDrug;
 	@ApiModelProperty(value = "是否招募 1是,0否,-1未知")
 	private Integer isRecruit;
+
+	@ApiModelProperty(value = "线上代表ID，有则传")
+	private Long onlineDrugUserId;
 }

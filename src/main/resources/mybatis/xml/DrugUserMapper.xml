@@ -60,6 +60,19 @@
         </if>
         LIMIT ${currentSize},${pageSize}
     </select>
+
+    <!-- 得到指定产品下的线上代表 sale_type:销售类型，0是没有类型为经理的，1是线上销售，2是线下销售-->
+    <select id="getOnlineDrugUserList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean">
+        SELECT
+            DISTINCT du.id, du.name
+        FROM
+            product_user pu
+        INNER JOIN drug_user du ON pu.user_id = du.id
+        WHERE
+            pu.prod_id = #{productId}
+        AND du.sale_type = 1
+    </select>
+
     <select id="doctorPageCount" resultType="java.lang.Integer"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean">
         select count(1) num from drug_user_doctor dud join doctor d on d.id=dud.doctor_id join

@@ -9,6 +9,7 @@ import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorMiniResponse;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.PrescriptionRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.SaveVirtualDoctorRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.UpdateVirtualDoctorRequest;
+import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorDetailsResponseBean;
 import org.apache.ibatis.annotations.Param;
 
@@ -22,6 +23,13 @@ public interface VirtualDoctorService {
 	 * @return
 	 */
 	Long saveVirtualDoctor(SaveVirtualDoctorRequest request, DrugUser user);
+
+	/**
+	 * 得到指定产品下的线上代表
+	 * @param productId
+	 * @return
+	 */
+	List<DrugUserResponseBean> getOnlineDrugUserList(Long productId);
 
 
 	void updateVirtualDoctor(UpdateVirtualDoctorRequest request, DrugUser user);

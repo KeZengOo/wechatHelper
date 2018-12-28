@@ -22,6 +22,14 @@ public interface DrugUserMapper extends MyMapper<DrugUser> {
      * @return
      */
     List<DoctorResponseBean> doctorPage(QueryRequestBean bean);
+
+    /**
+     * 得到指定产品的线上代表
+     * @param productId
+     * @return
+     */
+    List<DrugUserResponseBean> getOnlineDrugUserList(@Param(value = "productId") Long productId);
+
     Integer doctorPageCount(QueryRequestBean bean);
 
     /**

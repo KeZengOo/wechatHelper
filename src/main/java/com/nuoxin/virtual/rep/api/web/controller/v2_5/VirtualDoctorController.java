@@ -8,9 +8,11 @@ import javax.validation.Valid;
 
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
+import com.nuoxin.virtual.rep.api.enums.OnOffLineEnum;
 import com.nuoxin.virtual.rep.api.enums.RoleTypeEnum;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.PrescriptionRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.UpdateVirtualDoctorRequest;
+import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorDetailsResponseBean;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -60,6 +62,27 @@ public class VirtualDoctorController extends NewBaseController {
 		return responseBean;
 	}
 
+
+	@SuppressWarnings("unchecked")
+	@ApiOperation(value = "得到线下代表对应的线上代表")
+	@RequestMapping(value = "/online/user/list/{productId}", method = { RequestMethod.GET })
+	public DefaultResponseBean<List<DrugUserResponseBean>> getOnlineDrugUserList(HttpServletRequest request,@PathVariable(value = "productId") Long productId) {
+		DrugUser user = this.getDrugUser(request);
+		if (user == null) {
+			return super.getLoginErrorResponse();
+		}
+
+		Integer saleType = user.getSaleType();
+		if (saleType == null || (!saleType.equals(OnOffLineEnum.OFFLINE.getUserType()))){
+			throw new BusinessException(ErrorEnum.ERROR, "非线下代表不能访问");
+		}
+
+		List<DrugUserResponseBean> onlineDrugUserList = virtualDoctorService.getOnlineDrugUserList(productId);
+
+		DefaultResponseBean<List<DrugUserResponseBean>> responseBean = new DefaultResponseBean<>();
+		responseBean.setData(onlineDrugUserList);
+		return responseBean;
+	}
 
 
 	@ApiOperation(value = "修改单个医生基本信息固定字段")

@@ -13,12 +13,15 @@ import javax.transaction.Transactional.TxType;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.dao.DoctorTelephoneRepository;
+import com.nuoxin.virtual.rep.api.dao.DrugUserRepository;
+import com.nuoxin.virtual.rep.api.enums.OnOffLineEnum;
 import com.nuoxin.virtual.rep.api.enums.RoleTypeEnum;
 import com.nuoxin.virtual.rep.api.mybatis.*;
 import com.nuoxin.virtual.rep.api.service.v2_5.DoctorDynamicFieldService;
 import com.nuoxin.virtual.rep.api.utils.RegularUtils;
 import com.nuoxin.virtual.rep.api.utils.StringUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.*;
+import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorDetailsResponseBean;
 import org.springframework.stereotype.Service;
 
@@ -63,6 +66,8 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
     @Resource
     private DoctorMendMapper doctorMendMapper;
     @Resource
+    private DrugUserMapper drugUserMapper;
+    @Resource
     private VirtualCallDoctorFiexFieldMapper virtualCallDoctorFiexFieldMapper;
 
     @Resource(name = "dynamic")
@@ -71,6 +76,8 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
     @Resource
     private DoctorTelephoneRepository doctorTelephoneRepository;
 
+    @Resource
+    private DrugUserRepository drugUserRepository;
 
     @Override
     @Transactional(value = TxType.REQUIRED, rollbackOn = Exception.class)
@@ -97,6 +104,16 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 
 
         return virtualDoctorId;
+    }
+
+    @Override
+    public List<DrugUserResponseBean> getOnlineDrugUserList(Long productId) {
+        List<DrugUserResponseBean> list = new ArrayList<>();
+        List<DrugUserResponseBean> onlineDrugUserList = drugUserMapper.getOnlineDrugUserList(productId);
+        if (CollectionsUtil.isEmptyList(onlineDrugUserList)){
+            return list;
+        }
+        return onlineDrugUserList;
     }
 
     @Override
@@ -731,6 +748,27 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
         List<DrugUserDoctorParams> collectDrugUserDoctorParams = drugUserDoctorParams.stream().filter(d -> d.getProdId() > 0).distinct().collect(Collectors.toList());
         if (CollectionsUtil.isNotEmptyList(collectDrugUserDoctorParams)) {
             drugUserDoctorMapper.saveDrugUserDoctors(collectDrugUserDoctorParams);
+        }
+
+
+        // 如果是线下代表想关联线上代表，则需要在添加关系
+        Integer saleType = user.getSaleType();
+        if (saleType != null && saleType.equals(OnOffLineEnum.OFFLINE)){
+
+            List<DrugUserDoctorParams> onlineDrugUserDoctorParams = new ArrayList<>(size);
+            for (int i = 0; i < size; i++){
+                SaveVirtualDoctorMendRequest saveVirtualDoctorMendRequest = mends.get(i);
+                Long onlineDrugUserId = saveVirtualDoctorMendRequest.getOnlineDrugUserId();
+                if (onlineDrugUserId == null || onlineDrugUserId == 0){
+                    continue;
+                }
+                DrugUser onlineDrugUser = drugUserRepository.findFirstById(onlineDrugUserId);
+                if (onlineDrugUser == null){
+                    continue;
+                }
+                DrugUserDoctorParams drugUserDoctorParam = this.buildDrugUserDoctorProduct(request, virtualDoctorId, onlineDrugUser, saveVirtualDoctorMendRequest);
+                onlineDrugUserDoctorParams.add(drugUserDoctorParam);
+            }
         }
 
 
