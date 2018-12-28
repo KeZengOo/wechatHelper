@@ -357,8 +357,10 @@ public class StatisticalServiceImpl implements StatisticalService {
         map.put("visitTime", "拜访时间");
         map.put("doctorId", "医生ID");
         map.put("doctorName", "医生姓名");
+        map.put("depart", "医生科室");
         map.put("hospitalId", "医院ID");
         map.put("hospitalName", "医院");
+        map.put("hospitalLevel", "医院级别");
         map.put("visitType", "拜访方式");
         map.put("shareContent", "分享内容");
 

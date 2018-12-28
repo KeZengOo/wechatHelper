@@ -205,7 +205,23 @@
 
 
         <!-- 2018-09-29 修改后 -->
-        SELECT id,drugUserName,visitTime,doctorId,doctorName,hospitalId,hospitalName,isRecruit,visitType,
+        SELECT id,drugUserName,visitTime,doctorId,doctorName,hospitalId,hospitalName,
+        depart,
+        hospitalLevel,
+        CASE
+        WHEN hospitalLevel='11' THEN '一级甲等'
+        WHEN hospitalLevel='12' THEN '一级乙等'
+        WHEN hospitalLevel='13' THEN '一级丙等'
+        WHEN hospitalLevel='21' THEN '二级甲等'
+        WHEN hospitalLevel='22' THEN '二级乙等'
+        WHEN hospitalLevel='23' THEN '二级丙等'
+        WHEN hospitalLevel='31' THEN '三级甲等'
+        WHEN hospitalLevel='32' THEN '三级乙等'
+        WHEN hospitalLevel='33' THEN '三级丙等'
+        WHEN hospitalLevel='40' THEN '特级医院'
+        WHEN hospitalLevel='50' THEN '民营医院'
+        END hospitalLevel
+        isRecruit,visitType,
         visitChannel,
         shareContent,
         CASE
@@ -234,6 +250,8 @@
         vdci.id,call_dud.drugUserName,IFNULL(date_format(vdci.create_time, '%Y-%m-%d %H:%i:%s'),'')  visitTime,call_dud.doctorId,call_dud.doctorName,
         call_dud.hospitalId,
         call_dud.hospitalName,
+        call_dud.depart,
+        call_dud.hospitalLevel,
         CASE WHEN vdcim.is_recruit IS NULL THEN '未知' WHEN vdcim.is_recruit=0 THEN '否' WHEN vdcim.is_recruit=1 THEN '是' WHEN vdcim.is_recruit=2 THEN '退出项目' ELSE '' END isRecruit,
         CASE WHEN vdci.visit_channel=1 THEN "电话" WHEN vdci.visit_channel=2 THEN "微信" WHEN vdci.visit_channel=3 THEN "短信"
         WHEN vdci.visit_channel=4 THEN "邮件"
@@ -255,9 +273,10 @@
 
         INNER JOIN (
         SELECT DISTINCT
-        d.id doctorId,d.`name` doctorName,d.hospital_id hospitalId, d.hospital_name hospitalName,IFNULL(dv.client_level,'') clientLevel,du.`name` drugUserName
+        d.id doctorId,d.`name` doctorName,d.hospital_id hospitalId, d.hospital_name hospitalName,d.depart, h.level as hospitalLevel, IFNULL(dv.client_level,'') clientLevel,du.`name` drugUserName
         FROM
         doctor d
+        LEFT JOIN hospital h ON d.hospital_id=h.id
         INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
         INNER JOIN drug_user du ON dud.drug_user_id = du.id
         LEFT JOIN doctor_virtual dv
@@ -324,6 +343,8 @@
             a.id,content_dud.drugUserName,IFNULL(date_format(a.`create_time`, '%Y-%m-%d %H:%i:%s'),'') visitTime,content_dud.doctorId,content_dud.doctorName,
             content_dud.hospitalId,
             content_dud.hospitalName,
+            content_dud.depart,
+            content_dud.hospitalLevel,
             '' isRecruit,
             '内容分享' visitType,
             6 visitChannel,
@@ -335,9 +356,11 @@
             activity_share a
             INNER JOIN (
             SELECT DISTINCT
-            d.id doctorId,d.`name` doctorName,d.hospital_id hospitalId, d.hospital_name hospitalName,IFNULL(dv.client_level,'') clientLevel,du.`name` drugUserName
+            d.id doctorId,d.`name` doctorName,d.hospital_id hospitalId, d.hospital_name hospitalName,d.depart, h.level as hospitalLevel,IFNULL(dv.client_level,'') clientLevel,du.`name` drugUserName
             FROM
             doctor d
+            LEFT JOIN hospital h
+            ON d.hospital_id=h.id
             INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
             INNER JOIN drug_user du ON dud.drug_user_id = du.id
             LEFT JOIN doctor_virtual dv
@@ -350,7 +373,7 @@
             <if test="drugUserId!=null">
                 and du.id=#{drugUserId}
             </if>
-            -->
+    stat        -->
 
             AND du.id IN
             <foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
