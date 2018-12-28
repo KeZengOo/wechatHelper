@@ -246,27 +246,16 @@ public class WechatServiceImpl implements WechatService {
 
             if (StringUtil.isNotEmpty(isSend) && "1".equals(isSend)){
                 wechatMessageStatus = "发送";
+
+                userId = drugUser.getId();
+                userType = UserTypeEnum.DRUG_USER.getUserType();
+                nickname = drugUser.getName();
             }
 
             if (StringUtil.isNotEmpty(isSend) && "0".equals(isSend)){
                 wechatMessageStatus = "接收";
-            }
 
-            if (drugUserWechat.contains(talker)){
-                userId = drugUser.getId();
-                userType = UserTypeEnum.DRUG_USER.getUserType();
-                nickname = drugUser.getName();
-
-            }else {
-
-                if ("ahliangzl".equals(talker)){
-                    System.out.println("hhh");
-                }
                 Long doctorIdByTalker = wechatContactMapper.getDoctorIdByWechatNumber(talker);
-
-                if (doctorIdByTalker != null && doctorIdByTalker > 0 && doctorIdByTalker==601619){
-                    System.out.println("haha");
-                }
 
                 if (doctorIdByTalker != null && doctorIdByTalker > 0){
 
@@ -279,7 +268,31 @@ public class WechatServiceImpl implements WechatService {
                         telephone = doctor.getMobile();
                     }
                 }
+
             }
+
+//            if (drugUserWechat.contains(talker)){
+//                userId = drugUser.getId();
+//                userType = UserTypeEnum.DRUG_USER.getUserType();
+//                nickname = drugUser.getName();
+//
+//            }else {
+//
+//
+//                Long doctorIdByTalker = wechatContactMapper.getDoctorIdByWechatNumber(talker);
+//
+//                if (doctorIdByTalker != null && doctorIdByTalker > 0){
+//
+//                    Doctor doctor = doctorRepository.findFirstById(doctorIdByTalker);
+//                    if (doctor != null){
+//                        userId = doctorIdByTalker;
+//                        userType = UserTypeEnum.DOCTOR.getUserType();
+//                        nickname = doctor.getName();
+//                        doctorId = doctorIdByTalker;
+//                        telephone = doctor.getMobile();
+//                    }
+//                }
+//            }
 
             WechatMessageRequestBean wechatMessage = new WechatMessageRequestBean();
             wechatMessage.setUserId(userId);
