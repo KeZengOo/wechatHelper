@@ -4,7 +4,9 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.VisitCountRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.product.ProductResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VisitCountResponseBean;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +34,7 @@ public class VirtualDoctorCallInfoController extends NewBaseController{
 	private VirtualDoctorCallInfoService callInfoService;
 
 
+
 	@SuppressWarnings("unchecked")
 	@ApiOperation(value = "测试", notes = "测试")
 	@RequestMapping(value = "/test", method = { RequestMethod.GET })
@@ -44,6 +47,23 @@ public class VirtualDoctorCallInfoController extends NewBaseController{
 	}
 
 
+	@SuppressWarnings("unchecked")
+	@ApiOperation(value = "得到指定日期拜访人数", notes = "得到指定日期拜访人数")
+	@RequestMapping(value = "/date/visit/count", method = { RequestMethod.POST })
+	public DefaultResponseBean<List<VisitCountResponseBean>> getVisitCountList(HttpServletRequest request,
+													  @RequestBody VisitCountRequestBean bean) {
+		DrugUser user = this.getDrugUser(request);
+		if(user == null) {
+			return super.getLoginErrorResponse();
+		}
+
+
+		List<VisitCountResponseBean> visitCountList = callInfoService.getVisitCountList(bean);
+		DefaultResponseBean<List<VisitCountResponseBean>> responseBean = new DefaultResponseBean<>();
+		responseBean.setData(visitCountList);
+
+		return responseBean;
+	}
 
 	@SuppressWarnings("unchecked")
 	@ApiOperation(value = "保存电话接通拜访信息", notes = "保存电话接通拜访信息")

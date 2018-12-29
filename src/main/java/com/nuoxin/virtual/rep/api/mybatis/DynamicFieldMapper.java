@@ -268,11 +268,21 @@ public interface DynamicFieldMapper {
     List<DynamicFieldResponse> getProductDynamicField(@Param(value = "productId") Long productId);
 
     /**
-     * 得到产品下动态字段
+     * 得到产品下以及基本信息动态字段
      * @param productId
+     * @param doctorIds
      * @return
      */
     List<DynamicFieldValueResponse> getProductDynamicFieldValue(@Param(value = "productId") Long productId, @Param(value = "doctorIds") Set<Long> doctorIds);
+
+    /**
+     * 得到产品下以及基本信息动态字段，关联到callId
+     * @param productId
+     * @param callIds
+     * @return
+     */
+    List<DynamicFieldValueResponse> getProductCallDynamicFieldValue(@Param(value = "productId") Long productId, @Param(value = "callIds") Set<Long> callIds);
+
 
     /**
      * 得到医生详情问卷问题列表

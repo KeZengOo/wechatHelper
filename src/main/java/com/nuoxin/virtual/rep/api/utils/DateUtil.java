@@ -6,8 +6,10 @@ import com.nuoxin.virtual.rep.api.common.exception.FileFormatException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 对时间做处理的工具类
@@ -137,6 +139,33 @@ public final class DateUtil {
         SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
 
         return formatter.format(preDate);
+    }
+
+
+
+    /**
+     *  java 获取 获取某年某月 所有日期（yyyy-mm-dd格式字符串）
+     * @param year
+     * @param month
+     * @return
+     */
+    public static List<String> getMonthFullDay(int year , int month){
+        SimpleDateFormat dateFormatYYYYMMDD = new SimpleDateFormat("yyyy-MM-dd");
+        List<String> fullDayList = new ArrayList<>(32);
+        // 获得当前日期对象
+        Calendar cal = Calendar.getInstance();
+        cal.clear();// 清除信息
+        cal.set(Calendar.YEAR, year);
+        // 1月从0开始
+        cal.set(Calendar.MONTH, month-1 );
+        // 当月1号
+        cal.set(Calendar.DAY_OF_MONTH,1);
+        int count = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+        for (int j = 1; j <= count ; j++) {
+            fullDayList.add(dateFormatYYYYMMDD.format(cal.getTime()));
+            cal.add(Calendar.DAY_OF_MONTH,1);
+        }
+        return fullDayList;
     }
 
 
@@ -542,6 +571,7 @@ public final class DateUtil {
             return 0;
         }
     }
+
 
 
     public static void main(String[] args) {

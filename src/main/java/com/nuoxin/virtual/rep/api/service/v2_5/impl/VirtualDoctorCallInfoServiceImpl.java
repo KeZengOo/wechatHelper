@@ -9,14 +9,19 @@ import javax.annotation.Resource;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
+import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
+import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.enums.RecruitEnum;
 import com.nuoxin.virtual.rep.api.enums.RoleTypeEnum;
 import com.nuoxin.virtual.rep.api.enums.UserTypeEnum;
 import com.nuoxin.virtual.rep.api.mybatis.*;
+import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.CallRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.VisitHistoryRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.*;
 import com.nuoxin.virtual.rep.api.web.controller.response.product.ProductResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VisitCountResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VisitResultResponseBean;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
@@ -33,10 +38,6 @@ import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualDoctorCallInfoService;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualQuestionnaireService;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
-import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.BaseCallInfoRequest;
-import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.CallInfoListRequest;
-import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.SaveCallInfoRequest;
-import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.SaveCallInfoUnConnectedRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.questionnaire.SaveVirtualQuestionnaireRecordRequestBean;
 
 /**
@@ -175,6 +176,72 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 
 		List<ProductResponseBean> list = new ArrayList<>();
 		return list;
+	}
+
+	@Override
+	public List<VisitCountResponseBean> getVisitCountList(VisitCountRequestBean bean) {
+
+		String leaderPath = drugUserMapper.getLeaderPathById(bean.getDrugUserId());
+		bean.setLeaderPath(leaderPath);
+		List<VisitCountResponseBean> list = new ArrayList<>();
+		List<VisitCountResponseBean> visitCountList = callInfoMapper.getVisitCountList(bean);
+		if (CollectionsUtil.isNotEmptyList(visitCountList)){
+			list = visitCountList;
+			// 没有的不用补 0
+//			List<VisitCountResponseBean> visitCountResponseBeans = this.fileOtherDayVisitCount(bean.getDate(), list);
+//			return visitCountResponseBeans;
+		}
+
+		return list;
+	}
+
+	/**
+	 * 其他没有查询出来的日期，补充上0
+	 * @param date
+	 * @param list
+	 * @return
+	 */
+	private List<VisitCountResponseBean> fileOtherDayVisitCount(String date, List<VisitCountResponseBean> list) {
+		if (CollectionsUtil.isEmptyList(list)){
+			list = new ArrayList<>();
+		}
+
+		String[] yearAndMonth;
+		List<String> dateList ;
+		try {
+			yearAndMonth = date.split("-");
+			if (yearAndMonth == null || yearAndMonth.length !=2){
+				throw new Exception();
+			}
+			dateList = DateUtil.getMonthFullDay(Integer.parseInt(yearAndMonth[0]), Integer.parseInt(yearAndMonth[1]));
+			if (CollectionsUtil.isEmptyList(dateList)){
+				throw new Exception();
+			}
+
+		}catch (Exception e){
+			throw new BusinessException(ErrorEnum.ERROR, "日期格式不合法！");
+		}
+
+		int size = dateList.size();
+		List<VisitCountResponseBean> allList = new ArrayList<>(size);
+		for (int i = 0; i < size; i++){
+			VisitCountResponseBean visitCountResponseBean = new VisitCountResponseBean();
+			String dateStr = dateList.get(0);
+			Optional<VisitCountResponseBean> first = list.stream().filter(k -> k.getDate().equals(dateStr)).findFirst();
+			if (first.isPresent()){
+				VisitCountResponseBean visitCount = first.get();
+				allList.add(visitCount);
+			}else {
+				visitCountResponseBean.setDate(dateStr);
+				visitCountResponseBean.setCount(0);
+			}
+
+		}
+
+
+
+		return allList;
+
 	}
 
 	@Override

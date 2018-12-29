@@ -24,4 +24,7 @@ public class DynamicFieldValueResponse {
 
 	@ApiModelProperty(value = "医生id")
 	private Integer doctorId;
+
+	@ApiModelProperty(value = "拜访id")
+	private Long callId;
 }

@@ -6,7 +6,9 @@ import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse;
 import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsParams;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.CallRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.VisitHistoryRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.VisitCountRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CallTelephoneReponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VisitCountResponseBean;
 import org.apache.ibatis.annotations.Param;
 
 import com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitBean;
@@ -135,7 +137,12 @@ public interface VirtualDoctorCallInfoMapper {
 	void insertVisitHistoryMendResult(VisitHistoryRequestBean bean);
 
 
-
+	/**
+	 * 查询指定日期的计划拜访人数
+	 * @param bean
+	 * @return
+	 */
+	List<VisitCountResponseBean> getVisitCountList(VisitCountRequestBean bean);
 
 
 }

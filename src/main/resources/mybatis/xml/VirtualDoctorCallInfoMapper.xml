@@ -397,5 +397,25 @@
 		VALUES(#{mendId},#{visitResult})
 	</insert>
 
-
+	<!-- 查询指定日期的计划拜访人数 -->
+	<select id="getVisitCountList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VisitCountResponseBean">
+		SELECT
+			COUNT(
+				DISTINCT vdcim.virtual_doctor_id
+			) as count,
+			DATE_FORMAT(next_visit_time, '%Y-%m-%d') date
+		FROM
+			virtual_doctor_call_info_mend vdcim
+		INNER JOIN doctor d ON vdcim.virtual_doctor_id = d.id
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		AND dud.is_available = 1
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		WHERE
+			du.leader_path LIKE #{leaderPath}
+		AND DATE_FORMAT(next_visit_time, '%Y-%m') = #{date}
+		GROUP BY
+			DATE_FORMAT(next_visit_time, '%Y-%m-%d')
+		ORDER BY
+			DATE_FORMAT(next_visit_time, '%Y-%m-%d')
+	</select>
 </mapper>

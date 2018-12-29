@@ -10,7 +10,9 @@ import com.nuoxin.virtual.rep.api.web.controller.request.call.CallRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.CallInfoListRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.SaveCallInfoRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.SaveCallInfoUnConnectedRequest;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.VisitCountRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.product.ProductResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VisitCountResponseBean;
 
 /**
  * 电话拜访业务接口类
@@ -65,6 +67,14 @@ public interface VirtualDoctorCallInfoService {
 	 * @return
 	 */
 	List<ProductResponseBean> getProductList(DrugUser drugUser);
+
+	/**
+	 * 得到指定日期拜访人数
+	 * @param bean
+	 * @return
+	 */
+	List<VisitCountResponseBean> getVisitCountList(VisitCountRequestBean bean);
+
 
 	/**
 	 * 临时功能

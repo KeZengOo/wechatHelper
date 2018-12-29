@@ -132,6 +132,7 @@ public class StatisticalServiceImpl implements StatisticalService {
         List<LinkedHashMap<String, Object>> list = doctorCallInfoMapper.getDoctorVisitDetailList(statisticsParams);
         if(null!=list&&list.size()>0){
             Set<Long> ids = new HashSet<>();
+            Set<Long> callIds = new HashSet<>();
             list.forEach(x -> {
 
                 ids.add(Long.parseLong(x.get("doctorId").toString()));
@@ -139,19 +140,58 @@ public class StatisticalServiceImpl implements StatisticalService {
                 x.put("isHasDrug", getValue((String) x.get("isHasDrug")));
                 x.put("isTarget", getValue((String) x.get("isTarget")));
                 x.put("isHasAe", getValue((String) x.get("isHasAe")));
+                String visitChannel = x.get("visitChannel").toString();
+                // 6 是内容拜访，所以排序掉6
+                if (StringUtil.isNotEmpty(visitChannel) && (!visitChannel.equals(6))){
+                    callIds.add(Long.parseLong(x.get("callId").toString()));
+                }
             });
+
+
             if(ids.size()>0){
-                List<DynamicFieldValueResponse> fieldValueList = dynamicFieldMapper.getProductDynamicFieldValue(statisticsParams.getProductId(), ids);
-                Map<Integer, List<DynamicFieldValueResponse>> map = fieldValueList.stream().collect(Collectors.groupingBy(DynamicFieldValueResponse::getDoctorId));
-                list.forEach(x -> {
-                    Integer doctorId = Integer.parseInt(x.get("doctorId").toString());
-                    List<DynamicFieldValueResponse> valueList = map.get(doctorId);
-                    valueList.forEach(xx -> {
-                        if (xx.getProp() !=null && (!"".equals(xx.getProp().trim()))) {
-                            x.put(xx.getProp(), xx.getValue() == null ? "" : xx.getValue());
+                // type = 1 是通过拜访修改，2是拜访未修改的
+                Integer type;
+                List<DynamicFieldValueResponse> fieldValueList = null;
+                if (CollectionsUtil.isNotEmptySet(callIds)){
+                    fieldValueList = dynamicFieldMapper.getProductCallDynamicFieldValue(statisticsParams.getProductId(), callIds);
+                    type = 1;
+                    if (CollectionsUtil.isEmptyList(fieldValueList)){
+                        fieldValueList = dynamicFieldMapper.getProductDynamicFieldValue(statisticsParams.getProductId(), ids);
+                        type = 2;
+                    }
+                }else {
+                    fieldValueList = dynamicFieldMapper.getProductDynamicFieldValue(statisticsParams.getProductId(), ids);
+                    type = 2;
+                }
+
+                if (type == 1){
+                    Map<Long, List<DynamicFieldValueResponse>> map = fieldValueList.stream().collect(Collectors.groupingBy(DynamicFieldValueResponse::getCallId));
+                    list.forEach(x ->{
+                        Long callId = Long.parseLong(x.get("callId").toString());
+                        List<DynamicFieldValueResponse> valueList = map.get(callId);
+                        if (CollectionsUtil.isNotEmptyList(valueList)){
+                            valueList.forEach(xx -> {
+                                if (xx.getProp() !=null && (!"".equals(xx.getProp().trim()))) {
+                                    x.put(xx.getProp(), xx.getValue() == null ? "" : xx.getValue());
+                                }
+                            });
                         }
                     });
-                });
+                }
+
+                if (type == 2){
+                    Map<Integer, List<DynamicFieldValueResponse>> map = fieldValueList.stream().collect(Collectors.groupingBy(DynamicFieldValueResponse::getDoctorId));
+                    list.forEach(x -> {
+                        Integer doctorId = Integer.parseInt(x.get("doctorId").toString());
+                        List<DynamicFieldValueResponse> valueList = map.get(doctorId);
+                        valueList.forEach(xx -> {
+                            if (xx.getProp() !=null && (!"".equals(xx.getProp().trim()))) {
+                                x.put(xx.getProp(), xx.getValue() == null ? "" : xx.getValue());
+                            }
+                        });
+                    });
+                }
+
             }
         }
 
