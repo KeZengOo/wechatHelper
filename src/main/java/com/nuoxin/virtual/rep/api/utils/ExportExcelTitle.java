@@ -60,4 +60,65 @@ public class ExportExcelTitle {
         return map;
     }
 
+
+    /**
+     * 内容分享表头
+     * @return
+     */
+    public static Map<String, String> getDoctorShareListTitleMap(){
+        Map<String, String> map=new LinkedHashMap<>();
+        map.put("contentId","内容ID");
+        map.put("title", "内容标题");
+        map.put("doctorId","医生ID");
+        map.put("doctorName", "医生姓名");
+        map.put("hospitalName", "医院");
+        map.put("depart", "科室");
+        map.put("hospitalLevel", "医院级别");
+        map.put("shareTime", "分享时间");
+        return map;
+    }
+
+    /**
+     * 内容阅读表头
+     * @return
+     */
+    public static Map<String, String> getDoctorReadListTitleMap(){
+        Map<String, String> map=new LinkedHashMap<>();
+        map.put("contentId","内容ID");
+        map.put("title", "内容标题");
+        map.put("doctorId","医生ID");
+        map.put("doctorName", "医生姓名");
+        map.put("hospitalName", "医院");
+        map.put("depart", "科室");
+        map.put("hospitalLevel", "医院级别");
+        map.put("comment", "内容评论");
+        map.put("duration", "阅读时长");
+        map.put("readTime", "阅读时间");
+        map.put("useful", "是否有用");
+        map.put("channel", "阅读渠道");
+        return map;
+    }
+
+
+    /**
+     * 内容分享表头
+     * @return
+     */
+    public static Map<String, String> getDoctorAnswerListTitleMap(){
+        Map<String, String> map=new LinkedHashMap<>();
+        map.put("contentId","内容ID");
+        map.put("title", "内容标题");
+        map.put("doctorId","医生ID");
+        map.put("doctorName", "医生姓名");
+        map.put("hospitalName", "医院");
+        map.put("depart", "科室");
+        map.put("hospitalLevel", "医院级别");
+        map.put("questionId", "问题ID");
+        map.put("questionTitle", "问题标题");
+        map.put("answer", "问题答案");
+        map.put("createTime", "答题时间");
+
+        return map;
+    }
+
 }

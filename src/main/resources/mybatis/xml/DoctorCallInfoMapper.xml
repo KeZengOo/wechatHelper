@@ -221,7 +221,7 @@
         WHEN hospitalLevel='40' THEN '特级医院'
         WHEN hospitalLevel='50' THEN '民营医院'
         ELSE '未知'
-        END hospitalLevel
+        END hospitalLevel,
         isRecruit,visitType,
         visitChannel,
         shareContent,
@@ -631,7 +631,239 @@
 
 
     </select>
-    
+
+    <!-- 医生分享数据 -->
+    <select id="getDoctorShareList" resultType="java.util.LinkedHashMap">
+        SELECT
+        ai.id contentId,
+        ai.title title,
+        d.id doctorId,
+        d. NAME doctorName,
+        d.hospital_name hospitalName,
+        d.depart,
+        h.level hospitalLevel,
+        IFNULL(
+        d.telephone,
+        a.wechat_openid
+        ) telephone,
+        a.create_time shareTime
+        FROM
+        activity_share a
+        LEFT JOIN doctor d ON a.share_person_id = d.id
+        LEFT JOIN hospital h
+        ON d.hospital_id=h.id
+        INNER JOIN activity_info ai ON a.data_id = ai.id
+        WHERE
+        a.data_id IN (
+        SELECT DISTINCT
+        content_id
+        FROM
+        t_content_product
+        WHERE
+        product_id = #{productId}
+        )
+
+        <if test="startTime !=null and startTime !=''">
+            AND DATE_FORMAT(a.create_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+        </if>
+
+        <if test="endTime !=null and endTime !=''">
+            AND DATE_FORMAT(a.create_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        </if>
+    </select>
+
+    <!-- 医生阅读数据 -->
+    <select id="getDoctorReadList" resultType="java.util.LinkedHashMap">
+        SELECT
+        ttt.dataId contentId,
+        ttt.title title,
+        ttt.doctorId doctorId,
+        ttt. NAME doctorName,
+        ttt.hospital_name hospitalName,
+        ttt.depart,
+        ttt.hospitalLevel,
+        ttt.telephone,
+
+        IF (
+        ttt.ret_count > 0,
+        '是',
+        '否'
+        ) retrans,
+        ttt. COMMENT AS comment,
+        ttt.read_time duration,
+        ttt.create_time readTime,
+        ttt.`status` useful,
+        ttt.answers,
+        'APP' channel
+        FROM
+        (
+        SELECT
+        tt.*, (
+        SELECT
+        COUNT(*)
+        FROM
+        activity_retrans c
+        WHERE
+        c.data_id = tt.dataId
+        AND c.retrans_person_id = tt.doctorId
+        ) ret_count,
+        (
+        SELECT
+        GROUP_CONCAT(DISTINCT content SEPARATOR ';')
+        FROM
+        t_content_comment
+        WHERE
+        tel= tt.telephone
+        AND data_id = tt.dataId
+        ) COMMENT,
+        (
+        SELECT
+        `status`
+        FROM
+        t_content_popularity
+        WHERE
+        tel = tt.telephone
+        AND content_id = tt.dataId
+        ORDER BY
+        id DESC
+        LIMIT 1
+        ) `status`
+
+        FROM
+        (
+        SELECT
+        ai.id dataId,
+        ai.title,
+        d.id doctorId,
+        d. NAME,
+        d.hospital_name,
+        d.depart,
+        h.level hospitalLevel,
+        IFNULL(
+        d.telephone,
+        a.wechat_openid
+        ) telephone,
+        a.read_token,
+        a.read_time,
+        a.create_time,
+        ari.isp,
+        (SELECT IFNULL(GROUP_CONCAT(DISTINCT cqa.answer SEPARATOR ' '), '') FROM content_questionnaire_answers cqa WHERE cqa.telephone=d.telephone AND cqa.content_id=ai.id) as answers
+        FROM
+        activity_read a
+        LEFT JOIN doctor d ON a.read_person_id = d.id
+        LEFT JOIN hospital h
+        ON d.hospital_id=h.id
+        INNER JOIN activity_info ai ON a.data_id = ai.id
+        LEFT JOIN activity_read_ip ari ON a.read_token = ari.read_token
+        WHERE
+        (
+        ari.isp IS NULL
+        OR ari.isp != '阿里云'
+        )
+        AND a.data_id IN (
+        SELECT DISTINCT
+        content_id
+        FROM
+        t_content_product
+        WHERE
+        product_id = #{productId}
+
+        )
+
+
+        <if test="startTime !=null and startTime !=''">
+            AND DATE_FORMAT(a.create_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+        </if>
+
+        <if test="endTime !=null and endTime !=''">
+            AND DATE_FORMAT(a.create_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        </if>
+
+        ) tt
+        ) ttt
+        UNION ALL
+        SELECT
+        ai.id contentId,
+        ai.title title,
+        d.id doctorId,
+        d. NAME doctorName,
+        d.hospital_name,
+        d.depart,
+        h.level hospitalLevel,
+        d.telephone,
+        '' retrans,
+        '' COMMENT,
+        wur.read_time duration,
+        wur.create_time readTime,
+        NULL useful,
+        '' answers,
+        '小程序' channel
+        FROM
+        wx_user_read wur
+        INNER JOIN wx_users wu ON wur.user_id = wu.id
+        INNER JOIN doctor d ON wu.doctor_id = d.id
+        LEFT JOIN hospital h
+        ON d.hospital_id=h.id
+        INNER JOIN activity_info ai ON wur.content_id = ai.id
+        WHERE
+        wur.content_id IN (
+        SELECT DISTINCT
+        content_id
+        FROM
+        t_content_product
+        WHERE
+        product_id = #{productId}
+
+        )
+        <if test="startTime !=null and startTime !=''">
+            AND DATE_FORMAT(wur.create_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+        </if>
+
+        <if test="endTime !=null and endTime !=''">
+            AND DATE_FORMAT(wur.create_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        </if>
+    </select>
+
+    <!-- 医生问卷答案 -->
+    <select id="getDoctorAnswerList" resultType="java.util.LinkedHashMap">
+        SELECT
+        d.id doctorId,
+        d. NAME doctorName,
+        d.depart,
+        h.level hospitalLevel,
+        cqa.question_id questionId,
+        cqq.title AS questionTitle,
+        cqa.answer,
+        ai.id contentId,
+        ai.title contentTitle,
+        cqa.create_time createTime
+        FROM
+        content_questionnaire_answers cqa
+        INNER JOIN content_questionnaire_questions cqq ON cqa.question_id = cqq.id
+        INNER JOIN activity_info ai ON cqa.content_id = ai.id
+        LEFT JOIN doctor d ON cqa.telephone = d.telephone
+        LEFT JOIN hospital h
+        ON d.hospital_id=h.id
+        WHERE
+        cqa.content_id IN (
+        SELECT
+        content_id
+        FROM
+        t_content_product
+        WHERE
+        product_id = #{productId}
+        )
+
+        <if test="startTime !=null and startTime !=''">
+            AND DATE_FORMAT(cqa.create_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+        </if>
+
+        <if test="endTime !=null and endTime !=''">
+            AND DATE_FORMAT(cqa.create_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        </if>
+    </select>
+
+
     <!-- 得到电话统计 -->
     <select id="getCallTime" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CallTimeResponseBean">
 

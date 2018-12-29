@@ -1,5 +1,6 @@
 package com.nuoxin.virtual.rep.api.utils;
 
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.excel.SheetRequestBean;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -61,7 +62,7 @@ public final class ExportExcel {
     }
 
     /**
-     *
+     * 单个sheet
      * @param dataList
      *        对象集合
      * @param titleMap
@@ -77,6 +78,57 @@ public final class ExportExcel {
         createContentRowMap(dataList, titleMap);
         return workbook;
     }
+
+
+    /**
+     * 多个sheet
+     * @param list
+     *        对象集合
+     */
+    public static HSSFWorkbook excelLinkedHashMapExport(List<SheetRequestBean> list) {
+
+        if (CollectionsUtil.isEmptyList(list)){
+            return new HSSFWorkbook();
+        }
+
+        workbook = new HSSFWorkbook();
+        for (SheetRequestBean sheetRequestBean : list) {
+            String sheetName = sheetRequestBean.getSheetName();
+            Map<String, String> titleMap = sheetRequestBean.getTitleMap();
+            List<LinkedHashMap<String, Object>> dataList = sheetRequestBean.getDataList();
+            HSSFSheet sheet = workbook.createSheet(sheetName);
+            // 第1行创建
+            HSSFRow headRow = sheet.createRow(HEAD_START_POSITION);
+            int i = 0;
+            for (String entry : titleMap.keySet()) {
+                HSSFCell headCell = headRow.createCell(i);
+                headCell.setCellValue(titleMap.get(entry));
+                i++;
+            }
+
+            try {
+                int k=0;
+                for (LinkedHashMap obj : dataList) {
+                    HSSFRow textRow = sheet.createRow(CONTENT_START_POSITION + i);
+                    int j = 0;
+                    for (String entry : titleMap.keySet()) {
+                        String value =obj.get(entry)!=null?obj.get(entry).toString():"";
+                        HSSFCell textcell = textRow.createCell(j);
+                        textcell.setCellValue(value);
+                        j++;
+                    }
+                    k++;
+                }
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        return workbook;
+    }
+
 
     /***
      *

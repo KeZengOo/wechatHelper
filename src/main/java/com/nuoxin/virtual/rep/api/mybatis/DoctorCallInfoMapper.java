@@ -80,6 +80,30 @@ public interface DoctorCallInfoMapper {
 
 
     /**
+     * 医生分享数据
+     * @param statisticsParams
+     * @return
+     */
+    List<LinkedHashMap<String,Object>> getDoctorShareList(StatisticsParams statisticsParams);
+
+
+    /**
+     * 医生阅读数据
+     * @param statisticsParams
+     * @return
+     */
+    List<LinkedHashMap<String,Object>> getDoctorReadList(StatisticsParams statisticsParams);
+
+
+    /**
+     * 医生问卷信息
+     * @param statisticsParams
+     * @return
+     */
+    List<LinkedHashMap<String,Object>> getDoctorAnswerList(StatisticsParams statisticsParams);
+
+
+    /**
      * 得到电话统计
      * @param statisticsParams
      * @return

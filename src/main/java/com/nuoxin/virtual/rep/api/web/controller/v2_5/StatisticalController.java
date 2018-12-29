@@ -9,6 +9,7 @@ import com.nuoxin.virtual.rep.api.entity.v2_5.HospitalProvinceBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsParams;
 import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsResponse;
 import com.nuoxin.virtual.rep.api.enums.RoleTypeEnum;
+import com.nuoxin.virtual.rep.api.mybatis.DoctorCallInfoMapper;
 import com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorMapper;
 import com.nuoxin.virtual.rep.api.mybatis.DynamicFieldMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.StatisticalService;
@@ -17,6 +18,7 @@ import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.utils.ExportExcel;
 import com.nuoxin.virtual.rep.api.utils.ExportExcelTitle;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.SaveVirtualDoctorRequest;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.excel.SheetRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CallTimeResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorDetailsResponseBean;
 import io.swagger.annotations.Api;
@@ -52,6 +54,10 @@ public class StatisticalController extends NewBaseController {
 	private DrugUserDoctorMapper drugUserDoctorMapper;
     @Resource
     private DynamicFieldMapper dynamicFieldMapper;
+
+    @Resource
+    private DoctorCallInfoMapper doctorCallInfoMapper;
+
 	//分页
 	private int page=1;
 	//列表
@@ -182,7 +188,36 @@ public class StatisticalController extends NewBaseController {
         List<LinkedHashMap<String,Object>> list=statisticalService.doctorVisitDetailList(statisticsParams);
         //产品的动态字段
         List<DynamicFieldResponse> titleList=dynamicFieldMapper.getProductDynamicField(productId);
-        HSSFWorkbook wb=ExportExcel.excelLinkedHashMapExport(list, ExportExcelTitle.getDoctorVisitDetaiListTitleMap(titleList),"医生拜访明细表");
+        List<SheetRequestBean> sheetList = new ArrayList<>();
+        SheetRequestBean sheetRequestBean = new SheetRequestBean();
+		sheetRequestBean.setDataList(list);
+		sheetRequestBean.setTitleMap(ExportExcelTitle.getDoctorVisitDetaiListTitleMap(titleList));
+		sheetRequestBean.setSheetName("医生拜访明细表");
+		sheetList.add(sheetRequestBean);
+
+		List<LinkedHashMap<String, Object>> doctorShareList = doctorCallInfoMapper.getDoctorShareList(statisticsParams);
+		SheetRequestBean shareSheet = new SheetRequestBean();
+		shareSheet.setDataList(doctorShareList);
+		shareSheet.setTitleMap(ExportExcelTitle.getDoctorShareListTitleMap());
+		shareSheet.setSheetName("内容分享");
+		sheetList.add(shareSheet);
+
+		List<LinkedHashMap<String, Object>> doctorReadList = doctorCallInfoMapper.getDoctorReadList(statisticsParams);
+		SheetRequestBean readSheet = new SheetRequestBean();
+		readSheet.setDataList(doctorReadList);
+		readSheet.setTitleMap(ExportExcelTitle.getDoctorReadListTitleMap());
+		readSheet.setSheetName("内容阅读");
+		sheetList.add(readSheet);
+
+		List<LinkedHashMap<String, Object>> doctorAnswerList = doctorCallInfoMapper.getDoctorAnswerList(statisticsParams);
+		SheetRequestBean answerSheet = new SheetRequestBean();
+		answerSheet.setDataList(doctorAnswerList);
+		answerSheet.setTitleMap(ExportExcelTitle.getDoctorShareListTitleMap());
+		answerSheet.setSheetName("问卷答案");
+		sheetList.add(answerSheet);
+
+
+		HSSFWorkbook wb=ExportExcel.excelLinkedHashMapExport(sheetList);
         OutputStream ouputStream = null;
         try {
             response.setContentType("application/vnd.ms-excel");
