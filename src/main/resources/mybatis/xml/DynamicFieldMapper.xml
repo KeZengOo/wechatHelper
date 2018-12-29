@@ -711,7 +711,7 @@
                 virtual_doctor_dynamic_field,
                 (SELECT @i := 0) a
             WHERE
-                product_id = #{product} OR classification IN (1,5)
+                product_id = #{productId} OR classification IN (1,5)
             ORDER BY
                 id
         ) t1
