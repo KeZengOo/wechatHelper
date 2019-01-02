@@ -137,13 +137,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     private File file1;
     private File file2;
-
+   
     /**
      * 点击上传按钮时的时时间戳
      */
     private String mTimeStamp;
     private Object updateCode;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -161,7 +160,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         et_name = findViewById(R.id.et_name);
         btn_update.setOnClickListener(this);
         btn_export.setOnClickListener(this);
-
     }
 
     private void initData() {
@@ -429,7 +427,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //将微信数据库拷贝出来，因为直接连接微信的db，会导致微信崩溃
                 FileUtil.copyFile(wxDataDir.getAbsolutePath(), copyFilePath);
                 //将微信数据库导出到sd卡操作sd卡上数据库
-                openWxDb(new File(copyFilePath), mActivity, password,1);
+                openWxDb(new File(copyFilePath), mActivity, password);
             } catch (Exception e) {
                 Log.e("path", e.getMessage());
                 e.printStackTrace();
@@ -448,7 +446,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     /**
      * 连接数据库
      */
-    public  void openWxDb(File dbFile, final Activity mContext, String mDbPassword , int ActivityYype) {
+    public void openWxDb(File dbFile, final Activity mContext, String mDbPassword) {
         SQLiteDatabase.loadLibs(mContext);
         SQLiteDatabaseHook hook = new SQLiteDatabaseHook() {
             @Override
@@ -471,12 +469,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * @param mContext
      * @param db
      */
-    public  void runRecontact(final Activity mContext, final SQLiteDatabase db) {
+    public void runRecontact(final Activity mContext, final SQLiteDatabase db) {
 
         task.toPool(new Runnable() {
             @Override
             public void run() {
-                getRecontactDate(db, mContext);
+                getRecontactDate(db);
             }
         }).toMain(new Runnable() {
             @Override
@@ -489,7 +487,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     /**
      * 获取当前用户的微信所有联系人
      */
-    public void getRecontactDate(SQLiteDatabase db, Context mContext) {
+    public void getRecontactDate(SQLiteDatabase db) {
         Cursor c1 = null;
         Cursor c2 = null;
         try {
@@ -571,17 +569,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         default:
                             messageType = "其他消息";
                             break;
-
                     }
                     messageCsvPrinter.printRecord(talker, FilterUtil.filterEmoji(content), DateUtil.timeStamp2Date(createTime.toString()), imgPath, isSend, messageType);
                 }
             }
             messageCsvPrinter.printRecord();
             messageCsvPrinter.flush();
-
-            c1.close();
-            c2.close();
-            db.close();
 
             runOnUiThread(new Runnable() {
                 @Override
@@ -605,6 +598,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 }
             });
+        } finally {
+            if (c1 != null) {
+                c1.close();
+            }
+            if (c2 != null) {
+                c2.close();
+            }
+            if (db != null) {
+                db.close();
+            }
         }
     }
 

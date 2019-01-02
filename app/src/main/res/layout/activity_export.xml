@@ -40,7 +40,7 @@
             android:background="@drawable/bg_update"
             android:id="@+id/download"
             android:layout_centerVertical="true"
-            android:text="一键上传"
+            android:text="下载本地"
             android:textColor="#fff"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />

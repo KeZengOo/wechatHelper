@@ -376,8 +376,13 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
             e.printStackTrace();
         }
 
-        c1.close();
-        db.close();
+        if (c1 != null) {
+            c1.close();
+        }
+
+        if (db != null) {
+            db.close();
+        }
 
         runOnUiThread(new Runnable() {
             @Override
@@ -444,6 +449,7 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
             }
         });
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();

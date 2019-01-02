@@ -8,11 +8,11 @@ import java.security.NoSuchAlgorithmException;
 public class Md5Utils {
     /***
      * MD5加密 生成32位md5码
-     * @param
+     * @param inStr  "mm" + uid
      * @return 返回32位md5码
      */
     public static String md5Encode(String inStr) throws Exception {
-        MessageDigest md5 = null;
+        MessageDigest md5;
         try {
             md5 = MessageDigest.getInstance("MD5");
         } catch (Exception e) {
