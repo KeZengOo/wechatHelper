@@ -34,13 +34,17 @@ public class ExportExcelTitle {
 
     public static Map<String, String> getDoctorVisitDetaiListTitleMap(List<DynamicFieldResponse> list){
         Map<String, String> map=new LinkedHashMap<>();
+//        map.put("callId", "拜访ID");
         map.put("drugUserName","代表");
         map.put("visitTime","拜访时间");
         map.put("doctorId","医生ID");
         map.put("doctorName","医生姓名");
         map.put("hospitalId","医院ID");
         map.put("hospitalName","医院");
+        map.put("depart", "科室");
+        map.put("hospitalLevel", "医院级别");
         map.put("visitType","拜访方式");
+//        map.put("visitChannel", "拜访渠道");
         map.put("shareContent","分享内容");
 
         map.put("visitResult","拜访结果");
@@ -48,7 +52,6 @@ public class ExportExcelTitle {
         map.put("callText", "录音识别文本");
         map.put("attitude","医生态度");
         map.put("nextVisitTime","下次拜访时间");
-//        map.put("clientLevel","客户等级");
         map.put("hcpPotential","医生潜力");
         map.put("isRecruit", "是否招募");
         map.put("isHasDrug","是否有药");

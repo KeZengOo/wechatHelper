@@ -598,6 +598,8 @@
         SELECT COUNT(*)
         FROM virtual_doctor_dynamic_field
         WHERE product_id=#{productId}
+        OR classification IN (1, 5)
+
     </select>
 
     <!-- 得到医生详情问卷问题列表 -->
@@ -620,9 +622,19 @@
 
     <!-- 得到指定产品下的字段列表 -->
     <select id="getProductDynamicField" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.DynamicFieldResponse">
+        <!-- 2019-01-02 修改前
         SELECT field_name lable,CONCAT("field",(@i:=@i+1)) prop
         FROM virtual_doctor_dynamic_field,(SELECT @i:=0)  t2
         WHERE product_id=#{productId}  ORDER BY id
+        -->
+
+        <!-- 2019-01-02 修改后  -->
+        SELECT field_name lable,CONCAT("field",(@i:=@i+1)) prop
+        FROM virtual_doctor_dynamic_field,(SELECT @i:=0)  t2
+        WHERE product_id=#{productId}
+        OR classification IN (1,5)
+        ORDER BY id
+
     </select>
 
     <!-- 根据医生得到指定产品下的字段值 -->

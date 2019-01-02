@@ -109,7 +109,7 @@ public final class ExportExcel {
             try {
                 int k=0;
                 for (LinkedHashMap obj : dataList) {
-                    HSSFRow textRow = sheet.createRow(CONTENT_START_POSITION + i);
+                    HSSFRow textRow = sheet.createRow(CONTENT_START_POSITION + k);
                     int j = 0;
                     for (String entry : titleMap.keySet()) {
                         String value =obj.get(entry)!=null?obj.get(entry).toString():"";

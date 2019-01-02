@@ -207,7 +207,6 @@
         <!-- 2018-09-29 修改后 -->
         SELECT callId,drugUserName,visitTime,doctorId,doctorName,hospitalId,hospitalName,
         depart,
-        hospitalLevel,
         CASE
         WHEN hospitalLevel='11' THEN '一级甲等'
         WHEN hospitalLevel='12' THEN '一级乙等'
@@ -226,6 +225,7 @@
         visitChannel,
         shareContent,
         CASE
+        WHEN visitResultStr IS NULL OR visitResultStr='' THEN '未知'
         WHEN visitResultStr='answer' THEN '接通无拜访结果'
         WHEN visitResultStr='cancelmakecall' THEN '无响应'
         WHEN visitResultStr='poweroff' THEN '关机'
@@ -241,7 +241,6 @@
         callText,
         attitude,
         nextVisitTime,
-        clientLevel,
         hcpPotential,
         isHasDrug,
         isTarget,
@@ -258,8 +257,8 @@
         WHEN vdci.visit_channel=4 THEN "邮件"
         WHEN vdci.visit_channel=5 THEN "面谈"
         else "" END visitType,vdci.visit_channel visitChannel,
-        vdci.remark,
-        vdct.call_text callText,
+        IFNULL(vdci.remark,'') remark,
+        IFNULL(vdct.call_text,'') callText,
         "" shareContent,IFNULL(GROUP_CONCAT(vppvr.visit_result),vdci.status_name) visitResultStr,IFNULL(vdcim.`attitude`,'') attitude,IFNULL(date_format(vdcim.`next_visit_time`, '%Y-%m-%d %H:%i:%s'),'') nextVisitTime
         ,call_dud.clientLevel,IFNULL(vdcim.`hcp_potential`,'未知') hcpPotential,IFNULL(vdcim.is_has_drug,'未知') isHasDrug,IFNULL(vdcim.`is_target`,'未知') isTarget,IFNULL(vdcim.`is_has_ae`,'未知')  isHasAe
         FROM
@@ -274,7 +273,7 @@
 
         INNER JOIN (
         SELECT DISTINCT
-        d.id doctorId,d.`name` doctorName,d.hospital_id hospitalId, d.hospital_name hospitalName,d.depart, h.level as hospitalLevel, IFNULL(dv.client_level,'') clientLevel,du.`name` drugUserName
+        d.id doctorId,d.`name` doctorName,IFNULL(d.hospital_id,0) hospitalId, IFNULL(d.hospital_name,'') hospitalName,IFNULL(d.depart,'') depart, IFNULL(h.level,'0') as hospitalLevel, IFNULL(dv.client_level,'') clientLevel,du.`name` drugUserName
         FROM
         doctor d
         LEFT JOIN hospital h ON d.hospital_id=h.id
@@ -286,12 +285,6 @@
         dud.is_available = 1
 
         AND dud.prod_id = #{productId}
-
-        <!--
-        <if test="drugUserId!=null">
-            and du.id=#{drugUserId}
-        </if>
-        -->
 
         <if test="doctorId !=null and doctorId !=0">
             and d.id = #{doctorId}
@@ -351,13 +344,13 @@
             6 visitChannel,
             '' remark,
             '' callText,
-            IFNULL(ai.title,'') shareContent,"" visitResultStr,"" attitude,"" nextVisitTime
+            IFNULL(ai.title,'') shareContent,'' visitResultStr,'' attitude,'' nextVisitTime
             ,content_dud.clientLevel,'未知' hcpPotential,'未知' isHasDrug,'未知' isTarget,'未知'  isHasAe
             FROM
             activity_share a
             INNER JOIN (
             SELECT DISTINCT
-            d.id doctorId,d.`name` doctorName,d.hospital_id hospitalId, d.hospital_name hospitalName,d.depart, h.level as hospitalLevel,IFNULL(dv.client_level,'') clientLevel,du.`name` drugUserName
+            d.id doctorId,d.`name` doctorName,IFNULL(d.hospital_id,0) hospitalId, IFNULL(d.hospital_name,'') hospitalName,IFNULL(d.depart,'') depart, IFNULL(h.level,'0') as hospitalLevel,IFNULL(dv.client_level,'') clientLevel,du.`name` drugUserName
             FROM
             doctor d
             LEFT JOIN hospital h
@@ -370,11 +363,7 @@
             dud.is_available = 1
             AND dud.prod_id = #{productId}
 
-            <!--
-            <if test="drugUserId!=null">
-                and du.id=#{drugUserId}
-            </if>
-    stat        -->
+
 
             AND du.id IN
             <foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
