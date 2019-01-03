@@ -32,7 +32,7 @@ public class ActivityWechatShareController extends NewBaseController {
 
 
     @ApiOperation(value = "批量新增", notes = "批量新增")
-    @PostMapping("/contact/import")
+    @PostMapping("/batch/add")
     @ResponseBody
     public DefaultResponseBean<Boolean> batchInsert(HttpServletRequest request,@RequestBody List<ActivityWechatShareRequestBean> list){
 
