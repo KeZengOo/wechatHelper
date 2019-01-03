@@ -753,7 +753,7 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 
         // 如果是线下代表想关联线上代表，则需要在添加关系
         Integer saleType = user.getSaleType();
-        if (saleType != null && saleType.equals(OnOffLineEnum.OFFLINE)){
+        if (saleType != null && saleType.equals(OnOffLineEnum.OFFLINE.getUserType())){
 
             List<DrugUserDoctorParams> onlineDrugUserDoctorParams = new ArrayList<>(size);
             for (int i = 0; i < size; i++){
@@ -768,6 +768,11 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
                 }
                 DrugUserDoctorParams drugUserDoctorParam = this.buildDrugUserDoctorProduct(request, virtualDoctorId, onlineDrugUser, saveVirtualDoctorMendRequest);
                 onlineDrugUserDoctorParams.add(drugUserDoctorParam);
+            }
+
+            List<DrugUserDoctorParams> collectOnlineDrugUserDoctorParams = onlineDrugUserDoctorParams.stream().filter(d -> d.getProdId() > 0).distinct().collect(Collectors.toList());
+            if (CollectionsUtil.isNotEmptyList(collectOnlineDrugUserDoctorParams)) {
+                drugUserDoctorMapper.saveDrugUserDoctors(collectOnlineDrugUserDoctorParams);
             }
         }
 
