@@ -54,6 +54,9 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+/**
+ * zengke 2018 12
+ */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     public MainActivity mActivity;
@@ -64,19 +67,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static CSVPrinter messageCsvPrinter;
     private static final ObjectBus task = com.threekilogram.objectbus.bus.ObjectBus.newList();
     static String WXPackageName = "com.tencent.mm";
-
-    //微信数据库路径
+    /*
+    微信数据库路径
+     */
     public final String WX_ROOT_PATH = "/data/data/com.tencent.mm/";
     public final String WX_DB_DIR_PATH = WX_ROOT_PATH + "MicroMsg";
     public final String WX_DB_FILE_NAME = "EnMicroMsg.db";
-
-    //拷贝到sd 卡的路径
+    /*
+    拷贝到sd 卡的路径
+     */
     public String mCcopyPath = Environment.getExternalStorageDirectory().getPath() + "/";
     public final String COPY_WX_DATA_DB = "wx_data.db";
     String copyFilePath = mCcopyPath + COPY_WX_DATA_DB;
 
     public String USERNAME = "userName";
-    public String LASTUPDATETIME = "";
+    public String LASTUPDATETIME = EMPTY;
     public String USERINFO = "userInfo";
 
     /**
@@ -137,12 +142,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     private File file1;
     private File file2;
-   
+    /**
+     * baseUrl
+     */
+    String baseUrl = "http://123.56.95.29:7083/android/wechat/";   //测试
+//    String baseUrl = "http://47.93.121.23:10001/android/wechat/";  //正式
+
+    public static boolean isDebug = true;
+    public static final String EMPTY = "";
+    public static final String ZERO = "0";
+    public static final String SUCCESS_CODE = "200";
+
     /**
      * 点击上传按钮时的时时间戳
      */
     private String mTimeStamp;
     private Object updateCode;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -165,27 +182,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void initData() {
         // sp中获取销售代表名字和上次上传时间
         preferences = getSharedPreferences(USERINFO, Context.MODE_PRIVATE);
-        userName = preferences.getString(USERNAME, "");
+        userName = preferences.getString(USERNAME, EMPTY);
         //多账号切换时,key不同,要拿的时间也不同
         LASTUPDATETIME = userName;
-        lastUpdateTime = preferences.getString(LASTUPDATETIME, "");
+        lastUpdateTime = preferences.getString(LASTUPDATETIME, EMPTY);
         //赋值
         et_name.setText(userName.toCharArray(), 0, userName.length());
         longLastUpdateTime = Long.valueOf(DateUtil.date2Timestamp(lastUpdateTime));
         tv_updateTime.setText(lastUpdateTime);
-        if (et_name.getText().toString().equals("")) {
+        if (et_name.getText().toString().equals(EMPTY)) {
             tv_updateTime.setText("暂无上传时间");
         }
         //获取上次上传的时间
-        if (lastUpdateTime.equals("") || lastUpdateTime.equals("0")) {
+        if (lastUpdateTime.equals(EMPTY) || lastUpdateTime.equals(ZERO)) {
             //既没有微信号也没有上次上传时间(第一次安装),将时间重置为0
             tv_updateTime.setText("暂无上传时间");
-            longLastUpdateTime = Long.parseLong("0");
+            longLastUpdateTime = Long.parseLong(ZERO);
         } else {
             //有上次上传时间,赋值并记录
             tv_updateTime.setText(lastUpdateTime);
             longLastUpdateTime = Long.valueOf(DateUtil.date2Timestamp(lastUpdateTime));
-            Log.e("query sp中保存的上次上传时间", DateUtil.timeStamp2Date(longLastUpdateTime + ""));
+            if(isDebug){
+                Log.e("query sp中保存的上次上传时间", DateUtil.timeStamp2Date(longLastUpdateTime + EMPTY));
+            }
         }
     }
 
@@ -205,9 +224,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void uploadData() {
-        Log.e("query================", "=========");
+        if(isDebug){
+            Log.e("query================", "=========");
+        }
         //判断姓名是否为空
-        if (et_name.getText().toString().trim().equals("")) {
+        if (et_name.getText().toString().trim().equals(EMPTY)) {
             Toast.makeText(mActivity, "请先输入您的微信号!", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -221,9 +242,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (preferences == null) {
             preferences = getSharedPreferences(USERINFO, Context.MODE_PRIVATE);
         }
-        lastUpdateTime = preferences.getString(LASTUPDATETIME, "");
+        lastUpdateTime = preferences.getString(LASTUPDATETIME, EMPTY);
         //赋值
-        if (lastUpdateTime.equals("")) {
+        if (lastUpdateTime.equals(EMPTY)) {
             tv_updateTime.setText("暂无上传时间");
             longLastUpdateTime = Long.valueOf(0);
         } else {
@@ -310,9 +331,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, final IOException e) {
-
-                Log.e("query获取上次的上传时间的 错误信息", e.toString());
-
+                if(isDebug){
+                    Log.e("query获取上次的上传时间的 错误信息", e.toString());
+                }
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -327,20 +348,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onResponse(Call call, Response response) throws IOException {
 
                 String time = response.body().string();
-                Log.e("query 获取上次的上传时间==", time);
+                if(isDebug){
+                    Log.e("query 获取上次的上传时间==", time);
+                }
                 try {
                     JSONObject jsonOtimebject = new JSONObject(time);
                     Object code = jsonOtimebject.get("code");
                     final Object description = jsonOtimebject.get("description");
-                    //  Log.e("query 获取上次的上传时间的code", code.toString());
-                    if (code.toString().equals("200")) {
+                    if (code.toString().equals(SUCCESS_CODE)) {
                         Object data = jsonOtimebject.get("data");
                         JSONObject jsondata = new JSONObject(data.toString());
                         final String messageUploadTime = jsondata.getString("messageUploadTime");
-                        Log.e("query 获取上次的上传时间==", messageUploadTime);
-
+                        if(isDebug){
+                            Log.e("query 获取上次的上传时间==", messageUploadTime);
+                        }
                         //返回的时间不为空再复制,保存,不然就不处理,直接获取sp 的时间
-                        if (!messageUploadTime.equals("") && !messageUploadTime.equals("0")) {
+                        if (!messageUploadTime.equals(EMPTY) && !messageUploadTime.equals(ZERO)) {
                             //赋值上次上传时间
                             runOnUiThread(new Runnable() {
                                 @Override
@@ -388,7 +411,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //获取当前时间,并转换格式
                 mTimeStamp = DateUtil.getTimeStamp();
                 currentTime = DateUtil.timeStamp2Date(mTimeStamp);
-                Log.e("query当前时间值", DateUtil.timeStamp2Date(mTimeStamp));
+                if(isDebug){
+                    Log.e("query当前时间值", DateUtil.timeStamp2Date(mTimeStamp));
+                }
                 //异步执行文件拷贝和数据查询操作,防止 dialog 不显示
                 new MyTask().execute();
             }
@@ -415,10 +440,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             String uid = PasswordUtiles.initCurrWxUin(mActivity);
             try {
                 String path = WX_DB_DIR_PATH + "/" + Md5Utils.md5Encode("mm" + uid) + "/" + WX_DB_FILE_NAME;
-                Log.e("path", copyFilePath);
-                Log.e("path===", path);
-                Log.e("path", password);
-                if (password.equals("") || password == null) {
+                if(isDebug){
+                    Log.e("path", copyFilePath);
+                    Log.e("path===", path);
+                    Log.e("path", password);
+                }
+                if (password.equals(EMPTY) || password == null) {
                     getUploadTimeError("密码获取失败");
                 }
                 //微信原始数据库的地址
@@ -429,7 +456,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //将微信数据库导出到sd卡操作sd卡上数据库
                 openWxDb(new File(copyFilePath), mActivity, password);
             } catch (Exception e) {
-                Log.e("path", e.getMessage());
+                if(isDebug){
+                    Log.e("path", e.getMessage());
+                }
                 e.printStackTrace();
             }
             return null;
@@ -513,9 +542,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 String type = c1.getString(c1.getColumnIndex("type"));
                 boolean b = FilterUtil.filterPhoneNumber(conRemark);
                 if (b) {
-                    Log.e("contact", "userName=" + userName + "nickName=" + nickName + "alias=" + alias + "conRemark=" + conRemark + "type=" + type);
-                    //将联系人信息写入 csv 文件
-                    contactCsvPrinter.printRecord(FilterUtil.filterEmoji(userName), FilterUtil.filterEmoji(nickName), FilterUtil.filterEmoji(alias), FilterUtil.filterEmoji(conRemark), type);
+                    if(isDebug){
+                        Log.e("contact", "userName=" + userName + "nickName=" + nickName + "alias=" + alias + "conRemark=" + conRemark + "type=" + type);
+                        //将联系人信息写入 csv 文件
+                        contactCsvPrinter.printRecord(FilterUtil.filterEmoji(userName), FilterUtil.filterEmoji(nickName), FilterUtil.filterEmoji(alias), FilterUtil.filterEmoji(conRemark), type);
+                    }
                 }
             }
             contactCsvPrinter.printRecord();
@@ -524,7 +555,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             //查询聊天记录
             String query = "select * from message where  createTime > " + longLastUpdateTime;
 //            String query = "select * from message where  createTime > 0";
-            Log.e("query查询分割时间", DateUtil.timeStamp2Date(longLastUpdateTime + ""));
+            if(isDebug){
+                Log.e("query查询分割时间", DateUtil.timeStamp2Date(longLastUpdateTime + EMPTY));
+            }
             c2 = db.rawQuery(query, null);
             while (c2.moveToNext()) {
                 String content = c2.getString(c2.getColumnIndex("content"));
@@ -533,9 +566,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 int isSend = c2.getInt(c2.getColumnIndex("isSend"));
                 int imgPath = c2.getInt(c2.getColumnIndex("imgPath"));
                 int type = c2.getInt(c2.getColumnIndex("type"));
-                //Log.e(longLastUpdateTime+"",createTime);
+                //if(isDebug){
+                    //Log.e(longLastUpdateTime+EMPTY,createTime);
+               // }
                 if (content != null) {
-                    Log.e("chatInfo", "talker=" + talker + "createTime=" + DateUtil.timeStamp2Date(createTime.toString()) + "content=" + content + "imgPath=" + imgPath + "isSend=" + isSend + "type=" + type);
+                    if(isDebug){
+                        Log.e("chatInfo", "talker=" + talker + "createTime=" + DateUtil.timeStamp2Date(createTime.toString()) + "content=" + content + "imgPath=" + imgPath + "isSend=" + isSend + "type=" + type);
+                    }
                     //将聊天记录写入 csv 文件
                     String messageType;
                     switch (type) {
@@ -589,8 +626,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             upLoadFiles(baseUrl + "message/import?uploadTime=" + currentTime, file2, et_name.getText().toString().trim() + "_message_file.cvs", true);
 
         } catch (Exception e) {
-
-            Log.e("openWxDb", "读取数据库信息失败" + e.toString());
+            if(isDebug){
+                Log.e("openWxDb", "读取数据库信息失败" + e.toString());
+            }
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -616,7 +654,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * @throws Exception isSave 用来表示只有消息表上传成功时,才保存上传时间到 sp
      */
     private void upLoadFiles(String url, File file, String name, final boolean isSave) {
-        Log.e("query网站", url + file.getName());
+        if(isDebug){
+            Log.e("query网址", url + file.getName());
+        }
         OkHttpClient client = new OkHttpClient.Builder()
                 .readTimeout(60, TimeUnit.MINUTES)
                 .build();
@@ -642,7 +682,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 @Override
                 public void onFailure(Call call, IOException e) {
-                    Log.e("query上传文件失败的返回错误", e.toString());
+                    if(isDebug){
+                        Log.e("query上传文件失败的返回错误", e.toString());
+                    }
                     //上传失败
                     if (isSave) {
                         getUploadTimeError("聊天记录上传失败请联系开发人员");
@@ -664,12 +706,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    if (isSave) {
-                        Log.e("query上传聊天文件的返回值", string);
-                    } else {
-                        Log.e("query上传联系人文件的返回值", string);
+                    if(isDebug){
+                        if (isSave) {
+                            Log.e("query上传聊天文件的返回值", string);
+                        } else {
+                            Log.e("query上传联系人文件的返回值", string);
+                        }
                     }
-                    if (updateCode.toString().equals("200")) {
+                    if (updateCode.toString().equals(SUCCESS_CODE)) {
                         //上传成功,重新赋值时间并保存sp时间
                         if (isSave) {
                             runOnUiThread(new Runnable() {
@@ -689,11 +733,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     edit.commit();
                                     //重新赋值本次上传时间
                                     longLastUpdateTime = Long.valueOf(mTimeStamp);
-                                    Log.e("query聊天记录上传成功后更新的时间", DateUtil.timeStamp2Date(longLastUpdateTime + ""));
+                                    if(isDebug){
+                                        Log.e("query聊天记录上传成功后更新的时间", DateUtil.timeStamp2Date(longLastUpdateTime + EMPTY));
+                                    }
                                 }
                             });
                         } else {
-                            Log.e("query联系人上传成功", "");
+                            if(isDebug){
+                                Log.e("query联系人上传成功", EMPTY);
+                            }
                         }
 
                     } else {

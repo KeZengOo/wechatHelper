@@ -36,20 +36,26 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
+/**
+ * zengke 2018 12
+ */
 public class ExportActivity extends AppCompatActivity implements View.OnClickListener {
     private ListView listView;
     private List<DataBean> mDatas;
     private MyAdapter mAdapter;
     private static CSVPrinter contactCsvPrinter;
     private static final ObjectBus task = com.threekilogram.objectbus.bus.ObjectBus.newList();
-    //微信数据库路径
+    /**
+     微信数据库路径
+     */
     public final String WX_ROOT_PATH = "/data/data/com.tencent.mm/";
     public final String WX_DB_DIR_PATH = WX_ROOT_PATH + "MicroMsg";
     public final String WX_DB_FILE_NAME = "EnMicroMsg.db";
     public String password = "";
 
-    //拷贝到sd 卡的路径
+    /*
+    拷贝到sd 卡的路径
+     */
     public String mCcopyPath = Environment.getExternalStorageDirectory().getPath() + "/";
     public final String COPY_WX_DATA_DB = "wx_data.db";
     public final String OTHERLABEL = "otherLabel";
@@ -135,6 +141,8 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
                 //type 为2意思是导出选中的联系人
                 openWxDb(new File(copyFilePath), mActivity, password, 2);
                 break;
+                default:
+                    break;
         }
     }
 
@@ -157,9 +165,11 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
             String uid = PasswordUtiles.initCurrWxUin(mActivity);
             try {
                 String path = WX_DB_DIR_PATH + "/" + Md5Utils.md5Encode("mm" + uid) + "/" + WX_DB_FILE_NAME;
-                Log.e("path", copyFilePath);
-                Log.e("path===", path);
-                Log.e("path", password);
+                if(MainActivity.isDebug){
+                    Log.e("path", copyFilePath);
+                    Log.e("path===", path);
+                    Log.e("path", password);
+                }
                 if (password.equals("") || password == null) {
                     getUploadTimeError("密码获取失败");
                 }
@@ -171,7 +181,9 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
                 //将微信数据库导出到sd卡操作sd卡上数据库,type 为1 的意思是读取数据库标签数据
                 openWxDb(new File(copyFilePath), mActivity, password, 1);
             } catch (Exception e) {
-                Log.e("path", e.getMessage());
+                if(MainActivity.isDebug){
+                    Log.e("path", e.getMessage());
+                }
                 e.printStackTrace();
             }
             return null;
@@ -223,6 +235,8 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
                     case 2:
                         getRecontactDate(db, mContext);
                         break;
+                        default:
+                            break;
                 }
 
             }
@@ -250,8 +264,7 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
                 mDatas.add(new DataBean(labelID, labelName));
             }
             mDatas.add(new DataBean(OTHERLABEL, "其他"));
-            c1.close();
-            db.close();
+
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -279,7 +292,9 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
             });
 
         } catch (Exception e) {
-            Log.e("openWxDb", "读取数据库信息失败" + e.toString());
+            if(MainActivity.isDebug){
+                Log.e("openWxDb", "读取数据库信息失败" + e.toString());
+            }
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -287,6 +302,13 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
 
                 }
             });
+        }finally {
+            if(c1!=null){
+                c1.close();
+            }
+            if(db!=null){
+                db.close();
+            }
         }
     }
 
@@ -295,7 +317,7 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
      */
     public void getRecontactDate(SQLiteDatabase db, Context mContext) {
 
-        HashMap<String, String> integerStringMap = new HashMap<>();
+        HashMap<String, String> integerStringMap = new HashMap<>(100);
         for (int i = 0; i < mDatas.size(); i++) {
             if (mDatas.get(i).isCheck) {
                 integerStringMap.put(mDatas.get(i).id, mDatas.get(i).desc);
@@ -308,7 +330,6 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
                 @Override
                 public void run() {
                     Toast.makeText(mActivity, "请至少选择一个标签", Toast.LENGTH_SHORT).show();
-
                 }
             });
             return;
@@ -330,6 +351,7 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
                 null);
         while (c1.moveToNext()) {
             name = "";
+            StringBuilder sb = new StringBuilder();
             String userName = c1.getString(c1.getColumnIndex("username"));
             String nickName = c1.getString(c1.getColumnIndex("nickname"));
             String alias = c1.getString(c1.getColumnIndex("alias"));
@@ -354,7 +376,9 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
                 for (String s : split) {
                     //判断每个标签是否被选中
                     if (integerStringMap.containsKey(s)) {
-                        name += integerStringMap.get(s) + "  ";
+                        sb.append(integerStringMap.get(s) + "  ");
+                        name=sb+"";
+                       // name = name+integerStringMap.get(s) + "  ";
                     }
                 }
                 //分割后的标签可能都未被选中过,如果都没有选中,name为空,不要写入
@@ -374,15 +398,17 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
             contactCsvPrinter.flush();
         } catch (IOException e) {
             e.printStackTrace();
+        }finally {
+
+            if (c1 != null) {
+                c1.close();
+            }
+
+            if (db != null) {
+                db.close();
+            }
         }
 
-        if (c1 != null) {
-            c1.close();
-        }
-
-        if (db != null) {
-            db.close();
-        }
 
         runOnUiThread(new Runnable() {
             @Override
@@ -416,7 +442,11 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void write2CSV(String name, String userName, String nickName, String alias, String conRemark, String contactLabelIds) {
-        Log.e("contact存在", "userName=" + userName + "nickName=" + nickName + "alias=" + alias + "conRemark=" + conRemark + "contactLabelIds=" + contactLabelIds + "labelname" + name);
+        if(MainActivity.isDebug){
+            if(MainActivity.isDebug){
+                Log.e("contact存在", "userName=" + userName + "nickName=" + nickName + "alias=" + alias + "conRemark=" + conRemark + "contactLabelIds=" + contactLabelIds + "labelname" + name);
+            }
+        }
         //  将联系人信息写入 csv 文件
         try {
             contactCsvPrinter.printRecord(FilterUtil.filterEmoji(userName), FilterUtil.filterEmoji(nickName), FilterUtil.filterEmoji(alias), FilterUtil.filterEmoji(conRemark), name);
@@ -471,7 +501,11 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
             }
         }
         Toast.makeText(this, ids.toString(), Toast.LENGTH_SHORT).show();
-        Log.e("TAG", ids.toString());
+        if(MainActivity.isDebug){
+            if(MainActivity.isDebug){
+                Log.e("TAG", ids.toString());
+            }
+        }
     }
 }
 

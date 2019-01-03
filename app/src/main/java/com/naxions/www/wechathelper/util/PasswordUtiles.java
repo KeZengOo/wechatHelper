@@ -7,6 +7,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.naxions.www.wechathelper.MainActivity;
+
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
@@ -14,15 +16,20 @@ import org.dom4j.io.SAXReader;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 
-
+/**
+ * zengke 2018 12
+ */
 public class PasswordUtiles {
 
     public static final String WX_ROOT_PATH = "/data/data/com.tencent.mm/";
 
     private static final String WX_SP_UIN_PATH = WX_ROOT_PATH + "shared_prefs/auth_info_key_prefs.xml";
+    private static FileInputStream in;
+    private static DataOutputStream localDataOutputStream;
 
 
     /**
@@ -33,11 +40,15 @@ public class PasswordUtiles {
     public static String initDbPassword(final Activity mContext) {
         String imei = initPhoneIMEI(mContext);
         String uin = initCurrWxUin(mContext);
-        Log.e("initDbPassword", "imei===" + imei);
-        Log.e("initDbPassword", "uin===" + uin);
+        if(MainActivity.isDebug){
+            Log.e("initDbPassword", "imei===" + imei);
+            Log.e("initDbPassword", "uin===" + uin);
+        }
         try {
             if (TextUtils.isEmpty(imei) || TextUtils.isEmpty(uin)) {
-                Log.e("initDbPassword", "初始化数据库密码失败：imei或uid为空");
+                if(MainActivity.isDebug){
+                    Log.e("initDbPassword", "初始化数据库密码失败：imei或uid为空");
+                }
                 mContext.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -48,10 +59,14 @@ public class PasswordUtiles {
             }
             String md5 = Md5Utils.md5Encode(imei + uin);
             String password = md5.substring(0, 7).toLowerCase();
-            Log.e("initDbPassword", password);
+            if(MainActivity.isDebug){
+                Log.e("initDbPassword", password);
+            }
             return password;
         } catch (Exception e) {
-            Log.e("initDbPassword", e.getMessage());
+            if(MainActivity.isDebug){
+                Log.e("initDbPassword", e.getMessage());
+            }
         }
         return "";
     }
@@ -66,7 +81,7 @@ public class PasswordUtiles {
         try {
             Process localProcess = Runtime.getRuntime().exec("su");
             Object localObject = localProcess.getOutputStream();
-            DataOutputStream localDataOutputStream = new DataOutputStream((OutputStream) localObject);
+            localDataOutputStream = new DataOutputStream((OutputStream) localObject);
             String str = String.valueOf(paramString);
             localObject = str + "\n";
             localDataOutputStream.writeBytes((String) localObject);
@@ -77,6 +92,14 @@ public class PasswordUtiles {
             localObject = localProcess.exitValue();
         } catch (Exception localException) {
             localException.printStackTrace();
+        }finally {
+            if (localDataOutputStream!=null){
+                try {
+                    localDataOutputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
@@ -111,7 +134,7 @@ public class PasswordUtiles {
     </map>*/
         File file = new File(WX_SP_UIN_PATH);
         try {
-            FileInputStream in = new FileInputStream(file);
+            in = new FileInputStream(file);
             SAXReader saxReader = new SAXReader();
             Document document = saxReader.read(in);
             Element root = document.getRootElement();
@@ -121,10 +144,13 @@ public class PasswordUtiles {
                     mCurrWxUin = element.attributeValue("value");
                 }
             }
+
             return mCurrWxUin;
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e("initCurrWxUin", "获取微信uid失败，请检查auth_info_key_prefs文件权限");
+            if(MainActivity.isDebug){
+                Log.e("initCurrWxUin", "获取微信uid失败，请检查auth_info_key_prefs文件权限");
+            }
             context.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -132,6 +158,14 @@ public class PasswordUtiles {
                 }
             });
 
+        }finally {
+            try {
+                if(in!=null){
+                    in.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return "";
     }

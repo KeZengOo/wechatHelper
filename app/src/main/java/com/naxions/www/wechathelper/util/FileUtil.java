@@ -2,12 +2,21 @@ package com.naxions.www.wechathelper.util;
 
 import android.util.Log;
 
+import com.naxions.www.wechathelper.MainActivity;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
-
+/**
+ * zengke 2018 12
+ */
 public class FileUtil {
+
+    private static FileOutputStream fs;
+    private static InputStream inStream;
+
     /**
      * 复制单个文件
      *
@@ -19,19 +28,34 @@ public class FileUtil {
         try {
             int byteRead = 0;
             File oldFile = new File(oldPath);
-            if (oldFile.exists()) { //文件存在时
-                InputStream inStream = new FileInputStream(oldPath); //读入原文件
-                FileOutputStream fs = new FileOutputStream(newPath);
+            //文件存在时
+            if (oldFile.exists()) {
+                //读入原文件
+                inStream = new FileInputStream(oldPath);
+                fs = new FileOutputStream(newPath);
                 byte[] buffer = new byte[1444];
                 while ((byteRead = inStream.read(buffer)) != -1) {
                     fs.write(buffer, 0, byteRead);
                 }
-                inStream.close();
             }
-        } catch (Exception e) {
-            Log.e("copyFile", "复制单个文件操作出错");
-            e.printStackTrace();
-        }
 
+        } catch (Exception e) {
+            if (MainActivity.isDebug) {
+                Log.e("copyFile", "复制单个文件操作出错");
+            }
+            e.printStackTrace();
+        } finally {
+            try {
+                if (inStream != null) {
+                    inStream.close();
+                }
+                if (fs != null) {
+                    fs.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
     }
 }

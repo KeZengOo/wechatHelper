@@ -3,7 +3,9 @@ package com.naxions.www.wechathelper.util;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
+/**
+ * zengke 2018 12
+ */
 public class DateUtil {
     /** 
      * 时间戳转换成日期格式字符串 

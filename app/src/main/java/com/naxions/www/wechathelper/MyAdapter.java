@@ -9,7 +9,9 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import java.util.List;
- 
+/**
+ * zengke 2018 12
+ */
 public class MyAdapter extends BaseAdapter {
 
 	private Context mContext;
