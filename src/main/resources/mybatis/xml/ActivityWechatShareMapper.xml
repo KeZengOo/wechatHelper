@@ -5,10 +5,10 @@
 
 
     <insert id="batchInsert">
-        INSERT INTO virtual_activity_wechat_share(content_id, doctor_id, drug_user_id)
+        INSERT INTO virtual_activity_wechat_share(content_id, doctor_id, drug_user_id, create_time)
         VALUES
-        <foreach collection ="list" item="s" separator =",">
-            (#{s.contentId}, #{s.doctorId}, #{s.drugUserId})
+        <foreach collection ="bean.doctorIdList" item="doctorId" separator =",">
+            (#{bean.contentId}, #{doctorId}, #{bean.drugUserId}, #{bean.shareTime})
         </foreach>
     </insert>
 

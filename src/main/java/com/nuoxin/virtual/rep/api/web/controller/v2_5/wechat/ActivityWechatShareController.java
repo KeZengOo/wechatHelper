@@ -5,6 +5,7 @@ import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.FileFormatException;
 import com.nuoxin.virtual.rep.api.service.v2_5.ActivityWechatShareService;
 import com.nuoxin.virtual.rep.api.utils.StringUtil;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.share.WechatShareContentRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.wechat.WechatAndroidMessageRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.wechat.ActivityWechatShareRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.content.ContentResponseBean;
@@ -34,9 +35,9 @@ public class ActivityWechatShareController extends NewBaseController {
     @ApiOperation(value = "批量新增", notes = "批量新增")
     @PostMapping("/batch/add")
     @ResponseBody
-    public DefaultResponseBean<Boolean> batchInsert(HttpServletRequest request,@RequestBody List<ActivityWechatShareRequestBean> list){
+    public DefaultResponseBean<Boolean> batchInsert(HttpServletRequest request, @RequestBody WechatShareContentRequestBean bean){
 
-        activityWechatShareService.batchInsert(list);
+        activityWechatShareService.batchInsert(bean);
 
         DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<Boolean>();
         responseBean.setData(true);

@@ -1,6 +1,8 @@
 package com.nuoxin.virtual.rep.api.mybatis;
 
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.share.WechatShareContentRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.wechat.ActivityWechatShareRequestBean;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -12,8 +14,8 @@ public interface ActivityWechatShareMapper {
 
     /**
      * 批量新增
-     * @param list
+     * @param bean
      */
-    void batchInsert(List<ActivityWechatShareRequestBean> list);
+    void batchInsert(@Param(value = "bean") WechatShareContentRequestBean bean);
 
 }
