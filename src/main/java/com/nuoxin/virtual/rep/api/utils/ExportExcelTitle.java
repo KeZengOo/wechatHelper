@@ -34,8 +34,8 @@ public class ExportExcelTitle {
 
     public static Map<String, String> getDoctorVisitDetaiListTitleMap(List<DynamicFieldResponse> list){
         Map<String, String> map=new LinkedHashMap<>();
-//        map.put("callId", "拜访ID");
-        map.put("drugUserName","代表");
+        map.put("callId", "拜访ID");
+        map.put("drugUserName","互动代表");
         map.put("visitTime","拜访时间");
         map.put("doctorId","医生ID");
         map.put("doctorName","医生姓名");

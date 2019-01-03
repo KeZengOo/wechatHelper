@@ -321,26 +321,9 @@
 
 	<select id="getContentSendCount" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse">
 
-		<!-- 2018-09-29 修改前
-		SELECT
-		t.drug_user_id drugUserId,count(DISTINCT t.share_person_id) total
-		FROM activity_share t join t_content_product t1 on t.data_id=t1.content_id
-		WHERE
-		t.drug_user_id IN
-		<foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
-			#{drugUserId}
-		</foreach>
-		<if test="startTime!=null">
-			and date_format(t.create_time,'%Y-%m-%d')&gt;=#{startTime}
-		</if>
-		<if test="endTime!=null">
-			and date_format(t.create_time,'%Y-%m-%d')&lt;=#{endTime}
-		</if>
-		AND t1.product_id=#{productId}
-		GROUP BY t.drug_user_id
-		 -->
 
-		<!-- 2018-09-29 修改后 -->
+
+		<!-- 2019-01-02 修改前
 		SELECT
 		content_dud.drugUserId,
 		COUNT(DISTINCT a.share_person_id) total
@@ -383,8 +366,79 @@
 			and date_format(a.create_time,'%Y-%m-%d')&lt;=#{endTime}
 		</if>
 
+
 		GROUP BY
 		content_dud.drugUserId
+
+		-->
+
+		SELECT drugUserId, COUNT(DISTINCT doctorId) FROM (
+		SELECT
+		DISTINCT
+		content_dud.drugUserId,
+		a.share_person_id doctorId
+		FROM
+		activity_share a
+		INNER JOIN (
+		SELECT DISTINCT
+		d.id doctorId,
+		du.id drugUserId
+		FROM
+		doctor d
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		WHERE
+		dud.is_available = 1
+		AND dud.prod_id = #{productId}
+		AND du.id IN
+
+		<foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+
+		) content_dud ON a.share_person_id = content_dud.doctorId
+		WHERE
+		a.data_id IN (
+		SELECT DISTINCT
+		tcp.content_id
+		FROM
+		t_content_product tcp
+		INNER JOIN product_line pl ON tcp.product_id = pl.prod_id
+		INNER JOIN activity_info ai ON tcp.content_id = ai.id
+		WHERE
+		tcp.product_id = #{productId}
+		)
+
+		<if test="startTime!=null and startTime!=''">
+			and date_format(a.create_time,'%Y-%m-%d')&gt;=#{startTime}
+		</if>
+		<if test="endTime!=null and endTime!=''">
+			and date_format(a.create_time,'%Y-%m-%d')&lt;=#{endTime}
+		</if>
+
+
+		UNION
+		SELECT DISTINCT drug_user_id drugUserId, doctor_id doctorId FROM virtual_activity_wechat_share v
+		WHERE v.content_id IN
+		(
+		SELECT DISTINCT
+		tcp.content_id
+		FROM
+		t_content_product tcp
+		INNER JOIN product_line pl ON tcp.product_id = pl.prod_id
+		INNER JOIN activity_info ai ON tcp.content_id = ai.id
+		WHERE
+		tcp.product_id = #{productId}
+		)
+
+		AND v.drug_user_id IN
+		<foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		) tt
+
+
+		GROUP BY drugUserId
 
 	</select>
 

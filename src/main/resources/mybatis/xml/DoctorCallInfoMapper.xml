@@ -247,7 +247,7 @@
         isHasAe
         FROM (
         SELECT
-        vdci.id callId,call_dud.drugUserName,IFNULL(date_format(vdci.create_time, '%Y-%m-%d %H:%i:%s'),'')  visitTime,call_dud.doctorId,call_dud.doctorName,
+        vdci.id callId,du.name drugUserName,IFNULL(date_format(vdci.create_time, '%Y-%m-%d %H:%i:%s'),'')  visitTime,call_dud.doctorId,call_dud.doctorName,
         call_dud.hospitalId,
         call_dud.hospitalName,
         call_dud.depart,
@@ -263,6 +263,7 @@
         ,call_dud.clientLevel,IFNULL(vdcim.`hcp_potential`,'未知') hcpPotential,IFNULL(vdcim.is_has_drug,'未知') isHasDrug,IFNULL(vdcim.`is_target`,'未知') isTarget,IFNULL(vdcim.`is_has_ae`,'未知')  isHasAe
         FROM
         virtual_doctor_call_info vdci
+        INNER JOIN drug_user du ON vdci.virtual_drug_user_id=du.id
         LEFT JOIN virtual_doctor_call_text vdct ON vdci.sin_token=vdct.sin_token
         LEFT JOIN virtual_doctor_call_info_mend vdcim ON vdci.id=vdcim.call_id
 
@@ -334,7 +335,7 @@
         <if test="contents==null or contents.size==0">
             UNION ALL
             SELECT
-            a.id callId,content_dud.drugUserName,IFNULL(date_format(a.`create_time`, '%Y-%m-%d %H:%i:%s'),'') visitTime,content_dud.doctorId,content_dud.doctorName,
+            a.id callId,a.drug_user_name drugUserName,IFNULL(date_format(a.`create_time`, '%Y-%m-%d %H:%i:%s'),'') visitTime,content_dud.doctorId,content_dud.doctorName,
             content_dud.hospitalId,
             content_dud.hospitalName,
             content_dud.depart,
