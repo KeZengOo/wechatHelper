@@ -44,7 +44,7 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
     private List<DataBean> mDatas;
     private MyAdapter mAdapter;
     private static CSVPrinter contactCsvPrinter;
-    private static final ObjectBus task = com.threekilogram.objectbus.bus.ObjectBus.newList();
+    private static final ObjectBus TASK = com.threekilogram.objectbus.bus.ObjectBus.newList();
     /**
      微信数据库路径
      */
@@ -53,7 +53,7 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
     public final String WX_DB_FILE_NAME = "EnMicroMsg.db";
     public String password = "";
 
-    /*
+    /**
     拷贝到sd 卡的路径
      */
     public String mCcopyPath = Environment.getExternalStorageDirectory().getPath() + "/";
@@ -225,7 +225,7 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
      */
     public void runRecontact(final Activity mContext, final SQLiteDatabase db, final int type) {
 
-        task.toPool(new Runnable() {
+        TASK.toPool(new Runnable() {
             @Override
             public void run() {
                 switch (type) {
@@ -324,7 +324,6 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
                 System.out.println(mDatas.get(i).id);
             }
         }
-        //System.out.println(integerStringMap.toString());
         if (integerStringMap.size() == 0) {
             runOnUiThread(new Runnable() {
                 @Override
@@ -358,7 +357,7 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
             String conRemark = c1.getString(c1.getColumnIndex("conRemark"));
             String contactLabelIds = c1.getString(c1.getColumnIndex("contactLabelIds"));
             //如果 id 为空说明没有标签,设置为默认分类
-            if (contactLabelIds.equals("")) {
+            if ("".equals(contactLabelIds)) {
                 contactLabelIds = OTHERLABEL;
             }
 
@@ -429,16 +428,6 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
             }
         });
 
-    /*    } catch (Exception e) {
-            Log.e("openWxDb", "读取数据库信息失败" + e.toString());
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    getUploadTimeError("读取数据库信息失败");
-
-                }
-            });
-        }*/
     }
 
     private void write2CSV(String name, String userName, String nickName, String alias, String conRemark, String contactLabelIds) {

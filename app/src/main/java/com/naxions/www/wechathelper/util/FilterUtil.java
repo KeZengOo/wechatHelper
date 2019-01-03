@@ -10,6 +10,8 @@ import java.util.regex.Pattern;
  * 过滤 emoji 表情
  */
 public class FilterUtil {
+    public static final String NULL="null";
+    public static final String EMPTY="";
 
     private static boolean isEmojiCharacter(char codePoint) {
         return (codePoint == 0x0) || (codePoint == 0x9) || (codePoint == 0xA)
@@ -26,7 +28,7 @@ public class FilterUtil {
      * @return
      */
     public static String filterEmoji(String source) {
-        if (source.equals("") || source.equals("null") || source == null) {
+        if (source.equals(EMPTY) || source.equals(NULL) || source == null) {
             return "";
         }
         StringBuilder buf = null;
@@ -66,7 +68,8 @@ public class FilterUtil {
             return false;
         }
         char[] chars = nickName.toCharArray();
-        ArrayList<String> phoneList = new ArrayList<>();//所有11位数字的集合
+        //所有11位数字的集合
+        ArrayList<String> phoneList = new ArrayList<>();
         for (int i = 0; i < chars.length; i++) {
             StringBuilder stringBuilder = new StringBuilder();
             for (int j = 0; j < 11; j++) {
