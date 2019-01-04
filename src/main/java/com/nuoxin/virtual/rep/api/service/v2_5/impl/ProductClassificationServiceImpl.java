@@ -8,6 +8,7 @@ import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.utils.StringUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.questionnaire.ProductQuestionnaireRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.ProductClassificationRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationFieldResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationResponseBean;
 import org.springframework.stereotype.Service;
 
@@ -68,5 +69,11 @@ public class ProductClassificationServiceImpl implements ProductClassificationSe
         }
 
         return new ArrayList<>();
+    }
+
+    @Override
+    public ProductClassificationFieldResponseBean getProductClassificationField(Long productId) {
+        ProductClassificationFieldResponseBean productClassificationField = productClassificationMapper.getProductClassificationField(productId);
+        return productClassificationField;
     }
 }

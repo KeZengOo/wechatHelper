@@ -15,11 +15,19 @@
         WHERE product_id=#{productId}
     </delete>
 
-    <!-- 根据产品查询医生分型 -->
+    <!-- 根据产品查询医生分型, 列表形式-->
     <select id="getProductClassificationList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationResponseBean">
         SELECT id, field_value fieldValue, field_type fieldType,is_required required, is_supplement supplement
         FROM virtual_product_classification
         WHERE product_id=#{productId}
+    </select>
+
+    <!-- 根据产品查询医生分型, 字符串形式多个以逗号分开 -->
+    <select id="getProductClassificationField" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationFieldResponseBean">
+        SELECT GROUP_CONCAT(field_value) fieldValue, field_type fieldType,is_required required, is_supplement supplement
+        FROM virtual_product_classification
+        WHERE product_id=#{productId}
+        GROUP BY field_type,is_required,is_supplement
     </select>
 
 </mapper>

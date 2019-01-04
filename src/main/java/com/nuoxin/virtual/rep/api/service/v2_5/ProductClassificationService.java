@@ -2,6 +2,7 @@ package com.nuoxin.virtual.rep.api.service.v2_5;
 
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.questionnaire.ProductQuestionnaireRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.ProductClassificationRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationFieldResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationResponseBean;
 
 import java.util.List;
@@ -31,9 +32,17 @@ public interface ProductClassificationService {
     void deleteByProductId(Long productId);
 
     /**
-     * 查询产品下的医生分型
+     * 查询产品下的医生分型，列表形式
      * @param productId
      * @return
      */
     List<ProductClassificationResponseBean> getProductClassificationList(Long productId);
+
+
+    /**
+     * 查询产品下的医生分型，字符串形式，多个以逗号分开
+     * @param productId
+     * @return
+     */
+    ProductClassificationFieldResponseBean getProductClassificationField(Long productId);
 }

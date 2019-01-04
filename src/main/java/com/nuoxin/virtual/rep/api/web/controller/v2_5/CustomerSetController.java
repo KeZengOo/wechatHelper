@@ -13,6 +13,7 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DynamicFieldPr
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.ProductClassificationRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.customer.DoctorDynamicFieldResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DynamicFieldProductResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationFieldResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationResponseBean;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -269,12 +270,22 @@ public class CustomerSetController extends NewBaseController{
     }
 
 
-    @ApiOperation(value = "产品医生分型查询", notes = "产品医生分型查询")
-    @GetMapping(value = "/product/classification/get/{productId}")
+    @ApiOperation(value = "产品医生分型，列表形式", notes = "产品医生分型，列表形式")
+    @GetMapping(value = "/product/classification/list/{productId}")
     public DefaultResponseBean<List<ProductClassificationResponseBean>> getProductClassificationList(@PathVariable(value = "productId") Long productId) {
         List<ProductClassificationResponseBean> productClassificationList = productClassificationService.getProductClassificationList(productId);
         DefaultResponseBean<List<ProductClassificationResponseBean>> responseBean = new DefaultResponseBean<>();
         responseBean.setData(productClassificationList);
+        return responseBean;
+    }
+
+
+    @ApiOperation(value = "产品医生分型，字符串形式", notes = "产品医生分型列表，字符串形式")
+    @GetMapping(value = "/product/classification/field/{productId}")
+    public DefaultResponseBean<ProductClassificationFieldResponseBean> getProductClassificationField(@PathVariable(value = "productId") Long productId) {
+        ProductClassificationFieldResponseBean productClassificationField = productClassificationService.getProductClassificationField(productId);
+        DefaultResponseBean<ProductClassificationFieldResponseBean> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(productClassificationField);
         return responseBean;
     }
 
