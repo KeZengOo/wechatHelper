@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.ProductClassificationFrequencyMapper">
+
+    <insert id="batchInsert">
+        INSERT INTO virtual_doctor_classification_frequency(product_id, classification_id, potential, visit_frequency)
+        VALUES
+        <foreach collection="list" item="f" separator=",">
+            (#{f.productId}, #{f.classificationId},#{f.potential}, #{f.visitFrequency})
+        </foreach>
+    </insert>
+
+</mapper>

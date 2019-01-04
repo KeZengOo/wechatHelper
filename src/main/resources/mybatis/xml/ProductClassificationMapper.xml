@@ -17,7 +17,7 @@
 
     <!-- 根据产品查询医生分型 -->
     <select id="getProductClassificationList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationResponseBean">
-        SELECT field_value fieldValue, field_type fieldType,is_required required, is_supplement supplement
+        SELECT id, field_value fieldValue, field_type fieldType,is_required required, is_supplement supplement
         FROM virtual_product_classification
         WHERE product_id=#{productId}
     </select>

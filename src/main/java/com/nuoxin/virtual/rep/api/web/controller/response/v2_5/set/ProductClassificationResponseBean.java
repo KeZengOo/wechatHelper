@@ -16,6 +16,9 @@ import java.io.Serializable;
 public class ProductClassificationResponseBean implements Serializable {
     private static final long serialVersionUID = -8708476663633656205L;
 
+    @ApiModelProperty(value = "ID")
+    private Long id;
+
     @ApiModelProperty(value = "字段的值")
     private String fieldValue;
 
@@ -29,35 +32,4 @@ public class ProductClassificationResponseBean implements Serializable {
     private Integer supplement;
 
 
-    public String getFieldValue() {
-        return fieldValue;
-    }
-
-    public void setFieldValue(String fieldValue) {
-        this.fieldValue = fieldValue;
-    }
-
-    public Integer getFiledType() {
-        return filedType;
-    }
-
-    public void setFiledType(Integer filedType) {
-        this.filedType = filedType;
-    }
-
-    public Integer getRequired() {
-        return required;
-    }
-
-    public void setRequired(Integer required) {
-        this.required = required;
-    }
-
-    public Integer getSupplement() {
-        return supplement;
-    }
-
-    public void setSupplement(Integer supplement) {
-        this.supplement = supplement;
-    }
 }
