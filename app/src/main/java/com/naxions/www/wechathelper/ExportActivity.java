@@ -75,11 +75,11 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
     /**
      * 上传成功的图标
      */
-    private ImageView iv_success;
+    private ImageView ivSuccess;
     /**
      * 上传失败的图标
      */
-    private ImageView iv_fail;
+    private ImageView ivFail;
 
     /**
      * 文件上传
@@ -109,12 +109,12 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
         loadingDialog.show();
         loadingView = loadingDialog.findViewById(R.id.loadingView);
         mRemindText = loadingDialog.findViewById(R.id.text);
-        iv_success = loadingDialog.findViewById(R.id.iv_success);
-        iv_fail = loadingDialog.findViewById(R.id.iv_fail);
+        ivSuccess = loadingDialog.findViewById(R.id.iv_success);
+        ivFail = loadingDialog.findViewById(R.id.iv_fail);
         mRemindText.setText("正在加载联系人标签,请稍候");
         loadingView.setVisibility(View.VISIBLE);
-        iv_success.setVisibility(View.INVISIBLE);
-        iv_fail.setVisibility(View.INVISIBLE);
+        ivSuccess.setVisibility(View.INVISIBLE);
+        ivFail.setVisibility(View.INVISIBLE);
 
         //异步执行文件拷贝和数据查询操作,防止 dialog 不显示
         new MyTask().execute();
@@ -276,13 +276,13 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
                             loadingDialog = new CustomDialog(mActivity, R.style.customDialog, R.layout.layout_loading_dialog);
                             loadingView = loadingDialog.findViewById(R.id.loadingView);
                             mRemindText = loadingDialog.findViewById(R.id.text);
-                            iv_success = loadingDialog.findViewById(R.id.iv_success);
-                            iv_fail = loadingDialog.findViewById(R.id.iv_fail);
+                            ivSuccess = loadingDialog.findViewById(R.id.iv_success);
+                            ivFail = loadingDialog.findViewById(R.id.iv_fail);
                         }
                         loadingDialog.setCancelable(true);
                         loadingView.setVisibility(View.INVISIBLE);
-                        iv_fail.setVisibility(View.INVISIBLE);
-                        iv_success.setVisibility(View.VISIBLE);
+                        ivFail.setVisibility(View.INVISIBLE);
+                        ivSuccess.setVisibility(View.VISIBLE);
                         mRemindText.setText("加载联系人成功");
 
                         mAdapter = new MyAdapter(mActivity, mDatas);
@@ -416,13 +416,13 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
                     loadingDialog = new CustomDialog(mActivity, R.style.customDialog, R.layout.layout_loading_dialog);
                     loadingView = loadingDialog.findViewById(R.id.loadingView);
                     mRemindText = loadingDialog.findViewById(R.id.text);
-                    iv_success = loadingDialog.findViewById(R.id.iv_success);
-                    iv_fail = loadingDialog.findViewById(R.id.iv_fail);
+                    ivSuccess = loadingDialog.findViewById(R.id.iv_success);
+                    ivFail = loadingDialog.findViewById(R.id.iv_fail);
                 }
                 loadingDialog.setCancelable(true);
                 loadingView.setVisibility(View.INVISIBLE);
-                iv_fail.setVisibility(View.INVISIBLE);
-                iv_success.setVisibility(View.VISIBLE);
+                ivFail.setVisibility(View.INVISIBLE);
+                ivSuccess.setVisibility(View.VISIBLE);
                 mRemindText.setText("导出联系人成功!");
                 loadingDialog.show();
             }
@@ -457,14 +457,14 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
                     loadingDialog = new CustomDialog(mActivity, R.style.customDialog, R.layout.layout_loading_dialog);
                     loadingView = loadingDialog.findViewById(R.id.loadingView);
                     mRemindText = loadingDialog.findViewById(R.id.text);
-                    iv_success = loadingDialog.findViewById(R.id.iv_success);
-                    iv_fail = loadingDialog.findViewById(R.id.iv_fail);
+                    ivSuccess = loadingDialog.findViewById(R.id.iv_success);
+                    ivFail = loadingDialog.findViewById(R.id.iv_fail);
                 }
                 loadingDialog.setCancelable(true);
                 mRemindText.setText(s);
                 loadingView.setVisibility(View.INVISIBLE);
-                iv_success.setVisibility(View.INVISIBLE);
-                iv_fail.setVisibility(View.VISIBLE);
+                ivSuccess.setVisibility(View.INVISIBLE);
+                ivFail.setVisibility(View.VISIBLE);
             }
         });
     }

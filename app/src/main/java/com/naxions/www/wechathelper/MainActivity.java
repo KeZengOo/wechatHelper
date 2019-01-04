@@ -143,12 +143,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private File file1;
     private File file2;
     /**
-     * baseUrl
+     * 测试
      */
-    //测试
     String baseUrl = "http://123.56.95.29:7083/android/wechat/";
-    //正式
-//    String baseUrl = "http://47.93.121.23:10001/android/wechat/";
+    /**
+     * 正式
+     */
+//  String baseUrl = "http://47.93.121.23:10001/android/wechat/";
 
     public static boolean isDebug = true;
     public static final String EMPTY = "";
@@ -696,7 +697,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
                     String string = response.body().string();
-                    //Log.e("query上传文件的返回值", string);
                     try {
                         JSONObject objects = new JSONObject(string);
                         updateCode = objects.get("code");

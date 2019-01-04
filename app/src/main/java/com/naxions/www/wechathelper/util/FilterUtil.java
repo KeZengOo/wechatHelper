@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 public class FilterUtil {
     public static final String NULL="null";
     public static final String EMPTY="";
+    private static final int NUMBER_LENGTH = 11;
 
     private static boolean isEmojiCharacter(char codePoint) {
         return (codePoint == 0x0) || (codePoint == 0x9) || (codePoint == 0xA)
@@ -64,7 +65,8 @@ public class FilterUtil {
 
         // 过滤出纯数字
         nickName = Pattern.compile("[^0-9]").matcher(nickName.trim()).replaceAll("");
-        if (nickName.length() < 11) {
+       
+        if (nickName.length() < NUMBER_LENGTH) {
             return false;
         }
         char[] chars = nickName.toCharArray();
@@ -72,12 +74,12 @@ public class FilterUtil {
         ArrayList<String> phoneList = new ArrayList<>();
         for (int i = 0; i < chars.length; i++) {
             StringBuilder stringBuilder = new StringBuilder();
-            for (int j = 0; j < 11; j++) {
+            for (int j = 0; j < NUMBER_LENGTH; j++) {
                 if (i + j < chars.length) {
                     stringBuilder.append(chars[i + j]);
                 }
             }
-            if (stringBuilder.length() == 11) {
+            if (stringBuilder.length() == NUMBER_LENGTH) {
                 phoneList.add(stringBuilder.toString());
             }
         }
