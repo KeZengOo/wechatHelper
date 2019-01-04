@@ -145,10 +145,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     /**
      * baseUrl
      */
-    //测试
-    String baseUrl = "http://123.56.95.29:7083/android/wechat/";
-    //正式
-//    String baseUrl = "http://47.93.121.23:10001/android/wechat/";
+   
 
     public static boolean isDebug = true;
     public static final String EMPTY = "";
