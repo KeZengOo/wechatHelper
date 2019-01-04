@@ -6,11 +6,14 @@ import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.v2_5.ProductVisitResultParams;
 import com.nuoxin.virtual.rep.api.entity.v2_5.ProductVisitResultResponse;
 import com.nuoxin.virtual.rep.api.service.v2_5.CustomerSetService;
+import com.nuoxin.virtual.rep.api.service.v2_5.ProductClassificationService;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualProductVisitResultService;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DoctorDynamicFieldRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DynamicFieldProductRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.ProductClassificationRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.customer.DoctorDynamicFieldResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DynamicFieldProductResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationResponseBean;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +37,9 @@ public class CustomerSetController extends NewBaseController{
 
     @Resource
     private VirtualProductVisitResultService virtualProductVisitResultService;
+
+    @Resource
+    private ProductClassificationService productClassificationService;
 
 
     @ApiOperation(value = "客户设置动态字段列表", notes = "客户设置动态字段列表")
@@ -229,6 +235,48 @@ public class CustomerSetController extends NewBaseController{
         return responseBean;
     }
 
+
+
+
+    @ApiOperation(value = "产品医生分型新增", notes = "产品医生分型新增")
+    @PostMapping(value = "/product/classification")
+    public DefaultResponseBean<Boolean> productClassificationAdd(@RequestBody ProductClassificationRequestBean bean) {
+        productClassificationService.add(bean);
+        DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(true);
+        return responseBean;
+    }
+
+
+
+    @ApiOperation(value = "产品医生分型删除", notes = "产品医生分型删除")
+    @GetMapping(value = "/product/classification/delete/{productId}")
+    public DefaultResponseBean<Boolean> deleteByProductId(@PathVariable(value = "productId") Long productId) {
+        productClassificationService.deleteByProductId(productId);
+        DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(true);
+        return responseBean;
+    }
+
+
+    @ApiOperation(value = "产品医生分型修改", notes = "产品医生分型修改")
+    @PostMapping(value = "/product/classification/update")
+    public DefaultResponseBean<Boolean> productClassificationUpdate(@RequestBody ProductClassificationRequestBean bean) {
+        productClassificationService.update(bean);
+        DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(true);
+        return responseBean;
+    }
+
+
+    @ApiOperation(value = "产品医生分型查询", notes = "产品医生分型查询")
+    @GetMapping(value = "/product/classification/get/{productId}")
+    public DefaultResponseBean<List<ProductClassificationResponseBean>> getProductClassificationList(@PathVariable(value = "productId") Long productId) {
+        List<ProductClassificationResponseBean> productClassificationList = productClassificationService.getProductClassificationList(productId);
+        DefaultResponseBean<List<ProductClassificationResponseBean>> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(productClassificationList);
+        return responseBean;
+    }
 
 
 }

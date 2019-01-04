@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.ProductClassificationMapper">
+
+    <insert id="add">
+        INSERT INTO virtual_product_classification(product_id, field_value,field_type, is_required, is_supplement)
+        VALUES
+        <foreach collection="bean.fieldValueList" item="fieldValue" separator=",">
+            (#{bean.productId}, #{fieldValue}, #{bean.fieldType}, #{bean.required}, #{bean.supplement})
+        </foreach>
+    </insert>
+
+    <delete id="deleteByProductId">
+        DELETE FROM virtual_product_classification
+        WHERE product_id=#{productId}
+    </delete>
+
+    <!-- 根据产品查询医生分型 -->
+    <select id="getProductClassificationList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationResponseBean">
+        SELECT field_value fieldValue, field_type fieldType,is_required required, is_supplement supplement
+        FROM virtual_product_classification
+        WHERE product_id=#{productId}
+    </select>
+
+</mapper>
