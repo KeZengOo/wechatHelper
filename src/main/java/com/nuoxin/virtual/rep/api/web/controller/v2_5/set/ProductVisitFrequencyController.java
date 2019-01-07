@@ -5,17 +5,17 @@ import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.v2_5.ProductClassificationFrequencyService;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.ProductClassificationFrequencyRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.ProductClassificationFrequencyUpdateRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.share.ShareRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ContentShareResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationFrequencyResponseBean;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * @author tiancun
@@ -30,13 +30,46 @@ public class ProductVisitFrequencyController {
     private ProductClassificationFrequencyService productClassificationFrequencyService;
 
 
-    @ApiOperation(value = "医生分型拜访频次设置", notes = "医生分型拜访频次设置")
-    @PostMapping(value = "/classification")
+    @ApiOperation(value = "医生分型拜访频次新增", notes = "医生分型拜访频次新增")
+    @PostMapping(value = "/classification/add")
     public DefaultResponseBean<Boolean> add(@RequestBody ProductClassificationFrequencyRequestBean bean) {
 
         productClassificationFrequencyService.add(bean);
         DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
         responseBean.setData(true);
+        return responseBean;
+    }
+
+
+    @ApiOperation(value = "医生分型拜访频次编辑", notes = "医生分型拜访频次编辑")
+    @PostMapping(value = "/classification/update")
+    public DefaultResponseBean<Boolean> update(@RequestBody ProductClassificationFrequencyUpdateRequestBean bean) {
+
+        productClassificationFrequencyService.update(bean);
+        DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(true);
+        return responseBean;
+    }
+
+
+    @ApiOperation(value = "医生分型拜访频次删除", notes = "医生分型拜访频次删除")
+    @GetMapping(value = "/classification/delete/{batchNo}")
+    public DefaultResponseBean<Boolean> delete(@PathVariable(value = "batchNo") String batchNo) {
+
+        productClassificationFrequencyService.deleteByBatchNo(batchNo);
+        DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(true);
+        return responseBean;
+    }
+
+
+    @ApiOperation(value = "医生分型拜访频次列表", notes = "医生分型拜访频次列表")
+    @GetMapping(value = "/classification/list/{productId}")
+    public DefaultResponseBean<List<ProductClassificationFrequencyResponseBean>> getList(@PathVariable(value = "productId") Long productId) {
+
+        List<ProductClassificationFrequencyResponseBean> productClassificationFrequencyList = productClassificationFrequencyService.getProductClassificationFrequencyList(productId);
+        DefaultResponseBean<List<ProductClassificationFrequencyResponseBean>> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(productClassificationFrequencyList);
         return responseBean;
     }
 

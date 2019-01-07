@@ -1,5 +1,6 @@
 package com.nuoxin.virtual.rep.api.service.v2_5.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.entity.v2_5.ProductClassificationFrequencyParams;
@@ -7,11 +8,15 @@ import com.nuoxin.virtual.rep.api.mybatis.ProductClassificationFrequencyMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.ProductClassificationFrequencyService;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.ProductClassificationFrequencyRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.ProductClassificationFrequencyUpdateRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationFrequencyResponseBean;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -28,10 +33,32 @@ public class ProductClassificationFrequencyServiceImpl implements ProductClassif
     @Override
     public void add(ProductClassificationFrequencyRequestBean bean) {
 
-        List<ProductClassificationFrequencyParams> list = this.getProductClassificationFrequencyParamsList(bean);
+        List<ProductClassificationFrequencyParams> paramsList = this.getProductClassificationFrequencyParams(bean);
+        productClassificationFrequencyMapper.batchInsert(paramsList);
 
-        productClassificationFrequencyMapper.batchInsert(list);
+    }
 
+    @Override
+    public void deleteByBatchNo(String batchNo) {
+        productClassificationFrequencyMapper.deleteByBatchNo(batchNo);
+    }
+
+    @Override
+    public List<ProductClassificationFrequencyResponseBean> getProductClassificationFrequencyList(Long productId) {
+        List<ProductClassificationFrequencyResponseBean> productClassificationFrequencyList = productClassificationFrequencyMapper.getProductClassificationFrequencyList(productId);
+        if (CollectionsUtil.isNotEmptyList(productClassificationFrequencyList)){
+            return productClassificationFrequencyList;
+        }
+
+        return new ArrayList<>();
+    }
+
+    @Override
+    @Transactional
+    public void update(ProductClassificationFrequencyUpdateRequestBean bean) {
+        String batchNo = bean.getBatchNo();
+        this.deleteByBatchNo(batchNo);
+        this.add(bean);
     }
 
     /**
@@ -39,36 +66,53 @@ public class ProductClassificationFrequencyServiceImpl implements ProductClassif
      * @param bean
      * @return
      */
-    private List<ProductClassificationFrequencyParams> getProductClassificationFrequencyParamsList(ProductClassificationFrequencyRequestBean bean) {
+    private List<ProductClassificationFrequencyParams> getProductClassificationFrequencyParams(ProductClassificationFrequencyRequestBean bean) {
+
+        this.checkProductClassificationFrequencyRequestBean(bean);
+        List<Long> classificationIdList = bean.getClassificationIdList();
+        Integer potential = bean.getPotential();
         Long productId = bean.getProductId();
         Integer visitFrequency = bean.getVisitFrequency();
-        List<Long> classificationIdList = bean.getClassificationIdList();
-        List<Integer> potentialList = bean.getPotentialList();
+        String batchNo = UUID.randomUUID().toString();
+        List<ProductClassificationFrequencyParams> paramsList = new ArrayList<>(classificationIdList.size());
+        classificationIdList.forEach(c ->{
 
-
-        if (CollectionsUtil.isEmptyList(classificationIdList)){
-            throw new BusinessException(ErrorEnum.ERROR, "医生分型不能为空");
-        }
-
-        if (CollectionsUtil.isEmptyList(potentialList)){
-            throw new BusinessException(ErrorEnum.ERROR, "医生潜力不能为空");
-        }
-
-        List<ProductClassificationFrequencyParams> list = new ArrayList<>();
-        List<Long> collectClassificationIdList = classificationIdList.stream().distinct().collect(Collectors.toList());
-        List<Integer> collectPotentialList = potentialList.stream().distinct().collect(Collectors.toList());
-        collectClassificationIdList.forEach(c ->{
-            collectPotentialList.forEach(p ->{
-                ProductClassificationFrequencyParams params = new ProductClassificationFrequencyParams();
-                params.setProductId(productId);
-                params.setVisitFrequency(visitFrequency);
-                params.setClassificationId(c);
-                params.setPotential(p);
-                list.add(params);
-            });
+            ProductClassificationFrequencyParams params = new ProductClassificationFrequencyParams();
+            params.setProductId(productId);
+            params.setVisitFrequency(visitFrequency);
+            params.setClassificationId(c);
+            params.setPotential(potential);
+            params.setBatchNo(batchNo);
+            paramsList.add(params);
         });
 
+        return paramsList;
+    }
 
-        return list;
+    /**
+     * 校验参数
+     * @param bean
+     */
+    private void checkProductClassificationFrequencyRequestBean(ProductClassificationFrequencyRequestBean bean) {
+
+        Long productId = bean.getProductId();
+        if (productId == null || productId <=0){
+            throw new BusinessException(ErrorEnum.ERROR, "产品ID不能为空！");
+        }
+
+        Integer potential = bean.getPotential();
+        if (potential == null){
+            throw new BusinessException(ErrorEnum.ERROR, "医生潜力不能为空！");
+        }
+
+        List<Long> classificationIdList = bean.getClassificationIdList();
+        if (CollectionsUtil.isEmptyList(classificationIdList)){
+            throw new BusinessException(ErrorEnum.ERROR, "医生分型不能为空！");
+        }
+
+        Integer count = productClassificationFrequencyMapper.getClassificationCountByPotential(classificationIdList, potential);
+        if (count !=null && count > 0){
+            throw new BusinessException(ErrorEnum.ERROR, "该潜力医生分型已经存在！");
+        }
     }
 }

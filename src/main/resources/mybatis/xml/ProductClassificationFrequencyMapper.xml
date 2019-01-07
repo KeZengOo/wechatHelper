@@ -3,11 +3,37 @@
 <mapper namespace="com.nuoxin.virtual.rep.api.mybatis.ProductClassificationFrequencyMapper">
 
     <insert id="batchInsert">
-        INSERT INTO virtual_doctor_classification_frequency(product_id, classification_id, potential, visit_frequency)
+        INSERT INTO virtual_doctor_classification_frequency(product_id, classification_id, potential, visit_frequency, batch_no)
         VALUES
-        <foreach collection="list" item="f" separator=",">
-            (#{f.productId}, #{f.classificationId},#{f.potential}, #{f.visitFrequency})
+        <foreach collection ="list" item="f" separator =",">
+            (#{f.productId}, #{f.classificationId},#{f.potential}, #{f.visitFrequency}, #{f.batchNo})
         </foreach>
     </insert>
+
+    <!-- 查询总数，用来校验某个潜力的分型是否已经录入 -->
+    <select id="getClassificationCountByPotential" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM virtual_doctor_classification_frequency WHERE potential=#{potential}
+        AND classification_id IN
+        <foreach collection ="classificationIdList" item="classificationId" open="(" close=")" separator =",">
+            #{classificationId}
+        </foreach>
+    </select>
+
+    <!-- 得到产品的分型拜访频次 -->
+    <select id="getProductClassificationFrequencyList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationFrequencyResponseBean">
+        SELECT f.batch_no batchNo, GROUP_CONCAT(c.field_value) classificationStr, f.visit_frequency frequency FROM virtual_doctor_classification_frequency f
+        INNER JOIN virtual_product_classification c
+        ON f.classification_id=c.id
+        WHERE f.product_id=#{productId}
+        GROUP BY f.batch_no
+    </select>
+
+
+    <delete id="deleteByBatchNo">
+        DELETE FROM virtual_doctor_classification_frequency
+        WHERE batch_no=#{batchNo}
+    </delete>
+
+
 
 </mapper>

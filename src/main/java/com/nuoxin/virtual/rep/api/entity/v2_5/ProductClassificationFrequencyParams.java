@@ -27,4 +27,7 @@ public class ProductClassificationFrequencyParams implements Serializable {
 
     @ApiModelProperty(value = "拜访频次，单位工作日")
     private Integer visitFrequency;
+
+    @ApiModelProperty(value = "批次，标识同时新增和修改的")
+    private String batchNo;
 }

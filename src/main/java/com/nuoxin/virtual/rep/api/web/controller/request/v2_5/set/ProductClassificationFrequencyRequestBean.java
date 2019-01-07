@@ -1,5 +1,6 @@
 package com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -23,8 +24,9 @@ public class ProductClassificationFrequencyRequestBean implements Serializable {
     @ApiModelProperty(value = "分型ID")
     private List<Long> classificationIdList;
 
+
     @ApiModelProperty(value = "医生潜力，3高,2中,1低,-1未知")
-    private List<Integer> potentialList;
+    private Integer potential;
 
     @ApiModelProperty(value = "拜访频次，单位工作日")
     private Integer visitFrequency;
