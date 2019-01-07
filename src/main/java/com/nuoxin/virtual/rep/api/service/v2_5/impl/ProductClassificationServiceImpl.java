@@ -11,6 +11,8 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.ProductClassif
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationFieldResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationResponseBean;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -47,6 +49,7 @@ public class ProductClassificationServiceImpl implements ProductClassificationSe
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public void update(ProductClassificationRequestBean bean) {
         Long productId = bean.getProductId();
         this.deleteByProductId(productId);

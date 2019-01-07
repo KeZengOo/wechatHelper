@@ -4,8 +4,10 @@ import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.v2_5.ProductClassificationFrequencyService;
+import com.nuoxin.virtual.rep.api.service.v2_5.ProductVisitFrequencyService;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.ProductClassificationFrequencyRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.ProductClassificationFrequencyUpdateRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.ProductVisitFrequencyRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.share.ShareRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ContentShareResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationFrequencyResponseBean;
@@ -28,6 +30,9 @@ public class ProductVisitFrequencyController {
 
     @Resource
     private ProductClassificationFrequencyService productClassificationFrequencyService;
+
+    @Resource
+    private ProductVisitFrequencyService productVisitFrequencyService;
 
 
     @ApiOperation(value = "医生分型拜访频次新增", notes = "医生分型拜访频次新增")
@@ -70,6 +75,18 @@ public class ProductVisitFrequencyController {
         List<ProductClassificationFrequencyResponseBean> productClassificationFrequencyList = productClassificationFrequencyService.getProductClassificationFrequencyList(productId);
         DefaultResponseBean<List<ProductClassificationFrequencyResponseBean>> responseBean = new DefaultResponseBean<>();
         responseBean.setData(productClassificationFrequencyList);
+        return responseBean;
+    }
+
+
+
+    @ApiOperation(value = "医生拜访频次新增", notes = "医生分型拜访频次新增")
+    @PostMapping(value = "/visit/add")
+    public DefaultResponseBean<Boolean> addProductVisitFrequency(@RequestBody ProductVisitFrequencyRequestBean bean) {
+
+        productVisitFrequencyService.addProductVisitFrequency(bean);
+        DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(true);
         return responseBean;
     }
 

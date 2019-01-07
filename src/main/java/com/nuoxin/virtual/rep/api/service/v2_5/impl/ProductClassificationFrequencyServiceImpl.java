@@ -11,6 +11,7 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.ProductClassif
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.ProductClassificationFrequencyUpdateRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationFrequencyResponseBean;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -54,7 +55,7 @@ public class ProductClassificationFrequencyServiceImpl implements ProductClassif
     }
 
     @Override
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public void update(ProductClassificationFrequencyUpdateRequestBean bean) {
         String batchNo = bean.getBatchNo();
         this.deleteByBatchNo(batchNo);
