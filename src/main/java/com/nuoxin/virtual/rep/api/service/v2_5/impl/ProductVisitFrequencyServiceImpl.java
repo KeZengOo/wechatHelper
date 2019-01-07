@@ -60,4 +60,10 @@ public class ProductVisitFrequencyServiceImpl implements ProductVisitFrequencySe
 
         productVisitFrequencyMapper.addProductVisitFrequency(productVisitFrequency);
     }
+
+    @Override
+    public ProductVisitFrequencyResponseBean getProductVisitFrequency(Long productId) {
+        ProductVisitFrequencyResponseBean productVisitFrequency = productVisitFrequencyMapper.getProductVisitFrequency(productId);
+        return productVisitFrequency;
+    }
 }

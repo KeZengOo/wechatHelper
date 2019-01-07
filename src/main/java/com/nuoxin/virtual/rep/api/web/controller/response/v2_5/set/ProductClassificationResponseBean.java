@@ -1,5 +1,6 @@
 package com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -22,6 +23,9 @@ public class ProductClassificationResponseBean implements Serializable {
     @ApiModelProperty(value = "字段的值")
     private String fieldValue;
 
+    @JsonIgnore
+    @ApiModelProperty(value = "前端可以不用")
+    private String batchNo;
 
 
 

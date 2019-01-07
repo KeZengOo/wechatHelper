@@ -2,6 +2,7 @@ package com.nuoxin.virtual.rep.api.mybatis;
 
 import com.nuoxin.virtual.rep.api.entity.v2_5.ProductClassificationFrequencyParams;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationFrequencyResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationResponseBean;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -42,5 +43,13 @@ public interface ProductClassificationFrequencyMapper {
      * @param batchNo
      */
     void deleteByBatchNo(@Param(value = "batchNo") String batchNo);
+
+
+    /**
+     * 根据批次查询选中的分型
+     * @param batchNoList
+     * @return
+     */
+    List<ProductClassificationResponseBean> getProductClassificationListByBatchNo(@Param(value = "batchNoList") List<String> batchNoList);
 
 }

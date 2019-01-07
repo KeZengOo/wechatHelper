@@ -11,6 +11,7 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.ProductVisitFr
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.share.ShareRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ContentShareResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationFrequencyResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductVisitFrequencyResponseBean;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
@@ -90,4 +91,14 @@ public class ProductVisitFrequencyController {
         return responseBean;
     }
 
+
+    @ApiOperation(value = "医生拜访频次列表", notes = "医生分型拜访频次列表")
+    @GetMapping(value = "/visit/list/{productId}")
+    public DefaultResponseBean<ProductVisitFrequencyResponseBean> getProductVisitFrequency(@PathVariable(value = "productId") Long productId) {
+
+        ProductVisitFrequencyResponseBean productVisitFrequency = productVisitFrequencyService.getProductVisitFrequency(productId);
+        DefaultResponseBean<ProductVisitFrequencyResponseBean> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(productVisitFrequency);
+        return responseBean;
+    }
 }

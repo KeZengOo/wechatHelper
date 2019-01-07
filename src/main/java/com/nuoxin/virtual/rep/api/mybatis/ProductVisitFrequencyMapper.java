@@ -18,6 +18,9 @@ public interface ProductVisitFrequencyMapper {
      */
     ProductVisitFrequencyResponseBean getProductVisitFrequency(@Param(value = "productId") Long productId);
 
+
+
+
     /**
      * 新增
      * @param bean

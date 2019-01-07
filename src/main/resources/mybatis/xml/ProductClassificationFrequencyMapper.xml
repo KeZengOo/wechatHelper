@@ -21,7 +21,7 @@
 
     <!-- 得到产品的分型拜访频次 -->
     <select id="getProductClassificationFrequencyList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationFrequencyResponseBean">
-        SELECT f.batch_no batchNo, GROUP_CONCAT(c.field_value) classificationStr, f.visit_frequency frequency FROM virtual_doctor_classification_frequency f
+        SELECT f.batch_no batchNo, GROUP_CONCAT(c.field_value) classificationStr, f.potential, f.visit_frequency frequency FROM virtual_doctor_classification_frequency f
         INNER JOIN virtual_product_classification c
         ON f.classification_id=c.id
         WHERE f.product_id=#{productId}
@@ -34,6 +34,14 @@
         WHERE batch_no=#{batchNo}
     </delete>
 
-
+    <select id="getProductClassificationListByBatchNo" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationResponseBean">
+        SELECT DISTINCT c.id, c.field_value fieldValue, f.batch_no batchNo   FROM virtual_doctor_classification_frequency f
+        INNER JOIN virtual_product_classification c
+        ON f.classification_id=c.id
+        WHERE f.batch_no IN
+        <foreach collection ="batchNoList" item="batchNo" open="(" close=")" separator =",">
+            #{batchNo}
+        </foreach>
+    </select>
 
 </mapper>

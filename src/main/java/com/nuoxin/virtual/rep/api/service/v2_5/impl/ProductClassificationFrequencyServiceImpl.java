@@ -10,6 +10,7 @@ import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.ProductClassificationFrequencyRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.ProductClassificationFrequencyUpdateRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationFrequencyResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationResponseBean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -48,6 +50,21 @@ public class ProductClassificationFrequencyServiceImpl implements ProductClassif
     public List<ProductClassificationFrequencyResponseBean> getProductClassificationFrequencyList(Long productId) {
         List<ProductClassificationFrequencyResponseBean> productClassificationFrequencyList = productClassificationFrequencyMapper.getProductClassificationFrequencyList(productId);
         if (CollectionsUtil.isNotEmptyList(productClassificationFrequencyList)){
+            List<String> batchNoList = productClassificationFrequencyList.stream().map(ProductClassificationFrequencyResponseBean::getBatchNo).distinct().collect(Collectors.toList());
+            if (CollectionsUtil.isNotEmptyList(batchNoList)){
+                List<ProductClassificationResponseBean> productClassificationList = productClassificationFrequencyMapper.getProductClassificationListByBatchNo(batchNoList);
+                if (CollectionsUtil.isNotEmptyList(productClassificationList)){
+                    Map<String, List<ProductClassificationResponseBean>> map = productClassificationList.stream().collect(Collectors.groupingBy(ProductClassificationResponseBean::getBatchNo));
+                    productClassificationFrequencyList.forEach(p->{
+                        List<ProductClassificationResponseBean> productClassificationResponseBeans = map.get(p.getBatchNo());
+                        if (CollectionsUtil.isNotEmptyList(productClassificationResponseBeans)){
+                            p.setClassificationList(productClassificationResponseBeans);
+                        }
+                    });
+
+                }
+            }
+
             return productClassificationFrequencyList;
         }
 
