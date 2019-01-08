@@ -30,4 +30,29 @@
         GROUP BY field_type,is_required,is_supplement
     </select>
 
+    <!-- 医生选中的分型 -->
+    <select id="getDoctorClassificationList" resultType="java.lang.Long">
+        SELECT DISTINCT classification_id
+        FROM virtual_doctor_classification
+        WHERE product_id=#{productId}
+        AND doctor_id=#{doctorId}
+    </select>
+
+    <!-- 删除医生的分型 -->
+    <delete id="deleteDoctorClassificationByProductId">
+        DELETE
+        FROM virtual_doctor_classification
+        WHERE product_id=#{productId}
+        AND doctor_id=#{doctorId}
+    </delete>
+
+    <!-- 新增医生分型 -->
+    <insert id="addDoctorClassification">
+        INSERT INTO virtual_doctor_classification(product_id, classification_id, doctorId)
+        VALUES
+        <foreach collection="classificationIdList" item="classificationId" separator=",">
+            (#{productId}, #{classificationId}, #{doctorId})
+        </foreach>
+    </insert>
+
 </mapper>

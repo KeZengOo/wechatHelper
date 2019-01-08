@@ -40,4 +40,31 @@ public interface ProductClassificationMapper {
      * @return
      */
     ProductClassificationFieldResponseBean getProductClassificationField(@Param(value = "productId") Long productId);
+
+    /**
+     * 医生选中的分型
+     * @param productId
+     * @param doctorId
+     * @return
+     */
+    List<Long> getDoctorClassificationList(@Param(value = "productId") Long productId,@Param(value = "doctorId") Long doctorId);
+
+    /**
+     * 删除医生的分型
+     * @param productId
+     * @param doctorId
+     */
+    void deleteDoctorClassificationByProductId(@Param(value = "productId") Long productId,@Param(value = "doctorId") Long doctorId);
+
+    /**
+     * 新增医生分型
+     * @param productId
+     * @param doctorId
+     * @param classificationIdList
+     */
+    void addDoctorClassification(@Param(value = "productId") Long productId,@Param(value = "doctorId") Long doctorId,
+                                 @Param(value = "classificationIdList") List<Long> classificationIdList);
+
+
+
 }

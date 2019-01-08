@@ -10,6 +10,7 @@ import javax.annotation.Resource;
 import com.alibaba.fastjson.JSONObject;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.DynamicFieldResponse;
+import com.nuoxin.virtual.rep.api.mybatis.ProductClassificationMapper;
 import com.nuoxin.virtual.rep.api.utils.StringUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.*;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.questionnaire.ProductQuestionnaireRequestBean;
@@ -44,10 +45,15 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
     @Resource
     private CommonService commonService;
 
+    @Resource
+    private ProductClassificationMapper productClassificationMapper;
+
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public void addDoctorDynamicFieldValue(DoctorDynamicFieldValueListRequestBean bean) {
         Long doctorId = bean.getDoctorId();
+        Long productId = bean.getProductId();
+        List<Long> classificationIdList = bean.getClassificationIdList();
         List<DoctorDynamicFieldValueRequestBean> list = bean.getList();
         if(checkRequiredDoctorDynamicFieldValueList(list)){
             List<Integer> collectClassification = list.stream().map(DoctorDynamicFieldValueRequestBean::getClassification).distinct().collect(Collectors.toList());
@@ -59,6 +65,13 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
 
             dynamicFieldMapper.addDoctorBasicDynamicFieldValue(doctorId, list);
         }
+
+
+        if (CollectionsUtil.isNotEmptyList(classificationIdList)){
+            productClassificationMapper.deleteDoctorClassificationByProductId(productId, doctorId);
+            productClassificationMapper.addDoctorClassification(productId, doctorId, classificationIdList);
+        }
+
     }
 
     @Override
@@ -297,12 +310,19 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
             }
 
             List<String> result = dynamicFieldMapper.getVisit(doctorId, product.getProductId());
-           if (CollectionsUtil.isNotEmptyList(result)){
+            if (CollectionsUtil.isNotEmptyList(result)){
                VisitResponseBean visitResponseBean = new VisitResponseBean();
                visitResponseBean.setVisitResult(result);
                productDynamicFieldQuestionnaireResponseBean.setVisit(visitResponseBean);
 
            }
+
+            // 医生的选中的分型
+            List<Long> doctorClassificationList = productClassificationMapper.getDoctorClassificationList(product.getProductId(), doctorId);
+            if (CollectionsUtil.isNotEmptyList(doctorClassificationList)){
+                productDynamicFieldQuestionnaireResponseBean.setClassificationIdList(doctorClassificationList);
+            }
+
 
             list.add(productDynamicFieldQuestionnaireResponseBean);
         });
