@@ -36,8 +36,8 @@
         FROM virtual_doctor_classification a
         INNER JOIN virtual_product_classification b
         ON a.classification_id=b.id
-        WHERE product_id=#{productId}
-        AND doctor_id=#{doctorId}
+        WHERE a.product_id=#{productId}
+        AND a.doctor_id=#{doctorId}
     </select>
 
     <!-- 删除医生的分型 -->
