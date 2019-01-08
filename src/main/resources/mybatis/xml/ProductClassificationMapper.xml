@@ -50,7 +50,7 @@
 
     <!-- 新增医生分型 -->
     <insert id="addDoctorClassification">
-        INSERT INTO virtual_doctor_classification(product_id, classification_id, doctorId)
+        INSERT INTO virtual_doctor_classification(product_id, classification_id, doctor_id)
         VALUES
         <foreach collection="classificationIdList" item="classificationId" separator=",">
             (#{productId}, #{classificationId}, #{doctorId})
