@@ -10,6 +10,7 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.questionnaire.Prod
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.ProductClassificationRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationFieldResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationTypeResponseBean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,14 +65,18 @@ public class ProductClassificationServiceImpl implements ProductClassificationSe
     }
 
     @Override
-    public List<ProductClassificationResponseBean> getProductClassificationList(Long productId) {
+    public ProductClassificationTypeResponseBean getProductClassificationList(Long productId) {
+
+        ProductClassificationTypeResponseBean productClassificationType = new ProductClassificationTypeResponseBean();
 
         List<ProductClassificationResponseBean> productClassificationList = productClassificationMapper.getProductClassificationList(productId);
         if (CollectionsUtil.isNotEmptyList(productClassificationList)){
-            return productClassificationList;
+            productClassificationType.setList(productClassificationList);
+            Integer fieldType = productClassificationList.get(0).getFieldType();
+            productClassificationType.setFieldType(fieldType);
         }
 
-        return new ArrayList<>();
+        return productClassificationType;
     }
 
     @Override

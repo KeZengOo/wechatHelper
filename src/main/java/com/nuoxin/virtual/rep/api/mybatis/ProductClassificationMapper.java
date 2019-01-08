@@ -47,7 +47,7 @@ public interface ProductClassificationMapper {
      * @param doctorId
      * @return
      */
-    List<Long> getDoctorClassificationList(@Param(value = "productId") Long productId,@Param(value = "doctorId") Long doctorId);
+    List<ProductClassificationResponseBean> getDoctorClassificationList(@Param(value = "productId") Long productId,@Param(value = "doctorId") Long doctorId);
 
     /**
      * 删除医生的分型

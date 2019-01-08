@@ -4,6 +4,7 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.questionnaire.Prod
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.ProductClassificationRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationFieldResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationTypeResponseBean;
 
 import java.util.List;
 
@@ -36,7 +37,7 @@ public interface ProductClassificationService {
      * @param productId
      * @return
      */
-    List<ProductClassificationResponseBean> getProductClassificationList(Long productId);
+    ProductClassificationTypeResponseBean getProductClassificationList(Long productId);
 
 
     /**

@@ -15,6 +15,7 @@ import com.nuoxin.virtual.rep.api.utils.StringUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.*;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.questionnaire.ProductQuestionnaireRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.*;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationResponseBean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -318,9 +319,17 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
            }
 
             // 医生的选中的分型
-            List<Long> doctorClassificationList = productClassificationMapper.getDoctorClassificationList(product.getProductId(), doctorId);
+            List<ProductClassificationResponseBean> doctorClassificationList = productClassificationMapper.getDoctorClassificationList(product.getProductId(), doctorId);
             if (CollectionsUtil.isNotEmptyList(doctorClassificationList)){
-                productDynamicFieldQuestionnaireResponseBean.setClassificationIdList(doctorClassificationList);
+                List<Long> idList = doctorClassificationList.stream().map(ProductClassificationResponseBean::getId).distinct().collect(Collectors.toList());
+                List<String> valueList = doctorClassificationList.stream().map(ProductClassificationResponseBean::getFieldValue).distinct().collect(Collectors.toList());
+                if (CollectionsUtil.isNotEmptyList(idList)){
+                    productDynamicFieldQuestionnaireResponseBean.setClassificationIdList(idList);
+                }
+
+                if (CollectionsUtil.isNotEmptyList(valueList)){
+                    productDynamicFieldQuestionnaireResponseBean.setClassificationList(valueList);
+                }
             }
 
 

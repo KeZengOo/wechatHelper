@@ -31,9 +31,11 @@
     </select>
 
     <!-- 医生选中的分型 -->
-    <select id="getDoctorClassificationList" resultType="java.lang.Long">
-        SELECT DISTINCT classification_id
-        FROM virtual_doctor_classification
+    <select id="getDoctorClassificationList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationResponseBean">
+        SELECT DISTINCT b.id, b.field_value fieldValue
+        FROM virtual_doctor_classification a
+        INNER JOIN virtual_product_classification b
+        ON a.classification_id=b.id
         WHERE product_id=#{productId}
         AND doctor_id=#{doctorId}
     </select>

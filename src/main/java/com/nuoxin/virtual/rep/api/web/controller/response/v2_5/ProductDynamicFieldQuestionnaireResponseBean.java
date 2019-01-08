@@ -34,6 +34,9 @@ public class ProductDynamicFieldQuestionnaireResponseBean implements Serializabl
     @ApiModelProperty(value = "医生选中的分型ID")
     private List<Long> classificationIdList = new ArrayList<>();
 
+    @ApiModelProperty(value = "医生选中的分型名称")
+    private List<String> classificationList = new ArrayList<>();
+
 
 //    @ApiModelProperty(value = "产品问卷调查")
 //    private List<ProductQuestionnaireResponseBean> productQuestionnaireList = new ArrayList<>();

@@ -15,6 +15,7 @@ import com.nuoxin.virtual.rep.api.web.controller.response.customer.DoctorDynamic
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DynamicFieldProductResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationFieldResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationTypeResponseBean;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
@@ -272,9 +273,9 @@ public class CustomerSetController extends NewBaseController{
 
     @ApiOperation(value = "产品医生分型，列表形式", notes = "产品医生分型，列表形式")
     @GetMapping(value = "/product/classification/list/{productId}")
-    public DefaultResponseBean<List<ProductClassificationResponseBean>> getProductClassificationList(@PathVariable(value = "productId") Long productId) {
-        List<ProductClassificationResponseBean> productClassificationList = productClassificationService.getProductClassificationList(productId);
-        DefaultResponseBean<List<ProductClassificationResponseBean>> responseBean = new DefaultResponseBean<>();
+    public DefaultResponseBean<ProductClassificationTypeResponseBean> getProductClassificationList(@PathVariable(value = "productId") Long productId) {
+        ProductClassificationTypeResponseBean productClassificationList = productClassificationService.getProductClassificationList(productId);
+        DefaultResponseBean<ProductClassificationTypeResponseBean> responseBean = new DefaultResponseBean<>();
         responseBean.setData(productClassificationList);
         return responseBean;
     }
