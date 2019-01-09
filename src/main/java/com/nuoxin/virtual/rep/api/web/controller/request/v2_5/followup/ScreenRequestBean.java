@@ -38,4 +38,7 @@ public class ScreenRequestBean extends PageRequestBean {
 			"2上次拜访时间由近及远，3是上次拜访时间由远及近，4是创建时间由近及远，5是创建时间由远及近")
 	private Integer order;
 
+	@ApiModelProperty(value = "用于值的比较")
+	private Integer minValue = Integer.MIN_VALUE;
+
 }

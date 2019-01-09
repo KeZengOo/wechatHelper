@@ -63,19 +63,22 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public CustomerFollowUpPageResponseBean<List<CustomerFollowListBean>> list(ListRequestBean pageRequest, String leaderPath) {
+	public CustomerFollowUpPageResponseBean<List<CustomerFollowListBean>> list(SearchRequestBean pageRequest, String leaderPath) {
 		int count = 0;
 		CustomerFollowUpPageResponseBean pageResponse = null;
 		// 获取所有下属(直接&间接) virtualDrugUserIds
 		List<Long> virtualDrugUserIds = commonService.getSubordinateIds(leaderPath);
 		if (CollectionsUtil.isNotEmptyList(virtualDrugUserIds)) {
-			count = doctorMapper.getListCount(virtualDrugUserIds, null, null);
+			pageRequest.setVirtualDrugUserIds(virtualDrugUserIds);
+			count = doctorMapper.getListCount(pageRequest);
 			if(count > 0) {
 				int currentSize = pageRequest.getCurrentSize();
 				int pageSize = pageRequest.getPageSize();
 				long startTime = System.currentTimeMillis();
-				Integer minValue = Integer.MIN_VALUE;
-				List<CustomerFollowListBean> list = doctorMapper.getList(virtualDrugUserIds, currentSize, pageSize, null, pageRequest.getProductLineIds(), pageRequest.getOrder(), minValue, pageRequest.getDrugUserId());
+
+				pageRequest.setCurrentSize(currentSize);
+
+				List<CustomerFollowListBean> list = doctorMapper.getList(pageRequest);
 				if (CollectionsUtil.isNotEmptyList(list)){
 					// 填充产品信息
 					this.fillProductInfos(list, leaderPath);
@@ -101,13 +104,12 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		List<Long> productLineIds = request.getProductLineIds();
 		List<Long> virtualDrugUserIds = commonService.getSubordinateIds(leaderPath);
 		if (CollectionsUtil.isNotEmptyList(virtualDrugUserIds)) {
-			String search = request.getSearch();
-			count = doctorMapper.getListCount(virtualDrugUserIds, search, null);
+			request.setVirtualDrugUserIds(virtualDrugUserIds);
+			count = doctorMapper.getListCount(request);
 			if(count > 0) {
 				int currentSize = request.getCurrentSize();
-				int pageSize = request.getPageSize();
-				Integer minValue = Integer.MIN_VALUE;
-				List<CustomerFollowListBean> list = doctorMapper.getList(virtualDrugUserIds, currentSize, pageSize, search, productLineIds, request.getOrder(), minValue,request.getDrugUserId());
+				request.setCurrentSize(currentSize);
+				List<CustomerFollowListBean> list = doctorMapper.getList(request);
 				// TODO 填充上产品
 				pageResponseBean = this.getDoctorsList(count, list, request);
 //				this.fillProductInfos(list, productLineIds);
@@ -120,18 +122,14 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public CustomerFollowUpPageResponseBean<List<CustomerFollowListBean>> screen(ScreenRequestBean request) {
+	public CustomerFollowUpPageResponseBean<List<CustomerFollowListBean>> screen(SearchRequestBean request) {
 		CustomerFollowUpPageResponseBean pageResponseBean = null;
-		List<Long> virtualDrugUserIds = request.getVirtualDrugUserIds();
-		List<Long> productLineIds = request.getProductLineIds();
 		
-		int count = doctorMapper.getListCount(virtualDrugUserIds, null, productLineIds);
+		int count = doctorMapper.getListCount(request);
 		if(count > 0 ) {
 			int currentSize = request.getCurrentSize();
-			int pageSize = request.getPageSize();
-			Integer minValue = Integer.MIN_VALUE;
-			List<CustomerFollowListBean> list = doctorMapper.getList(virtualDrugUserIds, currentSize, pageSize, null,
-					productLineIds, request.getOrder(), minValue, request.getDrugUserId());
+			request.setCurrentSize(currentSize);
+			List<CustomerFollowListBean> list = doctorMapper.getList(request);
 			pageResponseBean = this.getDoctorsList(count, list, request);
 		}
 		

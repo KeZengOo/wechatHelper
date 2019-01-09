@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.nuoxin.virtual.rep.api.entity.Doctor;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.SaveDoctorTelephoneRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.SearchRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.call.CallDoctorResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorDetailsResponseBean;
 import org.apache.ibatis.annotations.Param;
@@ -64,35 +65,54 @@ public interface DoctorMapper{
     Doctor findTopByMobile(@Param(value = "mobile") String mobile);
 
 
+//    /**
+//     * 根据过滤条件获取医生总条数
+//     * @param virtualDrugUserIds 虚拟代表 ID
+//     * @param search 搜索内容(mobile,department,doctorName)
+//     * @param productLineIds 产品线 IDs
+//     * @return 返回符合过滤条件的医生总条
+//     */
+//    int getListCount(@Param(value = "virtualDrugUserIds") List<Long> virtualDrugUserIds,
+//    		                  @Param(value = "search")  String search,
+//    		                  @Param(value = "productLineIds") List<Long> productLineIds);
+//
+//    /**
+//     * 根据过滤条件获取医生拜访列表信息(不含对应的产品信息)
+//     * @param virtualDrugUserIds 虚拟代表 ID
+//     * @param currentSize startIndex
+//     * @param pageSize offset
+//     * @param search  搜索内容(mobile,department,doctorName)
+//     * @param productLineIds 产品线 IDs
+//     * @param order  排序规则
+//     * @return 返回符合过滤条件的医生列表信息
+//     */
+//    List<CustomerFollowListBean> getList(@Param(value = "virtualDrugUserIds") List<Long> virtualDrugUserIds,
+//    		                                                    @Param(value = "currentSize")int currentSize,
+//    		                                                    @Param(value = "pageSize")int pageSize,
+//    		                                                    @Param(value = "search")String search,
+//    		                                                    @Param(value = "productLineIds") List<Long> productLineIds,
+//                                                                @Param(value = "order") Integer order,
+//                                         @Param(value = "minValue") Integer minValue,
+//                                         @Param(value = "drugUserId") Long drugUserId);
+
+
+
     /**
      * 根据过滤条件获取医生总条数
-     * @param virtualDrugUserIds 虚拟代表 ID
-     * @param search 搜索内容(mobile,department,doctorName)
-     * @param productLineIds 产品线 IDs
+     * @param bean
      * @return 返回符合过滤条件的医生总条
      */
-    int getListCount(@Param(value = "virtualDrugUserIds") List<Long> virtualDrugUserIds,
-    		                  @Param(value = "search")  String search,
-    		                  @Param(value = "productLineIds") List<Long> productLineIds);
-    
+    int getListCount(SearchRequestBean bean);
+
     /**
      * 根据过滤条件获取医生拜访列表信息(不含对应的产品信息)
-     * @param virtualDrugUserIds 虚拟代表 ID
-     * @param currentSize startIndex
-     * @param pageSize offset
-     * @param search  搜索内容(mobile,department,doctorName)
-     * @param productLineIds 产品线 IDs
-     * @param order  排序规则
+     * @param bean
      * @return 返回符合过滤条件的医生列表信息
      */
-    List<CustomerFollowListBean> getList(@Param(value = "virtualDrugUserIds") List<Long> virtualDrugUserIds,
-    		                                                    @Param(value = "currentSize")int currentSize, 
-    		                                                    @Param(value = "pageSize")int pageSize, 
-    		                                                    @Param(value = "search")String search,
-    		                                                    @Param(value = "productLineIds") List<Long> productLineIds,
-                                                                @Param(value = "order") Integer order,
-                                         @Param(value = "minValue") Integer minValue,
-                                         @Param(value = "drugUserId") Long drugUserId);
+    List<CustomerFollowListBean> getList(SearchRequestBean bean);
+
+
+
     /**
      * 根据手机号列表查询医生
      * @param mobiles
