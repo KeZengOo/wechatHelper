@@ -50,7 +50,7 @@ public class CustomerFollowUpController extends NewBaseController {
 	@ApiOperation(value = "客户医生拜访列表信息")
 	@RequestMapping(value = "/list", method = { RequestMethod.POST })
 	public DefaultResponseBean<CustomerFollowUpPageResponseBean<List<CustomerFollowListBean>>> list(HttpServletRequest request,
-			@RequestBody ListRequestBean indexRequest) {
+			@RequestBody SearchRequestBean indexRequest) {
 		DrugUser user = super.getDrugUser(request);
 		if (user == null) {
 			return super.getLoginErrorResponse();
@@ -116,7 +116,7 @@ public class CustomerFollowUpController extends NewBaseController {
 	@ApiOperation(value = "筛选接口")
 	@RequestMapping(value = "/screen", method = { RequestMethod.POST })
 	public DefaultResponseBean<CustomerFollowUpPageResponseBean<List<CustomerFollowListBean>>> screen(
-			@RequestBody ScreenRequestBean screenRequest, HttpServletRequest request) {
+			@RequestBody SearchRequestBean screenRequest, HttpServletRequest request) {
 		DrugUser user = super.getDrugUser(request);
 		if (user == null) {
 			return super.getLoginErrorResponse();
