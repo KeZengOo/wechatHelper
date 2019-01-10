@@ -2,8 +2,10 @@ package com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nuoxin.virtual.rep.api.common.bean.PageRequestBean;
 
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.plan.VisitDoctorResponseBean;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -40,5 +42,19 @@ public class ScreenRequestBean extends PageRequestBean {
 
 	@ApiModelProperty(value = "用于值的比较")
 	private Integer minValue = Integer.MIN_VALUE;
+
+
+	@ApiModelProperty(value = "目前有6种：1.下次拜访时间为今天的；2.根据医生潜力、分型应今日拜访的；3.离上次拜访时间已经到XX天的" +
+			"4.转入后应在XX天内拜访的；5.今日需要发送参会提醒的；6.今日需要会议回访的, 其他默认全部的")
+	private Integer searchType = 0;
+
+	@JsonIgnore
+	private List<VisitDoctorResponseBean> VisitDoctorList;
+
+	/**
+	 * 1是工作日，2是小时
+	 */
+	@JsonIgnore
+	private Integer meetingTimeType = 0;
 
 }

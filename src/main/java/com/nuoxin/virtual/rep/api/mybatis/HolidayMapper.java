@@ -30,4 +30,10 @@ public interface HolidayMapper {
      */
     void deleteByBatchNo(@Param(value = "batchNo") String batchNo);
 
+
+    /**
+     * 得到所有法定节假日
+     * @return
+     */
+    List<String> getHolidayStrList();
 }

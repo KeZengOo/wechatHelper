@@ -7,6 +7,7 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.SaveDoctorT
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.SearchRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.call.CallDoctorResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorDetailsResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.plan.VisitDoctorResponseBean;
 import org.apache.ibatis.annotations.Param;
 
 import com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean;
@@ -110,6 +111,39 @@ public interface DoctorMapper{
      * @return 返回符合过滤条件的医生列表信息
      */
     List<CustomerFollowListBean> getList(SearchRequestBean bean);
+
+
+    /**
+     * 得到今日分型要拜访的医生列表
+     * @param bean
+     * @return
+     */
+    List<VisitDoctorResponseBean> getClassificationVisitDoctorList(SearchRequestBean bean);
+
+
+    /**
+     * 得到设定了拜访频次要拜访的医生列表,单位天
+     * @param bean
+     * @return
+     */
+    List<VisitDoctorResponseBean> getVisitFrequencyDayDoctorList(SearchRequestBean bean);
+
+
+
+    /**
+     * 得到设定了转移拜访频次要拜访的医生列表,单位天
+     * @param bean
+     * @return
+     */
+    List<VisitDoctorResponseBean> getRetVisitFrequencyDayDoctorList(SearchRequestBean bean);
+
+
+    /**
+     * 得到设定了会后拜访的医生列表,单位天
+     * @param bean
+     * @return
+     */
+    List<VisitDoctorResponseBean> getAfterMeetingDoctorList(SearchRequestBean bean);
 
 
 

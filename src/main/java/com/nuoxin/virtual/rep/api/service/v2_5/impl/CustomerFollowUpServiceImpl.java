@@ -6,10 +6,12 @@ import java.util.stream.Collectors;
 import javax.annotation.Resource;
 
 import com.nuoxin.virtual.rep.api.entity.Doctor;
-import com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorQuateResultMapper;
-import com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorCallInfoMapper;
+import com.nuoxin.virtual.rep.api.enums.SearchTypeEnum;
+import com.nuoxin.virtual.rep.api.mybatis.*;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.*;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.plan.VisitDoctorResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductVisitFrequencyResponseBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -18,8 +20,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.nuoxin.virtual.rep.api.common.bean.PageRequestBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.CustomerFollowUpPageResponseBean;
-import com.nuoxin.virtual.rep.api.mybatis.DoctorMapper;
-import com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorQuateMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v2_5.CustomerFollowUpService;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
@@ -49,6 +49,12 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	@Resource
 	private DrugUserDoctorQuateResultMapper drugUserDoctorQuateResultMapper;
 
+	@Resource
+	private ProductVisitFrequencyMapper productVisitFrequencyMapper;
+
+	@Resource
+	private HolidayMapper holidayMapper;
+
 	/**
 	 * 初始化表头信息
 	 */
@@ -70,6 +76,10 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		List<Long> virtualDrugUserIds = commonService.getSubordinateIds(leaderPath);
 		if (CollectionsUtil.isNotEmptyList(virtualDrugUserIds)) {
 			pageRequest.setVirtualDrugUserIds(virtualDrugUserIds);
+
+			this.fileSearchType(pageRequest);
+
+
 			count = doctorMapper.getListCount(pageRequest);
 			if(count > 0) {
 				int currentSize = pageRequest.getCurrentSize();
@@ -95,6 +105,59 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		return pageResponse;
 	}
 
+	/**
+	 * 补充上搜索类型
+	 * @param pageRequest
+	 */
+	private void fileSearchType(SearchRequestBean pageRequest) {
+		Integer searchType = pageRequest.getSearchType();
+		ProductVisitFrequencyResponseBean productVisitFrequency = productVisitFrequencyMapper.getProductVisitFrequency(pageRequest.getProductLineIds().get(0));
+		if (productVisitFrequency != null){
+			pageRequest.setMeetingTimeType(productVisitFrequency.getAfterMeetingFrequencyType());
+		}
+
+		if (searchType != null && searchType != 0){
+			List<VisitDoctorResponseBean> classificationVisitDoctorList = null;
+			if (searchType == SearchTypeEnum.SEARCH_TWO.getUserType()){
+				classificationVisitDoctorList = doctorMapper.getClassificationVisitDoctorList(pageRequest);
+			}
+
+			if (searchType == SearchTypeEnum.SEARCH_THREE.getUserType()){
+				classificationVisitDoctorList = doctorMapper.getVisitFrequencyDayDoctorList(pageRequest);
+			}
+
+			if (searchType == SearchTypeEnum.SEARCH_FOUR.getUserType()){
+				classificationVisitDoctorList = doctorMapper.getRetVisitFrequencyDayDoctorList(pageRequest);
+			}
+
+
+//			if (searchType == SearchTypeEnum.SEARCH_FIVE.getUserType()){
+//
+//			}
+
+			if (searchType == SearchTypeEnum.SEARCH_SIX.getUserType()){
+				// 1是工作日，2是小时
+				Integer meetingTimeType = pageRequest.getMeetingTimeType();
+				if (meetingTimeType !=null && meetingTimeType == 1){
+					classificationVisitDoctorList = doctorMapper.getAfterMeetingDoctorList(pageRequest);
+				}
+			}
+
+
+			if (CollectionsUtil.isEmptyList(classificationVisitDoctorList)){
+				classificationVisitDoctorList = new ArrayList<>();
+				VisitDoctorResponseBean visitDoctorResponseBean = new VisitDoctorResponseBean();
+				visitDoctorResponseBean.setDoctorId(0L);
+				visitDoctorResponseBean.setVisitIntervalDay(0);
+				classificationVisitDoctorList.add(visitDoctorResponseBean);
+			}
+
+			pageRequest.setVisitDoctorList(classificationVisitDoctorList);
+
+		}
+
+	}
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public CustomerFollowUpPageResponseBean<List<CustomerFollowListBean>> search(SearchRequestBean request, String leaderPath) {
@@ -105,6 +168,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		List<Long> virtualDrugUserIds = commonService.getSubordinateIds(leaderPath);
 		if (CollectionsUtil.isNotEmptyList(virtualDrugUserIds)) {
 			request.setVirtualDrugUserIds(virtualDrugUserIds);
+			this.fileSearchType(request);
 			count = doctorMapper.getListCount(request);
 			if(count > 0) {
 				int currentSize = request.getCurrentSize();
@@ -124,7 +188,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	@Override
 	public CustomerFollowUpPageResponseBean<List<CustomerFollowListBean>> screen(SearchRequestBean request) {
 		CustomerFollowUpPageResponseBean pageResponseBean = null;
-		
+		this.fileSearchType(request);
 		int count = doctorMapper.getListCount(request);
 		if(count > 0 ) {
 			int currentSize = request.getCurrentSize();
@@ -500,4 +564,29 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		info.add(isHasDrug);
 		
 	}
+
+
+	/**
+	 * 得到医生距离上次拜访的时间间隔，去掉法定节假日和周六日
+	 * @param list
+	 * @return
+	 */
+	private List<VisitDoctorResponseBean> getVisitDoctorList(List<VisitDoctorResponseBean> list){
+
+		if (CollectionsUtil.isEmptyList(list)){
+			return new ArrayList<>();
+		}
+
+		// 得到法定节假日
+		List<String> holidayStrList = holidayMapper.getHolidayStrList();
+
+
+		list.forEach(v ->{
+			String maxVisitTime = v.getMaxVisitTime();
+			int days = DateUtil.getDaysRemoveWeekend(maxVisitTime, DateUtil.gettDateStrFromSpecialDate(new Date(), DateUtil.DATE_FORMAT_YYYY_MM_DD), holidayStrList);
+			v.setVisitIntervalDay(days);
+		});
+		return list;
+	}
 }
+

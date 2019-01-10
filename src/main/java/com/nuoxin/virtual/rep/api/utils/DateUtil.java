@@ -142,6 +142,152 @@ public final class DateUtil {
     }
 
 
+    /**
+     * 获取两个日期之间的日期集合
+     * @param start
+     * @param end
+     * @return
+     */
+    public static  List<Date> getBetweenDates(Date start, Date end) {
+        List<Date> result = new ArrayList<>();
+        Calendar tempStart = Calendar.getInstance();
+        tempStart.setTime(start);
+        tempStart.add(Calendar.DAY_OF_YEAR, 1);
+
+        Calendar tempEnd = Calendar.getInstance();
+        tempEnd.setTime(end);
+        while (tempStart.before(tempEnd)) {
+            result.add(tempStart.getTime());
+            tempStart.add(Calendar.DAY_OF_YEAR, 1);
+        }
+        return result;
+    }
+
+
+    /**
+     * 获取两个日期之间的日期集合， yyyy-MM-dd格式
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    public static List<String> getDays(String startTime, String endTime) {
+
+        // 返回的日期集合
+        List<String> days = new ArrayList<>();
+
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            Date start = dateFormat.parse(startTime);
+            Date end = dateFormat.parse(endTime);
+
+            Calendar tempStart = Calendar.getInstance();
+            tempStart.setTime(start);
+
+            Calendar tempEnd = Calendar.getInstance();
+            tempEnd.setTime(end);
+            tempEnd.add(Calendar.DATE, +1);// 日期加1(包含结束)
+            while (tempStart.before(tempEnd)) {
+                days.add(dateFormat.format(tempStart.getTime()));
+                tempStart.add(Calendar.DAY_OF_YEAR, 1);
+            }
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return days;
+    }
+
+
+    /**
+     * 获取两个日期之间天数，去掉周六日和法定节假日
+     * @param startTime
+     * @param endTime
+     * @param holidayStr
+     * @return
+     */
+    public static int getDaysRemoveWeekend(String startTime, String endTime, List<String> holidayStr) {
+
+        // 返回的日期集合
+        int days = 0;
+
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            Date start = dateFormat.parse(startTime);
+            Date end = dateFormat.parse(endTime);
+
+            Calendar tempStart = Calendar.getInstance();
+            tempStart.setTime(start);
+
+            Calendar tempEnd = Calendar.getInstance();
+            tempEnd.setTime(end);
+//            tempEnd.add(Calendar.DATE, +1);// 日期加1(包含结束)
+            List<Calendar> holidayList = getHolidayList(holidayStr);
+            while (tempStart.before(tempEnd)) {
+                // 判断是否是周六日
+                if (tempStart.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY && tempStart.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY){
+
+                    // 判断是否是法定节假日
+                    if (CollectionsUtil.isEmptyList(holidayList)){
+                        days ++;
+                    }else {
+                        for (Calendar ca : holidayList) {
+                            if(ca.get(Calendar.MONTH) != tempStart.get(Calendar.MONTH) ||
+                                    ca.get(Calendar.DAY_OF_MONTH) != tempStart.get(Calendar.DAY_OF_MONTH) ||
+                                    ca.get(Calendar.YEAR) != tempStart.get(Calendar.YEAR)){
+                                days ++;
+                            }
+                        }
+                    }
+
+                }
+
+                tempStart.add(Calendar.DAY_OF_YEAR, 1);
+            }
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return days;
+    }
+
+
+    public static void main(String[] args) {
+        List<String> holiday = new ArrayList<>();
+        holiday.add("2019-01-18");
+        int daysRemoveWeekend = DateUtil.getDaysRemoveWeekend("2019-01-21", "2019-01-26", holiday);
+        System.out.println(daysRemoveWeekend);
+    }
+
+
+    /**
+     * 得到节假日
+     * @param holidayStr
+     * @return
+     */
+    private static List<Calendar> getHolidayList(List<String> holidayStr){
+        if (CollectionsUtil.isEmptyList(holidayStr)){
+            return new ArrayList<>();
+        }
+
+
+        List<Calendar> holidayList = new ArrayList<>();
+
+        for (String string : holidayStr) {
+            String[] da = string.split("-");
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.YEAR, Integer.valueOf(da[0]));
+            calendar.set(Calendar.MONTH, Integer.valueOf(da[1]) - 1);// 月份比正常小1,0代表一月
+            calendar.set(Calendar.DAY_OF_MONTH, Integer.valueOf(da[2]));
+            holidayList.add(calendar);
+        }
+
+
+        return holidayList;
+
+    }
+
 
     /**
      *  java 获取 获取某年某月 所有日期（yyyy-mm-dd格式字符串）
@@ -574,11 +720,5 @@ public final class DateUtil {
 
 
 
-    public static void main(String[] args) {
-        int d = DateUtil.getCurrentMonthLastDay();
-        System.out.println(d);
-        
-        int result = calLastedTime("2018-10-01 23:10:15", "2018-10-01 23:10:35");
-        System.out.println(result);
-    }
+
 }

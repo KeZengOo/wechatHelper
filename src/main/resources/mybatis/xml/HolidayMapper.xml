@@ -38,4 +38,9 @@
         WHERE batch_no=#{batchNo}
     </delete>
 
+
+    <select id="getHolidayStrList" resultType="java.lang.String">
+        SELECT DISTINCT  DATE_FORMAT(holiday_date, '%Y-%m-%d')  FROM virtual_holiday
+    </select>
+
 </mapper>

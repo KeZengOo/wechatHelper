@@ -140,4 +140,10 @@ public interface DoctorCallInfoMapper {
      */
     void updateNotAliyunCallUrl(@Param(value = "sinToken") String sinToken,@Param(value = "callUrl") String callUrl);
 
+
+
+
+
+
+
 }
