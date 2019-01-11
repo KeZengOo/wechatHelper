@@ -10,6 +10,6 @@
     <!-- 新增 -->
     <insert id="add" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.UpdateVirtualDoctorRequest">
         INSERT INTO virtual_call_doctor_fix_field(call_id, doctor_id, doctor_name,gender, telephones,is_add_wechat,wechat,email,address,depart,title,hospital, province,city,hospital_level)
-        VALUES(#{callId}, #{doctorId}, #{doctorName},#{gender},#{telephoneStr}, #{isAddWechat},#{wechat}, #{email}, #{address}, #{depart}, #{title,}, #{hospital}, #{province}, #{city},#{hciLevel})
+        VALUES(#{callId}, #{id}, #{name},#{gender},#{telephoneStr}, #{isAddWechat},#{wechat}, #{email}, #{address}, #{depart}, #{title,}, #{hospital}, #{province}, #{city},#{hciLevel})
     </insert>
 </mapper>
