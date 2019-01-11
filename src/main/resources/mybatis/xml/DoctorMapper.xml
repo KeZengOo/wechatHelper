@@ -162,7 +162,7 @@
 			HAVING
 			nextTime &gt;= maxTime
 			AND
-			nextTime &gt;= DATE_FORMAT(NOW(), '%Y-%m-%d')
+			nextTime &lt;= DATE_FORMAT(NOW(), '%Y-%m-%d')
 			) st1 ON temp.doctor_id=st1.virtual_doctor_id
 		</if>
 
@@ -409,7 +409,7 @@
 			HAVING
 			nextTime &gt;= maxTime
 			AND
-			nextTime &gt;= DATE_FORMAT(NOW(), '%Y-%m-%d')
+			nextTime &lt;= DATE_FORMAT(NOW(), '%Y-%m-%d')
 			) st1 ON temp.doctor_id=st1.virtual_doctor_id
 		</if>
 
