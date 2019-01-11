@@ -483,6 +483,8 @@
         <!-- 不要按时间倒叙啦，不然对话是反的
         ORDER BY vm.message_time DESC
         -->
+
+        ORDER BY vm.message_time
         LIMIT #{currentSize},#{pageSize}
 
 

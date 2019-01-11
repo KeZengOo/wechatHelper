@@ -404,14 +404,12 @@
 				#{virtualDrugUserId}
 			</foreach>
 
-			AND DATE_FORMAT(
-			m.next_visit_time,
-			'%Y-%m-%d'
-			) &lt;= DATE_FORMAT(NOW(), '%Y-%m-%d')
 			GROUP BY
 			v.virtual_doctor_id
 			HAVING
 			nextTime &gt;= maxTime
+			AND
+			nextTime &gt;= DATE_FORMAT(NOW(), '%Y-%m-%d')
 			) st1 ON temp.doctor_id=st1.virtual_doctor_id
 		</if>
 
