@@ -4,6 +4,7 @@ import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
 import com.nuoxin.virtual.rep.api.service.MeetingService;
+import com.nuoxin.virtual.rep.api.web.controller.request.meeting.MeetingNoRemindRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.meeting.MeetingRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.meeting.MeetingResponseBean;
 import io.swagger.annotations.Api;
@@ -60,10 +61,19 @@ public class MeetingController extends BaseController{
         return ResponseEntity.ok(responseBean);
     }
 
-    @ApiOperation(value = "会议修改接口", notes = "会议修改接口")
-    @PostMapping("/update")
+
+
+
+    @ApiOperation(value = "不需要会议提醒的医生", notes = "不需要会议提醒的医生")
+    @PostMapping("/no/remind/doctor")
     @ResponseBody
-    public void update(MeetingRequestBean bean){
+    public ResponseEntity<DefaultResponseBean<Boolean>> addMeetingNoRemind(@RequestBody MeetingNoRemindRequestBean bean){
+
+        meetingService.addMeetingNoRemind(bean);
+
+        DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(true);
+        return ResponseEntity.ok(responseBean);
     }
 
 }

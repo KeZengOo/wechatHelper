@@ -143,8 +143,12 @@ public class MeetingDetailService extends BaseService{
 
                 //Doctor doctor = doctorRepository.findTopByMobile(telephone);
                 Doctor doctor = newDoctorService.findFirstByMobile(telephone);
-                if (doctor == null){
-                    throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "手机号:" + telephone + "医生不存在");
+                String doctorName = "";
+                Long doctorId = 0L;
+                if (doctor != null){
+//                    throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "手机号:" + telephone + "医生不存在");
+                    doctorName = doctor.getName();
+                    doctorId = doctor.getId();
                 }
 
 
@@ -155,8 +159,8 @@ public class MeetingDetailService extends BaseService{
                 int m = (int)((meetingEnd - meetingStart)/(1000*60));
                 meetingDetail.setAttendSumTime(m);
 
-                    meetingDetail.setDoctorId(doctor.getId());
-                    meetingDetail.setDoctorName(doctor.getName());
+                meetingDetail.setDoctorId(doctorId);
+                meetingDetail.setDoctorName(doctorName);
 
                 meetingDetail.setAttendType(attendType);
                 meetingDetail.setAttendWay(attendWay);

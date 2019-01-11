@@ -7,6 +7,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.nuoxin.virtual.rep.api.entity.v2_5.MeetingNoRemindParams;
+import com.nuoxin.virtual.rep.api.enums.MeetingTimeTypeEnum;
+import com.nuoxin.virtual.rep.api.mybatis.ProductVisitFrequencyMapper;
+import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
+import com.nuoxin.virtual.rep.api.web.controller.request.meeting.MeetingNoRemindRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductVisitFrequencyResponseBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -34,6 +40,8 @@ import com.nuoxin.virtual.rep.api.web.controller.request.meeting.MeetingRequestB
 import com.nuoxin.virtual.rep.api.web.controller.request.vo.MeetingVo;
 import com.nuoxin.virtual.rep.api.web.controller.response.meeting.MeetingResponseBean;
 
+import javax.annotation.Resource;
+
 /**
  * 会议相关
  * Create by tiancun on 2017/10/11
@@ -51,6 +59,9 @@ public class MeetingService extends BaseService {
     private ProductLineRepository productLineRepository;
     @Autowired
     private MeetingMapper meetingMapper;
+
+    @Resource
+    private ProductVisitFrequencyMapper productVisitFrequencyMapper;
 
     /**
      * 导入会议记录
@@ -169,5 +180,73 @@ public class MeetingService extends BaseService {
         flag = true;
         return flag;
     }
+
+
+
+
+    public void addMeetingNoRemind(MeetingNoRemindRequestBean bean){
+        List<MeetingNoRemindParams> list = this.getMeetingNoRemindParams(bean);
+        if (CollectionsUtil.isNotEmptyList(list)){
+            meetingMapper.addMeetingNoRemind(list);
+        }
+
+    }
+
+    /**
+     * 处理参数，用于新增
+     * @param bean
+     * @return
+     */
+    private List<MeetingNoRemindParams> getMeetingNoRemindParams(MeetingNoRemindRequestBean bean) {
+
+        Long productId = bean.getProductId();
+        List<Long> doctorIdList = bean.getDoctorIdList();
+        if (CollectionsUtil.isEmptyList(doctorIdList)){
+            return null;
+        }
+
+        ProductVisitFrequencyResponseBean productVisitFrequency = productVisitFrequencyMapper.getProductVisitFrequency(productId);
+        if (productVisitFrequency == null){
+            return null;
+        }
+
+
+        Integer afterMeetingFrequencyType = productVisitFrequency.getAfterMeetingFrequencyType();
+        if (afterMeetingFrequencyType == null){
+            afterMeetingFrequencyType = 0;
+        }
+        Integer afterMeetingFrequency = productVisitFrequency.getAfterMeetingFrequency();
+        if (afterMeetingFrequency == null){
+            afterMeetingFrequency = 0;
+        }
+
+        Integer overMinute = 0;
+        if (MeetingTimeTypeEnum.DAY.getType() == afterMeetingFrequencyType){
+            overMinute = afterMeetingFrequency * 24 * 60;
+        }
+
+        if (MeetingTimeTypeEnum.HOUR.getType() == afterMeetingFrequencyType){
+            overMinute = afterMeetingFrequency * 60;
+        }
+
+
+        List<Long> meetingIdList = meetingMapper.getOverMinuteMeetingList(productId, overMinute);
+        if (CollectionsUtil.isEmptyList(meetingIdList)){
+            return null;
+        }
+
+        List<MeetingNoRemindParams> list = new ArrayList();
+        for (Long doctorId : doctorIdList) {
+            for (Long meetingId : meetingIdList) {
+                MeetingNoRemindParams meetingNoRemindParams = new MeetingNoRemindParams();
+                meetingNoRemindParams.setDoctorId(doctorId);
+                meetingNoRemindParams.setMeetingId(meetingId);
+                list.add(meetingNoRemindParams);
+            }
+        }
+
+        return list;
+    }
+
 
 }
