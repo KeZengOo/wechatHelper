@@ -13,7 +13,7 @@
 		SELECT 
 			id, name, province, city, level 
 		FROM hospital 
-		WHERE name LIKE "%"#{name}"%" LIMIT 10
+		WHERE name LIKE "%"#{name}"%" LIMIT 20
 	</select>
 	
 	<insert id="saveHospital" keyProperty="id" useGeneratedKeys="true">
