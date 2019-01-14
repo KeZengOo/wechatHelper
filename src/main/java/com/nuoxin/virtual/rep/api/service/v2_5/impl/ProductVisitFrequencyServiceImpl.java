@@ -58,6 +58,8 @@ public class ProductVisitFrequencyServiceImpl implements ProductVisitFrequencySe
             throw new BusinessException(ErrorEnum.ERROR, "不合法的拜访类型");
         }
 
+        productVisitFrequency.setProductId(productId);
+
         productVisitFrequencyMapper.addProductVisitFrequency(productVisitFrequency);
     }
 
