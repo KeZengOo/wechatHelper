@@ -33,7 +33,7 @@
         </activity>
 
         <activity
-            android:name=".ExportActivity"
+            android:name=".MainActivity$ExportActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         </activity>
     </application>

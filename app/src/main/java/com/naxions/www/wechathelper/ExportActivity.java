@@ -44,7 +44,7 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
     private List<DataBean> mDatas;
     private MyAdapter mAdapter;
     private static CSVPrinter contactCsvPrinter;
-    private static final ObjectBus TASK = com.threekilogram.objectbus.bus.ObjectBus.newList();
+    private static final ObjectBus TASK = ObjectBus.newList();
     /**
      微信数据库路径
      */
