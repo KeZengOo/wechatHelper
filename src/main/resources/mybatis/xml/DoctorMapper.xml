@@ -563,14 +563,15 @@
 
 		<!-- 排序规则 -->
 		<if test="order ==null or order ==0">
-			<if test="searchType ==null or searchType == 0">
+			<if test="searchType ==null or searchType == 0 or searchType == 1">
 				ORDER BY sign(orderNextVisitTime) DESC,abs(orderNextVisitTime)
 			</if>
 
+			<!--
 			<if test="searchType != null and searchType ==1">
 				ORDER BY st1.overtime DESC
 			</if>
-
+           -->
 
 			<if test="searchType==2 or searchType==3 or searchType==4">
 				ORDER BY st2.visitIntervalDay DESC
