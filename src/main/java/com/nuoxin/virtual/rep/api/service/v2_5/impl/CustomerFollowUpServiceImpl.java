@@ -5,6 +5,8 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
+import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.entity.Doctor;
 import com.nuoxin.virtual.rep.api.enums.SearchTypeEnum;
 import com.nuoxin.virtual.rep.api.mybatis.*;
@@ -112,10 +114,11 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	private void fileSearchType(SearchRequestBean pageRequest) {
 		Integer searchType = pageRequest.getSearchType();
 		ProductVisitFrequencyResponseBean productVisitFrequency = productVisitFrequencyMapper.getProductVisitFrequency(pageRequest.getProductLineIds().get(0));
-		if (productVisitFrequency != null){
-			pageRequest.setMeetingTimeType(productVisitFrequency.getAfterMeetingFrequencyType());
+		if (productVisitFrequency == null){
+			throw new BusinessException(ErrorEnum.ERROR, "该产品还未设置拜访频次");
 		}
 
+		pageRequest.setMeetingTimeType(productVisitFrequency.getBeforeMeetingFrequencyType());
 		if (searchType != null && searchType != 0){
 			List<VisitDoctorResponseBean> classificationVisitDoctorList = null;
 			if (searchType == SearchTypeEnum.SEARCH_TWO.getUserType()){
@@ -137,10 +140,9 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 
 			if (searchType == SearchTypeEnum.SEARCH_SIX.getUserType()){
 				// 1是工作日，2是小时
-				Integer meetingTimeType = pageRequest.getMeetingTimeType();
-				if (meetingTimeType !=null && meetingTimeType == 1){
-					classificationVisitDoctorList = doctorMapper.getAfterMeetingDoctorList(pageRequest);
-				}
+				pageRequest.setMeetingTimeType(productVisitFrequency.getAfterMeetingFrequencyType());
+				classificationVisitDoctorList = doctorMapper.getAfterMeetingDoctorList(pageRequest);
+
 			}
 
 

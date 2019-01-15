@@ -193,7 +193,7 @@
 			tmad.doctor_id doctorId,
 			round(
 			(
-			UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(m.start_time)
+			UNIX_TIMESTAMP(m.start_time) - UNIX_TIMESTAMP(NOW())
 			) / 60
 			) AS overMinute
 			FROM
@@ -211,10 +211,15 @@
 			LEFT JOIN virtual_meeting_no_remind r ON m.id = r.meeting_id
 			WHERE
 			r.id IS NULL
-			HAVING
-			overMinute >= (
+			HAVING overMinute>=0 AND
+			overMinute &lt;= (
 			SELECT
 			min(
+			<!-- 不合法的值 -->
+			<if test="meetingTimeType == null or meetingTimeType == 0">
+				-1
+			</if>
+
 			<!-- 工作日 -->
 			<if test="meetingTimeType!=null and (meetingTimeType==1 or meetingTimeType == 0)">
 			before_meeting_frequency * 24 * 60
@@ -252,7 +257,7 @@
 			tmad.doctor_id doctorId
 			FROM
 			t_meeting_data tmd
-			INNER JOIN t_meeting_attend_details tmad ON tmd.id = tmad.doctor_id
+			INNER JOIN t_meeting_attend_details tmad ON tmd.id = tmad.meeting_id
 			INNER JOIN drug_user_doctor dud ON tmad.doctor_id = dud.doctor_id
 			AND is_available = 1
 			WHERE
@@ -269,7 +274,7 @@
 			GROUP BY
 			tmad.doctor_id
 			HAVING
-			overMinute >= (
+			overMinute &lt;= (
 			SELECT
 			min(
 			after_meeting_frequency * 60
@@ -458,10 +463,16 @@
 			LEFT JOIN virtual_meeting_no_remind r ON m.id = r.meeting_id
 			WHERE
 			r.id IS NULL
-			HAVING
-			overMinute >= (
+			HAVING overMinute &gt;=0 AND
+			overMinute &lt;= (
 			SELECT
 			min(
+
+			<!-- 不合法的值 -->
+			<if test="meetingTimeType == null or meetingTimeType == 0">
+				-1
+			</if>
+
 			<!-- 工作日 -->
 			<if test="meetingTimeType!=null and meetingTimeType==1">
 				before_meeting_frequency * 24 * 60
@@ -499,7 +510,7 @@
 				tmad.doctor_id doctorId
 				FROM
 				t_meeting_data tmd
-				INNER JOIN t_meeting_attend_details tmad ON tmd.id = tmad.doctor_id
+				INNER JOIN t_meeting_attend_details tmad ON tmd.id = tmad.meeting_id
 				INNER JOIN drug_user_doctor dud ON tmad.doctor_id = dud.doctor_id
 				AND is_available = 1
 				WHERE
@@ -515,7 +526,7 @@
 				GROUP BY
 				tmad.doctor_id
 				HAVING
-				overMinute >= (
+				overMinute &lt;= (
 				SELECT
 				min(
 				after_meeting_frequency * 60
