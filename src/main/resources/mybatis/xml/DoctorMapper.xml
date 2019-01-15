@@ -315,9 +315,13 @@
   		<!-- 搜索:d.name 模糊匹配,d.telephone 及 d.depart 精确匹配 -->
   		<if test="search != null">
   			WHERE 
-			d.name LIKE "%"#{search,jdbcType=VARCHAR}"%" 
+			d.name LIKE "%"#{search,jdbcType=VARCHAR}"%"
+			OR d.hospital_name LIKE "%"#{search,jdbcType=VARCHAR}"%"
 			OR d.telephone LIKE "%"#{search,jdbcType=VARCHAR}"%" 
 			OR d.depart LIKE "%"#{search,jdbcType=VARCHAR}"%"
+			OR d.id IN (
+			SELECT doctor_id FROM doctor_telephone WHERE telephone LIKE "%"#{search,jdbcType=VARCHAR}"%"
+			)
   		</if>
   		
 	</select>
@@ -358,14 +362,7 @@
 		   GROUP BY doctor_id
 	  	) temp  ON  d.id=temp.doctor_id
 	  	
-	  	<!-- 搜索 -->
-	  	<if test="search != null">
-  			AND (
-  				d.name LIKE "%"#{search,jdbcType=VARCHAR}"%" 
-				OR d.telephone LIKE "%"#{search,jdbcType=VARCHAR} "%"
-				OR d.depart LIKE "%"#{search,jdbcType=VARCHAR}"%"
-			)
-  		</if>
+
 		
 		<!-- 左连接 virtual_doctor_call_info_mend 表获取电话拜访信息 -->
 		LEFT JOIN (
@@ -567,7 +564,17 @@
 
 		</if>
 
-
+		<!-- 搜索 -->
+		<if test="search != null">
+			WHERE
+			d.name LIKE "%"#{search,jdbcType=VARCHAR}"%"
+			OR d.hospital_name LIKE "%"#{search,jdbcType=VARCHAR}"%"
+			OR d.telephone LIKE "%"#{search,jdbcType=VARCHAR}"%"
+			OR d.depart LIKE "%"#{search,jdbcType=VARCHAR}"%"
+			OR d.id IN (
+			SELECT doctor_id FROM doctor_telephone WHERE telephone LIKE "%"#{search,jdbcType=VARCHAR}"%"
+			)
+		</if>
 
 
 		GROUP BY d.id
