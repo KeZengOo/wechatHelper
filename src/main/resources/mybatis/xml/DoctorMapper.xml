@@ -751,13 +751,16 @@
 		LEFT JOIN virtual_doctor_call_info v ON dud.doctorId = v.virtual_doctor_id
 		WHERE
 			v.id IS NULL
+		<!-- 没有拜访的都是满足的
 		HAVING days >= (
 		SELECT min(ret_visit_frequency) FROM virtual_product_visit_frequency
 		WHERE product_id IN
 		<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
 			#{productLineId}
 		</foreach>
+
 		)
+		-->
 	</select>
 
 
