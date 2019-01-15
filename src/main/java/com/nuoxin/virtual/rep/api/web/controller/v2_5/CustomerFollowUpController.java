@@ -95,14 +95,14 @@ public class CustomerFollowUpController extends NewBaseController {
 
 		List<Long> productLineIds = null;
 		List<ProductResponseBean> products = drugUserProductService.getProductsByDrugUserId(user.getLeaderPath());
-		if (CollectionsUtil.isNotEmptyList(products)) {
-			List<Long> productLineIdsTemp = new ArrayList<>();
-			products.forEach(product ->{
-				productLineIdsTemp.add(product.getProductId());
-			});
-			productLineIds = productLineIdsTemp;
-			searchRequest.setProductLineIds(productLineIds);
-		}
+//		if (CollectionsUtil.isNotEmptyList(products)) {
+//			List<Long> productLineIdsTemp = new ArrayList<>();
+//			products.forEach(product ->{
+//				productLineIdsTemp.add(product.getProductId());
+//			});
+//			productLineIds = productLineIdsTemp;
+//			searchRequest.setProductLineIds(productLineIds);
+//		}
 
 		searchRequest.setDrugUserId(user.getId());
 		CustomerFollowUpPageResponseBean<List<CustomerFollowListBean>> pageResponse = customerFollowService.search(searchRequest,
