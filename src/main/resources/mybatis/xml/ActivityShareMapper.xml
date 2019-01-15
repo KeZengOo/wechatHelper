@@ -150,7 +150,7 @@
 
 
 		SELECT
-		DISTINCT a.share_person_id
+		DISTINCT a.share_person_id doctorId
 		FROM
 		activity_share a
 		INNER JOIN (
@@ -197,6 +197,32 @@
 
 		<if test="endTime!=null and endTime!=''">
 			AND DATE_FORMAT(a.create_time, '%Y-%m-%d') &lt;= #{endTime}
+		</if>
+
+		UNION
+		SELECT DISTINCT doctor_id FROM virtual_activity_wechat_share w
+		WHERE w.drug_user_id IN
+		<foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		AND w.content_id IN
+		(
+		SELECT DISTINCT
+		tcp.content_id
+		FROM
+		t_content_product tcp
+		INNER JOIN product_line pl ON tcp.product_id = pl.prod_id
+		INNER JOIN activity_info ai ON tcp.content_id = ai.id
+		WHERE
+		tcp.product_id = #{productId}
+		)
+
+		<if test="startTime!=null and startTime!=''">
+			AND DATE_FORMAT(w.create_time, '%Y-%m-%d') &gt;= #{startTime}
+		</if>
+
+		<if test="endTime!=null and endTime!=''">
+			AND DATE_FORMAT(w.create_time, '%Y-%m-%d') &lt;= #{endTime}
 		</if>
 
 
@@ -372,7 +398,7 @@
 
 		-->
 
-		SELECT drugUserId, COUNT(DISTINCT doctorId) FROM (
+		SELECT drugUserId, COUNT(DISTINCT doctorId) as total FROM (
 		SELECT
 		DISTINCT
 		content_dud.drugUserId,
@@ -435,7 +461,16 @@
 		<foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
 			#{drugUserId}
 		</foreach>
+
+		<if test="startTime!=null and startTime!=''">
+			and date_format(v.create_time,'%Y-%m-%d')&gt;=#{startTime}
+		</if>
+		<if test="endTime!=null and endTime!=''">
+			and date_format(v.create_time,'%Y-%m-%d')&lt;=#{endTime}
+		</if>
+
 		) tt
+
 
 
 		GROUP BY drugUserId

@@ -574,7 +574,7 @@
            -->
 
 			<if test="searchType != null and searchType ==1">
-				ORDER BY tel_visit.next_visit_time DESC
+				ORDER BY tel_visit.next_visit_time
 			</if>
 
 			<if test="searchType==2 or searchType==3 or searchType==4">

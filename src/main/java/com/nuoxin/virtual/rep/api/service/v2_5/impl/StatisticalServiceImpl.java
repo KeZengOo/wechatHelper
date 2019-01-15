@@ -314,7 +314,7 @@ public class StatisticalServiceImpl implements StatisticalService {
 
         // 防止变量被修改，再还原
         statisticsParams.setDrugUserIds(drugUserIds);
-
+//
 
         //内容服务人数(内容分享的医生人数)
 //        List<StatisticsDrugNumResponse> contentServiceTotal = activityShareMapper.getContentServiceCount(statisticsParams);
