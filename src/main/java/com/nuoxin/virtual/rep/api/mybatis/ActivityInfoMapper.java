@@ -1,6 +1,7 @@
 package com.nuoxin.virtual.rep.api.mybatis;
 
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.content.ContentResponseBean;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -14,6 +15,6 @@ public interface ActivityInfoMapper {
      * 得到所有的产品文章
      * @return
      */
-    List<ContentResponseBean> getProductContentList();
+    List<ContentResponseBean> getProductContentList(@Param(value = "productId") Long productId);
 
 }

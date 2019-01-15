@@ -11,6 +11,7 @@
         FROM
             activity_info ai
         INNER JOIN t_content_product tcp ON ai.id = tcp.content_id
+        WHERE tcp.product_id=#{productId}
     </select>
 
 </mapper>

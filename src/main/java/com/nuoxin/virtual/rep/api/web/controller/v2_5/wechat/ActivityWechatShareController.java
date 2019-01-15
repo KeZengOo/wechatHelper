@@ -47,11 +47,11 @@ public class ActivityWechatShareController extends NewBaseController {
 
 
     @ApiOperation(value = "内容列表", notes = "内容列表")
-    @PostMapping("/content/list")
+    @GetMapping("/content/list/{productId}")
     @ResponseBody
-    public DefaultResponseBean<List<ContentResponseBean>> getProductContentList(){
+    public DefaultResponseBean<List<ContentResponseBean>> getProductContentList(@PathVariable(value = "productId") Long productId){
 
-        List<ContentResponseBean> productContentList = activityWechatShareService.getProductContentList();
+        List<ContentResponseBean> productContentList = activityWechatShareService.getProductContentList(productId);
         DefaultResponseBean<List<ContentResponseBean>> responseBean = new DefaultResponseBean<>();
         responseBean.setData(productContentList);
         return responseBean;

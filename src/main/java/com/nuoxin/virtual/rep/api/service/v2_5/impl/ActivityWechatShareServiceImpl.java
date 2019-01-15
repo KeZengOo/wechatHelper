@@ -33,8 +33,8 @@ public class ActivityWechatShareServiceImpl implements ActivityWechatShareServic
     }
 
     @Override
-    public List<ContentResponseBean> getProductContentList() {
-        List<ContentResponseBean> productContentList = activityInfoMapper.getProductContentList();
+    public List<ContentResponseBean> getProductContentList(Long productId) {
+        List<ContentResponseBean> productContentList = activityInfoMapper.getProductContentList(productId);
 
         return productContentList;
     }

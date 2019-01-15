@@ -25,7 +25,7 @@ public interface ActivityWechatShareService {
      * 得到所有的产品文章
      * @return
      */
-    List<ContentResponseBean> getProductContentList();
+    List<ContentResponseBean> getProductContentList(Long productId);
 
 
 }
