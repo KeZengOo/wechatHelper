@@ -158,7 +158,7 @@ public class MeetingDetailService extends BaseService{
                 Long meetingStart = meetingStartTime.getTime();
                 int m = (int)((meetingEnd - meetingStart)/(1000*60));
                 meetingDetail.setAttendSumTime(m);
-
+                meetingDetail.setTelephone(telephone);
                 meetingDetail.setDoctorId(doctorId);
                 meetingDetail.setDoctorName(doctorName);
 

@@ -32,6 +32,8 @@ public class MeetingDetail extends IdEntity{
     @Column(name = "doctor_name", length = 30)
     private String doctorName;
 
+
+
     @Column(name = "attend_type")
     private Integer attendWay;
 
@@ -135,4 +137,7 @@ public class MeetingDetail extends IdEntity{
     public void setDownload(Integer download) {
         this.download = download;
     }
+
+
+
 }
