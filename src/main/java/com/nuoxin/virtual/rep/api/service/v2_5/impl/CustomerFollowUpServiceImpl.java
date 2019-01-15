@@ -152,6 +152,8 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 				visitDoctorResponseBean.setDoctorId(0L);
 				visitDoctorResponseBean.setVisitIntervalDay(0);
 				classificationVisitDoctorList.add(visitDoctorResponseBean);
+			}else {
+				classificationVisitDoctorList = this.getVisitDoctorList(classificationVisitDoctorList);
 			}
 
 			pageRequest.setVisitDoctorList(classificationVisitDoctorList);

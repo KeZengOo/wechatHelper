@@ -666,11 +666,11 @@
 				</foreach>
 				AND a.potential = (
 					SELECT
-						potential
+						hcp_potential
 					FROM
 						drug_user_doctor_quate
 					WHERE
-						virtual_doctor_id = v.virtual_doctor_id
+						doctor_id = v.virtual_doctor_id
 								AND product_id IN
 					<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
 						#{productLineId}
