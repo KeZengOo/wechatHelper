@@ -205,7 +205,7 @@
 			FROM
 			t_meeting_data tma
 			WHERE
-			DATE_FORMAT(tma.start_time, '%Y-%m-%d') > DATE_FORMAT(NOW(), '%Y-%m-%d')
+			DATE_FORMAT(tma.start_time, '%Y-%m-%d') >= DATE_FORMAT(NOW(), '%Y-%m-%d')
 			AND tma.product_id
 			) m ON tmad.meeting_id = m.id
 			LEFT JOIN virtual_meeting_no_remind r ON m.id = r.meeting_id
@@ -454,7 +454,7 @@
 			FROM
 			t_meeting_data tma
 			WHERE
-			DATE_FORMAT(tma.start_time, '%Y-%m-%d') > DATE_FORMAT(NOW(), '%Y-%m-%d')
+			DATE_FORMAT(tma.start_time, '%Y-%m-%d') >= DATE_FORMAT(NOW(), '%Y-%m-%d')
 			AND tma.product_id
 			) m ON tmad.meeting_id = m.id
 			LEFT JOIN virtual_meeting_no_remind r ON m.id = r.meeting_id
