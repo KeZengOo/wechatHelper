@@ -27,4 +27,14 @@ public class VisitDoctorResponseBean implements Serializable {
      * 日期间隔，用来判断是否已经过期
      */
     private Integer visitIntervalDay;
+
+    /**
+     * 查询的
+     */
+    private Integer days;
+
+    /**
+     * 设置的频次
+     */
+    private Integer frequency;
 }

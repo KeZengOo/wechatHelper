@@ -200,13 +200,34 @@ public final class DateUtil {
 
 
     /**
-     * 获取两个日期之间天数，去掉周六日和法定节假日
+     * 获取两个日期之间的日期天数
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    public static int getDayCount(String startTime, String endTime) {
+
+        List<String> days = getDays(startTime, endTime);
+        int size = days.size();
+        if (size >=1){
+            size = size - 1;
+        }
+        return size;
+    }
+
+
+    /**
+     * 得到周六日和法定节假日天数
      * @param startTime
      * @param endTime
      * @param holidayStr
      * @return
      */
-    public static int getDaysRemoveWeekend(String startTime, String endTime, List<String> holidayStr) {
+    public static int getDaysWeekend(String startTime, String endTime, List<String> holidayStr) {
+
+        if (holidayStr == null){
+            holidayStr = new ArrayList<>();
+        }
 
         // 返回的日期集合
         int days = 0;
@@ -225,23 +246,15 @@ public final class DateUtil {
             List<Calendar> holidayList = getHolidayList(holidayStr);
             while (tempStart.before(tempEnd)) {
                 // 判断是否是周六日
-                if (tempStart.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY && tempStart.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY){
+                if (tempStart.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY || tempStart.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY){
+                    days ++;
 
-                    // 判断是否是法定节假日
-                    if (CollectionsUtil.isEmptyList(holidayList)){
+                }else {// 法定节假日
+                    String dateStr = DATE_FORMAT_YMR.format(tempStart.getTime());
+                    if(holidayList.contains(dateStr)){
                         days ++;
-                    }else {
-                        for (Calendar ca : holidayList) {
-                            if(ca.get(Calendar.MONTH) != tempStart.get(Calendar.MONTH) ||
-                                    ca.get(Calendar.DAY_OF_MONTH) != tempStart.get(Calendar.DAY_OF_MONTH) ||
-                                    ca.get(Calendar.YEAR) != tempStart.get(Calendar.YEAR)){
-                                days ++;
-                            }
-                        }
                     }
-
                 }
-
                 tempStart.add(Calendar.DAY_OF_YEAR, 1);
             }
 
@@ -255,9 +268,14 @@ public final class DateUtil {
 
     public static void main(String[] args) {
         List<String> holiday = new ArrayList<>();
-        holiday.add("2019-01-18");
-        int daysRemoveWeekend = DateUtil.getDaysRemoveWeekend("2019-01-21", "2019-01-26", holiday);
+        holiday.add("2019-01-10");
+        holiday.add("2019-01-11");
+        holiday.add("2019-01-12");
+        holiday.add("2019-01-13");
+        int daysRemoveWeekend = DateUtil.getDaysWeekend("2018-11-28", DateUtil.gettDateStrFromSpecialDate(new Date(), DateUtil.DATE_FORMAT_YYYY_MM_DD), holiday);
+        int dayCount = DateUtil.getDayCount("2019-01-13", "2019-01-14");
         System.out.println(daysRemoveWeekend);
+        System.out.println(dayCount);
     }
 
 

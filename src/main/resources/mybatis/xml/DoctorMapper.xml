@@ -635,7 +635,40 @@
 				'%Y-%m-%d'
 			) AS maxVisitTime,
 			DATEDIFF(NOW(), max(v.create_time)) AS days,
-			virtual_doctor_id doctorId
+			virtual_doctor_id doctorId,
+
+		(
+		SELECT
+		MIN(a.visit_frequency)
+		FROM
+		virtual_doctor_classification_frequency a
+		INNER JOIN virtual_doctor_classification b ON a.classification_id = b.classification_id
+		WHERE
+		b.doctor_id = v.virtual_doctor_id
+		AND a.product_id IN
+		<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+			#{productLineId}
+		</foreach>
+		AND b.product_id IN
+		<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+			#{productLineId}
+		</foreach>
+		AND a.potential = (
+		SELECT
+		hcp_potential
+		FROM
+		drug_user_doctor_quate
+		WHERE
+		doctor_id = v.virtual_doctor_id
+		AND product_id IN
+		<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+			#{productLineId}
+		</foreach>
+		ORDER BY
+		id DESC
+		LIMIT 1
+		)
+		) as frequency
 		FROM
 			virtual_doctor_call_info v
 		WHERE

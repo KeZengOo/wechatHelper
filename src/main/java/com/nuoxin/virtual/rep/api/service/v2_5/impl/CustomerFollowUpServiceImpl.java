@@ -8,6 +8,7 @@ import javax.annotation.Resource;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.entity.Doctor;
+import com.nuoxin.virtual.rep.api.enums.MeetingTimeTypeEnum;
 import com.nuoxin.virtual.rep.api.enums.SearchTypeEnum;
 import com.nuoxin.virtual.rep.api.mybatis.*;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
@@ -113,7 +114,9 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	 */
 	private void fileSearchType(SearchRequestBean pageRequest) {
 		Integer searchType = pageRequest.getSearchType();
-		ProductVisitFrequencyResponseBean productVisitFrequency = productVisitFrequencyMapper.getProductVisitFrequency(pageRequest.getProductLineIds().get(0));
+		// 现在改成了只能一个产品
+		Long productId = pageRequest.getProductLineIds().get(0);
+		ProductVisitFrequencyResponseBean productVisitFrequency = productVisitFrequencyMapper.getProductVisitFrequency(productId);
 		if (productVisitFrequency == null){
 			throw new BusinessException(ErrorEnum.ERROR, "该产品还未设置拜访频次");
 		}
@@ -123,10 +126,12 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 			List<VisitDoctorResponseBean> classificationVisitDoctorList = null;
 			if (searchType == SearchTypeEnum.SEARCH_TWO.getUserType()){
 				classificationVisitDoctorList = doctorMapper.getClassificationVisitDoctorList(pageRequest);
+				classificationVisitDoctorList = this.getVisitDoctorList(classificationVisitDoctorList, productVisitFrequency.getVisitFrequency(), SearchTypeEnum.SEARCH_TWO.getUserType());
 			}
 
 			if (searchType == SearchTypeEnum.SEARCH_THREE.getUserType()){
 				classificationVisitDoctorList = doctorMapper.getVisitFrequencyDayDoctorList(pageRequest);
+				classificationVisitDoctorList = this.getVisitDoctorList(classificationVisitDoctorList, productVisitFrequency.getVisitFrequency(), SearchTypeEnum.SEARCH_THREE.getUserType());
 			}
 
 			if (searchType == SearchTypeEnum.SEARCH_FOUR.getUserType()){
@@ -140,8 +145,16 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 
 			if (searchType == SearchTypeEnum.SEARCH_SIX.getUserType()){
 				// 1是工作日，2是小时
+				Integer afterMeetingFrequencyType = productVisitFrequency.getAfterMeetingFrequencyType();
 				pageRequest.setMeetingTimeType(productVisitFrequency.getAfterMeetingFrequencyType());
-				classificationVisitDoctorList = doctorMapper.getAfterMeetingDoctorList(pageRequest);
+				if (MeetingTimeTypeEnum.DAY.getType()==afterMeetingFrequencyType){
+					classificationVisitDoctorList = doctorMapper.getAfterMeetingDoctorList(pageRequest);
+					classificationVisitDoctorList = this.getVisitDoctorList(classificationVisitDoctorList, productVisitFrequency.getAfterMeetingFrequency(), SearchTypeEnum.SEARCH_SIX.getUserType());
+				}
+				if (MeetingTimeTypeEnum.HOUR.getType()==afterMeetingFrequencyType){
+					classificationVisitDoctorList = doctorMapper.getAfterMeetingDoctorList(pageRequest);
+				}
+
 
 			}
 
@@ -152,8 +165,6 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 				visitDoctorResponseBean.setDoctorId(0L);
 				visitDoctorResponseBean.setVisitIntervalDay(0);
 				classificationVisitDoctorList.add(visitDoctorResponseBean);
-			}else {
-				classificationVisitDoctorList = this.getVisitDoctorList(classificationVisitDoctorList);
 			}
 
 			pageRequest.setVisitDoctorList(classificationVisitDoctorList);
@@ -571,26 +582,46 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 
 
 	/**
-	 * 得到医生距离上次拜访的时间间隔，去掉法定节假日和周六日
+	 * 得到法定节假日和周六日，在此基础上加上设置频次
 	 * @param list
+	 * @param limitDays
 	 * @return
 	 */
-	private List<VisitDoctorResponseBean> getVisitDoctorList(List<VisitDoctorResponseBean> list){
+	private List<VisitDoctorResponseBean> getVisitDoctorList(List<VisitDoctorResponseBean> list, Integer limitDays, Integer searchType){
 
 		if (CollectionsUtil.isEmptyList(list)){
 			return new ArrayList<>();
 		}
 
+		List<VisitDoctorResponseBean> handleList = new ArrayList<>();
 		// 得到法定节假日
 		List<String> holidayStrList = holidayMapper.getHolidayStrList();
 
-
 		list.forEach(v ->{
+			Long doctorId = v.getDoctorId();
+
 			String maxVisitTime = v.getMaxVisitTime();
-			int days = DateUtil.getDaysRemoveWeekend(maxVisitTime, DateUtil.gettDateStrFromSpecialDate(new Date(), DateUtil.DATE_FORMAT_YYYY_MM_DD), holidayStrList);
-			v.setVisitIntervalDay(days);
+			int days = DateUtil.getDaysWeekend(maxVisitTime, DateUtil.gettDateStrFromSpecialDate(new Date(), DateUtil.DATE_FORMAT_YYYY_MM_DD), holidayStrList);
+			int dayCount = DateUtil.getDayCount(maxVisitTime, DateUtil.gettDateStrFromSpecialDate(new Date(), DateUtil.DATE_FORMAT_YYYY_MM_DD));
+
+			if (searchType == SearchTypeEnum.SEARCH_TWO.getUserType()){
+				if ((dayCount - days) >= v.getFrequency()){
+					v.setVisitIntervalDay(dayCount);
+					handleList.add(v);
+				}
+			}else {
+				if ((dayCount - days) >= limitDays){
+					v.setVisitIntervalDay(dayCount);
+					handleList.add(v);
+				}
+			}
+
 		});
-		return list;
+
+
+
+
+		return handleList;
 	}
 }
 
