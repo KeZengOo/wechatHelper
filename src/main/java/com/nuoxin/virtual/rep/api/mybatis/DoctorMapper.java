@@ -137,6 +137,12 @@ public interface DoctorMapper{
      */
     List<VisitDoctorResponseBean> getRetVisitFrequencyDayDoctorList(SearchRequestBean bean);
 
+    /**
+     * 得到设定了会前拜访的医生列表,单位天
+     * @param bean
+     * @return
+     */
+    List<VisitDoctorResponseBean> getBeforeMeetingDoctorList(SearchRequestBean bean);
 
     /**
      * 得到设定了会后拜访的医生列表,单位天

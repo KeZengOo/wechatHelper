@@ -139,17 +139,24 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 			}
 
 
-//			if (searchType == SearchTypeEnum.SEARCH_FIVE.getUserType()){
-//
-//			}
+			if (searchType == SearchTypeEnum.SEARCH_FIVE.getUserType()){
+				// 1是工作日，2是小时
+				Integer beforeMeetingFrequencyType = productVisitFrequency.getBeforeMeetingFrequencyType();
+				if (beforeMeetingFrequencyType == MeetingTimeTypeEnum.DAY.getType()){
+					pageRequest.setMeetingTimeType(beforeMeetingFrequencyType);
+					classificationVisitDoctorList = doctorMapper.getBeforeMeetingDoctorList(pageRequest);
+					classificationVisitDoctorList = this.getVisitDoctorList(classificationVisitDoctorList, beforeMeetingFrequencyType, SearchTypeEnum.SEARCH_FIVE.getUserType());
+				}
+
+			}
 
 			if (searchType == SearchTypeEnum.SEARCH_SIX.getUserType()){
 				// 1是工作日，2是小时
 				Integer afterMeetingFrequencyType = productVisitFrequency.getAfterMeetingFrequencyType();
-				pageRequest.setMeetingTimeType(productVisitFrequency.getAfterMeetingFrequencyType());
+				pageRequest.setMeetingTimeType(afterMeetingFrequencyType);
 				if (MeetingTimeTypeEnum.DAY.getType()==afterMeetingFrequencyType){
 					classificationVisitDoctorList = doctorMapper.getAfterMeetingDoctorList(pageRequest);
-					classificationVisitDoctorList = this.getVisitDoctorList(classificationVisitDoctorList, productVisitFrequency.getAfterMeetingFrequency(), SearchTypeEnum.SEARCH_SIX.getUserType());
+					classificationVisitDoctorList = this.getVisitDoctorList(classificationVisitDoctorList, afterMeetingFrequencyType, SearchTypeEnum.SEARCH_SIX.getUserType());
 				}
 				if (MeetingTimeTypeEnum.HOUR.getType()==afterMeetingFrequencyType){
 					classificationVisitDoctorList = doctorMapper.getAfterMeetingDoctorList(pageRequest);
@@ -601,16 +608,30 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 			Long doctorId = v.getDoctorId();
 
 			String maxVisitTime = v.getMaxVisitTime();
-			int days = DateUtil.getDaysWeekend(maxVisitTime, DateUtil.gettDateStrFromSpecialDate(new Date(), DateUtil.DATE_FORMAT_YYYY_MM_DD), holidayStrList);
-			int dayCount = DateUtil.getDayCount(maxVisitTime, DateUtil.gettDateStrFromSpecialDate(new Date(), DateUtil.DATE_FORMAT_YYYY_MM_DD));
-
+			int days = 0;
+			int dayCount = 0;
+			if (searchType == SearchTypeEnum.SEARCH_FIVE.getUserType()){
+				days = DateUtil.getDaysWeekend(DateUtil.gettDateStrFromSpecialDate(new Date(), DateUtil.DATE_FORMAT_YYYY_MM_DD), maxVisitTime, holidayStrList);
+				dayCount = DateUtil.getDayCount(DateUtil.gettDateStrFromSpecialDate(new Date(), DateUtil.DATE_FORMAT_YYYY_MM_DD), maxVisitTime);
+			}else {
+				days = DateUtil.getDaysWeekend(maxVisitTime, DateUtil.gettDateStrFromSpecialDate(new Date(), DateUtil.DATE_FORMAT_YYYY_MM_DD), holidayStrList);
+				dayCount = DateUtil.getDayCount(maxVisitTime, DateUtil.gettDateStrFromSpecialDate(new Date(), DateUtil.DATE_FORMAT_YYYY_MM_DD));
+			}
+//			int days = DateUtil.getDaysWeekend(maxVisitTime, DateUtil.gettDateStrFromSpecialDate(new Date(), DateUtil.DATE_FORMAT_YYYY_MM_DD), holidayStrList);
+//			int dayCount = DateUtil.getDayCount(maxVisitTime, DateUtil.gettDateStrFromSpecialDate(new Date(), DateUtil.DATE_FORMAT_YYYY_MM_DD));
+			int diff = dayCount - days;
 			if (searchType == SearchTypeEnum.SEARCH_TWO.getUserType()){
-				if ((dayCount - days) >= v.getFrequency()){
+				if (diff >= v.getFrequency()){
+					v.setVisitIntervalDay(dayCount);
+					handleList.add(v);
+				}
+			}else if (searchType == SearchTypeEnum.SEARCH_FIVE.getUserType()){
+				if (diff >=0 && diff <= v.getFrequency()){
 					v.setVisitIntervalDay(dayCount);
 					handleList.add(v);
 				}
 			}else {
-				if ((dayCount - days) >= limitDays){
+				if (diff >= limitDays){
 					v.setVisitIntervalDay(dayCount);
 					handleList.add(v);
 				}

@@ -186,7 +186,7 @@
 		</if>
 
 
-		<if test="searchType==5">
+		<if test="searchType==5 and meetingTimeType==2">
 			INNER JOIN (
 
 			SELECT
@@ -215,20 +215,8 @@
 			overMinute &lt;= (
 			SELECT
 			min(
-			<!-- 不合法的值 -->
-			<if test="meetingTimeType == null or meetingTimeType == 0">
-				-1
-			</if>
-
-			<!-- 工作日 -->
-			<if test="meetingTimeType!=null and (meetingTimeType==1 or meetingTimeType == 0)">
-			before_meeting_frequency * 24 * 60
-			</if>
-
 			<!-- 小时 -->
-			<if test="meetingTimeType!=null and meetingTimeType==2">
-				before_meeting_frequency * 60
-			</if>
+			  before_meeting_frequency * 60
 			)
 			FROM
 			virtual_product_visit_frequency
@@ -435,7 +423,7 @@
 		</if>
 
 
-		<if test="searchType==5">
+		<if test="searchType==5 and meetingTimeType==2">
 			INNER JOIN (
 
 			SELECT
@@ -464,21 +452,8 @@
 			overMinute &lt;= (
 			SELECT
 			min(
-
-			<!-- 不合法的值 -->
-			<if test="meetingTimeType == null or meetingTimeType == 0">
-				-1
-			</if>
-
-			<!-- 工作日 -->
-			<if test="meetingTimeType!=null and meetingTimeType==1">
-				before_meeting_frequency * 24 * 60
-			</if>
-
 			<!-- 小时 -->
-			<if test="meetingTimeType!=null and meetingTimeType==2">
-				before_meeting_frequency * 60
-			</if>
+			  before_meeting_frequency * 60
 			)
 			FROM
 			virtual_product_visit_frequency
@@ -797,12 +772,83 @@
 	</select>
 
 
+	<!-- 得到设定了会前拜访的医生列表,单位天 -->
+	<select id="getBeforeMeetingDoctorList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.plan.VisitDoctorResponseBean">
+		SELECT
+		tmad.doctor_id doctorId,
+		round(
+		(
+		UNIX_TIMESTAMP(m.start_time) - UNIX_TIMESTAMP(NOW())
+		) / 60
+		) AS overMinute,
+		m.start_time maxVisitTime,
+		(
+		SELECT
+		min(
+		before_meeting_frequency
+		)
+		FROM
+		virtual_product_visit_frequency
+		WHERE
+		product_id
+		IN
+		<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+			#{productLineId}
+		</foreach>
+		) as frequency
+		FROM
+		t_meeting_attend_details tmad
+		INNER JOIN (
+		SELECT
+		id,
+		tma.start_time
+		FROM
+		t_meeting_data tma
+		WHERE
+		DATE_FORMAT(tma.start_time, '%Y-%m-%d') >= DATE_FORMAT(NOW(), '%Y-%m-%d')
+		AND tma.product_id
+		) m ON tmad.meeting_id = m.id
+		LEFT JOIN virtual_meeting_no_remind r ON m.id = r.meeting_id
+		WHERE
+		r.id IS NULL
+		HAVING overMinute &gt;=0 AND
+		overMinute &lt;=(
+		SELECT
+		min(
+			before_meeting_frequency * 24 * 60
+		)
+		FROM
+		virtual_product_visit_frequency
+		WHERE
+		product_id
+		IN
+		<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+			#{productLineId}
+		</foreach>
+		)
+
+	</select>
+
 	<!-- 得到设定了会后拜访的医生列表,单位天 -->
 	<select id="getAfterMeetingDoctorList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.plan.VisitDoctorResponseBean">
 		SELECT
 			DATEDIFF(NOW(), tmd.end_time) AS days,
 			MAX(tmd.end_time) maxVisitTime,
-			tmad.doctor_id doctorId
+			tmad.doctor_id doctorId,
+			(
+			SELECT
+			min(
+			after_meeting_frequency
+			)
+			FROM
+			virtual_product_visit_frequency
+			WHERE
+			product_id
+			IN
+			<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+				#{productLineId}
+			</foreach>
+			) as frequency
 		FROM
 			t_meeting_data tmd
 		INNER JOIN t_meeting_attend_details tmad ON tmd.id = tmad.doctor_id
