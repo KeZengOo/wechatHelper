@@ -620,6 +620,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 //			int days = DateUtil.getDaysWeekend(maxVisitTime, DateUtil.gettDateStrFromSpecialDate(new Date(), DateUtil.DATE_FORMAT_YYYY_MM_DD), holidayStrList);
 //			int dayCount = DateUtil.getDayCount(maxVisitTime, DateUtil.gettDateStrFromSpecialDate(new Date(), DateUtil.DATE_FORMAT_YYYY_MM_DD));
 			int diff = dayCount - days;
+
 			if (searchType == SearchTypeEnum.SEARCH_TWO.getUserType()){
 				if (diff >= v.getFrequency()){
 					v.setVisitIntervalDay(dayCount);

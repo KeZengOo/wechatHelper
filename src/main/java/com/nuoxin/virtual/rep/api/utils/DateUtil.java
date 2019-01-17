@@ -251,7 +251,7 @@ public final class DateUtil {
 
                 }else {// 法定节假日
                     String dateStr = DATE_FORMAT_YMR.format(tempStart.getTime());
-                    if(holidayList.contains(dateStr)){
+                    if(holidayStr.contains(dateStr)){
                         days ++;
                     }
                 }
