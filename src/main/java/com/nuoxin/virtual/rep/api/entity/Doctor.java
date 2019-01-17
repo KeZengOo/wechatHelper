@@ -1,9 +1,13 @@
 package com.nuoxin.virtual.rep.api.entity;
 
 import com.nuoxin.virtual.rep.api.common.entity.IdEntity;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by fenggang on 9/11/17.
@@ -32,16 +36,29 @@ public class Doctor extends IdEntity {
     private String department;
     @Column(name = "telephone")
     private String mobile;
+
+    /**
+     * 医生的多个联系方式
+     */
+    @Transient
+    private List<String> telephoneList = new ArrayList<>();
+
     @Column(name = "positions")
     private String doctorLevel;
     @Column(name = "create_time")
     private Date createTime;
     @Column(name = "status")
     private Integer status;
+    @Column(name = "master_data_id")
+    private Integer masterDataId;
+    @Column(name = "sex")
+    private Integer sex;
+
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH},fetch = FetchType.EAGER)
     @JoinColumn(name = "virtual_doctor_id")
 //    @Transient
+    @NotFound(action= NotFoundAction.IGNORE)
     private DoctorVirtual doctorVirtual;
 
     public Long getEappId() {
@@ -146,5 +163,30 @@ public class Doctor extends IdEntity {
 
     public void setDoctorVirtual(DoctorVirtual doctorVirtual) {
         this.doctorVirtual = doctorVirtual;
+    }
+
+    public Integer getMasterDataId() {
+        return masterDataId;
+    }
+
+    public void setMasterDataId(Integer masterDataId) {
+        this.masterDataId = masterDataId;
+    }
+
+    public Integer getSex() {
+        return sex;
+    }
+
+    public void setSex(Integer sex) {
+        this.sex = sex;
+    }
+
+
+    public List<String> getTelephoneList() {
+        return telephoneList;
+    }
+
+    public void setTelephoneList(List<String> telephoneList) {
+        this.telephoneList = telephoneList;
     }
 }

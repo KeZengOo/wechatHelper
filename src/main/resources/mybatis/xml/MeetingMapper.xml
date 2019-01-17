@@ -83,4 +83,32 @@
         </if>
 
     </select>
+
+
+    <insert id="addMeetingNoRemind">
+        INSERT INTO virtual_meeting_no_remind(meeting_id, doctor_id)
+        VALUES
+        <foreach collection ="list" item="m" separator =",">
+            (#{m.meetingId}, #{m.doctorId})
+        </foreach>
+    </insert>
+
+
+    <select id="getOverMinuteMeetingList" resultType="java.lang.Long">
+
+        SELECT t.meetingId FROM (
+        SELECT round(
+			(
+			UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(start_time)
+			) / 60
+			) AS overMinute, id meetingId FROM t_meeting_data tmd
+			WHERE item_id IN
+			(SELECT id FROM drug_product WHERE product_id=#{productId})
+			OR product_id=#{productId}
+			GROUP BY id
+			HAVING overMinute > 0 AND  overMinute &lt;=#{overMinute}
+
+			) t
+    </select>
+
 </mapper>

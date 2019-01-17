@@ -1,10 +1,15 @@
 package com.nuoxin.virtual.rep.api.utils;
 
+import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
+import com.nuoxin.virtual.rep.api.common.exception.FileFormatException;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 对时间做处理的工具类
@@ -24,12 +29,17 @@ public final class DateUtil {
     public static final String DATE_FORMAT_YYYY_MM_DD = "yyyy-MM-dd";
     public static final String DATE_FORMAT_YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
     public static final String DATE_FORMAT_YYYY_MM_DD_HH_MM_SS_SSS = "yyyy-MM-dd HH:mm:ss.SSS";
+    public static final String DATE_FORMAT_YYYY_MM_DD_HH_MM_SS__SSS = "yyyy-MM-dd HH:mm:ss:SSS";
 
     public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public static final DateFormat DATE_FORMAT_YMR = new SimpleDateFormat("yyyy-MM-dd");
 
     public static final DateFormat DATE_FORMAT_TIME = new SimpleDateFormat("yyyyMMddHHmmss");
+
+    public static final DateFormat DATE_FORMAT_MILLISECONDTIME = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
+
+    public static final DateFormat DATE_FORMAT_SECONDTIME = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public static final DateFormat DATE_FORMAT_YM = new SimpleDateFormat("yyyy-MM");
 
@@ -80,8 +90,20 @@ public final class DateUtil {
      * @return
      */
     public static String getDateMillisecondString(Date date) {
+        return DATE_FORMAT_MILLISECONDTIME.format(date);
+    }
+
+
+    /**
+     * 返回日期格式：yyyyMMddHHmmssSSS
+     *
+     * @param date
+     * @return
+     */
+    public static String getDateSecondString(Date date) {
         return DATE_FORMAT_TIME.format(date);
     }
+
 
     /**
      * 将Date转化为指定格式的字符串
@@ -117,6 +139,197 @@ public final class DateUtil {
         SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
 
         return formatter.format(preDate);
+    }
+
+
+    /**
+     * 获取两个日期之间的日期集合
+     * @param start
+     * @param end
+     * @return
+     */
+    public static  List<Date> getBetweenDates(Date start, Date end) {
+        List<Date> result = new ArrayList<>();
+        Calendar tempStart = Calendar.getInstance();
+        tempStart.setTime(start);
+        tempStart.add(Calendar.DAY_OF_YEAR, 1);
+
+        Calendar tempEnd = Calendar.getInstance();
+        tempEnd.setTime(end);
+        while (tempStart.before(tempEnd)) {
+            result.add(tempStart.getTime());
+            tempStart.add(Calendar.DAY_OF_YEAR, 1);
+        }
+        return result;
+    }
+
+
+    /**
+     * 获取两个日期之间的日期集合， yyyy-MM-dd格式
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    public static List<String> getDays(String startTime, String endTime) {
+
+        // 返回的日期集合
+        List<String> days = new ArrayList<>();
+
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            Date start = dateFormat.parse(startTime);
+            Date end = dateFormat.parse(endTime);
+
+            Calendar tempStart = Calendar.getInstance();
+            tempStart.setTime(start);
+
+            Calendar tempEnd = Calendar.getInstance();
+            tempEnd.setTime(end);
+            tempEnd.add(Calendar.DATE, +1);// 日期加1(包含结束)
+            while (tempStart.before(tempEnd)) {
+                days.add(dateFormat.format(tempStart.getTime()));
+                tempStart.add(Calendar.DAY_OF_YEAR, 1);
+            }
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return days;
+    }
+
+
+    /**
+     * 获取两个日期之间的日期天数
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    public static int getDayCount(String startTime, String endTime) {
+
+        List<String> days = getDays(startTime, endTime);
+        int size = days.size();
+        if (size >=1){
+            size = size - 1;
+        }
+        return size;
+    }
+
+
+    /**
+     * 得到周六日和法定节假日天数
+     * @param startTime
+     * @param endTime
+     * @param holidayStr
+     * @return
+     */
+    public static int getDaysWeekend(String startTime, String endTime, List<String> holidayStr) {
+
+        if (holidayStr == null){
+            holidayStr = new ArrayList<>();
+        }
+
+        // 返回的日期集合
+        int days = 0;
+
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            Date start = dateFormat.parse(startTime);
+            Date end = dateFormat.parse(endTime);
+
+            Calendar tempStart = Calendar.getInstance();
+            tempStart.setTime(start);
+
+            Calendar tempEnd = Calendar.getInstance();
+            tempEnd.setTime(end);
+//            tempEnd.add(Calendar.DATE, +1);// 日期加1(包含结束)
+            List<Calendar> holidayList = getHolidayList(holidayStr);
+            while (tempStart.before(tempEnd)) {
+                // 判断是否是周六日
+                if (tempStart.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY || tempStart.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY){
+                    days ++;
+
+                }else {// 法定节假日
+                    String dateStr = DATE_FORMAT_YMR.format(tempStart.getTime());
+                    if(holidayStr.contains(dateStr)){
+                        days ++;
+                    }
+                }
+                tempStart.add(Calendar.DAY_OF_YEAR, 1);
+            }
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return days;
+    }
+
+
+    public static void main(String[] args) {
+        List<String> holiday = new ArrayList<>();
+        holiday.add("2019-01-10");
+        holiday.add("2019-01-11");
+        holiday.add("2019-01-12");
+        holiday.add("2019-01-13");
+        int daysRemoveWeekend = DateUtil.getDaysWeekend("2018-11-28", DateUtil.gettDateStrFromSpecialDate(new Date(), DateUtil.DATE_FORMAT_YYYY_MM_DD), holiday);
+        int dayCount = DateUtil.getDayCount("2019-01-13", "2019-01-14");
+        System.out.println(daysRemoveWeekend);
+        System.out.println(dayCount);
+    }
+
+
+    /**
+     * 得到节假日
+     * @param holidayStr
+     * @return
+     */
+    private static List<Calendar> getHolidayList(List<String> holidayStr){
+        if (CollectionsUtil.isEmptyList(holidayStr)){
+            return new ArrayList<>();
+        }
+
+
+        List<Calendar> holidayList = new ArrayList<>();
+
+        for (String string : holidayStr) {
+            String[] da = string.split("-");
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.YEAR, Integer.valueOf(da[0]));
+            calendar.set(Calendar.MONTH, Integer.valueOf(da[1]) - 1);// 月份比正常小1,0代表一月
+            calendar.set(Calendar.DAY_OF_MONTH, Integer.valueOf(da[2]));
+            holidayList.add(calendar);
+        }
+
+
+        return holidayList;
+
+    }
+
+
+    /**
+     *  java 获取 获取某年某月 所有日期（yyyy-mm-dd格式字符串）
+     * @param year
+     * @param month
+     * @return
+     */
+    public static List<String> getMonthFullDay(int year , int month){
+        SimpleDateFormat dateFormatYYYYMMDD = new SimpleDateFormat("yyyy-MM-dd");
+        List<String> fullDayList = new ArrayList<>(32);
+        // 获得当前日期对象
+        Calendar cal = Calendar.getInstance();
+        cal.clear();// 清除信息
+        cal.set(Calendar.YEAR, year);
+        // 1月从0开始
+        cal.set(Calendar.MONTH, month-1 );
+        // 当月1号
+        cal.set(Calendar.DAY_OF_MONTH,1);
+        int count = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+        for (int j = 1; j <= count ; j++) {
+            fullDayList.add(dateFormatYYYYMMDD.format(cal.getTime()));
+            cal.add(Calendar.DAY_OF_MONTH,1);
+        }
+        return fullDayList;
     }
 
 
@@ -237,8 +450,8 @@ public final class DateUtil {
             return sdf.parse(dateString);
         } catch (Exception e) {
             e.printStackTrace();
+            throw new FileFormatException(ErrorEnum.ERROR, "传入的日期不合法");
         }
-        return null;
     }
 
     /**
@@ -490,8 +703,40 @@ public final class DateUtil {
         return cdate.getTime();
     }
 
-    public static void main(String[] args) {
-        int d = DateUtil.getCurrentMonthLastDay();
-        System.out.println(d);
+    /**
+     * 得到两个时间之间相差的秒数
+     * @param startDate
+     * @param endDate
+     * @return
+     */
+    public static int calLastedTime(Date startDate, Date endDate) {
+        long a = endDate.getTime();
+        long b = startDate.getTime();
+        int c = (int) ((a - b) / 1000);
+        return c;
     }
+
+
+    /**
+     * 得到两个时间之间相差的秒数
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    public static int calLastedTime(String startTime, String endTime) {
+        try {
+        	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date startDate = sdf.parse(startTime);
+            Date endDate = sdf.parse(endTime);
+            int time = calLastedTime(startDate, endDate);
+            return time;
+        }catch (Exception e){
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+
+
+
 }

@@ -82,5 +82,999 @@
         update doctor set hospital_name = #{hospital} where id=#{doctorId}
     </update>
 
+	<!-- 以下是虚拟工作台 v2.5 后用到的 -->
+	<select id="getDoctorIdByMobile" resultType="java.lang.Long">
+		SELECT id FROM doctor WHERE telephone=#{mobile}
+	</select>
+
+
+	<!-- 根据手机号查找医生 -->
+	<select id="findTopByMobile" resultType="com.nuoxin.virtual.rep.api.entity.Doctor">
+		  SELECT
+			DISTINCT
+			d.id,
+			d.email,
+			d.`name`,
+			d.hospital_id hospitalId,
+			d.hospital_name hospitalName,
+			d.provice province,
+			d.city,
+			d.depart department,
+			d.sex
+		FROM
+			doctor d
+		WHERE d.telephone=#{mobile}
+		OR d.id=(SELECT doctor_id FROM doctor_telephone WHERE telephone=#{mobile} LIMIT 1)
+
+	</select>
+
+	<!-- 根据过滤条件获取医生总条数 -->
+	<select id="getListCount" resultType="java.lang.Integer">
+		SELECT 
+			count(d.id)
+		FROM doctor d 
+		JOIN (
+			<!-- 根据 virtualDrugUserIds (所有下属的)获取对应去重后的 doctorIds -->
+	  		SELECT 
+				DISTINCT doctor_id 
+			FROM drug_user_doctor 
+			WHERE is_available=1 AND drug_user_id IN
+			<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+	   			#{virtualDrugUserId}
+	  		</foreach> 
+	  		
+	  		<!-- 根据产品线 ID 筛选 -->
+	  		<if test="productLineIds != null">
+	            AND prod_id IN 
+				<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+                  #{productLineId}
+  				</foreach> 
+			</if>
+  		) temp ON  d.id=temp.doctor_id
+
+		<!-- 下次拜访时间为今天的或者过期的，过期的置顶 -->
+		<if test="searchType !=null and searchType==1">
+			INNER JOIN (
+			SELECT
+			v.virtual_doctor_id,
+			DATE_FORMAT(
+			max(v.create_time),
+			'%Y-%m-%d'
+			) maxTime,
+			DATE_FORMAT(
+			max(m.next_visit_time),
+			'%Y-%m-%d'
+			) nextTime,
+			DATEDIFF(NOW(),max(m.next_visit_time)) as overtime
+
+			FROM
+			virtual_doctor_call_info v
+			LEFT JOIN virtual_doctor_call_info_mend m ON v.id = m.call_id
+			WHERE
+			v.virtual_drug_user_id IN
+
+			<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+				#{virtualDrugUserId}
+			</foreach>
+
+			GROUP BY
+			v.virtual_doctor_id
+			HAVING
+			nextTime &gt;= maxTime
+			AND
+			nextTime &lt;= DATE_FORMAT(NOW(), '%Y-%m-%d')
+			) st1 ON temp.doctor_id=st1.virtual_doctor_id
+		</if>
+
+		<!-- 其他搜索 -->
+		<if test="searchType==2 or searchType==3 or searchType==4">
+
+			INNER JOIN (
+
+			<foreach collection="VisitDoctorList" item="v" index="index">
+				<if test="index==0">
+					SELECT #{v.doctorId} 'doctorId', #{v.visitIntervalDay} 'visitIntervalDay'
+				</if>
+
+				<if test="index !=0">
+					UNION
+					SELECT #{v.doctorId} 'doctorId', #{v.visitIntervalDay} 'visitIntervalDay'
+				</if>
+			</foreach>
+
+			) st2 ON temp.doctor_id=st2.doctorId
+		</if>
+
+
+		<if test="searchType==5 and meetingTimeType==2">
+			INNER JOIN (
+
+			SELECT
+			tmad.doctor_id doctorId,
+			round(
+			(
+			UNIX_TIMESTAMP(m.start_time) - UNIX_TIMESTAMP(NOW())
+			) / 60
+			) AS overMinute
+			FROM
+			t_meeting_attend_details tmad
+			INNER JOIN (
+			SELECT
+			id,
+			tma.start_time
+			FROM
+			t_meeting_data tma
+			WHERE
+			DATE_FORMAT(tma.start_time, '%Y-%m-%d') >= DATE_FORMAT(NOW(), '%Y-%m-%d')
+			AND tma.product_id
+			) m ON tmad.meeting_id = m.id
+			LEFT JOIN virtual_meeting_no_remind r ON m.id = r.meeting_id
+			WHERE
+			r.id IS NULL
+			HAVING overMinute>=0 AND
+			overMinute &lt;= (
+			SELECT
+			min(
+			<!-- 小时 -->
+			  before_meeting_frequency * 60
+			)
+			FROM
+			virtual_product_visit_frequency
+			WHERE
+			product_id
+			IN
+			<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+				#{productLineId}
+			</foreach>
+			)
+
+			) st5 ON temp.doctor_id=st5.doctorId
+		</if>
+
+
+		<if test="searchType==6">
+		<if test="meetingTimeType == 2">
+			INNER JOIN (
+			SELECT
+			round(
+			(
+			UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(tmd.end_time)
+			) / 60
+			) AS overMinute,
+			MAX(tmd.end_time) asMaxEndTime,
+			tmad.doctor_id doctorId
+			FROM
+			t_meeting_data tmd
+			INNER JOIN t_meeting_attend_details tmad ON tmd.id = tmad.meeting_id
+			INNER JOIN drug_user_doctor dud ON tmad.doctor_id = dud.doctor_id
+			AND is_available = 1
+			WHERE
+			dud.drug_user_id IN
+
+			<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+				#{virtualDrugUserId}
+			</foreach>
+
+			AND dud.prod_id IN
+			<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+				#{productLineId}
+			</foreach>
+			GROUP BY
+			tmad.doctor_id
+			HAVING
+			overMinute &lt;= (
+			SELECT
+			min(
+			after_meeting_frequency * 60
+			)
+			FROM
+			virtual_product_visit_frequency
+			WHERE
+			product_id
+			IN
+			<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+				#{productLineId}
+			</foreach>
+			)
+			AND tmad.doctor_id NOT IN (
+			SELECT DISTINCT
+			virtual_doctor_id
+			FROM
+			virtual_doctor_call_info
+			WHERE
+			virtual_drug_user_id IN
+
+			<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+				#{virtualDrugUserId}
+			</foreach>
+
+			AND product_id IN
+			<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+				#{productLineId}
+			</foreach>
+
+			AND create_time >= MAX(tmd.end_time)
+			)
+			) st6 ON temp.doctor_id=st6.doctorId
+		</if>
+
+		</if>
+  		
+  		<!-- 搜索:d.name 模糊匹配,d.telephone 及 d.depart 精确匹配 -->
+  		<if test="search != null">
+  			WHERE 
+			d.name LIKE "%"#{search,jdbcType=VARCHAR}"%"
+			OR d.hospital_name LIKE "%"#{search,jdbcType=VARCHAR}"%"
+			OR d.telephone LIKE "%"#{search,jdbcType=VARCHAR}"%" 
+			OR d.depart LIKE "%"#{search,jdbcType=VARCHAR}"%"
+			OR d.id IN (
+			SELECT doctor_id FROM doctor_telephone WHERE telephone LIKE "%"#{search,jdbcType=VARCHAR}"%"
+			)
+  		</if>
+  		
+	</select>
+
+	<!-- 根据过滤条件获取医生拜访列表信息(不含对应的产品信息) -->
+	<select id="getList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CustomerFollowListBean">
+		<!-- 根据 virtualDrugUserIds 获取对应医生基本信息 -->
+		SELECT
+			d.id AS doctorId, d.name AS doctorName, d.telephone AS doctorMobile,
+			d. sex AS gender, d.depart AS department, d.hospital_name AS hospitalName,d.email, d.positions AS title,IFNULL(h.level,0) hospitalLevel,
+			tel_visit.create_time AS visitTime,tel_visit.next_visit_time AS nextVisitTime,
+			IFNULL(TIMESTAMPDIFF(SECOND,NOW(), tel_visit.next_visit_time), #{minValue}) orderNextVisitTime,
+			tel_visit.visit_result AS visitResult,
+			dm.wechat, dm.secondary_mobile AS secondaryDoctorMobile, dm.thirdary_mobile AS thirdaryDoctorMobile,temp.doctorCreateTime,temp.click
+		FROM doctor d
+		LEFT JOIN hospital h ON d.hospital_id=h.id
+		LEFT JOIN doctor_mend dm
+			ON d.id=dm.virtual_doctor_id
+		JOIN (
+
+			<!-- 根据 virtualDrugUserIds 获取对应的 doctorIds -->
+			SELECT
+				doctor_id,min(DATE_FORMAT(modify_time,'%Y-%m-%d %H:%i:%s')) doctorCreateTime,
+				IF(drug_user_id=#{drugUserId},1,0) click
+			FROM drug_user_doctor
+			WHERE is_available=1 AND drug_user_id IN
+				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+		   			#{virtualDrugUserId}
+		  		</foreach> 
+		  	
+		  	<!-- 根据产品线 ID 筛选 -->
+		  	<if test="productLineIds != null">
+	            AND prod_id IN 
+				<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+                  #{productLineId}
+  				</foreach> 
+			</if>
+		   GROUP BY doctor_id
+	  	) temp  ON  d.id=temp.doctor_id
+	  	
+
+		
+		<!-- 左连接 virtual_doctor_call_info_mend 表获取电话拜访信息 -->
+		LEFT JOIN (
+			SELECT c.virtual_doctor_id, c.create_time,
+			m.visit_result, m.next_visit_time FROM virtual_doctor_call_info c 
+			LEFT JOIN virtual_doctor_call_info_mend m		
+				ON m.call_id=c.id	
+			WHERE c.id IN (
+				SELECT MAX(id) FROM virtual_doctor_call_info  WHERE virtual_drug_user_id IN 
+ 				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+		   			#{virtualDrugUserId}
+		  		</foreach> 
+		  		GROUP BY virtual_doctor_id
+			) 
+			
+		) tel_visit ON tel_visit.virtual_doctor_id=d.id
+
+
+		<!-- 下次拜访时间为今天的或者过期的，过期的置顶 -->
+		<if test="searchType !=null and searchType==1">
+			INNER JOIN (
+			SELECT
+			v.virtual_doctor_id,
+			DATE_FORMAT(
+			max(v.create_time),
+			'%Y-%m-%d'
+			) maxTime,
+			DATE_FORMAT(
+			max(m.next_visit_time),
+			'%Y-%m-%d'
+			) nextTime,
+			DATEDIFF(NOW(),max(m.next_visit_time)) as overtime
+
+			FROM
+			virtual_doctor_call_info v
+			LEFT JOIN virtual_doctor_call_info_mend m ON v.id = m.call_id
+			WHERE
+			v.virtual_drug_user_id IN
+
+			<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+				#{virtualDrugUserId}
+			</foreach>
+
+			GROUP BY
+			v.virtual_doctor_id
+			HAVING
+			nextTime &gt;= maxTime
+			AND
+			nextTime &lt;= DATE_FORMAT(NOW(), '%Y-%m-%d')
+			) st1 ON temp.doctor_id=st1.virtual_doctor_id
+		</if>
+
+		<!-- 其他搜索 -->
+		<if test="searchType==2 or searchType==3 or searchType==4 or (searchType==6 and meetingTimeType==1)">
+
+			INNER JOIN (
+
+			<foreach collection="VisitDoctorList" item="v" index="index">
+				<if test="index==0">
+					SELECT #{v.doctorId} 'doctorId', #{v.visitIntervalDay} 'visitIntervalDay'
+				</if>
+
+				<if test="index !=0">
+					UNION
+					SELECT #{v.doctorId} 'doctorId', #{v.visitIntervalDay} 'visitIntervalDay'
+				</if>
+			</foreach>
+
+			) st2 ON temp.doctor_id=st2.doctorId
+		</if>
+
+
+		<if test="searchType==5 and meetingTimeType==2">
+			INNER JOIN (
+
+			SELECT
+			tmad.doctor_id doctorId,
+			round(
+			(
+			UNIX_TIMESTAMP(m.start_time) - UNIX_TIMESTAMP(NOW())
+			) / 60
+			) AS overMinute
+			FROM
+			t_meeting_attend_details tmad
+			INNER JOIN (
+			SELECT
+			id,
+			tma.start_time
+			FROM
+			t_meeting_data tma
+			WHERE
+			DATE_FORMAT(tma.start_time, '%Y-%m-%d') >= DATE_FORMAT(NOW(), '%Y-%m-%d')
+			AND tma.product_id
+			) m ON tmad.meeting_id = m.id
+			LEFT JOIN virtual_meeting_no_remind r ON m.id = r.meeting_id
+			WHERE
+			r.id IS NULL
+			HAVING overMinute &gt;=0 AND
+			overMinute &lt;= (
+			SELECT
+			min(
+			<!-- 小时 -->
+			  before_meeting_frequency * 60
+			)
+			FROM
+			virtual_product_visit_frequency
+			WHERE
+			product_id
+			IN
+			<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+			#{productLineId}
+			</foreach>
+			)
+
+			) st5 ON temp.doctor_id=st5.doctorId
+		</if>
+
+
+		<if test="searchType==6">
+			<if test="meetingTimeType == 2">
+				INNER JOIN (
+				SELECT
+				round(
+				(
+				UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(tmd.end_time)
+				) / 60
+				) AS overMinute,
+				MAX(tmd.end_time) asMaxEndTime,
+				tmad.doctor_id doctorId
+				FROM
+				t_meeting_data tmd
+				INNER JOIN t_meeting_attend_details tmad ON tmd.id = tmad.meeting_id
+				INNER JOIN drug_user_doctor dud ON tmad.doctor_id = dud.doctor_id
+				AND is_available = 1
+				WHERE
+				dud.drug_user_id IN
+
+				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+					#{virtualDrugUserId}
+				</foreach>
+				AND dud.prod_id IN
+				<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+					#{productLineId}
+				</foreach>
+				GROUP BY
+				tmad.doctor_id
+				HAVING
+				overMinute &lt;= (
+				SELECT
+				min(
+				after_meeting_frequency * 60
+				)
+				FROM
+				virtual_product_visit_frequency
+				WHERE
+				product_id
+				IN
+				<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+					#{productLineId}
+				</foreach>
+				)
+				AND tmad.doctor_id NOT IN (
+				SELECT DISTINCT
+				virtual_doctor_id
+				FROM
+				virtual_doctor_call_info
+				WHERE
+				virtual_drug_user_id IN
+
+				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+					#{virtualDrugUserId}
+				</foreach>
+
+				AND
+
+				product_id IN
+				<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+					#{productLineId}
+				</foreach>
+
+				AND create_time >= MAX(tmd.end_time)
+				)
+
+				) st6 ON temp.doctor_id=st6.doctorId
+			</if>
+
+		</if>
+
+		<!-- 搜索 -->
+		<if test="search != null">
+			WHERE
+			d.name LIKE "%"#{search,jdbcType=VARCHAR}"%"
+			OR d.hospital_name LIKE "%"#{search,jdbcType=VARCHAR}"%"
+			OR d.telephone LIKE "%"#{search,jdbcType=VARCHAR}"%"
+			OR d.depart LIKE "%"#{search,jdbcType=VARCHAR}"%"
+			OR d.id IN (
+			SELECT doctor_id FROM doctor_telephone WHERE telephone LIKE "%"#{search,jdbcType=VARCHAR}"%"
+			)
+		</if>
+
+
+		GROUP BY d.id
+
+		<!-- 排序规则 -->
+		<if test="order ==null or order ==0">
+			<if test="searchType ==null or searchType == 0">
+				ORDER BY sign(orderNextVisitTime) DESC,abs(orderNextVisitTime)
+			</if>
+
+			<!--
+			<if test="searchType != null and searchType ==1">
+				ORDER BY st1.overtime DESC
+			</if>
+           -->
+
+			<if test="searchType != null and searchType ==1">
+				ORDER BY tel_visit.create_time
+			</if>
+
+			<if test="searchType==2 or searchType==3 or searchType==4">
+				ORDER BY st2.visitIntervalDay DESC
+			</if>
+		</if>
+
+		<if test="order !=null and order !=0">
+			<if test="order == 1">
+				ORDER BY sign(orderNextVisitTime) ASC,abs(orderNextVisitTime) DESC
+			</if>
+
+			<if test="order == 2">
+				ORDER BY tel_visit.create_time DESC
+			</if>
+
+			<if test="order == 3">
+				ORDER BY tel_visit.create_time ASC
+			</if>
+
+			<if test="order == 4">
+				ORDER BY temp.doctorCreateTime DESC
+			</if>
+
+			<if test="order == 5">
+				ORDER BY temp.doctorCreateTime ASC
+			</if>
+		</if>
+
+
+		LIMIT #{currentSize},#{pageSize}
+	</select>
+
+
+	<!-- 得到今日分型要拜访的医生列表 -->
+	<select id="getClassificationVisitDoctorList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.plan.VisitDoctorResponseBean">
+		SELECT
+			DATE_FORMAT(
+				max(v.create_time),
+				'%Y-%m-%d'
+			) AS maxVisitTime,
+			DATEDIFF(NOW(), max(v.create_time)) AS days,
+			virtual_doctor_id doctorId,
+
+		(
+		SELECT
+		MIN(a.visit_frequency)
+		FROM
+		virtual_doctor_classification_frequency a
+		INNER JOIN virtual_doctor_classification b ON a.classification_id = b.classification_id
+		WHERE
+		b.doctor_id = v.virtual_doctor_id
+		AND a.product_id IN
+		<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+			#{productLineId}
+		</foreach>
+		AND b.product_id IN
+		<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+			#{productLineId}
+		</foreach>
+		AND a.potential = (
+		SELECT
+		hcp_potential
+		FROM
+		drug_user_doctor_quate
+		WHERE
+		doctor_id = v.virtual_doctor_id
+		AND product_id IN
+		<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+			#{productLineId}
+		</foreach>
+		ORDER BY
+		id DESC
+		LIMIT 1
+		)
+		) as frequency
+		FROM
+			virtual_doctor_call_info v
+		WHERE
+			virtual_drug_user_id IN
+
+		<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+			#{virtualDrugUserId}
+		</foreach>
+
+		GROUP BY
+			v.virtual_doctor_id
+		HAVING
+		days >= (
+				SELECT
+					MIN(a.visit_frequency)
+				FROM
+					virtual_doctor_classification_frequency a
+				INNER JOIN virtual_doctor_classification b ON a.classification_id = b.classification_id
+				WHERE
+					b.doctor_id = v.virtual_doctor_id
+				AND a.product_id IN
+				<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+					#{productLineId}
+				</foreach>
+				AND b.product_id IN
+				<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+					#{productLineId}
+				</foreach>
+				AND a.potential = (
+					SELECT
+						hcp_potential
+					FROM
+						drug_user_doctor_quate
+					WHERE
+						doctor_id = v.virtual_doctor_id
+								AND product_id IN
+					<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+						#{productLineId}
+					</foreach>
+					ORDER BY
+						id DESC
+					LIMIT 1
+				)
+			)
+		ORDER BY
+			days DESC
+	</select>
+
+
+	<!-- 到设定了拜访频次要拜访的医生列表 -->
+	<select id="getVisitFrequencyDayDoctorList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.plan.VisitDoctorResponseBean">
+
+		SELECT
+		DATE_FORMAT(
+		max(v.create_time),
+		'%Y-%m-%d'
+		) AS maxVisitTime,
+		DATEDIFF(NOW(), max(v.create_time)) AS days,
+		virtual_doctor_id doctorId
+		FROM
+		virtual_doctor_call_info v
+		WHERE
+		virtual_drug_user_id IN
+
+		<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+			#{virtualDrugUserId}
+		</foreach>
+
+		GROUP BY
+		v.virtual_doctor_id
+		HAVING
+		days >= (
+			SELECT min(visit_frequency) FROM virtual_product_visit_frequency
+			WHERE product_id IN
+			<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+				#{productLineId}
+			</foreach>
+		)
+		ORDER BY
+		days DESC
+	</select>
+
+
+	<!-- 到设定了拜访频次要拜访的医生列表 -->
+	<select id="getRetVisitFrequencyDayDoctorList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.plan.VisitDoctorResponseBean">
+
+		SELECT
+			DATE_FORMAT(dud.maxCreateTime, '%Y-%m-%d') AS maxVisitTime,
+			DATEDIFF(NOW(), dud.maxCreateTime) AS days,
+		 dud.doctorId
+		FROM
+			(
+				SELECT
+					dud.doctor_id doctorId,
+					max(dud.modify_time) AS maxCreateTime
+				FROM
+					drug_user_doctor dud
+				INNER JOIN doctor d ON dud.doctor_id = d.id
+				WHERE
+					dud.is_available = 1
+				AND dud.drug_user_id IN
+
+					<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+						#{virtualDrugUserId}
+					</foreach>
+				AND dud.prod_id IN
+					<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+						#{productLineId}
+					</foreach>
+				GROUP BY
+					dud.doctor_id
+			) dud
+		LEFT JOIN virtual_doctor_call_info v ON dud.doctorId = v.virtual_doctor_id
+		WHERE
+			v.id IS NULL
+		<!-- 没有拜访的都是满足的
+		HAVING days >= (
+		SELECT min(ret_visit_frequency) FROM virtual_product_visit_frequency
+		WHERE product_id IN
+		<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+			#{productLineId}
+		</foreach>
+
+		)
+		-->
+	</select>
+
+
+	<!-- 得到设定了会前拜访的医生列表,单位天 -->
+	<select id="getBeforeMeetingDoctorList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.plan.VisitDoctorResponseBean">
+		SELECT
+		tmad.doctor_id doctorId,
+		round(
+		(
+		UNIX_TIMESTAMP(m.start_time) - UNIX_TIMESTAMP(NOW())
+		) / 60
+		) AS overMinute,
+		m.start_time maxVisitTime,
+		(
+		SELECT
+		min(
+		before_meeting_frequency
+		)
+		FROM
+		virtual_product_visit_frequency
+		WHERE
+		product_id
+		IN
+		<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+			#{productLineId}
+		</foreach>
+		) as frequency
+		FROM
+		t_meeting_attend_details tmad
+		INNER JOIN (
+		SELECT
+		id,
+		tma.start_time
+		FROM
+		t_meeting_data tma
+		WHERE
+		DATE_FORMAT(tma.start_time, '%Y-%m-%d') >= DATE_FORMAT(NOW(), '%Y-%m-%d')
+		AND tma.product_id
+		) m ON tmad.meeting_id = m.id
+		LEFT JOIN virtual_meeting_no_remind r ON m.id = r.meeting_id
+		WHERE
+		r.id IS NULL
+		HAVING overMinute &gt;=0 AND
+		overMinute &lt;=(
+		SELECT
+		min(
+			before_meeting_frequency * 24 * 60
+		)
+		FROM
+		virtual_product_visit_frequency
+		WHERE
+		product_id
+		IN
+		<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+			#{productLineId}
+		</foreach>
+		)
+
+	</select>
+
+	<!-- 得到设定了会后拜访的医生列表,单位天 -->
+	<select id="getAfterMeetingDoctorList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.plan.VisitDoctorResponseBean">
+		SELECT
+			DATEDIFF(NOW(), tmd.end_time) AS days,
+			MAX(tmd.end_time) maxVisitTime,
+			tmad.doctor_id doctorId,
+			(
+			SELECT
+			min(
+			after_meeting_frequency
+			)
+			FROM
+			virtual_product_visit_frequency
+			WHERE
+			product_id
+			IN
+			<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+				#{productLineId}
+			</foreach>
+			) as frequency
+		FROM
+			t_meeting_data tmd
+		INNER JOIN t_meeting_attend_details tmad ON tmd.id = tmad.doctor_id
+		INNER JOIN drug_user_doctor dud ON tmad.doctor_id = dud.doctor_id
+		AND is_available = 1
+		WHERE
+			dud.drug_user_id IN
+		<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+			#{virtualDrugUserId}
+		</foreach>
+
+		AND dud.prod_id IN
+		<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+			#{productLineId}
+		</foreach>
+		GROUP BY
+			tmad.doctor_id
+		HAVING
+		days >= (
+		SELECT
+		min(
+		after_meeting_frequency
+		)
+		FROM
+		virtual_product_visit_frequency
+		WHERE
+		product_id
+		IN
+		<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+			#{productLineId}
+		</foreach>
+		)
+		AND tmad.doctor_id NOT IN (
+			SELECT DISTINCT
+				virtual_doctor_id
+			FROM
+				virtual_doctor_call_info
+			WHERE
+				virtual_drug_user_id IN
+
+		<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+			#{virtualDrugUserId}
+		</foreach>
+			AND product_id IN
+		<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+			#{productLineId}
+		</foreach>
+			AND create_time >= MAX(tmd.end_time)
+		)
+	</select>
+
+	<select id="selectDoctorByMobiles" resultType="com.nuoxin.virtual.rep.api.entity.Doctor">
+		select DISTINCT id,email,name,hospital_id hospitalId,hospital_name hospitalName,provice,city,depart department,telephone mobile,positions doctorLevel,
+		create_time createTime,status,master_data_id masterDataId
+		FROM doctor t
+		WHERE
+		t.telephone IN
+		<foreach collection="mobiles" item="mobile" open="(" close=")" separator=",">
+			#{mobile}
+		</foreach>
+
+		OR t.id IN
+		(
+		SELECT DISTINCT doctor_id FROM doctor_telephone
+		WHERE telephone IN
+		<foreach collection="mobiles" item="mobile" open="(" close=")" separator=",">
+			#{mobile}
+		</foreach>
+		)
+
+	</select>
+
+	<insert id="saveDoctor" keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO doctor
+		( email, name, sex,hospital_id,hospital_name,provice,city,depart,telephone,positions,create_time,status,master_data_id)
+		VALUES
+		( #{email}, #{name},#{sex}, #{hospitalId}, #{hospitalName}, #{province}, #{city}, #{department}, #{mobile}, #{doctorLevel},now(),1,#{masterDataId})
+	</insert>
+
+	<update id="updateDoctor" >
+		UPDATE doctor
+		<trim prefix="set" suffixOverrides=",">
+			<if test="email !=null and email !=''">
+				email=#{email},
+			</if>
+			<if test="name !=null and name !=''">
+				name=#{name},
+			</if>
+			<if test="hospitalId !=null ">
+				hospital_id=#{hospitalId},
+			</if>
+			<if test="hospitalName !=null and hospitalName !=''">
+				hospital_name=#{hospitalName},
+			</if>
+			<if test="province !=null and province !=''">
+				provice=#{province},
+			</if>
+			<if test="city !=null and city !=''">
+				city=#{city},
+			</if>
+			<if test="department !=null and department !=''">
+				depart=#{department},
+			</if>
+			<if test="mobile !=null and mobile !=''">
+				telephone=#{mobile},
+			</if>
+			<if test="sex !=null">
+				sex=#{sex},
+			</if>
+			<if test="doctorLevel !=null ">
+				positions=#{doctorLevel},
+			</if>
+			<if test="masterDataId !=null ">
+				master_data_id=#{masterDataId},
+			</if>
+		</trim>
+		WHERE id=#{id}
+	</update>
+
+
+	<select id="doctorCountByMobile" resultType="java.lang.Integer">
+		SELECT sum(num) FROM (
+		SELECT COUNT(*) num FROM doctor WHERE telephone=#{mobile}
+		UNION
+		SELECT COUNT(*) num FROM doctor_telephone WHERE telephone=#{mobile}
+		) t
+	</select>
+
+	<select id="doctorNameCountByMobile" resultType="java.lang.String">
+		SELECT DISTINCT d.name FROM doctor d
+		WHERE d.telephone=#{mobile}
+		OR d.id IN
+		(
+	  SELECT DISTINCT doctor_id FROM doctor_telephone WHERE telephone=#{mobile}
+
+		)
+	</select>
+
+	<!-- 保存医生的多个手机号 -->
+	<insert id="insertDoctorTelephone">
+		INSERT INTO doctor_telephone(doctor_id, telephone, type)
+		VALUES
+		<foreach collection="list" item="d" separator=",">
+			(#{d.doctorId}, #{d.telephone}, #{d.type})
+		</foreach>
+	</insert>
+
+	<select id="doctorProductInfo" resultType="com.nuoxin.virtual.rep.api.web.controller.response.call.CallDoctorResponseBean">
+		SELECT t.id AS doctorId,t.name,t.telephone mobile,t.`positions` title,
+		t1.`name` hospital,t1.`level` AS hospitalLevel,t.subdivision_depart AS department
+		FROM doctor t
+		LEFT JOIN hospital t1 ON t.hospital_id=t1.`id`
+		WHERE t.id=#{doctorId}
+	</select>
+
+	<!-- 得到医生的联系方式 -->
+	<select id="getDoctorTelephone" resultType="java.lang.String">
+		SELECT telephone FROM doctor WHERE id=#{doctorId} AND LEFT(telephone, 1)=1
+		UNION
+		SELECT telephone FROM doctor_telephone WHERE doctor_id=#{doctorId}
+	</select>
+
+	<!-- 删除医生的多个联系方式 -->
+	<delete id="deleteDoctorTelephone">
+		DELETE FROM doctor_telephone WHERE doctor_id=#{doctorId}
+	</delete>
+
+	<!-- 查询总数，用于校验医生是否在指定产品下 -->
+	<select id="doctorProductCount" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM drug_user_doctor WHERE doctor_id=#{doctorId} AND prod_id=#{productId}
+		AND is_available=1
+	</select>
+
+	<!-- 根据联系方式获取医生列表 -->
+	<select id="getDoctorListByTelephone" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorDetailsResponseBean">
+		SELECT DISTINCT
+			d.id doctorId,
+			d.`name` doctorName,
+			h.id hospitalId,
+			d.hospital_name hospitalName,
+			h.`level` hospitalLevel,
+			h.province,
+			h.city,
+			d.depart department
+		FROM
+			doctor d
+		LEFT JOIN hospital h ON d.hospital_id = h.id
+		WHERE
+			d.id IN (
+				SELECT
+					id
+				FROM
+					doctor
+				WHERE
+					telephone = #{telephone}
+				UNION
+					SELECT
+						doctor_id
+					FROM
+						doctor_telephone
+					WHERE
+						telephone = #{telephone}
+			)
+	</select>
+
+
+	<select id="getDoctorList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorDetailsResponseBean">
+		SELECT DISTINCT
+		d.id doctorId,
+		d.name doctorName,
+		d.hospital_name hospitalName
+		FROM doctor d
+		INNER JOIN drug_user_doctor dud
+		ON d.id=dud.doctor_id
+		INNER JOIN drug_user du
+		ON dud.drug_user_id=du.id
+		WHERE dud.is_available=1
+		AND dud.prod_id=#{productId}
+		AND d.name LIKE CONCAT('%', #{doctorName}, '%')
+		AND du.id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+
+		LIMIT #{limitNum}
+
+	</select>
 
 </mapper>

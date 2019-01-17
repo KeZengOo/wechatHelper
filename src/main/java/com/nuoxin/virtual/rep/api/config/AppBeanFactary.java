@@ -124,8 +124,8 @@ public class AppBeanFactary {
     @Bean
     public MultipartConfigElement multipartConfigElement() {
         MultipartConfigFactory configFactory = new MultipartConfigFactory();
-        configFactory.setMaxFileSize("100MB");
-        configFactory.setMaxRequestSize("100MB");
+        configFactory.setMaxFileSize("1000MB");
+        configFactory.setMaxRequestSize("1000MB");
         return configFactory.createMultipartConfig();
     }
 

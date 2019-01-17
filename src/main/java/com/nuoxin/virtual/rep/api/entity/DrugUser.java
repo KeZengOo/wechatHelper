@@ -42,6 +42,9 @@ public class DrugUser extends IdEntity {
     @Column(name = "user_type")
     private Integer userType;
 
+    @Column(name = "sale_type")
+    private Integer saleType;
+
     @Transient
     private Long roleId;
 
@@ -147,5 +150,13 @@ public class DrugUser extends IdEntity {
 
     public void setRoleId(Long roleId) {
         this.roleId = roleId;
+    }
+
+    public Integer getSaleType() {
+        return saleType;
+    }
+
+    public void setSaleType(Integer saleType) {
+        this.saleType = saleType;
     }
 }

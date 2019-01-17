@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorCallInfoResultMapper">
+
+    <insert id="batchInsert">
+        INSERT INTO virtual_doctor_call_info_result (mend_id, result_id)
+        VALUES
+        <foreach collection ="resultIdList" item="resultId" separator =",">
+            (#{mendId}, #{resultId})
+        </foreach>
+    </insert>
+
+
+    <select id="getVisitResultByCallId" resultType="java.lang.String">
+        SELECT DISTINCT c.visit_result FROM virtual_doctor_call_info_mend a
+        INNER JOIN virtual_doctor_call_info_result b
+        ON a.id=b.mend_id
+        INNER JOIN virtual_product_visit_result c
+        ON b.result_id=c.id
+        WHERE a.call_id=#{callId}
+    </select>
+
+
+    <select id="getVisitResultList"
+            resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VisitResultResponseBean">
+        SELECT DISTINCT c.visit_result visitResult, a.call_id callId  FROM virtual_doctor_call_info_mend a
+        INNER JOIN virtual_doctor_call_info_result b
+        ON a.id=b.mend_id
+        INNER JOIN virtual_product_visit_result c
+        ON b.result_id=c.id
+        WHERE a.call_id IN
+        <foreach item="callId" index="index" collection="callIdList"
+                 open="(" separator="," close=")">
+            #{callId}
+        </foreach>
+
+    </select>
+
+
+
+</mapper>

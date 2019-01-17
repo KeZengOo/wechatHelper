@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.MeetingAttendMapper">
+
+	<select id="getMeetingAttendCount" resultType="java.lang.Integer">
+		SELECT
+			count(*)
+		FROM t_meeting_attend_details a 
+		JOIN t_meeting_data m
+		ON a.meeting_id = m.id
+		WHERE 
+			doctor_id = #{virtualDoctorId}
+			<!-- 加上产品 -->
+			AND m.product_id IN
+			(
+			SELECT DISTINCT pl.prod_id FROM product_line pl
+			INNER JOIN product_user pu
+			ON pl.prod_id=pu.prod_id
+			INNER JOIN drug_user du
+			ON pu.user_id=du.id
+			WHERE du.leader_path LIKE concat(#{leaderPath},'%')
+		)
+	</select>
+	
+	<select id="getMeetingAttendList" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.MeetingBean">
+		SELECT
+			m.title, m.speaker, m.s_hospital AS speakerHospital, 
+			DATE_FORMAT(m.start_time,'%Y-%m-%d %H:%i:%s') AS startTime, 
+			DATE_FORMAT(m.end_time,'%Y-%m-%d %H:%i:%s') AS endTime, 
+			DATE_FORMAT(a.attend_start_time,'%Y-%m-%d %H:%i:%s') AS attendStartTime, 
+			DATE_FORMAT(a.attend_end_time,'%Y-%m-%d %H:%i:%s') AS attendEndTime, 
+			type, attend_type AS attendType, download 
+		FROM t_meeting_attend_details a 
+		JOIN t_meeting_data m
+		ON a.meeting_id = m.id
+		WHERE 
+			doctor_id = #{virtualDoctorId}
+		<!-- 加上产品 -->
+		AND m.product_id IN
+		(
+		SELECT DISTINCT pl.prod_id FROM product_line pl
+		INNER JOIN product_user pu
+		ON pl.prod_id=pu.prod_id
+		INNER JOIN drug_user du
+		ON pu.user_id=du.id
+		WHERE du.leader_path LIKE concat(#{leaderPath},'%')
+		)
+
+		LIMIT #{currentSize}, #{pageSize}
+	</select>
+
+</mapper>
+

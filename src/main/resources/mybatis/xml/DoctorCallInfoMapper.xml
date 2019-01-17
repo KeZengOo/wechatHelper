@@ -17,6 +17,8 @@
                 inner join product_line pl
                 on dud.prod_id=pl.prod_id
                 where 1=1
+                and vdci.visit_channel=1
+                and dud.is_available=1
                 <if test="productId != null and productId !=0">
                     and dud.prod_id=#{productId}
                     and vdci.product_id = #{productId}
@@ -40,6 +42,8 @@
                 inner join product_line pl
                 on dud.prod_id=pl.prod_id
                 where 1=1
+                and dud.is_available=1
+                and vdci.visit_channel=1
                 <if test="productId!=null and productId !=0">
                     and dud.prod_id=#{productId}
                     and vdci.product_id = #{productId}
@@ -92,7 +96,8 @@
         inner join product_line pl
         on dud.prod_id=pl.prod_id
         where 1=1
-
+        and dud.is_available=1
+        and vdci.visit_channel=1
         and dud.prod_id=#{productId}
         and vdci.product_id=#{productId}
 
@@ -109,7 +114,8 @@
 
     <!-- 测试的 -->
     <select id="getCallInfoList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.call.CallInfoResponseBean">
-          select id,sin_token sinToken,info_json infoJson from virtual_doctor_call_info where call_time > 0 and ( call_url is null or call_url='') order by create_time desc
+          select id,sin_token sinToken,info_json infoJson from virtual_doctor_call_info
+          where visit_channel=1 and call_time > 0 and ( call_url is null or call_url='') order by create_time desc
     </select>
 
     <update id="updateCallUrl">
@@ -121,8 +127,847 @@
         select call_url from virtual_doctor_call_info where sin_token = #{sigToken}
     </select>
 
+    <!-- 根据sinToken查询电话记录信息 -->
+    <select id="getCallInfoBySinToken" resultType="com.nuoxin.virtual.rep.api.web.controller.response.call.CallInfoResponseBean">
+        SELECT id, call_url callUrl, call_time callTime, status_name statusName  FROM virtual_doctor_call_info WHERE sin_token = #{sinToken}
+    </select>
+
+    <!-- 新增重试的电话记录 -->
+    <insert id="addRetryCallInfo">
+        INSERT INTO virtual_doctor_call_info(sin_token, is_retry, mobile,status, status_name, call_time, call_url, create_time, type)
+        VALUES (#{sinToken}, #{retry}, #{mobile},#{status}, #{statusName}, #{callTime}, #{callUrl}, #{createTime}, #{type})
+    </insert>
+
+
     <update id="updateCallUrlBySigToken">
-        update virtual_doctor_call_info set call_url = #{callUrl} where sin_token = #{sinToken}
+        update virtual_doctor_call_info set is_retry=1, call_url = #{callUrl}, call_time=#{callTime}, status_name='answer'
+        where sin_token = #{sinToken}
+    </update>
+
+    <select id="getDoctorVisitDetailList" resultType="java.util.LinkedHashMap">
+
+        <!-- 2018-09-29 修改前
+        SELECT * FROM
+        (SELECT DISTINCT t.`id`,IFNULL(t2.`name`,'') drugUserName,IFNULL(date_format(t.`create_time`, '%Y-%m-%d %H:%i:%s'),'')  visitTime,IFNULL(t3.`id`,'') doctorId,IFNULL(t3.`name`,'') doctorName,
+        IFNULL(t3.`hospital_name`,'') hospitalName,"电话" visitType,"" shareContent,IFNULL(t1.`visit_result`,'') visitResult,IFNULL(t1.`attitude`,'') attitude,IFNULL(date_format(t1.`next_visit_time`, '%Y-%m-%d %H:%i:%s'),'') nextVisitTime
+        ,IFNULL(t4.client_level,'') clientLevel,IFNULL(t5.`hcp_potential`,'') hcpPotential,IFNULL(t5.is_has_drug,'') isHasDrug,IFNULL(t5.`is_target`,'') isTarget,IFNULL(t5.`is_has_ae`,'')  isHasAe
+        FROM `virtual_doctor_call_info` t LEFT JOIN `virtual_doctor_call_info_mend` t1 ON t.id=t1.`call_id`
+        JOIN drug_user t2 ON t.virtual_drug_user_id=t2.`id`
+        JOIN doctor t3 ON t.`virtual_doctor_id`=t3.id
+        LEFT JOIN `doctor_virtual` t4 ON t.`virtual_doctor_id`=t4.`doctor_id` AND t.`product_id`=t4.`product_id`
+        LEFT JOIN `drug_user_doctor_quate` t5 ON t.`virtual_doctor_id`=t5.`doctor_id` AND t.`product_id`=t5.`product_id` AND t.`virtual_drug_user_id`=t5.`drug_user_id`
+        WHERE t.product_id=#{productId}
+        <if test="drugUserId!=null">
+            and t.virtual_drug_user_id=#{drugUserId}
+        </if>
+        <if test="startTime!=null">
+            and date_format(t.create_time,'%Y-%m-%d')&gt;=#{startTime}
+        </if>
+        <if test="endTime!=null">
+            and date_format(t.create_time,'%Y-%m-%d')&lt;=#{endTime}
+        </if>
+        <if test="contents!=null and contents.size>0">
+            and
+            <foreach collection="contents" item="content" open="(" close=")" separator="or">
+                t1.visit_result LIKE CONCAT('%',#{content},'%')
+            </foreach>
+        </if>
+        <if test="contents==null or contents.size==0">
+            UNION ALL
+            SELECT DISTINCT t.`id`,IFNULL(t3.`name`,'') drugUserName,IFNULL(date_format(t.`create_time`, '%Y-%m-%d %H:%i:%s'),'') visitTime,IFNULL(t4.`id`,'') doctorId,IFNULL(t4.`name`,'') doctorName,
+            IFNULL(t4.`hospital_name`,'') hospitalName,CASE WHEN share_type=1 THEN "微信" WHEN share_type=2 THEN "短信" WHEN share_type=3 THEN "邮件" else "" END  visitType,
+            IFNULL(t2.title,'') shareContent,"" visitResult,"" attitude,"" nextVisitTime
+            ,call_dud.clientLevel,IFNULL(t6.`hcp_potential`,'') hcpPotential,IFNULL(t6.is_has_drug,'') isHasDrug,IFNULL(t6.`is_target`,'') isTarget,IFNULL(t6.`is_has_ae`,'')  isHasAe
+            FROM `activity_share` t
+            JOIN `t_content_product` t1 ON t.`data_id`=t1.`content_id`
+            JOIN `activity_info` t2 ON t.`data_id`=t2.`data_id`
+            JOIN drug_user t3 ON t.drug_user_id=t3.`id`
+            JOIN doctor t4 ON t.`share_person_id`=t4.id
+            LEFT JOIN `doctor_virtual` t5 ON t.`share_person_id`=t5.`doctor_id` AND t1.`product_id`=t5.`product_id`
+            LEFT JOIN `drug_user_doctor_quate` t6 ON t.`share_person_id`=t6.`doctor_id` AND t1.`product_id`=t6.`product_id` AND t.`drug_user_id`=t6.`drug_user_id`
+            WHERE t1.product_id=#{productId}
+            <if test="drugUserId!=null">
+                 and t.drug_user_id=#{drugUserId}
+            </if>
+            <if test="startTime!=null">
+                and date_format(t.create_time,'%Y-%m-%d')&gt;=#{startTime}
+            </if>
+            <if test="endTime!=null">
+                and date_format(t.create_time,'%Y-%m-%d')&lt;=#{endTime}
+            </if>
+        </if>
+        ) t ORDER BY t.visitTime DESC
+        <if test="type==1">
+            LIMIT #{currentSize},#{pageSize}
+        </if>
+        -->
+
+
+
+        <!-- 2018-09-29 修改后 -->
+        SELECT callId,drugUserName,visitTime,doctorId,doctorName,hospitalId,hospitalName,
+        depart,
+        CASE
+        WHEN hospitalLevel='11' THEN '一级甲等'
+        WHEN hospitalLevel='12' THEN '一级乙等'
+        WHEN hospitalLevel='13' THEN '一级丙等'
+        WHEN hospitalLevel='21' THEN '二级甲等'
+        WHEN hospitalLevel='22' THEN '二级乙等'
+        WHEN hospitalLevel='23' THEN '二级丙等'
+        WHEN hospitalLevel='31' THEN '三级甲等'
+        WHEN hospitalLevel='32' THEN '三级乙等'
+        WHEN hospitalLevel='33' THEN '三级丙等'
+        WHEN hospitalLevel='40' THEN '特级医院'
+        WHEN hospitalLevel='50' THEN '民营医院'
+        ELSE '未知'
+        END hospitalLevel,
+        isRecruit,visitType,
+        visitChannel,
+        shareContent,
+        CASE
+        WHEN visitResultStr IS NULL OR visitResultStr='' THEN '未知'
+        WHEN visitResultStr='answer' THEN '接通无拜访结果'
+        WHEN visitResultStr='cancelmakecall' THEN '无响应'
+        WHEN visitResultStr='poweroff' THEN '关机'
+        WHEN visitResultStr='reject' THEN '拒接'
+        WHEN visitResultStr='emptynumber' THEN '空号/错号'
+        WHEN visitResultStr='busy' THEN '忙音'
+        WHEN visitResultStr='stop' THEN '停机'
+        WHEN visitResultStr='noanswer' THEN '无人接听'
+        WHEN visitResultStr='makecall' THEN '忙音'
+        ELSE visitResultStr
+        END visitResult,
+        remark,
+        callText,
+        attitude,
+        nextVisitTime,
+        hcpPotential,
+        isHasDrug,
+        isTarget,
+        isHasAe
+        FROM (
+        SELECT
+        vdci.id callId,du.name drugUserName,IFNULL(date_format(vdci.create_time, '%Y-%m-%d %H:%i:%s'),'')  visitTime,call_dud.doctorId,call_dud.doctorName,
+        call_dud.hospitalId,
+        call_dud.hospitalName,
+        call_dud.depart,
+        call_dud.hospitalLevel,
+        CASE WHEN vdcim.is_recruit IS NULL THEN '未知' WHEN vdcim.is_recruit=0 THEN '否' WHEN vdcim.is_recruit=1 THEN '是' WHEN vdcim.is_recruit=2 THEN '退出项目' ELSE '' END isRecruit,
+        CASE WHEN vdci.visit_channel=1 THEN "电话" WHEN vdci.visit_channel=2 THEN "微信" WHEN vdci.visit_channel=3 THEN "短信"
+        WHEN vdci.visit_channel=4 THEN "邮件"
+        WHEN vdci.visit_channel=5 THEN "面谈"
+        else "" END visitType,vdci.visit_channel visitChannel,
+        IFNULL(vdci.remark,'') remark,
+        IFNULL(vdct.call_text,'') callText,
+        "" shareContent,IFNULL(GROUP_CONCAT(vppvr.visit_result),vdci.status_name) visitResultStr,IFNULL(vdcim.`attitude`,'') attitude,IFNULL(date_format(vdcim.`next_visit_time`, '%Y-%m-%d %H:%i:%s'),'') nextVisitTime
+        ,call_dud.clientLevel,IFNULL(vdcim.`hcp_potential`,'未知') hcpPotential,IFNULL(vdcim.is_has_drug,'未知') isHasDrug,IFNULL(vdcim.`is_target`,'未知') isTarget,IFNULL(vdcim.`is_has_ae`,'未知')  isHasAe
+        FROM
+        virtual_doctor_call_info vdci
+        INNER JOIN drug_user du ON vdci.virtual_drug_user_id=du.id
+        LEFT JOIN virtual_doctor_call_text vdct ON vdci.sin_token=vdct.sin_token
+        LEFT JOIN virtual_doctor_call_info_mend vdcim ON vdci.id=vdcim.call_id
+
+        LEFT JOIN virtual_doctor_call_info_result vdcir
+        ON vdcim.id=vdcir.mend_id
+        LEFT JOIN virtual_product_visit_result vppvr
+        ON vdcir.result_id=vppvr.id
+
+        INNER JOIN (
+        SELECT DISTINCT
+        d.id doctorId,d.`name` doctorName,IFNULL(d.hospital_id,0) hospitalId, IFNULL(d.hospital_name,'') hospitalName,IFNULL(d.depart,'') depart, IFNULL(h.level,'0') as hospitalLevel, IFNULL(dv.client_level,'') clientLevel,du.`name` drugUserName
+        FROM
+        doctor d
+        LEFT JOIN hospital h ON d.hospital_id=h.id
+        INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+        INNER JOIN drug_user du ON dud.drug_user_id = du.id
+        LEFT JOIN doctor_virtual dv
+        ON d.id=dv.doctor_id AND dv.product_id=#{productId}
+        WHERE
+        dud.is_available = 1
+
+        AND dud.prod_id = #{productId}
+
+        <if test="doctorId !=null and doctorId !=0">
+            and d.id = #{doctorId}
+        </if>
+
+        AND du.id IN
+        <foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+            #{drugUserId}
+        </foreach>
+
+        ) call_dud ON vdci.virtual_doctor_id = call_dud.doctorId
+        WHERE
+        vdci.product_id=#{productId}
+
+        <if test="visitResultIdList !=null and visitResultIdList.size > 0">
+            AND vdcir.result_id IN
+            <foreach collection="visitResultIdList" item="visitResultId" open="(" close=")" separator=",">
+                #{visitResultId}
+            </foreach>
+        </if>
+
+
+        <if test="startTime!=null and startTime!=''">
+            and date_format(vdci.create_time,'%Y-%m-%d') &gt;=#{startTime}
+        </if>
+        <if test="endTime!=null  and endTime!=''">
+            and date_format(vdci.create_time,'%Y-%m-%d') &lt;=#{endTime}
+        </if>
+        <if test="contents!=null and contents.size>0">
+            and
+            <foreach collection="contents" item="content" open="(" close=")" separator="or">
+                vdcim.visit_result LIKE CONCAT('%',#{content},'%')
+            </foreach>
+        </if>
+
+        <if test="self!=null and self==1">
+            AND vdci.virtual_drug_user_id IN
+            <foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+                #{drugUserId}
+            </foreach>
+        </if>
+
+
+
+        GROUP BY vdci.id
+
+        <if test="contents==null or contents.size==0">
+            UNION ALL
+            SELECT
+            a.id callId,a.drug_user_name drugUserName,IFNULL(date_format(a.`create_time`, '%Y-%m-%d %H:%i:%s'),'') visitTime,content_dud.doctorId,content_dud.doctorName,
+            content_dud.hospitalId,
+            content_dud.hospitalName,
+            content_dud.depart,
+            content_dud.hospitalLevel,
+            '' isRecruit,
+            '内容分享' visitType,
+            6 visitChannel,
+            '' remark,
+            '' callText,
+            IFNULL(ai.title,'') shareContent,'' visitResultStr,'' attitude,'' nextVisitTime
+            ,content_dud.clientLevel,'未知' hcpPotential,'未知' isHasDrug,'未知' isTarget,'未知'  isHasAe
+            FROM
+            activity_share a
+            INNER JOIN (
+            SELECT DISTINCT
+            d.id doctorId,d.`name` doctorName,IFNULL(d.hospital_id,0) hospitalId, IFNULL(d.hospital_name,'') hospitalName,IFNULL(d.depart,'') depart, IFNULL(h.level,'0') as hospitalLevel,IFNULL(dv.client_level,'') clientLevel,du.`name` drugUserName
+            FROM
+            doctor d
+            LEFT JOIN hospital h
+            ON d.hospital_id=h.id
+            INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+            INNER JOIN drug_user du ON dud.drug_user_id = du.id
+            LEFT JOIN doctor_virtual dv
+            ON d.id=dv.doctor_id AND dv.product_id=#{productId}
+            WHERE
+            dud.is_available = 1
+            AND dud.prod_id = #{productId}
+
+
+
+            AND du.id IN
+            <foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+                #{drugUserId}
+            </foreach>
+
+
+            <if test="doctorId !=null and doctorId !=0">
+                and d.id = #{doctorId}
+            </if>
+
+
+            ) content_dud ON a.share_person_id = content_dud.doctorId
+            INNER JOIN activity_info ai ON ai.id=a.data_id
+            WHERE
+            a.data_id IN (
+            SELECT DISTINCT
+            tcp.content_id
+            FROM
+            t_content_product tcp
+            INNER JOIN product_line pl ON tcp.product_id = pl.prod_id
+            INNER JOIN activity_info ai ON tcp.content_id = ai.id
+            WHERE
+            tcp.product_id = #{productId}
+            )
+            <if test="startTime!=null and startTime!=''">
+                and date_format(a.create_time,'%Y-%m-%d') &gt;=#{startTime}
+            </if>
+            <if test="endTime!=null and endTime!=''">
+                and date_format(a.create_time,'%Y-%m-%d') &lt;=#{endTime}
+            </if>
+
+            <if test="self!=null and self==1">
+                AND a.drug_user_id IN
+                <foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+                    #{drugUserId}
+                </foreach>
+            </if>
+
+            GROUP BY a.id
+
+
+
+        </if>
+        ) b
+        WHERE 1=1
+
+        <if test="visitChannel !=null and visitChannel!=0">
+            and visitChannel=#{visitChannel}
+        </if>
+
+
+        ORDER BY b.visitTime DESC
+        <if test="type==1">
+            LIMIT #{currentSize},#{pageSize}
+        </if>
+
+
+
+    </select>
+
+    <select id="getDoctorVisitDetailListCount" resultType="java.lang.Integer">
+
+        <!-- 2018-09-29 修改前
+        SELECT count(*) total FROM
+        (SELECT DISTINCT t.`id`
+        FROM `virtual_doctor_call_info` t LEFT JOIN `virtual_doctor_call_info_mend` t1 ON t.id=t1.`call_id`
+        JOIN drug_user t2 ON t.virtual_drug_user_id=t2.`id`
+        JOIN doctor t3 ON t.`virtual_doctor_id`=t3.id
+        WHERE t.product_id=#{productId}
+        <if test="drugUserId!=null">
+            and t.virtual_drug_user_id=#{drugUserId}
+        </if>
+        <if test="startTime!=null">
+            and date_format(t.create_time,'%Y-%m-%d')&gt;=#{startTime}
+        </if>
+        <if test="endTime!=null">
+            and date_format(t.create_time,'%Y-%m-%d')&lt;=#{endTime}
+        </if>
+        <if test="contents!=null and contents.size>0">
+            and
+            <foreach collection="contents" item="content" open="(" close=")" separator="or">
+                t1.visit_result LIKE CONCAT('%',#{content},'%')
+            </foreach>
+        </if>
+        <if test="contents==null or contents.size==0">
+            UNION ALL
+            SELECT DISTINCT t.`id`
+            FROM `activity_share` t
+            JOIN `t_content_product` t1 ON t.`data_id`=t1.`content_id`
+            JOIN `activity_info` t2 ON t.`data_id`=t2.`data_id`
+            JOIN drug_user t3 ON t.drug_user_id=t3.`id`
+            JOIN doctor t4 ON t.`share_person_id`=t4.id
+            WHERE t1.product_id=#{productId}
+            <if test="drugUserId!=null">
+                and t.drug_user_id=#{drugUserId}
+            </if>
+            <if test="startTime!=null">
+                and date_format(t.create_time,'%Y-%m-%d')&gt;=#{startTime}
+            </if>
+            <if test="endTime!=null">
+                and date_format(t.create_time,'%Y-%m-%d')&lt;=#{endTime}
+            </if>
+        </if>
+        ) t
+        -->
+
+
+        <!-- 2018-09-29 修改后 -->
+        SELECT COUNT(*) FROM (
+        SELECT
+        DISTINCT vdci.id, vdci.visit_channel visitChannel
+        FROM
+        virtual_doctor_call_info vdci
+        LEFT JOIN virtual_doctor_call_info_mend vdcim ON vdci.id=vdcim.call_id
+
+        LEFT JOIN virtual_doctor_call_info_result vdcir
+        ON vdcim.id=vdcir.mend_id
+        LEFT JOIN virtual_product_visit_result vppvr
+        ON vdcir.result_id=vppvr.id
+
+        INNER JOIN (
+        SELECT DISTINCT
+        d.id doctorId,d.`name` doctorName,d.hospital_name hospitalName,IFNULL(dv.client_level,'') clientLevel,du.`name` drugUserName
+        FROM
+        doctor d
+        INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+        INNER JOIN drug_user du ON dud.drug_user_id = du.id
+        LEFT JOIN doctor_virtual dv
+        ON d.id=dv.doctor_id AND dv.product_id=#{productId}
+        WHERE
+        dud.is_available = 1
+
+        AND dud.prod_id = #{productId}
+
+        <!--
+        <if test="drugUserId!=null">
+            and du.id=#{drugUserId}
+        </if>
+        -->
+
+        <if test="doctorId !=null and doctorId !=0">
+            and d.id = #{doctorId}
+        </if>
+
+        AND du.id IN
+        <foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+            #{drugUserId}
+        </foreach>
+
+        ) call_dud ON vdci.virtual_doctor_id = call_dud.doctorId
+        WHERE
+        vdci.product_id=#{productId}
+
+        <if test="visitResultIdList !=null and visitResultIdList.size > 0">
+            AND vdcir.result_id IN
+            <foreach collection="visitResultIdList" item="visitResultId" open="(" close=")" separator=",">
+                #{visitResultId}
+            </foreach>
+        </if>
+
+
+        <if test="startTime!=null and startTime!=''">
+            and date_format(vdci.create_time,'%Y-%m-%d') &gt;=#{startTime}
+        </if>
+        <if test="endTime!=null  and endTime!=''">
+            and date_format(vdci.create_time,'%Y-%m-%d') &lt;=#{endTime}
+        </if>
+        <if test="contents!=null and contents.size>0">
+            and
+            <foreach collection="contents" item="content" open="(" close=")" separator="or">
+                vdcim.visit_result LIKE CONCAT('%',#{content},'%')
+            </foreach>
+        </if>
+
+        <if test="self!=null and self==1">
+            AND vdci.virtual_drug_user_id IN
+            <foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+                #{drugUserId}
+            </foreach>
+        </if>
+
+
+        <if test="contents==null or contents.size==0">
+            UNION ALL
+            SELECT
+            DISTINCT a.id, 6 visitChannel
+            FROM
+            activity_share a
+            INNER JOIN (
+            SELECT DISTINCT
+            d.id doctorId,d.`name` doctorName,d.hospital_name hospitalName,IFNULL(dv.client_level,'') clientLevel,du.`name` drugUserName
+            FROM
+            doctor d
+            INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+            INNER JOIN drug_user du ON dud.drug_user_id = du.id
+            LEFT JOIN doctor_virtual dv
+            ON d.id=dv.doctor_id AND dv.product_id=#{productId}
+            WHERE
+            dud.is_available = 1
+            AND dud.prod_id = #{productId}
+
+            <!--
+            <if test="drugUserId!=null">
+                and du.id=#{drugUserId}
+            </if>
+            -->
+
+            AND du.id IN
+            <foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+                #{drugUserId}
+            </foreach>
+
+
+            <if test="doctorId !=null and doctorId !=0">
+                and d.id = #{doctorId}
+            </if>
+
+
+            ) content_dud ON a.share_person_id = content_dud.doctorId
+            INNER JOIN activity_info ai ON ai.id=a.data_id
+            WHERE
+            a.data_id IN (
+            SELECT DISTINCT
+            tcp.content_id
+            FROM
+            t_content_product tcp
+            INNER JOIN product_line pl ON tcp.product_id = pl.prod_id
+            INNER JOIN activity_info ai ON tcp.content_id = ai.id
+            WHERE
+            tcp.product_id = #{productId}
+            )
+            <if test="startTime!=null and startTime!=''">
+                and date_format(a.create_time,'%Y-%m-%d') &gt;=#{startTime}
+            </if>
+            <if test="endTime!=null and endTime!=''">
+                and date_format(a.create_time,'%Y-%m-%d') &lt;=#{endTime}
+            </if>
+
+            <if test="self!=null and self==1">
+                AND a.drug_user_id IN
+                <foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+                    #{drugUserId}
+                </foreach>
+            </if>
+
+        </if>
+        ) b
+        WHERE 1=1
+
+        <if test="visitChannel !=null and visitChannel!=0">
+            and visitChannel=#{visitChannel}
+        </if>
+
+
+    </select>
+
+    <!-- 医生分享数据 -->
+    <select id="getDoctorShareList" resultType="java.util.LinkedHashMap">
+        SELECT
+        ai.id contentId,
+        ai.title title,
+        d.id doctorId,
+        d. NAME doctorName,
+        d.hospital_name hospitalName,
+        d.depart,
+        h.level hospitalLevel,
+        IFNULL(
+        d.telephone,
+        a.wechat_openid
+        ) telephone,
+        a.create_time shareTime
+        FROM
+        activity_share a
+        LEFT JOIN doctor d ON a.share_person_id = d.id
+        LEFT JOIN hospital h
+        ON d.hospital_id=h.id
+        INNER JOIN activity_info ai ON a.data_id = ai.id
+        WHERE
+        a.data_id IN (
+        SELECT DISTINCT
+        content_id
+        FROM
+        t_content_product
+        WHERE
+        product_id = #{productId}
+        )
+
+        <if test="startTime !=null and startTime !=''">
+            AND DATE_FORMAT(a.create_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+        </if>
+
+        <if test="endTime !=null and endTime !=''">
+            AND DATE_FORMAT(a.create_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        </if>
+    </select>
+
+    <!-- 医生阅读数据 -->
+    <select id="getDoctorReadList" resultType="java.util.LinkedHashMap">
+        SELECT
+        ttt.dataId contentId,
+        ttt.title title,
+        ttt.doctorId doctorId,
+        ttt. NAME doctorName,
+        ttt.hospital_name hospitalName,
+        ttt.depart,
+        ttt.hospitalLevel,
+        ttt.telephone,
+
+        IF (
+        ttt.ret_count > 0,
+        '是',
+        '否'
+        ) retrans,
+        ttt. COMMENT AS comment,
+        ttt.read_time duration,
+        ttt.create_time readTime,
+        ttt.`status` useful,
+        ttt.answers,
+        'APP' channel
+        FROM
+        (
+        SELECT
+        tt.*, (
+        SELECT
+        COUNT(*)
+        FROM
+        activity_retrans c
+        WHERE
+        c.data_id = tt.dataId
+        AND c.retrans_person_id = tt.doctorId
+        ) ret_count,
+        (
+        SELECT
+        GROUP_CONCAT(DISTINCT content SEPARATOR ';')
+        FROM
+        t_content_comment
+        WHERE
+        tel= tt.telephone
+        AND data_id = tt.dataId
+        ) COMMENT,
+        (
+        SELECT
+        `status`
+        FROM
+        t_content_popularity
+        WHERE
+        tel = tt.telephone
+        AND content_id = tt.dataId
+        ORDER BY
+        id DESC
+        LIMIT 1
+        ) `status`
+
+        FROM
+        (
+        SELECT
+        ai.id dataId,
+        ai.title,
+        d.id doctorId,
+        d. NAME,
+        d.hospital_name,
+        d.depart,
+        h.level hospitalLevel,
+        IFNULL(
+        d.telephone,
+        a.wechat_openid
+        ) telephone,
+        a.read_token,
+        a.read_time,
+        a.create_time,
+        ari.isp,
+        (SELECT IFNULL(GROUP_CONCAT(DISTINCT cqa.answer SEPARATOR ' '), '') FROM content_questionnaire_answers cqa WHERE cqa.telephone=d.telephone AND cqa.content_id=ai.id) as answers
+        FROM
+        activity_read a
+        LEFT JOIN doctor d ON a.read_person_id = d.id
+        LEFT JOIN hospital h
+        ON d.hospital_id=h.id
+        INNER JOIN activity_info ai ON a.data_id = ai.id
+        LEFT JOIN activity_read_ip ari ON a.read_token = ari.read_token
+        WHERE
+        (
+        ari.isp IS NULL
+        OR ari.isp != '阿里云'
+        )
+        AND a.data_id IN (
+        SELECT DISTINCT
+        content_id
+        FROM
+        t_content_product
+        WHERE
+        product_id = #{productId}
+
+        )
+
+
+        <if test="startTime !=null and startTime !=''">
+            AND DATE_FORMAT(a.create_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+        </if>
+
+        <if test="endTime !=null and endTime !=''">
+            AND DATE_FORMAT(a.create_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        </if>
+
+        ) tt
+        ) ttt
+        UNION ALL
+        SELECT
+        ai.id contentId,
+        ai.title title,
+        d.id doctorId,
+        d. NAME doctorName,
+        d.hospital_name,
+        d.depart,
+        h.level hospitalLevel,
+        d.telephone,
+        '' retrans,
+        '' COMMENT,
+        wur.read_time duration,
+        wur.create_time readTime,
+        NULL useful,
+        '' answers,
+        '小程序' channel
+        FROM
+        wx_user_read wur
+        INNER JOIN wx_users wu ON wur.user_id = wu.id
+        INNER JOIN doctor d ON wu.doctor_id = d.id
+        LEFT JOIN hospital h
+        ON d.hospital_id=h.id
+        INNER JOIN activity_info ai ON wur.content_id = ai.id
+        WHERE
+        wur.content_id IN (
+        SELECT DISTINCT
+        content_id
+        FROM
+        t_content_product
+        WHERE
+        product_id = #{productId}
+
+        )
+        <if test="startTime !=null and startTime !=''">
+            AND DATE_FORMAT(wur.create_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+        </if>
+
+        <if test="endTime !=null and endTime !=''">
+            AND DATE_FORMAT(wur.create_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        </if>
+    </select>
+
+    <!-- 医生问卷答案 -->
+    <select id="getDoctorAnswerList" resultType="java.util.LinkedHashMap">
+        SELECT
+        d.id doctorId,
+        d. NAME doctorName,
+        d.depart,
+        h.level hospitalLevel,
+        cqa.question_id questionId,
+        cqq.title AS questionTitle,
+        cqa.answer,
+        ai.id contentId,
+        ai.title contentTitle,
+        cqa.create_time createTime
+        FROM
+        content_questionnaire_answers cqa
+        INNER JOIN content_questionnaire_questions cqq ON cqa.question_id = cqq.id
+        INNER JOIN activity_info ai ON cqa.content_id = ai.id
+        LEFT JOIN doctor d ON cqa.telephone = d.telephone
+        LEFT JOIN hospital h
+        ON d.hospital_id=h.id
+        WHERE
+        cqa.content_id IN (
+        SELECT
+        content_id
+        FROM
+        t_content_product
+        WHERE
+        product_id = #{productId}
+        )
+
+        <if test="startTime !=null and startTime !=''">
+            AND DATE_FORMAT(cqa.create_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+        </if>
+
+        <if test="endTime !=null and endTime !=''">
+            AND DATE_FORMAT(cqa.create_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+        </if>
+    </select>
+
+
+    <!-- 得到电话统计 -->
+    <select id="getCallTime" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CallTimeResponseBean">
+
+        SELECT
+        SUM(call_time) callTime,
+        COUNT(*) callCount
+        FROM virtual_doctor_call_info WHERE status_name='answer' AND  id IN (
+
+        SELECT
+        DISTINCT vdci.id
+        FROM
+        virtual_doctor_call_info vdci
+        LEFT JOIN virtual_doctor_call_info_mend vdcim ON vdci.id=vdcim.call_id
+
+        <if test="visitResultIdList !=null and visitResultIdList.size > 0">
+            LEFT JOIN virtual_doctor_call_info_result vdcir
+            ON vdcim.id=vdcir.mend_id
+        </if>
+
+
+        INNER JOIN (
+        SELECT DISTINCT
+        d.id doctorId,d.`name` doctorName,d.hospital_name hospitalName,IFNULL(dv.client_level,'') clientLevel,du.`name`
+        drugUserName
+        FROM
+        doctor d
+        INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+        INNER JOIN drug_user du ON dud.drug_user_id = du.id
+        LEFT JOIN doctor_virtual dv
+        ON d.id=dv.doctor_id AND dv.product_id=#{productId}
+        WHERE
+        dud.is_available = 1
+
+        <if test="doctorId !=null and doctorId !=0">
+            and d.id = #{doctorId}
+        </if>
+        AND dud.prod_id = #{productId}
+
+        AND du.id IN
+        <foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+            #{drugUserId}
+        </foreach>
+
+        ) call_dud ON vdci.virtual_doctor_id = call_dud.doctorId
+        WHERE
+        vdci.product_id=#{productId}
+        AND vdci.visit_channel=1
+
+        <if test="visitResultIdList !=null and visitResultIdList.size > 0">
+            AND vdcir.result_id IN
+            <foreach collection="visitResultIdList" item="visitResultId" open="(" close=")" separator=",">
+                #{visitResultId}
+            </foreach>
+        </if>
+
+
+        <if test="startTime!=null and startTime!=''">
+            and date_format(vdci.create_time,'%Y-%m-%d') &gt;=#{startTime}
+        </if>
+        <if test="endTime!=null  and endTime!=''">
+            and date_format(vdci.create_time,'%Y-%m-%d') &lt;=#{endTime}
+        </if>
+
+
+        <if test="self!=null and self==1">
+            AND vdci.virtual_drug_user_id IN
+            <foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+                #{drugUserId}
+            </foreach>
+        </if>
+
+        )
+    </select>
+    
+
+    <select id="lastVisitTime" resultType="java.util.Date">
+        SELECT MAX(t.create_time) lastVisitTime FROM virtual_doctor_call_info t
+        WHERE visit_channel=1 AND virtual_drug_user_id =#{drugUserId} AND virtual_doctor_id=#{doctorId}
+    </select>
+
+    <!-- 查询需要识别的录音url -->
+    <select id="getIdentifyCallUrl" resultType="com.nuoxin.virtual.rep.api.web.controller.response.call.CallInfoResponseBean">
+        SELECT
+            a.sin_token sinToken,
+            a.call_url callUrl
+        FROM
+            virtual_doctor_call_info a
+        LEFT JOIN virtual_doctor_call_text b ON a.sin_token = b.sin_token
+        WHERE
+            a.call_url IS NOT NULL
+        AND a.call_url != ''
+        AND b.sin_token IS NULL
+        ORDER BY a.create_time DESC
+        LIMIT #{limitNum}
+    </select>
+
+
+    <select id="getNotAliyunCallUrl" resultType="com.nuoxin.virtual.rep.api.web.controller.response.call.CallInfoResponseBean">
+        SELECT
+            sin_token sinToken,
+            call_url callUrl
+        FROM
+            virtual_doctor_call_info
+        WHERE
+            call_url IS NOT NULL
+        AND call_url != ''
+        AND call_url NOT LIKE '%aliyun%'
+    </select>
+
+    <update id="updateNotAliyunCallUrl">
+        UPDATE virtual_doctor_call_info
+        SET call_url=#{callUrl}
+        WHERE sin_token = #{sinToken}
+
     </update>
 
 </mapper>

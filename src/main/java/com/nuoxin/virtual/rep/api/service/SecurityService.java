@@ -21,12 +21,12 @@ import javax.servlet.http.HttpServletResponse;
  * Created by fenggang on 7/28/17.
  */
 @Service
-public class SercurityService {
+public class SecurityService {
 
-	private static Logger logger = LoggerFactory.getLogger(SercurityService.class);
+	private static final Logger logger = LoggerFactory.getLogger(SecurityService.class);
 
 	@Autowired
-	SessionMemUtils memUtils;
+	private SessionMemUtils memUtils;
 
 	/**
 	 * 保存session
@@ -67,61 +67,84 @@ public class SercurityService {
 	 * @throws NeedLoginException
 	 */
 	public void cleanSession(HttpServletRequest request) throws NeedLoginException {
-
 		String sessionId = getSessionId(request);
-
 		if (!StringUtils.isEmpty(sessionId)) {
 			memUtils.delSession(sessionId);
 		}
 	}
 
+	/**
+	 * 获取 MySession
+	 * @param request HttpServletRequest 对象
+	 * @return MySession
+	 * @throws NeedLoginException
+	 */
 	public MySession getSession(HttpServletRequest request) throws NeedLoginException {
-
 		String sessionId = getSessionId(request);
-
 		MySession session = memUtils.getSession(sessionId);
-
 		if (session == null || session.getAttribute(SessionConfig.DEFAULT_OPERATOR_REQUEST_ATTRIBUTE_NAME) == null) {
 			throw new NeedLoginException(ErrorEnum.LOGIN_NO);
 		}
-
 		return session;
 	}
 
+	/**
+	 * 根据 request 获取 DrugUser
+	 * @param request HttpServletRequest 对象
+	 * @return MySession
+	 * @throws NeedLoginException
+	 */
 	public DrugUser getDrugUser(HttpServletRequest request) throws NeedLoginException {
 		MySession session = getSession(request);
 		Object obj = session.getAttribute(SessionConfig.DEFAULT_OPERATOR_REQUEST_ATTRIBUTE_NAME);
 		return JSONObject.parseObject(obj.toString(), DrugUser.class);
 	}
 
+	/**
+	 * Session 校验
+	 * @param request
+	 * @throws NeedLoginException
+	 */
 	public void sessionValidation(HttpServletRequest request) throws NeedLoginException {
-
 		String sessionId = getSessionId(request);
-
 		// 检测mem
 		MySession session = memUtils.getSession(sessionId);
 		if (session == null || session.getAttribute(SessionConfig.DEFAULT_OPERATOR_REQUEST_ATTRIBUTE_NAME) == null) {
 			logger.debug("Session is out of time");
 			throw new NeedLoginException(ErrorEnum.LOGIN_NO);
 		}
-
 	}
 
 	/**
-	 * 刷新 session
+	 * 刷新 Cookie
 	 * @param sessionId
 	 * @param response
 	 */
 	public void flushCookie(String sessionId, HttpServletResponse response) {
-
 		Cookie cookie = new Cookie(SessionConfig.DEFAULT_SESSION_COOKIE_NAME, sessionId);
 		cookie.setPath("/");
 		cookie.setMaxAge(-1);
 		response.addCookie(cookie);
 	}
 
-	private String getSessionId(HttpServletRequest request) throws NeedLoginException {
+	/**
+	 * 刷新 session
+	 * @param user
+	 * @param request
+	 * @throws NeedLoginException
+	 */
+	public void refreshSession(DrugUser user, HttpServletRequest request) throws NeedLoginException {
+		// 找到当前session
+		MySession session = this.getSession(request);
+		// 把新用户信息保存到session中
+		session.setAttribute(SessionConfig.DEFAULT_OPERATOR_REQUEST_ATTRIBUTE_NAME, user);
+		// 把session保存到缓存中
+		memUtils.setSession(session.getId(), session);
+	}
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private String getSessionId(HttpServletRequest request) throws NeedLoginException {
 		Cookie[] cookies = request.getCookies();
 		String sessionId = request.getSession().getId();
 //		if ((cookies != null) && (cookies.length > 0)) {
@@ -140,24 +163,5 @@ public class SercurityService {
 		}
 
 		return sessionId;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.idailycar.ops.service.SercurityService#refreshSession(com.idailycar.ops.domain.Operator,
-	 * javax.servlet.http.HttpServletRequest)
-	 */
-	public void refreshSession(DrugUser user, HttpServletRequest request) throws NeedLoginException {
-
-		// 找到当前session
-		MySession session = getSession(request);
-
-		// 把新用户信息保存到session中
-		session.setAttribute(SessionConfig.DEFAULT_OPERATOR_REQUEST_ATTRIBUTE_NAME, user);
-
-		// 把session保存到缓存中
-		memUtils.setSession(session.getId(), session);
 	}
 }

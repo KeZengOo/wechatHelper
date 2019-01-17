@@ -8,6 +8,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.nuoxin.virtual.rep.api.utils.StringUtil;
+import com.nuoxin.virtual.rep.api.web.controller.response.call.CallDoctorResponseBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -131,6 +133,22 @@ public class DoctorCallController extends BaseController {
         return responseBean;
     }
 
+    @ApiOperation(value = "获取销售名下医生的产品及基本信息", notes = "获取销售名下医生的产品及基本信息")
+    @PostMapping("/druguser/doctor/info")
+    public DefaultResponseBean<CallDoctorResponseBean> drugUserDoctorInfo(HttpServletRequest request,@RequestBody Long doctorId) {
+        DefaultResponseBean<CallDoctorResponseBean> responseBean = new DefaultResponseBean();
+        DrugUser drugUser = this.getLoginUser(request);
+        if (drugUser == null) {
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
+        }
+        CallDoctorResponseBean bean=doctorCallService.doctorProductInfo(drugUser.getId(),doctorId);
+        responseBean.setData(bean);
+        return responseBean;
+    }
+
+
     @ApiOperation(value = "客户电话搜索列表", notes = "客户电话搜索列表")
     @PostMapping("/doctor/page")
     public DefaultResponseBean<PageResponseBean<CallResponseBean>> doctorPage(@RequestBody QueryRequestBean bean,
@@ -188,8 +206,13 @@ public class DoctorCallController extends BaseController {
             responseBean.setMessage("登录失效");
             return responseBean;
         }
-        
-        if(!StringUtils.isNotEmtity(bean.getSinToken())){
+
+        // 1是电话
+        Integer visitChannel = bean.getVisitChannel();
+        if (visitChannel == null || visitChannel == 0){
+            visitChannel = 1;
+        }
+        if(visitChannel !=null &&  visitChannel == 1 && StringUtil.isEmpty(bean.getSinToken())){
             responseBean.setCode(500);
             responseBean.setMessage("sinToken不能为空");
             return responseBean;

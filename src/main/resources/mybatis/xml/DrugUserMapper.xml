@@ -28,7 +28,7 @@
         select
         d.id,d.name,d.email,d.hospital_id,d.hospital_name,d.provice,d.city,d.depart,d.telephone,d.positions,d.create_time,d.status,dv.doctor_id,dv.hospital_level,dv.client_level,dv.master_data_id,du.name
         drug_user_name,dud.prod_id product_id,dud.drug_user_id,pl.prod_name product_name from drug_user_doctor dud join doctor d on d.id=dud.doctor_id join
-        drug_user du on du.id=dud.drug_user_id join doctor_virtual dv on dv.doctor_id=dud.doctor_id join product_line pl on pl.prod_id=dud.prod_id where du.leader_path
+        drug_user du on du.id=dud.drug_user_id join doctor_virtual dv on dv.doctor_id=dud.doctor_id join product_line pl on pl.prod_id=dud.prod_id where dud.is_available=1 and du.leader_path
         like #{leaderPath,jdbcType=VARCHAR}
         <if test="name!=null and name!=''">
 
@@ -60,10 +60,23 @@
         </if>
         LIMIT ${currentSize},${pageSize}
     </select>
+
+    <!-- 得到指定产品下的线上代表 sale_type:销售类型，0是没有类型为经理的，1是线上销售，2是线下销售-->
+    <select id="getOnlineDrugUserList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean">
+        SELECT
+            DISTINCT du.id, du.name
+        FROM
+            product_user pu
+        INNER JOIN drug_user du ON pu.user_id = du.id
+        WHERE
+            pu.prod_id = #{productId}
+        AND du.sale_type = 1
+    </select>
+
     <select id="doctorPageCount" resultType="java.lang.Integer"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean">
         select count(1) num from drug_user_doctor dud join doctor d on d.id=dud.doctor_id join
-        drug_user du on du.id=dud.drug_user_id join doctor_virtual dv on dv.doctor_id=dud.doctor_id where du.leader_path
+        drug_user du on du.id=dud.drug_user_id join doctor_virtual dv on dv.doctor_id=dud.doctor_id where dud.is_available=1 and du.leader_path
         like #{leaderPath,jdbcType=VARCHAR}
         <if test="name!=null and name!=''">
 
@@ -104,4 +117,92 @@
       select du.id,du.name from product_user pu join drug_user du on pu.user_id=du.id where du.leader_path like #{leaderPath,jdbcType=VARCHAR} and pu.prod_id = #{productId} group by du.id
 
     </select>
+    
+    <!-- 以下是 v2.5 使用到的 -->
+    
+    <select id="getSubordinatesByLeaderPath" resultMap="drugUserResponseBean">
+    	SELECT id,name FROM drug_user WHERE leader_path LIKE #{leaderPath}
+    </select>
+    
+    <select id="getSubordinateIdsByLeaderPath" resultType="java.lang.Long">
+    	SELECT id FROM drug_user WHERE leader_path LIKE #{leaderPath}
+    </select>
+
+
+    <!-- 查询名下所有的产品 -->
+    <select id="getProductList" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.ProductDO">
+
+        SELECT
+        DISTINCT pl.prod_id productId, pl.prod_name productName
+        FROM product_line pl
+        INNER JOIN product_user pu
+        ON pl.prod_id=pl.prod_id
+        INNER JOIN drug_user du
+        ON pu.user_id=du.id
+        WHERE du.leader_path
+        LIKE #{leaderPath}
+
+    </select>
+
+
+
+    <!-- 查询名下所有的产品 -->
+    <select id="getSetDynamicFieldProductList" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.ProductDO">
+
+        SELECT
+        DISTINCT pl.prod_id productId, pl.prod_name productName
+        FROM product_line pl
+        INNER JOIN product_user pu
+        ON pl.prod_id=pu.prod_id
+        INNER JOIN drug_user du
+        ON pu.user_id=du.id
+        INNER JOIN virtual_doctor_dynamic_field vddf
+        ON pl.prod_id=vddf.product_id
+        WHERE du.leader_path
+        LIKE #{leaderPath}
+
+    </select>
+
+    <!-- 查询销售名下某个医生所有设置动态字段的产品 -->
+    <select id="getSetDynamicFieldProductListByDoctorId" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.ProductDO">
+
+        SELECT
+        DISTINCT pl.prod_id productId, pl.prod_name productName
+        FROM product_line pl
+        INNER JOIN drug_user_doctor dud
+        ON pl.prod_id=dud.prod_id
+        INNER JOIN drug_user du
+        ON dud.drug_user_id=du.id
+        INNER JOIN doctor d
+        ON dud.doctor_id=d.id
+        INNER JOIN virtual_doctor_dynamic_field vddf
+        ON pl.prod_id=vddf.product_id
+        WHERE d.id=#{doctorId} And du.leader_path
+        LIKE #{leaderPath}
+
+    </select>
+
+
+    <!-- 根据ID获得已经拼上%的leaderPath -->
+    <select id="getLeaderPathById" resultType="java.lang.String">
+        SELECT concat(du.leader_path, '%')
+        FROM drug_user du
+        WHERE du.id=#{id}
+    </select>
+
+    <!-- 根据邮箱查询代表的产品ID列表 -->
+    <select id="getProductIdListByEmail" resultType="java.lang.Long">
+        SELECT DISTINCT pl.prod_id FROM product_line pl
+        INNER JOIN product_user pu
+        ON pl.prod_id=pu.prod_id
+        INNER JOIN drug_user du
+        ON pu.user_id=du.id
+        WHERE du.email=#{email}
+    </select>
+
+
+    <select id="getRoleIdByDrugUserId" resultType="java.lang.String">
+        SELECT GROUP_CONCAT(role_id) FROM role_user WHERE user_id=#{drugUserId}
+    </select>
+    
 </mapper>

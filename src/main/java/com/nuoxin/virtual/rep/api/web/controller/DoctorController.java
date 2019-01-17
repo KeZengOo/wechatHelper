@@ -8,7 +8,9 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.nuoxin.virtual.rep.api.entity.v2_5.DoctorExcelBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -58,6 +60,8 @@ public class DoctorController extends BaseController {
     private DrugUserService drugUserService;
     @Autowired
     private ContactPlanService contactPlanService;
+    @Value("${excel.maxNum}")
+    private Integer maxNum;
 
     @ApiOperation(value = "获取医生信息", notes = "获取医生信息")
     @GetMapping("/details/{doctorId}")
@@ -126,57 +130,56 @@ public class DoctorController extends BaseController {
         return responseBean;
     }
 
-    @ApiOperation(value = "医生保存", notes = "医生保存")
-    @PostMapping("/save")
-    public DefaultResponseBean<Boolean> save(@RequestBody DoctorRequestBean bean,
-                                             HttpServletRequest request, HttpServletResponse response){
-        DefaultResponseBean responseBean = new DefaultResponseBean();
-        DrugUser user = super.getLoginUser(request);
-        if(user==null){
-            responseBean.setCode(300);
-            responseBean.setMessage("登录失效");
-            return responseBean;
-        }
-        bean.setDrugUserId(user.getId());
-        bean.setLeaderPath(user.getLeaderPath());
-        responseBean.setData(doctorService.save(bean));
-        return responseBean;
-    }
+//    @ApiOperation(value = "医生保存", notes = "医生保存")
+//    @PostMapping("/save")
+//    public DefaultResponseBean<Boolean> save(@RequestBody DoctorRequestBean bean,
+//                                             HttpServletRequest request, HttpServletResponse response){
+//        DefaultResponseBean responseBean = new DefaultResponseBean();
+//        DrugUser user = super.getLoginUser(request);
+//        if(user==null){
+//            responseBean.setCode(300);
+//            responseBean.setMessage("登录失效");
+//            return responseBean;
+//        }
+//        bean.setDrugUserId(user.getId());
+//        bean.setLeaderPath(user.getLeaderPath());
+//        responseBean.setData(doctorService.save(bean));
+//        return responseBean;
+//    }
 
-    @ApiOperation(value = "医生修改", notes = "医生修改")
-    @PostMapping("/update")
-    public DefaultResponseBean<Boolean> update(@RequestBody DoctorUpdateRequestBean bean,
-                                             HttpServletRequest request, HttpServletResponse response){
-        DefaultResponseBean responseBean = new DefaultResponseBean();
-        DrugUser user = super.getLoginUser(request);
-        if(user==null){
-            responseBean.setCode(300);
-            responseBean.setMessage("登录失效");
-            return responseBean;
-        }
-        if(bean.getDrugUserId()==null){
-            bean.setDrugUserId(user.getId());
-        }
-        bean.setLeaderPath(drugUserService.findById(bean.getDrugUserId()).getLeaderPath());
-        responseBean.setData(doctorService.update(bean));
-        return responseBean;
-    }
+//    @ApiOperation(value = "医生修改", notes = "医生修改")
+//    @PostMapping("/update")
+//    public DefaultResponseBean<Boolean> update(@RequestBody DoctorUpdateRequestBean bean,
+//                                             HttpServletRequest request, HttpServletResponse response){
+//        DefaultResponseBean responseBean = new DefaultResponseBean();
+//        DrugUser user = super.getLoginUser(request);
+//        if(user==null){
+//            responseBean.setCode(300);
+//            responseBean.setMessage("登录失效");
+//            return responseBean;
+//        }
+//        if(bean.getDrugUserId()==null){
+//            bean.setDrugUserId(user.getId());
+//        }
+//        bean.setLeaderPath(drugUserService.findById(bean.getDrugUserId()).getLeaderPath());
+//        responseBean.setData(doctorService.update(bean));
+//        return responseBean;
+//    }
 
     @ApiOperation(value = "医生excle导入", notes = "医生excle导入")
     @PostMapping("/excel")
     public DefaultResponseBean<Boolean> excel(MultipartFile file,
                                               HttpServletRequest request, HttpServletResponse response){
         DefaultResponseBean responseBean = new DefaultResponseBean();
-        ExcelUtils<DoctorExcel> excelUtils = new ExcelUtils<>(new DoctorExcel());
+        ExcelUtils<DoctorExcelBean> excelUtils = new ExcelUtils<>(new DoctorExcelBean());
         String productId = request.getParameter("productId");
         if(!StringUtils.isNotEmtity(productId)){
             responseBean.setCode(500);
             responseBean.setMessage("产品不能为空");
             return responseBean;
         }
-
         InputStream inputStream = null;
-        List<DoctorExcel> list = new ArrayList<>();
+        List<DoctorExcelBean> list = new ArrayList<>();
         try{
             inputStream = file.getInputStream();
 			list = excelUtils.readFromFile(null, inputStream);
@@ -202,9 +205,15 @@ public class DoctorController extends BaseController {
             responseBean.setMessage("导入数据为空");
             return responseBean;
         }
+        if(list.size()>maxNum){
+            responseBean.setCode(500);
+            responseBean.setMessage("导入数据大于"+maxNum+"条");
+            return responseBean;
+        }
         
         try {
-            doctorService.saves(list,Long.valueOf(productId),getLoginUser(request));
+            //doctorService.saves(list,Long.valueOf(productId),getLoginUser(request));
+            doctorService.excelSaves(list,Long.valueOf(productId));
         } catch (Exception e) {
             e.printStackTrace();
             responseBean.setCode(500);

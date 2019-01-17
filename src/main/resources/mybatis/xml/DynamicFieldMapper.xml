@@ -121,5 +121,666 @@
         values (#{ddfvId},#{doctorId},#{drugUserId}, #{fieldId}, #{key}, #{value},#{oldFieldId}, #{oldKey}, #{oldValue}, #{correct})
     </insert>
 
+    <!-- 返回医生基本信息和医院新增的动态字段的 1是医生基本信息，5是医院信息,2是处方信息3是拜访记录-->
+    <select id="getDoctorDynamicFieldList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.customer.DoctorDynamicFieldResponseBean">
+
+        SELECT
+            id,
+            serial_number serialNumber,
+            field_name `name`,
+            `type`,
+            field_value `value`,
+            required,
+            classification
+        FROM
+            virtual_doctor_dynamic_field
+        WHERE 1=1
+
+        <if test="productId !=null and productId !=0">
+            and product_id=#{productId}
+            and classification IN (2, 3)
+        </if>
+
+        <if test="productId==null or productId==0">
+            and classification IN (1, 5)
+        </if>
+
+        ORDER BY
+            classification ASC,
+            id ASC
+    </select>
+
+    <!-- 客户设置医生动态字段修改 -->
+    <select id="updateDoctorDynamicField" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DoctorDynamicFieldRequestBean">
+
+        update virtual_doctor_dynamic_field
+        <set>
+            <if test="serialNumber !=null and serialNumber !=0">
+                serial_number=#{serialNumber},
+            </if>
+
+            <if test="name != null and name !=''">
+                field_name=#{name},
+            </if>
+
+            <if test="type!=null and type!=0">
+                type=#{type},
+            </if>
+
+            <if test="value !=null and value!=''">
+                field_value=#{value},
+            </if>
+
+            <if test="required !=null">
+                required=#{required},
+            </if>
+
+            <if test="classification !=null and classification !=0">
+                classification=#{classification},
+            </if>
+
+            <if test="menderId !=null and menderId !=0">
+                mender_id=#{menderId},
+            </if>
+
+            <if test="menderName !=null and menderName !=''">
+                mender_name=#{menderName}
+            </if>
+        </set>
+
+        where id=#{id}
+
+    </select>
+
+    <delete id="deleteDoctorDynamicField">
+        delete from virtual_doctor_dynamic_field
+        where id=#{id}
+    </delete>
+
+    <insert id="insertDoctorDynamicField" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DoctorDynamicFieldRequestBean" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into virtual_doctor_dynamic_field(serial_number, field_name, type, field_value, classification, required, product_id, creator_id, creator_name, mender_id, mender_name)
+        values
+        (#{serialNumber}, #{name}, #{type}, #{value}, #{classification}, #{required}, #{productId}, #{creatorId}, #{creatorName}, #{menderId}, #{menderName})
+    </insert>
+
+    <!-- 得到医生基本信息动态字段填充的值 -->
+    <select id="getDoctorBasicDynamicFieldValue" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorBasicDynamicFieldValueResponseBean">
+        SELECT
+            t.*, t2.id,IFNULL(t2.dynamic_field_value,'') dynamicFieldValue,
+            IFNULL(t2.dynamic_extend_value,'') dymaicExtendValue
+        FROM
+            (
+                SELECT
+                    vddf.id dynamicFieldId,
+                    IFNULL(vddf.field_name,'') dynamicFieldName,
+                    IFNULL(vddf.field_value,'') dynamicFieldSelectValue,
+                    vddf.required,
+                    vddf.type,
+                    vddf.classification
+                FROM
+                    virtual_doctor_dynamic_field vddf
+                WHERE
+                    classification=#{classification}
+            ) t
+        LEFT JOIN virtual_doctor_dynamic_field_value t2 ON t.dynamicFieldId = t2.dynamic_field_id
+        WHERE
+            t2.doctor_id = #{doctorId}
+        ORDER BY
+            t.dynamicFieldId ASC
+    </select>
+
+
+
+    <!-- 得到医生基本信息动态字段填充的值 -->
+    <select id="getDoctorBasicDynamicField" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorBasicDynamicFieldValueResponseBean">
+       SELECT
+                    vddf.id dynamicFieldId,
+                    IFNULL(vddf.field_name,'') dynamicFieldName,
+                    IFNULL(vddf.field_value,'') dynamicFieldSelectValue,
+                    vddf.required,
+                    vddf.type,
+                    vddf.classification
+                FROM
+                    virtual_doctor_dynamic_field vddf
+                WHERE
+                    vddf.classification=#{classification}
+                    ORDER BY vddf.id
+    </select>
+
+
+    <!-- 得到医生产品信息动态字段填充的值 -->
+    <select id="getDoctorProductDynamicFieldValue" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorProductDynamicFieldValueResponseBean">
+        SELECT
+            t.*, t2.id,IFNULL(t2.dynamic_field_value,'') dynamicFieldValue,
+            IFNULL(t2.dynamic_extend_value,'') dymaicExtendValue
+        FROM
+            (
+                SELECT DISTINCT
+                    vddf.id dynamicFieldId,
+                    IFNULL(vddf.field_name,'') dynamicFieldName,
+                    IFNULL(vddf.field_value,'') dynamicFieldSelectValue,
+                    vddf.required,
+                    vddf.classification,
+                    vddf.type,
+                    pl.prod_id productId,
+                    pl.prod_name productName
+                FROM
+                    virtual_doctor_dynamic_field vddf
+                    INNER JOIN product_line pl
+                    ON vddf.product_id=pl.prod_id
+
+                WHERE
+                    vddf.product_id=#{productId}
+                    and classification IN (2, 3)
+            ) t
+        LEFT JOIN virtual_doctor_dynamic_field_value t2 ON t.dynamicFieldId = t2.dynamic_field_id
+        WHERE
+            t2.doctor_id = #{doctorId}
+        ORDER BY
+            t.classification ASC,
+            t.dynamicFieldId ASC
+    </select>
+
+
+
+
+    <!-- 根据产品ID得到产品设置的动态字段 -->
+    <select id="getDoctorProductDynamicField" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorProductDynamicFieldValueResponseBean">
+
+        SELECT DISTINCT
+            vddf.id dynamicFieldId,
+            IFNULL(vddf.field_name,'') dynamicFieldName,
+            IFNULL(vddf.field_value,'') dynamicFieldSelectValue,
+            vddf.required,
+            vddf.classification,
+            vddf.type,
+            pl.prod_id productId,
+            pl.prod_name productName
+        FROM
+            virtual_doctor_dynamic_field vddf
+            INNER JOIN product_line pl
+            ON vddf.product_id=pl.prod_id
+
+        WHERE
+            vddf.product_id=#{productId}
+            and classification IN (2, 3)
+            ORDER BY
+            vddf.classification ASC,
+            vddf.id ASC
+
+
+    </select>
+
+    <!-- 得到医生字段填充的值 -->
+    <select id="getDoctorDynamicFieldValue" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorBasicDynamicFieldValueResponseBean">
+
+        SELECT IFNULL(t.dynamic_field_value,'') dynamicFieldValue,
+            IFNULL(t.dynamic_extend_value,'') dymaicExtendValue
+        FROM virtual_doctor_dynamic_field_value t
+        WHERE t.doctor_id=#{doctorId} AND t.dynamic_field_id=#{dynamicFieldId}
+
+
+    </select>
+
+
+
+
+    <!-- 得到产品信息动态字段填充的值 -->
+    <select id="getDoctorProductDynamicFieldValueByProductId" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorProductDynamicFieldValueResponseBean">
+       SELECT DISTINCT
+            vddf.id dynamicFieldId,
+            IFNULL(vddf.field_name,'') dynamicFieldName,
+            IFNULL(vddf.field_value,'') dynamicFieldSelectValue,
+            vddf.required,
+            vddf.classification,
+            vddf.type,
+            pl.prod_id productId,
+            pl.prod_name productName
+        FROM
+            virtual_doctor_dynamic_field vddf
+            INNER JOIN product_line pl
+            ON vddf.product_id=pl.prod_id
+
+        WHERE
+            vddf.product_id=#{productId}
+            and classification IN (2, 3)
+            ORDER BY
+            vddf.classification ASC,
+            vddf.id ASC
+    </select>
+
+
+
+    <insert id="addDoctorBasicDynamicFieldValue">
+        INSERT INTO
+        virtual_doctor_dynamic_field_value(doctor_id, dynamic_field_id, dynamic_field_name, dynamic_field_value,dynamic_extend_value)
+        VALUES
+        <foreach collection="list" item="d" separator=",">
+            (#{doctorId}, #{d.dynamicFieldId}, #{d.dynamicFieldName}, #{d.dynamicFieldValue}, #{d.dynamicExtendValue})
+        </foreach>
+
+    </insert>
+
+
+
+    <insert id="addDoctorCallBasicDynamicFieldValue">
+        INSERT INTO
+        virtual_doctor_call_dynamic_field_value(doctor_id,call_id, dynamic_field_id, dynamic_field_name, dynamic_field_value,dynamic_extend_value)
+        VALUES
+        <foreach collection="list" item="d" separator=",">
+            (#{doctorId},#{callId}, #{d.dynamicFieldId}, #{d.dynamicFieldName}, #{d.dynamicFieldValue}, #{d.dynamicExtendValue})
+        </foreach>
+
+    </insert>
+
+
+
+    <delete id="deleteDoctorDynamicFieldValue">
+        DELETE
+        FROM
+            virtual_doctor_dynamic_field_value
+        WHERE
+            doctor_id = #{doctorId}
+        AND dynamic_field_id IN (
+            SELECT
+                id
+            FROM
+                virtual_doctor_dynamic_field
+            WHERE
+                classification = #{classification}
+        )
+    </delete>
+
+    <delete id="deleteDoctorCallDynamicFieldValue">
+        DELETE
+        FROM
+            virtual_doctor_call_dynamic_field_value
+        WHERE
+            doctor_id = #{doctorId}
+            AND call_id=#{callId}
+        AND dynamic_field_id IN (
+            SELECT
+                id
+            FROM
+                virtual_doctor_dynamic_field
+            WHERE
+                classification = #{classification}
+        )
+    </delete>
+
+
+
+    <!-- 找出填的字段中的必填字段 -->
+    <select id="getRequiredFieldId" resultType="java.lang.Long">
+        SELECT id
+        FROM virtual_doctor_dynamic_field
+        WHERE required=1
+        AND id IN
+        <foreach item="item" index="index" collection="list"
+                 open="(" separator="," close=")">
+            #{item}
+        </foreach>
+
+    </select>
+
+
+    <!-- 客户设置产品信息列表 -->
+    <select id="getDynamicFieldProductList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DynamicFieldProductResponseBean" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DynamicFieldProductRequestBean">
+        SELECT
+            t.*, (
+                SELECT
+                    mender_name
+                FROM
+                    virtual_doctor_dynamic_field vddf
+                WHERE
+                    product_id = t.productId
+                AND update_time = t.updateTime
+                LIMIT 1
+            ) menderName
+        FROM
+            (
+                SELECT DISTINCT
+                    pl.prod_id productId,
+                    pl.prod_name productName,
+                    date_format(
+                        MAX(vddf.update_time),
+                        '%Y-%m-%d %H:%i:%s'
+                    ) updateTime
+                FROM
+                    product_line pl
+                INNER JOIN product_user pu ON pl.prod_id = pu.prod_id
+                INNER JOIN drug_user du ON pu.user_id = du.id
+                LEFT JOIN virtual_doctor_dynamic_field vddf ON pl.prod_id = vddf.product_id
+                WHERE
+                    du.leader_path LIKE #{leaderPath}
+                GROUP BY
+                    pl.prod_id
+            ) t
+            LIMIT #{currentSize},#{pageSize}
+
+    </select>
+
+
+    <!-- 客户设置产品信息列表总数 -->
+    <select id="getDynamicFieldProductListCount" resultType="java.lang.Integer" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DynamicFieldProductRequestBean">
+
+        SELECT
+            COUNT(DISTINCT pl.prod_id)
+        FROM
+            product_line pl
+        INNER JOIN product_user pu ON pl.prod_id = pu.prod_id
+        INNER JOIN drug_user du ON pu.user_id = du.id
+        WHERE
+        du.leader_path LIKE #{leaderPath}
+    </select>
+
+    <!-- 根据产品ID删除 -->
+    <select id="deleteByProductId">
+        DELETE FROM virtual_doctor_dynamic_field WHERE product_id=#{productId}
+    </select>
+
+    <!-- 根据产品复制动态字段 -->
+    <insert id="copyByProductId">
+        INSERT INTO virtual_doctor_dynamic_field(field_name, type, field_value, classification, required, product_id, creator_id, creator_name, mender_id, mender_name)
+        SELECT field_name, type, field_value, classification, required, #{newProductId} product_id, #{drugUserId} creator_id,#{drugUserName} creator_name,#{drugUserId} mender_id, #{drugUserName} mender_name
+        FROM virtual_doctor_dynamic_field
+        WHERE product_id=#{oldProductId}
+    </insert>
+
+    <!-- 得到医生指定产品下的问卷列表 -->
+    <select id="getProductQuestionnaireList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ProductQuestionnaireResponseBean">
+        SELECT
+            t.*, (
+                SELECT
+                    count(*)
+                FROM
+                    virtual_question a
+                INNER JOIN virtual_doctor_questionnaire b ON a.id = b.virtual_question_id
+                WHERE
+                    a.del_flag = 0
+                AND a.virtual_questionnaire_id = t.questionnaireId
+                AND date_format(
+                    b.create_time,
+                    '%Y-%m-%d %H:%i'
+                ) = date_format(
+                    t.answerTime,
+                    '%Y-%m-%d %H:%i'
+                )
+                LIMIT 1
+            ) answerQuestionCount,
+            (
+                SELECT
+                    date_format(
+                        v1.create_time,
+                        '%Y-%m-%d %H:%i:%s'
+                    )
+                FROM
+                    virtual_doctor_questionnaire v1
+                INNER JOIN virtual_question v2 ON v1.virtual_question_id = v2.id
+                WHERE
+                    v1.virtual_doctor_id = #{doctorId}
+                AND v2.del_flag = 0
+                AND v2.virtual_questionnaire_id = t.questionnaireId
+                AND date_format(
+                    v1.create_time,
+                    '%Y-%m-%d %H:%i'
+                ) != date_format(
+                    t.answerTime,
+                    '%Y-%m-%d %H:%i'
+                )
+                ORDER BY
+                    v1.create_time DESC
+                LIMIT 1
+            ) beforeTime
+        FROM
+            (
+                SELECT
+                    vq.id questionnaireId,
+                    vq.title questionnaireName,
+                    max(
+                        date_format(
+                            vdq.create_time,
+                            '%Y-%m-%d %H:%i:%s'
+                        )
+                    ) answerTime,
+                    (
+                        SELECT
+                            `name`
+                        FROM
+                            drug_user
+                        WHERE
+                            id = vdq.virtual_drug_user_id
+                    ) drugUserName,
+                    (
+                        SELECT
+                            count(*)
+                        FROM
+                            virtual_question a
+                        WHERE
+                            a.virtual_questionnaire_id = vq.id
+                        AND a.del_flag = 0
+                    ) questionCount
+                FROM
+                    virtual_questionnaire vq
+                INNER JOIN virtual_doctor_questionnaire vdq ON vq.id = vdq.virtual_questionnaire_id
+                WHERE
+                    vq.product_id = #{productId}
+                AND vdq.virtual_doctor_id = #{doctorId}
+                AND vq.del_flag = 0
+                GROUP BY
+                    vq.id
+            ) t
+
+            LIMIT #{currentSize},#{pageSize}
+
+    </select>
+
+
+
+    <!-- 得到医生指定产品下的问卷列表总数 -->
+    <select id="getProductQuestionnaireListCount" resultType="java.lang.Integer">
+        SELECT
+            COUNT(DISTINCT vq.id)
+        FROM
+            virtual_questionnaire vq
+        INNER JOIN virtual_doctor_questionnaire vdq ON vq.id = vdq.virtual_questionnaire_id
+        WHERE
+            vq.product_id = #{productId}
+        AND vdq.virtual_doctor_id = #{doctorId}
+        AND vq.del_flag = 0
+
+    </select>
+
+
+
+    <!-- 得到医生指定产品下的问卷列表 -->
+    <select id="getProductDynamicFieldCount" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM virtual_doctor_dynamic_field
+        WHERE product_id=#{productId}
+        OR classification IN (1, 5)
+
+    </select>
+
+    <!-- 得到医生详情问卷问题列表 -->
+    <select id="getDynamicFieldQuestionList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DynamicFieldQuestionDetailResponseBean">
+        SELECT DISTINCT
+            vq.title,
+            vq.`options`,
+            vdq.answer
+        FROM
+            virtual_question vq
+        INNER JOIN virtual_doctor_questionnaire vdq ON vq.id = vdq.virtual_question_id
+        WHERE
+            vq.virtual_questionnaire_id = #{questionnaireId}
+        AND vdq.virtual_doctor_id = #{doctorId}
+        AND DATE_FORMAT(
+            vdq.create_time,
+            '%Y-%m-%d %H:%i'
+        ) = DATE_FORMAT(#{answerTime},'%Y-%m-%d %H:%i')
+    </select>
+
+    <!-- 得到指定产品下的字段列表 -->
+    <select id="getProductDynamicField" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.DynamicFieldResponse">
+        <!-- 2019-01-02 修改前
+        SELECT field_name lable,CONCAT("field",(@i:=@i+1)) prop
+        FROM virtual_doctor_dynamic_field,(SELECT @i:=0)  t2
+        WHERE product_id=#{productId}  ORDER BY id
+        -->
+
+        <!-- 2019-01-02 修改后  -->
+        SELECT field_name lable,CONCAT("field",(@i:=@i+1)) prop
+        FROM virtual_doctor_dynamic_field,(SELECT @i:=0)  t2
+        WHERE product_id=#{productId}
+        OR classification IN (1,5)
+        ORDER BY id
+
+    </select>
+
+    <!-- 根据医生得到指定产品下的字段值 -->
+    <select id="getProductDynamicFieldValue" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.DynamicFieldValueResponse">
+        <!-- 2018-12-28 修改前
+        SELECT t.id doctorId,t1.prop,t1.lable,t2.dynamic_field_value VALUE FROM doctor t
+        LEFT JOIN (SELECT field_name lable,CONCAT("field",(@i:=@i+1)) prop
+        FROM virtual_doctor_dynamic_field,(SELECT @i:=0) a
+        WHERE product_id=#{productId}  ORDER BY id) t1 ON 1=1
+        LEFT JOIN (SELECT t.`field_name`,t1.`doctor_id` ,t1.`dynamic_field_value`
+        FROM `virtual_doctor_dynamic_field` t
+        LEFT JOIN `virtual_doctor_dynamic_field_value` t1 ON t.`id`=t1.`dynamic_field_id`
+        WHERE product_id=#{productId} ) t2 ON t.`id`=t2.doctor_id AND t1.lable=t2.field_name
+        WHERE t.id IN
+        <foreach collection="doctorIds" item="doctorId" open="(" close=")" separator=",">
+            #{doctorId}
+        </foreach>
+        -->
+
+
+
+        SELECT
+        t.id doctorId,
+        t1.prop,
+        t1.lable,
+        t2.dynamic_field_value value
+
+        FROM
+        doctor t
+        LEFT JOIN (
+        SELECT
+        id fieldId,
+        field_name lable,
+        CONCAT("field",(@i :=@i + 1)) prop
+        FROM
+        virtual_doctor_dynamic_field,
+        (SELECT @i := 0) a
+        WHERE
+        product_id = #{productId} OR classification IN (1,5)
+        ORDER BY
+        id
+        ) t1 ON 1 = 1
+        LEFT JOIN (
+        SELECT
+        t.id fieldId,
+        t.`field_name`,
+        t1.`doctor_id`,
+        t1.`dynamic_field_value`
+        FROM
+        `virtual_doctor_dynamic_field` t
+        LEFT JOIN `virtual_doctor_dynamic_field_value` t1 ON t.`id` = t1.`dynamic_field_id`
+        WHERE
+        product_id = #{productId}
+        OR t.classification IN (1,5)
+        ) t2 ON t.`id` = t2.doctor_id
+        AND t1.fieldId = t2.fieldId
+        WHERE
+        t.id IN
+        <foreach collection="doctorIds" item="doctorId" open="(" close=")" separator=",">
+            #{doctorId}
+        </foreach>
+
+
+
+
+
+    </select>
+
+
+    <!-- 根据医生得到指定产品下的字段值, 关联到callId -->
+    <select id="getProductCallDynamicFieldValue" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.DynamicFieldValueResponse">
+
+
+
+        SELECT
+            t2.callId,
+            t1.prop,
+            t1.lable,
+            t2.dynamic_field_value VALUE
+         FROM  (
+            SELECT
+                id fieldId,
+                field_name lable,
+                CONCAT("field",(@i :=@i + 1)) prop
+            FROM
+                virtual_doctor_dynamic_field,
+                (SELECT @i := 0) a
+            WHERE
+                product_id = #{productId} OR classification IN (1,5)
+            ORDER BY
+                id
+        ) t1
+        INNER JOIN (
+            SELECT
+                t.id fieldId,
+                t.`field_name`,
+                t1.`doctor_id`,
+                t1.`dynamic_field_value`,
+                t1.call_id callId
+            FROM
+                `virtual_doctor_dynamic_field` t
+            LEFT JOIN `virtual_doctor_call_dynamic_field_value` t1 ON t.`id` = t1.`dynamic_field_id`
+            WHERE
+                (t.product_id = #{productId}
+                OR t.classification IN (1,5))
+                AND t1.call_id IN
+
+                <foreach collection="callIds" item="callId" open="(" close=")" separator=",">
+                    #{callId}
+                </foreach>
+
+        ) t2 ON t1.fieldId = t2.fieldId
+
+
+
+
+
+    </select>
+
+
+
+    <select id="getDynamicFieldNameById" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorBasicDynamicFieldValueResponseBean">
+        SELECT field_name dynamicFieldName, classification, required FROM virtual_doctor_dynamic_field WHERE id = #{id}
+    </select>
+
+    <!-- 根据产品ID 得到处方信息  -->
+    <select id="getPrescription" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.PrescriptionResponseBean">
+        SELECT hcp_potential potential, is_has_drug hasDrug, is_target target, is_recruit recruit, is_break_off breakOff
+         FROM drug_user_doctor_quate
+         WHERE product_id=#{productId}
+         AND doctor_id=#{doctorId}
+         ORDER BY create_time DESC LIMIT 1
+    </select>
+
+
+    <!-- 根据产品ID 得到拜访记录信息  -->
+    <select id="getVisit" resultType="java.lang.String">
+        SELECT
+            DISTINCT c.visit_result
+        FROM
+            drug_user_doctor_quate a
+        INNER JOIN drug_user_doctor_quate_result b ON a.id = b.quate_id
+        INNER JOIN virtual_product_visit_result c ON b.result_id = c.id
+        WHERE
+            a.doctor_id = #{doctorId}
+        AND a.product_id = #{productId}
+    </select>
 
 </mapper>

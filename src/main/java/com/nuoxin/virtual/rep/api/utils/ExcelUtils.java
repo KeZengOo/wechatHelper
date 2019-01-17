@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
@@ -48,7 +49,7 @@ public class ExcelUtils<E> {
 	 * 最好是所有的单元格都是文本格式，<br>
 	 * 日期格式要求yyyy-MM-dd HH:mm:ss,布尔类型0：真，1：假
 	 * @param edf 数据格式化，如果没有要格式化的，传null
-	 * @param is  Excel文件输入流，支持xlsx 和 xls 后缀的文件
+	 * @param inputStream  Excel文件输入流，支持xlsx 和 xls 后缀的文件
 	 * @return List<E>
 	 * @throws Exception
 	 */
@@ -58,6 +59,8 @@ public class ExcelUtils<E> {
 		try {
 			wb = WorkbookFactory.create(inputStream);
 			list = this.convertExcelToList(edf, wb, this.getTextToMap());
+		} catch (InvalidFormatException e){
+			throw new InvalidFormatException("非Excel格式文件,文件需要另存为Excel格式");
 		} catch (Exception e) {
 			logger.error("Exception", e);
 		} finally {
@@ -117,9 +120,9 @@ public class ExcelUtils<E> {
 				continue;
 			}
 
-			if (row.getCell(0) == null) {
+			/*if (row.getCell(0) == null) {
 				continue;
-			}
+			}*/
 
 			e = get();
 

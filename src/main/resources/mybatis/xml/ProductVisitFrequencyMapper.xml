@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.ProductVisitFrequencyMapper">
+
+    <!-- 获取产品下拜访频次 -->
+    <select id="getProductVisitFrequency" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductVisitFrequencyResponseBean">
+        SELECT product_id productId,
+        visit_frequency visitFrequency,
+        visit_frequency_type visitFrequencyType,
+        ret_visit_frequency retVisitFrequency,
+        ret_visit_frequency_type retVisitFrequencyType,
+        before_meeting_frequency beforeMeetingFrequency,
+        before_meeting_frequency_type beforeMeetingFrequencyType,
+        after_meeting_frequency afterMeetingFrequency,
+        after_meeting_frequency_type afterMeetingFrequencyType
+        FROM virtual_product_visit_frequency
+        WHERE product_id=#{productId}
+    </select>
+
+
+    <insert id="addProductVisitFrequency">
+        INSERT INTO virtual_product_visit_frequency
+        (product_id,
+        visit_frequency,
+        visit_frequency_type,
+        ret_visit_frequency,
+        ret_visit_frequency_type,
+        before_meeting_frequency,
+        before_meeting_frequency_type,
+        after_meeting_frequency,
+        after_meeting_frequency_type)
+        VALUES
+        (#{productId},
+        #{visitFrequency},
+        #{visitFrequencyType},
+        #{retVisitFrequency},
+        #{retVisitFrequencyType},
+        #{beforeMeetingFrequency},
+        #{beforeMeetingFrequencyType},
+        #{afterMeetingFrequency},
+        #{afterMeetingFrequencyType}
+        )
+    </insert>
+
+    <delete id="deleteByProductId">
+        DELETE FROM virtual_product_visit_frequency
+        WHERE product_id=#{productId}
+    </delete>
+
+</mapper>

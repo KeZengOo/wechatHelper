@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorMapper">
+
+	<select id="getVirtualDoctor" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorDO">
+		<!-- 2018-11-06 修前
+		SELECT
+			name,
+			hospital_name AS hospitalName,
+			sex AS gender,
+			positions AS title,
+			depart,
+			email,
+			m.wechat,
+			m.address,
+			m.fixed_phone AS fixedPhone,
+			udo.is_add_wechat AS isAddWechat
+		FROM doctor d
+			
+		LEFT JOIN doctor_mend m
+			ON m.virtual_doctor_id = d.id
+		
+		LEFT JOIN drug_user_doctor_one_to_one udo
+			ON udo.doctor_id=d.id
+			
+		WHERE d.id = #{virtualDoctorId}
+		 -->
+
+
+		SELECT
+			`name`,
+			hospital_name AS hospitalName,
+			sex AS gender,
+			positions AS title,
+			depart,
+			email,
+			m.wechat,
+			m.address,
+			m.fixed_phone AS fixedPhone,
+			(
+				SELECT
+					IFNULL(d.is_add_wechat, 0)
+				FROM
+					drug_user_doctor_one_to_one d
+				INNER JOIN drug_user du ON d.drug_user_id = du.id
+				WHERE
+					du.user_type = 1
+				AND du.leader_path LIKE #{leaderPath}
+				AND is_add_wechat = 1
+				AND doctor_id = #{doctorId}
+				LIMIT 1
+			) AS isAddWechat
+		FROM
+			doctor d
+		LEFT JOIN doctor_mend m ON m.virtual_doctor_id = d.id
+		WHERE
+		d.id = #{doctorId}
+
+
+	</select>
+	
+	<select id="getVirtualDoctorMini" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorMiniResponse">
+		SELECT 
+			name,
+			hospital_name AS hospitalName,
+			(CASE sex WHEN '男' THEN '0'  ELSE '1' END) AS gender,
+			telephone AS mobile,
+			positions AS title,
+			depart,
+			vd.client_level AS hcpLevel,
+			temp.nextVisit,
+			(SELECT `level` FROM hospital WHERE id=d.hospital_id) hospitalGrade
+		FROM doctor d
+		LEFT JOIN doctor_virtual vd
+			ON vd.doctor_id = d.id 
+			AND d.id = #{virtualDoctorId}
+		LEFT JOIN (
+			SELECT 
+				date_format(next_visit_time, '%Y-%m-%d %H:%i:%S') AS nextVisit,virtual_doctor_id
+			FROM virtual_doctor_call_info_mend
+			WHERE 
+				virtual_doctor_id = #{virtualDoctorId}
+			ORDER BY create_time DESC LIMIT 1	
+		) temp
+		ON temp.virtual_doctor_id=d.id
+		WHERE d.id = #{virtualDoctorId}
+		LIMIT 1
+	</select>
+	
+	<insert id="saveVirtualDoctors"  keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO doctor
+		 (name, sex, telephone, email, depart, 
+		  positions, hospital_name, hospital_id, provice, city, create_time)
+		VALUES 
+		<foreach collection ="list" item="item" separator =",">
+        	(#{item.name}, #{item.gender}, #{item.mobile}, #{item.email}, #{item.depart}, 
+        	#{item.title}, #{item.hospital}, #{item.hospitalId}, #{item.province}, #{item.city}, NOW())
+    	</foreach >
+	</insert>
+
+	<insert id="saveVirtualDoctor"  keyProperty="id" useGeneratedKeys="true"
+			parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorParams">
+		INSERT INTO doctor
+		(name, sex, telephone, email, depart,
+		positions, hospital_name, hospital_id, provice, city, create_time)
+		VALUES
+		(#{name}, #{gender}, #{mobile}, #{email}, #{depart},
+		#{title}, #{hospital}, #{hospitalId}, #{province}, #{city}, NOW())
+
+	</insert>
+
+
+	<update id="updateVirtualDoctor"
+			parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorParams">
+
+		update doctor
+		<set>
+			<if test="name !=null and name !=''">
+				name=#{name},
+			</if>
+
+			<if test="mobile!=null and mobile!=''">
+				telephone=#{mobile},
+			</if>
+			<if test="gender != null">
+				sex=#{gender},
+			</if>
+			<if test="email != null and email !=''">
+				email=#{email},
+			</if>
+			<if test="depart != null and depart!=''">
+				depart=#{depart},
+			</if>
+
+			<if test="title !=null and title !=''">
+				positions = #{title},
+			</if>
+
+			<if test="hospital !=null and hospital !=''">
+				hospital_name=#{hospital},
+			</if>
+
+			<if test="hospitalId !=null and hospitalId !=0">
+				hospital_id=#{hospitalId},
+			</if>
+
+			<if test="province !=null and province !=''">
+				provice=#{province},
+			</if>
+
+			<if test="city !=null and city !=''">
+				city = #{city}
+			</if>
+
+
+		</set>
+		where id=#{id}
+
+	</update>
+
+	<!-- 修改医生产品固定字段 -->
+	<update id="updateDoctorProductFixField">
+		UPDATE drug_user_doctor_quate
+		SET is_has_drug=#{hasDrug},
+		is_target=#{target},
+		is_recruit=#{recruit},
+		is_break_off=#{breakOff},
+		hcp_potential=#{potential}
+		WHERE doctor_id=#{doctorId}
+		AND product_id=#{productId}
+	</update>
+
+
+	<insert id="saveVirtualDoctorMends" >
+		INSERT INTO doctor_mend
+		 (wechat, virtual_doctor_id)
+		VALUES 
+		<foreach collection ="list" item="item" separator =",">
+        	(#{item.wechat}, #{item.virtualDoctorId})
+    	</foreach >
+	</insert> 
+	
+	<insert id="saveDoctorVirtuals">
+		INSERT INTO doctor_virtual 
+			(doctor_id, client_level, product_id)
+		VALUES 
+		<foreach collection ="list" item="item" separator =",">
+        	(#{item.virtualDoctorId}, #{item.hcpLevel}, #{item.productId}) 
+    	</foreach >
+	</insert>
+
+
+	<!-- 得到以4开头的最大的手机号 -->
+	<select id="maxTelephone" resultType="java.lang.String">
+		SELECT max(telephone) FROM doctor WHERE LEFT(telephone,1)=4
+	</select>
+
+	<!-- 更新医生的微信 -->
+	<insert id="updateDoctorWechat">
+		REPLACE INTO doctor_mend(wechat, virtual_doctor_id) VALUES (#{wechat}, #{doctorId})
+	</insert>
+
+	<!-- 更新医生是否添加微信 -->
+	<insert id="updateIsAddWechat">
+		REPLACE INTO drug_user_doctor_one_to_one(is_add_wechat, doctor_id, drug_user_id) VALUES(#{addWechat}, #{doctorId}, #{drugUserId})
+	</insert>
+
+</mapper>

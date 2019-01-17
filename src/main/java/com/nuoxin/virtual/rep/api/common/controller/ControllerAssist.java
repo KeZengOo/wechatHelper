@@ -14,6 +14,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -65,7 +66,16 @@ public class ControllerAssist {
 	@ResponseBody
 	public ResponseEntity<DefaultResponseBean<?>> handleBusinessException(BusinessException exception, HttpServletRequest request) {
 		logger.info("{}", exception);
-		return ResponseEntity.ok(DefaultResponseBean.clone(exception.getLabel(), exception.getCode(), exception.getMessage()));
+		//return ResponseEntity.ok(DefaultResponseBean.clone(exception.getLabel(), exception.getCode(), exception.getMessage()));
+
+		ErrorEnum error = ErrorEnum.FILE_FORMAT_ERROR;
+		String errorMessage = exception.getMessage();
+		if (StringUtils.isEmpty(errorMessage)){
+			errorMessage=error.getMessage();
+		}
+		return ResponseEntity.ok(DefaultResponseBean.clone(errorMessage, error.getStatus(), exception.getMessage()));
+
+
 	}
 
 	@ExceptionHandler(NeedLoginException.class)
@@ -116,7 +126,7 @@ public class ControllerAssist {
 	public ResponseEntity<DefaultResponseBean<?>> handleSQLException(HttpServletRequest request, Exception exception, Locale locale) {
 		logger.info("{}", exception);
 		ErrorEnum error = ErrorEnum.ERROR;
-		return ResponseEntity.ok(DefaultResponseBean.clone(error.getMessage(), error.getStatus(), exception.getMessage()));
+		return ResponseEntity.ok(DefaultResponseBean.clone(error.getMessage(), error.getStatus(), exception.getCause().toString()));
 	}
 
 
@@ -132,8 +142,11 @@ public class ControllerAssist {
 
 		logger.info("文件格式错误。。。{}", exception);
 		ErrorEnum error = ErrorEnum.FILE_FORMAT_ERROR;
-
-		return ResponseEntity.ok(DefaultResponseBean.clone(error.getMessage(), error.getStatus(), exception.getMessage()));
+		String errorMessage = exception.getMessage();
+		if (StringUtils.isEmpty(errorMessage)){
+			errorMessage=error.getMessage();
+		}
+		return ResponseEntity.ok(DefaultResponseBean.clone(errorMessage, error.getStatus(), exception.getMessage()));
 
 
 	}

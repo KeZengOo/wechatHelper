@@ -1,5 +1,6 @@
 package com.nuoxin.virtual.rep.api.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
@@ -13,15 +14,15 @@ import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.Message;
 import com.nuoxin.virtual.rep.api.enums.MessageTypeEnum;
 import com.nuoxin.virtual.rep.api.enums.UserTypeEnum;
+import com.nuoxin.virtual.rep.api.mybatis.DrugUserWechatMapper;
 import com.nuoxin.virtual.rep.api.mybatis.MessageMapper;
-import com.nuoxin.virtual.rep.api.utils.DateUtil;
-import com.nuoxin.virtual.rep.api.utils.ExcelUtils;
-import com.nuoxin.virtual.rep.api.utils.RegularUtils;
-import com.nuoxin.virtual.rep.api.utils.StringFormatUtil;
+import com.nuoxin.virtual.rep.api.service.v2_5.NewDoctorService;
+import com.nuoxin.virtual.rep.api.utils.*;
 import com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.vo.WechatMessageVo;
 import com.nuoxin.virtual.rep.api.web.controller.response.message.MessageLinkmanResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.message.MessageResponseBean;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
@@ -41,6 +43,8 @@ import javax.persistence.criteria.Root;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 
 /**
  * 微信相关接口
@@ -60,6 +64,14 @@ public class MessageService extends BaseService {
     private DoctorRepository doctorRepository;
     @Autowired
     private MessageMapper messageMapper;
+
+    @Resource
+    private DrugUserWechatMapper drugUserWechatMapper;
+
+    @Resource
+    private NewDoctorService newDoctorService;
+
+
 
     public void downloadExcel(HttpServletResponse response) {
         response.setHeader("content-Type", "application/vnd.ms-excel");
@@ -104,39 +116,25 @@ public class MessageService extends BaseService {
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public boolean importExcel(MultipartFile file, DrugUser drugUser) {
         boolean success = false;
-        
-        String originalFilename = file.getOriginalFilename();
-        if (StringUtils.isEmpty(originalFilename)){
-            throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "文件名称不能为空");
-        }
-        
-        if (!originalFilename.endsWith(RegularUtils.EXTENSION_XLS) && !originalFilename.endsWith(RegularUtils.EXTENSION_XLSX)) {
-            throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
-        }
 
-        String fileName = originalFilename.substring(0,originalFilename.lastIndexOf("."));
-        boolean matcher = RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, fileName);
-        if (!matcher){
-            throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "文件名称输入不合法，请以医生的手机号命名");
-        }
-
-        String doctorTelephone = fileName;
-        boolean matche = RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, doctorTelephone);
-        if (!matche){
-            throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "手机号输入有误，请检查是否是文本格式");
-        }
-
-        List<Message> list = new ArrayList<>();
+        // 检查文件
+        Doctor doctor = checkWechatFile(file);
 
         ExcelUtils<WechatMessageVo> excelUtils = new ExcelUtils<>(new WechatMessageVo());
         List<WechatMessageVo> wechatMessageVos = null;
         InputStream inputStream = null;
         try {
-        	inputStream = file.getInputStream();
+            inputStream = file.getInputStream();
             wechatMessageVos = excelUtils.readFromFile(null, inputStream);
+            if (CollectionsUtil.isEmptyList(wechatMessageVos)) {
+                logger.warn("微信聊天excel文件读取失败：wechatMessageVos={}", JSONObject.toJSONString(wechatMessageVos));
+                throw new FileFormatException(ErrorEnum.ERROR,"Excel读取为空！");
+            }
+        }catch (InvalidFormatException e){
+            throw new FileFormatException(ErrorEnum.ERROR,e.getMessage());
         } catch (Exception e) {
             logger.error("读取上传的excel文件失败。。", e);
-            throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
+            throw new FileFormatException(ErrorEnum.ERROR, e.getMessage() );
         } finally {
         	if(inputStream != null) {
         		try {
@@ -147,14 +145,79 @@ public class MessageService extends BaseService {
         	}
         }
 
-        if (null == wechatMessageVos || wechatMessageVos.size() <= 0) {
-            return false;
+        // 得到去重后的聊天消息
+        List<Message> list = getDuplicateRemovalMessageList(wechatMessageVos, doctor,  drugUser);
+        if (CollectionsUtil.isEmptyList(list)){
+            throw new FileFormatException(ErrorEnum.ERROR,"医生的聊天记录已经被导入！");
+        }
+        //批量保存微信聊天消息
+        logger.info("开始批量插入聊天记录drugUserId={}, drugUserName={}, doctorId={}, doctorName={}, size={}", drugUser.getId(), drugUser.getName(), doctor.getId(), doctor.getName(), list.size());
+        messageRepository.save(list);
+        logger.info("批量插入聊天记录结束！！");
+        success = true;
+        return success;
+    }
+
+    /**
+     * 得到去重后的消息列表
+     * @param wechatMessageVos
+     * @return
+     */
+    private List<Message> getDuplicateRemovalMessageList(List<WechatMessageVo> wechatMessageVos,Doctor doctor, DrugUser drugUser) {
+        if (CollectionsUtil.isEmptyList(wechatMessageVos)){
+            return null;
         }
 
+        // 校验是否是IOS客户端导入的，安卓端的导入需要特殊处理 DRUG_USER_NICKNAME
+        List<String> collectNickNameList = wechatMessageVos.stream().filter(wechatMessageVo->(!StringUtils.isEmpty(wechatMessageVo.getId()))).map(WechatMessageVo::getNickname).distinct().collect(Collectors.toList());
+        if (CollectionsUtil.isEmptyList(collectNickNameList)){
+            throw new FileFormatException(ErrorEnum.ERROR, "微信昵称不能为空");
+        }
+        if (collectNickNameList.size() !=2){
+            throw new FileFormatException(ErrorEnum.ERROR, "Excel文件微信昵称只能有两个");
+        }
+
+        // 不是安卓端导出的聊天记录，将对应销售昵称替换成
+        if (!collectNickNameList.contains(DRUG_USER_NICKNAME)){
+            List<String> collectWechatNumber = wechatMessageVos.stream().filter(wechatMessageVo -> (!StringUtils.isEmpty(wechatMessageVo.getId()))).filter(wechatMessageVo -> (!StringUtils.isEmpty(wechatMessageVo.getWechatNumber()))).map(WechatMessageVo::getWechatNumber).distinct().collect(Collectors.toList());
+            if (CollectionsUtil.isEmptyList(collectWechatNumber)){
+                throw new FileFormatException(ErrorEnum.ERROR, "微信号不能为空");
+            }
+            if (collectNickNameList.size() !=2){
+                throw new FileFormatException(ErrorEnum.ERROR, "Excel文件微信号只能有两个");
+            }
+
+            Map<String, String> map = new HashMap<>(1);
+            String wechatNumber = collectWechatNumber.get(0);
+            Integer count = drugUserWechatMapper.getCountByWechat(wechatNumber);
+            if (count == null || count == 0){
+                wechatNumber = collectWechatNumber.get(1);
+                count = drugUserWechatMapper.getCountByWechat(wechatNumber);
+                if (count == null || count == 0){
+                    throw new FileFormatException(ErrorEnum.ERROR, "安卓手机导出的聊天记录需要绑定微信号！");
+                }else {
+                    map.put(wechatNumber, DRUG_USER_NICKNAME);
+                }
+            }else{
+                map.put(wechatNumber, DRUG_USER_NICKNAME);
+            }
+
+            wechatMessageVos.forEach(anWechatMessageVo -> {
+                String s = map.get(anWechatMessageVo.getWechatNumber());
+                if (!StringUtils.isEmpty(s)){
+                    anWechatMessageVo.setNickname(DRUG_USER_NICKNAME);
+                }
+            });
+
+        }
+
+
+        List<Message> list = new ArrayList<>();
         for (WechatMessageVo wechatMessageVo : wechatMessageVos) {
             if (null != wechatMessageVo) {
                 String id = wechatMessageVo.getId();
                 if (StringUtils.isEmpty(id)) {
+                    logger.warn("WechatId 是{} 过滤掉这条！" ,id );
                     continue;
                 }
 
@@ -165,12 +228,16 @@ public class MessageService extends BaseService {
                 String wechatMessageStatus = wechatMessageVo.getMessageStatus();
                 String wechatMessageType = wechatMessageVo.getMessageType();
                 String message = wechatMessageVo.getMessage();
+                if (StringUtils.isEmpty(wechatNumber)){
+                    throw new FileFormatException(ErrorEnum.ERROR, "微信号不能为空");
+                }
+
 
                 //判断数据库中是否存在该条数据
-				Message findMessage = messageRepository.findTopByMessageTypeAndWechatNumberAndMessageTimeOrderByMessageTimeDesc(
-						MessageTypeEnum.WECHAT.getMessageType(), wechatNumber, wechatTime);
-                if (findMessage != null){
+                Integer count = messageMapper.getCountByTypeAndWechatNumAndTime(MessageTypeEnum.WECHAT.getMessageType(), wechatNumber, wechatTime);
+                if (count != null && count > 0){
                     //数据库存在该条数据
+                    logger.warn("数据库存在该条数据，过滤掉这条！");
                     continue;
                 }
 
@@ -179,23 +246,18 @@ public class MessageService extends BaseService {
                 String telephone = "";
                 Long userId = 0L;
 
-                Doctor doctor = doctorRepository.findTopByMobile(doctorTelephone);
-                if (doctor == null) {
-                    throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
-                }
-
                 Long drugUserId = drugUser.getId();
                 Long doctorId = doctor.getId();
-                if (wechatNickName == null) {
-                    throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
+                if (StringUtils.isEmpty(wechatNickName)){
+                    throw new FileFormatException(ErrorEnum.ERROR.getStatus(), "文件中昵称不能为空！");
                 }
 
-                if (wechatNickName != null && DRUG_USER_NICKNAME.equals(wechatNickName)) {
+                if (DRUG_USER_NICKNAME.equals(wechatNickName)) {
                     userType = UserTypeEnum.DRUG_USER.getUserType();
                     nickname = drugUser.getName();
                     telephone = drugUser.getMobile();
                     userId = drugUserId;
-                } else if (wechatNickName != null && !DRUG_USER_NICKNAME.equals(wechatNickName)) {
+                } else{
                     userType = UserTypeEnum.DOCTOR.getUserType();
                     nickname = doctor.getName();
                     telephone = doctor.getMobile();
@@ -208,6 +270,7 @@ public class MessageService extends BaseService {
                 wechatMessage.setNickname(nickname);
                 wechatMessage.setDrugUserId(drugUserId);
                 wechatMessage.setDoctorId(doctorId);
+                wechatMessage.setWechatId(id);
                 wechatMessage.setWechatNumber(wechatNumber);
                 wechatMessage.setTelephone(telephone);
                 wechatMessage.setWechatMessageStatus(wechatMessageStatus);
@@ -220,11 +283,39 @@ public class MessageService extends BaseService {
             }
         }
 
-        //批量保存微信聊天消息
-        messageRepository.save(list);
+        return list;
+    }
 
-        success = true;
-        return success;
+    /**
+     * 检查导入的的微信消息文件是否合法，不合法会抛出异常，合法返回医生信息
+     * @param file
+     */
+    private Doctor checkWechatFile(MultipartFile file) {
+        String originalFilename = file.getOriginalFilename();
+        if (StringUtils.isEmpty(originalFilename)){
+            throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "文件名不能为空");
+        }
+
+        if (!originalFilename.endsWith(RegularUtils.EXTENSION_XLS) && !originalFilename.endsWith(RegularUtils.EXTENSION_XLSX)) {
+            throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR);
+        }
+
+
+        String fileName = originalFilename.substring(0,originalFilename.lastIndexOf("."));
+        Matcher matcher = RegularUtils.getMatcher(RegularUtils.MATCH_ELEVEN_NUM, fileName);
+        if (matcher.find()){
+            String telephone = matcher.group();
+            //Doctor doctor = doctorRepository.findTopByMobile(telephone);
+            Doctor doctor = newDoctorService.findFirstByMobile(telephone);
+            if (doctor == null){
+                throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "文件名中包含的手机号匹配不到医生！");
+            }
+            doctor.setMobile(telephone);
+            return doctor;
+        }else {
+            throw new FileFormatException(ErrorEnum.FILE_FORMAT_ERROR, "文件名中没有包含手机号！");
+        }
+
     }
 
     //mybatis的写法
@@ -237,7 +328,6 @@ public class MessageService extends BaseService {
         bean.setLeaderPath(leaderPath +"%");
         Integer page = bean.getPage();
         Integer pageSize = bean.getPageSize();
-        //bean.setPage(page  * pageSize);
         bean.setCurrentSize(page  * pageSize);
 
         List<MessageResponseBean> messageList = null;
@@ -245,13 +335,17 @@ public class MessageService extends BaseService {
         Integer messageType = bean.getMessageType();
         if (messageType != null){
             if (messageType == MessageTypeEnum.IM.getMessageType() || messageType == MessageTypeEnum.WECHAT.getMessageType()){
-                messageList = messageMapper.getMessageList(bean);
                 messageListCount = messageMapper.getMessageListCount(bean);
+                if (messageListCount != null && messageListCount > 0){
+                    messageList = messageMapper.getMessageList(bean);
+                }
             }
 
             if (messageType == MessageTypeEnum.EMAIL.getMessageType()){
-                messageList = messageMapper.getEmailMessageList(bean);
                 messageListCount = messageMapper.getEmailMessageListCount(bean);
+                if (messageListCount != null && messageListCount > 0){
+                    messageList = messageMapper.getEmailMessageList(bean);
+                }
             }
         }
 
@@ -278,15 +372,21 @@ public class MessageService extends BaseService {
         bean.setLeaderPath(leaderPath +"%");
         bean.setMessageType(MessageTypeEnum.WECHAT.getMessageType());
         Integer wechatCount = messageMapper.messageCount(bean);
-        bean.setMessageType(MessageTypeEnum.IM.getMessageType());
-        Integer imCount = messageMapper.messageCount(bean);
-        Integer emailMessageCount = messageMapper.emailMessageCount(bean);
-        if (emailMessageCount == null){
-            emailMessageCount=0;
-        }
-        map.put("wechat", wechatCount);
+//        bean.setMessageType(MessageTypeEnum.IM.getMessageType());
+//        Integer imCount = messageMapper.messageCount(bean);
+//        Integer emailMessageCount = messageMapper.emailMessageCount(bean);
+//        if (emailMessageCount == null){
+//            emailMessageCount=0;
+//        }
+
+        // 现在只有微信
+        /*map.put("wechat", wechatCount);
         map.put("im", imCount);
-        map.put("email",emailMessageCount);
+        map.put("email",emailMessageCount);*/
+
+        map.put("wechat", wechatCount);
+        map.put("im", 0);
+        map.put("email",0);
 
         return map;
     }
@@ -304,27 +404,31 @@ public class MessageService extends BaseService {
         bean.setLeaderPath(leaderPath+"%");
         Integer page = bean.getPage();
         Integer pageSize = bean.getPageSize();
-        //bean.setPage(page * pageSize);
         bean.setCurrentSize(page * pageSize);
-        List<MessageLinkmanResponseBean> messageLinkmanList = messageMapper.getMessageLinkmanList(bean);
-        if (null != messageLinkmanList && !messageLinkmanList.isEmpty()){
-            for (MessageLinkmanResponseBean messageLinkmanResponseBean:messageLinkmanList){
-                Integer messageType = messageLinkmanResponseBean.getMessageType();
-                if (messageType != null){
-                    if (messageType == MessageTypeEnum.WECHAT.getMessageType() || messageType == MessageTypeEnum.IM.getMessageType()){
-                        String lastMessage = messageMapper.getLastMessage(messageType, messageLinkmanResponseBean.getDoctorId(), messageLinkmanResponseBean.getLastTime());
-                        messageLinkmanResponseBean.setLastMessage(lastMessage);
-                    }
 
-                    if (messageType == MessageTypeEnum.EMAIL.getMessageType()){
-                        String lastEmailMessage = messageMapper.getLastEmailMessage(messageLinkmanResponseBean.getDoctorId(), messageLinkmanResponseBean.getLastTime());
-                        messageLinkmanResponseBean.setLastMessage(lastEmailMessage);
+        Integer messageLinkmanListCount = messageMapper.getMessageLinkmanListCount(bean);
+        List<MessageLinkmanResponseBean> messageLinkmanList = null;
+        if (messageLinkmanListCount !=null && messageLinkmanListCount > 0){
+            messageLinkmanList = messageMapper.getMessageLinkmanList(bean);
+            if (null != messageLinkmanList && !messageLinkmanList.isEmpty()){
+                for (MessageLinkmanResponseBean messageLinkmanResponseBean:messageLinkmanList){
+                    Integer messageType = messageLinkmanResponseBean.getMessageType();
+                    if (messageType != null){
+                        if (messageType == MessageTypeEnum.WECHAT.getMessageType() || messageType == MessageTypeEnum.IM.getMessageType()){
+                            String lastMessage = messageMapper.getLastMessage(messageType, messageLinkmanResponseBean.getDoctorId(), messageLinkmanResponseBean.getLastTime());
+                            messageLinkmanResponseBean.setLastMessage(lastMessage);
+                        }
+                        if (messageType == MessageTypeEnum.EMAIL.getMessageType()){
+                            String lastEmailMessage = messageMapper.getLastEmailMessage(messageLinkmanResponseBean.getDoctorId(), messageLinkmanResponseBean.getLastTime());
+                            messageLinkmanResponseBean.setLastMessage(lastEmailMessage);
+                        }
                     }
                 }
             }
         }
 
-        Integer messageLinkmanListCount = messageMapper.getMessageLinkmanListCount(bean);
+
+
         PageResponseBean<MessageLinkmanResponseBean> pageResponseBean = new PageResponseBean<>(bean,messageLinkmanListCount, messageLinkmanList);
 
         return pageResponseBean;

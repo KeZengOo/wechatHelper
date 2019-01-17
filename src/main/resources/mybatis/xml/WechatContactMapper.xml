@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.WechatContactMapper">
+
+
+    <select id="getWechatAndroidContactList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.wechat.WechatAndroidContactResponseBean">
+
+      SELECT drug_user_id drugUserId, upload_time uploadTime,
+      user_name userName,nickname,alias,con_remark conRemark
+      FROM virtual_wechat_contact
+      WHERE user_name IN
+        <foreach collection="userNameList" item="userName" open="(" close=")" separator=",">
+            #{userName}
+        </foreach>
+
+    </select>
+
+
+    <insert id="batchInsert">
+
+        INSERT INTO virtual_wechat_contact(drug_user_id, upload_time, user_name,nickname,alias,con_remark, doctor_id, telephone)
+        VALUES
+        <foreach collection="list" item="c" separator=",">
+            (#{drugUserId},#{uploadTime},#{c.userName},#{c.nickName}, #{c.alias}, #{c.conRemark}, #{c.doctorId}, #{c.telephone})
+        </foreach>
+
+    </insert>
+
+
+    <update id="updateWechatContact">
+        UPDATE virtual_wechat_contact
+        SET drug_user_id=#{drugUserId},nickname=#{bean.nickName},alias=#{bean.alias},con_remark=#{bean.conRemark},
+        doctor_id=#{bean.doctorId}, telephone=#{bean.telephone}
+        WHERE user_name=#{bean.userName}
+    </update>
+
+    <select id="getDoctorIdByWechatNumber" resultType="java.lang.Long">
+        SELECT doctor_id FROM virtual_wechat_contact
+        WHERE user_name=#{wechatNumber}
+    </select>
+
+
+    <select id="getUploadTime" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.wechat.WechatAndroidUploadTimeResponseBean">
+        SELECT
+            (
+                SELECT
+                    MAX(upload_time)
+                FROM
+                    virtual_wechat_contact
+                WHERE
+                    drug_user_id = (
+                        SELECT
+                            drug_user_id
+                        FROM
+                            virtual_drug_user_wechat
+                        WHERE
+                            wechat_number = #{wechatNumber}
+                        LIMIT 1
+                    )
+            ) AS contactUploadTimeValue,
+            (
+                SELECT
+                    MAX(upload_time)
+                FROM
+                    virtual_message
+                WHERE
+                    drug_user_id = (
+                        SELECT
+                            drug_user_id
+                        FROM
+                            virtual_drug_user_wechat
+                        WHERE
+                            wechat_number = #{wechatNumber}
+                        LIMIT 1
+                    )
+            ) AS messageUploadTimeValue
+    </select>
+
+</mapper>

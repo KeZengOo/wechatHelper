@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.ActivityInfoMapper">
+
+    <!-- 得到所有的产品文章 -->
+    <select id="getProductContentList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.content.ContentResponseBean">
+        SELECT DISTINCT
+            ai.id contentId,
+            ai.title
+        FROM
+            activity_info ai
+        INNER JOIN t_content_product tcp ON ai.id = tcp.content_id
+        WHERE tcp.product_id=#{productId}
+    </select>
+
+</mapper>

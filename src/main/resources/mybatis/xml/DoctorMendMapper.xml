@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.DoctorMendMapper">
+
+	<insert id="saveDoctorMend" keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO doctor_mend
+			( address, virtual_doctor_id)
+		VALUES  
+			( #{address}, #{virtualDoctorId})
+	</insert>
+
+	<update id="updateDoctorMend" >
+		UPDATE doctor_mend SET address=#{address},fixed_phone=#{fixedPhone} WHERE virtual_doctor_id=#{virtualDoctorId}
+	</update>
+
+	<select id="getDoctorMend" resultType="java.lang.Long">
+		SELECT id FROM doctor_mend  WHERE virtual_doctor_id=#{virtualDoctorId}
+	</select>
+
+	<!-- 新增医生地址 -->
+	<insert id="addWechat">
+		INSERT doctor_mend(wechat,virtual_doctor_id) VALUES(#{wechat}, #{doctorId})
+	</insert>
+
+	<!-- 更新医生地址 -->
+	<update id="updateWechat">
+		UPDATE doctor_mend SET wechat=#{wechat} WHERE virtual_doctor_id=#{doctorId}
+	</update>
+
+
+	<!-- 新增医生地址 -->
+	<insert id="addAddress">
+		INSERT doctor_mend(address,virtual_doctor_id) VALUES(#{address}, #{doctorId})
+	</insert>
+
+
+	<!-- 更新医生地址 -->
+	<update id="updateAddress">
+		UPDATE doctor_mend SET address=#{address} WHERE virtual_doctor_id=#{doctorId}
+	</update>
+
+	<!-- 根据医生ID查询总数，校验数据是否存在 -->
+	<select id="getCountByDoctorId" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM doctor_mend WHERE virtual_doctor_id=#{doctorId}
+	</select>
+	
+</mapper>

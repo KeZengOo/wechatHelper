@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorMapper">
+
+	<insert id="saveDrugUserDoctors" keyProperty="drugUserDoctorId" useGeneratedKeys="true" parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorParams">
+		INSERT INTO drug_user_doctor
+		(doctor_id, doctor_name, doctor_email, 
+		drug_user_id, drug_user_name, drug_user_email, prod_id, created_time)
+		VALUES 
+		<foreach collection ="list" item="index" separator =",">
+        	(#{index.doctorId}, #{index.doctorName}, #{index.doctorEmail}, 
+        	#{index.drugUserId}, #{index.drugUserName}, #{index.drugUserEmail},
+        	#{index.prodId}, NOW())
+    	</foreach >
+	</insert>		
+	
+	<insert id="saveDrugUserDoctorsOneToOne">
+		INSERT INTO drug_user_doctor_one_to_one 
+		(drug_user_id, doctor_id, is_add_wechat,create_time)
+		VALUES 
+		<foreach collection ="list" item="index" separator =",">
+        	(#{index.drugUserId}, #{index.doctorId}, #{index.isAddWechat}, NOW())
+    	</foreach >
+	</insert>
+
+	<select id="selectDrugUserDoctors" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsResponse">
+		SELECT DISTINCT user_id AS drugUserId,t1.name AS drugUserName FROM `product_user` t JOIN drug_user t1 ON t.user_id=t1.id
+		WHERE t.prod_id = #{productId} AND t1.status=1
+		and t.user_id IN
+		<foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		ORDER BY user_id
+		<if test="type==1">
+			LIMIT #{currentSize},#{pageSize}
+		</if>
+	</select>
+
+	<select id="selectDrugUserDoctorsCount" resultType="java.lang.Integer">
+		select count(DISTINCT user_id) total FROM `product_user` t JOIN drug_user t1 ON t.user_id=t1.id
+		WHERE t.prod_id =#{productId}  AND t1.status=1
+		and t.user_id IN
+		<foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+	</select>
+	
+	<select id="getProducts" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.ProductBean">
+		SELECT 
+			p.prod_id AS productId, prod_name AS productName 
+		FROM drug_user_doctor dud 
+		JOIN product_line p
+			ON p.prod_id=dud.prod_id 
+			AND dud.drug_user_id=#{virtualDrugUserId} 
+			AND dud.doctor_id = #{virtualDoctorId}
+	</select>
+
+	<select id="getDrugUserIdByProductId" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsResponse">
+		SELECT DISTINCT user_id AS drugUserId,t1.name AS drugUserName FROM `product_user` t JOIN drug_user t1 ON t.user_id=t1.id
+		WHERE t.prod_id = #{productId} AND t1.status=1 AND t1.`leader_path` LIKE #{leaderPath}
+	</select>
+
+</mapper>

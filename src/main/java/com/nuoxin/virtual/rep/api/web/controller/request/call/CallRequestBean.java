@@ -3,6 +3,7 @@ package com.nuoxin.virtual.rep.api.web.controller.request.call;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -22,16 +23,22 @@ public class CallRequestBean implements Serializable {
     private String statusName;
     @ApiModelProperty(value = "状态(1-成功接通，0-未成功)")
     private Integer status;
-    @ApiModelProperty(value = "类型(1,呼出,2-呼出)")
+    @ApiModelProperty(value = "类型(1,呼出,2-呼入)")
     private Integer type;
     @ApiModelProperty(value = "通话时长")
     private Long times;
     @ApiModelProperty(value = "录音文件url")
     private String url;
 
+    @ApiModelProperty(value = "拜访渠道，默认是电话1，2是微信，3是短信，4邮件，5面谈")
+    private Integer visitChannel = 1;
+
     @ApiModelProperty(value = "产品id")
     private Long productId;
     private Long drugUserId;
+
+    @NotNull(message = "医生ID不能为空")
+    private Long doctorId;
 
     public String getMobile() {
         return mobile;
@@ -111,5 +118,22 @@ public class CallRequestBean implements Serializable {
 
     public void setProductId(Long productId) {
         this.productId = productId;
+    }
+
+
+    public Long getDoctorId() {
+        return doctorId;
+    }
+
+    public void setDoctorId(Long doctorId) {
+        this.doctorId = doctorId;
+    }
+
+    public Integer getVisitChannel() {
+        return visitChannel;
+    }
+
+    public void setVisitChannel(Integer visitChannel) {
+        this.visitChannel = visitChannel;
     }
 }

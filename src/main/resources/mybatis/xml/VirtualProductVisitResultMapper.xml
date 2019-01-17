@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.VirtualProductVisitResultMapper">
+
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, product_id AS productId, visit_type AS visitType, visit_result AS visitResult
+    </sql>
+
+    <!-- 产品与拜访结果表批量新增 -->
+    <insert id="batchInsert" >
+        INSERT INTO virtual_product_visit_result
+		(id,product_id,visit_type,visit_result)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+		(#{item.id},#{item.productId},#{item.visitType},#{item.visitResult})
+        </foreach>
+    </insert>
+
+    <!-- 根据产品id查询拜访结果列表 -->
+    <select id="selectVisitResultList" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.ProductVisitResultResponse">
+        SELECT id,product_id AS productId,visit_type AS visitType,visit_result AS visitResult
+        FROM virtual_product_visit_result
+        WHERE product_id=#{productId}
+    </select>
+
+    <!-- 根据拜访结果和产品Id校验是否存在 -->
+    <select id="checkVisitResult" resultType="java.lang.Integer">
+        SELECT 1
+        FROM virtual_product_visit_result
+        WHERE product_id=#{productId}
+        <if test="visitResult!=null and visitResult!='' ">
+            AND visit_result=#{visitResult}
+        </if>
+         LIMIT 1;
+    </select>
+
+    <!-- 查询那些产品有拜访记录的数据 -->
+    <select id="selectProductVisitResult" resultType="java.lang.Long">
+        SELECT product_id AS productId
+        FROM virtual_product_visit_result
+        WHERE
+        product_id IN
+        <foreach collection="productIds" item="productId" open="(" close=")" separator=",">
+            #{productId}
+        </foreach>
+    </select>
+
+    <!-- 根据Id查询拜访结果 -->
+    <select id="selectVisitResultById" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.ProductVisitResultResponse">
+        SELECT visit_result AS visitResult,product_id AS productId,visit_type AS visitType
+        FROM virtual_product_visit_result
+        WHERE id=#{id} LIMIT 1;
+    </select>
+
+    <!-- 修改拜访结果 -->
+    <update id="update" >
+        UPDATE virtual_product_visit_result SET visit_type=#{visitType},visit_result=#{visitResult} where id=#{id}
+    </update>
+
+
+</mapper>

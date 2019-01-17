@@ -6,11 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
@@ -32,16 +28,16 @@ public class ProductController extends BaseController{
     private ProductLineService productLineService;
 
     @ApiOperation(value = "产品列表接口", notes = "产品列表接口")
-    @PostMapping("/getList")
+    @GetMapping("/getList")
     @ResponseBody
 	public ResponseEntity<DefaultResponseBean<List<ProductResponseBean>>> getList(
-			@RequestParam(value = "drugUserId", required = false) Long drugUserId, HttpServletRequest request) {
+			@RequestParam(value = "drugUserId", required = false) Long drugUserId,@RequestParam(value = "doctorId", required = false) Long doctorId, HttpServletRequest request) {
         if (drugUserId == null || drugUserId == 0){
             drugUserId = getLoginId(request);
         }
 
         DefaultResponseBean<List<ProductResponseBean>> responseBean = new DefaultResponseBean<>();
-        List<ProductResponseBean> list = productLineService.getList(drugUserId);
+        List<ProductResponseBean> list = productLineService.getList(drugUserId, doctorId);
         responseBean.setData(list);
 
         return ResponseEntity.ok(responseBean);

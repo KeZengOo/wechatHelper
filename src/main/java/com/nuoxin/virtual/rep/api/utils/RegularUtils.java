@@ -11,12 +11,22 @@ import java.util.regex.Pattern;
 public class RegularUtils {
 
     //excel文件扩展名校验
-    public static final String EXTENSION_XLS = "xls";
+    public static final String EXTENSION_XLS = ".xls";
 
-    public static final String EXTENSION_XLSX = "xlsx";
+    public static final String EXTENSION_XLSX = ".xlsx";
+
+
+    public static final String EXTENSION_CSV = ".csv";
+
 
     //手机号验证
     public static final String MATCH_TELEPHONE = "^1\\d{10}$";
+
+    // 校验座机号
+    public static final String MATCH_FIX_PHONE = "^(0\\d{2,3}-?)?\\d{7,8}$";
+
+    // 匹配1开头的11位数字
+    public static final String MATCH_ELEVEN_NUM = "(?<!\\d)(?:(?:1\\d{10}))";
 
     /**
      * @param regEx 正则表达式
@@ -41,4 +51,17 @@ public class RegularUtils {
         boolean matches = matcher.matches();
         return matches;
     }
+
+
+
+    public static void main(String[] args) {
+
+        String s = "0101234567890";
+        boolean matcher = RegularUtils.isMatcher(RegularUtils.MATCH_FIX_PHONE, s);
+        System.out.println(matcher);
+
+
+    }
+
+
 }

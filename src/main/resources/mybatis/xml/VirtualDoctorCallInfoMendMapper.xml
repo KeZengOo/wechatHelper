@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorCallInfoMendMapper">
+
+	<!-- 保存问卷作答 -->
+	<insert id="saveVirtualDoctorCallInfoMend" keyProperty="id" useGeneratedKeys="true"
+		parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoParams">
+		INSERT INTO virtual_doctor_call_info_mend
+		(virtual_drug_user_id, virtual_doctor_id, doctor_questionnaire_id, product_id,
+		 next_visit_time, visit_result, call_id, attitude, create_time, 
+		 hcp_potential, is_break_off, is_has_ae, is_target,is_has_drug, is_recruit, recruit_time, drop_out_time)
+		VALUES
+		(#{virtualDrugUserId}, #{virtualDoctorId}, #{doctorQuestionnaireId}, #{productId},
+		#{nextVisitTime}, #{visitResult}, #{callId}, #{attitude}, NOW(),
+		#{hcpPotential},#{isBreakOff},#{isHasAe},#{isTarget},#{isHasDrug}, #{isRecruit},
+		#{recruitTime},
+		#{dropOutTime}
+		)
+	</insert>
+	
+	<select id="getCallVisitMendList" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitMendBean">
+		SELECT 
+			call_id AS callId, attitude, visit_result AS visitResult
+		FROM virtual_doctor_call_info_mend
+		WHERE 
+			call_id IN 
+			<foreach collection="callIds" item="callId" open="(" close=")" separator=",">
+		   		#{callId}
+		  	</foreach> 	
+	</select>
+
+	<select id="getDoctorNum" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse">
+	   <!-- 2018-09-29 重构前
+		SELECT virtual_drug_user_id drugUserId,count(DISTINCT virtual_doctor_id) total
+		FROM virtual_doctor_call_info_mend
+		WHERE
+		virtual_drug_user_id IN
+		<foreach collection="statisticsParams.drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		and
+		<foreach collection="contents" item="content" open="(" close=")" separator="or">
+			visit_result LIKE CONCAT('%',#{content},'%')
+		</foreach>
+		<if test="statisticsParams.startTime!=null">
+			and date_format(create_time,'%Y-%m-%d')&gt;=#{statisticsParams.startTime}
+		</if>
+		<if test="statisticsParams.endTime!=null">
+			and date_format(create_time,'%Y-%m-%d')&lt;=#{statisticsParams.endTime}
+		</if>
+		and product_id=#{statisticsParams.productId}
+		GROUP BY virtual_drug_user_id
+		 -->
+
+		<!-- 2018-09-29 重构后 -->
+		SELECT
+		call_dud.drugUserId,
+		COUNT(
+		DISTINCT vdci.virtual_doctor_id
+		) total
+		FROM
+		virtual_doctor_call_info_mend vdci
+		INNER JOIN (
+		SELECT DISTINCT
+		d.id doctorId,
+		du.id drugUserId
+		FROM
+		doctor d
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		WHERE
+		dud.is_available = 1
+		AND dud.prod_id = #{statisticsParams.productId}
+		AND du.id IN
+
+		<foreach collection="statisticsParams.drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+
+		) call_dud ON vdci.virtual_doctor_id = call_dud.doctorId
+		WHERE
+		vdci.product_id = #{statisticsParams.productId}
+		and
+		<foreach collection="contents" item="content" open="(" close=")" separator="or">
+			vdci.visit_result LIKE CONCAT('%',#{content},'%')
+		</foreach>
+
+		<if test="statisticsParams.startTime!=null and statisticsParams.startTime!=''">
+			and date_format(vdci.create_time,'%Y-%m-%d')&gt;=#{statisticsParams.startTime}
+		</if>
+		<if test="statisticsParams.endTime!=null and statisticsParams.endTime!='' ">
+			and date_format(vdci.create_time,'%Y-%m-%d')&lt;=#{statisticsParams.endTime}
+		</if>
+
+		GROUP BY
+		call_dud.drugUserId
+
+	</select>
+
+
+
+
+
+</mapper>
+

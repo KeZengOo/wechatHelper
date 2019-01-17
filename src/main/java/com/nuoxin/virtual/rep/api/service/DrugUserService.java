@@ -76,6 +76,9 @@ public class DrugUserService {
         return drugUserMapper.relationDrugUser(leaderPath,productId);
     }
 
+
+
+
     /**
      * 获取doctor集合
      * @param bean

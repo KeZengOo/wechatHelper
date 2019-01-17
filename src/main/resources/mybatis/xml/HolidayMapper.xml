@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.HolidayMapper">
+
+
+    <insert id="batchInsert">
+        INSERT INTO virtual_holiday(batch_no, name, holiday_date)
+        VALUES
+        <foreach collection ="list" item="h" separator =",">
+            (#{h.batchNo},#{h.name}, #{h.holidayDate})
+        </foreach>
+
+    </insert>
+
+
+    <select id="getHolidayList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.HolidayResponseBean">
+       SELECT
+       h.batch_no batchNo,
+            h.`name`,
+            min(h.holiday_date) startDate,
+            (
+                SELECT
+                    COUNT(*)
+                FROM
+                    virtual_holiday
+                WHERE
+                    batch_no = h.batch_no
+            ) AS days
+        FROM
+            virtual_holiday h
+        GROUP BY
+            h.batch_no
+    </select>
+
+
+    <delete id="deleteByBatchNo">
+        DELETE FROM virtual_holiday
+        WHERE batch_no=#{batchNo}
+    </delete>
+
+
+    <select id="getHolidayStrList" resultType="java.lang.String">
+        SELECT DISTINCT  DATE_FORMAT(holiday_date, '%Y-%m-%d')  FROM virtual_holiday
+    </select>
+
+</mapper>

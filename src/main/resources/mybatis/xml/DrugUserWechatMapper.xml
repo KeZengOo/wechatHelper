@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.DrugUserWechatMapper">
+
+    <select id="getCountByWechat" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM virtual_drug_user_wechat
+        WHERE wechat_number=#{wechatNumber}
+    </select>
+
+
+    <select id="getDrugUserIdByWechat" resultType="java.lang.Long">
+        SELECT drug_user_id FROM virtual_drug_user_wechat
+        WHERE wechat_number=#{wechatNumber}
+    </select>
+
+
+    <!-- 查询代表的微信 -->
+    <select id="getDrugUserWechat" resultType="java.lang.String">
+        SELECT wechat_number FROM virtual_drug_user_wechat
+        WHERE drug_user_id=#{drugUserId}
+    </select>
+
+</mapper>

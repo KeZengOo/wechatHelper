@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorQuateResultMapper">
+
+
+    <insert id="batchInsert">
+        INSERT INTO drug_user_doctor_quate_result (quate_id, result_id)
+        VALUES
+        <foreach collection ="resultIdList" item="resultId" separator =",">
+            (#{quateId}, #{resultId})
+        </foreach>
+    </insert>
+
+    <select id="getVisitResult" resultType="java.lang.String">
+        SELECT
+            DISTINCT b.visit_result
+        FROM
+            drug_user_doctor_quate_result a
+        INNER JOIN virtual_product_visit_result b ON a.result_id = b.id
+        WHERE
+            a.quate_id = (
+                SELECT
+                    id
+                FROM
+                    drug_user_doctor_quate
+                WHERE
+                doctor_id = #{doctorId}
+                <if test="productList !=null and productList.size > 0">
+                    AND product_id IN
+                    <foreach collection="productList" item="productId" open="(" close=")" separator=",">
+                        #{productId}
+                    </foreach>
+                </if>
+
+
+                ORDER BY
+                    create_time DESC
+                LIMIT 1
+            )
+    </select>
+
+
+
+
+    <select id="getVisitResultList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VisitResultResponseBean">
+        SELECT DISTINCT
+            b.visit_result visitResult,
+            quate.doctorId
+        FROM
+            drug_user_doctor_quate_result a
+        INNER JOIN virtual_product_visit_result b ON a.result_id = b.id
+        INNER JOIN (
+            SELECT
+                MAX(id) quateId,
+                doctor_id doctorId
+            FROM
+                drug_user_doctor_quate q
+            WHERE 1=1
+
+            <if test="doctorIdList !=null and doctorIdList.size > 0">
+                AND q.doctor_id IN
+                <foreach collection="doctorIdList" item="doctorId" open="(" close=")" separator=",">
+                    #{doctorId}
+                </foreach>
+            </if>
+
+
+            <if test="productList !=null and productList.size > 0">
+                AND q.product_id IN
+                <foreach collection="productList" item="productId" open="(" close=")" separator=",">
+                    #{productId}
+                </foreach>
+            </if>
+
+            GROUP BY
+                doctor_id
+        ) quate ON a.quate_id = quate.quateId
+        WHERE b.visit_result IS NOT NULL AND b.visit_result !=''
+    </select>
+
+</mapper>

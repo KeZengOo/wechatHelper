@@ -17,6 +17,7 @@
 		<version>1.5.5.RELEASE</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
+	
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -27,7 +28,6 @@
 		<spymemcached.version>2.12.3</spymemcached.version>
 		<mybatis.spring.version>1.2.4</mybatis.spring.version>
 		<junit.version>4.12</junit.version>
-
 	</properties>
 
 	<dependencies>
@@ -37,6 +37,7 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-aop</artifactId>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
@@ -46,22 +47,27 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-jdbc</artifactId>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-jwt</artifactId>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-web</artifactId>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
@@ -78,12 +84,12 @@
 			<!--<version>1.7</version>-->
 		<!--</dependency>-->
 
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-freemarker</artifactId>
@@ -94,11 +100,13 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context-support</artifactId>
 		</dependency>
+		
 		<!-- spring-cloud -->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-ribbon</artifactId>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-eureka</artifactId>
@@ -111,6 +119,7 @@
 			<artifactId>springfox-swagger-ui</artifactId>
 			<version>${springfox.swagger.version}</version>
 		</dependency>
+		
 		<dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-swagger2</artifactId>
@@ -123,6 +132,7 @@
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 		</dependency>
+		
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
@@ -135,12 +145,14 @@
 			<artifactId>mybatis-spring-boot-starter</artifactId>
 			<version>1.3.0</version>
 		</dependency>
+		
 		<!--mapper-->
 		<dependency>
 			<groupId>tk.mybatis</groupId>
 			<artifactId>mapper-spring-boot-starter</artifactId>
 			<version>1.1.3</version>
 		</dependency>
+		
 		<!--pagehelper-->
 		<dependency>
 			<groupId>com.github.pagehelper</groupId>
@@ -153,6 +165,7 @@
 			<artifactId>spring-boot-configuration-processor</artifactId>
 			<optional>true</optional>
 		</dependency>
+		
 		<!-- log4j日志 -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -171,6 +184,7 @@
 			<artifactId>jedis</artifactId>
 			<version>${redis.version}</version>
 		</dependency>
+		
 		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-redis -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -221,6 +235,7 @@
 			<version>1.1.8</version>
 			<classifier>jar-with-dependencies</classifier>
 		</dependency>
+		
 		<dependency>
 			<groupId>com.aliyun.oss</groupId>
 			<artifactId>aliyun-sdk-oss</artifactId>
@@ -239,6 +254,7 @@
 			<artifactId>jave</artifactId>
 			<version>1.0.2</version>
 		</dependency>
+		
 		<dependency>
 			<groupId>com.wav2mp3</groupId>
 			<artifactId>wav2mp3</artifactId>
@@ -253,7 +269,31 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.0</version>
+			<version>1.18.4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.aliyun</groupId>
+			<artifactId>aliyun-java-sdk-core</artifactId>
+			<version>3.5.0</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+			<version>1.2.49</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-csv</artifactId>
+			<version>1.6</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.vdurmont</groupId>
+			<artifactId>emoji-java</artifactId>
+			<version>4.0.0</version>
 		</dependency>
 
 	</dependencies>
@@ -277,6 +317,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
@@ -299,12 +340,14 @@
 				<profiles.active>dev</profiles.active>
 			</properties>
 		</profile>
+		
 		<profile>
 			<id>test</id>
 			<properties>
 				<profiles.active>test</profiles.active>
 			</properties>
 		</profile>
+		
 		<profile>
 			<id>prod</id>
 			<properties>

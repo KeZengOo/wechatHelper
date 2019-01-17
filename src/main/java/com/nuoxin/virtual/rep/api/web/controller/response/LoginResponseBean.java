@@ -1,14 +1,16 @@
 package com.nuoxin.virtual.rep.api.web.controller.response;
 
+import java.io.Serializable;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
-import java.io.Serializable;
+import lombok.Data;
 
 /**
  * Created by fenggang on 9/19/17.
  */
-@ApiModel
+@Data
+@ApiModel("返回登录信息")
 public class LoginResponseBean implements Serializable {
 
     private static final long serialVersionUID = -8729573139433484148L;
@@ -19,38 +21,11 @@ public class LoginResponseBean implements Serializable {
     private String email;
     @ApiModelProperty(value = "角色（101-普通虚拟代表，102-虚拟代表管理员）")
     private Long roleId;
+    @ApiModelProperty(value = "虚拟代表ID")
+    private Long virtualDrugUserId;
+    @ApiModelProperty(value = "销售类型，0是没有类型为经理的，1是线上销售，2是线下销售")
+    private Integer saleType;
 
     private DrugUserCallDetaiBean callBean;
 
-    public DrugUserCallDetaiBean getCallBean() {
-        return callBean;
-    }
-
-    public void setCallBean(DrugUserCallDetaiBean callBean) {
-        this.callBean = callBean;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public Long getRoleId() {
-        return roleId;
-    }
-
-    public void setRoleId(Long roleId) {
-        this.roleId = roleId;
-    }
 }

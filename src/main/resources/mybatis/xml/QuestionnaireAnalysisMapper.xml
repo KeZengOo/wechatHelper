@@ -44,11 +44,12 @@
         select dq.virtual_questionnaire_id questionnaire_id,q.title,q.product_id from virtual_doctor_questionnaire dq join drug_user_doctor dud on dud.doctor_id=dq.virtual_doctor_id AND dud.drug_user_id=dq.virtual_drug_user_id
         join virtual_questionnaire q on q.id=dq.virtual_questionnaire_id join drug_user du on
         du.id=dq.virtual_drug_user_id where 1=1
+        and dud.is_available=1
         <if test="startDate!=null and startDate!=''">
-            AND dq.create_time &gt;= #{startDate}
+            AND DATE_FORMAT(dq.create_time, '%Y-%m-%d') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d')
         </if>
         <if test="endDate!=null and endDate!=''">
-            AND dq.create_time &lt;= #{endDate}
+            AND DATE_FORMAT(dq.create_time, '%Y-%m-%d') &lt;= DATE_FORMAT(#{endDate}, '%Y-%m-%d')
         </if>
         and du.leader_path like #{leaderPath,jdbcType=VARCHAR} GROUP BY dq.virtual_questionnaire_id;
     </select>
@@ -59,11 +60,12 @@
         dq join drug_user_doctor dud on dud.doctor_id=dq.virtual_doctor_id AND dud.drug_user_id=dq.virtual_drug_user_id
         join virtual_questionnaire q on q.id=dq.virtual_questionnaire_id join drug_user du on
         du.id=dq.virtual_drug_user_id where 1=1
+        and dud.is_available=1
         <if test="startDate!=null and startDate!=''">
-            AND dq.create_time &gt;= #{startDate}
+            AND DATE_FORMAT(dq.create_time, '%Y-%m-%d') &gt;= DATE_FORMAT(#{startDate}, '%Y-%m-%d')
         </if>
         <if test="endDate!=null and endDate!=''">
-            AND dq.create_time &lt;= #{endDate}
+            AND DATE_FORMAT(dq.create_time, '%Y-%m-%d') &lt;= DATE_FORMAT(#{endDate}, '%Y-%m-%d')
         </if>
         and du.leader_path like #{leaderPath,jdbcType=VARCHAR}
     </select>
@@ -74,11 +76,12 @@
         dq.virtual_doctor_id) people_num from virtual_doctor_questionnaire dq join drug_user_doctor dud on dud.doctor_id=dq.virtual_doctor_id AND dud.drug_user_id=dq.virtual_drug_user_id
         join virtual_questionnaire q on q.id=dq.virtual_questionnaire_id join drug_user du on
         du.id=dq.virtual_drug_user_id where 1=1
+        and dud.is_available=1
         <if test="startDate!=null and startDate!=''">
-            AND dq.create_time &gt;= #{startDate}
+            AND DATE_FORMAT(dq.create_time, '%Y-%m-%d') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d')
         </if>
         <if test="endDate!=null and endDate!=''">
-            AND dq.create_time &lt;= #{endDate}
+            AND DATE_FORMAT(dq.create_time, '%Y-%m-%d') &lt;= DATE_FORMAT(#{endDate}, '%Y-%m-%d')
         </if>
         and du.leader_path like #{leaderPath,jdbcType=VARCHAR} group by DATE_FORMAT(dq.create_time,'%Y-%m-%d')
     </select>
@@ -87,11 +90,12 @@
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.QuestionnaireAnalysisRequestBean">
         select q.id,q.virtual_questionnaire_id,q.title,q.options,q.type,count(DISTINCT dq.virtual_doctor_id) answerNum from virtual_doctor_questionnaire dq join drug_user_doctor dud on dud.doctor_id=dq.virtual_doctor_id AND dud.drug_user_id=dq.virtual_drug_user_id join virtual_question
         q on q.id=dq.virtual_question_id join drug_user du on du.id=dq.virtual_drug_user_id where 1=1
+        and dud.is_available=1
         <if test="startDate!=null and startDate!=''">
-            AND dq.create_time &gt;= #{startDate}
+            AND DATE_FORMAT(dq.create_time, '%Y-%m-%d') &gt;= DATE_FORMAT(#{startDate}, '%Y-%m-%d')
         </if>
         <if test="endDate!=null and endDate!=''">
-            AND dq.create_time &lt;= #{endDate}
+            AND DATE_FORMAT(dq.create_time, '%Y-%m-%d') &lt;= DATE_FORMAT(#{endDate}, '%Y-%m-%d')
         </if>
         and du.leader_path like #{leaderPath,jdbcType=VARCHAR}
         and dq.virtual_questionnaire_id =#{questionnaireId} group by dq.virtual_question_id
@@ -100,12 +104,14 @@
     <select id="questionUsreAnswerType0" resultMap="qAnswerResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.QuestionnaireAnalysisRequestBean">
         select COUNT(DISTINCT dq.virtual_doctor_id) count_num,dq.virtual_question_id question_id,dq.answer from virtual_doctor_questionnaire dq join drug_user_doctor dud on dud.doctor_id=dq.virtual_doctor_id AND dud.drug_user_id=dq.virtual_drug_user_id join virtual_question
-        q on q.id=dq.virtual_question_id join drug_user du on du.id=dq.virtual_drug_user_id where q.type=0
+        q on q.id=dq.virtual_question_id join drug_user du on du.id=dq.virtual_drug_user_id where
+         dud.is_available=1 and
+        q.type=0
         <if test="startDate!=null and startDate!=''">
-            AND dq.create_time &gt;= #{startDate}
+            AND DATE_FORMAT(dq.create_time, '%Y-%m-%d') &gt;= DATE_FORMAT(#{startDate}, '%Y-%m-%d')
         </if>
         <if test="endDate!=null and endDate!=''">
-            AND dq.create_time &lt;= #{endDate}
+            AND DATE_FORMAT(dq.create_time, '%Y-%m-%d') &lt;= DATE_FORMAT(#{endDate}, '%Y-%m-%d')
         </if>
         and du.leader_path like #{leaderPath,jdbcType=VARCHAR}
         and dq.virtual_questionnaire_id =#{questionnaireId} group by dq.virtual_question_id,dq.answer
@@ -114,12 +120,12 @@
     <select id="questionUsreAnswerType1" resultMap="qAnswerResponseBean"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.analysis.QuestionnaireAnalysisRequestBean">
         select COUNT(DISTINCT dq.virtual_doctor_id) count_num,dq.virtual_question_id question_id,dq.answer from virtual_doctor_questionnaire dq join drug_user_doctor dud on dud.doctor_id=dq.virtual_doctor_id AND dud.drug_user_id=dq.virtual_drug_user_id join virtual_question
-        q on q.id=dq.virtual_question_id join drug_user du on du.id=dq.virtual_drug_user_id where q.type=1
+        q on q.id=dq.virtual_question_id join drug_user du on du.id=dq.virtual_drug_user_id where dud.is_available=1 and  q.type=1
         <if test="startDate!=null and startDate!=''">
-            AND dq.create_time &gt;= #{startDate}
+            AND DATE_FORMAT(dq.create_time, '%Y-%m-%d') &gt;= DATE_FORMAT(#{startDate}, '%Y-%m-%d')
         </if>
         <if test="endDate!=null and endDate!=''">
-            AND dq.create_time &lt;= #{endDate}
+            AND DATE_FORMAT(dq.create_time, '%Y-%m-%d') &lt;= DATE_FORMAT(#{endDate}, '%Y-%m-%d')
         </if>
         and du.leader_path like #{leaderPath,jdbcType=VARCHAR}
         and dq.virtual_questionnaire_id =#{questionnaireId} group by dq.virtual_question_id

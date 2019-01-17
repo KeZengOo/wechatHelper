@@ -20,6 +20,7 @@ import com.nuoxin.virtual.rep.api.entity.Message;
 import com.nuoxin.virtual.rep.api.entity.SmsTemplate;
 import com.nuoxin.virtual.rep.api.enums.MessageTypeEnum;
 import com.nuoxin.virtual.rep.api.enums.UserTypeEnum;
+import com.nuoxin.virtual.rep.api.service.v2_5.NewDoctorService;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.utils.RegularUtils;
 import com.nuoxin.virtual.rep.api.web.controller.request.SmsSendRequestBean;
@@ -29,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.*;
 import java.util.regex.Matcher;
 
@@ -52,6 +54,10 @@ public class SmsSendService {
     private DoctorRepository doctorRepository;
     @Autowired
     private MessageRepository messageRepository;
+
+    @Resource
+    private NewDoctorService newDoctorService;
+
 
     /**
      * 发送短信
@@ -205,7 +211,8 @@ public class SmsSendService {
         List<String> mobiles =  sms.getMobiles();
         if (null != mobiles && mobiles.size() > 0){
             for (String mobile:mobiles){
-                Doctor doctor = doctorRepository.findTopByMobile(mobile);
+                //Doctor doctor = doctorRepository.findTopByMobile(mobile);
+                Doctor doctor = newDoctorService.findFirstByMobile(mobile);
                 if(doctor != null){
                     Message message = new Message();
                     message.setUserId(doctor.getId());

@@ -13,7 +13,7 @@
         on d.id=dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id=du.id
-        where vm.message_type=1
+        where dud.is_available=1 and vm.message_type=1
         and vm.user_type=2
         and du.leader_path like #{leaderPath}
         and date_format(vm.message_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
@@ -26,7 +26,7 @@
         on d.id=dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id=du.id
-        where vm.message_type=1
+        where dud.is_available=1 and vm.message_type=1
         and vm.user_type=2
         and du.leader_path like #{leaderPath}
         and date_format(vm.message_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
@@ -40,7 +40,7 @@
         on d.id=dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id=du.id
-        where vm.message_type=2
+        where dud.is_available=1 and vm.message_type=2
         and vm.user_type=2
         <if test="productId !=null and productId !=0">
             and dud.prod_id=#{productId}
@@ -59,7 +59,7 @@
         on d.id=dud.doctor_id
         inner join drug_user du
         on dud.drug_user_id=du.id
-        where vm.message_type=2
+        where dud.is_available=1 and vm.message_type=2
         and vm.user_type=2
         <if test="productId !=null and productId !=0">
             and dud.prod_id=#{productId}
@@ -81,6 +81,9 @@
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean"
             resultType="com.nuoxin.virtual.rep.api.web.controller.response.message.MessageLinkmanResponseBean">
 
+
+
+        <!-- 2018-09-19 重构
         select
         a.doctor_id doctorId,
         a.doctorName nickname,
@@ -166,13 +169,7 @@
         ) t group by t.type,t.product_id,t.doctor_id
         ) a
         where 1=1
-       <!-- <if test="startTime !=null and startTime !=''">
-            and date_format(a.maxMessageTime,'%Y-%m-%d %H:%i:%s') &gt;=#{startTime}
-        </if>
 
-        <if test="endTime !=null and endTime !=''">
-            and date_format(a.maxMessageTime,'%Y-%m-%d %H:%i:%s') &lt;=#{endTime}
-        </if>-->
         <if test="messageType !=null and messageType !=0">
             and a.type=#{messageType}
         </if>
@@ -182,8 +179,90 @@
 
 
         order by a.maxMessageTime desc limit #{currentSize},#{pageSize}
+            -->
 
 
+        <!-- 2018-09-19 重构后 -->
+        SELECT DISTINCT
+        content_dud.doctorId,
+        content_dud.doctorName nickname,
+        vm.message_type messageType,
+        (
+        SELECT
+        MAX(
+        DATE_FORMAT(
+        message_time,
+        '%Y-%m-%d %H:%i:%s'
+        )
+        )
+        FROM
+        virtual_message
+        WHERE
+        doctor_id = content_dud.doctorId
+        AND message_type = 1
+
+        <if test="startTime !=null and startTime !=''">
+            and date_format(message_time,'%Y-%m-%d %H:%i:%s') &gt;=date_format(#{startTime},'%Y-%m-%d %H:%i:%s')
+        </if>
+
+        <if test="endTime !=null and endTime !=''">
+            and date_format(message_time,'%Y-%m-%d %H:%i:%s') &lt;=date_format(#{endTime},'%Y-%m-%d %H:%i:%s')
+        </if>
+
+
+        ) lastTime,
+        (
+        SELECT
+        message
+        FROM
+        virtual_message
+        WHERE
+        doctor_id = content_dud.doctorId
+        AND message_type = 1
+        <if test="startTime !=null and startTime !=''">
+            and date_format(message_time,'%Y-%m-%d %H:%i:%s') &gt;=date_format(#{startTime},'%Y-%m-%d %H:%i:%s')
+        </if>
+
+        <if test="endTime !=null and endTime !=''">
+            and date_format(message_time,'%Y-%m-%d %H:%i:%s') &lt;=date_format(#{endTime},'%Y-%m-%d %H:%i:%s')
+        </if>
+
+        ORDER BY
+        message_time DESC
+        LIMIT 1
+        ) lastMessage
+        FROM
+        (
+        SELECT DISTINCT
+        d.id doctorId,
+        d. NAME doctorName
+        FROM
+        doctor d
+        INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+        INNER JOIN drug_user du ON dud.drug_user_id = du.id
+        WHERE
+        dud.is_available=1 and
+        du.leader_path LIKE #{leaderPath}
+        <if test="nickname !=null and nickname !=''">
+            and d.`name` like concat('%',#{nickname},'%')
+        </if>
+
+        ) content_dud
+        INNER JOIN virtual_message vm ON content_dud.doctorId = vm.doctor_id
+        AND vm.message_type=1
+        WHERE 1=1
+        <if test="startTime !=null and startTime !=''">
+            and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &gt;=date_format(#{startTime},'%Y-%m-%d %H:%i:%s')
+        </if>
+
+        <if test="endTime !=null and endTime !=''">
+            and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &lt;=date_format(#{endTime},'%Y-%m-%d %H:%i:%s')
+        </if>
+
+        <!-- 排序比较慢，暂时不加了
+        ORDER BY vm.message_time DESC
+        -->
+        LIMIT #{currentSize},#{pageSize}
 
     </select>
 
@@ -191,6 +270,7 @@
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean"
             resultType="java.lang.Integer">
 
+        <!-- 2018-09-19 重构前
         select count(1)
         from (
         select t.doctor_id,max(message_time) as maxMessageTime,t.type,t.doctorName,t.product_id from (
@@ -268,24 +348,45 @@
         ) t group by t.type,t.product_id,t.doctor_id
         ) a
         where 1=1
-        <!--<if test="startTime !=null and startTime !=''">
-            and date_format(a.maxMessageTime,'%Y-%m-%d %H:%i:%s') &gt;=#{startTime}
-        </if>
-
-        <if test="endTime !=null and endTime !=''">
-            and date_format(a.maxMessageTime,'%Y-%m-%d %H:%i:%s') &lt;=#{endTime}
-        </if>-->
         <if test="messageType !=null and messageType !=0">
             and a.type=#{messageType}
         </if>
         <if test="nickname !=null and nickname !=''">
             and a.doctorName like concat('%',#{nickname},'%')
         </if>
+         -->
 
 
+        <!-- 2018-09-19 重构后 -->
+        SELECT count(DISTINCT content_dud.doctorId)
 
+        FROM
+        (
+        SELECT DISTINCT
+        d.id doctorId,
+        d. NAME doctorName
+        FROM
+        doctor d
+        INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+        INNER JOIN drug_user du ON dud.drug_user_id = du.id
+        WHERE
+        dud.is_available=1 and
+        du.leader_path LIKE #{leaderPath}
+        <if test="nickname !=null and nickname !=''">
+            and d.`name` like concat('%',#{nickname},'%')
+        </if>
 
+        ) content_dud
+        INNER JOIN virtual_message vm ON content_dud.doctorId = vm.doctor_id
+        AND vm.message_type=1
+        WHERE 1=1
+        <if test="startTime !=null and startTime !=''">
+            and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &gt;=date_format(#{startTime},'%Y-%m-%d %H:%i:%s')
+        </if>
 
+        <if test="endTime !=null and endTime !=''">
+            and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &lt;=date_format(#{endTime},'%Y-%m-%d %H:%i:%s')
+        </if>
 
 
     </select>
@@ -304,6 +405,7 @@
     <select id="getMessageList" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean"
             resultType="com.nuoxin.virtual.rep.api.web.controller.response.message.MessageResponseBean">
 
+      <!-- 2018-09-19 重构
         select
         distinct
         vm.id id,
@@ -340,19 +442,50 @@
         </if>
 
         and vm.doctor_id=#{doctorId}
-        <!--<if test="startTime !=null and endTime !=null">
-            and date_format(vm.message_time,'%Y-%m-%d') between #{startTime} and #{endTime}
-        </if>-->
-
         <if test="startTime !=null and startTime !=''">
-            and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &gt;=#{startTime}
+            and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &gt;=date_format(#{startTime},'%Y-%m-%d %H:%i:%s')
         </if>
 
         <if test="endTime !=null and endTime !=''">
-            and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &lt;=#{endTime}
+            and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &lt;=date_format(#{endTime},'%Y-%m-%d %H:%i:%s')
         </if>
         and vm.drug_user_id in (select id from drug_user where leader_path like #{leaderPath})
         order by vm.message_time desc limit #{currentSize},#{pageSize}
+        -->
+
+
+        SELECT
+        vm.id,
+        vm.user_id userId,
+        vm.user_type userType,
+        vm.nickname,
+        vm.wechat_number wechatNumer,
+        vm.telephone,
+        vm.wechat_message_status wechatMessageStatus,
+        vm.wechat_message_type wechatMessageType,
+        vm.message,
+        vm.message_type messageType,
+        vm.message_time messageTime
+        FROM
+        virtual_message vm
+        WHERE
+        vm.doctor_id = #{doctorId}
+        AND vm.message_type = #{messageType}
+
+        <if test="startTime !=null and startTime !=''">
+            and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &gt;=date_format(#{startTime},'%Y-%m-%d %H:%i:%s')
+        </if>
+
+        <if test="endTime !=null and endTime !=''">
+            and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &lt;=date_format(#{endTime},'%Y-%m-%d %H:%i:%s')
+        </if>
+
+        <!-- 不要按时间倒叙啦，不然对话是反的
+        ORDER BY vm.message_time DESC
+        -->
+
+        ORDER BY vm.message_time
+        LIMIT #{currentSize},#{pageSize}
 
 
     </select>
@@ -361,6 +494,8 @@
     <select id="getMessageListCount" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean"
             resultType="java.lang.Integer">
 
+
+        <!-- 2018-09-19 重构
         select
         count(distinct vm.id)
         from virtual_message vm
@@ -395,6 +530,26 @@
             and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &lt;=#{endTime}
         </if>
         and vm.drug_user_id in (select id from drug_user where leader_path like #{leaderPath})
+        -->
+
+        SELECT
+        COUNT(*)
+        FROM
+        virtual_message vm
+        WHERE
+        vm.doctor_id = #{doctorId}
+        AND vm.message_type =#{messageType}
+
+        <if test="startTime !=null and startTime !=''">
+            and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &gt;=date_format(#{startTime},'%Y-%m-%d %H:%i:%s')
+        </if>
+
+        <if test="endTime !=null and endTime !=''">
+            and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &lt;=date_format(#{endTime},'%Y-%m-%d %H:%i:%s')
+        </if>
+
+
+
 
 
     </select>
@@ -417,6 +572,7 @@
         inner join drug_user du
         on dud.drug_user_id=du.id
         where 1=1
+        and dud.is_available=1
         <if test="productId !=null and productId !=0">
             and vei.product_id=#{productId}
             and dud.prod_id=#{productId}
@@ -448,6 +604,7 @@
         inner join drug_user du
         on dud.drug_user_id=du.id
         where 1=1
+        and dud.is_available=1
         <if test="productId !=null and productId !=0">
             and vei.product_id=#{productId}
             and dud.prod_id=#{productId}
@@ -468,6 +625,8 @@
 
 
     <select id="messageCount" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean" resultType="java.lang.Integer">
+
+        <!-- 2018-09-19 重构前
         select
         count(distinct vm.doctor_id)
         from virtual_message vm
@@ -497,6 +656,31 @@
                 and du.leader_path like #{leaderPath}
             )
         and vm.drug_user_id in (select id from drug_user where leader_path like #{leaderPath})
+        -->
+
+
+        <!-- 2018-09-19 重构后 -->
+
+        SELECT
+        COUNT(DISTINCT vm.doctor_id)
+        FROM
+        (
+        SELECT DISTINCT
+        d.id doctorId,
+        d. NAME doctorName
+        FROM
+        doctor d
+        INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+        INNER JOIN drug_user du ON dud.drug_user_id = du.id
+        WHERE
+        dud.is_available=1 and
+        du.leader_path LIKE #{leaderPath}
+        ) content_dud
+        INNER JOIN virtual_message vm ON content_dud.doctorId = vm.doctor_id
+        AND vm.message_type = 1
+        WHERE
+        DATE_FORMAT(vm.message_time, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d')
+
 
 
     </select>
@@ -512,6 +696,7 @@
         inner join drug_user du
         on dud.drug_user_id=du.id
         where 1=1
+        and dud.is_available=1
         <if test="productId !=null and productId !=0">
             and vei.product_id=#{productId}
             and dud.prod_id=#{productId}
@@ -520,4 +705,151 @@
         and du.leader_path like #{leaderPath}
         and date_format(vei.create_time,'%Y-%m-%d')=date_format(NOW(),'%Y-%m-%d')
     </select>
+
+    <select id="getWeiXinDoctorVisitCount"  resultType="com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse">
+        <!-- 2018-09-29 修改前
+        SELECT
+        drug_user_id drugUserId,count(DISTINCT doctor_id) total
+        FROM virtual_message
+        WHERE message_type=1 and
+        drug_user_id IN
+        <foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+            #{drugUserId}
+        </foreach>
+        <if test="startTime!=null">
+            and date_format(message_time,'%Y-%m-%d')&gt;=#{startTime}
+        </if>
+        <if test="endTime!=null">
+            and date_format(message_time,'%Y-%m-%d')&lt;=#{endTime}
+        </if>
+        AND product_id=#{productId}
+        GROUP BY drug_user_id
+        -->
+
+        <!-- 2018-09-29 修改后 -->
+        SELECT
+        message_dud.drugUserId,
+        COUNT(DISTINCT vm.doctor_id)
+        FROM
+        virtual_message vm
+        INNER JOIN (
+        SELECT DISTINCT
+        d.id doctorId,
+        du.id drugUserId
+        FROM
+        doctor d
+        INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+        INNER JOIN drug_user du ON dud.drug_user_id = du.id
+        WHERE
+        dud.is_available = 1
+        AND dud.prod_id = #{productId}
+        AND du.id IN
+
+        <foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+            #{drugUserId}
+        </foreach>
+
+        ) message_dud ON vm.doctor_id = message_dud.doctorId
+        AND vm.message_type = 1
+        WHERE 1=1
+        <if test="startTime!=null and startTime!=''">
+            and date_format(vm.message_time,'%Y-%m-%d') &gt;=#{startTime}
+        </if>
+        <if test="endTime!=null and endTime!=''">
+            and date_format(vm.message_time,'%Y-%m-%d') &lt;=#{endTime}
+        </if>
+        GROUP BY
+        message_dud.drugUserId
+
+    </select>
+
+    <select id="getWeiXinMessageCount"  resultType="com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse">
+       <!-- 2018-09-29 修改前
+
+        SELECT
+        drug_user_id drugUserId,count(DISTINCT doctor_id) total
+        FROM virtual_message
+        WHERE message_type=1 and
+        drug_user_id IN
+        <foreach collection="statisticsParams.drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+            #{drugUserId}
+        </foreach>
+        <if test="statisticsParams.startTime!=null">
+            and date_format(message_time,'%Y-%m-%d')&gt;=#{statisticsParams.startTime}
+        </if>
+        <if test="statisticsParams.endTime!=null">
+            and date_format(message_time,'%Y-%m-%d')&lt;=#{statisticsParams.endTime}
+        </if>
+        AND product_id=#{statisticsParams.productId} and wechat_message_status=#{wechatMessageStatus}
+        GROUP BY drug_user_id
+        -->
+
+        <!-- 2018-09-29 修改后 -->
+        SELECT
+        message_dud.drugUserId,
+        COUNT(DISTINCT vm.doctor_id)
+        FROM
+        virtual_message vm
+        INNER JOIN (
+        SELECT DISTINCT
+        d.id doctorId,
+        du.id drugUserId
+        FROM
+        doctor d
+        INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+        INNER JOIN drug_user du ON dud.drug_user_id = du.id
+        WHERE
+        dud.is_available = 1
+        AND dud.prod_id = #{statisticsParams.productId}
+        AND du.id IN
+        <foreach collection="statisticsParams.drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+            #{drugUserId}
+        </foreach>
+
+        ) message_dud ON vm.doctor_id = message_dud.doctorId
+        AND vm.message_type = 1
+        WHERE wechat_message_status=#{wechatMessageStatus}
+
+        <if test="statisticsParams.startTime!=null and statisticsParams.startTime!=''">
+            and date_format(vm.message_time,'%Y-%m-%d')&gt;=#{statisticsParams.startTime}
+        </if>
+        <if test="statisticsParams.endTime!=null and statisticsParams.endTime!=''">
+            and date_format(vm.message_time,'%Y-%m-%d')&lt;=#{statisticsParams.endTime}
+        </if>
+        GROUP BY
+        message_dud.drugUserId
+
+
+    </select>
+
+
+
+    <!-- 查询消息类型，判断是否重复 -->
+    <select id="getCountByTypeAndWechatNumAndTime" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM virtual_message
+        WHERE message_type=#{messageType}
+        AND wechat_number=#{wechatNumber}
+        AND DATE_FORMAT(message_time,'%Y-%m-%d %H:%i:%s')=DATE_FORMAT(#{wechatTime},'%Y-%m-%d %H:%i:%s')
+    </select>
+
+
+
+    <insert id="batchInsertWechatMessage">
+        INSERT INTO virtual_message(user_id, user_type, nickname, drug_user_id, upload_time, doctor_id, wechat_number, telephone,
+        wechat_message_status, message, img_path, wechat_message_type,message_time, message_time_stamp)
+        VALUES
+        <foreach collection="list" item="c" separator=",">
+            (#{c.userId},#{c.userType},#{c.nickname},#{c.drugUserId}, #{c.uploadTime},
+            #{c.doctorId}, #{c.wechatNumber},
+            #{c.telephone},#{c.wechatMessageStatus},
+            #{c.message},
+            #{c.imgPath},#{c.wechatMessageType},
+            #{c.messageTime},
+            #{c.messageTimestamp}
+            )
+        </foreach>
+
+    </insert>
+
 </mapper>
