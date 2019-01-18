@@ -154,41 +154,34 @@ public class StatisticalServiceImpl implements StatisticalService {
                 List<DynamicFieldValueResponse> fieldValueList = null;
                 if (CollectionsUtil.isNotEmptySet(callIds)){
                     fieldValueList = dynamicFieldMapper.getProductCallDynamicFieldValue(statisticsParams.getProductId(), callIds);
-                    type = 1;
-                    if (CollectionsUtil.isEmptyList(fieldValueList)){
-                        fieldValueList = dynamicFieldMapper.getProductDynamicFieldValue(statisticsParams.getProductId(), ids);
-                        type = 2;
-                    }
-                }else {
-                    fieldValueList = dynamicFieldMapper.getProductDynamicFieldValue(statisticsParams.getProductId(), ids);
-                    type = 2;
-                }
-
-                if (type == 1){
+                    List<DynamicFieldValueResponse> fieldValueList2 = dynamicFieldMapper.getProductDynamicFieldValue(statisticsParams.getProductId(), ids);
                     Map<Long, List<DynamicFieldValueResponse>> map = fieldValueList.stream().collect(Collectors.groupingBy(DynamicFieldValueResponse::getCallId));
+                    Map<Long, List<DynamicFieldValueResponse>> map2 = fieldValueList2.stream().collect(Collectors.groupingBy(DynamicFieldValueResponse::getDoctorId));
+
+//                    type = 1;
+//                    if (CollectionsUtil.isEmptyList(fieldValueList)){
+//                        fieldValueList = dynamicFieldMapper.getProductDynamicFieldValue(statisticsParams.getProductId(), ids);
+//                        type = 2;
+//                    }
+
                     list.forEach(x ->{
                         Long callId = Long.parseLong(x.get("callId").toString());
+                        Long doctorId = Long.parseLong(x.get("doctorId").toString());
                         List<DynamicFieldValueResponse> valueList = map.get(callId);
+                        List<DynamicFieldValueResponse> valueList2 = map2.get(doctorId);
                         if (CollectionsUtil.isNotEmptyList(valueList)){
                             valueList.forEach(xx -> {
                                 if (xx.getProp() !=null && (!"".equals(xx.getProp().trim()))) {
                                     x.put(xx.getProp(), xx.getValue() == null ? "" : xx.getValue());
                                 }
                             });
+                        }else {
+                            valueList2.forEach(xx -> {
+                                if (xx.getProp() !=null && (!"".equals(xx.getProp().trim()))) {
+                                    x.put(xx.getProp(), xx.getValue() == null ? "" : xx.getValue());
+                                }
+                            });
                         }
-                    });
-                }
-
-                if (type == 2){
-                    Map<Integer, List<DynamicFieldValueResponse>> map = fieldValueList.stream().collect(Collectors.groupingBy(DynamicFieldValueResponse::getDoctorId));
-                    list.forEach(x -> {
-                        Integer doctorId = Integer.parseInt(x.get("doctorId").toString());
-                        List<DynamicFieldValueResponse> valueList = map.get(doctorId);
-                        valueList.forEach(xx -> {
-                            if (xx.getProp() !=null && (!"".equals(xx.getProp().trim()))) {
-                                x.put(xx.getProp(), xx.getValue() == null ? "" : xx.getValue());
-                            }
-                        });
                     });
                 }
 
