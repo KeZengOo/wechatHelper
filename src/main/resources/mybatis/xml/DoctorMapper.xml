@@ -167,7 +167,7 @@
 		</if>
 
 		<!-- 其他搜索 -->
-		<if test="searchType==2 or searchType==3 or searchType==4">
+		<if test="searchType==2 or searchType==3 or searchType==4 or (searchType==5 and meetingTimeType==1) or (searchType==6 and meetingTimeType==1)">
 
 			INNER JOIN (
 
@@ -404,7 +404,7 @@
 		</if>
 
 		<!-- 其他搜索 -->
-		<if test="searchType==2 or searchType==3 or searchType==4 or (searchType==6 and meetingTimeType==1)">
+		<if test="searchType==2 or searchType==3 or searchType==4 or (searchType==5 and meetingTimeType==1) or (searchType==6 and meetingTimeType==1)">
 
 			INNER JOIN (
 
