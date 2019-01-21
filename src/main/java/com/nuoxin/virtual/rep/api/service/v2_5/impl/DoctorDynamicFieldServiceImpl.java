@@ -59,7 +59,8 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
         }
         Long doctorId = bean.getDoctorId();
         Long productId = bean.getProductId();
-        List<Long> classificationIdList = bean.getClassificationIdList();
+        // 先暂时去掉医生分型
+//        List<Long> classificationIdList = bean.getClassificationIdList();
         List<DoctorDynamicFieldValueRequestBean> list = bean.getList();
         if(checkRequiredDoctorDynamicFieldValueList(list)){
             List<Integer> collectClassification = list.stream().map(DoctorDynamicFieldValueRequestBean::getClassification).distinct().collect(Collectors.toList());
@@ -73,10 +74,10 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
         }
 
 
-        if (CollectionsUtil.isNotEmptyList(classificationIdList)){
-            productClassificationMapper.deleteDoctorClassificationByProductId(productId, doctorId);
-            productClassificationMapper.addDoctorClassification(productId, doctorId, classificationIdList);
-        }
+//        if (CollectionsUtil.isNotEmptyList(classificationIdList)){
+//            productClassificationMapper.deleteDoctorClassificationByProductId(productId, doctorId);
+//            productClassificationMapper.addDoctorClassification(productId, doctorId, classificationIdList);
+//        }
 
     }
 
