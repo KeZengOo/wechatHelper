@@ -52,6 +52,11 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public void addDoctorDynamicFieldValue(DoctorDynamicFieldValueListRequestBean bean) {
+        Long callId = bean.getCallId();
+        // 如果是根据拜访来的，不添加
+        if (callId !=null && callId > 0){
+            return;
+        }
         Long doctorId = bean.getDoctorId();
         Long productId = bean.getProductId();
         List<Long> classificationIdList = bean.getClassificationIdList();
@@ -94,6 +99,11 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
 
     @Override
     public void addDoctorBasicDynamicFieldValue(DoctorBasicDynamicFieldValueListRequestBean bean) {
+        Long callId = bean.getCallId();
+        // 如果是根据拜访来的，不添加
+        if (callId !=null && callId > 0){
+            return;
+        }
         DoctorDynamicFieldValueListRequestBean doctorDynamicFieldValueListRequestBean = getDoctorDynamicFieldValueList(bean);
         this.addDoctorDynamicFieldValue(doctorDynamicFieldValueListRequestBean);
 
