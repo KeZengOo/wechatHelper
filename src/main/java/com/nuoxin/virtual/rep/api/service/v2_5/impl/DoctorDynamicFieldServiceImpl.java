@@ -83,12 +83,12 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
         Long callId = bean.getCallId();
         List<DoctorDynamicFieldValueRequestBean> list = bean.getList();
         if(checkRequiredDoctorDynamicFieldValueList(list)){
-            List<Integer> collectClassification = list.stream().map(DoctorDynamicFieldValueRequestBean::getClassification).distinct().collect(Collectors.toList());
+            /*List<Integer> collectClassification = list.stream().map(DoctorDynamicFieldValueRequestBean::getClassification).distinct().collect(Collectors.toList());
             if (CollectionsUtil.isNotEmptyList(collectClassification)){
                 collectClassification.forEach(classification->{
                     this.deleteDoctorCallDynamicFieldValue(doctorId, classification, callId);
                 });
-            }
+            }*/
 
             dynamicFieldMapper.addDoctorCallBasicDynamicFieldValue(doctorId, callId, list);
         }
