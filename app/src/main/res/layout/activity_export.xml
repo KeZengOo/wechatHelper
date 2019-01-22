@@ -1,54 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
     android:orientation="vertical"
-    tools:context=".MainActivity$ExportActivity">
+    tools:context=".ExportActivity">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#f8f8f8"
-        android:gravity="center"
-        android:padding="18dp"
+        android:layout_gravity="center"
+        android:background="#2DA1F8"
+        android:gravity="center_horizontal"
+        android:paddingBottom="25dp"
+        android:paddingTop="25dp"
         android:text="请选择联系人"
-        android:textColor="#000000"
+        android:textColor="#FFFFFF"
         android:textSize="18dp" />
 
-    <RelativeLayout
-        android:orientation="horizontal"
+
+    <CheckBox
+        android:textColor="#2DA1F8"
+        android:id="@+id/selectAll"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="90dp"
+        android:text="全选"
+        android:textSize="18dp" />
+
+
+    <ImageView
+        android:layout_marginTop="135dp"
+        android:background="#efe6dbdb"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <CheckBox
-            android:layout_marginLeft="6dp"
-            android:id="@+id/selectAll"
-            android:text="  全选"
-            android:layout_centerVertical="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:layout_centerHorizontal="true"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"
-            android:background="@drawable/bg_update"
-            android:id="@+id/download"
-            android:layout_centerVertical="true"
-            android:text="下载本地"
-            android:textColor="#fff"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </RelativeLayout>
+        android:layout_height="1dp" />
 
     <ListView
         android:id="@+id/listview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        ></ListView>
-</LinearLayout>
+        android:layout_marginTop="135dp"></ListView>
+
+    <TextView
+        android:id="@+id/download"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="50dp"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/bg_update"
+        android:paddingBottom="10dp"
+        android:paddingLeft="40dp"
+        android:paddingRight="40dp"
+        android:paddingTop="10dp"
+        android:text="下载本地"
+        android:textColor="#fff"
+        android:textSize="18dp" />
+</RelativeLayout>

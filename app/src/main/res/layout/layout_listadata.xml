@@ -2,14 +2,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="15dp"
     android:orientation="horizontal">
 
     <CheckBox
+        android:layout_marginLeft="15dp"
         android:id="@+id/checkbox_operate_data"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:layout_margin="6dp" />
+         />
 
     <TextView
         android:id="@+id/text_desc"
@@ -18,8 +20,7 @@
         android:layout_gravity="center_vertical"
         android:gravity="bottom"
         android:singleLine="true"
-        android:text="描述描述描述描述描述描述"
-        android:textColor="#0e0d0d"
-        android:textSize="14sp" />
+        android:textColor="#2DA1F8"
+        android:textSize="18dp" />
 
 </LinearLayout>

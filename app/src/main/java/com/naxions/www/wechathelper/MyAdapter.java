@@ -71,7 +71,7 @@ public class MyAdapter extends BaseAdapter {
 		if (dataBean != null) {
 			holder.textDesc.setText(dataBean.desc);
 			holder.checkboxOperateData.setChecked(dataBean.isCheck);
-			//注意这里设置的不是onCheckedChangListener，还是值得思考一下的  
+			//注意这里设置的不是onCheckedChangListener，还是值得思考一下的
 			holder.checkboxOperateData.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
@@ -91,5 +91,6 @@ public class MyAdapter extends BaseAdapter {
 	class ViewHolder {
 		public CheckBox checkboxOperateData;
 		public TextView textDesc;
+
 	}
 }

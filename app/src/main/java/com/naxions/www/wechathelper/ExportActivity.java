@@ -2,7 +2,9 @@ package com.naxions.www.wechathelper;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
@@ -52,7 +54,6 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
     public final String WX_DB_DIR_PATH = WX_ROOT_PATH + "MicroMsg";
     public final String WX_DB_FILE_NAME = "EnMicroMsg.db";
     public String password = "";
-
     /**
     拷贝到sd 卡的路径
      */
@@ -93,6 +94,14 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_export);
+        if (Build.VERSION.SDK_INT >= 23) {
+            View decorView = getWindow().getDecorView();
+            int option = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+            decorView.setSystemUiVisibility(option);
+            //状态栏颜色设置透明
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
+        }
         mActivity = this;
         listView = findViewById(R.id.listview);
         selectAll = findViewById(R.id.selectAll);
