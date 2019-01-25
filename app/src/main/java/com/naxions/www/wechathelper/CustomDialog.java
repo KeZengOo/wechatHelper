@@ -4,7 +4,9 @@ import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 /**
- * creater zengke 2018 12
+ * @Author: zengke
+ * @Date: 2018.12
+ *
  */
 public class CustomDialog extends Dialog {
     private Context context;

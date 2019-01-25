@@ -61,7 +61,9 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 /**
- * zengke 2018 12
+ * @Author: zengke
+ * @Date: 2018.12
+ *
  */
 public class MainActivity extends AppCompatActivity implements OnDownloadListener, View.OnClickListener, OnButtonClickListener {
 
@@ -72,23 +74,30 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
     private static CSVPrinter contactCsvPrinter;
     private static CSVPrinter messageCsvPrinter;
     private static final ObjectBus TASK = ObjectBus.newList();
-    static String WXPackageName = "com.tencent.mm";
+
     /**
      * 微信数据库路径
      */
     public final String WX_ROOT_PATH = "/data/data/com.tencent.mm/";
     public final String WX_DB_DIR_PATH = WX_ROOT_PATH + "MicroMsg";
     public final String WX_DB_FILE_NAME = "EnMicroMsg.db";
+    public final String WXPACKAGENAME = "com.tencent.mm";
+    public final String COPY_WX_DATA_DB = "wx_data.db";
     /**
      * 拷贝到sd 卡的路径
      */
-    public String mCcopyPath = Environment.getExternalStorageDirectory().getPath() + "/";
-    public final String COPY_WX_DATA_DB = "wx_data.db";
-    String copyFilePath = mCcopyPath + COPY_WX_DATA_DB;
+    public String copyPath = Environment.getExternalStorageDirectory().getPath() + "/";
+    String copyFilePath = copyPath + COPY_WX_DATA_DB;
 
-    public String USERNAME = "userName";
-    public String LASTUPDATETIME = EMPTY;
-    public String USERINFO = "userInfo";
+    //sp 的 key
+    public final String USERNAME = "userName";
+    public final String USERINFO = "userInfo";
+    //根据输入的不同微信号切换到不同的key
+    public String LAST_UPDATE_TIME = EMPTY;
+
+    /**
+     * apk下载
+     */
     private DownloadManager manager;
 
     /**
@@ -96,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
      */
     private Button btn_update;
     private Button btn_export;
+    private Button btn_update_version;
     /**
      * 上次上传时间
      */
@@ -149,8 +159,17 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
      */
     private File file1;
     private File file2;
-
-
+    /**
+     * baseUrl
+     */
+    //测试
+    String baseUrl = "http://123.56.95.29:7083/android/wechat/";
+    //正式
+//   String baseUrl = "http://47.93.121.23:10001/android/wechat/";
+    //sql 语句
+    String contactSql = "select * from rcontact where verifyFlag = 0 and type != 4 and type != 2 and type != 0 and type != 33 and nickname != ''and nickname != '文件传输助手'";
+    String messageSql = "select * from message where  createTime > "+longLastUpdateTime;
+//    String messageSql = "select * from message where  createTime > "+0;
     public static boolean isDebug = true;
     public static final String EMPTY = "";
     public static final String ZERO = "0";
@@ -167,37 +186,39 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mainn);
+        //沉浸式状态栏
         if (Build.VERSION.SDK_INT >= 23) {
             View decorView = getWindow().getDecorView();
             int option = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                     | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
             decorView.setSystemUiVisibility(option);
-            //状态栏颜色设置透明
             getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
         mActivity = this;
         initView();
         initData();
-        //  startUpdate3();
+
     }
 
     private void initView() {
         btn_update = findViewById(R.id.btn_update);
         btn_export = findViewById(R.id.btn_export);
         tv_updateTime = findViewById(R.id.tv_updateTime);
+        btn_update_version = findViewById(R.id.btn_update_version);
         et_name = findViewById(R.id.et_name);
         btn_update.setOnClickListener(this);
         btn_export.setOnClickListener(this);
+        btn_update_version.setOnClickListener(this);
 
     }
 
     private void initData() {
-        // sp中获取销售代表名字和上次上传时间
+        //sp中获取销售代表名字和上次上传时间
         preferences = getSharedPreferences(USERINFO, Context.MODE_PRIVATE);
         userName = preferences.getString(USERNAME, EMPTY);
         //多账号切换时,key不同,要拿的时间也不同
-        LASTUPDATETIME = userName;
-        lastUpdateTime = preferences.getString(LASTUPDATETIME, EMPTY);
+        LAST_UPDATE_TIME = userName;
+        lastUpdateTime = preferences.getString(LAST_UPDATE_TIME, EMPTY);
         //赋值
         et_name.setText(userName.toCharArray(), 0, userName.length());
         longLastUpdateTime = Long.valueOf(DateUtil.date2Timestamp(lastUpdateTime));
@@ -223,13 +244,18 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            //上传按钮
             case (R.id.btn_update):
                 uploadData();
                 break;
+            //导出按钮
             case (R.id.btn_export):
                 startActivity(new Intent(mActivity, ExportActivity.class));
                 break;
-
+            //更新按钮
+            case (R.id.btn_update_version):
+                startUpdate3();
+                break;
             default:
                 break;
         }
@@ -250,11 +276,11 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
         }
         //可能修改过用户 更新userName和上传时间;
         userName = et_name.getText().toString().trim();
-        LASTUPDATETIME = userName;
+        LAST_UPDATE_TIME = userName;
         if (preferences == null) {
             preferences = getSharedPreferences(USERINFO, Context.MODE_PRIVATE);
         }
-        lastUpdateTime = preferences.getString(LASTUPDATETIME, EMPTY);
+        lastUpdateTime = preferences.getString(LAST_UPDATE_TIME, EMPTY);
         //赋值
         if (EMPTY.equals(lastUpdateTime)) {
             tv_updateTime.setText("暂无上传时间");
@@ -264,7 +290,6 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
             tv_updateTime.setText(lastUpdateTime);
         }
         et_name.setText(userName.toCharArray(), 0, userName.length());
-
         //保存姓名
         SharedPreferences.Editor edit = preferences.edit();
         edit.putString(USERNAME, et_name.getText().toString().trim());
@@ -281,7 +306,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
                 @Override
                 public void onClick(View view) {
                     //跳转到微信设置界面,关闭微信,避免操作同一数据库崩溃冲突
-                    Uri packageURI = Uri.parse("package:" + WXPackageName);
+                    Uri packageURI = Uri.parse("package:" + WXPACKAGENAME);
                     Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, packageURI);
                     startActivity(intent);
                 }
@@ -307,7 +332,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
                     loadingView.setVisibility(View.VISIBLE);
                     iv_success.setVisibility(View.INVISIBLE);
                     iv_fail.setVisibility(View.INVISIBLE);
-
+                    //获取上次上传时间并赋值
                     getLastUploadTime();
 
                 }
@@ -387,7 +412,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
                                         preferences = getSharedPreferences(USERINFO, Context.MODE_PRIVATE);
                                     }
                                     SharedPreferences.Editor edit = preferences.edit();
-                                    edit.putString(LASTUPDATETIME, messageUploadTime);
+                                    edit.putString(LAST_UPDATE_TIME, messageUploadTime);
                                     edit.commit();
                                     go2GetData();
                                 }
@@ -546,24 +571,14 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
      */
     public void getRecontactDate(SQLiteDatabase db) {
         Cursor c1 = null;
-        Cursor c2 = null;
         try {
             //新建文件保存联系人信息
             file1 = new File(Environment.getExternalStorageDirectory().getPath() + "/" + et_name.getText().toString().trim() + "_contact_file" + ".csv");
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file1), "UTF-8"));
             contactCsvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader("userName", "nickName", "alias", "conRemark", "type"));
-            //新建文件保存聊天记录
-            file2 = new File(Environment.getExternalStorageDirectory().getPath() + "/" + et_name.getText().toString().trim() + "_message_file" + ".csv");
-            // 防止出现乱码 utf-8
-            BufferedWriter writer2 = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file2), "UTF-8"));
-            messageCsvPrinter = new CSVPrinter(writer2, CSVFormat.DEFAULT.withHeader("talker", "content", "createTime", "imgPath", "isSend", "type"));
-
             // 查询所有联系人verifyFlag!=0:公众号等类型，群里面非好友的类型为4，未知类型2）
-            c1 = db.rawQuery(
-                    "select * from rcontact where verifyFlag = 0 and type != 4 and type != 2 and type != 0 and type != 33 and nickname != ''and nickname != '文件传输助手'",
-                    null);
+            c1 = db.rawQuery(contactSql, null);
             while (c1.moveToNext()) {
-
                 String userName = c1.getString(c1.getColumnIndex("username"));
                 String nickName = c1.getString(c1.getColumnIndex("nickname"));
                 String alias = c1.getString(c1.getColumnIndex("alias"));
@@ -580,76 +595,10 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
             }
             contactCsvPrinter.printRecord();
             contactCsvPrinter.flush();
-
-            //查询聊天记录
-            String query = "select * from message where  createTime > " + longLastUpdateTime;
-//            String query = "select * from message where  createTime > 0";
-            if (isDebug) {
-                Log.e("query查询分割时间", DateUtil.timeStamp2Date(longLastUpdateTime + EMPTY));
-            }
-            c2 = db.rawQuery(query, null);
-            while (c2.moveToNext()) {
-                String content = c2.getString(c2.getColumnIndex("content"));
-                String talker = c2.getString(c2.getColumnIndex("talker"));
-                String createTime = c2.getString(c2.getColumnIndex("createTime"));
-                int isSend = c2.getInt(c2.getColumnIndex("isSend"));
-                int imgPath = c2.getInt(c2.getColumnIndex("imgPath"));
-                int type = c2.getInt(c2.getColumnIndex("type"));
-                if (content != null) {
-                    if (isDebug) {
-                        Log.e("chatInfo", "talker=" + talker + "createTime=" + DateUtil.timeStamp2Date(createTime.toString()) + "content=" + content + "imgPath=" + imgPath + "isSend=" + isSend + "type=" + type);
-                    }
-                    //将聊天记录写入 csv 文件
-                    String messageType;
-                    switch (type) {
-                        case 1:
-                            messageType = "文字消息";
-                            break;
-                        case 47:
-                            messageType = "表情消息";
-                            break;
-                        case 43:
-                            messageType = "视频消息";
-                            break;
-                        case 49:
-                            messageType = "链接/小程序/聊天记录";
-                            break;
-                        case 50:
-                            messageType = "语音视频通话";
-                            break;
-                        case 3:
-                            messageType = "图片消息";
-                            break;
-                        case 34:
-                            messageType = "语音消息";
-                            break;
-                        case 48:
-                            messageType = "地图消息";
-                            break;
-                        case 10000:
-                            messageType = "撤回提醒";
-                            break;
-                        default:
-                            messageType = "其他消息";
-                            break;
-                    }
-                    messageCsvPrinter.printRecord(talker, FilterUtil.filterEmoji(content), DateUtil.timeStamp2Date(createTime.toString()), imgPath, isSend, messageType);
-                }
-            }
-            messageCsvPrinter.printRecord();
-            messageCsvPrinter.flush();
-
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mRemindText.setText("正在向工作台上传聊天记录,请稍候");
-                }
-            });
-
             //上传联系人
             upLoadFiles(baseUrl + "contact/import?uploadTime=" + currentTime, file1, et_name.getText().toString().trim() + "_contact_file.cvs", false);
-            //上传聊天记录
-            upLoadFiles(baseUrl + "message/import?uploadTime=" + currentTime, file2, et_name.getText().toString().trim() + "_message_file.cvs", true);
+            //联系人上传后再获取并上传聊天记录
+            getReMessageDate(db);
 
         } catch (Exception e) {
             if (isDebug) {
@@ -666,29 +615,124 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
             if (c1 != null) {
                 c1.close();
             }
-            if (c2 != null) {
-                c2.close();
-            }
-            if (db != null) {
-                db.close();
-            }
         }
     }
 
     /**
+     * 获取聊天记录并上传
+     * @param db
+     */
+    public void getReMessageDate(SQLiteDatabase db) {
+        Cursor c2 = null;
+        if (isDebug) {
+            Log.e("query查询分割时间", DateUtil.timeStamp2Date(longLastUpdateTime + EMPTY));
+        }
+        try {
+            //新建文件保存聊天记录
+            file2 = new File(Environment.getExternalStorageDirectory().getPath() + "/" + et_name.getText().toString().trim() + "_message_file" + ".csv");
+            // 防止出现乱码 utf-8
+            BufferedWriter writer2 = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file2), "UTF-8"));
+            messageCsvPrinter = new CSVPrinter(writer2, CSVFormat.DEFAULT.withHeader("talker", "content", "createTime", "imgPath", "isSend", "type"));
+        c2 = db.rawQuery(messageSql, null);
+        while (c2.moveToNext()) {
+            String content = c2.getString(c2.getColumnIndex("content"));
+            String talker = c2.getString(c2.getColumnIndex("talker"));
+            String createTime = c2.getString(c2.getColumnIndex("createTime"));
+            int isSend = c2.getInt(c2.getColumnIndex("isSend"));
+            int imgPath = c2.getInt(c2.getColumnIndex("imgPath"));
+            int type = c2.getInt(c2.getColumnIndex("type"));
+            if (content != null) {
+                if (isDebug) {
+                    Log.e("chatInfo", "talker=" + talker + "createTime=" + DateUtil.timeStamp2Date(createTime.toString()) + "content=" + content + "imgPath=" + imgPath + "isSend=" + isSend + "type=" + type);
+                }
+                //将聊天记录写入 csv 文件
+                String messageType;
+                switch (type) {
+                    case 1:
+                        messageType = "文字消息";
+                        break;
+                    case 47:
+                        messageType = "表情消息";
+                        break;
+                    case 43:
+                        messageType = "视频消息";
+                        break;
+                    case 49:
+                        messageType = "链接/小程序/聊天记录";
+                        break;
+                    case 50:
+                        messageType = "语音视频通话";
+                        break;
+                    case 3:
+                        messageType = "图片消息";
+                        break;
+                    case 34:
+                        messageType = "语音消息";
+                        break;
+                    case 48:
+                        messageType = "地图消息";
+                        break;
+                    case 10000:
+                        messageType = "撤回提醒";
+                        break;
+                    default:
+                        messageType = "其他消息";
+                        break;
+                }
+                messageCsvPrinter.printRecord(talker, FilterUtil.filterEmoji(content), DateUtil.timeStamp2Date(createTime.toString()), imgPath, isSend, messageType);
+            }
+        }
+        messageCsvPrinter.printRecord();
+        messageCsvPrinter.flush();
+
+    } catch (Exception e) {
+        if (isDebug) {
+            Log.e("openWxDb", "读取数据库信息失败" + e.toString());
+        }
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                getUploadTimeError("读取数据库信息失败");
+
+            }
+        });
+    } finally {
+        if (c2 != null) {
+            c2.close();
+        }
+        if (db != null) {
+            db.close();
+        }
+    }
+        //上传聊天记录
+        upLoadFiles(baseUrl + "message/import?uploadTime=" + currentTime, file2, et_name.getText().toString().trim() + "_message_file.cvs", true);
+    }
+    /**
      * @param url
      * @throws Exception isSave 用来表示只有消息表上传成功时,才保存上传时间到 sp
      */
-    private void upLoadFiles(String url, File file, String name, final boolean isSave) {
+    private void upLoadFiles(String url, File file, String name, final boolean isMessage) {
         if (isDebug) {
             Log.e("query网址", url + file.getName());
         }
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (mRemindText != null) {
+                    if (isMessage) {
+                        mRemindText.setText("正在向工作台上传聊天记录,请稍候");
+                    } else {
+                        mRemindText.setText("正在向工作台上传联系人,请稍候");
+                    }
+                }
+            }
+        });
         OkHttpClient client = new OkHttpClient.Builder()
                 .readTimeout(60, TimeUnit.MINUTES)
                 .build();
         MultipartBody.Builder builder = new MultipartBody.Builder();
         if (file.exists()) {
-
             String TYPE = "application/octet-stream";
             RequestBody fileBody = RequestBody.create(MediaType.parse(TYPE), file);
 
@@ -712,12 +756,11 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
                         Log.e("query上传文件失败的返回错误", e.toString());
                     }
                     //上传失败
-                    if (isSave) {
+                    if (isMessage) {
                         getUploadTimeError("聊天记录上传失败请联系开发人员");
                     } else {
                         getUploadTimeError("联系人上传失败请联系开发人员");
                     }
-
                 }
 
                 @Override
@@ -733,15 +776,15 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
                         e.printStackTrace();
                     }
                     if (isDebug) {
-                        if (isSave) {
+                        if (isMessage) {
                             Log.e("query上传聊天文件的返回值", string);
                         } else {
                             Log.e("query上传联系人文件的返回值", string);
                         }
                     }
                     if (SUCCESS_CODE.equals(updateCode.toString())) {
-                        //上传成功,重新赋值时间并保存sp时间
-                        if (isSave) {
+                        //上传消息记录成功,重新赋值时间并保存sp时间
+                        if (isMessage) {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -755,7 +798,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
                                         preferences = getSharedPreferences(USERINFO, Context.MODE_PRIVATE);
                                     }
                                     SharedPreferences.Editor edit = preferences.edit();
-                                    edit.putString(LASTUPDATETIME, currentTime);
+                                    edit.putString(LAST_UPDATE_TIME, currentTime);
                                     edit.commit();
                                     //重新赋值本次上传时间
                                     longLastUpdateTime = Long.valueOf(mTimeStamp);
@@ -772,7 +815,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
 
                     } else {
 
-                        if (isSave) {
+                        if (isMessage) {
                             getUploadTimeError("聊天记录上传失败," + description);
                         } else {
                             getUploadTimeError("联系人上传失败" + description);
@@ -799,6 +842,9 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                if (loadingDialog == null) {
+                    loadingDialog = new CustomDialog(mActivity, R.style.customDialog, R.layout.layout_loading_dialog);
+                }
                 loadingDialog.setCancelable(true);
                 mRemindText.setText(s);
                 loadingView.setVisibility(View.INVISIBLE);
@@ -819,7 +865,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
         if (pinfo != null) {
             for (int i = 0; i < pinfo.size(); i++) {
                 String pn = pinfo.get(i).packageName;
-                if (pn.equals(WXPackageName)) {
+                if (pn.equals(WXPACKAGENAME)) {
                     return true;
                 }
             }
@@ -829,8 +875,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
 
     private void startUpdate3() {
         /*
-         * 整个库允许配置的内容
-         * 非必选
+         * 安装更新
          */
         UpdateConfiguration configuration = new UpdateConfiguration()
                 //输出错误日志
@@ -857,8 +902,8 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
                 .setOnDownloadListener(this);
 
         manager = DownloadManager.getInstance(this);
-        manager.setApkName("appupdate.apk")
-                .setApkUrl("http://nuoxin-eapp.oss-cn-beijing.aliyuncs.com/apk/mzyx.apk")
+        manager.setApkName("wechatHelper.apk")
+                .setApkUrl("https://github.com/KeZengOo/wechatHelper/raw/master/app/%E8%81%8A%E5%A4%A9%E4%B8%8A%E4%BC%A0%E5%B7%A5%E5%85%B7.apk")
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setShowNewerToast(true)
                 .setConfiguration(configuration)
@@ -866,8 +911,9 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
                 .setApkVersionCode(4)
                 .setApkVersionName("1.2.0")
                 .setAuthorities(getPackageName())
-                .setApkDescription("1.支持断点下载\n2.支持Android N\n3.支持Android O\n4.支持自定义下载过程\n5.支持 设备>=Android M 动态权限的申请\n6.支持通知栏进度条展示(或者自定义显示进度)")
+                .setApkDescription("这都是啥")
                 .download();
+
     }
 
 

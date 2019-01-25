@@ -39,7 +39,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 /**
- * zengke 2018 12
+ * @Author: zengke
+ * @Date: 2018.12
+ *
  */
 public class ExportActivity extends AppCompatActivity implements View.OnClickListener {
     private ListView listView;
@@ -57,10 +59,10 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
     /**
     拷贝到sd 卡的路径
      */
-    public String mCcopyPath = Environment.getExternalStorageDirectory().getPath() + "/";
+    public String copyPath = Environment.getExternalStorageDirectory().getPath() + "/";
     public final String COPY_WX_DATA_DB = "wx_data.db";
     public final String OTHERLABEL = "otherLabel";
-    String copyFilePath = mCcopyPath + COPY_WX_DATA_DB;
+    String copyFilePath = copyPath + COPY_WX_DATA_DB;
     /**
      * 正在上传提示的 loadingView
      */
@@ -89,6 +91,7 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
     private Activity mActivity;
     private CheckBox selectAll;
     private TextView download;
+    String labelSql="select * from ContactLabel";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -262,11 +265,8 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
     public void getContactLabel(SQLiteDatabase db, Context mContext) {
         Cursor c1 = null;
         try {
-
             // 查询所有联系人verifyFlag!=0:公众号等类型，群里面非好友的类型为4，未知类型2）
-            c1 = db.rawQuery(
-                    "select * from ContactLabel",
-                    null);
+            c1 = db.rawQuery(labelSql, null);
             while (c1.moveToNext()) {
                 String labelName = c1.getString(c1.getColumnIndex("labelName"));
                 String labelID = c1.getString(c1.getColumnIndex("labelID"));
@@ -351,6 +351,8 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
             contactCsvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader("默认微信号", "昵称", "微信号", "备注", "标签"));
         } catch (IOException e) {
             e.printStackTrace();
+        }finally {
+
         }
 
         // 查询所有联系人verifyFlag!=0:公众号等类型，群里面非好友的类型为4，未知类型2）
@@ -416,7 +418,6 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
                 db.close();
             }
         }
-
 
         runOnUiThread(new Runnable() {
             @Override

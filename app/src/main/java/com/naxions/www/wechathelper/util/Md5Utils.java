@@ -2,7 +2,9 @@ package com.naxions.www.wechathelper.util;
 
 import java.security.MessageDigest;
 /**
- * zengke 2018 12
+ * @Author: zengke
+ * @Date: 2018.12
+ *
  */
 public class Md5Utils {
     /***

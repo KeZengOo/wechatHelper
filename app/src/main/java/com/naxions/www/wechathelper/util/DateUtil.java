@@ -4,7 +4,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 /**
- * zengke 2018 12
+ * @Author: zengke
+ * @Date: 2018.12
+ *
  */
 public class DateUtil {
     public static final String NULL="null";

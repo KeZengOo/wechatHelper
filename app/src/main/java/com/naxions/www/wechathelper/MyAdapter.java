@@ -10,7 +10,9 @@ import android.widget.TextView;
 
 import java.util.List;
 /**
- * zengke 2018 12
+ * @Author: zengke
+ * @Date: 2018.12
+ *
  */
 public class MyAdapter extends BaseAdapter {
 

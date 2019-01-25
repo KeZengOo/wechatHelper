@@ -1,7 +1,9 @@
 package com.naxions.www.wechathelper;
 
 /**
- * zengke 2018 12
+ * @Author: zengke
+ * @Date: 2018.12
+ *
  */
 public class DataBean {
 

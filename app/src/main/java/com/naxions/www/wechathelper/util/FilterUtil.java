@@ -4,7 +4,9 @@ package com.naxions.www.wechathelper.util;
 import java.util.regex.Pattern;
 
 /**
- * 过滤 emoji 表情
+ * @Author: zengke
+ * @Date: 2018.12
+ *
  */
 public class FilterUtil {
     public static final String NULL="null";
