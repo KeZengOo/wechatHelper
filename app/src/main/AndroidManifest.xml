@@ -24,6 +24,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:name=".MainActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <intent-filter>
@@ -33,11 +34,11 @@
         </activity>
 
         <activity
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:name=".ExportActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         </activity>
-
-
+        
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="${applicationId}"

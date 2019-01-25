@@ -9,19 +9,22 @@
     android:focusableInTouchMode="true"
     android:orientation="vertical"
     tools:context=".MainActivity">
-
+<RelativeLayout
+    android:background="#2DA1F8"
+    android:paddingBottom="125dp"
+    android:paddingTop="25dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
     <TextView
-        android:layout_width="match_parent"
+        android:id="@+id/tv_title"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
         android:background="#2DA1F8"
-        android:gravity="center_horizontal"
-        android:paddingBottom="125dp"
-        android:paddingTop="25dp"
         android:text="微信聊天上传工具"
         android:textColor="#FFFFFF"
         android:textSize="18dp" />
-
+</RelativeLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="200dp"

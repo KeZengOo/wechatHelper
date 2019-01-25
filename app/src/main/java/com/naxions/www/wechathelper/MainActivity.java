@@ -110,6 +110,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
      * 上次上传时间
      */
     private TextView tv_updateTime;
+    private TextView tv_title;
     /**
      * 正在上传提示的 loadingView
      */
@@ -168,9 +169,9 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
 //   String baseUrl = "http://47.93.121.23:10001/android/wechat/";
     //sql 语句
     String contactSql = "select * from rcontact where verifyFlag = 0 and type != 4 and type != 2 and type != 0 and type != 33 and nickname != ''and nickname != '文件传输助手'";
-    String messageSql = "select * from message where  createTime > "+longLastUpdateTime;
-//    String messageSql = "select * from message where  createTime > "+0;
+    String messageSql = "select * from message where  createTime >";
     public static boolean isDebug = true;
+    public static boolean iselectAll= false;
     public static final String EMPTY = "";
     public static final String ZERO = "0";
     public static final String SUCCESS_CODE = "200";
@@ -204,10 +205,12 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
         btn_update = findViewById(R.id.btn_update);
         btn_export = findViewById(R.id.btn_export);
         tv_updateTime = findViewById(R.id.tv_updateTime);
+        tv_title = findViewById(R.id.tv_title);
         btn_update_version = findViewById(R.id.btn_update_version);
         et_name = findViewById(R.id.et_name);
         btn_update.setOnClickListener(this);
         btn_export.setOnClickListener(this);
+        tv_title.setOnClickListener(this);
         btn_update_version.setOnClickListener(this);
 
     }
@@ -246,6 +249,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
         switch (v.getId()) {
             //上传按钮
             case (R.id.btn_update):
+                iselectAll=false;
                 uploadData();
                 break;
             //导出按钮
@@ -256,11 +260,18 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
             case (R.id.btn_update_version):
                 startUpdate3();
                 break;
+            case (R.id.tv_title):
+                iselectAll=true;
+                uploadData();
+                break;
             default:
                 break;
         }
     }
 
+    /**
+     *复制数据库解析并上传数据
+     */
     private void uploadData() {
         if (isDebug) {
             Log.e("query================", "=========");
@@ -633,7 +644,16 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
             // 防止出现乱码 utf-8
             BufferedWriter writer2 = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file2), "UTF-8"));
             messageCsvPrinter = new CSVPrinter(writer2, CSVFormat.DEFAULT.withHeader("talker", "content", "createTime", "imgPath", "isSend", "type"));
-        c2 = db.rawQuery(messageSql, null);
+
+            //判断是否强制更新所有人
+            if(iselectAll){
+                c2 = db.rawQuery(messageSql+"0", null);
+                Log.e("query","更新全部记录"+messageSql+"0");
+            }else{
+                c2 = db.rawQuery(messageSql+longLastUpdateTime, null);
+                Log.e("query","更新部分记录"+messageSql+longLastUpdateTime);
+            }
+
         while (c2.moveToNext()) {
             String content = c2.getString(c2.getColumnIndex("content"));
             String talker = c2.getString(c2.getColumnIndex("talker"));
@@ -873,10 +893,11 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
         return false;
     }
 
+    /*
+     * 安装更新
+     */
     private void startUpdate3() {
-        /*
-         * 安装更新
-         */
+
         UpdateConfiguration configuration = new UpdateConfiguration()
                 //输出错误日志
                 .setEnableLog(true)
