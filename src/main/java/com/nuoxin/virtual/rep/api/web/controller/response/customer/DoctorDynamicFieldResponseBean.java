@@ -37,4 +37,7 @@ public class DoctorDynamicFieldResponseBean implements Serializable{
     @ApiModelProperty(value = "分类，目前1基本信息，2医生的处方信息，3之前拜访记录，4分析，5是医院信息")
     private Integer classification;
 
+    @ApiModelProperty(value = "")
+    private Integer extendType;
+
 }

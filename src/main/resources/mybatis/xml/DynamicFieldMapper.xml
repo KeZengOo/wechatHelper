@@ -131,7 +131,8 @@
             `type`,
             field_value `value`,
             required,
-            classification
+            classification,
+            extend_type extendType
         FROM
             virtual_doctor_dynamic_field
         WHERE 1=1
