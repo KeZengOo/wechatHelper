@@ -21,17 +21,20 @@ public class ProductClassificationFrequencyResponseBean implements Serializable 
     @ApiModelProperty(value = "批次ID")
     private String batchNo;
 
-    @ApiModelProperty(value = "潜力，3高,2中,1低,其他未知")
-    private Integer potential;
+    @ApiModelProperty(value = "潜力")
+    private String potential;
 
     @ApiModelProperty(value = "多个分型以逗号分开")
-    private String classificationStr;
+    private String classification;
 
     @ApiModelProperty(value = "频次")
     private Integer frequency;
 
+    @ApiModelProperty(value = "选中的潜力")
+    private String selectPotential;
+
     @ApiModelProperty(value = "选中的分型")
-    private List<ProductClassificationResponseBean> classificationList = new ArrayList<>();
+    private List<String> classificationList = new ArrayList<>();
 
 
 

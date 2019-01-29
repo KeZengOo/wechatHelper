@@ -19,11 +19,11 @@ public class ProductClassificationFrequencyParams implements Serializable {
     @ApiModelProperty(value = "产品ID")
     private Long productId;
 
-    @ApiModelProperty(value = "分型ID")
-    private Long classificationId;
+    @ApiModelProperty(value = "分型")
+    private String classification;
 
-    @ApiModelProperty(value = "医生潜力，3高,2中,1低,-1未知")
-    private Integer potential;
+    @ApiModelProperty(value = "医生潜力")
+    private String potential;
 
     @ApiModelProperty(value = "拜访频次，单位工作日")
     private Integer visitFrequency;

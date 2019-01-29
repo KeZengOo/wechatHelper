@@ -28,6 +28,9 @@ public class DoctorDynamicFieldRequestBean implements Serializable {
     @ApiModelProperty(value = "字段类型，1是文本,2是下拉框")
     private Integer type;
 
+    @ApiModelProperty(value = "扩展的字段类型,1是分型，2是潜力")
+    private Integer extendType;
+
     @ApiModelProperty(value = "下拉框的值")
     private String value;
 

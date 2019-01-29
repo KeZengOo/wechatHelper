@@ -24,11 +24,11 @@ public interface ProductClassificationFrequencyMapper {
 
     /**
      * 查询总数，用来校验某个潜力的分型是否已经录入
-     * @param classificationIdList
+     * @param classificationList
      * @param potential
      */
-    Integer getClassificationCountByPotential(@Param(value = "classificationIdList") List<Long> classificationIdList,
-                                              @Param(value = "potential") Integer potential);
+    Integer getClassificationCountByPotential(@Param(value = "classificationList") List<String> classificationList,
+                                              @Param(value = "potential") String potential);
 
 
     /**
