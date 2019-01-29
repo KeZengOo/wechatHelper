@@ -206,7 +206,7 @@
     <insert id="insertDoctorDynamicField" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DoctorDynamicFieldRequestBean" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         insert into virtual_doctor_dynamic_field(serial_number, field_name, type, extend_type, field_value, classification, required, product_id, creator_id, creator_name, mender_id, mender_name)
         values
-        (#{serialNumber}, #{name}, #{type},#{extend_type}, #{value}, #{classification}, #{required}, #{productId}, #{creatorId}, #{creatorName}, #{menderId}, #{menderName})
+        (#{serialNumber}, #{name}, #{type},#{extendType}, #{value}, #{classification}, #{required}, #{productId}, #{creatorId}, #{creatorName}, #{menderId}, #{menderName})
     </insert>
 
     <!-- 得到医生基本信息动态字段填充的值 -->

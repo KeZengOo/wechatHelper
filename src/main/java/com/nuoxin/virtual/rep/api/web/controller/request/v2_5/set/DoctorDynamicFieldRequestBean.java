@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -26,6 +27,7 @@ public class DoctorDynamicFieldRequestBean implements Serializable {
     private String name;
 
     @ApiModelProperty(value = "字段类型，1是文本,2是下拉框")
+    @NotNull(message = "字段类型不能为空！")
     private Integer type;
 
     @ApiModelProperty(value = "扩展的字段类型,1是分型，2是潜力")

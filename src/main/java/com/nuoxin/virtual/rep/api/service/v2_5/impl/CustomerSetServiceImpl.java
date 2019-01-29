@@ -4,6 +4,7 @@ import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
+import com.nuoxin.virtual.rep.api.enums.DynamicFieldTypeEnum;
 import com.nuoxin.virtual.rep.api.enums.ExtendDynamicFieldTypeEnum;
 import com.nuoxin.virtual.rep.api.mybatis.DrugUserMapper;
 import com.nuoxin.virtual.rep.api.mybatis.DynamicFieldMapper;
@@ -64,9 +65,20 @@ public class CustomerSetServiceImpl implements CustomerSetService {
         }
 
         Long extendId = dynamicFieldMapper.getProductExtendTypeField(bean);
-        if (id != extendId){
-            throw new BusinessException(ErrorEnum.ERROR.getStatus(), ExtendDynamicFieldTypeEnum.getNameByType(bean.getExtendType()) +  " 字段已经存在！");
+        if (extendId != null){
+            if (id != extendId){
+                throw new BusinessException(ErrorEnum.ERROR.getStatus(), ExtendDynamicFieldTypeEnum.getNameByType(bean.getExtendType()) +  " 字段已经存在！");
+            }else {
+                Integer extendType = bean.getExtendType();
+                if (extendType == ExtendDynamicFieldTypeEnum.POTENTIAL.getType()){
+                    Integer type = bean.getType();
+                    if (type != DynamicFieldTypeEnum.RADIO.getType() && type != DynamicFieldTypeEnum.SINGLE.getType()){
+                        throw new BusinessException(ErrorEnum.ERROR, "潜力字段必须为单选！");
+                    }
+                }
+            }
         }
+
 
         dynamicFieldMapper.updateDoctorDynamicField(bean);
 
@@ -97,6 +109,13 @@ public class CustomerSetServiceImpl implements CustomerSetService {
 
         Integer extendType = bean.getExtendType();
         if (extendType != null && extendType !=0){
+            if (extendType == ExtendDynamicFieldTypeEnum.POTENTIAL.getType()){
+                Integer type = bean.getType();
+                if (type != DynamicFieldTypeEnum.RADIO.getType() && type != DynamicFieldTypeEnum.SINGLE.getType()){
+                    throw new BusinessException(ErrorEnum.ERROR, "潜力字段必须为单选！");
+                }
+            }
+
             Long id = dynamicFieldMapper.getProductExtendTypeField(bean);
             if (id !=null && id > 0){
                 throw new BusinessException(ErrorEnum.ERROR.getStatus(), ExtendDynamicFieldTypeEnum.getNameByType(bean.getExtendType()) +  " 字段已经存在！");
