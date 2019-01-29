@@ -23,7 +23,7 @@ public class DynamicFieldValueResponse {
 	private String value;
 
 	@ApiModelProperty(value = "医生id")
-	private Integer doctorId;
+	private Long doctorId;
 
 	@ApiModelProperty(value = "拜访id")
 	private Long callId;

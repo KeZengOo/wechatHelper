@@ -411,7 +411,8 @@
 		AND dud.is_available = 1
 		INNER JOIN drug_user du ON dud.drug_user_id = du.id
 		WHERE
-			du.leader_path LIKE #{leaderPath}
+				du.id=#{drugUserId}
+				AND vdcim.virtual_drug_user_id=#{drugUserId}
 		AND DATE_FORMAT(next_visit_time, '%Y-%m') = #{date}
 		GROUP BY
 			DATE_FORMAT(next_visit_time, '%Y-%m-%d')
