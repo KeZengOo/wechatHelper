@@ -62,7 +62,7 @@ public class ProductClassificationFrequencyServiceImpl implements ProductClassif
 
                 if (ExtendDynamicFieldTypeEnum.CLASSIFICATION.getType() == extendType){
                     potentialClassificationResponseBean.setClassification(fieldName);
-                    potentialClassificationResponseBean.setPotentialList(Arrays.asList(fieldValueArray));
+                    potentialClassificationResponseBean.setClassificationList(Arrays.asList(fieldValueArray));
                 }
             }
 
@@ -158,7 +158,7 @@ public class ProductClassificationFrequencyServiceImpl implements ProductClassif
 
         TableHeader tableHeader = new TableHeader();
         tableHeader.setName("frequency");
-        tableHeader.setName("拜访频次");
+        tableHeader.setLabel("拜访频次");
         labelList.add(tableHeader);
 
         return labelList;
