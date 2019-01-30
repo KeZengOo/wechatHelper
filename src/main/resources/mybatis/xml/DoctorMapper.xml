@@ -628,88 +628,7 @@
 
 		GROUP BY
 			v.virtual_doctor_id
-		HAVING
-		days >= (
 
-				<!-- 修改前
-				SELECT
-					MIN(a.visit_frequency)
-				FROM
-					virtual_doctor_classification_frequency a
-				INNER JOIN virtual_doctor_classification b ON a.classification_id = b.classification_id
-				WHERE
-					b.doctor_id = v.virtual_doctor_id
-				AND a.product_id IN
-				<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
-					#{productLineId}
-				</foreach>
-				AND b.product_id IN
-				<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
-					#{productLineId}
-				</foreach>
-				AND a.potential = (
-					SELECT
-						hcp_potential
-					FROM
-						drug_user_doctor_quate
-					WHERE
-						doctor_id = v.virtual_doctor_id
-								AND product_id IN
-					<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
-						#{productLineId}
-					</foreach>
-					ORDER BY
-						id DESC
-					LIMIT 1
-				)
-			-->
-
-
-				SELECT
-				min(visit_frequency)
-				FROM
-				virtual_doctor_classification_frequency a
-				INNER JOIN (
-				SELECT
-				(
-
-				SELECT
-				v2.dynamic_field_value
-				FROM
-				virtual_doctor_dynamic_field v1
-				INNER JOIN virtual_doctor_dynamic_field_value v2 ON v1.id = v2.dynamic_field_id
-				WHERE
-				v2.doctor_id = v.virtual_doctor_id
-				AND v1.product_id
-				IN
-				<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
-					#{productLineId}
-				</foreach>
-
-				AND v1.extend_type = 1
-				LIMIT 1
-				) AS potential,
-				(
-				SELECT
-				v2.dynamic_field_value
-				FROM
-				virtual_doctor_dynamic_field v1
-				INNER JOIN virtual_doctor_dynamic_field_value v2 ON v1.id = v2.dynamic_field_id
-				WHERE
-				v2.doctor_id = v.virtual_doctor_id
-				AND v1.product_id
-				IN
-				<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
-					#{productLineId}
-				</foreach>
-
-				AND v1.extend_type = 2
-				LIMIT 1
-				) AS classification
-				) b ON a.potential = b.potential
-				AND b.classification LIKE CONCAT('%', a.classification, '%')
-
-			)
 		ORDER BY
 			days DESC
 	</select>
@@ -751,19 +670,13 @@
 						</foreach>
 					AND v1.product_id IN
 					<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
-						#{productLineId}
+						#{productId}
 					</foreach>
 					AND v1.extend_type = 2
 		GROUP BY v2.doctor_id
 
 	</select>
 
-	<!-- 得到今日分型要拜访的医生列表以及医生设定的拜访频次 -->
-	<select id="getClassificationVisitDoctorFrequencyList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.plan.VisitDoctorResponseBean">
-
-
-
-	</select>
 
 
 	<!-- 到设定了拜访频次要拜访的医生列表 -->

@@ -6,8 +6,10 @@ import com.nuoxin.virtual.rep.api.entity.Doctor;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.SaveDoctorTelephoneRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.SearchRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.call.CallDoctorResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorDetailsResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.plan.VisitDoctorResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.DoctorClassificationResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.DoctorPotentialResponseBean;
 import org.apache.ibatis.annotations.Param;
 
@@ -137,8 +139,8 @@ public interface DoctorMapper{
      * @param productIdList
      * @return
      */
-    List<DoctorPotentialResponseBean> getDoctorClassificationList(@Param(value = "doctorIdList") List<Long> doctorIdList,
-                                                             @Param(value = "productIdList") List<Long> productIdList);
+    List<DoctorClassificationResponseBean> getDoctorClassificationList(@Param(value = "doctorIdList") List<Long> doctorIdList,
+                                                                                    @Param(value = "productIdList") List<Long> productIdList);
 
     /**
      * 得到设定了拜访频次要拜访的医生列表,单位天

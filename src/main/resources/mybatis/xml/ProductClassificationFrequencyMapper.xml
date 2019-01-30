@@ -51,4 +51,23 @@
         </foreach>
     </select>
 
+    <!-- 得到产品下设置的分型和潜力拜访频次 -->
+    <select id="getFrequencyList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.DoctorPotentialClassificationResponseBean">
+        SELECT
+        potential,
+        classification,
+        min(visit_frequency) frequency
+    FROM
+        virtual_doctor_classification_frequency
+    WHERE
+        product_id IN
+        <foreach collection ="productIdList" item="productId" open="(" close=")" separator =",">
+            #{productId}
+        </foreach>
+    GROUP BY
+        potential,
+        classification
+
+    </select>
+
 </mapper>

@@ -12,8 +12,13 @@ import com.nuoxin.virtual.rep.api.enums.MeetingTimeTypeEnum;
 import com.nuoxin.virtual.rep.api.enums.SearchTypeEnum;
 import com.nuoxin.virtual.rep.api.mybatis.*;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
+import com.nuoxin.virtual.rep.api.utils.StringUtil;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DoctorPotentialClassificationRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.*;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.plan.VisitDoctorResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.DoctorClassificationResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.DoctorPotentialClassificationResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.DoctorPotentialResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductVisitFrequencyResponseBean;
 import org.slf4j.Logger;
@@ -55,6 +60,9 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 
 	@Resource
 	private ProductVisitFrequencyMapper productVisitFrequencyMapper;
+
+	@Resource
+	private ProductClassificationFrequencyMapper productClassificationFrequencyMapper;
 
 	@Resource
 	private HolidayMapper holidayMapper;
@@ -131,8 +139,8 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 				if (CollectionsUtil.isNotEmptyList(classificationVisitDoctorList)){
 					List<Long> doctorIdList = classificationVisitDoctorList.stream().map(VisitDoctorResponseBean::getDoctorId).distinct().collect(Collectors.toList());
 					List<DoctorPotentialResponseBean> doctorPotentialList = doctorMapper.getDoctorPotentialList(doctorIdList, pageRequest.getProductLineIds());
-					List<DoctorPotentialResponseBean> doctorClassificationList = doctorMapper.getDoctorClassificationList(doctorIdList, pageRequest.getProductLineIds());
-					classificationVisitDoctorList = this.getSearchTwoClassificationVisitDoctorList(doctorPotentialList, doctorClassificationList, pageRequest.getProductLineIds());
+					List<DoctorClassificationResponseBean> doctorClassificationList = doctorMapper.getDoctorClassificationList(doctorIdList, pageRequest.getProductLineIds());
+					classificationVisitDoctorList = this.getSearchTwoClassificationVisitDoctorList(classificationVisitDoctorList,doctorPotentialList, doctorClassificationList, pageRequest.getProductLineIds());
 				}
 
 				classificationVisitDoctorList = this.getVisitDoctorList(classificationVisitDoctorList, productVisitFrequency.getVisitFrequency(), SearchTypeEnum.SEARCH_TWO.getUserType());
@@ -191,18 +199,89 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 
 	/**
 	 * 得到医生分型潜力设置的拜访频次
+	 * @param classificationVisitDoctorList
 	 * @param doctorPotentialList
 	 * @param doctorClassificationList
 	 * @param productLineIds
 	 * @return
 	 */
-	private List<VisitDoctorResponseBean> getSearchTwoClassificationVisitDoctorList(List<DoctorPotentialResponseBean> doctorPotentialList,
-																					List<DoctorPotentialResponseBean> doctorClassificationList,
+	private List<VisitDoctorResponseBean> getSearchTwoClassificationVisitDoctorList(List<VisitDoctorResponseBean> classificationVisitDoctorList,List<DoctorPotentialResponseBean> doctorPotentialList,
+																					List<DoctorClassificationResponseBean> doctorClassificationList,
 																					List<Long> productLineIds) {
 
+		if (CollectionsUtil.isEmptyList(classificationVisitDoctorList)
+				|| CollectionsUtil.isEmptyList(doctorPotentialList)
+				|| CollectionsUtil.isEmptyList(doctorClassificationList)
+				|| CollectionsUtil.isEmptyList(productLineIds)){
+			return new ArrayList<>();
+		}
+
+		List<DoctorPotentialClassificationResponseBean> frequencyList = productClassificationFrequencyMapper.getFrequencyList(productLineIds);
+		if (CollectionsUtil.isEmptyList(frequencyList)){
+			return new ArrayList<>();
+		}
 
 
-		return null;
+		List<DoctorPotentialClassificationRequestBean> list = new ArrayList<>();
+		doctorClassificationList.forEach(c ->{
+			String classification = c.getClassification();
+			if (StringUtil.isNotEmpty(classification)){
+				Optional<DoctorPotentialResponseBean> doctorPotentialFirst = doctorPotentialList.stream().filter(p -> p.getDoctorId().equals(c.getDoctorId())).findFirst();
+				if (doctorPotentialFirst.isPresent()){
+					DoctorPotentialResponseBean doctorPotentialResponseBean = doctorPotentialFirst.get();
+					String potential = doctorPotentialResponseBean.getPotential();
+					String[] classificationArray = classification.split(",");
+					if (StringUtil.isNotEmpty(potential) && CollectionsUtil.isNotEmptyArray(classificationArray)){
+
+						for (String f:classificationArray){
+							DoctorPotentialClassificationRequestBean doctorPotentialClassificationRequestBean = new DoctorPotentialClassificationRequestBean();
+							doctorPotentialClassificationRequestBean.setDoctorId(c.getDoctorId());
+							doctorPotentialClassificationRequestBean.setClassification(f);
+							doctorPotentialClassificationRequestBean.setPotential(potential);
+							list.add(doctorPotentialClassificationRequestBean);
+						}
+
+					}
+				}
+			}
+
+		});
+
+
+
+		list.forEach(pc->{
+			Optional<DoctorPotentialClassificationResponseBean> doctorPotentialClassification = frequencyList.stream().filter(f -> (f.getPotential().equals(pc.getPotential()) && f.getClassification().equals(pc.getClassification()))).findFirst();
+			if (doctorPotentialClassification.isPresent()){
+				DoctorPotentialClassificationResponseBean dcp = doctorPotentialClassification.get();
+				pc.setFrequency(dcp.getFrequency());
+			}
+		});
+
+		// 得到每个医生的最小拜访频次
+		Map<Long, Integer> map = new HashMap<>();
+		for (DoctorPotentialClassificationRequestBean dcf : list) {
+			Long doctorId = dcf.getDoctorId();
+			Integer value = map.get(doctorId);
+			Integer frequency = dcf.getFrequency();
+			if (frequency == null){
+				frequency = 0;
+			}
+
+			if (value == null){
+				map.put(doctorId, frequency);
+			}else {
+				if (frequency > value){
+					map.put(doctorId, frequency);
+				}
+			}
+		}
+
+		for (VisitDoctorResponseBean visitDoctorResponseBean : classificationVisitDoctorList) {
+			visitDoctorResponseBean.setFrequency(map.get(visitDoctorResponseBean.getDoctorId()));
+		}
+
+		return classificationVisitDoctorList;
+
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })

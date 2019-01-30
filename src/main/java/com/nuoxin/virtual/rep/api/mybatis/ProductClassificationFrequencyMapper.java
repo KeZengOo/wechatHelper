@@ -1,6 +1,7 @@
 package com.nuoxin.virtual.rep.api.mybatis;
 
 import com.nuoxin.virtual.rep.api.entity.v2_5.ProductClassificationFrequencyParams;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.DoctorPotentialClassificationResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationFrequencyResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationResponseBean;
 import org.apache.ibatis.annotations.Param;
@@ -52,4 +53,11 @@ public interface ProductClassificationFrequencyMapper {
      */
     List<ProductClassificationResponseBean> getProductClassificationListByBatchNo(@Param(value = "batchNoList") List<String> batchNoList);
 
+
+    /**
+     * 得到产品下设置的分型和潜力拜访频次
+     * @param productIdList
+     * @return
+     */
+    List<DoctorPotentialClassificationResponseBean> getFrequencyList(@Param(value = "productIdList") List<Long> productIdList);
 }
