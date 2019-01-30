@@ -132,7 +132,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 					List<Long> doctorIdList = classificationVisitDoctorList.stream().map(VisitDoctorResponseBean::getDoctorId).distinct().collect(Collectors.toList());
 					List<DoctorPotentialResponseBean> doctorPotentialList = doctorMapper.getDoctorPotentialList(doctorIdList, pageRequest.getProductLineIds());
 					List<DoctorPotentialResponseBean> doctorClassificationList = doctorMapper.getDoctorClassificationList(doctorIdList, pageRequest.getProductLineIds());
-					//classificationVisitDoctorList = this.getclassificationVisitDoctorList
+					classificationVisitDoctorList = this.getSearchTwoClassificationVisitDoctorList(doctorPotentialList, doctorClassificationList, pageRequest.getProductLineIds());
 				}
 
 				classificationVisitDoctorList = this.getVisitDoctorList(classificationVisitDoctorList, productVisitFrequency.getVisitFrequency(), SearchTypeEnum.SEARCH_TWO.getUserType());
@@ -187,6 +187,22 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 
 		}
 
+	}
+
+	/**
+	 * 得到医生分型潜力设置的拜访频次
+	 * @param doctorPotentialList
+	 * @param doctorClassificationList
+	 * @param productLineIds
+	 * @return
+	 */
+	private List<VisitDoctorResponseBean> getSearchTwoClassificationVisitDoctorList(List<DoctorPotentialResponseBean> doctorPotentialList,
+																					List<DoctorPotentialResponseBean> doctorClassificationList,
+																					List<Long> productLineIds) {
+
+
+
+		return null;
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })

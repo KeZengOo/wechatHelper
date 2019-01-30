@@ -22,6 +22,9 @@ public class DoctorDynamicExtendResponseBean implements Serializable {
     @ApiModelProperty(value = "字段类型")
     private Integer fieldType;
 
+    @ApiModelProperty(value = "是否必填")
+    private Integer required;
+
     @ApiModelProperty(value = "字段的值")
     private String fieldValue;
 

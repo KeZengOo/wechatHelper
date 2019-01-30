@@ -24,6 +24,9 @@ public class PotentialClassificationResponseBean implements Serializable {
     @ApiModelProperty(value = "潜力字段类型，文本、单选、下拉")
     private Integer potentialType;
 
+    @ApiModelProperty(value = "是否必填")
+    private Integer potentialRequired;
+
     @ApiModelProperty(value = "医生潜力")
     private List<String> potentialList = new ArrayList<>();
 
@@ -32,6 +35,9 @@ public class PotentialClassificationResponseBean implements Serializable {
 
     @ApiModelProperty(value = "分型字段类型，文本、单选、下拉")
     private Integer classificationType;
+
+    @ApiModelProperty(value = "是否必填")
+    private Integer classificationRequired;
 
     @ApiModelProperty(value = "医生分型")
     private List<String> classificationList = new ArrayList<>();
