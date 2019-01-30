@@ -75,7 +75,7 @@ public class CustomerSetServiceImpl implements CustomerSetService {
 
             Long extendId = dynamicFieldMapper.getProductExtendTypeField(bean);
             if (extendId != null){
-                if (id != extendId){
+                if (id.longValue() != extendId.longValue()){
                     throw new BusinessException(ErrorEnum.ERROR.getStatus(), ExtendDynamicFieldTypeEnum.getNameByType(bean.getExtendType()) +  " 字段已经存在！");
                 }
             }
