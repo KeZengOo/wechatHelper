@@ -602,7 +602,7 @@
 	</select>
 
 
-	<!-- 得到今日分型要拜访的医生列表 -->
+	<!-- 得到今日分型要拜访的医生列表以及医生距离上次拜访天数 -->
 	<select id="getClassificationVisitDoctorList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.plan.VisitDoctorResponseBean">
 		SELECT
 			DATE_FORMAT(
@@ -610,47 +610,20 @@
 				'%Y-%m-%d'
 			) AS maxVisitTime,
 			DATEDIFF(NOW(), max(v.create_time)) AS days,
-			virtual_doctor_id doctorId,
-
-		(
-		SELECT
-		MIN(a.visit_frequency)
-		FROM
-		virtual_doctor_classification_frequency a
-		INNER JOIN virtual_doctor_classification b ON a.classification_id = b.classification_id
-		WHERE
-		b.doctor_id = v.virtual_doctor_id
-		AND a.product_id IN
-		<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
-			#{productLineId}
-		</foreach>
-		AND b.product_id IN
-		<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
-			#{productLineId}
-		</foreach>
-		AND a.potential = (
-		SELECT
-		hcp_potential
-		FROM
-		drug_user_doctor_quate
-		WHERE
-		doctor_id = v.virtual_doctor_id
-		AND product_id IN
-		<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
-			#{productLineId}
-		</foreach>
-		ORDER BY
-		id DESC
-		LIMIT 1
-		)
-		) as frequency
+			virtual_doctor_id doctorId
 		FROM
 			virtual_doctor_call_info v
 		WHERE
-			virtual_drug_user_id IN
+			v.virtual_drug_user_id IN
 
 		<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
 			#{virtualDrugUserId}
+		</foreach>
+
+		AND v.product_id
+		IN
+		<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+			#{productLineId}
 		</foreach>
 
 		GROUP BY
@@ -739,6 +712,13 @@
 			)
 		ORDER BY
 			days DESC
+	</select>
+
+	<!-- 得到今日分型要拜访的医生列表以及医生设定的拜访频次 -->
+	<select id="getClassificationVisitDoctorFrequencyList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.plan.VisitDoctorResponseBean">
+
+
+
 	</select>
 
 
