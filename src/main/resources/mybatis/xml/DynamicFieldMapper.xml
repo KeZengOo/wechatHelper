@@ -188,7 +188,7 @@
                 mender_name=#{menderName},
             </if>
 
-            <if test="extendType !=null and extendType!=0">
+            <if test="extendType !=null">
                 extend_type=#{extendType}
             </if>
         </set>
