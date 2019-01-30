@@ -58,11 +58,13 @@ public class ProductClassificationFrequencyServiceImpl implements ProductClassif
                 if (ExtendDynamicFieldTypeEnum.POTENTIAL.getType() == extendType){
                     potentialClassificationResponseBean.setPotential(fieldName);
                     potentialClassificationResponseBean.setPotentialList(Arrays.asList(fieldValueArray));
+                    potentialClassificationResponseBean.setPotentialType(f.getFieldType());
                 }
 
                 if (ExtendDynamicFieldTypeEnum.CLASSIFICATION.getType() == extendType){
                     potentialClassificationResponseBean.setClassification(fieldName);
                     potentialClassificationResponseBean.setClassificationList(Arrays.asList(fieldValueArray));
+                    potentialClassificationResponseBean.setClassificationType(f.getFieldType());
                 }
             }
 

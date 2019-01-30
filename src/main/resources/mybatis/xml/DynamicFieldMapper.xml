@@ -800,6 +800,7 @@
         SELECT
             field_name fieldName,
             field_value fieldValue,
+            type fieldType,
             extend_type extendType
         FROM
             virtual_doctor_dynamic_field

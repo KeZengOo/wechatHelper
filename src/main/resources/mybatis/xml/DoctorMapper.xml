@@ -714,6 +714,50 @@
 			days DESC
 	</select>
 
+	<!-- 得到医生输入的潜力 -->
+	<select id="getDoctorPotentialList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.DoctorPotentialResponseBean">
+		SELECT
+						v2.dynamic_field_value potential,
+						v2.doctor_id doctorId
+					FROM
+						virtual_doctor_dynamic_field v1
+					INNER JOIN virtual_doctor_dynamic_field_value v2 ON v1.id = v2.dynamic_field_id
+					WHERE
+						v2.doctor_id IN
+						<foreach collection="doctorIdList" item="doctorId" open="(" close=")" separator=",">
+						#{doctorId}
+						</foreach>
+					AND v1.product_id IN
+					<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+						#{productId}
+					</foreach>
+					AND v1.extend_type = 1
+		GROUP BY v2.doctor_id
+
+	</select>
+
+	<!-- 得到医生输入的分型 -->
+	<select id="getDoctorClassificationList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.DoctorClassificationResponseBean">
+		SELECT
+						v2.dynamic_field_value classification,
+						v2.doctor_id doctorId
+					FROM
+						virtual_doctor_dynamic_field v1
+					INNER JOIN virtual_doctor_dynamic_field_value v2 ON v1.id = v2.dynamic_field_id
+					WHERE
+						v2.doctor_id IN
+						<foreach collection="doctorIdList" item="doctorId" open="(" close=")" separator=",">
+							#{doctorId}
+						</foreach>
+					AND v1.product_id IN
+					<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+						#{productLineId}
+					</foreach>
+					AND v1.extend_type = 2
+		GROUP BY v2.doctor_id
+
+	</select>
+
 	<!-- 得到今日分型要拜访的医生列表以及医生设定的拜访频次 -->
 	<select id="getClassificationVisitDoctorFrequencyList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.plan.VisitDoctorResponseBean">
 

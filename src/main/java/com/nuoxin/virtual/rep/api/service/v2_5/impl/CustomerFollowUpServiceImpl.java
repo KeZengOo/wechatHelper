@@ -14,6 +14,7 @@ import com.nuoxin.virtual.rep.api.mybatis.*;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.*;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.plan.VisitDoctorResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.DoctorPotentialResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductVisitFrequencyResponseBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -126,6 +127,14 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 			List<VisitDoctorResponseBean> classificationVisitDoctorList = null;
 			if (searchType == SearchTypeEnum.SEARCH_TWO.getUserType()){
 				classificationVisitDoctorList = doctorMapper.getClassificationVisitDoctorList(pageRequest);
+
+				if (CollectionsUtil.isNotEmptyList(classificationVisitDoctorList)){
+					List<Long> doctorIdList = classificationVisitDoctorList.stream().map(VisitDoctorResponseBean::getDoctorId).distinct().collect(Collectors.toList());
+					List<DoctorPotentialResponseBean> doctorPotentialList = doctorMapper.getDoctorPotentialList(doctorIdList, pageRequest.getProductLineIds());
+					List<DoctorPotentialResponseBean> doctorClassificationList = doctorMapper.getDoctorClassificationList(doctorIdList, pageRequest.getProductLineIds());
+					//classificationVisitDoctorList = this.getclassificationVisitDoctorList
+				}
+
 				classificationVisitDoctorList = this.getVisitDoctorList(classificationVisitDoctorList, productVisitFrequency.getVisitFrequency(), SearchTypeEnum.SEARCH_TWO.getUserType());
 			}
 
