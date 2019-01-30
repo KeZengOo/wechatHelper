@@ -276,11 +276,17 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 			}
 		}
 
+		List<VisitDoctorResponseBean> vList = new ArrayList<>();
 		for (VisitDoctorResponseBean visitDoctorResponseBean : classificationVisitDoctorList) {
-			visitDoctorResponseBean.setFrequency(map.get(visitDoctorResponseBean.getDoctorId()));
+			Integer frequency = map.get(visitDoctorResponseBean.getDoctorId());
+			if (frequency !=null && frequency > 0){
+				visitDoctorResponseBean.setFrequency(map.get(visitDoctorResponseBean.getDoctorId()));
+				vList.add(visitDoctorResponseBean);
+			}
+
 		}
 
-		return classificationVisitDoctorList;
+		return vList;
 
 	}
 
