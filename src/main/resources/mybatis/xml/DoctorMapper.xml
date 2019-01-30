@@ -657,6 +657,8 @@
 			v.virtual_doctor_id
 		HAVING
 		days >= (
+
+				<!-- 修改前
 				SELECT
 					MIN(a.visit_frequency)
 				FROM
@@ -687,6 +689,53 @@
 						id DESC
 					LIMIT 1
 				)
+			-->
+
+
+				SELECT
+				min(visit_frequency)
+				FROM
+				virtual_doctor_classification_frequency a
+				INNER JOIN (
+				SELECT
+				(
+
+				SELECT
+				v2.dynamic_field_value
+				FROM
+				virtual_doctor_dynamic_field v1
+				INNER JOIN virtual_doctor_dynamic_field_value v2 ON v1.id = v2.dynamic_field_id
+				WHERE
+				v2.doctor_id = v.virtual_doctor_id
+				AND v1.product_id
+				IN
+				<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+					#{productLineId}
+				</foreach>
+
+				AND v1.extend_type = 1
+				LIMIT 1
+				) AS potential,
+				(
+				SELECT
+				v2.dynamic_field_value
+				FROM
+				virtual_doctor_dynamic_field v1
+				INNER JOIN virtual_doctor_dynamic_field_value v2 ON v1.id = v2.dynamic_field_id
+				WHERE
+				v2.doctor_id = v.virtual_doctor_id
+				AND v1.product_id
+				IN
+				<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+					#{productLineId}
+				</foreach>
+
+				AND v1.extend_type = 2
+				LIMIT 1
+				) AS classification
+				) b ON a.potential = b.potential
+				AND b.classification LIKE CONCAT('%', a.classification, '%')
+
 			)
 		ORDER BY
 			days DESC

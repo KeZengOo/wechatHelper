@@ -152,7 +152,7 @@
     </select>
 
     <!-- 客户设置医生动态字段修改 -->
-    <select id="updateDoctorDynamicField" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DoctorDynamicFieldRequestBean">
+    <update id="updateDoctorDynamicField" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DoctorDynamicFieldRequestBean">
 
         update virtual_doctor_dynamic_field
         <set>
@@ -185,13 +185,17 @@
             </if>
 
             <if test="menderName !=null and menderName !=''">
-                mender_name=#{menderName}
+                mender_name=#{menderName},
+            </if>
+
+            <if test="extendType !=null and extendType!=0">
+                extend_type=#{extendType}
             </if>
         </set>
 
         where id=#{id}
 
-    </select>
+    </update>
 
     <delete id="deleteDoctorDynamicField">
         delete from virtual_doctor_dynamic_field
