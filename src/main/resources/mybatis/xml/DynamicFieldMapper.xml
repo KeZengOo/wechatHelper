@@ -812,4 +812,24 @@
 
     </select>
 
+    <!-- 得到高级搜索需要用的动态字段 classification: 分类，目前1基本信息，2医生的处方信息，3之前拜访记录，4分析，5是医院信息-->
+    <select id="getSearchDynamicField" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.SearchDynamicFieldResponseBean">
+        SELECT
+            id fieldId,
+            field_name fieldName,
+            type,
+            extend_type extendType,
+            field_value fieldValue,
+            classification,
+            required
+        FROM
+            virtual_doctor_dynamic_field
+        WHERE
+            (
+                product_id IS NULL
+                OR product_id = #{productId}
+            )
+        AND classification IN (1, 2, 3, 5)
+    </select>
+
 </mapper>

@@ -8,6 +8,7 @@ import javax.annotation.Resource;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.entity.Doctor;
+import com.nuoxin.virtual.rep.api.enums.ClassificationEnum;
 import com.nuoxin.virtual.rep.api.enums.MeetingTimeTypeEnum;
 import com.nuoxin.virtual.rep.api.enums.SearchTypeEnum;
 import com.nuoxin.virtual.rep.api.mybatis.*;
@@ -17,10 +18,7 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DoctorPotentia
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.*;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.plan.VisitDoctorResponseBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.DoctorClassificationResponseBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.DoctorPotentialClassificationResponseBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.DoctorPotentialResponseBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductVisitFrequencyResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -66,6 +64,10 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 
 	@Resource
 	private HolidayMapper holidayMapper;
+
+	@Resource
+	private DynamicFieldMapper dynamicFieldMapper;
+
 
 	/**
 	 * 初始化表头信息
@@ -332,7 +334,41 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		this.compensate(request, pageResponseBean);
 		return pageResponseBean;
 	}
-	
+
+	@Override
+	public SearchDynamicFieldListResponseBean getSearchDynamicField(Long productId) {
+		SearchDynamicFieldListResponseBean searchDynamicFieldList = new SearchDynamicFieldListResponseBean();
+		List<SearchDynamicFieldResponseBean> searchDynamicField = dynamicFieldMapper.getSearchDynamicField(productId);
+		if (CollectionsUtil.isNotEmptyList(searchDynamicField)){
+			Map<Integer, List<SearchDynamicFieldResponseBean>> map = searchDynamicField.stream().collect(Collectors.groupingBy(SearchDynamicFieldResponseBean::getClassification));
+			for (Map.Entry<Integer, List<SearchDynamicFieldResponseBean>> entry:map.entrySet()){
+				Integer type = entry.getKey();
+				List<SearchDynamicFieldResponseBean> value = entry.getValue();
+				if (CollectionsUtil.isEmptyList(value)){
+					continue;
+				}
+
+				if (ClassificationEnum.BASIC.getType() == type){
+					searchDynamicFieldList.setBasic(value);
+				}
+
+				if (ClassificationEnum.HOSPITAL.getType() == type){
+					searchDynamicFieldList.setHospital(value);
+				}
+
+				if (ClassificationEnum.PRESCRIPTION.getType() == type){
+					searchDynamicFieldList.setPrescription(value);
+				}
+
+				if (ClassificationEnum.VISIT.getType() == type){
+					searchDynamicFieldList.setVisit(value);
+				}
+			}
+		}
+
+		return searchDynamicFieldList;
+	}
+
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/**

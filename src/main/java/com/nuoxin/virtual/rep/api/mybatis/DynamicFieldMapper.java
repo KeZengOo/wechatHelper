@@ -13,6 +13,7 @@ import com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpBasicInfoHistor
 import com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpDynamicRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.*;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.DoctorDynamicExtendResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.SearchDynamicFieldResponseBean;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -332,4 +333,10 @@ public interface DynamicFieldMapper {
     List<DoctorDynamicExtendResponseBean> getExtendDoctorDynamicField(@Param(value = "productId") Long productId);
 
 
+    /**
+     * 得到高级搜索需要用的动态字段
+     * @param productId
+     * @return
+     */
+    List<SearchDynamicFieldResponseBean> getSearchDynamicField(Long productId);
 }
