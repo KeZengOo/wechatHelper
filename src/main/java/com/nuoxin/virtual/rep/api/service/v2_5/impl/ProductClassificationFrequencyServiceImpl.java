@@ -45,8 +45,8 @@ public class ProductClassificationFrequencyServiceImpl implements ProductClassif
 
         PotentialClassificationResponseBean potentialClassificationResponseBean = new PotentialClassificationResponseBean();
         List<DoctorDynamicExtendResponseBean> extendDoctorDynamicField = dynamicFieldMapper.getExtendDoctorDynamicField(productId);
-        if (CollectionsUtil.isEmptyList(extendDoctorDynamicField)){
-            return potentialClassificationResponseBean;
+        if (CollectionsUtil.isEmptyList(extendDoctorDynamicField) || extendDoctorDynamicField.size() < 2){
+            throw new BusinessException(ErrorEnum.ERROR, "请先设置潜力和分型字段！");
         }
 
         extendDoctorDynamicField.forEach(f->{
@@ -128,6 +128,12 @@ public class ProductClassificationFrequencyServiceImpl implements ProductClassif
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public void update(ProductClassificationFrequencyUpdateRequestBean bean) {
+
+        List<DoctorDynamicExtendResponseBean> extendDoctorDynamicField = dynamicFieldMapper.getExtendDoctorDynamicField(bean.getProductId());
+        if (CollectionsUtil.isEmptyList(extendDoctorDynamicField) || extendDoctorDynamicField.size() < 2){
+            throw new BusinessException(ErrorEnum.ERROR, "请先设置潜力和分型字段！");
+        }
+
         String batchNo = bean.getBatchNo();
         this.deleteByBatchNo(batchNo);
         this.add(bean);

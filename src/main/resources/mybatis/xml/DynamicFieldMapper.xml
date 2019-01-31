@@ -807,7 +807,8 @@
             virtual_doctor_dynamic_field
         WHERE
             product_id = #{productId}
-        AND extend_type IN (1, 2);
+        AND extend_type IN (1, 2)
+        GROUP BY extend_type
 
 
     </select>
