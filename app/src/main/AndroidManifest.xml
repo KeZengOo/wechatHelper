@@ -38,7 +38,7 @@
             android:name=".ExportActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         </activity>
-        
+
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="${applicationId}"

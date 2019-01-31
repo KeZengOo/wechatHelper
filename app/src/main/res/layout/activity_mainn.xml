@@ -104,12 +104,11 @@
             android:layout_marginRight="20dp"
             android:layout_marginTop="10dp"
             android:background="@drawable/bg_update"
-
-            android:text="下载本地"
+            android:text="按标签导出联系人"
             android:textColor="#FFFFFF"
             android:textSize="18dp" />
         <Button
-            android:id="@+id/btn_update_version"
+            android:id="@+id/btn_export_all_message"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_alignParentRight="true"
@@ -117,7 +116,7 @@
             android:layout_marginRight="20dp"
             android:layout_marginTop="10dp"
             android:background="@drawable/bg_update"
-            android:text="版本更新"
+            android:text="导出所有聊天记录"
             android:textColor="#FFFFFF"
             android:textSize="18dp" />
 
