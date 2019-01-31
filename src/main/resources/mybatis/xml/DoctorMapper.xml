@@ -110,27 +110,52 @@
 
 	<!-- 根据过滤条件获取医生总条数 -->
 	<select id="getListCount" resultType="java.lang.Integer">
-		SELECT 
-			count(d.id)
-		FROM doctor d 
+		<!-- 根据 virtualDrugUserIds 获取对应医生基本信息 -->
+		SELECT COUNT(DISTINCT d.id)
+		FROM doctor d
+		LEFT JOIN hospital h ON d.hospital_id=h.id
+		LEFT JOIN doctor_mend dm
+		ON d.id=dm.virtual_doctor_id
 		JOIN (
-			<!-- 根据 virtualDrugUserIds (所有下属的)获取对应去重后的 doctorIds -->
-	  		SELECT 
-				DISTINCT doctor_id 
-			FROM drug_user_doctor 
-			WHERE is_available=1 AND drug_user_id IN
-			<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
-	   			#{virtualDrugUserId}
-	  		</foreach> 
-	  		
-	  		<!-- 根据产品线 ID 筛选 -->
-	  		<if test="productLineIds != null">
-	            AND prod_id IN 
-				<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
-                  #{productLineId}
-  				</foreach> 
-			</if>
-  		) temp ON  d.id=temp.doctor_id
+
+		<!-- 根据 virtualDrugUserIds 获取对应的 doctorIds -->
+		SELECT
+		doctor_id,min(DATE_FORMAT(modify_time,'%Y-%m-%d %H:%i:%s')) doctorCreateTime,
+		IF(drug_user_id=#{drugUserId},1,0) click
+		FROM drug_user_doctor
+		WHERE is_available=1 AND drug_user_id IN
+		<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+			#{virtualDrugUserId}
+		</foreach>
+
+		<!-- 根据产品线 ID 筛选 -->
+		<if test="productLineIds != null">
+			AND prod_id IN
+			<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+				#{productLineId}
+			</foreach>
+		</if>
+		GROUP BY doctor_id
+		) temp  ON  d.id=temp.doctor_id
+
+
+
+		<!-- 左连接 virtual_doctor_call_info_mend 表获取电话拜访信息 -->
+		LEFT JOIN (
+		SELECT c.virtual_doctor_id, c.create_time,
+		m.visit_result, m.next_visit_time FROM virtual_doctor_call_info c
+		LEFT JOIN virtual_doctor_call_info_mend m
+		ON m.call_id=c.id
+		WHERE c.id IN (
+		SELECT MAX(id) FROM virtual_doctor_call_info  WHERE virtual_drug_user_id IN
+		<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+			#{virtualDrugUserId}
+		</foreach>
+		GROUP BY virtual_doctor_id
+		)
+
+		) tel_visit ON tel_visit.virtual_doctor_id=d.id
+
 
 		<!-- 下次拜访时间为今天的或者过期的，过期的置顶 -->
 		<if test="searchType !=null and searchType==1">
@@ -211,12 +236,12 @@
 			LEFT JOIN virtual_meeting_no_remind r ON m.id = r.meeting_id
 			WHERE
 			r.id IS NULL
-			HAVING overMinute>=0 AND
+			HAVING overMinute &gt;=0 AND
 			overMinute &lt;= (
 			SELECT
 			min(
 			<!-- 小时 -->
-			  before_meeting_frequency * 60
+			before_meeting_frequency * 60
 			)
 			FROM
 			virtual_product_visit_frequency
@@ -233,57 +258,166 @@
 
 
 		<if test="searchType==6">
-		<if test="meetingTimeType == 2">
-			INNER JOIN (
-			SELECT
-			round(
-			(
-			UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(tmd.end_time)
-			) / 60
-			) AS overMinute,
-			MAX(tmd.end_time) asMaxEndTime,
-			tmad.doctor_id doctorId
-			FROM
-			t_meeting_data tmd
-			INNER JOIN t_meeting_attend_details tmad ON tmd.id = tmad.meeting_id
-			INNER JOIN drug_user_doctor dud ON tmad.doctor_id = dud.doctor_id
-			AND is_available = 1
-			WHERE
-			dud.drug_user_id IN
+			<if test="meetingTimeType == 2">
+				INNER JOIN (
+				SELECT
+				round(
+				(
+				UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(tmd.end_time)
+				) / 60
+				) AS overMinute,
+				MAX(tmd.end_time) asMaxEndTime,
+				tmad.doctor_id doctorId
+				FROM
+				t_meeting_data tmd
+				INNER JOIN t_meeting_attend_details tmad ON tmd.id = tmad.meeting_id
+				INNER JOIN drug_user_doctor dud ON tmad.doctor_id = dud.doctor_id
+				AND is_available = 1
+				WHERE
+				dud.drug_user_id IN
 
-			<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
-				#{virtualDrugUserId}
-			</foreach>
+				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+					#{virtualDrugUserId}
+				</foreach>
+				AND dud.prod_id IN
+				<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+					#{productLineId}
+				</foreach>
+				GROUP BY
+				tmad.doctor_id
+				HAVING
+				overMinute &lt;= (
+				SELECT
+				min(
+				after_meeting_frequency * 60
+				)
+				FROM
+				virtual_product_visit_frequency
+				WHERE
+				product_id
+				IN
+				<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+					#{productLineId}
+				</foreach>
+				)
+				AND tmad.doctor_id NOT IN (
+				SELECT DISTINCT
+				virtual_doctor_id
+				FROM
+				virtual_doctor_call_info
+				WHERE
+				virtual_drug_user_id IN
 
-			AND dud.prod_id IN
-			<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
-				#{productLineId}
-			</foreach>
-			GROUP BY
-			tmad.doctor_id
-			HAVING
-			overMinute &lt;= (
-			SELECT
-			min(
-			after_meeting_frequency * 60
+				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+					#{virtualDrugUserId}
+				</foreach>
+
+				AND
+
+				product_id IN
+				<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+					#{productLineId}
+				</foreach>
+
+				AND create_time >= MAX(tmd.end_time)
+				)
+
+				) st6 ON temp.doctor_id=st6.doctorId
+			</if>
+
+		</if>
+
+		WHERE 1=1
+		<!-- 搜索 -->
+		<if test="search != null">
+			AND (
+			d.name LIKE "%"#{search,jdbcType=VARCHAR}"%"
+			OR d.hospital_name LIKE "%"#{search,jdbcType=VARCHAR}"%"
+			OR d.telephone LIKE "%"#{search,jdbcType=VARCHAR}"%"
+			OR d.depart LIKE "%"#{search,jdbcType=VARCHAR}"%"
+			OR d.id IN (
+			SELECT doctor_id FROM doctor_telephone WHERE telephone LIKE "%"#{search,jdbcType=VARCHAR}"%"
 			)
-			FROM
-			virtual_product_visit_frequency
-			WHERE
-			product_id
-			IN
-			<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
-				#{productLineId}
-			</foreach>
 			)
-			AND tmad.doctor_id NOT IN (
-			SELECT DISTINCT
-			virtual_doctor_id
-			FROM
-			virtual_doctor_call_info
-			WHERE
-			virtual_drug_user_id IN
+		</if>
 
+
+		<!-- 高级搜索 -->
+
+		<!-- 医生基本信息搜索 -->
+		<if test="sex!=null">
+			AND d.sex=#{sex}
+		</if>
+
+		<if test="email!=null and email !=''">
+			AND d.email LIKE CONCAT('%', #{email}, '%')
+		</if>
+
+		<if test="title!=null and title!=''">
+			AND d.positions LIKE CONCAT('%', #{title}, '%')
+		</if>
+
+		<if test="wechat !=null and wechat !=''">
+			AND d.id IN (SELECT DISTINCT virtual_doctor_id FROM doctor_mend WHERE wechat LIKE CONCAT('%', #{wechat}, '%'))
+		</if>
+
+		<if test="address !=null and address !=''">
+			AND d.id IN (SELECT DISTINCT virtual_doctor_id FROM doctor_mend WHERE address LIKE CONCAT('%', #{address}, '%'))
+		</if>
+
+		<if test="isAddWechat !=null and isAddWechat !=''">
+			<if test="isAddWechat == -1">
+				AND d.id IN (
+				SELECT DISTINCT doctor_id FROM drug_user_doctor_one_to_one
+				WHERE drug_user_id IN
+				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+					#{virtualDrugUserId}
+				</foreach>
+				AND ((is_add_wechat !=1 AND is_add_wechat !=0) OR is_add_wechat IS NULL)
+				)
+			</if>
+			<if test="isAddWechat == 1 or isAddWechat== 0">
+				AND d.id IN (
+				SELECT DISTINCT doctor_id FROM drug_user_doctor_one_to_one
+				WHERE drug_user_id IN
+				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+					#{virtualDrugUserId}
+				</foreach>
+				AND is_add_wechat=#{isAddWechat}
+
+				)
+			</if>
+
+		</if>
+
+		<if test="startDoctorCreateTime !=null and startDoctorCreateTime !=''">
+			AND DATE_FORMAT(temp.doctorCreateTime, '%Y-%m-%d %H:%i:%s') &gt;= DATE_FORMAT(#{startDoctorCreateTime}, '%Y-%m-%d %H:%i:%s')
+		</if>
+
+		<if test="endDoctorCreateTime !=null and endDoctorCreateTime !=''">
+			AND DATE_FORMAT(temp.doctorCreateTime, '%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(#{endDoctorCreateTime}, '%Y-%m-%d %H:%i:%s')
+		</if>
+
+		<!-- 医院高级搜索 -->
+		<if test="hospitalId !=null and hospitalId !=0">
+			AND h.id=#{hospitalId}
+		</if>
+
+		<if test="hospitalProvince !=null and hospitalProvince !=''">
+			AND h.province=#{hospitalProvince}
+		</if>
+
+		<if test="hospitalCity !=null and hospitalCity !=''">
+			AND h.city LIKE #{hospitalCity}
+		</if>
+
+		<if test="hospitalGrade !=null">
+			AND h.level=#{hospitalGrade}
+		</if>
+
+		<!-- 处方信息固定字段高级搜索 -->
+		<if test="hasDrug !=null">
+			AND d.id IN (SELECT DISTINCT doctor_id FROM drug_user_doctor_quate WHERE drug_user_id IN
 			<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
 				#{virtualDrugUserId}
 			</foreach>
@@ -293,25 +427,115 @@
 				#{productLineId}
 			</foreach>
 
-			AND create_time >= MAX(tmd.end_time)
+			and is_has_drug=#{hasDrug}
 			)
-			) st6 ON temp.doctor_id=st6.doctorId
 		</if>
 
-		</if>
-  		
-  		<!-- 搜索:d.name 模糊匹配,d.telephone 及 d.depart 精确匹配 -->
-  		<if test="search != null">
-  			WHERE 
-			d.name LIKE "%"#{search,jdbcType=VARCHAR}"%"
-			OR d.hospital_name LIKE "%"#{search,jdbcType=VARCHAR}"%"
-			OR d.telephone LIKE "%"#{search,jdbcType=VARCHAR}"%" 
-			OR d.depart LIKE "%"#{search,jdbcType=VARCHAR}"%"
-			OR d.id IN (
-			SELECT doctor_id FROM doctor_telephone WHERE telephone LIKE "%"#{search,jdbcType=VARCHAR}"%"
+		<if test="target !=null">
+			AND d.id IN (SELECT DISTINCT doctor_id FROM drug_user_doctor_quate WHERE drug_user_id IN
+			<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+				#{virtualDrugUserId}
+			</foreach>
+
+			AND product_id IN
+			<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+				#{productLineId}
+			</foreach>
+
+			and is_target=#{target}
 			)
-  		</if>
-  		
+		</if>
+
+		<if test="recruit !=null">
+			AND d.id IN (SELECT DISTINCT doctor_id FROM drug_user_doctor_quate WHERE drug_user_id IN
+			<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+				#{virtualDrugUserId}
+			</foreach>
+
+			AND product_id IN
+			<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+				#{productLineId}
+			</foreach>
+
+			and is_recruit=#{recruit}
+			)
+		</if>
+
+		<if test="breakOff !=null">
+			AND d.id IN (SELECT DISTINCT doctor_id FROM drug_user_doctor_quate WHERE drug_user_id IN
+			<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+				#{virtualDrugUserId}
+			</foreach>
+
+			AND product_id IN
+			<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+				#{productLineId}
+			</foreach>
+
+			and is_break_off=#{breakOff}
+			)
+		</if>
+
+		<!-- 拜访记录高级搜索 -->
+		<if test="startLastVisitTime !=null and startLastVisitTime !=''">
+			AND DATE_FORMAT(tel_visit.create_time, '%Y-%m-%d %H:%i:%s') &gt;= DATE_FORMAT(#{startLastVisitTime}, '%Y-%m-%d %H:%i:%s')
+		</if>
+
+		<if test="endLastVisitTime !=null and endLastVisitTime !=''">
+			AND DATE_FORMAT(tel_visit.create_time, '%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(#{endLastVisitTime}, '%Y-%m-%d %H:%i:%s')
+		</if>
+
+		<if test="startNextVisitTime !=null and startNextVisitTime !=''">
+			AND DATE_FORMAT(tel_visit.next_visit_time, '%Y-%m-%d %H:%i:%s') &gt;= DATE_FORMAT(#{startNextVisitTime}, '%Y-%m-%d %H:%i:%s')
+		</if>
+
+		<if test="endNextVisitTime !=null and endNextVisitTime !=''">
+			AND DATE_FORMAT(tel_visit.next_visit_time, '%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(#{endNextVisitTime}, '%Y-%m-%d %H:%i:%s')
+		</if>
+
+		<if test="interviewResult !=null and interviewResult.size >0">
+			AND d.id IN (
+			SELECT DISTINCT q.doctor_id FROM drug_user_doctor_quate q
+			INNER JOIN drug_user_doctor_quate_result r
+			ON q.id=r.quate_id
+			WHERE q.drug_user_id IN
+			<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+				#{virtualDrugUserId}
+			</foreach>
+
+			AND q.product_id IN
+			<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+				#{productLineId}
+			</foreach>
+
+			AND r.result_id IN
+			<foreach collection="interviewResult" item="resultId" open="(" close=")" separator=",">
+				#{resultId}
+			</foreach>
+			)
+		</if>
+
+
+		<!-- 动态字段筛选 -->
+		<if test="valueList !=null and valueList.size >0">
+			AND d.id IN (
+
+			SELECT DISTINCT doctor_id FROM virtual_doctor_dynamic_field_value WHERE 1=1
+			<foreach collection="valueList" item="v">
+				AND (
+				 dynamic_field_id=#{v.dynamicFieldId}
+
+				AND (
+				<foreach collection="v.dynamicFieldValueList" item="v2"  separator="OR">
+					dynamic_field_value  LIKE CONCAT('%', #{v2}, '%')
+				</foreach>
+
+				)
+				)
+			</foreach>
+			)
+		</if>
+
 	</select>
 
 	<!-- 根据过滤条件获取医生拜访列表信息(不含对应的产品信息) -->
@@ -539,9 +763,10 @@
 
 		</if>
 
+		WHERE 1=1
 		<!-- 搜索 -->
 		<if test="search != null">
-			WHERE
+			AND (
 			d.name LIKE "%"#{search,jdbcType=VARCHAR}"%"
 			OR d.hospital_name LIKE "%"#{search,jdbcType=VARCHAR}"%"
 			OR d.telephone LIKE "%"#{search,jdbcType=VARCHAR}"%"
@@ -549,7 +774,205 @@
 			OR d.id IN (
 			SELECT doctor_id FROM doctor_telephone WHERE telephone LIKE "%"#{search,jdbcType=VARCHAR}"%"
 			)
+			)
 		</if>
+
+
+		<!-- 高级搜索 -->
+
+		<!-- 医生基本信息搜索 -->
+		<if test="sex!=null">
+			AND d.sex=#{sex}
+		</if>
+
+		<if test="email!=null and email !=''">
+			AND d.email LIKE CONCAT('%', #{email}, '%')
+		</if>
+
+		<if test="title!=null and title!=''">
+			AND d.positions LIKE CONCAT('%', #{title}, '%')
+		</if>
+
+		<if test="wechat !=null and wechat !=''">
+			AND d.id IN (SELECT DISTINCT virtual_doctor_id FROM doctor_mend WHERE wechat LIKE CONCAT('%', #{wechat}, '%'))
+		</if>
+
+		<if test="address !=null and address !=''">
+			AND d.id IN (SELECT DISTINCT virtual_doctor_id FROM doctor_mend WHERE address LIKE CONCAT('%', #{address}, '%'))
+		</if>
+
+		<if test="isAddWechat !=null and isAddWechat !=''">
+			<if test="isAddWechat == -1">
+				AND d.id IN (
+					SELECT DISTINCT doctor_id FROM drug_user_doctor_one_to_one
+				   WHERE drug_user_id IN
+				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+					#{virtualDrugUserId}
+				</foreach>
+				AND ((is_add_wechat !=1 AND is_add_wechat !=0) OR is_add_wechat IS NULL)
+				)
+			</if>
+			<if test="isAddWechat == 1 or isAddWechat== 0">
+				AND d.id IN (
+				SELECT DISTINCT doctor_id FROM drug_user_doctor_one_to_one
+				WHERE drug_user_id IN
+				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+					#{virtualDrugUserId}
+				</foreach>
+				AND is_add_wechat=#{isAddWechat}
+
+				)
+			</if>
+
+		</if>
+
+		<if test="startDoctorCreateTime !=null and startDoctorCreateTime !=''">
+			AND DATE_FORMAT(temp.doctorCreateTime, '%Y-%m-%d %H:%i:%s') &gt;= DATE_FORMAT(#{startDoctorCreateTime}, '%Y-%m-%d %H:%i:%s')
+		</if>
+
+		<if test="endDoctorCreateTime !=null and endDoctorCreateTime !=''">
+			AND DATE_FORMAT(temp.doctorCreateTime, '%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(#{endDoctorCreateTime}, '%Y-%m-%d %H:%i:%s')
+		</if>
+
+		<!-- 医院高级搜索 -->
+		<if test="hospitalId !=null and hospitalId !=0">
+			AND h.id=#{hospitalId}
+		</if>
+
+		<if test="hospitalProvince !=null and hospitalProvince !=''">
+			AND h.province=#{hospitalProvince}
+		</if>
+
+		<if test="hospitalCity !=null and hospitalCity !=''">
+			AND h.city LIKE #{hospitalCity}
+		</if>
+
+		<if test="hospitalGrade !=null">
+			AND h.level=#{hospitalGrade}
+		</if>
+
+		<!-- 处方信息固定字段高级搜索 -->
+		<if test="hasDrug !=null">
+			AND d.id IN (SELECT DISTINCT doctor_id FROM drug_user_doctor_quate WHERE drug_user_id IN
+			<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+				#{virtualDrugUserId}
+			</foreach>
+
+			AND product_id IN
+			<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+				#{productLineId}
+			</foreach>
+
+			and is_has_drug=#{hasDrug}
+			)
+		</if>
+
+		<if test="target !=null">
+			AND d.id IN (SELECT DISTINCT doctor_id FROM drug_user_doctor_quate WHERE drug_user_id IN
+			<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+				#{virtualDrugUserId}
+			</foreach>
+
+			AND product_id IN
+			<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+				#{productLineId}
+			</foreach>
+
+			and is_target=#{target}
+			)
+		</if>
+
+		<if test="recruit !=null">
+			AND d.id IN (SELECT DISTINCT doctor_id FROM drug_user_doctor_quate WHERE drug_user_id IN
+			<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+				#{virtualDrugUserId}
+			</foreach>
+
+			AND product_id IN
+			<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+				#{productLineId}
+			</foreach>
+
+			and is_recruit=#{recruit}
+			)
+		</if>
+
+		<if test="breakOff !=null">
+			AND d.id IN (SELECT DISTINCT doctor_id FROM drug_user_doctor_quate WHERE drug_user_id IN
+			<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+				#{virtualDrugUserId}
+			</foreach>
+
+			AND product_id IN
+			<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+				#{productLineId}
+			</foreach>
+
+			and is_break_off=#{breakOff}
+			)
+		</if>
+
+		<!-- 拜访记录高级搜索 -->
+		<if test="startLastVisitTime !=null and startLastVisitTime !=''">
+			AND DATE_FORMAT(tel_visit.create_time, '%Y-%m-%d %H:%i:%s') &gt;= DATE_FORMAT(#{startLastVisitTime}, '%Y-%m-%d %H:%i:%s')
+		</if>
+
+		<if test="endLastVisitTime !=null and endLastVisitTime !=''">
+			AND DATE_FORMAT(tel_visit.create_time, '%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(#{endLastVisitTime}, '%Y-%m-%d %H:%i:%s')
+		</if>
+
+		<if test="startNextVisitTime !=null and startNextVisitTime !=''">
+			AND DATE_FORMAT(tel_visit.next_visit_time, '%Y-%m-%d %H:%i:%s') &gt;= DATE_FORMAT(#{startNextVisitTime}, '%Y-%m-%d %H:%i:%s')
+		</if>
+
+		<if test="endNextVisitTime !=null and endNextVisitTime !=''">
+			AND DATE_FORMAT(tel_visit.next_visit_time, '%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(#{endNextVisitTime}, '%Y-%m-%d %H:%i:%s')
+		</if>
+
+		<if test="interviewResult !=null and interviewResult.size >0">
+			AND d.id IN (
+			SELECT DISTINCT q.doctor_id FROM drug_user_doctor_quate q
+			INNER JOIN drug_user_doctor_quate_result r
+			ON q.id=r.quate_id
+			WHERE q.drug_user_id IN
+			<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+				#{virtualDrugUserId}
+			</foreach>
+
+			AND q.product_id IN
+			<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+				#{productLineId}
+			</foreach>
+
+			AND r.result_id IN
+			<foreach collection="interviewResult" item="resultId" open="(" close=")" separator=",">
+				#{resultId}
+			</foreach>
+			)
+		</if>
+
+
+		<!-- 动态字段筛选 -->
+		<if test="valueList !=null and valueList.size >0">
+			AND d.id IN (
+
+				SELECT DISTINCT doctor_id FROM virtual_doctor_dynamic_field_value WHERE 1=1
+				<foreach collection="valueList" item="v"  separator="OR">
+					AND (
+					 dynamic_field_id=#{v.dynamicFieldId}
+
+					AND (
+					<foreach collection="v.dynamicFieldValueList" item="v2"  separator="OR">
+						dynamic_field_value  LIKE CONCAT('%', #{v2}, '%')
+					</foreach>
+
+					)
+					)
+				</foreach>
+			)
+		</if>
+
+
 
 
 		GROUP BY d.id

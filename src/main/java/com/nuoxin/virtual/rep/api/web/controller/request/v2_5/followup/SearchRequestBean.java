@@ -58,8 +58,11 @@ public class SearchRequestBean extends ListRequestBean {
 	@ApiModelProperty(value = "医院ID")
 	private Long hospitalId;
 
+	@ApiModelProperty(value = "医院的省份")
+	private String hospitalProvince;
+
 	@ApiModelProperty(value = "医院的城市")
-	private String hospitalProvinceCity;
+	private String hospitalCity;
 
 	@ApiModelProperty(value = "医院等级")
 	private Integer hospitalGrade;
@@ -97,6 +100,7 @@ public class SearchRequestBean extends ListRequestBean {
 	private String endNextVisitTime;
 
 
+	// 所有动态字段输入的值
 	@ApiModelProperty(value = "动态字段输入的所有值")
 	private List<SearchDynamicFieldRequestBean> valueList;
 
