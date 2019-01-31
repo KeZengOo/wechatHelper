@@ -826,7 +826,7 @@
             virtual_doctor_dynamic_field
         WHERE
             (
-                product_id IS NULL
+                product_id = 0
                 OR product_id = #{productId}
             )
         AND classification IN (1, 2, 3, 5)
