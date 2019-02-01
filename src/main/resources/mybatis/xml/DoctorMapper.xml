@@ -358,36 +358,21 @@
 		</if>
 
 		<if test="wechat !=null and wechat !=''">
-			AND d.id IN (SELECT DISTINCT virtual_doctor_id FROM doctor_mend WHERE wechat LIKE CONCAT('%', #{wechat}, '%'))
+			AND dm.wechat LIKE CONCAT('%', #{wechat}, '%')
 		</if>
 
 		<if test="address !=null and address !=''">
 			AND d.id IN (SELECT DISTINCT virtual_doctor_id FROM doctor_mend WHERE address LIKE CONCAT('%', #{address}, '%'))
 		</if>
 
-		<if test="isAddWechat !=null and isAddWechat !=''">
-			<if test="isAddWechat == -1">
-				AND d.id IN (
-				SELECT DISTINCT doctor_id FROM drug_user_doctor_one_to_one
-				WHERE drug_user_id IN
-				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
-					#{virtualDrugUserId}
-				</foreach>
-				AND ((is_add_wechat !=1 AND is_add_wechat !=0) OR is_add_wechat IS NULL)
-				)
-			</if>
-			<if test="isAddWechat == 1 or isAddWechat== 0">
-				AND d.id IN (
-				SELECT DISTINCT doctor_id FROM drug_user_doctor_one_to_one
-				WHERE drug_user_id IN
-				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
-					#{virtualDrugUserId}
-				</foreach>
-				AND is_add_wechat=#{isAddWechat}
-
-				)
+		<if test="isAddWechat !=null">
+			<if test="isAddWechat == 1">
+				AND dm.wechat IS NOT NULL AND dm.wechat!=''
 			</if>
 
+			<if test="isAddWechat == 0">
+				AND (dm.wechat IS NULL OR dm.wechat='')
+			</if>
 		</if>
 
 		<if test="startDoctorCreateTime !=null and startDoctorCreateTime !=''">
@@ -790,35 +775,25 @@
 		</if>
 
 		<if test="wechat !=null and wechat !=''">
-			AND d.id IN (SELECT DISTINCT virtual_doctor_id FROM doctor_mend WHERE wechat LIKE CONCAT('%', #{wechat}, '%'))
+			AND dm.wechat LIKE CONCAT('%', #{wechat}, '%')
 		</if>
 
 		<if test="address !=null and address !=''">
 			AND d.id IN (SELECT DISTINCT virtual_doctor_id FROM doctor_mend WHERE address LIKE CONCAT('%', #{address}, '%'))
 		</if>
 
-		<if test="isAddWechat !=null and isAddWechat !=''">
-			<if test="isAddWechat == -1">
-				AND d.id IN (
-					SELECT DISTINCT doctor_id FROM drug_user_doctor_one_to_one
-				   WHERE drug_user_id IN
-				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
-					#{virtualDrugUserId}
-				</foreach>
-				AND ((is_add_wechat !=1 AND is_add_wechat !=0) OR is_add_wechat IS NULL)
-				)
-			</if>
-			<if test="isAddWechat == 1 or isAddWechat== 0">
-				AND d.id IN (
-				SELECT DISTINCT doctor_id FROM drug_user_doctor_one_to_one
-				WHERE drug_user_id IN
-				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
-					#{virtualDrugUserId}
-				</foreach>
-				AND is_add_wechat=#{isAddWechat}
+		<if test="isAddWechat !=null">
 
-				)
+
+
+			<if test="isAddWechat == 1">
+				AND dm.wechat IS NOT NULL AND dm.wechat!=''
 			</if>
+
+			<if test="isAddWechat == 0">
+				AND (dm.wechat IS NULL OR dm.wechat='')
+			</if>
+
 
 		</if>
 
