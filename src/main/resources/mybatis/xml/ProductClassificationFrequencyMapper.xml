@@ -33,6 +33,8 @@
             f.product_id = #{productId}
         GROUP BY
             f.batch_no
+
+        ORDER BY f.update_time DESC
     </select>
 
 
