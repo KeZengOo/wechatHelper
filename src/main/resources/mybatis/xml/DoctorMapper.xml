@@ -505,14 +505,19 @@
 		<if test="valueList !=null and valueList.size >0">
 			AND d.id IN (
 
-			SELECT DISTINCT doctor_id FROM virtual_doctor_dynamic_field_value WHERE 1=1
-			<foreach collection="valueList" item="v">
+			<foreach collection="valueList" item="v" index="index">
+
+				<if test="index > 0">
+					UNION
+				</if>
+
+				SELECT DISTINCT doctor_id FROM virtual_doctor_dynamic_field_value WHERE 1=1
 				AND dynamic_field_id=#{v.dynamicFieldId}
-
-				<foreach collection="v.dynamicFieldValueList" item="v2" >
-				AND	dynamic_field_value  LIKE CONCAT('%', #{v2}, '%')
+				AND (
+				<foreach collection="v.dynamicFieldValueList" item="v2" separator="OR">
+					dynamic_field_value LIKE CONCAT('%', #{v2}, '%')
 				</foreach>
-
+				)
 			</foreach>
 			)
 		</if>
@@ -927,14 +932,19 @@
 		<if test="valueList !=null and valueList.size >0">
 			AND d.id IN (
 
-			SELECT DISTINCT doctor_id FROM virtual_doctor_dynamic_field_value WHERE 1=1
-			<foreach collection="valueList" item="v">
+			<foreach collection="valueList" item="v" index="index">
+
+				<if test="index > 0">
+					UNION
+				</if>
+
+				SELECT DISTINCT doctor_id FROM virtual_doctor_dynamic_field_value WHERE 1=1
 				AND dynamic_field_id=#{v.dynamicFieldId}
-
-				<foreach collection="v.dynamicFieldValueList" item="v2" >
-					AND	dynamic_field_value  LIKE CONCAT('%', #{v2}, '%')
+				AND (
+				<foreach collection="v.dynamicFieldValueList" item="v2" separator="OR">
+					dynamic_field_value LIKE CONCAT('%', #{v2}, '%')
 				</foreach>
-
+				)
 			</foreach>
 			)
 		</if>
