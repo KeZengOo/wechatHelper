@@ -357,6 +357,10 @@
 			AND d.positions LIKE CONCAT('%', #{title}, '%')
 		</if>
 
+		<if test="depart !=null and depart !=''">
+			AND d.depart LIKE CONCAT('%', #{depart}, '%')
+		</if>
+
 		<if test="wechat !=null and wechat !=''">
 			AND dm.wechat LIKE CONCAT('%', #{wechat}, '%')
 		</if>
@@ -776,6 +780,10 @@
 
 		<if test="title!=null and title!=''">
 			AND d.positions LIKE CONCAT('%', #{title}, '%')
+		</if>
+
+		<if test="depart !=null and depart !=''">
+			AND d.depart LIKE CONCAT('%', #{depart}, '%')
 		</if>
 
 		<if test="wechat !=null and wechat !=''">

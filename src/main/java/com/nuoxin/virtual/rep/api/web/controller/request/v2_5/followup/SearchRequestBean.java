@@ -46,6 +46,9 @@ public class SearchRequestBean extends ListRequestBean {
 	@ApiModelProperty(value = "医生职称")
 	private String title;
 
+	@ApiModelProperty(value = "科室")
+	private String depart;
+
 	@ApiModelProperty(value = "筛选的开始医生创建时间")
 	private String startDoctorCreateTime;
 
