@@ -14,6 +14,7 @@ import com.nuoxin.virtual.rep.api.enums.SearchTypeEnum;
 import com.nuoxin.virtual.rep.api.mybatis.*;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.utils.StringUtil;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.SearchDynamicFieldRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DoctorPotentialClassificationRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.*;
@@ -92,6 +93,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 			pageRequest.setVirtualDrugUserIds(virtualDrugUserIds);
 
 			this.fileSearchType(pageRequest);
+			this.handleSearchValueList(pageRequest);
 
 
 			count = doctorMapper.getListCount(pageRequest);
@@ -303,6 +305,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		if (CollectionsUtil.isNotEmptyList(virtualDrugUserIds)) {
 			request.setVirtualDrugUserIds(virtualDrugUserIds);
 			this.fileSearchType(request);
+			this.handleSearchValueList(request);
 			count = doctorMapper.getListCount(request);
 			if(count > 0) {
 				int currentSize = request.getCurrentSize();
@@ -323,6 +326,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	public CustomerFollowUpPageResponseBean<List<CustomerFollowListBean>> screen(SearchRequestBean request) {
 		CustomerFollowUpPageResponseBean pageResponseBean = null;
 		this.fileSearchType(request);
+		this.handleSearchValueList(request);
 		int count = doctorMapper.getListCount(request);
 		if(count > 0 ) {
 			int currentSize = request.getCurrentSize();
@@ -333,6 +337,30 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		
 		this.compensate(request, pageResponseBean);
 		return pageResponseBean;
+	}
+
+	/**
+	 * 处理动态字段，将空值的去掉
+	 * @param request
+	 */
+	private void handleSearchValueList(SearchRequestBean request) {
+		List<SearchDynamicFieldRequestBean> valueList = request.getValueList();
+		if (CollectionsUtil.isEmptyList(valueList)){
+			return;
+		}
+
+		List<SearchDynamicFieldRequestBean> handleValueList = new ArrayList<>();
+		for (SearchDynamicFieldRequestBean searchDynamicFieldRequestBean : valueList) {
+			Long dynamicFieldId = searchDynamicFieldRequestBean.getDynamicFieldId();
+			List<String> dynamicFieldValueList = searchDynamicFieldRequestBean.getDynamicFieldValueList();
+			if (dynamicFieldId == null || dynamicFieldId == 0 || CollectionsUtil.isEmptyList(dynamicFieldValueList)){
+				continue;
+			}
+
+			handleValueList.add(searchDynamicFieldRequestBean);
+		}
+
+		request.setValueList(handleValueList);
 	}
 
 	@Override
