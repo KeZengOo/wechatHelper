@@ -8,13 +8,18 @@ import javax.annotation.Resource;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.entity.Doctor;
+import com.nuoxin.virtual.rep.api.enums.ClassificationEnum;
 import com.nuoxin.virtual.rep.api.enums.MeetingTimeTypeEnum;
 import com.nuoxin.virtual.rep.api.enums.SearchTypeEnum;
 import com.nuoxin.virtual.rep.api.mybatis.*;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
+import com.nuoxin.virtual.rep.api.utils.StringUtil;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.SearchDynamicFieldRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DoctorPotentialClassificationRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.*;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.plan.VisitDoctorResponseBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductVisitFrequencyResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -56,7 +61,14 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	private ProductVisitFrequencyMapper productVisitFrequencyMapper;
 
 	@Resource
+	private ProductClassificationFrequencyMapper productClassificationFrequencyMapper;
+
+	@Resource
 	private HolidayMapper holidayMapper;
+
+	@Resource
+	private DynamicFieldMapper dynamicFieldMapper;
+
 
 	/**
 	 * 初始化表头信息
@@ -81,6 +93,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 			pageRequest.setVirtualDrugUserIds(virtualDrugUserIds);
 
 			this.fileSearchType(pageRequest);
+			this.handleSearchValueList(pageRequest);
 
 
 			count = doctorMapper.getListCount(pageRequest);
@@ -126,6 +139,14 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 			List<VisitDoctorResponseBean> classificationVisitDoctorList = null;
 			if (searchType == SearchTypeEnum.SEARCH_TWO.getUserType()){
 				classificationVisitDoctorList = doctorMapper.getClassificationVisitDoctorList(pageRequest);
+
+				if (CollectionsUtil.isNotEmptyList(classificationVisitDoctorList)){
+					List<Long> doctorIdList = classificationVisitDoctorList.stream().map(VisitDoctorResponseBean::getDoctorId).distinct().collect(Collectors.toList());
+					List<DoctorPotentialResponseBean> doctorPotentialList = doctorMapper.getDoctorPotentialList(doctorIdList, pageRequest.getProductLineIds());
+					List<DoctorClassificationResponseBean> doctorClassificationList = doctorMapper.getDoctorClassificationList(doctorIdList, pageRequest.getProductLineIds());
+					classificationVisitDoctorList = this.getSearchTwoClassificationVisitDoctorList(classificationVisitDoctorList,doctorPotentialList, doctorClassificationList, pageRequest.getProductLineIds());
+				}
+
 				classificationVisitDoctorList = this.getVisitDoctorList(classificationVisitDoctorList, productVisitFrequency.getVisitFrequency(), SearchTypeEnum.SEARCH_TWO.getUserType());
 			}
 
@@ -180,6 +201,99 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 
 	}
 
+	/**
+	 * 得到医生分型潜力设置的拜访频次
+	 * @param classificationVisitDoctorList
+	 * @param doctorPotentialList
+	 * @param doctorClassificationList
+	 * @param productLineIds
+	 * @return
+	 */
+	private List<VisitDoctorResponseBean> getSearchTwoClassificationVisitDoctorList(List<VisitDoctorResponseBean> classificationVisitDoctorList,List<DoctorPotentialResponseBean> doctorPotentialList,
+																					List<DoctorClassificationResponseBean> doctorClassificationList,
+																					List<Long> productLineIds) {
+
+		if (CollectionsUtil.isEmptyList(classificationVisitDoctorList)
+				|| CollectionsUtil.isEmptyList(doctorPotentialList)
+				|| CollectionsUtil.isEmptyList(doctorClassificationList)
+				|| CollectionsUtil.isEmptyList(productLineIds)){
+			return new ArrayList<>();
+		}
+
+		List<DoctorPotentialClassificationResponseBean> frequencyList = productClassificationFrequencyMapper.getFrequencyList(productLineIds);
+		if (CollectionsUtil.isEmptyList(frequencyList)){
+			return new ArrayList<>();
+		}
+
+
+		List<DoctorPotentialClassificationRequestBean> list = new ArrayList<>();
+		doctorClassificationList.forEach(c ->{
+			String classification = c.getClassification();
+			if (StringUtil.isNotEmpty(classification)){
+				Optional<DoctorPotentialResponseBean> doctorPotentialFirst = doctorPotentialList.stream().filter(p -> p.getDoctorId().equals(c.getDoctorId())).findFirst();
+				if (doctorPotentialFirst.isPresent()){
+					DoctorPotentialResponseBean doctorPotentialResponseBean = doctorPotentialFirst.get();
+					String potential = doctorPotentialResponseBean.getPotential();
+					String[] classificationArray = classification.split(",");
+					if (StringUtil.isNotEmpty(potential) && CollectionsUtil.isNotEmptyArray(classificationArray)){
+
+						for (String f:classificationArray){
+							DoctorPotentialClassificationRequestBean doctorPotentialClassificationRequestBean = new DoctorPotentialClassificationRequestBean();
+							doctorPotentialClassificationRequestBean.setDoctorId(c.getDoctorId());
+							doctorPotentialClassificationRequestBean.setClassification(f);
+							doctorPotentialClassificationRequestBean.setPotential(potential);
+							list.add(doctorPotentialClassificationRequestBean);
+						}
+
+					}
+				}
+			}
+
+		});
+
+
+
+		list.forEach(pc->{
+			Optional<DoctorPotentialClassificationResponseBean> doctorPotentialClassification = frequencyList.stream().filter(f -> (f.getPotential().equals(pc.getPotential()) && f.getClassification().equals(pc.getClassification()))).findFirst();
+			if (doctorPotentialClassification.isPresent()){
+				DoctorPotentialClassificationResponseBean dcp = doctorPotentialClassification.get();
+				pc.setFrequency(dcp.getFrequency());
+			}
+		});
+
+		// 得到每个医生的最小拜访频次
+		Map<Long, Integer> map = new HashMap<>();
+		for (DoctorPotentialClassificationRequestBean dcf : list) {
+			Long doctorId = dcf.getDoctorId();
+			Integer value = map.get(doctorId);
+			Integer frequency = dcf.getFrequency();
+			if (frequency == null){
+				frequency = 0;
+			}
+
+			if (value == null){
+				map.put(doctorId, frequency);
+			}else {
+				if (frequency > value){
+					map.put(doctorId, frequency);
+				}
+			}
+		}
+
+		List<VisitDoctorResponseBean> vList = new ArrayList<>();
+		for (VisitDoctorResponseBean visitDoctorResponseBean : classificationVisitDoctorList) {
+			Integer frequency = map.get(visitDoctorResponseBean.getDoctorId());
+			if (frequency !=null && frequency > 0){
+				visitDoctorResponseBean.setFrequency(map.get(visitDoctorResponseBean.getDoctorId()));
+				vList.add(visitDoctorResponseBean);
+			}
+
+		}
+
+		return vList;
+
+	}
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public CustomerFollowUpPageResponseBean<List<CustomerFollowListBean>> search(SearchRequestBean request, String leaderPath) {
@@ -191,6 +305,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		if (CollectionsUtil.isNotEmptyList(virtualDrugUserIds)) {
 			request.setVirtualDrugUserIds(virtualDrugUserIds);
 			this.fileSearchType(request);
+			this.handleSearchValueList(request);
 			count = doctorMapper.getListCount(request);
 			if(count > 0) {
 				int currentSize = request.getCurrentSize();
@@ -211,6 +326,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	public CustomerFollowUpPageResponseBean<List<CustomerFollowListBean>> screen(SearchRequestBean request) {
 		CustomerFollowUpPageResponseBean pageResponseBean = null;
 		this.fileSearchType(request);
+		this.handleSearchValueList(request);
 		int count = doctorMapper.getListCount(request);
 		if(count > 0 ) {
 			int currentSize = request.getCurrentSize();
@@ -222,7 +338,65 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		this.compensate(request, pageResponseBean);
 		return pageResponseBean;
 	}
-	
+
+	/**
+	 * 处理动态字段，将空值的去掉
+	 * @param request
+	 */
+	private void handleSearchValueList(SearchRequestBean request) {
+		List<SearchDynamicFieldRequestBean> valueList = request.getValueList();
+		if (CollectionsUtil.isEmptyList(valueList)){
+			return;
+		}
+
+		List<SearchDynamicFieldRequestBean> handleValueList = new ArrayList<>();
+		for (SearchDynamicFieldRequestBean searchDynamicFieldRequestBean : valueList) {
+			Long dynamicFieldId = searchDynamicFieldRequestBean.getDynamicFieldId();
+			List<String> dynamicFieldValueList = searchDynamicFieldRequestBean.getDynamicFieldValueList();
+			if (dynamicFieldId == null || dynamicFieldId == 0 || CollectionsUtil.isEmptyList(dynamicFieldValueList)){
+				continue;
+			}
+
+			handleValueList.add(searchDynamicFieldRequestBean);
+		}
+
+		request.setValueList(handleValueList);
+	}
+
+	@Override
+	public SearchDynamicFieldListResponseBean getSearchDynamicField(Long productId) {
+		SearchDynamicFieldListResponseBean searchDynamicFieldList = new SearchDynamicFieldListResponseBean();
+		List<SearchDynamicFieldResponseBean> searchDynamicField = dynamicFieldMapper.getSearchDynamicField(productId);
+		if (CollectionsUtil.isNotEmptyList(searchDynamicField)){
+			Map<Integer, List<SearchDynamicFieldResponseBean>> map = searchDynamicField.stream().collect(Collectors.groupingBy(SearchDynamicFieldResponseBean::getClassification));
+			for (Map.Entry<Integer, List<SearchDynamicFieldResponseBean>> entry:map.entrySet()){
+				Integer type = entry.getKey();
+				List<SearchDynamicFieldResponseBean> value = entry.getValue();
+				if (CollectionsUtil.isEmptyList(value)){
+					continue;
+				}
+
+				if (ClassificationEnum.BASIC.getType() == type){
+					searchDynamicFieldList.setBasic(value);
+				}
+
+				if (ClassificationEnum.HOSPITAL.getType() == type){
+					searchDynamicFieldList.setHospital(value);
+				}
+
+				if (ClassificationEnum.PRESCRIPTION.getType() == type){
+					searchDynamicFieldList.setPrescription(value);
+				}
+
+				if (ClassificationEnum.VISIT.getType() == type){
+					searchDynamicFieldList.setVisit(value);
+				}
+			}
+		}
+
+		return searchDynamicFieldList;
+	}
+
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/**

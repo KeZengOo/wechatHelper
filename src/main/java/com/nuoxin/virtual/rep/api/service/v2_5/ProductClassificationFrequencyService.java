@@ -3,6 +3,8 @@ package com.nuoxin.virtual.rep.api.service.v2_5;
 import com.nuoxin.virtual.rep.api.entity.v2_5.ProductClassificationFrequencyParams;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.ProductClassificationFrequencyRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.ProductClassificationFrequencyUpdateRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.TableHeader;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.PotentialClassificationResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationFrequencyResponseBean;
 
 import java.util.List;
@@ -13,6 +15,14 @@ import java.util.List;
  * @date 2019-01-04
  */
 public interface ProductClassificationFrequencyService {
+
+    /**
+     * 得到新增医生潜力分型频次需要的列表
+     * @param productId
+     * @return
+     */
+    PotentialClassificationResponseBean getPotentialClassification(Long productId);
+
 
     /**
      * 新增
@@ -41,4 +51,12 @@ public interface ProductClassificationFrequencyService {
      * @param bean
      */
     void update(ProductClassificationFrequencyUpdateRequestBean bean);
+
+
+    /**
+     * 得到标题
+     * @param productId
+     * @return
+     */
+    List<TableHeader> getTableHeaderList(Long productId);
 }

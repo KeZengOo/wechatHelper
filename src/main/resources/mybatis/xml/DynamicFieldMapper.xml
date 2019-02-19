@@ -131,7 +131,8 @@
             `type`,
             field_value `value`,
             required,
-            classification
+            classification,
+            extend_type extendType
         FROM
             virtual_doctor_dynamic_field
         WHERE 1=1
@@ -151,7 +152,7 @@
     </select>
 
     <!-- 客户设置医生动态字段修改 -->
-    <select id="updateDoctorDynamicField" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DoctorDynamicFieldRequestBean">
+    <update id="updateDoctorDynamicField" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DoctorDynamicFieldRequestBean">
 
         update virtual_doctor_dynamic_field
         <set>
@@ -184,23 +185,33 @@
             </if>
 
             <if test="menderName !=null and menderName !=''">
-                mender_name=#{menderName}
+                mender_name=#{menderName},
+            </if>
+
+            <if test="extendType !=null">
+                extend_type=#{extendType}
             </if>
         </set>
 
         where id=#{id}
 
-    </select>
+    </update>
 
     <delete id="deleteDoctorDynamicField">
         delete from virtual_doctor_dynamic_field
         where id=#{id}
     </delete>
 
+    <!-- 得到产品扩展类型(分型,潜力); 用来判断字段是否存在 -->
+    <select id="getProductExtendTypeField" resultType="java.lang.Long">
+        SELECT id FROM virtual_doctor_dynamic_field WHERE product_id=#{productId} AND extend_type=#{extendType}
+    </select>
+
+
     <insert id="insertDoctorDynamicField" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DoctorDynamicFieldRequestBean" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        insert into virtual_doctor_dynamic_field(serial_number, field_name, type, field_value, classification, required, product_id, creator_id, creator_name, mender_id, mender_name)
+        insert into virtual_doctor_dynamic_field(serial_number, field_name, type, extend_type, field_value, classification, required, product_id, creator_id, creator_name, mender_id, mender_name)
         values
-        (#{serialNumber}, #{name}, #{type}, #{value}, #{classification}, #{required}, #{productId}, #{creatorId}, #{creatorName}, #{menderId}, #{menderName})
+        (#{serialNumber}, #{name}, #{type},#{extendType}, #{value}, #{classification}, #{required}, #{productId}, #{creatorId}, #{creatorName}, #{menderId}, #{menderName})
     </insert>
 
     <!-- 得到医生基本信息动态字段填充的值 -->
@@ -781,6 +792,57 @@
         WHERE
             a.doctor_id = #{doctorId}
         AND a.product_id = #{productId}
+    </select>
+
+
+    <!-- 得到产品下的扩展动态字段 目前：1潜力，2分型 -->
+    <select id="getExtendDoctorDynamicField" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.DoctorDynamicExtendResponseBean">
+        SELECT
+            field_name fieldName,
+            field_value fieldValue,
+            type fieldType,
+            required,
+            extend_type extendType
+        FROM
+            virtual_doctor_dynamic_field
+        WHERE
+            product_id = #{productId}
+        AND extend_type IN (1, 2)
+        GROUP BY extend_type
+
+
+    </select>
+
+    <!-- 得到高级搜索需要用的动态字段 classification: 分类，目前1基本信息，2医生的处方信息，3之前拜访记录，4分析，5是医院信息-->
+    <select id="getSearchDynamicField" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.SearchDynamicFieldResponseBean">
+
+        SELECT
+                    id fieldId,
+                    field_name fieldName,
+                    type,
+                    extend_type extendType,
+                    field_value fieldValue,
+                    classification,
+                    required
+                FROM
+                    virtual_doctor_dynamic_field
+                WHERE
+                     classification IN (1,  5)
+
+        UNION
+        SELECT
+                    id fieldId,
+                    field_name fieldName,
+                    type,
+                    extend_type extendType,
+                    field_value fieldValue,
+                    classification,
+                    required
+                FROM
+                    virtual_doctor_dynamic_field
+                WHERE
+                    product_id=#{productId}
+                AND classification IN (2, 3)
     </select>
 
 </mapper>

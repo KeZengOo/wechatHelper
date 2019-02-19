@@ -101,7 +101,11 @@ public class VirtualDoctorCallInfoController extends NewBaseController{
 		if(bindingResult.hasErrors()){
 			return super.getParamsErrorResponse(bindingResult.getFieldError().getDefaultMessage());
         }
-		
+
+		Long virtualDrugUserId = saveRequest.getVirtualDrugUserId();
+		if (virtualDrugUserId == null || virtualDrugUserId.equals(0)){
+			saveRequest.setVirtualDrugUserId(user.getId());
+		}
 		boolean flag = callInfoService.saveUnconnectedCallInfo(saveRequest);
 		DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<Boolean>();
 		responseBean.setData(flag);

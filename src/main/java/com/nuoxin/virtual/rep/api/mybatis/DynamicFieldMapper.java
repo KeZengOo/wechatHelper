@@ -12,6 +12,8 @@ import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorBasicInfo
 import com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpBasicInfoHistoryResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpDynamicRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.*;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.DoctorDynamicExtendResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.SearchDynamicFieldResponseBean;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -106,6 +108,12 @@ public interface DynamicFieldMapper {
      */
     void deleteDoctorDynamicField(@Param(value="id") Long id);
 
+    /**
+     * 得到产品扩展类型(分型,潜力); 用来判断字段是否存在
+     * @param bean
+     * @return
+     */
+    Long getProductExtendTypeField(DoctorDynamicFieldRequestBean bean);
     /**
      * 动态字段新增
      * @param bean
@@ -315,4 +323,20 @@ public interface DynamicFieldMapper {
      */
     PrescriptionResponseBean getPrescription(@Param(value = "doctorId") Long doctorId, @Param(value = "productId") Long productId);
 
+
+    /**
+     * 得到产品下的扩展动态字段
+     * 目前：潜力，分型
+     * @param productId
+     * @return
+     */
+    List<DoctorDynamicExtendResponseBean> getExtendDoctorDynamicField(@Param(value = "productId") Long productId);
+
+
+    /**
+     * 得到高级搜索需要用的动态字段
+     * @param productId
+     * @return
+     */
+    List<SearchDynamicFieldResponseBean> getSearchDynamicField(Long productId);
 }

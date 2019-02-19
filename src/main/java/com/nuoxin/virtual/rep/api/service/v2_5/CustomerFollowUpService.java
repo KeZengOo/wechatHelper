@@ -8,6 +8,8 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.ListReque
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.ScreenRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.SearchRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CustomerFollowListBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.SearchDynamicFieldListResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.SearchDynamicFieldResponseBean;
 
 /**
  * 客户跟进业务接口
@@ -39,4 +41,12 @@ public interface CustomerFollowUpService {
 	CustomerFollowUpPageResponseBean<List<CustomerFollowListBean>> screen(SearchRequestBean request);
 	
 	// TODO 更多筛选 @田存
+	/**
+	 * 得到高级搜索要用的动态字段
+	 * @param productId
+	 * @return
+	 */
+	SearchDynamicFieldListResponseBean getSearchDynamicField(Long productId);
+
+
 }

@@ -5,11 +5,14 @@ import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.v2_5.ProductClassificationFrequencyService;
 import com.nuoxin.virtual.rep.api.service.v2_5.ProductVisitFrequencyService;
+import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.ProductClassificationFrequencyRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.ProductClassificationFrequencyUpdateRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.ProductVisitFrequencyRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.share.ShareRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ContentShareResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.TableHeader;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.PotentialClassificationResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationFrequencyResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductVisitFrequencyResponseBean;
 import io.swagger.annotations.Api;
@@ -18,7 +21,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author tiancun
@@ -34,6 +39,16 @@ public class ProductVisitFrequencyController {
 
     @Resource
     private ProductVisitFrequencyService productVisitFrequencyService;
+
+    @ApiOperation(value = "新增频次需要的选项列表", notes = "新增频次需要的选项列表")
+    @PostMapping(value = "/potential/classification/list/{productId}")
+    public DefaultResponseBean<PotentialClassificationResponseBean> getPotentialClassification(@PathVariable(value = "productId") Long productId) {
+
+        PotentialClassificationResponseBean potentialClassification = productClassificationFrequencyService.getPotentialClassification(productId);
+        DefaultResponseBean<PotentialClassificationResponseBean> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(potentialClassification);
+        return responseBean;
+    }
 
 
     @ApiOperation(value = "医生分型拜访频次新增", notes = "医生分型拜访频次新增")
@@ -71,14 +86,18 @@ public class ProductVisitFrequencyController {
 
     @ApiOperation(value = "医生分型拜访频次列表", notes = "医生分型拜访频次列表")
     @GetMapping(value = "/classification/list/{productId}")
-    public DefaultResponseBean<List<ProductClassificationFrequencyResponseBean>> getList(@PathVariable(value = "productId") Long productId) {
+    public DefaultResponseBean<Map<String,Object>> getList(@PathVariable(value = "productId") Long productId) {
+        Map<String,Object> map = new HashMap<>();
+        List<TableHeader> tableHeaderList = productClassificationFrequencyService.getTableHeaderList(productId);
+        map.put("tableHeaders", tableHeaderList);
 
         List<ProductClassificationFrequencyResponseBean> productClassificationFrequencyList = productClassificationFrequencyService.getProductClassificationFrequencyList(productId);
-        DefaultResponseBean<List<ProductClassificationFrequencyResponseBean>> responseBean = new DefaultResponseBean<>();
-        responseBean.setData(productClassificationFrequencyList);
+        map.put("content", productClassificationFrequencyList);
+
+        DefaultResponseBean<Map<String,Object>> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(map);
         return responseBean;
     }
-
 
 
     @ApiOperation(value = "医生拜访频次新增", notes = "医生分型拜访频次新增")
@@ -101,4 +120,6 @@ public class ProductVisitFrequencyController {
         responseBean.setData(productVisitFrequency);
         return responseBean;
     }
+
+
 }

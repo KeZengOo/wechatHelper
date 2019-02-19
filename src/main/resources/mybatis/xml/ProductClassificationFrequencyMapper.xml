@@ -3,29 +3,38 @@
 <mapper namespace="com.nuoxin.virtual.rep.api.mybatis.ProductClassificationFrequencyMapper">
 
     <insert id="batchInsert">
-        INSERT INTO virtual_doctor_classification_frequency(product_id, classification_id, potential, visit_frequency, batch_no)
+        INSERT INTO virtual_doctor_classification_frequency(product_id, classification, potential, visit_frequency, batch_no)
         VALUES
         <foreach collection ="list" item="f" separator =",">
-            (#{f.productId}, #{f.classificationId},#{f.potential}, #{f.visitFrequency}, #{f.batchNo})
+            (#{f.productId}, #{f.classification},#{f.potential}, #{f.visitFrequency}, #{f.batchNo})
         </foreach>
     </insert>
 
     <!-- 查询总数，用来校验某个潜力的分型是否已经录入 -->
     <select id="getClassificationCountByPotential" resultType="java.lang.Integer">
         SELECT COUNT(*) FROM virtual_doctor_classification_frequency WHERE potential=#{potential}
-        AND classification_id IN
-        <foreach collection ="classificationIdList" item="classificationId" open="(" close=")" separator =",">
-            #{classificationId}
+        AND classification IN
+        <foreach collection ="classificationList" item="classification" open="(" close=")" separator =",">
+            #{classification}
         </foreach>
     </select>
 
     <!-- 得到产品的分型拜访频次 -->
     <select id="getProductClassificationFrequencyList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.ProductClassificationFrequencyResponseBean">
-        SELECT f.batch_no batchNo, GROUP_CONCAT(c.field_value) classificationStr, f.potential, f.visit_frequency frequency FROM virtual_doctor_classification_frequency f
-        INNER JOIN virtual_product_classification c
-        ON f.classification_id=c.id
-        WHERE f.product_id=#{productId}
-        GROUP BY f.batch_no
+        SELECT
+            f.batch_no batchNo,
+            GROUP_CONCAT(DISTINCT f.classification) classification,
+            GROUP_CONCAT(DISTINCT f.potential) potential,
+            GROUP_CONCAT(DISTINCT f.potential) selectPotential,
+            f.visit_frequency frequency
+        FROM
+            virtual_doctor_classification_frequency f
+        WHERE
+            f.product_id = #{productId}
+        GROUP BY
+            f.batch_no
+
+        ORDER BY f.update_time DESC
     </select>
 
 
@@ -42,6 +51,25 @@
         <foreach collection ="batchNoList" item="batchNo" open="(" close=")" separator =",">
             #{batchNo}
         </foreach>
+    </select>
+
+    <!-- 得到产品下设置的分型和潜力拜访频次 -->
+    <select id="getFrequencyList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.DoctorPotentialClassificationResponseBean">
+        SELECT
+        potential,
+        classification,
+        min(visit_frequency) frequency
+    FROM
+        virtual_doctor_classification_frequency
+    WHERE
+        product_id IN
+        <foreach collection ="productIdList" item="productId" open="(" close=")" separator =",">
+            #{productId}
+        </foreach>
+    GROUP BY
+        potential,
+        classification
+
     </select>
 
 </mapper>

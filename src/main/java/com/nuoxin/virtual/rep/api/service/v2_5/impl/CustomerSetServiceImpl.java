@@ -4,6 +4,8 @@ import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
+import com.nuoxin.virtual.rep.api.enums.DynamicFieldTypeEnum;
+import com.nuoxin.virtual.rep.api.enums.ExtendDynamicFieldTypeEnum;
 import com.nuoxin.virtual.rep.api.mybatis.DrugUserMapper;
 import com.nuoxin.virtual.rep.api.mybatis.DynamicFieldMapper;
 import com.nuoxin.virtual.rep.api.mybatis.VirtualProductVisitResultMapper;
@@ -62,6 +64,25 @@ public class CustomerSetServiceImpl implements CustomerSetService {
             throw new BusinessException(ErrorEnum.ERROR.getStatus(),"修改id 不能为空");
         }
 
+        Integer extendType = bean.getExtendType();
+        if (extendType !=null && (extendType == ExtendDynamicFieldTypeEnum.POTENTIAL.getType() || extendType == ExtendDynamicFieldTypeEnum.CLASSIFICATION.getType())){
+            if (extendType == ExtendDynamicFieldTypeEnum.POTENTIAL.getType()){
+                Integer type = bean.getType();
+                if (type != DynamicFieldTypeEnum.RADIO.getType() && type != DynamicFieldTypeEnum.SINGLE.getType()){
+                    throw new BusinessException(ErrorEnum.ERROR, "潜力字段必须为单选！");
+                }
+            }
+
+            Long extendId = dynamicFieldMapper.getProductExtendTypeField(bean);
+            if (extendId != null){
+                if (id.longValue() != extendId.longValue()){
+                    throw new BusinessException(ErrorEnum.ERROR.getStatus(), ExtendDynamicFieldTypeEnum.getNameByType(bean.getExtendType()) +  " 字段已经存在！");
+                }
+            }
+        }
+
+
+
         dynamicFieldMapper.updateDoctorDynamicField(bean);
 
     }
@@ -87,6 +108,21 @@ public class CustomerSetServiceImpl implements CustomerSetService {
         Long productId = bean.getProductId();
         if (productId == null || productId <= 0){
             throw new BusinessException(ErrorEnum.ERROR.getStatus(),"产品id 不能为空");
+        }
+
+        Integer extendType = bean.getExtendType();
+        if (extendType != null && extendType !=0){
+            if (extendType == ExtendDynamicFieldTypeEnum.POTENTIAL.getType()){
+                Integer type = bean.getType();
+                if (type != DynamicFieldTypeEnum.RADIO.getType() && type != DynamicFieldTypeEnum.SINGLE.getType()){
+                    throw new BusinessException(ErrorEnum.ERROR, "潜力字段必须为单选！");
+                }
+            }
+
+            Long id = dynamicFieldMapper.getProductExtendTypeField(bean);
+            if (id !=null && id > 0){
+                throw new BusinessException(ErrorEnum.ERROR.getStatus(), ExtendDynamicFieldTypeEnum.getNameByType(bean.getExtendType()) +  " 字段已经存在！");
+            }
         }
 
         dynamicFieldMapper.insertDoctorDynamicField(bean);

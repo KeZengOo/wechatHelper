@@ -16,7 +16,7 @@ public class BaseCallInfoRequest {
 	@ApiModelProperty(value = "电话拜访主键盘值")
 	private Long callInfoId;
 
-	@NotNull(message = "virtualDrugUserId is null")
+//	@NotNull(message = "virtualDrugUserId is null")
 	@ApiModelProperty(value = "虚拟代表 id ")
 	private Long virtualDrugUserId;
 	

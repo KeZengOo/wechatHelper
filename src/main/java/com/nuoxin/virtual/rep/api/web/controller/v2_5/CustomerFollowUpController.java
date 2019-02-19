@@ -6,11 +6,9 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.SearchDynamicFieldListResponseBean;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.util.mem.SessionMemUtils;
@@ -45,6 +43,25 @@ public class CustomerFollowUpController extends NewBaseController {
 	private DrugUserProductService drugUserProductService;
 	@Resource
 	private CustomerFollowUpService customerFollowService;
+
+
+	@SuppressWarnings("unchecked")
+	@ApiOperation(value = "高级搜索用到的筛选条件")
+	@RequestMapping(value = "/search/dynamic/field/list/{productId}", method = { RequestMethod.GET })
+	public DefaultResponseBean<SearchDynamicFieldListResponseBean> getSearchDynamicFieldList(HttpServletRequest request,
+																		@PathVariable(value = "productId") Long productId) {
+		DrugUser user = super.getDrugUser(request);
+		if (user == null) {
+			return super.getLoginErrorResponse();
+		}
+
+		SearchDynamicFieldListResponseBean searchDynamicField = customerFollowService.getSearchDynamicField(productId);
+		DefaultResponseBean<SearchDynamicFieldListResponseBean> responseBean = new DefaultResponseBean<>();
+		responseBean.setData(searchDynamicField);
+
+		return responseBean;
+	}
+
 
 	@SuppressWarnings("unchecked")
 	@ApiOperation(value = "客户医生拜访列表信息")
