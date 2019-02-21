@@ -46,6 +46,9 @@ public interface VirtualDoctorMapper {
 	void saveVirtualDoctor(VirtualDoctorParams virtualDoctorParams);
 
 
+
+
+
 	/**
 	 * 更新单个客户医生
 	 * @param virtualDoctorParams
@@ -67,6 +70,12 @@ public interface VirtualDoctorMapper {
 	 * @return
 	 */
 	int saveVirtualDoctorMends(List<VirtualDoctorMendParams> list);
+
+	/**
+	 * 更新客户医生扩展信息
+	 * @param params
+	 */
+	void updateVirtualDoctorMend(VirtualDoctorMendParams params);
 
 	/**
 	 * 批量添加至 doctor_virtual 表

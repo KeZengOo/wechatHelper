@@ -27,6 +27,14 @@ public interface DrugUserDoctorQuateMapper {
 	 * @return
 	 */
 	int saveDrugUserDoctorQuates (List<DrugUserDoctorQuateParams> list);
+
+	/**
+	 * 删除关系
+	 * @param drugUserId
+	 * @param doctorId
+	 * @param productId
+	 */
+	void deleteDrugUserDoctorQuates(@Param(value = "drugUserId") Long drugUserId,@Param(value = "doctorId") Long doctorId,@Param(value = "productId") Long productId);
 	
 	/**
 	 * 备虚拟代表关联的医生关系信息:是否有药,是否是目标客户,是否有AE

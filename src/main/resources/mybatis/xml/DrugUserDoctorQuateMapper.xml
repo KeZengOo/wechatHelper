@@ -36,6 +36,13 @@
 		</foreach>
 	</insert>
 
+	<delete id="deleteDrugUserDoctorQuates">
+		DELETE FROM drug_user_doctor_quate
+		WHERE drug_user_id=#{drugUserId}
+		AND doctor_id=#{doctorId}
+		AND product_id=#{productId}
+	</delete>
+
 	<select id="getPotentialDoctorCount" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse">
 		<!-- 2018-09-29 重构前
 		SELECT

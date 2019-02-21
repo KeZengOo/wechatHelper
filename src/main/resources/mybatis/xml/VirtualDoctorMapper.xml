@@ -178,7 +178,21 @@
 		<foreach collection ="list" item="item" separator =",">
         	(#{item.wechat}, #{item.virtualDoctorId})
     	</foreach >
-	</insert> 
+	</insert>
+
+	<update id="updateVirtualDoctorMend">
+		UPDATE doctor_mend
+		<set>
+			<if test="wechat != null and wechat !=''">
+				wechat=#{wechat},
+			</if>
+			<if test="address != null and address !=''">
+				address=#{address}
+			</if>
+
+		</set>
+		where virtual_doctor_id=#{virtualDoctorId}
+	</update>
 	
 	<insert id="saveDoctorVirtuals">
 		INSERT INTO doctor_virtual 

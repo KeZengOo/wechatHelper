@@ -114,6 +114,7 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 
         Long doctorId = doctorDetail.getDoctorId();
         DoctorAddResponseBean doctorAddResponseBean = new DoctorAddResponseBean();
+        doctorAddResponseBean.setDoctorId(doctorId);
         doctorAddResponseBean.setDoctorName(doctorDetail.getDoctorName());
         doctorAddResponseBean.setSex(doctorDetail.getSex());
         List<String> doctorTelephones = doctorMapper.getDoctorTelephone(doctorId);
@@ -175,8 +176,18 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
         this.checkSaveVirtualDoctorParam(request);
         int hospitalId = this.getHospiTalId(request);
         if (hospitalId > 0) {
-            // 保存医生信息
-            virtualDoctorId = this.saveSingleDoctor(request, hospitalId);
+
+            Long doctorId = request.getDoctorId();
+            if (doctorId != null && doctorId > 0){
+                // 更新医生信息
+                virtualDoctorId = doctorId;
+                this.updateSingleDoctor(request, hospitalId);
+
+            }else {
+                // 保存医生信息
+                virtualDoctorId = this.saveSingleDoctor(request, hospitalId);
+            }
+
             if (virtualDoctorId > 0) {
                 this.saveDrugUserDoctorProductRelationShip(request, virtualDoctorId, user);
 
@@ -193,6 +204,8 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 
         return virtualDoctorId;
     }
+
+
 
     @Override
     public List<DrugUserResponseBean> getOnlineDrugUserList(Long productId) {
@@ -405,14 +418,9 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
                     throw new BusinessException(ErrorEnum.ERROR, "姓名为:" + name + ",联系方式为:" + telephone + " 的医生已经存在！");
                 }
 
-            } else {
-
-                // 如果是手机号，校验手机号是否唯一
-                Integer count = doctorMapper.doctorCountByMobile(telephone);
-                if (count != null && count > 0) {
-                    throw new BusinessException(ErrorEnum.ERROR, "手机号：" + telephone + " 已经存在！");
-                }
             }
+
+            // 手机号不校验是否存在，如果存在信息更新
         }
 
     }
@@ -532,6 +540,75 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 
         return doctorId;
     }
+
+
+    /**
+     * 更新单个医生信息
+     * @param request
+     * @param hospitalId
+     */
+    private void updateSingleDoctor(SaveVirtualDoctorRequest request, int hospitalId) {
+
+        Long doctorId = request.getDoctorId();
+
+        VirtualDoctorParams param = new VirtualDoctorParams();
+        param.setName(request.getName());
+        param.setGender(request.getGender());
+
+        List<String> telephones = request.getTelephones();
+        if (CollectionsUtil.isNotEmptyList(telephones)) {
+            String mobile = getMobile(telephones);
+            param.setMobile(mobile);
+        }
+
+        param.setEmail(request.getEmail());
+        param.setDepart(request.getDepart());
+        param.setTitle(request.getTitle());
+
+        param.setProvince(request.getProvince());
+        param.setCity(request.getCity());
+        param.setHospital(request.getHospital());
+        param.setHospitalId(hospitalId);
+        param.setId(doctorId);
+
+        virtualDoctorMapper.updateVirtualDoctor(param);
+
+        // 手机号不存在的添加，库里有的手机号不做处理
+        List<String> doctorTelephone = doctorMapper.getDoctorTelephone(doctorId);
+        List<String> collectTelephone = telephones.stream().filter(t -> (!doctorTelephone.contains(t))).distinct().collect(Collectors.toList());
+        if (CollectionsUtil.isNotEmptyList(collectTelephone)){
+            List<SaveDoctorTelephoneRequestBean> list = new ArrayList<>();
+            for (String telephone : collectTelephone) {
+                boolean matcher = RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, telephone);
+                SaveDoctorTelephoneRequestBean saveDoctorTelephoneRequestBean = new SaveDoctorTelephoneRequestBean();
+                if (matcher) {
+                    saveDoctorTelephoneRequestBean.setType(1);
+                } else {
+                    saveDoctorTelephoneRequestBean.setType(2);
+                }
+
+
+                saveDoctorTelephoneRequestBean.setDoctorId(doctorId);
+                saveDoctorTelephoneRequestBean.setTelephone(telephone);
+                list.add(saveDoctorTelephoneRequestBean);
+            }
+
+
+            if (CollectionsUtil.isNotEmptyList(list)) {
+                doctorMapper.insertDoctorTelephone(list);
+            }
+        }
+
+        // 更新医生的扩展信息
+        VirtualDoctorMendParams p = new VirtualDoctorMendParams();
+        p.setVirtualDoctorId(doctorId);
+        p.setWechat(request.getWechat());
+        p.setAddress(request.getAddress());
+        doctorMendMapper.updateDoctorMend(p);
+
+
+    }
+
 
     /**
      * 保存医生的多个联系方式
@@ -803,6 +880,9 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
      * @param user
      */
     private void saveDrugUserDoctor(SaveVirtualDoctorRequest request, Long virtualDoctorId, DrugUser user) {
+
+        drugUserDoctorMapper.deleteDrugUserDoctorsOneToOne(user.getId(), virtualDoctorId);
+
         DrugUserDoctorOneToOneParams param = new DrugUserDoctorOneToOneParams();
         param.setDoctorId(virtualDoctorId);
         param.setDrugUserId(user.getId());
@@ -836,6 +916,7 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 
         List<DrugUserDoctorParams> collectDrugUserDoctorParams = drugUserDoctorParams.stream().filter(d -> d.getProdId() > 0).distinct().collect(Collectors.toList());
         if (CollectionsUtil.isNotEmptyList(collectDrugUserDoctorParams)) {
+            this.updateDrugUserDoctors(collectDrugUserDoctorParams);
             drugUserDoctorMapper.saveDrugUserDoctors(collectDrugUserDoctorParams);
         }
 
@@ -861,6 +942,7 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 
             List<DrugUserDoctorParams> collectOnlineDrugUserDoctorParams = onlineDrugUserDoctorParams.stream().filter(d -> d.getProdId() > 0).distinct().collect(Collectors.toList());
             if (CollectionsUtil.isNotEmptyList(collectOnlineDrugUserDoctorParams)) {
+                this.updateDrugUserDoctors(collectOnlineDrugUserDoctorParams);
                 drugUserDoctorMapper.saveDrugUserDoctors(collectOnlineDrugUserDoctorParams);
             }
         }
@@ -874,8 +956,47 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
         }
         List<DrugUserDoctorQuateParams> collectDrugUserDoctorQuateParams = drugUserDoctorQuateParams.stream().filter(d -> d.getProductLineId() > 0).distinct().collect(Collectors.toList());
         if (CollectionsUtil.isNotEmptyList(collectDrugUserDoctorQuateParams)) {
+            this.deleteDrugUserDoctorQuates(collectDrugUserDoctorQuateParams);
             drugUserDoctorQuateMapper.saveDrugUserDoctorQuates(collectDrugUserDoctorQuateParams);
         }
+
+    }
+
+    /**
+     * 如果关系已经存在则删除掉
+     * @param collectDrugUserDoctorQuateParams
+     */
+    private void deleteDrugUserDoctorQuates(List<DrugUserDoctorQuateParams> collectDrugUserDoctorQuateParams) {
+
+        if (CollectionsUtil.isEmptyList(collectDrugUserDoctorQuateParams)){
+            return;
+        }
+
+        for (DrugUserDoctorQuateParams collectDrugUserDoctorQuateParam : collectDrugUserDoctorQuateParams) {
+            Long virtualDrugUserId = collectDrugUserDoctorQuateParam.getVirtualDrugUserId();
+            Long doctorId = collectDrugUserDoctorQuateParam.getDoctorId();
+            Long productLineId = collectDrugUserDoctorQuateParam.getProductLineId().longValue();
+            drugUserDoctorQuateMapper.deleteDrugUserDoctorQuates(virtualDrugUserId, doctorId, productLineId);
+        }
+    }
+
+    /**
+     * 如果代表医生产品的关系已经存在，变成不可用
+     * @param collectDrugUserDoctorParams
+     */
+    private void updateDrugUserDoctors(List<DrugUserDoctorParams> collectDrugUserDoctorParams) {
+        if (CollectionsUtil.isEmptyList(collectDrugUserDoctorParams)){
+            return;
+        }
+
+        for (DrugUserDoctorParams collectDrugUserDoctorParam : collectDrugUserDoctorParams) {
+            Long drugUserId = collectDrugUserDoctorParam.getDrugUserId();
+            Long doctorId = collectDrugUserDoctorParam.getDoctorId();
+            Long prodId = collectDrugUserDoctorParam.getProdId().longValue();
+            drugUserDoctorMapper.updateDrugUserDoctorAvailable(drugUserId, doctorId, prodId);
+        }
+
+
 
     }
 

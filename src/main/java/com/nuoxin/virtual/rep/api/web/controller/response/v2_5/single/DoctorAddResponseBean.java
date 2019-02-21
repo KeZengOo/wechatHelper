@@ -18,6 +18,9 @@ import java.util.List;
 public class DoctorAddResponseBean implements Serializable {
     private static final long serialVersionUID = 7372803710804738609L;
 
+    @ApiModelProperty(value = "医生ID")
+    private Long doctorId;
+
     @ApiModelProperty(value = "医生姓名")
     private String doctorName;
 

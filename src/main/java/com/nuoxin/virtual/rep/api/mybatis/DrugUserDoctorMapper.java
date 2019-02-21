@@ -22,11 +22,24 @@ public interface DrugUserDoctorMapper {
 	 * @return
 	 */
 	int saveDrugUserDoctors(List<DrugUserDoctorParams> list);
+
+	/**
+	 * 更新代表医生产品的关系可用状态
+	 * @param drugUserId
+	 * @param doctorId
+	 * @param prodId
+	 */
+	void updateDrugUserDoctorAvailable(@Param(value = "drugUserId") Long drugUserId,@Param(value = "doctorId") Long doctorId,@Param(value = "prodId") Long prodId);
 	
 	/**
 	 * 保存代表医生一对一关联关系
 	 */
 	int saveDrugUserDoctorsOneToOne (List<DrugUserDoctorOneToOneParams> list);
+
+	/**
+	 * 删除代表医生一对一关联关系
+	 */
+	void deleteDrugUserDoctorsOneToOne (@Param(value = "drugUserId") Long drugUserId,@Param(value = "doctorId") Long doctorId);
 
 	/**
 	 * 根据参数查询销售代表列表
