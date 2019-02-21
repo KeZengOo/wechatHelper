@@ -1293,8 +1293,9 @@
 	</select>
 
 	<select id="selectDoctorByMobiles" resultType="com.nuoxin.virtual.rep.api.entity.Doctor">
-		select DISTINCT id,email,name,hospital_id hospitalId,hospital_name hospitalName,provice,city,depart department,telephone mobile,positions doctorLevel,
-		create_time createTime,status,master_data_id masterDataId
+		select DISTINCT t.id,t.email,t.name,t.hospital_id hospitalId,t.hospital_name hospitalName,
+		t.provice,t.city,t.depart department,t.telephone mobile,t.positions doctorLevel,
+		t.create_time createTime,t.status,t.master_data_id masterDataId
 		FROM doctor t
 		WHERE
 		t.telephone IN
@@ -1445,6 +1446,58 @@
 						telephone = #{telephone}
 			)
 	</select>
+
+
+
+	<!-- 根据多个联系方式获取详情 -->
+	<select id="getDoctorListByTelephones" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorDetailsResponseBean">
+		SELECT DISTINCT
+			d.id doctorId,
+			d.`name` doctorName,
+			d.sex,
+			dm.wechat,
+			dm.address,
+			d.email,
+			h.id hospitalId,
+			d.hospital_name hospitalName,
+			h.`level` hospitalLevel,
+			h.province,
+			h.city,
+			d.depart department,
+			d.positions,
+			IFNULL(dudoto.is_add_wechat, 0) addWechat
+		FROM
+			doctor d
+		LEFT JOIN hospital h ON d.hospital_id = h.id
+		LEFT JOIN doctor_mend dm
+		ON d.id=dm.virtual_doctor_id
+		LEFT JOIN drug_user_doctor_one_to_one dudoto
+		ON  dudoto.doctor_id=d.id
+		AND dudoto.drug_user_id=#{drugUserId}
+		WHERE
+			d.id IN (
+				SELECT
+					id
+				FROM
+					doctor
+				WHERE
+					telephone IN
+					<foreach collection="telephones" item="telephone" open="(" close=")" separator=",">
+						#{telephone}
+					</foreach>
+				UNION
+					SELECT
+						doctor_id
+					FROM
+						doctor_telephone
+					WHERE
+						telephone IN
+						<foreach collection="telephones" item="telephone" open="(" close=")" separator=",">
+							#{telephone}
+						</foreach>
+			)
+	</select>
+
 
 
 	<select id="getDoctorList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorDetailsResponseBean">

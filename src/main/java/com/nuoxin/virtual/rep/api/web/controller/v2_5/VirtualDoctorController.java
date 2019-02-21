@@ -10,10 +10,12 @@ import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.enums.OnOffLineEnum;
 import com.nuoxin.virtual.rep.api.enums.RoleTypeEnum;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorSingleAddEchoRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.PrescriptionRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.UpdateVirtualDoctorRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorDetailsResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.single.DoctorAddResponseBean;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,7 +41,24 @@ public class VirtualDoctorController extends NewBaseController {
 	@Resource
 	private VirtualDoctorService virtualDoctorService;
 
-	
+
+	@SuppressWarnings("unchecked")
+	@ApiOperation(value = "添加单个客户医生信息前医生信息回显")
+	@RequestMapping(value = "/single/save/echo", method = { RequestMethod.POST })
+	public DefaultResponseBean<DoctorAddResponseBean> getDoctorAddEcho(HttpServletRequest request,
+												@RequestBody DoctorSingleAddEchoRequestBean bean) {
+		DrugUser user = this.getDrugUser(request);
+		if (user == null) {
+			return super.getLoginErrorResponse();
+		}
+
+		bean.setDrugUserId(user.getId());
+		DoctorAddResponseBean doctorAddEcho = virtualDoctorService.getDoctorAddEcho(bean);
+		DefaultResponseBean<DoctorAddResponseBean> responseBean = new DefaultResponseBean<>();
+		responseBean.setData(doctorAddEcho);
+		return responseBean;
+	}
+
 	@SuppressWarnings("unchecked")
 	@ApiOperation(value = "添加单个客户医生信息")
 	@RequestMapping(value = "/single/save", method = { RequestMethod.POST })

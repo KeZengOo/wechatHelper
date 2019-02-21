@@ -10,10 +10,12 @@ import javax.annotation.Resource;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
+import com.nuoxin.virtual.rep.api.common.enums.ClassificationEnum;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.dao.DoctorTelephoneRepository;
 import com.nuoxin.virtual.rep.api.dao.DrugUserRepository;
+import com.nuoxin.virtual.rep.api.entity.Doctor;
 import com.nuoxin.virtual.rep.api.enums.OnOffLineEnum;
 import com.nuoxin.virtual.rep.api.enums.RoleTypeEnum;
 import com.nuoxin.virtual.rep.api.mybatis.*;
@@ -23,6 +25,8 @@ import com.nuoxin.virtual.rep.api.utils.StringUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.*;
 import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorDetailsResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.single.DoctorAddDynamicFieldResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.single.DoctorAddResponseBean;
 import org.springframework.stereotype.Service;
 
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
@@ -79,12 +83,96 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
     @Resource
     private DrugUserRepository drugUserRepository;
 
+    @Resource
+    private DynamicFieldMapper dynamicFieldMapper;
+
+    @Override
+    public DoctorAddResponseBean getDoctorAddEcho(DoctorSingleAddEchoRequestBean bean) {
+
+        List<String> telephones = bean.getTelephones();
+        if (CollectionsUtil.isEmptyList(telephones)){
+            throw new BusinessException(ErrorEnum.ERROR, "联系方式不能为空！");
+        }
+
+        // 去掉座机号
+        List<String> mobileList =  this.removeFixTelephone(telephones);
+        if (CollectionsUtil.isEmptyList(mobileList)){
+            return null;
+        }
+
+
+        List<Doctor> doctors = doctorMapper.selectDoctorByMobiles(mobileList);
+        if (CollectionsUtil.isEmptyList(doctors)){
+            return null;
+        }
+
+        if (doctors.size() > 1){
+            throw new BusinessException(ErrorEnum.ERROR, "联系方式属于多个医生！");
+        }
+
+        DoctorDetailsResponseBean doctorDetail = doctorMapper.getDoctorListByTelephones(bean.getTelephones(), bean.getDrugUserId()).get(0);
+
+        Long doctorId = doctorDetail.getDoctorId();
+        DoctorAddResponseBean doctorAddResponseBean = new DoctorAddResponseBean();
+        doctorAddResponseBean.setDoctorName(doctorDetail.getDoctorName());
+        doctorAddResponseBean.setSex(doctorDetail.getSex());
+        List<String> doctorTelephones = doctorMapper.getDoctorTelephone(doctorId);
+        doctorAddResponseBean.setTelephones(doctorTelephones);
+        doctorAddResponseBean.setWechat(doctorDetail.getWechat());
+        doctorAddResponseBean.setAddWechat(doctorDetail.getAddWechat());
+        doctorAddResponseBean.setEmail(doctorDetail.getEmail());
+        doctorAddResponseBean.setAddress(doctorDetail.getAddress());
+        doctorAddResponseBean.setDepart(doctorDetail.getDepartment());
+        doctorAddResponseBean.setPosition(doctorDetail.getPositions());
+        doctorAddResponseBean.setHospitalName(doctorDetail.getHospitalName());
+        doctorAddResponseBean.setHospitalLevel(Integer.parseInt(doctorDetail.getHospitalLevel()));
+        doctorAddResponseBean.setProvince(doctorDetail.getProvince());
+        doctorAddResponseBean.setCity(doctorDetail.getCity());
+
+
+        // 动态字段
+        List<DoctorAddDynamicFieldResponseBean> doctorBaisicDynamicField = dynamicFieldMapper.getDoctorAddDynamicField(doctorId, ClassificationEnum.BASIC.getType());
+        List<DoctorAddDynamicFieldResponseBean> doctorHospitalDynamicField = dynamicFieldMapper.getDoctorAddDynamicField(doctorId, ClassificationEnum.HOSPITAL.getType());
+
+        if (CollectionsUtil.isNotEmptyList(doctorBaisicDynamicField)){
+            doctorAddResponseBean.setBasicDynamicList(doctorBaisicDynamicField);
+        }
+
+        if (CollectionsUtil.isNotEmptyList(doctorHospitalDynamicField)){
+            doctorAddResponseBean.setHospitalDynamicList(doctorHospitalDynamicField);
+        }
+
+        return doctorAddResponseBean;
+
+    }
+
+    /**
+     * 去掉手机号中的座机号
+     * @param telephones
+     * @return
+     */
+    private List<String> removeFixTelephone(List<String> telephones) {
+
+        List<String> mobileList = new ArrayList<>();
+        for (String telephone : telephones) {
+            boolean fixPhoneMatch = RegularUtils.isMatcher(RegularUtils.MATCH_FIX_PHONE, telephone);
+            if (fixPhoneMatch){
+                continue;
+            }
+
+            mobileList.add(telephone);
+        }
+
+        return mobileList;
+
+    }
+
     @Override
     @Transactional(value = TxType.REQUIRED, rollbackOn = Exception.class)
     public Long saveVirtualDoctor(SaveVirtualDoctorRequest request, DrugUser user) {
 
         long virtualDoctorId = 0;
-        checkSaveVirtualDoctorParam(request);
+        this.checkSaveVirtualDoctorParam(request);
         int hospitalId = this.getHospiTalId(request);
         if (hospitalId > 0) {
             // 保存医生信息
@@ -634,6 +722,7 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 
         if (StringUtil.isEmpty(mobile)) {
             String telephone = virtualDoctorMapper.maxTelephone();
+            // 如果输入的是座机号，就伪造一个手机号，都是4 开头的
             if (StringUtil.isEmpty(telephone)) {
                 mobile = "40000000000";
             } else {

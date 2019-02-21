@@ -18,6 +18,19 @@ public class DoctorDetailsResponseBean implements Serializable {
     private Long doctorId;
     @ApiModelProperty(value = "姓名")
     private String doctorName;
+
+    @ApiModelProperty(value = "医生性别")
+    private Integer sex;
+
+    @ApiModelProperty(value = "医生微信")
+    private String wechat;
+
+    @ApiModelProperty(value = "地址")
+    private String address;
+
+    @ApiModelProperty(value = "医生邮箱")
+    private String email;
+
     @ApiModelProperty(value = "医院id")
     private Long hospitalId;
     @ApiModelProperty(value = "医院名称")
@@ -30,6 +43,12 @@ public class DoctorDetailsResponseBean implements Serializable {
     private String city;
     @ApiModelProperty(value = "科室")
     private String department;
+
+    @ApiModelProperty(value = "医生职称")
+    private String positions;
+
+    @ApiModelProperty(value = "是否添加微信，1是添加，0是未添加")
+    private Integer addWechat;
 
 
 }

@@ -6,14 +6,25 @@ import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.v2_5.HospitalProvinceBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorBasicResponse;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorMiniResponse;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorSingleAddEchoRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.PrescriptionRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.SaveVirtualDoctorRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.UpdateVirtualDoctorRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorDetailsResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.single.DoctorAddResponseBean;
 import org.apache.ibatis.annotations.Param;
 
 public interface VirtualDoctorService {
+
+
+	/**
+	 * 新增单个医生时候，数据回显
+	 * @param bean
+	 * @return
+	 */
+	DoctorAddResponseBean getDoctorAddEcho(DoctorSingleAddEchoRequestBean bean);
+
 
 	/**
 	 * 保存单个客户医生信息,有 REQUIRED 事务<br>
