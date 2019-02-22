@@ -275,4 +275,11 @@ public interface DoctorMapper{
                                                   @Param(value = "limitNum") Integer limitNum);
 
 
+    /**
+     * 校验姓名，医院是否存在
+     * @param doctorName
+     * @param hospitalName
+     * @return
+     */
+    Integer getDoctorCount(@Param(value = "doctorName") String doctorName,@Param(value = "hospitalName") String hospitalName);
 }

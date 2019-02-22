@@ -5,6 +5,7 @@ import sun.misc.BASE64Encoder;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.UUID;
 
 /**
  * @author tiancun
@@ -84,6 +85,27 @@ public class StringUtil {
         }
         String encodedText = encoder.encode(textByte);
         return encodedText;
+    }
+
+
+    /**
+     * 得到UUID
+     * @return
+     */
+    public static String getUuid(){
+        String uuid = UUID.randomUUID().toString();
+        return  uuid;
+    }
+
+
+    /**
+     * 得到UUID,去掉横线
+     * @return
+     */
+    public static String getUuidRemoveLine(){
+        String uuid = UUID.randomUUID().toString();
+        uuid = uuid.replace("-", "");
+        return uuid;
     }
 
 }

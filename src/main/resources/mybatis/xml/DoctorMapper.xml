@@ -1522,4 +1522,12 @@
 
 	</select>
 
+
+	<select id="getDoctorCount" resultType="java.lang.Integer">
+		SELECT COUNT(*)
+		FROM doctor
+		WHERE name=#{doctorName}
+		AND hospital_name=#{hospitalName}
+	</select>
+
 </mapper>
