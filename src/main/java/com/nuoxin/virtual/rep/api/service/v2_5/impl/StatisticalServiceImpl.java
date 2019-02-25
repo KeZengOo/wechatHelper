@@ -142,7 +142,7 @@ public class StatisticalServiceImpl implements StatisticalService {
                 x.put("isHasAe", getValue((String) x.get("isHasAe")));
                 String visitChannel = x.get("visitChannel").toString();
                 // 6 是内容拜访，所以排序掉6
-                if (StringUtil.isNotEmpty(visitChannel) && (!visitChannel.equals(6))){
+                if (StringUtil.isNotEmpty(visitChannel) && (!visitChannel.equals(6)) && (!visitChannel.equals(7))){
                     callIds.add(Long.parseLong(x.get("callId").toString()));
                 }
             });

@@ -426,7 +426,7 @@
             wx_dud.hospitalLevel,
             '' isRecruit,
             '内容分享' visitType,
-            6 visitChannel,
+            7 visitChannel,
             '' remark,
             '' callText,
             wx.title shareContent,
