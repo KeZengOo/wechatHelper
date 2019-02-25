@@ -5,7 +5,6 @@ import java.util.List;
 import com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorQuateParams;
 import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse;
 import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsParams;
-import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.statistics.DailyStatisticsRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ProductInfoResponse;
 import org.apache.ibatis.annotations.Param;
 
@@ -104,14 +103,5 @@ public interface DrugUserDoctorQuateMapper {
 	 * @return
 	 */
 	List<Long> getRecruitDoctorIdList(StatisticsParams statisticsParams);
-
-
-	/**
-	 * 招募医生数量
-	 * @param bean
-	 * @return
-	 */
-	Integer getRecruitDoctor(DailyStatisticsRequestBean bean);
-
 }
 
