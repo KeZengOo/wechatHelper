@@ -24,7 +24,6 @@ import com.nuoxin.virtual.rep.api.utils.RegularUtils;
 import com.nuoxin.virtual.rep.api.utils.StringUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.*;
 import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorBasicDynamicFieldValueResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorDetailsResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.single.DoctorAddDynamicFieldResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.single.DoctorAddResponseBean;
@@ -133,8 +132,8 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 
 
         // 动态字段
-        List<DoctorBasicDynamicFieldValueResponseBean> doctorBaisicDynamicField = dynamicFieldMapper.getDoctorAddDynamicField(doctorId, ClassificationEnum.BASIC.getType());
-        List<DoctorBasicDynamicFieldValueResponseBean> doctorHospitalDynamicField = dynamicFieldMapper.getDoctorAddDynamicField(doctorId, ClassificationEnum.HOSPITAL.getType());
+        List<DoctorAddDynamicFieldResponseBean> doctorBaisicDynamicField = dynamicFieldMapper.getDoctorAddDynamicField(doctorId, ClassificationEnum.BASIC.getType());
+        List<DoctorAddDynamicFieldResponseBean> doctorHospitalDynamicField = dynamicFieldMapper.getDoctorAddDynamicField(doctorId, ClassificationEnum.HOSPITAL.getType());
 
         if (CollectionsUtil.isNotEmptyList(doctorBaisicDynamicField)){
             doctorAddResponseBean.setBasicDynamicList(doctorBaisicDynamicField);
