@@ -1,5 +1,6 @@
 package com.nuoxin.virtual.rep.api.web.controller.response.v2_5.single;
 
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorBasicDynamicFieldValueResponseBean;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -49,7 +50,7 @@ public class DoctorAddResponseBean implements Serializable {
     private String position;
 
     @ApiModelProperty(value = "医生基本信息动态字段填入的值")
-    private List<DoctorAddDynamicFieldResponseBean> basicDynamicList = new ArrayList<>();
+    private List<DoctorBasicDynamicFieldValueResponseBean> basicDynamicList = new ArrayList<>();
 
     @ApiModelProperty(value = "医院名称")
     private String hospitalName;
@@ -64,6 +65,6 @@ public class DoctorAddResponseBean implements Serializable {
     private Integer hospitalLevel;
 
     @ApiModelProperty(value = "医院信息动态字段填入的值")
-    private List<DoctorAddDynamicFieldResponseBean> hospitalDynamicList = new ArrayList<>();
+    private List<DoctorBasicDynamicFieldValueResponseBean> hospitalDynamicList = new ArrayList<>();
 
 }

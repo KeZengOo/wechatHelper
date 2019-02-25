@@ -316,4 +316,25 @@
 
 	</select>
 
+
+	<!-- 招募医生数 -->
+	<select id="getRecruitDoctor" resultType="java.lang.Integer">
+		SELECT
+			COUNT(DISTINCT d.id)
+		FROM
+			doctor d
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		INNER JOIN drug_user_doctor_quate q ON d.id = q.doctor_id
+		AND q.product_id = #{productId}
+		WHERE
+			dud.is_available = 1
+		AND dud.prod_id = #{productId}
+		AND q.is_recruit = 1
+		AND du.id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+	</select>
+
 </mapper>
