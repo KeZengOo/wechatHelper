@@ -18,4 +18,20 @@ public interface DailyStatisticsService {
      */
     DailyStatisticsResponseBean getDailyStatistics(DailyStatisticsRequestBean bean);
 
+    /**
+     * 更新产品目标医院
+     * @param productId
+     * @param targetHospital
+     */
+    void updateTargetHospital(Long productId, Integer targetHospital);
+
+
+
+    /**
+     * 更新产品目标医生
+     * @param productId
+     * @param targetDoctor
+     */
+    void updateTargetDoctor(Long productId, Integer targetDoctor);
+
 }

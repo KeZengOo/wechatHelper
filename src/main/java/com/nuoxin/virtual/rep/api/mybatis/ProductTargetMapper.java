@@ -18,4 +18,37 @@ public interface ProductTargetMapper {
      */
     ProductTargetResponseBean getProductTarget(@Param(value = "productId") Long productId);
 
+
+    /**
+     * 新增产品目标医院
+     * @param productId
+     * @param targetHospital
+     */
+    void addTargetHospital(@Param(value = "productId") Long productId,@Param(value = "targetHospital") Integer targetHospital);
+
+
+    /**
+     * 更新产品目标医院
+     * @param productId
+     * @param targetHospital
+     */
+    void updateTargetHospital(@Param(value = "productId") Long productId,@Param(value = "targetHospital") Integer targetHospital);
+
+
+
+    /**
+     * 新增产品目标医生
+     * @param productId
+     * @param targetDoctor
+     */
+    void addTargetDoctor(@Param(value = "productId") Long productId,@Param(value = "targetDoctor") Integer targetDoctor);
+
+
+    /**
+     * 更新产品目标医生
+     * @param productId
+     * @param targetDoctor
+     */
+    void updateTargetDoctor(@Param(value = "productId") Long productId,@Param(value = "targetDoctor") Integer targetDoctor);
+
 }

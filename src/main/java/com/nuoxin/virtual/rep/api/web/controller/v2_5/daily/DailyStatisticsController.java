@@ -10,10 +10,7 @@ import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ContentShareRespo
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.statistics.DailyStatisticsResponseBean;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -43,6 +40,34 @@ public class DailyStatisticsController {
 
         return responseBean;
     }
+
+
+    @ApiOperation(value = "医院目标修改", notes = "医院目标修改")
+    @PostMapping(value = "/hospital/target/{productId}/{targetHospital}")
+    public DefaultResponseBean<Boolean> updateTargetHospital(HttpServletRequest request, @PathVariable(value = "productId") Long productId,@PathVariable(value = "targetHospital") Integer targetHospital) {
+
+        dailyStatisticsService.updateTargetHospital(productId, targetHospital);
+
+        DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(true);
+
+        return responseBean;
+    }
+
+
+    @ApiOperation(value = "医生目标修改", notes = "医生目标修改")
+    @PostMapping(value = "/doctor/target/{productId}/{targetDoctor}")
+    public DefaultResponseBean<Boolean> updateTargetDoctor(HttpServletRequest request, @PathVariable(value = "productId") Long productId,@PathVariable(value = "targetDoctor") Integer targetDoctor) {
+
+        dailyStatisticsService.updateTargetDoctor(productId, targetDoctor);
+
+        DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(true);
+
+        return responseBean;
+    }
+
+
 
 
 }

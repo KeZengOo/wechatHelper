@@ -8,4 +8,29 @@
         FROM virtual_product_target
         WHERE product_id=#{productId}
     </select>
+
+
+    <insert id="addTargetHospital">
+        INSERT INTO virtual_product_target(product_id, target_hospital)
+        VALUES (#{productId}, #{targetHospital})
+    </insert>
+
+
+    <update id="updateTargetHospital">
+        UPDATE virtual_product_target SET target_hospital=#{targetHospital}
+        WHERE product_id=#{productId}
+    </update>
+
+
+    <insert id="addTargetDoctor">
+        INSERT INTO virtual_product_target(product_id, target_doctor)
+        VALUES (#{productId}, #{targetDoctor})
+    </insert>
+
+
+    <update id="updateTargetDoctor">
+        UPDATE virtual_product_target SET target_doctor=#{targetDoctor}
+        WHERE product_id=#{productId}
+    </update>
+
 </mapper>

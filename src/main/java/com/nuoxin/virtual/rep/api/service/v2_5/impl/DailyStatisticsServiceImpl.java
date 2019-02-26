@@ -239,4 +239,30 @@ public class DailyStatisticsServiceImpl implements DailyStatisticsService {
 
         return dailyStatistics;
     }
+
+    @Override
+    public void updateTargetHospital(Long productId, Integer targetHospital) {
+
+        ProductTargetResponseBean productTarget = productTargetMapper.getProductTarget(productId);
+        if (productTarget == null){
+            productTargetMapper.addTargetHospital(productId, targetHospital);
+        }else {
+            productTargetMapper.updateTargetHospital(productId, targetHospital);
+        }
+
+
+    }
+
+    @Override
+    public void updateTargetDoctor(Long productId, Integer targetDoctor) {
+
+        ProductTargetResponseBean productTarget = productTargetMapper.getProductTarget(productId);
+        if (productTarget == null){
+            productTargetMapper.addTargetDoctor(productId, targetDoctor);
+        }else {
+            productTargetMapper.updateTargetDoctor(productId, targetDoctor);
+        }
+
+
+    }
 }
