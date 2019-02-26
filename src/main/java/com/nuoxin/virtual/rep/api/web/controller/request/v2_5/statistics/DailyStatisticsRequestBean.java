@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -29,11 +30,9 @@ public class DailyStatisticsRequestBean implements Serializable {
     @NotNull(message = "产品ID不能为空")
     private Long productId;
 
-    @ApiModelProperty(value = "代表ID")
-    @NotNull(message = "代表ID不能为空")
-    private Long drugUserId;
-
     @ApiModelProperty(value = "代表ID列表")
+    @NotNull(message = "代表ID不能为空")
+    @Length(min = 1, message = "代表列表不能为空")
     private List<Long> drugUserIdList;
 
     @ApiModelProperty(value = "1是接触，2是成功，3是覆盖")

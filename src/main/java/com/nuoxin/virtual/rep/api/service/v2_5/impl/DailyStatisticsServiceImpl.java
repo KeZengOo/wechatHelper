@@ -58,10 +58,6 @@ public class DailyStatisticsServiceImpl implements DailyStatisticsService {
     @Override
     public DailyStatisticsResponseBean getDailyStatistics(DailyStatisticsRequestBean bean) {
 
-        List<Long> drugUserIdList = new ArrayList<>();
-        drugUserIdList.add(bean.getDrugUserId());
-        bean.setDrugUserIdList(drugUserIdList);
-
         Integer targetHospital = 0;
         Integer targetDoctor = 0;
         String startTime = bean.getStartTime();
