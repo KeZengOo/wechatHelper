@@ -113,5 +113,36 @@ public interface DrugUserDoctorQuateMapper {
 	 */
 	Integer getRecruitDoctor(DailyStatisticsRequestBean bean);
 
+	/**
+	 * 招募医院数量
+	 * @param bean
+	 * @return
+	 */
+	Integer getRecruitHospital(DailyStatisticsRequestBean bean);
+
+
+	/**
+	 * 有AE的医生数量
+	 * @param bean
+	 * @return
+	 */
+	Integer hasAeDoctor(DailyStatisticsRequestBean bean);
+
+
+	/**
+	 * 退出项目医院数量
+	 * @param bean
+	 * @return
+	 */
+	Integer breakOffHospital(DailyStatisticsRequestBean bean);
+
+
+	/**
+	 * 退出项目医生数量
+	 * @param bean
+	 * @return
+	 */
+	Integer breakOffDoctor(DailyStatisticsRequestBean bean);
+
 }
 

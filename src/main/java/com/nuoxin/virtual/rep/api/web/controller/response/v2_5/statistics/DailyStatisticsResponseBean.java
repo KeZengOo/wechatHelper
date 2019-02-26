@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -23,12 +25,12 @@ public class DailyStatisticsResponseBean implements Serializable {
     @ApiModelProperty(value = "目标医生人数")
     private Integer targetDoctor;
 
-    @ApiModelProperty(value = "目标医生招募达成率")
-    private String targetRecruitDoctorRate;
-
-
-    @ApiModelProperty(value = "目标医院招募达成率")
-    private String targetRecruitHospitalRate;
+//    @ApiModelProperty(value = "目标医生招募达成率")
+//    private String targetRecruitDoctorRate;
+//
+//
+//    @ApiModelProperty(value = "目标医院招募达成率")
+//    private String targetRecruitHospitalRate;
 
 
     @ApiModelProperty(value = "招募医院数")
@@ -83,7 +85,7 @@ public class DailyStatisticsResponseBean implements Serializable {
     @ApiModelProperty(value = "电话接通数量")
     private Integer doctorConnectCall;
 
-    @ApiModelProperty(value = "通话时长，单位分钟")
+    @ApiModelProperty(value = "通话时长，单位秒，前端注意")
     private Integer callTime;
 
     @ApiModelProperty(value = "面谈拜访次数")
@@ -110,6 +112,14 @@ public class DailyStatisticsResponseBean implements Serializable {
     @ApiModelProperty(value = "添加微信医生数量")
     private Integer addWechatDoctor;
 
+    @ApiModelProperty(value = "不同拜访结果的医生数量")
+    private List<VisitResultDoctorResponseBean> visitResultDoctor = new ArrayList<>();
+
+    @ApiModelProperty(value = "退出项目的医院数量")
+    private Integer breakOffHospital;
+
+    @ApiModelProperty(value = "退出项目的医生数量")
+    private Integer breakOffDoctor;
 
 
 

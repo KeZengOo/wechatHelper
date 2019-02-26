@@ -7,6 +7,7 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorDynam
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.questionnaire.ProductQuestionnaireRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DoctorDynamicFieldRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DynamicFieldProductRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.statistics.DailyStatisticsRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.customer.DoctorDynamicFieldResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorBasicInfoResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpBasicInfoHistoryResponseBean;
@@ -347,4 +348,14 @@ public interface DynamicFieldMapper {
      * @return
      */
     List<DoctorBasicDynamicFieldValueResponseBean> getDoctorAddDynamicField(@Param(value = "doctorId") Long doctorId, @Param(value = "classification") Integer classification);
+
+
+    /**
+     * 得到有需求的医生人数
+     * @param bean
+     * @return
+     */
+    Integer getDemandDoctor(DailyStatisticsRequestBean bean);
+
+
 }

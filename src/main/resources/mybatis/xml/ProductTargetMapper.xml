@@ -5,7 +5,7 @@
     <!-- 根据产品ID 得到产品目标 -->
     <select id="getProductTarget" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.statistics.ProductTargetResponseBean">
         SELECT target_hospital targetHospital, target_doctor targetDoctor
-        FROM virtual_product_targetl
+        FROM virtual_product_target
         WHERE product_id=#{productId}
     </select>
 </mapper>

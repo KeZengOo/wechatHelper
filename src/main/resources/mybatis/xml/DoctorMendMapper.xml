@@ -43,5 +43,35 @@
 	<select id="getCountByDoctorId" resultType="java.lang.Integer">
 		SELECT COUNT(*) FROM doctor_mend WHERE virtual_doctor_id=#{doctorId}
 	</select>
+
+
+	<!-- 有微信医生人数 -->
+	<select id="hasWechatDoctor" resultType="java.lang.Integer">
+		SELECT
+			COUNT(DISTINCT d.id)
+		FROM
+			doctor d
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		INNER JOIN doctor_mend dm
+		ON d.id=dm.virtual_doctor_id
+		WHERE dud.is_available=1
+		AND dud.prod_id=#{productId}
+		AND du.id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		AND dm.wechat IS NOT NULL
+		AND dm.wechat!=''
+
+		<if test="startTime!=null and startTime !=''">
+			AND DATE_FORMAT(dm.create_time, '%Y-%m-%d') >=DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+		</if>
+
+		<if test="endTime!=null and endTime !=''">
+			AND DATE_FORMAT(dm.create_time, '%Y-%m-%d') &lt;=DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+		</if>
+
+	</select>
 	
 </mapper>

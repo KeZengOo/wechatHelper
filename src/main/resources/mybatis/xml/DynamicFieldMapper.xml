@@ -867,4 +867,35 @@
     </select>
 
 
+
+    <!--得到有医生需求的人数-->
+    <select id="getDemandDoctor" resultType="java.lang.Integer">
+        SELECT
+            COUNT(DISTINCT d.id)
+        FROM
+            doctor d
+        INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+        INNER JOIN drug_user du ON dud.drug_user_id = du.id
+        INNER JOIN virtual_doctor_dynamic_field v ON dud.prod_id = v.product_id
+        INNER JOIN virtual_doctor_dynamic_field_value v2 ON v.id = v2.dynamic_field_id
+        AND d.id = v2.doctor_id
+        WHERE
+            dud.is_available = 1
+        AND dud.prod_id = #{productId}
+        AND du.id IN
+        <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+            #{drugUserId}
+        </foreach>
+        AND v.field_name = '医生需求'
+
+        <if test="startTime!=null and startTime !=''">
+            AND DATE_FORMAT(v2.create_time, '%Y-%m-%d') >=DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+        </if>
+
+        <if test="endTime!=null and endTime !=''">
+            AND DATE_FORMAT(v2.create_time, '%Y-%m-%d') &lt;=DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+        </if>
+    </select>
+
+
 </mapper>

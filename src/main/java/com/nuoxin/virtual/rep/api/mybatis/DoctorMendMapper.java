@@ -1,6 +1,7 @@
 package com.nuoxin.virtual.rep.api.mybatis;
 
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorMendParams;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.statistics.DailyStatisticsRequestBean;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;
 
@@ -66,5 +67,13 @@ public interface DoctorMendMapper {
 	 * @return
 	 */
 	Integer getCountByDoctorId(@Param(value = "doctorId") Long doctorId);
+
+
+	/**
+	 * 有微信医生人数
+	 * @param bean
+	 * @return
+	 */
+	Integer hasWechatDoctor(DailyStatisticsRequestBean bean);
 
 }

@@ -4,6 +4,7 @@ import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse;
 import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsParams;
 import com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.message.MessageRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.statistics.DailyStatisticsRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.wechat.WechatMessageRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.message.MessageLinkmanResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.message.MessageResponseBean;
@@ -84,5 +85,23 @@ public interface MessageMapper {
      * @param list
      */
     void batchInsertWechatMessage(List<WechatMessageRequestBean> list);
+
+
+    /**
+     * 医生回复次数
+     * @param bean
+     * @return
+     */
+    Integer doctorWechatCount(DailyStatisticsRequestBean bean);
+
+
+    /**
+     * 医生回复人数
+     * @param bean
+     * @return
+     */
+    Integer doctorWechatNum(DailyStatisticsRequestBean bean);
+
+
 
 }

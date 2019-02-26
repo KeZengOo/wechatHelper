@@ -3,8 +3,10 @@ package com.nuoxin.virtual.rep.api.mybatis;
 import com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorQuateParams;
 import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse;
 import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsParams;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.statistics.DailyStatisticsRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ProductInfoResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VisitResultResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.statistics.VisitResultDoctorResponseBean;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -39,6 +41,14 @@ public interface DrugUserDoctorQuateResultMapper {
 	 * @return
 	 */
 	List<VisitResultResponseBean> getVisitResultList(@Param(value = "doctorIdList") List<Long> doctorIdList, @Param(value = "productList") List<Long> productList);
+
+
+	/**
+	 * 得到不同拜访结果的医生
+	 * @param bean
+	 * @return
+	 */
+	List<VisitResultDoctorResponseBean> getVisitResultDoctorList(DailyStatisticsRequestBean bean);
 
 }
 
