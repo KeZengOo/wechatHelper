@@ -106,6 +106,7 @@ public interface DrugUserDoctorQuateMapper {
 	List<Long> getRecruitDoctorIdList(StatisticsParams statisticsParams);
 
 
+
 	/**
 	 * 招募医生数量
 	 * @param bean
@@ -143,6 +144,7 @@ public interface DrugUserDoctorQuateMapper {
 	 * @return
 	 */
 	Integer breakOffDoctor(DailyStatisticsRequestBean bean);
+
 
 }
 

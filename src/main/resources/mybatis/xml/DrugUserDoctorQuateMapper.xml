@@ -317,6 +317,7 @@
 	</select>
 
 
+
 	<!-- 招募医生数 -->
 	<select id="getRecruitDoctor" resultType="java.lang.Integer">
 		SELECT
@@ -500,5 +501,6 @@
 			AND DATE_FORMAT(q.create_time, '%Y-%m-%d') &lt;=DATE_FORMAT(#{endTime}, '%Y-%m-%d')
 		</if>
 	</select>
+
 
 </mapper>

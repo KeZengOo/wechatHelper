@@ -15,6 +15,7 @@ import com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpDynamicRequestB
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.*;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.DoctorDynamicExtendResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.SearchDynamicFieldResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.single.DoctorAddDynamicFieldResponseBean;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -356,6 +357,8 @@ public interface DynamicFieldMapper {
      * @return
      */
     Integer getDemandDoctor(DailyStatisticsRequestBean bean);
+
+
 
 
 }

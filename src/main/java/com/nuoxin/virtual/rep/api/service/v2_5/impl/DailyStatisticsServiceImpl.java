@@ -1,15 +1,14 @@
 package com.nuoxin.virtual.rep.api.service.v2_5.impl;
 
 import com.nuoxin.virtual.rep.api.enums.VisitResultTypeEnum;
-import com.nuoxin.virtual.rep.api.mybatis.*;
-import com.nuoxin.virtual.rep.api.service.v2_5.DailyStatisticsService;
+
+
+import com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorQuateMapper;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
-import com.nuoxin.virtual.rep.api.utils.StringUtil;
+
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.statistics.DailyStatisticsRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.statistics.DailyStatisticsResponseBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.statistics.ProductTargetResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.statistics.VisitResultDoctorResponseBean;
-import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

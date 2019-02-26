@@ -244,7 +244,8 @@
         hcpPotential,
         isHasDrug,
         isTarget,
-        isHasAe
+        isHasAe,
+        is_app_read
         FROM (
         SELECT
         vdci.id callId,du.name drugUserName,IFNULL(date_format(vdci.create_time, '%Y-%m-%d %H:%i:%s'),'')  visitTime,call_dud.doctorId,call_dud.doctorName,
@@ -260,7 +261,7 @@
         IFNULL(vdci.remark,'') remark,
         IFNULL(vdct.call_text,'') callText,
         "" shareContent,IFNULL(GROUP_CONCAT(vppvr.visit_result),vdci.status_name) visitResultStr,IFNULL(vdcim.`attitude`,'') attitude,IFNULL(date_format(vdcim.`next_visit_time`, '%Y-%m-%d %H:%i:%s'),'') nextVisitTime
-        ,call_dud.clientLevel,IFNULL(vdcim.`hcp_potential`,'未知') hcpPotential,IFNULL(vdcim.is_has_drug,'未知') isHasDrug,IFNULL(vdcim.`is_target`,'未知') isTarget,IFNULL(vdcim.`is_has_ae`,'未知')  isHasAe
+        ,call_dud.clientLevel,IFNULL(vdcim.`hcp_potential`,'未知') hcpPotential,IFNULL(vdcim.is_has_drug,'未知') isHasDrug,IFNULL(vdcim.`is_target`,'未知') isTarget,IFNULL(vdcim.`is_has_ae`,'未知')  isHasAe, 0 is_app_read
         FROM
         virtual_doctor_call_info vdci
         INNER JOIN drug_user du ON vdci.virtual_drug_user_id=du.id
@@ -346,7 +347,8 @@
             '' remark,
             '' callText,
             IFNULL(ai.title,'') shareContent,'' visitResultStr,'' attitude,'' nextVisitTime
-            ,content_dud.clientLevel,'未知' hcpPotential,'未知' isHasDrug,'未知' isTarget,'未知'  isHasAe
+            ,content_dud.clientLevel,'未知' hcpPotential,'未知' isHasDrug,'未知' isTarget,'未知'  isHasAe,
+            0 is_app_read
             FROM
             activity_share a
             INNER JOIN (
@@ -437,7 +439,8 @@
             '未知' hcpPotential,
             '未知' isHasDrug,
             '未知' isTarget,
-            '未知' isHasAe
+            '未知' isHasAe,
+            1 is_app_read
             FROM
             (
             SELECT
