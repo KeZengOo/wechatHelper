@@ -25,12 +25,12 @@ public class DailyStatisticsResponseBean implements Serializable {
     @ApiModelProperty(value = "目标医生人数")
     private Integer targetDoctor;
 
-//    @ApiModelProperty(value = "目标医生招募达成率")
-//    private String targetRecruitDoctorRate;
-//
-//
-//    @ApiModelProperty(value = "目标医院招募达成率")
-//    private String targetRecruitHospitalRate;
+    @ApiModelProperty(value = "目标医生招募达成率")
+    private String targetRecruitDoctorRate;
+
+
+    @ApiModelProperty(value = "目标医院招募达成率")
+    private String targetRecruitHospitalRate;
 
 
     @ApiModelProperty(value = "招募医院数")
@@ -85,8 +85,8 @@ public class DailyStatisticsResponseBean implements Serializable {
     @ApiModelProperty(value = "电话接通数量")
     private Integer doctorConnectCall;
 
-    @ApiModelProperty(value = "通话时长，单位秒，前端注意")
-    private Integer callTime;
+    @ApiModelProperty(value = "通话时长，单位分,保留一位")
+    private String callTime;
 
     @ApiModelProperty(value = "面谈拜访次数")
     private Integer interviewVisit;

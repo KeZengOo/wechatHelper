@@ -11,9 +11,11 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.statistics.DailySt
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.statistics.DailyStatisticsResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.statistics.ProductTargetResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.statistics.VisitResultDoctorResponseBean;
+import org.apache.poi.ss.formula.functions.Rate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,6 +85,24 @@ public class DailyStatisticsServiceImpl implements DailyStatisticsService {
         Integer recruitHospital = drugUserDoctorQuateMapper.getRecruitHospital(bean);
 
 
+        // 目标医生招募达成率
+        String targetRecruitDoctorRate = "0%";
+
+        if (targetDoctor > 0){
+            DecimalFormat df = new DecimalFormat("#.0");
+            targetRecruitDoctorRate = df.format((recruitDoctor * 100)/targetDoctor);
+            targetRecruitDoctorRate = targetRecruitDoctorRate + "%";
+        }
+
+        // 目标医院招募达成率
+        String targetRecruitHospitalRate = "0%";
+        if (targetHospital > 0){
+            DecimalFormat df = new DecimalFormat("#.0");
+            targetRecruitHospitalRate = df.format((recruitHospital * 100)/targetHospital);
+            targetRecruitHospitalRate = targetRecruitHospitalRate + "%";
+        }
+
+
         // 拜访医生数
         Integer visitDoctorCount = virtualDoctorCallInfoMapper.getVisitDoctorCount(bean);
 
@@ -124,8 +144,8 @@ public class DailyStatisticsServiceImpl implements DailyStatisticsService {
         // 电话接通量
         Integer connectCallCount = virtualDoctorCallInfoMapper.getConnectCallCount(bean);
 
-        // 通话时长(单位是秒)
-        Integer callTime = virtualDoctorCallInfoMapper.getCallTime(bean);
+        // 通话时长(单位是分钟，保留一位小数)
+        String callTime = virtualDoctorCallInfoMapper.getCallTime(bean);
 
         // 面谈拜访次数
         Integer interviewVisit = virtualDoctorCallInfoMapper.interviewVisit(bean);
@@ -200,6 +220,10 @@ public class DailyStatisticsServiceImpl implements DailyStatisticsService {
         DailyStatisticsResponseBean dailyStatistics = new DailyStatisticsResponseBean();
         dailyStatistics.setTargetHospital(targetHospital);
         dailyStatistics.setTargetDoctor(targetDoctor);
+
+        dailyStatistics.setTargetRecruitDoctorRate(targetRecruitDoctorRate);
+        dailyStatistics.setTargetRecruitHospitalRate(targetRecruitHospitalRate);
+
         dailyStatistics.setRecruitHospital(recruitHospital);
         dailyStatistics.setRecruitDoctor(recruitDoctor);
         dailyStatistics.setAddRecruitHospital(addRecruitHospital);

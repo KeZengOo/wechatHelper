@@ -196,7 +196,7 @@ public interface VirtualDoctorCallInfoMapper {
 	 * @param bean
 	 * @return
 	 */
-	Integer getCallTime(DailyStatisticsRequestBean bean);
+	String getCallTime(DailyStatisticsRequestBean bean);
 
 	/**
 	 * 面谈次数
