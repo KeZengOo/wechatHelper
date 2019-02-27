@@ -2,6 +2,7 @@ package com.nuoxin.virtual.rep.api.mybatis;
 
 import java.util.List;
 
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.statistics.DailyStatisticsRequestBean;
 import org.apache.ibatis.annotations.Param;
 
 import com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorOneToOneParams;
@@ -59,6 +60,14 @@ public interface DrugUserDoctorMapper {
 
 	List<StatisticsResponse> getDrugUserIdByProductId(@Param(value = "productId")Integer productId,
 			                                          @Param(value = "leaderPath")String leaderPath);
-	
+
+	/**
+	 * 添加微信的医生数量
+	 * @param bean
+	 * @return
+	 */
+	Integer addWechatDoctor(DailyStatisticsRequestBean bean);
+
+
 }
 

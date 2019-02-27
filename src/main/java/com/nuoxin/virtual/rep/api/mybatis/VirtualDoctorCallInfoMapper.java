@@ -7,6 +7,7 @@ import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsParams;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.CallRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.VisitHistoryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.VisitCountRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.statistics.DailyStatisticsRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CallTelephoneReponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VisitCountResponseBean;
 import org.apache.ibatis.annotations.Param;
@@ -144,6 +145,72 @@ public interface VirtualDoctorCallInfoMapper {
 	 */
 	List<VisitCountResponseBean> getVisitCountList(VisitCountRequestBean bean);
 
+	/**
+	 * 得到拜访医院数量
+	 * @param bean
+	 * @return
+	 */
+	Integer getVisitHospitalCount(DailyStatisticsRequestBean bean);
+
+
+	/**
+	 * 得到拜访医生数量
+	 * @param bean
+	 * @return
+	 */
+	Integer getVisitDoctorCount(DailyStatisticsRequestBean bean);
+
+	/**
+	 * 得到接触/覆盖/成功医院数量
+	 * @param bean
+	 * @return
+	 */
+	Integer getVisitTypeHospitalCount(DailyStatisticsRequestBean bean);
+
+
+	/**
+	 * 得到接触/覆盖/成功过医生数量
+	 * @param bean
+	 * @return
+	 */
+	Integer getVisitTypeDoctorCount(DailyStatisticsRequestBean bean);
+
+
+	/**
+	 * 电话外呼量
+	 * @param bean
+	 * @return
+	 */
+	Integer getCallCount(DailyStatisticsRequestBean bean);
+
+	/**
+	 * 电话接通量
+	 * @param bean
+	 * @return
+	 */
+	Integer getConnectCallCount(DailyStatisticsRequestBean bean);
+
+
+	/**
+	 * 通话时长
+	 * @param bean
+	 * @return
+	 */
+	String getCallTime(DailyStatisticsRequestBean bean);
+
+	/**
+	 * 面谈次数
+	 * @param bean
+	 * @return
+	 */
+	Integer interviewVisit(DailyStatisticsRequestBean bean);
+
+	/**
+	 * 除去电话、面谈其他拜访次数
+	 * @param bean
+	 * @return
+	 */
+	Integer otherVisit(DailyStatisticsRequestBean bean);
 
 }
 

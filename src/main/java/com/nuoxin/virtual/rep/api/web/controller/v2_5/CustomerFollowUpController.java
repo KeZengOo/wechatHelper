@@ -110,8 +110,8 @@ public class CustomerFollowUpController extends NewBaseController {
 			searchRequest.setVirtualDrugUserIds(virtualDrugUserIds);
 		}
 
-		List<Long> productLineIds = null;
-		List<ProductResponseBean> products = drugUserProductService.getProductsByDrugUserId(user.getLeaderPath());
+//		List<Long> productLineIds = null;
+//		List<ProductResponseBean> products = drugUserProductService.getProductsByDrugUserId(user.getLeaderPath());
 //		if (CollectionsUtil.isNotEmptyList(products)) {
 //			List<Long> productLineIdsTemp = new ArrayList<>();
 //			products.forEach(product ->{
