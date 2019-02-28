@@ -3,6 +3,7 @@ package com.nuoxin.virtual.rep.api.web.controller;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.ParseException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -227,8 +228,12 @@ public class DoctorCallController extends BaseController {
         		responseBean.setData(info);
         		return responseBean;
         	}
-        	
-            responseBean.setData(doctorCallService.save(bean));
+
+            try {
+                responseBean.setData(doctorCallService.save(bean));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
             return responseBean;
         }
     }

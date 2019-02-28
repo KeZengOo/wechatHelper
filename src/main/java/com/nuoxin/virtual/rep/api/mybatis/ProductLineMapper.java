@@ -80,7 +80,8 @@ public interface ProductLineMapper extends MyMapper<ProductLine> {
      * @param drugUserId
      * @param doctorId
      * @param dayNum
+     * @param productId
      * @return list
      */
-    List<VirtualWechatDate> wechatVisitLogsDate(@Param(value = "drugUserId") Long drugUserId,@Param(value = "doctorId") Long doctorId, @Param(value = "dayNum") Integer dayNum);
+    List<VirtualWechatDate> wechatVisitLogsDate(@Param(value = "drugUserId") Long drugUserId,@Param(value = "doctorId") Long doctorId,@Param(value = "productId") Integer productId, @Param(value = "dayNum") Integer dayNum);
 }

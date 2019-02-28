@@ -87,7 +87,7 @@
     <!-- 在客户聊天记录中，当前代表在过去N天内是否与医生有微信聊天记录的日期 -->
     <select id="wechatChatRecordDate" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualWechatDate">
         SELECT
-            DATE_FORMAT(t.message_time, '%Y-%c-%e') existDate
+            DATE_FORMAT(t.message_time, '%Y-%c-%e') existDate,count(t.message_time) dayCount
         FROM
             virtual_message t
         WHERE
@@ -102,13 +102,14 @@
     <!-- 当前代表在过去N天内是否存在微信拜访记录日期 -->
     <select id="wechatVisitLogsDate" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualWechatDate">
         SELECT
-            DATE_FORMAT(t.create_time, '%Y-%c-%e') existDate
+            DATE_FORMAT(t.create_time, '%Y-%c-%e') existDate, count(t.create_time) dayCount
         FROM
             virtual_doctor_call_info t
         WHERE
             t.visit_channel = 2
         AND t.virtual_drug_user_id = #{drugUserId}
         AND t.virtual_doctor_id = #{doctorId}
+        AND t.product_id = #{productId}
         AND t.create_time > date_sub(NOW(), INTERVAL #{dayNum} DAY)
         GROUP BY
             existDate;

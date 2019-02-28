@@ -1,6 +1,7 @@
 package com.nuoxin.virtual.rep.api.web.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -120,7 +121,7 @@ public class ProductController extends BaseController{
      */
     @ApiOperation(value = "获取N天内的所有日期，有微信聊天记录的日期，有微信拜访的日期", notes = "获取N天内的所有日期，有微信聊天记录的日期，有微信拜访的日期")
     @GetMapping("/wechatIsExistDateList")
-    public ResponseEntity<DefaultResponseBean<VirtualWechatDateReturn>> wechatIsExistDateList(@RequestParam(value = "drugUserId", required = false) Long drugUserId,@RequestParam(value = "doctorId", required = false) Long doctorId, HttpServletRequest request){
+    public ResponseEntity<DefaultResponseBean<VirtualWechatDateReturn>> wechatIsExistDateList(@RequestParam(value = "drugUserId", required = false) Long drugUserId,@RequestParam(value = "doctorId", required = false) Long doctorId, @RequestParam(value = "productId", required = false) Integer productId, HttpServletRequest request){
         if (drugUserId == null || drugUserId == 0){
             drugUserId = getLoginId(request);
         }
@@ -131,7 +132,7 @@ public class ProductController extends BaseController{
         vwvc = productLineService.virtualWechatVisitCountAndCycleConfig();
         //微信拜访记录或消息存在的时间返回类
         VirtualWechatDateReturn virtualWechatDateReturn = new VirtualWechatDateReturn();
-        String result = productLineService.wechatIsExistDateList(drugUserId,doctorId,vwvc.getCycleCount());
+        Map<String, Integer> result = productLineService.wechatIsExistDateList(drugUserId,doctorId,productId,vwvc.getCycleCount());
         virtualWechatDateReturn.setEvents(result);
         virtualWechatDateReturn.setDayCount(vwvc.getCycleCount());
         DefaultResponseBean<VirtualWechatDateReturn> responseBean = new DefaultResponseBean<>();

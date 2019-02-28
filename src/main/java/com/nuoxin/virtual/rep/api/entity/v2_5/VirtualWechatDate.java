@@ -9,4 +9,6 @@ import lombok.Data;
 public class VirtualWechatDate {
     @ApiModelProperty(value = "存在日期")
     private String existDate;
+    @ApiModelProperty(value = "日期count")
+    private Integer dayCount;
 }

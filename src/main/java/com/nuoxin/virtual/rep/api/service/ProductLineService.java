@@ -101,14 +101,16 @@ public class ProductLineService {
      * @param doctorId
      * @return String
      */
-    public String wechatIsExistDateList(Long drugUserId, Long doctorId, Integer dayNum){
+    public Map<String, Integer> wechatIsExistDateList(Long drugUserId, Long doctorId, Integer productId, Integer dayNum){
 
         SimpleDateFormat sdf  = new SimpleDateFormat("yyyy-M-d");
 
         //在客户聊天记录中，当前代表在过去N天内是否与医生有微信聊天记录的日期 type 1
         List<VirtualWechatDate> wechatChatRecordDateList = productLineMapper.wechatChatRecordDate(drugUserId, doctorId, dayNum);
         //当前代表在过去N天内是否存在微信拜访记录日期 type 2
-        List<VirtualWechatDate> wechatVisitLogsDateList = productLineMapper.wechatVisitLogsDate(drugUserId, doctorId, dayNum);
+        List<VirtualWechatDate> wechatVisitLogsDateList = productLineMapper.wechatVisitLogsDate(drugUserId, doctorId, productId, dayNum);
+        //微信聊天记录天数和一天内可添加微信拜访记录的配置表
+        VirtualWechatVisitCountAndCycleConfigParams vwvc = productLineMapper.virtualWechatVisitCountAndCycleConfig();
 
         //获取时间区间内的所有日期
         Map<String, Integer> dateMaps = getDayMaps(dayNum);
@@ -125,15 +127,23 @@ public class ProductLineService {
             //判断更新微信拜访记录的日期在区间日期内的状态
             for (int i = 0; i<wechatVisitLogsDateList.size(); i++){
                 if(key.equals(wechatVisitLogsDateList.get(i).getExistDate())){
-                    dateMaps.put(key,2);
+                    //如果配置一自然天的条数大于等于微信拜访记录的条数，type为2 不可点击
+                    if(vwvc.getAddCount() >= wechatVisitLogsDateList.get(i).getDayCount())
+                    {
+                        dateMaps.put(key,2);
+                    }
+                    else
+                    {
+                        dateMaps.put(key,1);
+                    }
                 }
             }
         }
 
         //org.json.JSONObject 将Map转换为JSON方法
-        JSONObject jsonObject =new JSONObject(dateMaps);
-        String json = jsonObject.toString();
-        return json;
+//        JSONObject jsonObject =new JSONObject(dateMaps);
+//        String json = jsonObject.toString();
+        return dateMaps;
     }
 
     /**

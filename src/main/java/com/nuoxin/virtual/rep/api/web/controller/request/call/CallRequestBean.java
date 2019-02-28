@@ -37,8 +37,19 @@ public class CallRequestBean implements Serializable {
     private Long productId;
     private Long drugUserId;
 
+    @ApiModelProperty(value = "创建时间")
+    private String createTime;
+
     @NotNull(message = "医生ID不能为空")
     private Long doctorId;
+
+    public String getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
+    }
 
     public String getMobile() {
         return mobile;

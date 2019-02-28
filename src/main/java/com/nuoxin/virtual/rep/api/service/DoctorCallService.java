@@ -1,6 +1,9 @@
 package com.nuoxin.virtual.rep.api.service;
 
 import java.io.File;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -331,7 +334,7 @@ public class DoctorCallService extends BaseService {
      * @return 返回 CallRequestBean 对象
      */
     @Transactional(readOnly = false)
-    public CallRequestBean save(CallRequestBean bean){
+    public CallRequestBean save(CallRequestBean bean) throws ParseException {
 //        DoctorCallInfo info = new DoctorCallInfo();
 //        info.setSinToken(bean.getSinToken());
 //        info.setStatus(bean.getStatus());
@@ -362,7 +365,16 @@ public class DoctorCallService extends BaseService {
         infoDetails.setCallId(bean.getId());
         infoDetails.setStatus(bean.getStatus());
         infoDetails.setStatusName(bean.getStatusName());
-        infoDetails.setCreateTime(new Date());
+        if(bean.getCreateTime() != null && !bean.getCreateTime().equals("")){
+            DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            Date date = null;
+            date = format.parse(bean.getCreateTime());
+            infoDetails.setCreateTime(date);
+        }
+        else
+        {
+            infoDetails.setCreateTime(new Date());
+        }
         doctorCallInfoDetailsRepository.save(infoDetails);
         
         return bean;
