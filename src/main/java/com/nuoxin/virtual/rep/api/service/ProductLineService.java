@@ -128,7 +128,7 @@ public class ProductLineService {
             for (int i = 0; i<wechatVisitLogsDateList.size(); i++){
                 if(key.equals(wechatVisitLogsDateList.get(i).getExistDate())){
                     //如果配置一自然天的条数大于等于微信拜访记录的条数，type为2 不可点击
-                    if(vwvc.getAddCount() >= wechatVisitLogsDateList.get(i).getDayCount())
+                    if(vwvc.getAddCount() <= wechatVisitLogsDateList.get(i).getDayCount())
                     {
                         dateMaps.put(key,2);
                     }
