@@ -18,6 +18,10 @@ public class DynamicFieldResponse {
 
 	@ApiModelProperty(value = "英文字段")
 	private String prop;
+
+	@ApiModelProperty(value = "分类")
+	private Integer classification;
+
 	/**
 	 * 子集
 	 */
