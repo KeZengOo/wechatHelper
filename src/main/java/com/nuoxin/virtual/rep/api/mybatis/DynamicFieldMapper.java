@@ -19,6 +19,7 @@ import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.single.DoctorAddD
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -358,7 +359,11 @@ public interface DynamicFieldMapper {
      */
     Integer getDemandDoctor(DailyStatisticsRequestBean bean);
 
-
-
-
+    /**
+     * 根据产品和医生列表获得医生处方列表
+     * @param productId
+     * @param doctorList
+     * @return
+     */
+    List<PrescriptionResponseBean> getPrescriptionListByDoctorList(@Param(value = "productId") Long productId, @Param(value = "doctorList") List<Long> doctorList);
 }
