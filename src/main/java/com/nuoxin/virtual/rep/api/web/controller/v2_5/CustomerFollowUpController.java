@@ -256,6 +256,7 @@ public class CustomerFollowUpController extends NewBaseController {
 			String excelName = customerFollowService.getExportExcelName(searchReq);
 			map.put("filename", excelName);
 		}catch (Exception e){
+			e.printStackTrace();
 			return super.getParamsErrorResponse("错误");
 		}
 		responseBean.setData(map);
