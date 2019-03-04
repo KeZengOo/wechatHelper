@@ -107,4 +107,8 @@ public class SearchRequestBean extends ListRequestBean {
 	@ApiModelProperty(value = "动态字段输入的所有值")
 	private List<SearchDynamicFieldRequestBean> valueList;
 
+	//不分页标志
+	@ApiModelProperty(value = "不分页标志,前端不传递")
+	private Integer NonPagingFlag;
+
 }

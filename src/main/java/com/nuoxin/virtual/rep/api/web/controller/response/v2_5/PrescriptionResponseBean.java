@@ -16,6 +16,9 @@ import java.io.Serializable;
 public class PrescriptionResponseBean implements Serializable {
     private static final long serialVersionUID = 5767741042064002760L;
 
+    @ApiModelProperty(value = "医生id")
+    private Long doctorId;
+
     /**
      * 所有的都给了默认值
      */
