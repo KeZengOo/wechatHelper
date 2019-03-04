@@ -26,6 +26,14 @@ public class DailyStatisticsRequestBean implements Serializable {
     @ApiModelProperty(value = "结束时间")
     private String endTime;
 
+    @ApiModelProperty(value = "前端传过来的结束时间，没有经过处理")
+    private String noHandleStartTime;
+
+    @ApiModelProperty(value = "前端传过来的结束时间，没有经过处理")
+    private String noHandleEndTime;
+
+
+
     @ApiModelProperty(value = "产品ID")
     @NotNull(message = "产品ID不能为空")
     private Long productId;

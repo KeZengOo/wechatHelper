@@ -292,6 +292,8 @@ public class DailyStatisticsServiceImpl implements DailyStatisticsService {
         Long productId = bean.getProductId();
         List<DailyStatisticsResponseBean> dailyList = new ArrayList<>();
         // 下载合计的
+        bean.setNoHandleStartTime(bean.getStartTime());
+        bean.setNoHandleEndTime(bean.getEndTime());
         DailyStatisticsResponseBean dailyStatistics = this.getDailyStatistics(bean);
         dailyStatistics.setDrugUserName("合计");
         dailyList.add(dailyStatistics);
@@ -305,6 +307,9 @@ public class DailyStatisticsServiceImpl implements DailyStatisticsService {
             if (drugUser == null){
                 throw new BusinessException(ErrorEnum.ERROR, "不合法的代表ID:" + drugUserId);
             }
+
+            bean.setStartTime(bean.getNoHandleStartTime());
+            bean.setEndTime(bean.getNoHandleEndTime());
             DailyStatisticsResponseBean subDailyStatistics = this.getDailyStatistics(bean);
             subDailyStatistics.setDrugUserName(drugUser.getName());
             dailyList.add(subDailyStatistics);
@@ -401,12 +406,14 @@ public class DailyStatisticsServiceImpl implements DailyStatisticsService {
             drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getTargetHospital()));
             drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getTargetRecruitHospitalRate()));
             drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getVisitHospital()));
+            drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getRecruitHospital()));
             drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getAddRecruitHospital()));
             drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getContactHospital()));
             drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getCoverHospital()));
             drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getSuccessHospital()));
             drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getNoRecruitHospital()));
             drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getBreakOffHospital()));
+
             drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getTargetDoctor()));
             drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getTargetRecruitDoctorRate()));
             drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getVisitDoctor()));
@@ -415,7 +422,6 @@ public class DailyStatisticsServiceImpl implements DailyStatisticsService {
             drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getContactDoctor()));
             drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getCoverDoctor()));
             drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getSuccessDoctor()));
-            drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getVisitHospital()));
             drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getDemandDoctor()));
             drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getHasAeDoctor()));
             drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getNoRecruitDoctor()));
