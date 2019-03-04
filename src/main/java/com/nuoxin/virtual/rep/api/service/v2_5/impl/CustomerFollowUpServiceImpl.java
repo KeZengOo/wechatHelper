@@ -26,15 +26,13 @@ import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.*;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.nuoxin.virtual.rep.api.common.bean.PageRequestBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.CustomerFollowUpPageResponseBean;
 import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v2_5.CustomerFollowUpService;
-import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.ListRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.ScreenRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.SearchRequestBean;
 
@@ -50,6 +48,9 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	private static final Logger logger = LoggerFactory.getLogger(CustomerFollowUpServiceImpl.class);
 	
 	private static final List<Object> tableHeaders = new ArrayList<>(20);
+
+	@Value("${download.file.path}")
+	private String downloadPath;
 
 	@Resource
 	private DrugUserDoctorQuateMapper drugUserDoctorQuateMapper;
@@ -411,7 +412,6 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 			throw new BusinessException(ErrorEnum.SYSTEM_REQUEST_PARAM_ERROR, "无数据返回");
 		}
 
-		System.out.println("list:" + list);
 		//医生id列表
 		List<Long> doctorIds = new ArrayList<Long>();
 		Set<Long> ids = new HashSet<>();
@@ -424,14 +424,12 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 			doctorInfoMap.put(d.getDoctorId(), d);
 				}
 		);
-		System.out.println("doctorIds:" + doctorIds.size());
 
 		//产品id,目前产品数量为1
 		Long productId = searchReq.getProductLineIds().get(0);
 
 		//动态字段列表
 		List<DynamicFieldResponse> dynamicTitleList = dynamicFieldMapper.getProductDynamicField(productId);
-		System.out.println("dynamicTitleList:" + dynamicTitleList);
 
 		//动态字段value列表
 		List<DynamicFieldValueResponse> dynamicFieldValueList = dynamicFieldMapper.getProductDynamicFieldValue(productId, ids);
@@ -446,7 +444,6 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 				visitResultListMap = groupByVisitResultList;
 			}
 		}
-		System.out.println("visitResultListMap:" + visitResultList);
 
 		//获得处方信息
 		List<PrescriptionResponseBean> prescriptionList = dynamicFieldMapper.getPrescriptionListByDoctorList(productId, doctorIds);
@@ -481,10 +478,10 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 			if(CollectionsUtil.isNotEmptyList(tempPresList)){
 				prescription = tempPresList.get(0);
 			}
-			detailMap.put("prescription_hasDrug", prescription == null ? "" : prescription.getHasDrug());
-			detailMap.put("prescription_target", prescription == null ? "" : prescription.getTarget());
-			detailMap.put("prescription_recruit", prescription == null ? "" : prescription.getRecruit());
-			detailMap.put("prescription_breakOff", prescription == null ? "" : prescription.getBreakOff());
+			detailMap.put("prescription_hasDrug", prescription == null ? "" : processPrescriptionShowFlag(prescription.getHasDrug()));
+			detailMap.put("prescription_target", prescription == null ? "" : processPrescriptionShowFlag(prescription.getTarget()));
+			detailMap.put("prescription_recruit", prescription == null ? "" : processPrescriptionShowFlag(prescription.getRecruit()));
+			detailMap.put("prescription_breakOff", prescription == null ? "" : processPrescriptionShowFlag(prescription.getBreakOff()));
 
 			detailMap.put("visit_result", visitResultListMap.containsKey(doctorId) ? processVisitResult(visitResultListMap.get(doctorId)) : "");
 
@@ -501,44 +498,10 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 			mapList.add(detailMap);
 		}
 
-		/*
-		list.forEach(d->{
-			        LinkedHashMap<String, Object> detailMap = new LinkedHashMap<String, Object>();
-			        Long doctorId = d.getDoctorId();
-			        //固定字段值
-			        detailMap.put("doctor_id", doctorId);
-			        detailMap.put("doctor_name", d.getDoctorName());
-			        detailMap.put("doctor_gender", d.getGender());
-			        detailMap.put("doctor_dept", d.getDepartment());
-			        detailMap.put("doctor_title", d.getTitle());
-			        detailMap.put("hospital_id", d.getHospitalId());
-			        detailMap.put("hospital_name", d.getHospitalName());
-			        //detailMap.put("hospital_level", d.getHospitalLevel());
-			        detailMap.put("hospital_levelName", HospitalLevelUtil.getLevelNameByLevelCode(d.getHospitalLevel().toString()));
-			        detailMap.put("hospital_province", d.getProvince());
-			        detailMap.put("hospital_city", d.getCity());
-			        detailMap.put("prescription_isBreakOff", d.getIsBreakOff());
-			        detailMap.put("prescription_isTarget", d.getIsTarget());
-			        detailMap.put("visit_result", "");
-
-			        //填充动态字段值
-			        List<DynamicFieldValueResponse> valueList = doctorDynamicFieldMap.containsKey(doctorId) ? doctorDynamicFieldMap.get(doctorId) : null;
-			        if(CollectionsUtil.isNotEmptyList(valueList)){
-						valueList.forEach(v -> {
-							if (v.getProp() !=null && (!"".equals(v.getProp().trim()))) {
-								detailMap.put(v.getProp(), v.getValue() == null ? "" : v.getValue());
-							}
-						});
-					}
-
-			        mapList.add(detailMap);
-				}
-		);
-		**/
-
 		return getExportExcelName(mapList, dynamicTitleList);
 	}
 
+	//拜访记录结果展示
 	private String processVisitResult(List<VisitResultResponseBean> resultList){
 		if(CollectionsUtil.isEmptyList(resultList)){
 			return "";
@@ -549,6 +512,12 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		 }
 		);
 		return String.join(",", resultSet);
+	}
+
+	//处方信息结果展示
+	private String processPrescriptionShowFlag(Integer flag){
+		if(flag == null) return "未知";
+		return flag == 1 ? "是" : flag == 0 ? "否" : "未知";
 	}
 
 	private Map<String, String> getTitleMap(List<DynamicFieldResponse> list){
@@ -589,8 +558,6 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	}
 
 	private String getExportExcelName(List<LinkedHashMap<String, Object>> mapList, List<DynamicFieldResponse> dynamicTitleList) throws Exception{
-		System.out.println("mapList:" + mapList);
-		//HSSFWorkbook wb = ExportExcel.excelExport(mapList, getTitleMap(dynamicTitleList), "医生详情");
 		List<SheetRequestBean> sheetList = new ArrayList<>();
 		SheetRequestBean sheetRequestBean = new SheetRequestBean();
 		sheetRequestBean.setDataList(mapList);
@@ -599,10 +566,8 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		sheetList.add(sheetRequestBean);
 		HSSFWorkbook wb = ExportExcel.excelLinkedHashMapExport(sheetList);
 
-		String path = "/Users/yangyang/Downloads/";
-		System.out.println("path:" + path);
-		String fileName = "virtual_app_doctorList"  + ".xls";
-		String fullFileName = path + fileName;
+		String fileName = "virtual_app_doctorList_"  + DateUtil.getDateSecondString(new Date()) + ".xls";
+		String fullFileName = downloadPath + fileName;
 		FileOutputStream exportXls = null;
 		try{
 			exportXls = new FileOutputStream(fullFileName);

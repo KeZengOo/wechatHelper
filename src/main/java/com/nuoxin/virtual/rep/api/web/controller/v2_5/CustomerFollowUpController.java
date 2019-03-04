@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.SearchDynamicFieldListResponseBean;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,6 +48,9 @@ public class CustomerFollowUpController extends NewBaseController {
 	private DrugUserProductService drugUserProductService;
 	@Resource
 	private CustomerFollowUpService customerFollowService;
+
+	@Value("${download.file.path}")
+	private String downloadPath;
 
 
 	@SuppressWarnings("unchecked")
@@ -267,9 +271,7 @@ public class CustomerFollowUpController extends NewBaseController {
 			response.setHeader("Content-Disposition", "attachment;filename="+filename);
 			//3)、输出流
 			OutputStream out = response.getOutputStream();
-			//String filePath = "/Users/yangyang/Downloads/pfizerLabel/";
-			String filePath = "/Users/yangyang/Downloads/";
-			InputStream in = new FileInputStream(new File(filePath + filename));
+			InputStream in = new FileInputStream(new File(downloadPath + filename));
 			int b;
 			while((b=in.read())!=-1){
 				out.write(b);
