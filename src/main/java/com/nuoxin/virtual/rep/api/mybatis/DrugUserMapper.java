@@ -102,5 +102,11 @@ public interface DrugUserMapper extends MyMapper<DrugUser> {
      * @return
      */
 	String getRoleIdByDrugUserId(@Param(value = "drugUserId") Long drugUserId);
-    
+
+    /**
+     * 得到多个代表名字
+     * @param drugUserIdList
+     * @return
+     */
+	String getDrugUserNameList(@Param(value = "drugUserIdList") List<Long> drugUserIdList);
 }

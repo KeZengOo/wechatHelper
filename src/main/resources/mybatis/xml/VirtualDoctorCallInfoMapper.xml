@@ -1254,7 +1254,7 @@
 	<!-- 通话时长 -->
 	<select id="getCallTime" resultType="java.lang.String">
 		SELECT
-		ROUND(SUM(v.call_time)/60,1) callTime
+		ROUND(IFNULL(SUM(v.call_time), 0)/60,1) callTime
 		FROM
 		doctor d
 		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id

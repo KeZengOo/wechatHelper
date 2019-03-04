@@ -80,25 +80,33 @@
 
     <!-- 得到不同拜访结果的医生 -->
     <select id="getVisitResultDoctorList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.statistics.VisitResultDoctorResponseBean">
+
         SELECT
-            COUNT(DISTINCT d.id) doctorCount, pr.visit_result visitResult
+        vpvr.visit_result visitResult,
+        IFNULL(t.doctorCount, 0) doctorCount
         FROM
-            doctor d
+        virtual_product_visit_result vpvr
+        LEFT JOIN (
+        SELECT
+        COUNT(DISTINCT d.id) doctorCount,
+        pr.id
+        FROM
+        doctor d
         INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
         INNER JOIN drug_user du ON dud.drug_user_id = du.id
-        INNER JOIN drug_user_doctor_quate q
-        ON dud.doctor_id=q.doctor_id AND dud.drug_user_id=q.drug_user_id AND dud.prod_id=q.product_id
-        INNER JOIN drug_user_doctor_quate_result qr
-        ON qr.quate_id=q.id
-        INNER JOIN virtual_product_visit_result pr
-        ON qr.result_id=pr.id
-        WHERE dud.is_available=1
-        AND dud.prod_id=#{productId}
+        INNER JOIN drug_user_doctor_quate q ON dud.doctor_id = q.doctor_id
+        AND dud.drug_user_id = q.drug_user_id
+        AND dud.prod_id = q.product_id
+        INNER JOIN drug_user_doctor_quate_result qr ON qr.quate_id = q.id
+        INNER JOIN virtual_product_visit_result pr ON qr.result_id = pr.id
+        WHERE
+        dud.is_available = 1
+        AND dud.prod_id = #{productId}
         AND du.id IN
+
         <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
             #{drugUserId}
         </foreach>
-        AND pr.product_id=#{productId}
 
         <if test="startTime!=null and startTime !=''">
             AND DATE_FORMAT(qr.create_time, '%Y-%m-%d') >=DATE_FORMAT(#{startTime}, '%Y-%m-%d')
@@ -108,7 +116,15 @@
             AND DATE_FORMAT(qr.create_time, '%Y-%m-%d') &lt;=DATE_FORMAT(#{endTime}, '%Y-%m-%d')
         </if>
 
-        GROUP BY pr.visit_result
+        GROUP BY
+        pr.id
+        ) t ON vpvr.id = t.id
+        WHERE
+        vpvr.product_id = #{productId}
+        ORDER BY
+        vpvr.id
+
+
     </select>
 
 </mapper>

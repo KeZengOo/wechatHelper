@@ -115,4 +115,9 @@
             existDate;
     </select>
 
+    <!-- 得到产品名称 -->
+    <select id="getProductName" resultType="java.lang.String">
+        SELECT prod_name FROM product_line WHERE prod_id=#{productId}
+    </select>
+
 </mapper>
