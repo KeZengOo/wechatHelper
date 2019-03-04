@@ -469,7 +469,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 			detailMap.put("hospital_id", d.getHospitalId());
 			detailMap.put("hospital_name", d.getHospitalName());
 			//detailMap.put("hospital_level", d.getHospitalLevel());
-			detailMap.put("hospital_levelName", HospitalLevelUtil.getLevelNameByLevelCode(d.getHospitalLevel().toString()));
+			detailMap.put("hospital_levelName", d.getHospitalLevel() == null ? "" : HospitalLevelUtil.getLevelNameByLevelCode(d.getHospitalLevel().toString()));
 			detailMap.put("hospital_province", d.getProvince());
 			detailMap.put("hospital_city", d.getCity());
 
@@ -499,6 +499,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 			mapList.add(detailMap);
 		}
 
+		System.out.println("fffff");
 		return getExportExcelName(mapList, dynamicTitleList);
 	}
 
@@ -575,6 +576,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 			wb.write(exportXls);
 			exportXls.flush();
 		}catch (Exception e){
+			e.printStackTrace();
 
 		}finally {
 			exportXls.close();
