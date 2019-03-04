@@ -103,8 +103,6 @@ public class ProductLineService {
      */
     public Map<String, Integer> wechatIsExistDateList(Long drugUserId, Long doctorId, Integer productId, Integer dayNum){
 
-        SimpleDateFormat sdf  = new SimpleDateFormat("yyyy-M-d");
-
         //在客户聊天记录中，当前代表在过去N天内是否与医生有微信聊天记录的日期 type 1
         List<VirtualWechatDate> wechatChatRecordDateList = productLineMapper.wechatChatRecordDate(drugUserId, doctorId, dayNum);
         //当前代表在过去N天内是否存在微信拜访记录日期 type 2
@@ -139,10 +137,6 @@ public class ProductLineService {
                 }
             }
         }
-
-        //org.json.JSONObject 将Map转换为JSON方法
-//        JSONObject jsonObject =new JSONObject(dateMaps);
-//        String json = jsonObject.toString();
         return dateMaps;
     }
 

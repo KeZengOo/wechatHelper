@@ -1,5 +1,6 @@
 package com.nuoxin.virtual.rep.api.web.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,7 +55,7 @@ public class ProductController extends BaseController{
      */
     @ApiOperation(value = "当前代表在过去N天内是否与医生有微信聊天记录", notes = "当前代表在过去N天内是否与医生有微信聊天记录")
     @GetMapping("/wechatChatRecordIsExist")
-    public ResponseEntity<DefaultResponseBean<Integer>> wechatChatRecordIsExist(@RequestParam(value = "drugUserId", required = false) Long drugUserId,@RequestParam(value = "doctorId", required = false) Long doctorId,HttpServletRequest request){
+    public ResponseEntity<DefaultResponseBean<Map<String, Integer>>> wechatChatRecordIsExist(@RequestParam(value = "drugUserId", required = false) Long drugUserId,@RequestParam(value = "doctorId", required = false) Long doctorId,HttpServletRequest request){
         if (drugUserId == null || drugUserId == 0){
             drugUserId = getLoginId(request);
         }
@@ -64,7 +65,7 @@ public class ProductController extends BaseController{
         vwvc = productLineService.virtualWechatVisitCountAndCycleConfig();
         int existCount = 0;
         existCount = productLineService.wechatChatRecordIsExist(drugUserId,doctorId,vwvc.getCycleCount());
-        DefaultResponseBean<Integer> responseBean = new DefaultResponseBean<>();
+        DefaultResponseBean<Map<String, Integer>> responseBean = new DefaultResponseBean<>();
         if(existCount > 0){
             existCount = 1;
         }
@@ -72,7 +73,12 @@ public class ProductController extends BaseController{
         {
             responseBean.setMessage("系统检测到"+vwvc.getCycleCount()+"天内，没有可添加微信拜访的微信聊天记录，请使用微信聊天上传工具上传聊天内容");
         }
-        responseBean.setData(existCount);
+
+        Map<String, Integer> maps = new HashMap<String, Integer>();
+        maps.put("cycleCount",vwvc.getCycleCount());
+        maps.put("wechatChatRecordIsExist",existCount);
+
+        responseBean.setData(maps);
         return ResponseEntity.ok(responseBean);
     }
 
