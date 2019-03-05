@@ -846,19 +846,27 @@
     </select>
 
     <!--  -->
-    <select id="getDoctorAddDynamicField" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.single.DoctorAddDynamicFieldResponseBean">
+    <select id="getDoctorAddDynamicField" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorBasicDynamicFieldValueResponseBean">
 
         SELECT DISTINCT
-            v3.id fieldId,
-            v3.field_name fieldName,
-            t.selectValue
+            v3.id dynamicFieldId,
+            v3.field_name dynamicFieldName,
+            v3.field_value dynamicFieldSelectValue,
+            t.selectValue dynamicFieldValue,
+            t.dynamic_extend_value dynamicExtendValue,
+            v3.required,
+            v3.classification,
+            v3.type,
+            t.id
         FROM
             virtual_doctor_dynamic_field v3
         LEFT JOIN (
             SELECT
                 v.id fieldId,
                 v.field_name fieldName,
-                v2.dynamic_field_value selectValue
+                v2.dynamic_field_value selectValue,
+                v2.dynamic_extend_value,
+                v2.id
             FROM
                 virtual_doctor_dynamic_field v
             INNER JOIN virtual_doctor_dynamic_field_value v2 ON v.id = v2.dynamic_field_id
