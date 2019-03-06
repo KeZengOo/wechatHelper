@@ -366,4 +366,13 @@ public interface DynamicFieldMapper {
      * @return
      */
     List<PrescriptionResponseBean> getPrescriptionListByDoctorList(@Param(value = "productId") Long productId, @Param(value = "doctorList") List<Long> doctorList);
+
+
+    /**
+     * 判断是否有医生需求字段
+     * @param productId
+     * @return 有的话大于0
+     */
+    Integer hasDemandField(@Param(value = "productId") Long productId);
+
 }

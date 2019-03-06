@@ -925,4 +925,10 @@
         ORDER BY create_time Desc
     </select>
 
+
+    <select id="hasDemandField" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM virtual_doctor_dynamic_field WHERE product_id=#{productId}
+        AND field_name='医生需求'
+    </select>
+
 </mapper>

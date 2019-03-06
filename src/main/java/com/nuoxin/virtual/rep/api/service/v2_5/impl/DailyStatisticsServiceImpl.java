@@ -108,7 +108,7 @@ public class DailyStatisticsServiceImpl implements DailyStatisticsService {
 
         if (targetDoctor > 0 && recruitDoctor > 0){
             DecimalFormat df = new DecimalFormat("#.0");
-            targetRecruitDoctorRate = df.format((recruitDoctor * 100)/targetDoctor);
+            targetRecruitDoctorRate = df.format((double) (recruitDoctor * 100)/targetDoctor);
             targetRecruitDoctorRate = targetRecruitDoctorRate + "%";
         }
 
@@ -116,7 +116,7 @@ public class DailyStatisticsServiceImpl implements DailyStatisticsService {
         String targetRecruitHospitalRate = "0%";
         if (targetHospital > 0 && recruitHospital > 0){
             DecimalFormat df = new DecimalFormat("#.0");
-            targetRecruitHospitalRate = df.format((recruitHospital * 100)/targetHospital);
+            targetRecruitHospitalRate = df.format((double)(recruitHospital * 100)/targetHospital);
             targetRecruitHospitalRate = targetRecruitHospitalRate + "%";
         }
 
@@ -234,6 +234,10 @@ public class DailyStatisticsServiceImpl implements DailyStatisticsService {
             addRecruitDoctor = allRecruitDoctor - recruitDoctor;
         }
 
+        // 是否有医生需求字段
+        Integer hasDemandField = dynamicFieldMapper.hasDemandField(productId);
+
+
 
         DailyStatisticsResponseBean dailyStatistics = new DailyStatisticsResponseBean();
         dailyStatistics.setTargetHospital(targetHospital);
@@ -244,8 +248,14 @@ public class DailyStatisticsServiceImpl implements DailyStatisticsService {
 
         dailyStatistics.setRecruitHospital(recruitHospital);
         dailyStatistics.setRecruitDoctor(recruitDoctor);
-        dailyStatistics.setAddRecruitHospital(addRecruitHospital);
-        dailyStatistics.setAddRecruitDoctor(addRecruitDoctor);
+
+        // 暂时去掉新增招募医生和新增招募医院
+
+//        dailyStatistics.setAddRecruitHospital(addRecruitHospital);
+//        dailyStatistics.setAddRecruitDoctor(addRecruitDoctor);
+
+
+
         dailyStatistics.setVisitHospital(visitHospitalCount);
         dailyStatistics.setContactHospital(contactHospital);
         dailyStatistics.setCoverHospital(coverHospital);
@@ -273,6 +283,8 @@ public class DailyStatisticsServiceImpl implements DailyStatisticsService {
 
         dailyStatistics.setBreakOffHospital(breakOffHospital);
         dailyStatistics.setBreakOffDoctor(breakOffDoctor);
+
+        dailyStatistics.setHasDemandField(hasDemandField);
 
 
         return dailyStatistics;
@@ -422,7 +434,14 @@ public class DailyStatisticsServiceImpl implements DailyStatisticsService {
             drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getContactDoctor()));
             drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getCoverDoctor()));
             drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getSuccessDoctor()));
-            drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getDemandDoctor()));
+
+            Integer hasDemandField = dynamicFieldMapper.hasDemandField(productId);
+            if (hasDemandField != null && hasDemandField > 0){
+                drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getDemandDoctor()));
+            }
+
+
+
             drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getHasAeDoctor()));
             drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getNoRecruitDoctor()));
             drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getDoctorWechatReplyCount()));
@@ -465,7 +484,9 @@ public class DailyStatisticsServiceImpl implements DailyStatisticsService {
         itemList.add("目标医院招募达成率");
         itemList.add("拜访医院数量");
         itemList.add("招募医院数量");
-        itemList.add("新增招募医院数量");
+
+//        itemList.add("新增招募医院数量");
+
         itemList.add("接触医院数量");
         itemList.add("覆盖医院数量");
         itemList.add("成功医院数量");
@@ -476,11 +497,18 @@ public class DailyStatisticsServiceImpl implements DailyStatisticsService {
         itemList.add("目标医生招募达成率");
         itemList.add("拜访医生数量");
         itemList.add("招募医生数量");
-        itemList.add("新增招募医生数量");
+
+//        itemList.add("新增招募医生数量");
+
         itemList.add("接触医生数量");
         itemList.add("覆盖医生数量");
         itemList.add("成功医生数量");
-        itemList.add("有需求医生数量");
+
+        Integer hasDemandField = dynamicFieldMapper.hasDemandField(productId);
+        if (hasDemandField != null && hasDemandField > 0){
+            itemList.add("有需求医生数量");
+        }
+
         itemList.add("有AE的医生数量");
         itemList.add("未招募医生数量");
         itemList.add("医生微信回复次数");

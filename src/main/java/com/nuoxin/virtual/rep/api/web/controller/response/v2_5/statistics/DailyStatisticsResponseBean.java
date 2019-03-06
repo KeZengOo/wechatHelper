@@ -126,4 +126,9 @@ public class DailyStatisticsResponseBean implements Serializable {
     @ApiModelProperty(value = "不同拜访结果的医生数量")
     private List<VisitResultDoctorResponseBean> visitResultDoctor = new ArrayList<>();
 
+
+    @ApiModelProperty(value = "是否有医生需求字段，大于0代表有")
+    private Integer hasDemandField;
+
+
 }
