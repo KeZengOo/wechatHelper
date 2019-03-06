@@ -20,6 +20,7 @@ import com.nuoxin.virtual.rep.api.enums.OnOffLineEnum;
 import com.nuoxin.virtual.rep.api.enums.RoleTypeEnum;
 import com.nuoxin.virtual.rep.api.mybatis.*;
 import com.nuoxin.virtual.rep.api.service.v2_5.DoctorDynamicFieldService;
+import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.utils.RegularUtils;
 import com.nuoxin.virtual.rep.api.utils.StringUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.*;
@@ -252,7 +253,14 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
             if (count == null || count == 0){
                 doctorMendMapper.addWechat(request.getId(), wechat);
             }else {
-                doctorMendMapper.updateWechat(request.getId(), wechat);
+                VirtualDoctorMendParams virtualDoctorMendParams = doctorMendMapper.getVirtualDoctorMendParams(request.getId());
+                String addWechat = virtualDoctorMendParams.getWechat();
+                if (StringUtil.isEmpty(addWechat)){
+                    doctorMendMapper.updateWechatAndTime(request.getId(), wechat);
+                }else {
+                    doctorMendMapper.updateWechat(request.getId(), wechat);
+                }
+
             }
 //            virtualDoctorMapper.updateDoctorWechat(request.getId(), wechat);
         }
@@ -602,11 +610,25 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 
         // 更新医生的扩展信息
         VirtualDoctorMendParams p = new VirtualDoctorMendParams();
+
+
+
+        String wechat = request.getWechat();
+        if (StringUtil.isEmpty(wechat)){
+            p.setAddWechatTime(null);
+        }else {
+            VirtualDoctorMendParams virtualDoctorMendParams = doctorMendMapper.getVirtualDoctorMendParams(doctorId);
+            String addWechat = virtualDoctorMendParams.getWechat();
+            if (StringUtil.isEmpty(addWechat)){
+                p.setAddWechatTime(DateUtil.getDateTimeString(new Date()));
+            }else{
+                p.setAddWechatTime(virtualDoctorMendParams.getAddWechatTime());
+            }
+        }
         p.setVirtualDoctorId(doctorId);
-        p.setWechat(request.getWechat());
+        p.setWechat(wechat);
         p.setAddress(request.getAddress());
         doctorMendMapper.updateDoctorMend(p);
-
 
     }
 
@@ -832,6 +854,10 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
         param.setAddress(request.getAddress());
 
         param.setWechat(request.getWechat());
+
+        if (StringUtil.isNotEmpty(wechat)){
+            param.setAddWechatTime(DateUtil.getDateTimeString(new Date()));
+        }
 
         List<VirtualDoctorMendParams> list = new ArrayList<>(1);
         list.add(param);
