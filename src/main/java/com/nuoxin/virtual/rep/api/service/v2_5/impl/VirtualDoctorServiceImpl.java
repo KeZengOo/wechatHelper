@@ -818,6 +818,15 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
      * @param virtualDoctorId
      */
     private void saveVirtualDoctorMend(SaveVirtualDoctorRequest request, long virtualDoctorId) {
+
+        String wechat = request.getWechat();
+        String address = request.getAddress();
+
+        if (StringUtil.isEmpty(wechat) && StringUtil.isEmpty(address)){
+            return;
+        }
+
+
         VirtualDoctorMendParams param = new VirtualDoctorMendParams();
         param.setVirtualDoctorId(virtualDoctorId); // 保存关联关系
         param.setAddress(request.getAddress());

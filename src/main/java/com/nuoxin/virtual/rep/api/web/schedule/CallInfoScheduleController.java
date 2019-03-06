@@ -64,7 +64,7 @@ public class CallInfoScheduleController {
     }
 
 
-    @ApiOperation(value = "识别录音文件", notes = "识别录音文件")
+    @ApiOperation(value = "将非阿里云录音上传到阿里云", notes = "将非阿里云录音上传到阿里云")
     @GetMapping(value = "/not/aliyun/url/update")
     public DefaultResponseBean<String> handleNotAliyunCallUrl() {
         logger.info("CallInfoScheduleController handleNotAliyunCallUrl start....");
