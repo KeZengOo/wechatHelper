@@ -173,7 +173,7 @@
 
 	<insert id="saveVirtualDoctorMends" >
 		INSERT INTO doctor_mend
-		 (wechat, virtual_doctor_id)
+		 (wechat,add_wechat_time, virtual_doctor_id)
 		VALUES 
 		<foreach collection ="list" item="item" separator =",">
         	(#{item.wechat}, #{item.addWechatTime},  #{item.virtualDoctorId})
