@@ -455,7 +455,6 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 			}
 		}
 
-		System.out.println("prescriptionList:" + prescriptionList);
 		List<LinkedHashMap<String, Object>> mapList = new ArrayList<LinkedHashMap<String, Object>>();
 		for(CustomerFollowListBean d : list){
 			LinkedHashMap<String, Object> detailMap = new LinkedHashMap<String, Object>();
@@ -499,7 +498,6 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 			mapList.add(detailMap);
 		}
 
-		System.out.println("fffff");
 		return getExportExcelName(mapList, dynamicTitleList);
 	}
 
