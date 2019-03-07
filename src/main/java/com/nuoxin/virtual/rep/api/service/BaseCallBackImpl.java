@@ -1,10 +1,13 @@
 package com.nuoxin.virtual.rep.api.service;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
 
+import com.nuoxin.virtual.rep.api.utils.AudioConvertUtil;
 import com.nuoxin.virtual.rep.api.utils.SpeechRecognitionUtil;
 import com.nuoxin.virtual.rep.api.utils.StringUtil;
 import org.slf4j.Logger;
@@ -20,6 +23,7 @@ import com.nuoxin.virtual.rep.api.entity.DoctorCallInfo;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoParams;
 import com.nuoxin.virtual.rep.api.mybatis.DoctorMapper;
 import com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorCallInfoMapper;
+import ws.schild.jave.*;
 
 @Transactional
 @Service
@@ -182,5 +186,19 @@ public abstract class BaseCallBackImpl implements CallBackService {
 		logger.info("callUrl:{},status:{}, statusName:{},id:{}", callOssUrl, status, statusName, callId);
 		callInfoDao.updateUrlRefactor(callOssUrl, status, statusName, callId, callTime);
 	}
-	
+
+	/**
+	 * 分割录音文件并上传阿里云
+	 */
+	public Map<String,String> splitSpeechAliyunUrlUpdate(String ossFilePath){
+		Map<String,String> pathMaps = new HashMap<String,String>();
+		String local = FileConstant.LOCAL_PATH;
+		//下载阿里云中的录音文件
+		SpeechRecognitionUtil.ossDownLoad(ossFilePath);
+		String sourceFileName = local+ossFilePath.substring((ossFilePath.lastIndexOf("/")));
+		String targeFileName = local+ossFilePath.substring((ossFilePath.lastIndexOf("/")));
+		targeFileName = targeFileName.substring(0,targeFileName.length()-3)+"wav";
+//		AudioConvertUtil.mp3ToWav(sourceFileName,targeFileName);
+		return pathMaps;
+	}
 }

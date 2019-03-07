@@ -14,4 +14,9 @@ public interface FileConstant {
 	 * WAV文件尾缀
 	 */
 	String WAV_SUFFIX = ".wav";
+
+	/**
+	 * 文件保存路径
+	 */
+	String LOCAL_PATH = "D:/mp3";
 }

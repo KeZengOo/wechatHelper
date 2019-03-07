@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.Map;
 
 /**
  * V2.5电话记录补偿,手动调用
@@ -78,5 +79,19 @@ public class CallInfoScheduleController {
         return responseBean;
     }
 
+    /**
+     *  1.下载阿里云上的电话录音到本地
+     * 	2.之后进行MP3转WAV
+     * 	3.进行左右声道分割
+     * 	4.分别进行语音识别转成文本
+     * 	5.入库
+     */
+    @ApiOperation(value = "分割录音文件并上传阿里云", notes = "分割录音文件并上传阿里云")
+    @GetMapping(value = "/split/speech/aliyun/url/update")
+    public DefaultResponseBean<Map<String,String>> splitSpeechAliyunUrlUpdate(@RequestParam(value = "ossFilePath") String ossFilePath) {
+        Map<String,String> pathMap = callBackService.splitSpeechAliyunUrlUpdate(ossFilePath);
+        DefaultResponseBean<Map<String,String>> responseBean = new DefaultResponseBean<>();
+        return responseBean;
+    }
 
 }

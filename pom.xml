@@ -296,6 +296,12 @@
 			<version>4.0.0</version>
 		</dependency>
 
+		<dependency>
+			<groupId>sphinx4</groupId>
+			<artifactId>speakerid</artifactId>
+			<version>4.0</version>
+		</dependency>
+
 	</dependencies>
 
 	<dependencyManagement>
