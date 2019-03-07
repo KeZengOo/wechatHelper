@@ -372,7 +372,7 @@ public class DoctorCallService extends BaseService {
         infoDetails.setStatus(bean.getStatus());
         infoDetails.setStatusName(bean.getStatusName());
         if(bean.getCreateTime() != null && !bean.getCreateTime().equals("")){
-            DateFormat format = new SimpleDateFormat("yyyy-MM-dd  HH:mm:ss");
+            DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
             Date date = null;
             date = format.parse(bean.getCreateTime());
             infoDetails.setCreateTime(date);
