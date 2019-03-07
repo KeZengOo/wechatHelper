@@ -411,7 +411,7 @@
             UNION ALL
 
             SELECT
-            a.id callId,
+            wx.id callId,
             '' drugUserName,
             IFNULL(
             date_format(
@@ -460,7 +460,7 @@
             <if test="endTime!=null and endTime!=''">
                 and date_format(wur.create_time,'%Y-%m-%d') &lt;=#{endTime}
             </if>
-            INNER JOIN drug_user_doctor dud ON dud.doctor_id = wu.doctor_id
+
             AND dud.drug_user_id in
 
             <foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
