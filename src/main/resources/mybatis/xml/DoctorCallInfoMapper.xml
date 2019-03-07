@@ -709,7 +709,7 @@
             UNION ALL
 
             SELECT
-            a.id callId,
+            wx.id callId,
             6 visitChannel
             FROM
             (
@@ -741,7 +741,6 @@
             AND dud.is_available = 1
             LEFT JOIN activity_info ai ON wur.content_id = ai.id
             ) wx
-            INNER JOIN activity_share a ON wx.doctor_id = a.share_person_id
             INNER JOIN (
             SELECT DISTINCT
             d.id doctorId,
