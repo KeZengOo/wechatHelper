@@ -201,7 +201,35 @@ public abstract class BaseCallBackImpl implements CallBackService {
 		String sourceFileName = local+ossFilePath.substring((ossFilePath.lastIndexOf("/")));
 		String targeFileName = local+ossFilePath.substring((ossFilePath.lastIndexOf("/")));
 		targeFileName = targeFileName.substring(0,targeFileName.length()-3)+"wav";
-//		AudioConvertUtil.mp3ToWav(sourceFileName,targeFileName);
+		AudioConvertUtil.mp3ToWav(sourceFileName,targeFileName);
+
+		String wavSourceFileName = local+ossFilePath.substring((ossFilePath.lastIndexOf("/")));
+		wavSourceFileName = wavSourceFileName.substring(0,wavSourceFileName.length()-3)+"wav";
+		String leftTargeFileName = local+ossFilePath.substring((ossFilePath.lastIndexOf("/")));
+		leftTargeFileName = leftTargeFileName.substring(0,leftTargeFileName.length()-4)+"_left.wav";
+		String rightTargeFileName = local+ossFilePath.substring((ossFilePath.lastIndexOf("/")));
+		rightTargeFileName = rightTargeFileName.substring(0,rightTargeFileName.length()-4)+"_right.wav";
+		AudioConvertUtil.steroToMono(wavSourceFileName,leftTargeFileName,rightTargeFileName);
+
+		//把左右声道上传到阿里云
+		String leftOSSPath = getFileOSSPathByLocalFilePath(leftTargeFileName);
+		String rightOSSPath = getFileOSSPathByLocalFilePath(rightTargeFileName);
+
+		pathMaps.put("leftOSSPath",leftOSSPath);
+		pathMaps.put("rightOSSPath",rightOSSPath);
 		return pathMaps;
+	}
+
+	/**
+	 * File方式上传
+	 *
+	 * @param filePath 本地文件路径
+	 * @return path
+	 */
+	public String getFileOSSPathByLocalFilePath(String filePath){
+		File file = new File(filePath);
+		String path = "";
+		path = ossService.uploadFile(file);
+		return path;
 	}
 }
