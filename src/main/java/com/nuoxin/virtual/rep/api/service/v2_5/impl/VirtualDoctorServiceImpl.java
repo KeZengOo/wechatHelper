@@ -128,7 +128,14 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
         doctorAddResponseBean.setDepart(doctorDetail.getDepartment());
         doctorAddResponseBean.setPosition(doctorDetail.getPositions());
         doctorAddResponseBean.setHospitalName(doctorDetail.getHospitalName());
-        doctorAddResponseBean.setHospitalLevel(Integer.parseInt(doctorDetail.getHospitalLevel()));
+
+
+        String hospitalLevel = doctorDetail.getHospitalLevel();
+        if (StringUtil.isEmpty(hospitalLevel)){
+            hospitalLevel = "0";
+        }
+
+        doctorAddResponseBean.setHospitalLevel(Integer.parseInt(hospitalLevel));
         doctorAddResponseBean.setProvince(doctorDetail.getProvince());
         doctorAddResponseBean.setCity(doctorDetail.getCity());
 
