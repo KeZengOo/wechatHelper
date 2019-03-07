@@ -540,7 +540,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 
 	private Map<String, String> getTitleMap(List<DynamicFieldResponse> list){
 		Map<String, String> titleMap = new LinkedHashMap<>();
-		titleMap.put("drug_userId", "代表姓名");
+		titleMap.put("drug_userId", "代表_姓名");
 		titleMap.put("doctor_id", "医生_id");
 		titleMap.put("doctor_gender", "医生_性别");
 		titleMap.put("doctor_dept", "医生_科室");
