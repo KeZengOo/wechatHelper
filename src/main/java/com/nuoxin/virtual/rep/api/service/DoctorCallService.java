@@ -33,6 +33,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
@@ -333,7 +334,7 @@ public class DoctorCallService extends BaseService {
      * @param bean CallRequestBean 对象
      * @return 返回 CallRequestBean 对象
      */
-    @Transactional(readOnly = false)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public CallRequestBean save(CallRequestBean bean) throws ParseException {
 //        DoctorCallInfo info = new DoctorCallInfo();
 //        info.setSinToken(bean.getSinToken());

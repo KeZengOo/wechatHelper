@@ -249,12 +249,9 @@ public class DailyStatisticsServiceImpl implements DailyStatisticsService {
         dailyStatistics.setRecruitHospital(recruitHospital);
         dailyStatistics.setRecruitDoctor(recruitDoctor);
 
-        // 暂时去掉新增招募医生和新增招募医院
 
-//        dailyStatistics.setAddRecruitHospital(addRecruitHospital);
-//        dailyStatistics.setAddRecruitDoctor(addRecruitDoctor);
-
-
+        dailyStatistics.setAddRecruitHospital(addRecruitHospital);
+        dailyStatistics.setAddRecruitDoctor(addRecruitDoctor);
 
         dailyStatistics.setVisitHospital(visitHospitalCount);
         dailyStatistics.setContactHospital(contactHospital);
@@ -419,7 +416,8 @@ public class DailyStatisticsServiceImpl implements DailyStatisticsService {
             drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getTargetRecruitHospitalRate()));
             drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getVisitHospital()));
             drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getRecruitHospital()));
-            drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getAddRecruitHospital()));
+
+//            drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getAddRecruitHospital()));
             drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getContactHospital()));
             drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getCoverHospital()));
             drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getSuccessHospital()));
@@ -430,7 +428,7 @@ public class DailyStatisticsServiceImpl implements DailyStatisticsService {
             drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getTargetRecruitDoctorRate()));
             drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getVisitDoctor()));
             drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getRecruitDoctor()));
-            drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getAddRecruitDoctor()));
+//            drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getAddRecruitDoctor()));
             drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getContactDoctor()));
             drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getCoverDoctor()));
             drugUserStatics.add(String.valueOf(dailyStatisticsResponseBean.getSuccessDoctor()));

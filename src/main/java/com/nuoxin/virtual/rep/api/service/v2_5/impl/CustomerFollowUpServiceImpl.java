@@ -9,12 +9,16 @@ import javax.annotation.Resource;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.entity.Doctor;
+import com.nuoxin.virtual.rep.api.entity.DrugUser;
+import com.nuoxin.virtual.rep.api.entity.ProductLine;
 import com.nuoxin.virtual.rep.api.entity.v2_5.DynamicFieldResponse;
 import com.nuoxin.virtual.rep.api.entity.v2_5.DynamicFieldValueResponse;
 import com.nuoxin.virtual.rep.api.enums.ClassificationEnum;
 import com.nuoxin.virtual.rep.api.enums.MeetingTimeTypeEnum;
 import com.nuoxin.virtual.rep.api.enums.SearchTypeEnum;
 import com.nuoxin.virtual.rep.api.mybatis.*;
+import com.nuoxin.virtual.rep.api.service.DrugUserService;
+import com.nuoxin.virtual.rep.api.service.ProductLineService;
 import com.nuoxin.virtual.rep.api.utils.*;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.excel.SheetRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.SearchDynamicFieldRequestBean;
@@ -26,6 +30,7 @@ import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.*;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -72,6 +77,12 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 
 	@Resource
 	private DynamicFieldMapper dynamicFieldMapper;
+
+	@Autowired
+	private DrugUserService drugUserService;
+
+	@Autowired
+	private ProductLineService productLineService;
 
 
 	/**
@@ -427,6 +438,11 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 
 		//产品id,目前产品数量为1
 		Long productId = searchReq.getProductLineIds().get(0);
+		Long drugUserId = searchReq.getVirtualDrugUserIds().get(0);
+		//医药代表
+		DrugUser drugUser = drugUserService.findById(drugUserId);
+		//产品信息
+		ProductLine product = productLineService.findById(productId);
 
 		//动态字段列表
 		List<DynamicFieldResponse> dynamicTitleList = dynamicFieldMapper.getProductDynamicField(productId);
@@ -455,14 +471,13 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 			}
 		}
 
-		System.out.println("prescriptionList:" + prescriptionList);
 		List<LinkedHashMap<String, Object>> mapList = new ArrayList<LinkedHashMap<String, Object>>();
 		for(CustomerFollowListBean d : list){
 			LinkedHashMap<String, Object> detailMap = new LinkedHashMap<String, Object>();
 			Long doctorId = d.getDoctorId();
 			//固定字段值
+			detailMap.put("drug_userId", drugUser == null ? "" : drugUser.getName());
 			detailMap.put("doctor_id", doctorId);
-			detailMap.put("doctor_name", d.getDoctorName());
 			detailMap.put("doctor_gender", d.getGender() == 0 ? "男" : d.getGender() == 1 ? "女" : "未知");
 			detailMap.put("doctor_dept", d.getDepartment());
 			detailMap.put("doctor_title", d.getTitle());
@@ -472,6 +487,8 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 			detailMap.put("hospital_levelName", d.getHospitalLevel() == null ? "" : HospitalLevelUtil.getLevelNameByLevelCode(d.getHospitalLevel().toString()));
 			detailMap.put("hospital_province", d.getProvince());
 			detailMap.put("hospital_city", d.getCity());
+			detailMap.put("product_id", productId);
+			detailMap.put("product_name", product == null ? "" : product.getName());
 
 			//处方信息固定值
 			List<PrescriptionResponseBean> tempPresList = prescriptionListMap.containsKey(doctorId) ? prescriptionListMap.get(doctorId): null;
@@ -499,7 +516,6 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 			mapList.add(detailMap);
 		}
 
-		System.out.println("fffff");
 		return getExportExcelName(mapList, dynamicTitleList);
 	}
 
@@ -524,8 +540,8 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 
 	private Map<String, String> getTitleMap(List<DynamicFieldResponse> list){
 		Map<String, String> titleMap = new LinkedHashMap<>();
+		titleMap.put("drug_userId", "代表_姓名");
 		titleMap.put("doctor_id", "医生_id");
-		titleMap.put("doctor_name", "医生_名称");
 		titleMap.put("doctor_gender", "医生_性别");
 		titleMap.put("doctor_dept", "医生_科室");
 		titleMap.put("doctor_title", "医生_职称");
@@ -534,6 +550,8 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		titleMap.put("hospital_levelName", "医院_等级");
 		titleMap.put("hospital_province", "医院_省份");
 		titleMap.put("hospital_city", "医院_城市");
+		titleMap.put("product_id", "产品_id");
+		titleMap.put("product_name", "产品_名称");
 		titleMap.put("prescription_hasDrug", "处方信息_是否有药");
 		titleMap.put("prescription_target", "处方信息_是否目标医生");
 		titleMap.put("prescription_recruit", "处方信息_是否招募");

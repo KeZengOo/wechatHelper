@@ -438,7 +438,6 @@
 							#{drugUserId}
 						</foreach>
 						AND dud.prod_id = #{productId}
-						AND q.is_target = 1
 						AND dd.hospital_id = d.hospital_id
 					) allCount
 				FROM
@@ -456,7 +455,6 @@
 				</foreach>
 				AND dud.prod_id = #{productId}
 				AND q.is_recruit = 2
-				AND q.is_target = 1
 
 				<if test="startTime!=null and startTime !=''">
 					AND DATE_FORMAT(q.create_time, '%Y-%m-%d') >=DATE_FORMAT(#{startTime}, '%Y-%m-%d')

@@ -46,6 +46,13 @@ public interface DoctorMendMapper {
 	 */
 	void updateWechat(@Param(value = "doctorId") Long doctorId,@Param(value = "wechat") String wechat);
 
+	/**
+	 * 更新医生微信
+	 * @param doctorId
+	 * @param wechat
+	 */
+	void updateWechatAndTime(@Param(value = "doctorId") Long doctorId,@Param(value = "wechat") String wechat);
+
 
 	/**
 	 * 新增医生地址
@@ -75,5 +82,13 @@ public interface DoctorMendMapper {
 	 * @return
 	 */
 	Integer hasWechatDoctor(DailyStatisticsRequestBean bean);
+
+
+	/**
+	 * 根据医生ID查询医生扩展信息
+	 * @param doctorId
+	 * @return
+	 */
+	VirtualDoctorMendParams getVirtualDoctorMendParams(@Param(value = "doctorId") Long doctorId);
 
 }

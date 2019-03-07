@@ -10,7 +10,7 @@
 	</insert>
 
 	<update id="updateDoctorMend" >
-		UPDATE doctor_mend SET address=#{address},fixed_phone=#{fixedPhone} WHERE virtual_doctor_id=#{virtualDoctorId}
+		UPDATE doctor_mend SET address=#{address},wechat=#{wechat}, add_wechat_time=#{addWechatTime},fixed_phone=#{fixedPhone} WHERE virtual_doctor_id=#{virtualDoctorId}
 	</update>
 
 	<select id="getDoctorMend" resultType="java.lang.Long">
@@ -19,7 +19,7 @@
 
 	<!-- 新增医生地址 -->
 	<insert id="addWechat">
-		INSERT doctor_mend(wechat,virtual_doctor_id) VALUES(#{wechat}, #{doctorId})
+		INSERT doctor_mend(wechat,add_wechat_time,virtual_doctor_id) VALUES(#{wechat},now(), #{doctorId})
 	</insert>
 
 	<!-- 更新医生地址 -->
@@ -27,6 +27,9 @@
 		UPDATE doctor_mend SET wechat=#{wechat} WHERE virtual_doctor_id=#{doctorId}
 	</update>
 
+	<update id="updateWechatAndTime">
+		UPDATE doctor_mend SET wechat=#{wechat}, add_wechat_time=now() WHERE virtual_doctor_id=#{doctorId}
+	</update>
 
 	<!-- 新增医生地址 -->
 	<insert id="addAddress">
@@ -65,12 +68,20 @@
 		AND dm.wechat!=''
 
 		<if test="startTime!=null and startTime !=''">
-			AND DATE_FORMAT(dm.create_time, '%Y-%m-%d') >=DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+			AND DATE_FORMAT(dm.add_wechat_time, '%Y-%m-%d') >=DATE_FORMAT(#{startTime}, '%Y-%m-%d')
 		</if>
 
 		<if test="endTime!=null and endTime !=''">
-			AND DATE_FORMAT(dm.create_time, '%Y-%m-%d') &lt;=DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+			AND DATE_FORMAT(dm.add_wechat_time, '%Y-%m-%d') &lt;=DATE_FORMAT(#{endTime}, '%Y-%m-%d')
 		</if>
+
+	</select>
+
+	<!-- 根据医生ID查询医生扩展信息 -->
+	<select id="getVirtualDoctorMendParams" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorMendParams">
+
+		SELECT wechat, add_wechat_time addWechatTime, address
+		FROM doctor_mend WHERE virtual_doctor_id=#{doctorId}
 
 	</select>
 	
