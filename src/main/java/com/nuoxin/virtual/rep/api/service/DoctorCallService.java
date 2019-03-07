@@ -356,6 +356,11 @@ public class DoctorCallService extends BaseService {
 //        if (doctor != null){
 //            bean.setDoctorId(doctor.getId());
 //        }
+        if(bean.getCreateTime() == null){
+            DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String createTime = format.format(new Date());
+            bean.setCreateTime(createTime);
+        }
         virtualDoctorCallInfoService.saveCallInfo(bean);
         
 //        Long infoId = info.getId();
@@ -367,7 +372,7 @@ public class DoctorCallService extends BaseService {
         infoDetails.setStatus(bean.getStatus());
         infoDetails.setStatusName(bean.getStatusName());
         if(bean.getCreateTime() != null && !bean.getCreateTime().equals("")){
-            DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            DateFormat format = new SimpleDateFormat("yyyy-MM-dd  HH:mm:ss");
             Date date = null;
             date = format.parse(bean.getCreateTime());
             infoDetails.setCreateTime(date);
