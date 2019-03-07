@@ -454,6 +454,7 @@
             FROM
             wx_user_read wur
             INNER JOIN wx_users wu ON wur.user_id = wu.id
+            INNER JOIN drug_user_doctor dud ON dud.doctor_id = wu.doctor_id
             <if test="startTime!=null and startTime!=''">
                 and date_format(wur.create_time,'%Y-%m-%d') &gt;=#{startTime}
             </if>
