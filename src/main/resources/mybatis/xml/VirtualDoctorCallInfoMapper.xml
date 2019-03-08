@@ -1354,4 +1354,45 @@
 		</if>
 	</select>
 
+	<!-- 分割录音文件并上传阿里云 -->
+	<insert id="saveSplitSpeechAliyunPath" parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualSplitSpeechAliyunPathParams">
+		INSERT INTO virtual_split_speech_aliyun_path (
+			targe_url,
+			source_url,
+			type,
+			create_time
+		)
+		VALUES
+		(
+			#{targeUrl},
+			#{sourceUrl},
+			#{type},
+			NOW()
+		)
+	</insert>
+
+	<!-- 根据左右声道的阿里云地址进行语音识别，进行入库 -->
+	<insert id="saveSpeechRecognitionResultCallInfo" parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualSplitSpeechCallInfoParams">
+		INSERT INTO virtual_split_speech_call_info (
+			sin_token,
+			type,
+			begin_time,
+			virtual_drug_user_id,
+			text,
+			create_time
+		)
+		VALUES
+		<foreach collection="list" item="item" separator=",">
+			(
+			#{item.sinToken},
+			#{item.type},
+			#{item.beginTime},
+			#{item.virtualDrugUserId},
+			#{item.text},
+			NOW()
+			)
+		</foreach>
+
+	</insert>
+
 </mapper>

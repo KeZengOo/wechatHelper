@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -88,9 +89,25 @@ public class CallInfoScheduleController {
      */
     @ApiOperation(value = "分割录音文件并上传阿里云", notes = "分割录音文件并上传阿里云")
     @GetMapping(value = "/split/speech/aliyun/url/update")
-    public DefaultResponseBean<Map<String,String>> splitSpeechAliyunUrlUpdate(@RequestParam(value = "ossFilePath") String ossFilePath) {
-        Map<String,String> pathMap = callBackService.splitSpeechAliyunUrlUpdate(ossFilePath);
-        DefaultResponseBean<Map<String,String>> responseBean = new DefaultResponseBean<>();
+    public DefaultResponseBean<String> splitSpeechAliyunUrlUpdate(@RequestParam(value = "ossFilePath") String ossFilePath) {
+//        Map<String,String> pathMap = callBackService.splitSpeechAliyunUrlUpdate(ossFilePath);
+        String sinToken = "4222137804108258";
+        Integer virtualDrugUserId = 16145426;
+
+        Map<String,String> pathMaps = new HashMap<String,String>(16);
+        pathMaps.put("leftOSSPath","https://nuoxin-virtual-rep-storage.oss-cn-beijing.aliyuncs.com/virtual/2019030715/42b7f644-4199-4d8d-9a55-41eeb1d97585_left.wav");
+        pathMaps.put("rightOSSPath","https://nuoxin-virtual-rep-storage.oss-cn-beijing.aliyuncs.com/virtual/2019030715/42b7f644-4199-4d8d-9a55-41eeb1d97585_right.wav");
+
+        //根据左右声道的阿里云地址进行语音识别，进行入库
+//        boolean result = callBackService.saveSpeechRecognitionResultCallInfo(pathMap);
+        boolean result = callBackService.saveSpeechRecognitionResultCallInfo(pathMaps, sinToken, virtualDrugUserId);
+        String resultStr = "";
+        if(result == true){
+            resultStr = "分割录音文件并上传阿里云入库成功";
+        }
+
+        DefaultResponseBean<String> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(resultStr);
         return responseBean;
     }
 

@@ -54,4 +54,13 @@ public interface CallBackService {
 	 * 分割录音文件并上传阿里云
 	 */
 	Map<String,String> splitSpeechAliyunUrlUpdate(String ossFilePath);
+
+	/**
+	 * 根据左右声道的阿里云地址进行语音识别，进行入库
+	 * @param pathMaps
+	 * @param sinToken
+	 * @param virtualDrugUserId
+	 * @return boolean
+	 */
+	boolean saveSpeechRecognitionResultCallInfo(Map<String,String> pathMaps, String sinToken, Integer virtualDrugUserId);
 }
