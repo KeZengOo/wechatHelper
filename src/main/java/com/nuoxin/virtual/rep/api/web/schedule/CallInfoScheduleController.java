@@ -92,7 +92,7 @@ public class CallInfoScheduleController {
     public DefaultResponseBean<String> splitSpeechAliyunUrlUpdate(@RequestParam(value = "ossFilePath") String ossFilePath) {
 //        Map<String,String> pathMap = callBackService.splitSpeechAliyunUrlUpdate(ossFilePath);
         String sinToken = "4222137804108258";
-        Integer virtualDrugUserId = 16145426;
+        Integer callId = 1;
 
         Map<String,String> pathMaps = new HashMap<String,String>(16);
         pathMaps.put("leftOSSPath","https://nuoxin-virtual-rep-storage.oss-cn-beijing.aliyuncs.com/virtual/2019030715/42b7f644-4199-4d8d-9a55-41eeb1d97585_left.wav");
@@ -100,7 +100,7 @@ public class CallInfoScheduleController {
 
         //根据左右声道的阿里云地址进行语音识别，进行入库
 //        boolean result = callBackService.saveSpeechRecognitionResultCallInfo(pathMap);
-        boolean result = callBackService.saveSpeechRecognitionResultCallInfo(pathMaps, sinToken, virtualDrugUserId);
+        boolean result = callBackService.saveSpeechRecognitionResultCallInfo(pathMaps, sinToken,callId);
         String resultStr = "";
         if(result == true){
             resultStr = "分割录音文件并上传阿里云入库成功";

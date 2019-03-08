@@ -254,12 +254,28 @@ public abstract class BaseCallBackImpl implements CallBackService {
 	/**
 	 * 根据左右声道的阿里云地址进行语音识别，然后根据语句的开始时间进行排序
 	 * @param pathMaps
-	 * @return mapText
+	 * @param sinToken
+	 * @return
 	 */
 	@Override
-	public boolean saveSpeechRecognitionResultCallInfo(Map<String,String> pathMaps, String sinToken, Integer virtualDrugUserId){
+	public boolean saveSpeechRecognitionResultCallInfo(Map<String,String> pathMaps, String sinToken, Integer callId){
 		Map<Integer,String> leftMapText = new HashMap<Integer,String>(16);
 		Map<Integer,String> rightMapText = new HashMap<Integer,String>(16);
+		Integer virtualDrugUserId = 0;
+
+		//判断sinToken或callId是否存在，如果存在通过该字段查询相关语音信息
+		if(sinToken != null && sinToken != ""){
+			//通过sinToken查询virtual_doctor_call_info表
+//			VirtualDoctorCallInfoParams v = callInfoMapper.
+			virtualDrugUserId = 0;
+		}else if(callId != null && callId != 0)
+		{
+			//通过callId查询virtual_doctor_call_info表
+//			VirtualDoctorCallInfoParams v = callInfoMapper.
+			sinToken = "";
+			virtualDrugUserId = 0;
+		}
+
 		String leftPath = pathMaps.get("leftOSSPath");
 		String rightPath = pathMaps.get("rightOSSPath");
 		try {
