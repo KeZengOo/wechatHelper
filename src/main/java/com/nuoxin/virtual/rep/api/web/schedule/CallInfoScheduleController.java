@@ -91,7 +91,7 @@ public class CallInfoScheduleController {
     @GetMapping(value = "/split/speech/aliyun/url/update")
     public DefaultResponseBean<String> splitSpeechAliyunUrlUpdate(@RequestParam(value = "ossFilePath") String ossFilePath) {
 //        Map<String,String> pathMap = callBackService.splitSpeechAliyunUrlUpdate(ossFilePath);
-        String sinToken = "4222137804108258";
+        String sinToken = "";
         Integer callId = 1;
 
         Map<String,String> pathMaps = new HashMap<String,String>(16);

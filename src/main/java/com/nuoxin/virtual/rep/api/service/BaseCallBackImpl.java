@@ -262,18 +262,18 @@ public abstract class BaseCallBackImpl implements CallBackService {
 		Map<Integer,String> leftMapText = new HashMap<Integer,String>(16);
 		Map<Integer,String> rightMapText = new HashMap<Integer,String>(16);
 		Integer virtualDrugUserId = 0;
-
-		//判断sinToken或callId是否存在，如果存在通过该字段查询相关语音信息
+		VirtualSplitSpeechCallInfoParams vss = new VirtualSplitSpeechCallInfoParams();
+		//判断sinToken或callId是否存在，如果存在通过该字段查询sinToken和id值
 		if(sinToken != null && sinToken != ""){
 			//通过sinToken查询virtual_doctor_call_info表
-//			VirtualDoctorCallInfoParams v = callInfoMapper.
-			virtualDrugUserId = 0;
+			vss = callInfoMapper.getCallInfoBySinToken(sinToken);
+			virtualDrugUserId = vss.getVirtualDrugUserId();
 		}else if(callId != null && callId != 0)
 		{
 			//通过callId查询virtual_doctor_call_info表
-//			VirtualDoctorCallInfoParams v = callInfoMapper.
-			sinToken = "";
-			virtualDrugUserId = 0;
+			vss = callInfoMapper.getCallInfoById(callId);
+			sinToken = vss.getSinToken();
+			virtualDrugUserId = vss.getVirtualDrugUserId();
 		}
 
 		String leftPath = pathMaps.get("leftOSSPath");

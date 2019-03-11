@@ -1395,5 +1395,13 @@
 
 	</insert>
 
+    <!-- 根据sin_token获取virtual_doctor_call_info表中的id-->
+    <select id="getCallInfoBySinToken" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualSplitSpeechCallInfoParams">
+      SELECT t.id,t.sin_token sinToken,t.virtual_drug_user_id virtualDrugUserId FROM virtual_doctor_call_info t WHERE t.sin_token = #{sinToken}
+    </select>
 
+    <!-- 根据id获取virtual_doctor_call_info表中的sin_token-->
+    <select id="getCallInfoById" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualSplitSpeechCallInfoParams">
+      SELECT t.id,t.sin_token sinToken,t.virtual_drug_user_id virtualDrugUserId FROM virtual_doctor_call_info t WHERE t.id = #{id}
+    </select>
 </mapper>

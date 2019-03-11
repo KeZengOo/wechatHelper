@@ -219,5 +219,19 @@ public interface VirtualDoctorCallInfoMapper {
 	 * @return
 	 */
 	Integer saveSpeechRecognitionResultCallInfo(@Param(value = "list") List<VirtualSplitSpeechCallInfoParams> list);
+
+	/**
+	 * 根据sin_token获取virtual_doctor_call_info表中的id
+	 * @param sinToken
+	 * @return id
+	 */
+	VirtualSplitSpeechCallInfoParams getCallInfoBySinToken(@Param(value = "sinToken") String sinToken);
+
+	/**
+	 * 根据id获取virtual_doctor_call_info表中的sin_token
+	 * @param id
+	 * @return sinToken
+	 */
+	VirtualSplitSpeechCallInfoParams getCallInfoById(@Param(value = "id") Integer id);
 }
 
