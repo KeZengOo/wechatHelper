@@ -24,11 +24,10 @@ import com.nuoxin.virtual.rep.api.entity.DoctorCallInfo;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoParams;
 import com.nuoxin.virtual.rep.api.mybatis.DoctorMapper;
 import com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorCallInfoMapper;
-import ws.schild.jave.*;
 
 @Transactional
 @Service
-public abstract class BaseCallBackImpl implements CallBackService {
+public abstract class BaseCallBackImpl implements CallBackService{
 	
 	private static final Logger logger = LoggerFactory.getLogger(BaseCallBackImpl.class);
 
@@ -45,7 +44,7 @@ public abstract class BaseCallBackImpl implements CallBackService {
 	private DoctorMapper doctorMapper;
 	@Resource
 	private DoctorCallInfoRepository callInfoDao;
-	
+
 	/**
 	 * 父类通用回调处理
 	 * @param result ConvertResult 对象
@@ -54,7 +53,25 @@ public abstract class BaseCallBackImpl implements CallBackService {
 		String sinToken = result.getSinToken();
 		String audioFileDownloadUrl = result.getMonitorFilenameUrl();
 		String callOssUrl = this.processFile(audioFileDownloadUrl, sinToken);
-		
+
+		//异步（分割录音文件并上传阿里云，返回左右声道的阿里云地址 并且 根据左右声道的阿里云地址进行语音识别，进行入库）
+		new Thread(new Runnable(){
+			@Override
+			public void run() {
+				//分割录音文件并上传阿里云，返回左右声道的阿里云地址
+				Map<String,String> pathMap = splitSpeechAliyunUrlUpdate(callOssUrl);
+				logger.info("pathMap={}, 分割录音文件并上传阿里云，返回左右声道的阿里云地址", pathMap);
+				//根据左右声道的阿里云地址进行语音识别，进行入库
+				boolean result_is_save = saveSpeechRecognitionResultCallInfo(pathMap, sinToken);
+				logger.info("result_is_save={}, 根据左右声道的阿里云地址进行语音识别，进行入库是否成功！", result_is_save);
+			}
+		}).start();
+
+//		//分割录音文件并上传阿里云，返回左右声道的阿里云地址
+//		Map<String,String> pathMap = splitSpeechAliyunUrlUpdate(callOssUrl);
+//		//根据左右声道的阿里云地址进行语音识别，进行入库
+//		boolean result_is_save = saveSpeechRecognitionResultCallInfo(pathMap, sinToken,0);
+
 		result.setMonitorFilenameUrl(callOssUrl);
 
 		DoctorCallInfo info = this.getDoctorCallInfoBySinToken(sinToken);
@@ -198,9 +215,10 @@ public abstract class BaseCallBackImpl implements CallBackService {
 	 */
 	@Override
 	public Map<String,String> splitSpeechAliyunUrlUpdate(String ossFilePath){
-		Map<String,String> pathMaps = new HashMap<String,String>();
+		Map<String,String> pathMaps = new HashMap<String,String>(16);
 		String local = FileConstant.LOCAL_PATH;
-		if(ossFilePath.indexOf("\\")> -1)
+		int num = ossFilePath.indexOf("\\");
+		if(num> -1)
 		{
 			ossFilePath = ossFilePath.replace("\\","/");
 		}
@@ -258,7 +276,7 @@ public abstract class BaseCallBackImpl implements CallBackService {
 	 * @return
 	 */
 	@Override
-	public boolean saveSpeechRecognitionResultCallInfo(Map<String,String> pathMaps, String sinToken, Integer callId){
+	public boolean saveSpeechRecognitionResultCallInfo(Map<String,String> pathMaps, String sinToken){
 		Map<Integer,String> leftMapText = new HashMap<Integer,String>(16);
 		Map<Integer,String> rightMapText = new HashMap<Integer,String>(16);
 		Integer virtualDrugUserId = 0;
@@ -267,18 +285,32 @@ public abstract class BaseCallBackImpl implements CallBackService {
 		if(sinToken != null && sinToken != ""){
 			//通过sinToken查询virtual_doctor_call_info表
 			vss = callInfoMapper.getCallInfoBySinToken(sinToken);
-			virtualDrugUserId = vss.getVirtualDrugUserId();
-		}else if(callId != null && callId != 0)
-		{
-			//通过callId查询virtual_doctor_call_info表
-			vss = callInfoMapper.getCallInfoById(callId);
-			sinToken = vss.getSinToken();
-			virtualDrugUserId = vss.getVirtualDrugUserId();
+			if(null != vss){
+				if(vss.getVirtualDrugUserId() == null){
+					virtualDrugUserId = 0;
+				}
+				else
+				{
+					virtualDrugUserId = vss.getVirtualDrugUserId();
+				}
+			}
 		}
 
 		String leftPath = pathMaps.get("leftOSSPath");
 		String rightPath = pathMaps.get("rightOSSPath");
 		try {
+			int leftNum = leftPath.indexOf("\\");
+			if(leftNum> -1)
+			{
+				leftPath = leftPath.replace("\\","/");
+			}
+
+			int rightNum = rightPath.indexOf("\\");
+			if(rightNum> -1)
+			{
+				rightPath = rightPath.replace("\\","/");
+			}
+
 			leftMapText = SpeechRecognitionUtil.getSpeechRecognitionResultCallBack(leftPath);
 			rightMapText = SpeechRecognitionUtil.getSpeechRecognitionResultCallBack(rightPath);
 			List<VirtualSplitSpeechCallInfoParams> leftList = new ArrayList<VirtualSplitSpeechCallInfoParams>();

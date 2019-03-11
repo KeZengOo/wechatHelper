@@ -109,8 +109,8 @@ public class AudioConvertUtil {
 	}
 	
 	private static void mp3ToWavTest() {
-		String sourceFileName = "D:/mp3/42b7f644-4199-4d8d-9a55-41eeb1d97585.mp3";
-		String targeFileName = "D:/mp3/42b7f644-4199-4d8d-9a55-41eeb1d97585.wav";
+		String sourceFileName = "D:/mp3/bedba0bd-25b7-4c5c-a36e-f294010b56df.mp3";
+		String targeFileName = "D:/mp3/bedba0bd-25b7-4c5c-a36e-f294010b56df.wav";
 		int retVal = encode(sourceFileName, targeFileName, CONVERT_MP3_TO_WAV, null);
 		System.out.println(retVal);
 	}

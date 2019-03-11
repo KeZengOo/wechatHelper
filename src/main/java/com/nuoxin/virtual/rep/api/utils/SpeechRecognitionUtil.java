@@ -106,7 +106,6 @@ public class SpeechRecognitionUtil {
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
-				return 0;
 			}
 		}
 	}
