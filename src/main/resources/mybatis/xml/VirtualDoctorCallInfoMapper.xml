@@ -1253,6 +1253,9 @@
 
 	<!-- 通话时长 -->
 	<select id="getCallTime" resultType="java.lang.String">
+
+		<!-- 修改前 -->
+		<!--
 		SELECT
 		ROUND(IFNULL(SUM(v.call_time), 0)/60,1) callTime
 		FROM
@@ -1284,13 +1287,69 @@
 			AND DATE_FORMAT(v.create_time, '%Y-%m-%d') &lt;=DATE_FORMAT(#{endTime}, '%Y-%m-%d')
 		</if>
 
+		-->
+
+
+
+		SELECT
+		ROUND(IFNULL(SUM(v.call_time), 0)/60,1) callTime
+		FROM
+		virtual_doctor_call_info v
+		WHERE
+		v.product_id = #{productId}
+		AND v.virtual_drug_user_id IN
+
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+
+		AND v.visit_channel = 1
+		AND (
+		v.status_name = 'answer'
+		OR (
+		call_url IS NOT NULL
+		AND call_url != ''
+		)
+		)
+
+		<if test="startTime!=null and startTime !=''">
+			AND DATE_FORMAT(v.create_time, '%Y-%m-%d') >=DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+		</if>
+
+		<if test="endTime!=null and endTime !=''">
+			AND DATE_FORMAT(v.create_time, '%Y-%m-%d') &lt;=DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+		</if>
+
+		AND v.virtual_doctor_id IN (
+		SELECT
+		id
+		FROM
+		(
+		SELECT DISTINCT
+		d.id
+		FROM
+		doctor d
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		WHERE
+		dud.prod_id = #{productId}
+		AND dud.drug_user_id IN
+
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+
+		AND dud.is_available = 1
+		) t
+		)
+
 	</select>
 
 
 	<!-- 面谈次数 -->
 	<select id="interviewVisit" resultType="java.lang.Integer">
 		SELECT
-		COUNT(v.id)
+		COUNT(DISTINCT v.id)
 		FROM
 		doctor d
 		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
@@ -1324,7 +1383,7 @@
 	<!-- 其他次数 -->
 	<select id="otherVisit" resultType="java.lang.Integer">
 		SELECT
-		COUNT(v.id)
+		COUNT(DISTINCT v.id)
 		FROM
 		doctor d
 		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
