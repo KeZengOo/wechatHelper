@@ -6,8 +6,9 @@ android {
         applicationId "com.naxions.www.wechathelper"
         minSdkVersion 15
         targetSdkVersion 21
-        versionCode 3
-        versionName "1.1.1"
+        //3月12号更改
+        versionCode 4
+        versionName "2.2.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

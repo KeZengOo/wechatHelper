@@ -40,7 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 /**
  * @Author: zengke
- * @Date: 2018.12
+ * @Data: 2018.12
  *
  */
 public class ExportActivity extends AppCompatActivity implements View.OnClickListener {
@@ -245,7 +245,7 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
                         getContactLabel(db, mContext);
                         break;
                     case 2:
-                        getRecontactDate(db, mContext);
+                        getRecontactData(db, mContext);
                         break;
                         default:
                             break;
@@ -324,7 +324,7 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
     /**
      * 获取当前用户的微信所有联系人
      */
-    public void getRecontactDate(SQLiteDatabase db, Context mContext) {
+    public void getRecontactData(SQLiteDatabase db, Context mContext) {
 
         HashMap<String, String> integerStringMap = new HashMap<>(100);
         for (int i = 0; i < mDatas.size(); i++) {

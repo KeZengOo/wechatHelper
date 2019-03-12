@@ -22,11 +22,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.azhon.appupdate.config.UpdateConfiguration;
 import com.azhon.appupdate.listener.OnButtonClickListener;
 import com.azhon.appupdate.listener.OnDownloadListener;
 import com.azhon.appupdate.manager.DownloadManager;
+import com.azhon.appupdate.config.UpdateConfiguration;
 import com.naxions.www.wechathelper.util.DateUtil;
+
 import com.naxions.www.wechathelper.util.FileUtil;
 import com.naxions.www.wechathelper.util.FilterUtil;
 import com.naxions.www.wechathelper.util.Md5Utils;
@@ -62,19 +63,18 @@ import okhttp3.Response;
 
 /**
  * @Author: zengke
- * @Date: 2018.12
+ * @Data: 2018.12
  */
 public class MainActivity extends AppCompatActivity implements OnDownloadListener, View.OnClickListener, OnButtonClickListener {
 
     public MainActivity mActivity;
-
 
     private SharedPreferences preferences;
     private static CSVPrinter contactCsvPrinter;
     private static CSVPrinter messageCsvPrinter;
     private static final ObjectBus TASK = ObjectBus.newList();
 
-    /**
+    /**4
      * 微信数据库路径
      */
     public final String WX_ROOT_PATH = "/data/data/com.tencent.mm/";
@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
     /**
      * 上传导出按钮
      */
-    private Button btn_update;
+    private Button btn_updateData;
     private Button btn_export;
     private Button btn_export_all_message;
     /**
@@ -162,10 +162,11 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
     /**
      * baseUrl
      */
-   
+  
     //sql 语句
      String contactSql = "select * from rcontact where verifyFlag = 0 and type != 4 and type != 2 and type != 0 and type != 33 and nickname != ''and nickname != '文件传输助手'";
      String messageSql = "select * from message where  createTime >";
+     String chatroomSql = "select * from chatroom";
     /**
      * 是否处于 debug 模式
      */
@@ -192,7 +193,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_mainn);
+        setContentView(R.layout.activity_main);
         //沉浸式状态栏
         if (Build.VERSION.SDK_INT >= 23) {
             View decorView = getWindow().getDecorView();
@@ -208,19 +209,17 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
     }
 
     private void initView() {
-        btn_update = findViewById(R.id.btn_update);
+        btn_updateData = findViewById(R.id.btn_updateData);
         btn_export = findViewById(R.id.btn_export);
         tv_updateTime = findViewById(R.id.tv_updateTime);
         tv_title = findViewById(R.id.tv_title);
         btn_export_all_message = findViewById(R.id.btn_export_all_message);
         et_name = findViewById(R.id.et_name);
-        btn_update.setOnClickListener(this);
+        btn_updateData.setOnClickListener(this);
         btn_export.setOnClickListener(this);
         tv_title.setOnClickListener(this);
         btn_export_all_message.setOnClickListener(this);
-
     }
-
 
     private void initData() {
         //sp中获取销售代表名字和上次上传时间
@@ -255,7 +254,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
     public void onClick(View v) {
         switch (v.getId()) {
             //上传按钮
-            case (R.id.btn_update):
+            case (R.id.btn_updateData):
                 iselectAll = false;
                 isUpload = true;
                 uploadData();
@@ -266,9 +265,11 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
                 break;
             //导出所有聊天记录到本地,不上传
             case (R.id.btn_export_all_message):
-                iselectAll = true;
-                isUpload = false;
-                uploadData();
+//                iselectAll = true;
+//                isUpload = false;
+//                uploadData();
+                  Toast.makeText(mActivity,"功能暂时下线",Toast.LENGTH_LONG).show() ;
+                //startUpdate3();
                 break;
             //强制更新所有聊天记录
             case (R.id.tv_title):
@@ -323,7 +324,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
                 closeWxDialog = new CustomDialog(this, R.style.customDialog, R.layout.layout_closewx_dialog);
             }
             closeWxDialog.show();
-            TextView tv_updateData = closeWxDialog.findViewById(R.id.tv_updateData);
+            TextView tv_updateData = closeWxDialog.findViewById(R.id.tv_update);
             TextView tv_closeWX = closeWxDialog.findViewById(R.id.tv_closeWX);
             tv_closeWX.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -339,7 +340,6 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
                 //点击上传文件
                 @Override
                 public void onClick(View view) {
-
                     //显示 loadingView
                     if (loadingDialog == null) {
                         loadingDialog = new CustomDialog(mActivity, R.style.customDialog, R.layout.layout_loading_dialog);
@@ -406,7 +406,6 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-
                 String time = response.body().string();
                 if (isDebug) {
                     Log.e("query 获取上次的上传时间==", time);
@@ -578,7 +577,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
         TASK.toPool(new Runnable() {
             @Override
             public void run() {
-                getRecontactDate(db);
+                getRecontactData(db);
             }
         }).toMain(new Runnable() {
             @Override
@@ -591,7 +590,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
     /**
      * 获取当前用户的微信所有联系人
      */
-    public void getRecontactDate(SQLiteDatabase db) {
+    public void getRecontactData(SQLiteDatabase db) {
         Cursor c1 = null;
         try {
             //新建文件保存联系人信息
@@ -618,11 +617,13 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
             contactCsvPrinter.printRecord();
             contactCsvPrinter.flush();
 
+            //判断是否需要将聊天记录上传,若需要就上传,不然就导出到本地
             if (isUpload) {
                 //上传联系人
                 upLoadFiles(baseUrl + "contact/import?uploadTime=" + currentTime, file1, et_name.getText().toString().trim() + "_contact_file.cvs", false);
                 //联系人上传后再获取并上传聊天记录
-                getReMessageDate(db);
+                getReMessageData(db);
+
             } else {
                 exportMessageToSD(db);
             }
@@ -645,12 +646,14 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
         }
     }
 
+
+
     /**
      * 获取聊天记录并上传
      *
      * @param db
      */
-    public void getReMessageDate(SQLiteDatabase db) {
+    public void getReMessageData(SQLiteDatabase db) {
         Cursor c2 = null;
         if (isDebug) {
             Log.e("query查询分割时间", DateUtil.timeStamp2Date(longLastUpdateTime + EMPTY));
@@ -737,12 +740,61 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
             if (c2 != null) {
                 c2.close();
             }
+
+        }
+        //上传聊天记录
+        upLoadFiles(baseUrl + "message/import?uploadTime=" + currentTime, file2, et_name.getText().toString().trim() + "_message_file.cvs", true);
+       //上传聊天记录的同时获取聊天室信息
+        getChatRoomData(db);
+    }
+
+
+    //获取群聊的信息并上传
+    private void getChatRoomData(SQLiteDatabase db) {
+        Cursor c3 = null;
+
+        try {
+            //新建文件保存聊天记录
+            file2 = new File(Environment.getExternalStorageDirectory().getPath() + "/" + et_name.getText().toString().trim() + "_chatRoom_file" + ".csv");
+            // 防止出现乱码 utf-8
+            BufferedWriter writer2 = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file2), "UTF-8"));
+            messageCsvPrinter = new CSVPrinter(writer2, CSVFormat.DEFAULT.withHeader("chatroomname", "memberlist", "displayname", "roomowner"));
+
+            c3 = db.rawQuery(chatroomSql, null);
+
+            while (c3.moveToNext()) {
+                String chatroomname = c3.getString(c3.getColumnIndex("chatroomname"));
+                String memberlist = c3.getString(c3.getColumnIndex("memberlist"));
+                String displayname = c3.getString(c3.getColumnIndex("displayname"));
+                String roomowner = c3.getString(c3.getColumnIndex("roomowner"));
+
+                messageCsvPrinter.printRecord(chatroomname,memberlist, FilterUtil.filterEmoji(displayname),FilterUtil.filterEmoji(roomowner));
+                }
+
+            messageCsvPrinter.printRecord();
+            messageCsvPrinter.flush();
+
+        } catch (Exception e) {
+            if (isDebug) {
+                Log.e("openWxDb", "读取数据库信息失败" + e.toString());
+            }
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    getUploadTimeError("读取数据库信息失败");
+
+                }
+            });
+        } finally {
+            if (c3 != null) {
+                c3.close();
+            }
             if (db != null) {
                 db.close();
             }
         }
-        //上传聊天记录
-        upLoadFiles(baseUrl + "message/import?uploadTime=" + currentTime, file2, et_name.getText().toString().trim() + "_message_file.cvs", true);
+        //上传群聊信息
+        //upLoadFiles(baseUrl + "message/import?uploadTime=" + currentTime, file2, et_name.getText().toString().trim() + "_message_file.cvs", true);
     }
 
     /**
@@ -873,8 +925,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
             });
         }
     }
-
-
+    
     /**
      * 获取聊天记录并保存在本地
      *
