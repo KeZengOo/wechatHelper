@@ -46,13 +46,13 @@ public class SaveVirtualDoctorRequest{
 	@NotNull(message = "hospital is null")
 	@ApiModelProperty(value = "医院")
 	private String hospital;
-	@NotNull(message = "province is null")
+	//@NotNull(message = "province is null")
 	@ApiModelProperty(value = "省份")
 	private String province;
-	@NotNull(message = "city is null")
+	//@NotNull(message = "city is null")
 	@ApiModelProperty(value = "城市")
 	private String city;
-	@NotNull(message = "hciLevel is null")
+	//@NotNull(message = "hciLevel is null")
 	@ApiModelProperty(value = "医院等级")
 	private Integer hciLevel;
 	
