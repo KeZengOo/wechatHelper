@@ -53,11 +53,13 @@ public abstract class BaseCallBackImpl implements CallBackService{
 		String sinToken = result.getSinToken();
 		String audioFileDownloadUrl = result.getMonitorFilenameUrl();
 		String callOssUrl = this.processFile(audioFileDownloadUrl, sinToken);
+		logger.info("callOssUrl={}, processCallBack方法中获取的地址："+ callOssUrl);
 
 		//异步（分割录音文件并上传阿里云，返回左右声道的阿里云地址 并且 根据左右声道的阿里云地址进行语音识别，进行入库）
 		new Thread(new Runnable(){
 			@Override
 			public void run() {
+				logger.info("runCallOssUrl={}, processCallBack方法中获取的地址："+ callOssUrl);
 				//分割录音文件并上传阿里云，返回左右声道的阿里云地址
 				Map<String,String> pathMap = splitSpeechAliyunUrlUpdate(callOssUrl);
 				logger.info("pathMap={}, 分割录音文件并上传阿里云，返回左右声道的阿里云地址", pathMap);
@@ -137,9 +139,11 @@ public abstract class BaseCallBackImpl implements CallBackService{
 	protected String processFile(String audioFileUrl, String sinToken) {
 		String fileName = sinToken.concat(FileConstant.MP3_SUFFIX);
 		fileService.processLocalFile(audioFileUrl, fileName, path);
-		
+
 		String fullFileName = path.concat(fileName);
+		logger.info("文件处理方法的文件名：",fullFileName);
 		String ossUrl = ossService.uploadFile(new File(fullFileName));
+		logger.info("文件处理处理方法中的ossUrl！ossUrl={}", ossUrl);
 		
 		// 这里走了补偿机制.即:当上传至阿里失败时写入回调时供应商传递过来的文件下载链接
 		if (StringUtils.isBlank(ossUrl)) {

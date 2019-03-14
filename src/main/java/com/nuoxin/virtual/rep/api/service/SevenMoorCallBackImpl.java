@@ -179,6 +179,7 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 			new Thread(new Runnable(){
 				@Override
 				public void run() {
+					logger.info("callUrl={}, callInfo中获取的地址：", callInfo.getCallUrl());
 					//分割录音文件并上传阿里云，返回左右声道的阿里云地址
 					Map<String,String> pathMap = splitSpeechAliyunUrlUpdate(callInfo.getCallUrl());
 					logger.info("pathMap={}, 分割录音文件并上传阿里云，返回左右声道的阿里云地址", pathMap);
