@@ -37,6 +37,9 @@ public class LoginValidationInterceptor extends HandlerInterceptorAdapter {
 //			throw new BusinessException(ErrorEnum.ERROR);
 //		}
 //
+
+		//TODO 虚拟代表版HCP360 请求不需要验证，根据白名单判断
+
 		String servletPath = request.getServletPath();
 		logger.info("接口【{}】请求开始登录验证",servletPath);
 		sercurityService.sessionValidation(request);
