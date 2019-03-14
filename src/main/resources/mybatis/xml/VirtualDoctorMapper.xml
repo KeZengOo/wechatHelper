@@ -173,12 +173,26 @@
 
 	<insert id="saveVirtualDoctorMends" >
 		INSERT INTO doctor_mend
-		 (wechat, virtual_doctor_id)
+		 (wechat,add_wechat_time, virtual_doctor_id)
 		VALUES 
 		<foreach collection ="list" item="item" separator =",">
-        	(#{item.wechat}, #{item.virtualDoctorId})
+        	(#{item.wechat}, #{item.addWechatTime},  #{item.virtualDoctorId})
     	</foreach >
-	</insert> 
+	</insert>
+
+	<update id="updateVirtualDoctorMend">
+		UPDATE doctor_mend
+		<set>
+			<if test="wechat != null and wechat !=''">
+				wechat=#{wechat},
+			</if>
+			<if test="address != null and address !=''">
+				address=#{address}
+			</if>
+
+		</set>
+		where virtual_doctor_id=#{virtualDoctorId}
+	</update>
 	
 	<insert id="saveDoctorVirtuals">
 		INSERT INTO doctor_virtual 

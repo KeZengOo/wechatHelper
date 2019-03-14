@@ -25,6 +25,7 @@
         SELECT id,product_id AS productId,visit_type AS visitType,visit_result AS visitResult
         FROM virtual_product_visit_result
         WHERE product_id=#{productId}
+        ORDER BY id
     </select>
 
     <!-- 根据拜访结果和产品Id校验是否存在 -->

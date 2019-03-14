@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.ProductTargetMapper">
+
+    <!-- 根据产品ID 得到产品目标 -->
+    <select id="getProductTarget" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.statistics.ProductTargetResponseBean">
+        SELECT target_hospital targetHospital, target_doctor targetDoctor
+        FROM virtual_product_target
+        WHERE product_id=#{productId}
+    </select>
+
+
+    <insert id="addTargetHospital">
+        INSERT INTO virtual_product_target(product_id, target_hospital)
+        VALUES (#{productId}, #{targetHospital})
+    </insert>
+
+
+    <update id="updateTargetHospital">
+        UPDATE virtual_product_target SET target_hospital=#{targetHospital}
+        WHERE product_id=#{productId}
+    </update>
+
+
+    <insert id="addTargetDoctor">
+        INSERT INTO virtual_product_target(product_id, target_doctor)
+        VALUES (#{productId}, #{targetDoctor})
+    </insert>
+
+
+    <update id="updateTargetDoctor">
+        UPDATE virtual_product_target SET target_doctor=#{targetDoctor}
+        WHERE product_id=#{productId}
+    </update>
+
+</mapper>

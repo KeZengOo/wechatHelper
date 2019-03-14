@@ -2,17 +2,14 @@ package com.nuoxin.virtual.rep.api.mybatis;
 
 import java.util.List;
 
-import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse;
-import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsParams;
+import com.nuoxin.virtual.rep.api.entity.v2_5.*;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.CallRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.VisitHistoryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.VisitCountRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.statistics.DailyStatisticsRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CallTelephoneReponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VisitCountResponseBean;
 import org.apache.ibatis.annotations.Param;
-
-import com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitBean;
-import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoParams;
 
 /**
  * 电话拜访 Mapper
@@ -144,6 +141,97 @@ public interface VirtualDoctorCallInfoMapper {
 	 */
 	List<VisitCountResponseBean> getVisitCountList(VisitCountRequestBean bean);
 
+	/**
+	 * 得到拜访医院数量
+	 * @param bean
+	 * @return
+	 */
+	Integer getVisitHospitalCount(DailyStatisticsRequestBean bean);
 
+
+	/**
+	 * 得到拜访医生数量
+	 * @param bean
+	 * @return
+	 */
+	Integer getVisitDoctorCount(DailyStatisticsRequestBean bean);
+
+	/**
+	 * 得到接触/覆盖/成功医院数量
+	 * @param bean
+	 * @return
+	 */
+	Integer getVisitTypeHospitalCount(DailyStatisticsRequestBean bean);
+
+
+	/**
+	 * 得到接触/覆盖/成功过医生数量
+	 * @param bean
+	 * @return
+	 */
+	Integer getVisitTypeDoctorCount(DailyStatisticsRequestBean bean);
+
+
+	/**
+	 * 电话外呼量
+	 * @param bean
+	 * @return
+	 */
+	Integer getCallCount(DailyStatisticsRequestBean bean);
+
+	/**
+	 * 电话接通量
+	 * @param bean
+	 * @return
+	 */
+	Integer getConnectCallCount(DailyStatisticsRequestBean bean);
+
+
+	/**
+	 * 通话时长
+	 * @param bean
+	 * @return
+	 */
+	String getCallTime(DailyStatisticsRequestBean bean);
+
+	/**
+	 * 面谈次数
+	 * @param bean
+	 * @return
+	 */
+	Integer interviewVisit(DailyStatisticsRequestBean bean);
+
+	/**
+	 * 除去电话、面谈其他拜访次数
+	 * @param bean
+	 * @return
+	 */
+	Integer otherVisit(DailyStatisticsRequestBean bean);
+
+	/**
+	 * 保存分割音频左右声道后上传的阿里云地址
+	 */
+	Integer saveSplitSpeechAliyunPath(@Param(value = "sourceUrl") String sourceUrl, @Param(value = "targeUrl")String targeUrl, @Param(value = "type")Integer type);
+
+	/**
+	 * 根据左右声道的阿里云地址进行语音识别，进行入库
+	 * @param list
+	 * @return
+	 */
+	Integer saveSpeechRecognitionResultCallInfo(@Param(value = "list") List<VirtualSplitSpeechCallInfoParams> list);
+
+	/**
+	 * 根据sin_token获取virtual_doctor_call_info表中的id
+	 * @param sinToken
+	 * @return id
+	 */
+	VirtualSplitSpeechCallInfoParams getCallInfoBySinToken(@Param(value = "sinToken") String sinToken);
+
+	/**
+	 * 根据id获取virtual_doctor_call_info表中的sin_token
+	 * @param id
+	 * @return sinToken
+	 */
+	VirtualSplitSpeechCallInfoParams getCallInfoById(@Param(value = "id") Integer id);
 }
 

@@ -46,9 +46,18 @@ public class CustomerFollowListBean implements Serializable {
 	//private List<String> mobiles = new ArrayList<>(3);
 
     private List<CallTelephoneReponseBean> mobiles = new ArrayList<>(3);
-    
+
+    @ApiModelProperty(value = "医生所在医院id")
+    private Integer hospitalId;
+
     @ApiModelProperty(value = "医生所在医院名称")
     private String hospitalName;
+
+    @ApiModelProperty(value = "省份")
+    private String province;
+
+    @ApiModelProperty(value = "城市")
+    private String city;
 
     @ApiModelProperty(value = "医院等级")
     private Integer hospitalLevel;

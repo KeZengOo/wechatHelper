@@ -88,12 +88,12 @@ public class WechatServiceImpl implements WechatService {
             e.printStackTrace();
         }
         // 格式 userName,nickName,alias,conRemark,type
-        List<CSVRecord> contactStrList = this.handleCsvFile(inputStream, new String[]{"userName","nickName","alias","conRemark","type"});
+        List<CSVRecord> contactStrList = this.handleCsvFile(inputStream, new String[]{"userName", "nickName", "alias", "conRemark", "type"});
         List<WechatAndroidContactRequestBean> contactList = this.getWechatContactList(contactStrList);
 
-        if (CollectionsUtil.isNotEmptyList(contactList)){
+        if (CollectionsUtil.isNotEmptyList(contactList)) {
 
-            this.saveOrUpdateContactList(drugUserId,bean.getUploadFileTime(), contactList);
+            this.saveOrUpdateContactList(drugUserId, bean.getUploadFileTime(), contactList);
         }
 
     }
@@ -110,9 +110,9 @@ public class WechatServiceImpl implements WechatService {
         }
 
         // 格式 talker,content,createTime,imgPath,isSend,type
-        List<CSVRecord> contactStrList = this.handleCsvFile(inputStream, new String[]{"talker","content","createTime","imgPath","isSend","type"});
+        List<CSVRecord> contactStrList = this.handleCsvFile(inputStream, new String[]{"talker", "content", "createTime", "imgPath", "isSend", "type"});
 
-        List<WechatMessageRequestBean> wechatMessageList = this.getWechatMessageList(drugUserId,bean.getUploadFileTime(),contactStrList);
+        List<WechatMessageRequestBean> wechatMessageList = this.getWechatMessageList(drugUserId, bean.getUploadFileTime(), contactStrList);
         this.saveOrUpdateWechatMessageList(wechatMessageList);
 
 
@@ -122,20 +122,20 @@ public class WechatServiceImpl implements WechatService {
     public WechatAndroidUploadTimeResponseBean getWechatAndroidUploadTime(String wechatNumber) {
         WechatAndroidUploadTimeResponseBean wechatAndroidUploadTimeResponseBean = new WechatAndroidUploadTimeResponseBean();
         WechatAndroidUploadTimeResponseBean uploadTime = wechatContactMapper.getUploadTime(wechatNumber);
-        if (uploadTime == null){
+        if (uploadTime == null) {
             return wechatAndroidUploadTimeResponseBean;
         }
 
 
         Long contactUploadTimeValue = uploadTime.getContactUploadTimeValue();
         Long messageUploadTimeValue = uploadTime.getMessageUploadTimeValue();
-        if (contactUploadTimeValue != null && contactUploadTimeValue > 0){
+        if (contactUploadTimeValue != null && contactUploadTimeValue > 0) {
             Date contactDate = new Date(contactUploadTimeValue);
             String contactDateMillisecond = DateUtil.getDateMillisecondString(contactDate);
             uploadTime.setContactUploadTime(contactDateMillisecond);
         }
 
-        if (messageUploadTimeValue != null && messageUploadTimeValue > 0){
+        if (messageUploadTimeValue != null && messageUploadTimeValue > 0) {
             Date messageDate = new Date(messageUploadTimeValue);
             String messageDateMillisecond = DateUtil.getDateMillisecondString(messageDate);
             uploadTime.setMessageUploadTime(messageDateMillisecond);
@@ -147,7 +147,7 @@ public class WechatServiceImpl implements WechatService {
 
 
     private void saveOrUpdateWechatMessageList(List<WechatMessageRequestBean> wechatMessageList) {
-        if (CollectionsUtil.isEmptyList(wechatMessageList)){
+        if (CollectionsUtil.isEmptyList(wechatMessageList)) {
             return;
         }
 
@@ -155,7 +155,7 @@ public class WechatServiceImpl implements WechatService {
          * 得到去重后的消息列表
          */
         List<WechatMessageRequestBean> duplicateRemovalWechatMessageList = this.getDuplicateRemovalWechatMessageList(wechatMessageList);
-        if (CollectionsUtil.isEmptyList(duplicateRemovalWechatMessageList)){
+        if (CollectionsUtil.isEmptyList(duplicateRemovalWechatMessageList)) {
             return;
         }
 
@@ -163,15 +163,15 @@ public class WechatServiceImpl implements WechatService {
         // 每次最多插入1000条
         int totalPage = PageUtil.getTotalPage(size, BATCH_INSERT_SIZE);
         List<WechatMessageRequestBean> subWechatMessageRequestBean = null;
-        for (int i = 0; i < totalPage; i++){
-            if (i==(totalPage-1)){
+        for (int i = 0; i < totalPage; i++) {
+            if (i == (totalPage - 1)) {
 
-                subWechatMessageRequestBean = duplicateRemovalWechatMessageList.subList(i * BATCH_INSERT_SIZE, i * BATCH_INSERT_SIZE + (size - i *BATCH_INSERT_SIZE));
-            }else{
+                subWechatMessageRequestBean = duplicateRemovalWechatMessageList.subList(i * BATCH_INSERT_SIZE, i * BATCH_INSERT_SIZE + (size - i * BATCH_INSERT_SIZE));
+            } else {
                 subWechatMessageRequestBean = duplicateRemovalWechatMessageList.subList(i * BATCH_INSERT_SIZE, i * BATCH_INSERT_SIZE + BATCH_INSERT_SIZE);
             }
 
-            List<WechatMessageRequestBean> addWechatMessageList= new ArrayList<>(subWechatMessageRequestBean);
+            List<WechatMessageRequestBean> addWechatMessageList = new ArrayList<>(subWechatMessageRequestBean);
             messageMapper.batchInsertWechatMessage(addWechatMessageList);
 
         }
@@ -180,11 +180,11 @@ public class WechatServiceImpl implements WechatService {
 
     private List<WechatMessageRequestBean> getDuplicateRemovalWechatMessageList(List<WechatMessageRequestBean> wechatMessageList) {
 
-        if (CollectionsUtil.isEmptyList(wechatMessageList)){
+        if (CollectionsUtil.isEmptyList(wechatMessageList)) {
             return wechatMessageList;
         }
         List<WechatMessageRequestBean> list = new ArrayList<>();
-        for (WechatMessageRequestBean wechatMessage:wechatMessageList){
+        for (WechatMessageRequestBean wechatMessage : wechatMessageList) {
             // 处理emoji表情
             String message = wechatMessage.getMessage();
 //            if (EmojiUtil.containsEmoji(message)){
@@ -195,7 +195,7 @@ public class WechatServiceImpl implements WechatService {
             String s = EmojiParser.removeAllEmojis(message);
             wechatMessage.setMessage(s);
             Integer count = messageMapper.getCountByTypeAndWechatNumAndTime(MessageTypeEnum.WECHAT.getMessageType(), wechatMessage.getWechatNumber(), wechatMessage.getMessageTime());
-            if (count !=null && count > 0){
+            if (count != null && count > 0) {
                 continue;
             }
             list.add(wechatMessage);
@@ -205,13 +205,13 @@ public class WechatServiceImpl implements WechatService {
         return list;
     }
 
-    private List<WechatMessageRequestBean> getWechatMessageList(Long drugUserId,String uploadTime, List<CSVRecord> contactList) {
-        if (CollectionsUtil.isEmptyList(contactList)){
+    private List<WechatMessageRequestBean> getWechatMessageList(Long drugUserId, String uploadTime, List<CSVRecord> contactList) {
+        if (CollectionsUtil.isEmptyList(contactList)) {
             return null;
         }
 
         List<String> drugUserWechat = drugUserWechatMapper.getDrugUserWechat(drugUserId);
-        if (CollectionsUtil.isEmptyList(drugUserWechat)){
+        if (CollectionsUtil.isEmptyList(drugUserWechat)) {
             throw new FileFormatException(ErrorEnum.ERROR, "代表还没有绑定微信号");
         }
 
@@ -220,8 +220,8 @@ public class WechatServiceImpl implements WechatService {
 
         DrugUser drugUser = drugUserRepository.findFirstById(drugUserId);
 
-        for (int i = 0; i < contactList.size(); i++){
-            if (i == 0){
+        for (int i = 0; i < contactList.size(); i++) {
+            if (i == 0) {
                 continue;// 标题过滤
             }
 
@@ -229,7 +229,7 @@ public class WechatServiceImpl implements WechatService {
 
             String talker = contactList.get(i).get("talker");
             String content = contactList.get(i).get("content");
-            String createTime =contactList.get(i).get("createTime");
+            String createTime = contactList.get(i).get("createTime");
             String imgPath = contactList.get(i).get("imgPath");
             String isSend = contactList.get(i).get("isSend");
             String type = contactList.get(i).get("type");
@@ -240,11 +240,18 @@ public class WechatServiceImpl implements WechatService {
             Long doctorId = 0L;
             String telephone = "";
             String wechatMessageStatus = "";
-            if (StringUtil.isEmpty(imgPath) || "0".equals(imgPath)){
+            if (StringUtil.isEmpty(imgPath) || "0".equals(imgPath)) {
                 imgPath = "";
             }
 
-            if (StringUtil.isNotEmpty(isSend) && "1".equals(isSend)){
+            Long doctorIdByTalker = wechatContactMapper.getDoctorIdByWechatNumber(talker);
+            Doctor doctor = doctorRepository.findFirstById(doctorIdByTalker);
+            if (doctor != null) {
+                doctorId = doctorIdByTalker;
+                telephone = doctor.getMobile();
+            }
+
+            if (StringUtil.isNotEmpty(isSend) && "1".equals(isSend)) {
                 wechatMessageStatus = "发送";
 
                 userId = drugUser.getId();
@@ -252,47 +259,14 @@ public class WechatServiceImpl implements WechatService {
                 nickname = drugUser.getName();
             }
 
-            if (StringUtil.isNotEmpty(isSend) && "0".equals(isSend)){
+            if (StringUtil.isNotEmpty(isSend) && "0".equals(isSend)) {
                 wechatMessageStatus = "接收";
-
-                Long doctorIdByTalker = wechatContactMapper.getDoctorIdByWechatNumber(talker);
-
-                if (doctorIdByTalker != null && doctorIdByTalker > 0){
-
-                    Doctor doctor = doctorRepository.findFirstById(doctorIdByTalker);
-                    if (doctor != null){
-                        userId = doctorIdByTalker;
-                        userType = UserTypeEnum.DOCTOR.getUserType();
-                        nickname = doctor.getName();
-                        doctorId = doctorIdByTalker;
-                        telephone = doctor.getMobile();
-                    }
+                if (doctor != null) {
+                    userId = doctorIdByTalker;
+                    userType = UserTypeEnum.DOCTOR.getUserType();
+                    nickname = doctor.getName();
                 }
-
             }
-
-//            if (drugUserWechat.contains(talker)){
-//                userId = drugUser.getId();
-//                userType = UserTypeEnum.DRUG_USER.getUserType();
-//                nickname = drugUser.getName();
-//
-//            }else {
-//
-//
-//                Long doctorIdByTalker = wechatContactMapper.getDoctorIdByWechatNumber(talker);
-//
-//                if (doctorIdByTalker != null && doctorIdByTalker > 0){
-//
-//                    Doctor doctor = doctorRepository.findFirstById(doctorIdByTalker);
-//                    if (doctor != null){
-//                        userId = doctorIdByTalker;
-//                        userType = UserTypeEnum.DOCTOR.getUserType();
-//                        nickname = doctor.getName();
-//                        doctorId = doctorIdByTalker;
-//                        telephone = doctor.getMobile();
-//                    }
-//                }
-//            }
 
             WechatMessageRequestBean wechatMessage = new WechatMessageRequestBean();
             wechatMessage.setUserId(userId);
@@ -335,16 +309,17 @@ public class WechatServiceImpl implements WechatService {
 
     /**
      * 保存或者更新
+     *
      * @param id
      * @param contactList
      */
-    private void saveOrUpdateContactList(Long id,String uploadTime, List<WechatAndroidContactRequestBean> contactList) {
-        if (CollectionsUtil.isEmptyList(contactList)){
+    private void saveOrUpdateContactList(Long id, String uploadTime, List<WechatAndroidContactRequestBean> contactList) {
+        if (CollectionsUtil.isEmptyList(contactList)) {
             return;
         }
 
         List<String> userNameList = contactList.stream().map(WechatAndroidContactRequestBean::getUserName).distinct().collect(Collectors.toList());
-        if (CollectionsUtil.isEmptyList(userNameList)){
+        if (CollectionsUtil.isEmptyList(userNameList)) {
             return;
         }
 
@@ -352,15 +327,15 @@ public class WechatServiceImpl implements WechatService {
         List<WechatAndroidContactRequestBean> updateContactList = new ArrayList<>();
 
         List<WechatAndroidContactResponseBean> wechatContactList = wechatContactMapper.getWechatAndroidContactList(userNameList);
-        if (CollectionsUtil.isEmptyList(wechatContactList)){
+        if (CollectionsUtil.isEmptyList(wechatContactList)) {
             addContactList = contactList;
-        }else {
+        } else {
             List<String> collectWechatNumer = wechatContactList.stream().map(WechatAndroidContactResponseBean::getUserName).distinct().collect(Collectors.toList());
-            for (WechatAndroidContactRequestBean c:contactList){
+            for (WechatAndroidContactRequestBean c : contactList) {
                 String userName = c.getUserName();
-                if (collectWechatNumer.contains(userName)){
+                if (collectWechatNumer.contains(userName)) {
                     updateContactList.add(c);
-                }else {
+                } else {
                     addContactList.add(c);
                 }
             }
@@ -370,13 +345,13 @@ public class WechatServiceImpl implements WechatService {
 
         Date date = DateUtil.stringToDate(uploadTime, DateUtil.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS__SSS);
         long time = date.getTime();
-        if (CollectionsUtil.isNotEmptyList(addContactList)){
+        if (CollectionsUtil.isNotEmptyList(addContactList)) {
             wechatContactMapper.batchInsert(id, time, addContactList);
         }
 
 
-        if (CollectionsUtil.isNotEmptyList(updateContactList)){
-            updateContactList.forEach(c->{
+        if (CollectionsUtil.isNotEmptyList(updateContactList)) {
+            updateContactList.forEach(c -> {
                 wechatContactMapper.updateWechatContact(id, c);
             });
         }
@@ -384,13 +359,13 @@ public class WechatServiceImpl implements WechatService {
 
 
     private List<WechatAndroidContactRequestBean> getWechatContactList(List<CSVRecord> contactList) {
-        if (CollectionsUtil.isEmptyList(contactList)){
+        if (CollectionsUtil.isEmptyList(contactList)) {
             return null;
         }
 
         List<WechatAndroidContactRequestBean> wechatContactList = new ArrayList<>();
-        for (int i = 0; i < contactList.size(); i++){
-            if (i == 0){
+        for (int i = 0; i < contactList.size(); i++) {
+            if (i == 0) {
                 continue;// 标题过滤
             }
 
@@ -400,10 +375,10 @@ public class WechatServiceImpl implements WechatService {
             String userName = contactList.get(i).get("userName");
             wechatAndroidContact.setUserName(userName);
             String nickName = contactList.get(i).get("nickName");
-            if (EmojiUtil.containsEmoji(nickName)){
+            if (EmojiUtil.containsEmoji(nickName)) {
                 String s = EmojiUtil.handleEmojiStr(nickName);
                 wechatAndroidContact.setNickName(s);
-            }else {
+            } else {
                 wechatAndroidContact.setNickName(nickName);
             }
 
@@ -411,18 +386,18 @@ public class WechatServiceImpl implements WechatService {
 
             String conRemark = contactList.get(i).get("conRemark");
             Matcher matcher = RegularUtils.getMatcher(RegularUtils.MATCH_ELEVEN_NUM, conRemark);
-            if (!matcher.find()){
+            if (!matcher.find()) {
                 // 先去掉异常，因为现在好多医生还没有备注上手机号
                 //throw new FileFormatException(ErrorEnum.ERROR, "微信号为："+ userName + "联系人备注中没有包含手机号");
                 wechatAndroidContact.setDoctorId(0L);
                 wechatAndroidContact.setTelephone("");
-            }else {
+            } else {
                 String telephone = matcher.group();
                 Long doctorId = doctorMapper.getDoctorIdByMobile(telephone);
 //                if (doctorId == null || doctorId == 0){
 //                    throw new FileFormatException(ErrorEnum.ERROR, "微信号为："+ userName + "联系人备注中包含的手机号对应医生不存在");
 //                }
-                if (doctorId == null){
+                if (doctorId == null) {
                     doctorId = 0L;
                 }
                 wechatAndroidContact.setDoctorId(doctorId);
@@ -439,6 +414,7 @@ public class WechatServiceImpl implements WechatService {
 
     /**
      * 检查文件
+     *
      * @param file
      * @return 成功返回代表ID
      */
@@ -446,7 +422,7 @@ public class WechatServiceImpl implements WechatService {
 
 
         String originalFilename = file.getOriginalFilename();
-        if (StringUtil.isEmpty(originalFilename)){
+        if (StringUtil.isEmpty(originalFilename)) {
             throw new FileFormatException(ErrorEnum.ERROR, "文件名称不能为空");
         }
 
@@ -454,19 +430,19 @@ public class WechatServiceImpl implements WechatService {
             throw new FileFormatException(ErrorEnum.ERROR, "只能上传CSV文件");
         }
 
-        String fileName = originalFilename.substring(0,originalFilename.lastIndexOf("."));
-        if (StringUtil.isEmpty(fileName)){
+        String fileName = originalFilename.substring(0, originalFilename.lastIndexOf("."));
+        if (StringUtil.isEmpty(fileName)) {
             throw new FileFormatException(ErrorEnum.ERROR, "文件名称不能为空");
         }
 
         String[] splitStr = fileName.split("_");
-        if (CollectionsUtil.isEmptyArray(splitStr)){
+        if (CollectionsUtil.isEmptyArray(splitStr)) {
             throw new FileFormatException(ErrorEnum.ERROR, "不合法的文件命名，必须包含代表微信号");
         }
         String wechatNumer = splitStr[0];
 
         Long drugUserId = drugUserWechatMapper.getDrugUserIdByWechat(wechatNumer);
-        if (drugUserId == null || drugUserId == 0){
+        if (drugUserId == null || drugUserId == 0) {
             throw new FileFormatException(ErrorEnum.ERROR, "代表的微信号还未进行绑定");
         }
 
@@ -477,12 +453,13 @@ public class WechatServiceImpl implements WechatService {
 
     /**
      * CSV文件InputStream转成字符串list
+     *
      * @param inputStream
-     * @param headers 表头
+     * @param headers     表头
      * @return
      */
-    private List<CSVRecord> handleCsvFile(InputStream inputStream, String[] headers){
-        if (inputStream == null){
+    private List<CSVRecord> handleCsvFile(InputStream inputStream, String[] headers) {
+        if (inputStream == null) {
             return null;
         }
 

@@ -10,19 +10,25 @@ import javax.annotation.Resource;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
+import com.nuoxin.virtual.rep.api.common.enums.ClassificationEnum;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.dao.DoctorTelephoneRepository;
 import com.nuoxin.virtual.rep.api.dao.DrugUserRepository;
+import com.nuoxin.virtual.rep.api.entity.Doctor;
 import com.nuoxin.virtual.rep.api.enums.OnOffLineEnum;
 import com.nuoxin.virtual.rep.api.enums.RoleTypeEnum;
 import com.nuoxin.virtual.rep.api.mybatis.*;
 import com.nuoxin.virtual.rep.api.service.v2_5.DoctorDynamicFieldService;
+import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.utils.RegularUtils;
 import com.nuoxin.virtual.rep.api.utils.StringUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.*;
 import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorBasicDynamicFieldValueResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorDetailsResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.single.DoctorAddDynamicFieldResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.single.DoctorAddResponseBean;
 import org.springframework.stereotype.Service;
 
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
@@ -79,16 +85,118 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
     @Resource
     private DrugUserRepository drugUserRepository;
 
+    @Resource
+    private DynamicFieldMapper dynamicFieldMapper;
+
+    @Override
+    public DoctorAddResponseBean getDoctorAddEcho(DoctorSingleAddEchoRequestBean bean) {
+
+        List<String> telephones = bean.getTelephones();
+        if (CollectionsUtil.isEmptyList(telephones)){
+            throw new BusinessException(ErrorEnum.ERROR, "联系方式不能为空！");
+        }
+
+        // 去掉座机号
+        List<String> mobileList =  this.removeFixTelephone(telephones);
+        if (CollectionsUtil.isEmptyList(mobileList)){
+            return null;
+        }
+
+
+        List<Doctor> doctors = doctorMapper.selectDoctorByMobiles(mobileList);
+        if (CollectionsUtil.isEmptyList(doctors)){
+            return null;
+        }
+
+        if (doctors.size() > 1){
+            throw new BusinessException(ErrorEnum.ERROR, "联系方式属于多个医生！");
+        }
+
+        DoctorDetailsResponseBean doctorDetail = doctorMapper.getDoctorListByTelephones(bean.getTelephones(), bean.getDrugUserId()).get(0);
+
+        Long doctorId = doctorDetail.getDoctorId();
+        DoctorAddResponseBean doctorAddResponseBean = new DoctorAddResponseBean();
+        doctorAddResponseBean.setDoctorId(doctorId);
+        doctorAddResponseBean.setDoctorName(doctorDetail.getDoctorName());
+        doctorAddResponseBean.setSex(doctorDetail.getSex());
+        List<String> doctorTelephones = doctorMapper.getDoctorTelephone(doctorId);
+        doctorAddResponseBean.setTelephones(doctorTelephones);
+        doctorAddResponseBean.setWechat(doctorDetail.getWechat());
+        doctorAddResponseBean.setAddWechat(doctorDetail.getAddWechat());
+        doctorAddResponseBean.setEmail(doctorDetail.getEmail());
+        doctorAddResponseBean.setAddress(doctorDetail.getAddress());
+        doctorAddResponseBean.setDepart(doctorDetail.getDepartment());
+        doctorAddResponseBean.setPosition(doctorDetail.getPositions());
+        doctorAddResponseBean.setHospitalName(doctorDetail.getHospitalName());
+
+
+        String hospitalLevel = doctorDetail.getHospitalLevel();
+        if (StringUtil.isEmpty(hospitalLevel)){
+            hospitalLevel = "0";
+        }
+
+        doctorAddResponseBean.setHospitalLevel(Integer.parseInt(hospitalLevel));
+        doctorAddResponseBean.setProvince(doctorDetail.getProvince());
+        doctorAddResponseBean.setCity(doctorDetail.getCity());
+
+
+        // 动态字段
+        List<DoctorBasicDynamicFieldValueResponseBean> doctorBaisicDynamicField = dynamicFieldMapper.getDoctorAddDynamicField(doctorId, ClassificationEnum.BASIC.getType());
+        List<DoctorBasicDynamicFieldValueResponseBean> doctorHospitalDynamicField = dynamicFieldMapper.getDoctorAddDynamicField(doctorId, ClassificationEnum.HOSPITAL.getType());
+
+        if (CollectionsUtil.isNotEmptyList(doctorBaisicDynamicField)){
+            doctorAddResponseBean.setBasicDynamicList(doctorBaisicDynamicField);
+        }
+
+        if (CollectionsUtil.isNotEmptyList(doctorHospitalDynamicField)){
+            doctorAddResponseBean.setHospitalDynamicList(doctorHospitalDynamicField);
+        }
+
+        return doctorAddResponseBean;
+
+    }
+
+    /**
+     * 去掉手机号中的座机号
+     * @param telephones
+     * @return
+     */
+    private List<String> removeFixTelephone(List<String> telephones) {
+
+        List<String> mobileList = new ArrayList<>();
+        for (String telephone : telephones) {
+            boolean fixPhoneMatch = RegularUtils.isMatcher(RegularUtils.MATCH_FIX_PHONE, telephone);
+            if (fixPhoneMatch){
+                continue;
+            }
+
+            mobileList.add(telephone);
+        }
+
+        return mobileList;
+
+    }
+
     @Override
     @Transactional(value = TxType.REQUIRED, rollbackOn = Exception.class)
     public Long saveVirtualDoctor(SaveVirtualDoctorRequest request, DrugUser user) {
 
         long virtualDoctorId = 0;
-        checkSaveVirtualDoctorParam(request);
+        this.checkSaveVirtualDoctorParam(request);
         int hospitalId = this.getHospiTalId(request);
         if (hospitalId > 0) {
-            // 保存医生信息
-            virtualDoctorId = this.saveSingleDoctor(request, hospitalId);
+
+            Long doctorId = request.getDoctorId();
+            if (doctorId != null && doctorId > 0){
+                // 更新医生信息
+                virtualDoctorId = doctorId;
+                this.updateSingleDoctor(request, hospitalId);
+
+            }else {
+                // 保存医生信息
+                virtualDoctorId = this.saveSingleDoctor(request, hospitalId);
+            }
+
             if (virtualDoctorId > 0) {
                 this.saveDrugUserDoctorProductRelationShip(request, virtualDoctorId, user);
 
@@ -105,6 +213,8 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 
         return virtualDoctorId;
     }
+
+
 
     @Override
     public List<DrugUserResponseBean> getOnlineDrugUserList(Long productId) {
@@ -150,7 +260,14 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
             if (count == null || count == 0){
                 doctorMendMapper.addWechat(request.getId(), wechat);
             }else {
-                doctorMendMapper.updateWechat(request.getId(), wechat);
+                VirtualDoctorMendParams virtualDoctorMendParams = doctorMendMapper.getVirtualDoctorMendParams(request.getId());
+                String addWechat = virtualDoctorMendParams.getWechat();
+                if (StringUtil.isEmpty(addWechat)){
+                    doctorMendMapper.updateWechatAndTime(request.getId(), wechat);
+                }else {
+                    doctorMendMapper.updateWechat(request.getId(), wechat);
+                }
+
             }
 //            virtualDoctorMapper.updateDoctorWechat(request.getId(), wechat);
         }
@@ -317,14 +434,9 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
                     throw new BusinessException(ErrorEnum.ERROR, "姓名为:" + name + ",联系方式为:" + telephone + " 的医生已经存在！");
                 }
 
-            } else {
-
-                // 如果是手机号，校验手机号是否唯一
-                Integer count = doctorMapper.doctorCountByMobile(telephone);
-                if (count != null && count > 0) {
-                    throw new BusinessException(ErrorEnum.ERROR, "手机号：" + telephone + " 已经存在！");
-                }
             }
+
+            // 手机号不校验是否存在，如果存在信息更新
         }
 
     }
@@ -444,6 +556,89 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 
         return doctorId;
     }
+
+
+    /**
+     * 更新单个医生信息
+     * @param request
+     * @param hospitalId
+     */
+    private void updateSingleDoctor(SaveVirtualDoctorRequest request, int hospitalId) {
+
+        Long doctorId = request.getDoctorId();
+
+        VirtualDoctorParams param = new VirtualDoctorParams();
+        param.setName(request.getName());
+        param.setGender(request.getGender());
+
+        List<String> telephones = request.getTelephones();
+        if (CollectionsUtil.isNotEmptyList(telephones)) {
+            String mobile = getMobile(telephones);
+            param.setMobile(mobile);
+        }
+
+        param.setEmail(request.getEmail());
+        param.setDepart(request.getDepart());
+        param.setTitle(request.getTitle());
+
+        param.setProvince(request.getProvince());
+        param.setCity(request.getCity());
+        param.setHospital(request.getHospital());
+        param.setHospitalId(hospitalId);
+        param.setId(doctorId);
+
+        virtualDoctorMapper.updateVirtualDoctor(param);
+
+        // 手机号不存在的添加，库里有的手机号不做处理
+        List<String> doctorTelephone = doctorMapper.getDoctorTelephone(doctorId);
+        List<String> collectTelephone = telephones.stream().filter(t -> (!doctorTelephone.contains(t))).distinct().collect(Collectors.toList());
+        if (CollectionsUtil.isNotEmptyList(collectTelephone)){
+            List<SaveDoctorTelephoneRequestBean> list = new ArrayList<>();
+            for (String telephone : collectTelephone) {
+                boolean matcher = RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, telephone);
+                SaveDoctorTelephoneRequestBean saveDoctorTelephoneRequestBean = new SaveDoctorTelephoneRequestBean();
+                if (matcher) {
+                    saveDoctorTelephoneRequestBean.setType(1);
+                } else {
+                    saveDoctorTelephoneRequestBean.setType(2);
+                }
+
+
+                saveDoctorTelephoneRequestBean.setDoctorId(doctorId);
+                saveDoctorTelephoneRequestBean.setTelephone(telephone);
+                list.add(saveDoctorTelephoneRequestBean);
+            }
+
+
+            if (CollectionsUtil.isNotEmptyList(list)) {
+                doctorMapper.insertDoctorTelephone(list);
+            }
+        }
+
+        // 更新医生的扩展信息
+        VirtualDoctorMendParams p = new VirtualDoctorMendParams();
+
+
+
+        String wechat = request.getWechat();
+        if (StringUtil.isEmpty(wechat)){
+            p.setAddWechatTime(null);
+        }else {
+            VirtualDoctorMendParams virtualDoctorMendParams = doctorMendMapper.getVirtualDoctorMendParams(doctorId);
+            String addWechat = virtualDoctorMendParams.getWechat();
+            if (StringUtil.isEmpty(addWechat)){
+                p.setAddWechatTime(DateUtil.getDateTimeString(new Date()));
+            }else{
+                p.setAddWechatTime(virtualDoctorMendParams.getAddWechatTime());
+            }
+        }
+        p.setVirtualDoctorId(doctorId);
+        p.setWechat(wechat);
+        p.setAddress(request.getAddress());
+        doctorMendMapper.updateDoctorMend(p);
+
+    }
+
 
     /**
      * 保存医生的多个联系方式
@@ -634,6 +829,7 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 
         if (StringUtil.isEmpty(mobile)) {
             String telephone = virtualDoctorMapper.maxTelephone();
+            // 如果输入的是座机号，就伪造一个手机号，都是4 开头的
             if (StringUtil.isEmpty(telephone)) {
                 mobile = "40000000000";
             } else {
@@ -651,11 +847,24 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
      * @param virtualDoctorId
      */
     private void saveVirtualDoctorMend(SaveVirtualDoctorRequest request, long virtualDoctorId) {
+
+        String wechat = request.getWechat();
+        String address = request.getAddress();
+
+        if (StringUtil.isEmpty(wechat) && StringUtil.isEmpty(address)){
+            return;
+        }
+
+
         VirtualDoctorMendParams param = new VirtualDoctorMendParams();
         param.setVirtualDoctorId(virtualDoctorId); // 保存关联关系
         param.setAddress(request.getAddress());
 
         param.setWechat(request.getWechat());
+
+        if (StringUtil.isNotEmpty(wechat)){
+            param.setAddWechatTime(DateUtil.getDateTimeString(new Date()));
+        }
 
         List<VirtualDoctorMendParams> list = new ArrayList<>(1);
         list.add(param);
@@ -714,6 +923,9 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
      * @param user
      */
     private void saveDrugUserDoctor(SaveVirtualDoctorRequest request, Long virtualDoctorId, DrugUser user) {
+
+        drugUserDoctorMapper.deleteDrugUserDoctorsOneToOne(user.getId(), virtualDoctorId);
+
         DrugUserDoctorOneToOneParams param = new DrugUserDoctorOneToOneParams();
         param.setDoctorId(virtualDoctorId);
         param.setDrugUserId(user.getId());
@@ -747,6 +959,7 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 
         List<DrugUserDoctorParams> collectDrugUserDoctorParams = drugUserDoctorParams.stream().filter(d -> d.getProdId() > 0).distinct().collect(Collectors.toList());
         if (CollectionsUtil.isNotEmptyList(collectDrugUserDoctorParams)) {
+            this.updateDrugUserDoctors(collectDrugUserDoctorParams);
             drugUserDoctorMapper.saveDrugUserDoctors(collectDrugUserDoctorParams);
         }
 
@@ -772,6 +985,7 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 
             List<DrugUserDoctorParams> collectOnlineDrugUserDoctorParams = onlineDrugUserDoctorParams.stream().filter(d -> d.getProdId() > 0).distinct().collect(Collectors.toList());
             if (CollectionsUtil.isNotEmptyList(collectOnlineDrugUserDoctorParams)) {
+                this.updateDrugUserDoctors(collectOnlineDrugUserDoctorParams);
                 drugUserDoctorMapper.saveDrugUserDoctors(collectOnlineDrugUserDoctorParams);
             }
         }
@@ -785,8 +999,47 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
         }
         List<DrugUserDoctorQuateParams> collectDrugUserDoctorQuateParams = drugUserDoctorQuateParams.stream().filter(d -> d.getProductLineId() > 0).distinct().collect(Collectors.toList());
         if (CollectionsUtil.isNotEmptyList(collectDrugUserDoctorQuateParams)) {
+            this.deleteDrugUserDoctorQuates(collectDrugUserDoctorQuateParams);
             drugUserDoctorQuateMapper.saveDrugUserDoctorQuates(collectDrugUserDoctorQuateParams);
         }
+
+    }
+
+    /**
+     * 如果关系已经存在则删除掉
+     * @param collectDrugUserDoctorQuateParams
+     */
+    private void deleteDrugUserDoctorQuates(List<DrugUserDoctorQuateParams> collectDrugUserDoctorQuateParams) {
+
+        if (CollectionsUtil.isEmptyList(collectDrugUserDoctorQuateParams)){
+            return;
+        }
+
+        for (DrugUserDoctorQuateParams collectDrugUserDoctorQuateParam : collectDrugUserDoctorQuateParams) {
+            Long virtualDrugUserId = collectDrugUserDoctorQuateParam.getVirtualDrugUserId();
+            Long doctorId = collectDrugUserDoctorQuateParam.getDoctorId();
+            Long productLineId = collectDrugUserDoctorQuateParam.getProductLineId().longValue();
+            drugUserDoctorQuateMapper.deleteDrugUserDoctorQuates(virtualDrugUserId, doctorId, productLineId);
+        }
+    }
+
+    /**
+     * 如果代表医生产品的关系已经存在，变成不可用
+     * @param collectDrugUserDoctorParams
+     */
+    private void updateDrugUserDoctors(List<DrugUserDoctorParams> collectDrugUserDoctorParams) {
+        if (CollectionsUtil.isEmptyList(collectDrugUserDoctorParams)){
+            return;
+        }
+
+        for (DrugUserDoctorParams collectDrugUserDoctorParam : collectDrugUserDoctorParams) {
+            Long drugUserId = collectDrugUserDoctorParam.getDrugUserId();
+            Long doctorId = collectDrugUserDoctorParam.getDoctorId();
+            Long prodId = collectDrugUserDoctorParam.getProdId().longValue();
+            drugUserDoctorMapper.updateDrugUserDoctorAvailable(drugUserId, doctorId, prodId);
+        }
+
+
 
     }
 

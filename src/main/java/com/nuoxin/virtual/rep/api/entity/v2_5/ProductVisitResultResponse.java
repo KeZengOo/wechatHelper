@@ -41,7 +41,7 @@ public class ProductVisitResultResponse extends ProductVisitResultDO{
     /**
      * 拜访将结果
      */
-    @ApiModelProperty(value = "拜访将结果")
+    @ApiModelProperty(value = "拜访结果")
     private String visitResult;
 
     /**

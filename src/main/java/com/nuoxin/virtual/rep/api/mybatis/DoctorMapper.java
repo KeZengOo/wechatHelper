@@ -255,6 +255,14 @@ public interface DoctorMapper{
 
 
     /**
+     * 根据多个联系方式获取详情
+     * @param telephones
+     * @return
+     */
+    List<DoctorDetailsResponseBean> getDoctorListByTelephones(@Param(value = "telephones") List<String> telephones,@Param(value = "drugUserId") Long drugUserId);
+
+
+    /**
      * 根据销售代表和产品获得医生列表
      * @param drugUserIdList
      * @param productId
@@ -267,4 +275,11 @@ public interface DoctorMapper{
                                                   @Param(value = "limitNum") Integer limitNum);
 
 
+    /**
+     * 校验姓名，医院是否存在
+     * @param doctorName
+     * @param hospitalName
+     * @return
+     */
+    Integer getDoctorCount(@Param(value = "doctorName") String doctorName,@Param(value = "hospitalName") String hospitalName);
 }

@@ -48,5 +48,6 @@ public interface CustomerFollowUpService {
 	 */
 	SearchDynamicFieldListResponseBean getSearchDynamicField(Long productId);
 
-
+	//获得导出医生excel
+	String getExportExcelName(SearchRequestBean request) throws Exception;
 }

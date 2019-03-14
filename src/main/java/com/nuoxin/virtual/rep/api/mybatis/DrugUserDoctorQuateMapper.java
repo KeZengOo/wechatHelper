@@ -5,6 +5,7 @@ import java.util.List;
 import com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorQuateParams;
 import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse;
 import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsParams;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.statistics.DailyStatisticsRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ProductInfoResponse;
 import org.apache.ibatis.annotations.Param;
 
@@ -27,6 +28,14 @@ public interface DrugUserDoctorQuateMapper {
 	 * @return
 	 */
 	int saveDrugUserDoctorQuates (List<DrugUserDoctorQuateParams> list);
+
+	/**
+	 * 删除关系
+	 * @param drugUserId
+	 * @param doctorId
+	 * @param productId
+	 */
+	void deleteDrugUserDoctorQuates(@Param(value = "drugUserId") Long drugUserId,@Param(value = "doctorId") Long doctorId,@Param(value = "productId") Long productId);
 	
 	/**
 	 * 备虚拟代表关联的医生关系信息:是否有药,是否是目标客户,是否有AE
@@ -95,5 +104,47 @@ public interface DrugUserDoctorQuateMapper {
 	 * @return
 	 */
 	List<Long> getRecruitDoctorIdList(StatisticsParams statisticsParams);
+
+
+
+	/**
+	 * 招募医生数量
+	 * @param bean
+	 * @return
+	 */
+	Integer getRecruitDoctor(DailyStatisticsRequestBean bean);
+
+	/**
+	 * 招募医院数量
+	 * @param bean
+	 * @return
+	 */
+	Integer getRecruitHospital(DailyStatisticsRequestBean bean);
+
+
+	/**
+	 * 有AE的医生数量
+	 * @param bean
+	 * @return
+	 */
+	Integer hasAeDoctor(DailyStatisticsRequestBean bean);
+
+
+	/**
+	 * 退出项目医院数量
+	 * @param bean
+	 * @return
+	 */
+	Integer breakOffHospital(DailyStatisticsRequestBean bean);
+
+
+	/**
+	 * 退出项目医生数量
+	 * @param bean
+	 * @return
+	 */
+	Integer breakOffDoctor(DailyStatisticsRequestBean bean);
+
+
 }
 

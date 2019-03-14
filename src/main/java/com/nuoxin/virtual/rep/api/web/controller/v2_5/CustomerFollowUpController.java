@@ -1,12 +1,17 @@
 package com.nuoxin.virtual.rep.api.web.controller.v2_5;
 
+import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.SearchDynamicFieldListResponseBean;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,6 +48,9 @@ public class CustomerFollowUpController extends NewBaseController {
 	private DrugUserProductService drugUserProductService;
 	@Resource
 	private CustomerFollowUpService customerFollowService;
+
+	@Value("${download.file.path}")
+	private String downloadPath;
 
 
 	@SuppressWarnings("unchecked")
@@ -110,8 +118,8 @@ public class CustomerFollowUpController extends NewBaseController {
 			searchRequest.setVirtualDrugUserIds(virtualDrugUserIds);
 		}
 
-		List<Long> productLineIds = null;
-		List<ProductResponseBean> products = drugUserProductService.getProductsByDrugUserId(user.getLeaderPath());
+//		List<Long> productLineIds = null;
+//		List<ProductResponseBean> products = drugUserProductService.getProductsByDrugUserId(user.getLeaderPath());
 //		if (CollectionsUtil.isNotEmptyList(products)) {
 //			List<Long> productLineIdsTemp = new ArrayList<>();
 //			products.forEach(product ->{
@@ -220,6 +228,60 @@ public class CustomerFollowUpController extends NewBaseController {
 		responseBean.setData(list);
 
 		return responseBean;
+	}
+
+	@SuppressWarnings("unchecked")
+	@ApiOperation(value = "获得下载医生excel名称")
+	@RequestMapping(value = "/exportExcelAndGetName", method = { RequestMethod.POST })
+	public DefaultResponseBean<Map> exportExcel(HttpServletRequest request, @RequestBody SearchRequestBean searchReq){
+		DrugUser user = super.getDrugUser(request);
+		if (user == null) {
+			return super.getLoginErrorResponse();
+		}
+		searchReq.setDrugUserId(user.getId());
+
+		List<Long> virtualDrugUserIds = searchReq.getVirtualDrugUserIds();
+		if (CollectionsUtil.isEmptyList(virtualDrugUserIds)) {
+			return super.getParamsErrorResponse("virtualDrugUserIds is empty list");
+		}
+
+		List<Long> productLineIds = searchReq.getProductLineIds();
+		if (CollectionsUtil.isEmptyList(productLineIds)) {
+			return super.getParamsErrorResponse("productLineIds is empty list");
+		}
+
+		Map<String, String> map = new HashMap<String, String>();
+		DefaultResponseBean<Map> responseBean = new DefaultResponseBean<>();
+		try{
+			String excelName = customerFollowService.getExportExcelName(searchReq);
+			map.put("filename", excelName);
+		}catch (Exception e){
+			e.printStackTrace();
+			return super.getParamsErrorResponse("错误");
+		}
+		responseBean.setData(map);
+		return responseBean;
+	}
+
+	@ApiOperation(value = "下载医生详细信息", notes = "下载医生详细信息")
+	@GetMapping("/downloadExcel")
+	public void downloadExcel(@RequestParam("filename")String filename, HttpServletResponse response) {
+		try {
+			response.setContentType("application/vnd.ms-excel");
+			//2)、设置Content-Disposition
+			response.setHeader("Content-Disposition", "attachment;filename="+filename);
+			//3)、输出流
+			OutputStream out = response.getOutputStream();
+			InputStream in = new FileInputStream(new File(downloadPath + filename));
+			int b;
+			while((b=in.read())!=-1){
+				out.write(b);
+			}
+			in.close();
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

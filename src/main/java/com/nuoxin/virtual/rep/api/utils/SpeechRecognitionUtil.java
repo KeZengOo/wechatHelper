@@ -1,7 +1,12 @@
 package com.nuoxin.virtual.rep.api.utils;
+import com.aliyun.oss.OSSClient;
+import com.aliyun.oss.common.utils.BinaryUtil;
+import com.aliyun.oss.model.ObjectMetadata;
+import com.nuoxin.virtual.rep.api.common.util.FileUtils;
+import com.nuoxin.virtual.rep.api.common.util.OSSContentTypeUtil;
+import com.nuoxin.virtual.rep.api.config.AliyunConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyuncs.CommonRequest;
@@ -11,15 +16,22 @@ import com.aliyuncs.IAcsClient;
 import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
-
 import shaded.org.apache.commons.lang3.StringUtils;
+
+import javax.annotation.Resource;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by yangyang on 2018/10/25.
  * 参考链接：https://help.aliyun.com/document_detail/32290.html?spm=a2c4g.11186623.6.613.4c754d7a9IDrC9
  */
 public class SpeechRecognitionUtil {
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(SpeechRecognitionUtil.class);
 	
     private static final String REGIONID = "cn-shanghai";
@@ -35,15 +47,84 @@ public class SpeechRecognitionUtil {
     private static final String KEY_TASK = "Task";
     private static final String KEY_TASK_ID = "TaskId";
     private static final String KEY_STATUS_TEXT = "StatusText";
-    
+
+	private static final String ENABLE_CALLBACK = "enable_callback";
+	private static final String CALLBACK_URL = "callback_url";
+
+
     //naxions accessKeyId
     private static final String accessKeyId = "LTAI3UKhV3R68YYQ";
     //naxions accessKeySecret
     private static final String accessKeySecret = "mu0v9rh1kUM9ndSX5ODIZh8wz6Ak3N";
     //naxions appKey
     private static final String appKey = "X8P4PfbkTkU32OpO";
-    
-    /**
+
+
+	/**
+	 *  1.下载阿里云上的电话录音到本地
+	 * 	2.之后进行MP3转WAV
+	 * 	3.进行左右声道分割
+	 * 	4.分别进行语音识别转成文本
+	 * 	5.入库
+	 */
+	private static final String OSS_HTTP_URL = "https://nuoxin-virtual-rep-storage.oss-cn-beijing.aliyuncs.com/virtual/2018112317/42b7f644-4199-4d8d-9a55-41eeb1d97585.mp3";
+
+	private static final String LOCAL_PATH = "D:/mp3";
+
+	public static Integer ossDownLoad(String ossHttpUrl){
+		BufferedInputStream bis=null;
+		BufferedOutputStream bos=null;
+		try {
+			URL url = new URL(ossHttpUrl);
+			HttpURLConnection connection =  (HttpURLConnection) url.openConnection();
+			connection.setRequestMethod("GET");
+			connection.connect();
+			InputStream is = connection.getInputStream();
+
+			bis = new BufferedInputStream(is);
+
+			//名字截取 可以省略
+			File file = new File(LOCAL_PATH+ossHttpUrl.substring((ossHttpUrl.lastIndexOf("/"))));
+			FileOutputStream fos = new FileOutputStream(file);
+			bos = new BufferedOutputStream(fos);
+			int b = 0;
+			byte[] byArr = new byte[1024*4];
+			while((b=bis.read(byArr))!=-1){
+				bos.write(byArr, 0, b);
+			}
+			return 1;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return 0;
+		}finally{
+			try {
+				if(bis!=null){
+					bis.close();
+				}
+				if(bos!=null){
+					bos.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+				return 0;
+			}
+		}
+	}
+
+	/**
+	 * File方式上传
+	 *
+	 * @param filePath 本地文件路径
+	 * @return path
+	 */
+	public String getFileOSSPathByLocalFilePath(String filePath){
+		File file = new File(filePath);
+		String path = "";
+//		path = uploadFile(file);
+		return path;
+	}
+
+	/**
      * 根据语音文件 URL 识别对应文字
      * @param fileUrl 语音文件 URL
      * @return 返回识别后的文字
@@ -100,6 +181,10 @@ public class SpeechRecognitionUtil {
         taskObject.put(KEY_APP_KEY, appKey);
         // 设置音频文件访问链接
         taskObject.put(KEY_FILE_LINK, fileUrl);
+        //设置回调方式
+		taskObject.put(ENABLE_CALLBACK, true);
+		taskObject.put(CALLBACK_URL, fileUrl);
+
         String task = taskObject.toJSONString();
         // 设置以上JSON字符串为Body参数
         postRequest.putBodyParameter(KEY_TASK, task);
@@ -161,7 +246,7 @@ public class SpeechRecognitionUtil {
     /**
      * 获取识别结果
      * @param client
-     * @param getRequest
+     * @param request
      * @return
      * @throws ClientException
      */
@@ -214,11 +299,117 @@ public class SpeechRecognitionUtil {
 
 		return speechRecognitionResult;
 	}
-	
+
+	/**
+	 * 根据回调语音文件 URL 识别对应文字
+	 * @param fileUrl 语音文件 URL
+	 * @return 返回识别后的文字
+	 * @throws ClientException
+	 */
+	public static Map<Integer,String> getSpeechRecognitionResultCallBack(String fileUrl) throws ClientException {
+		Map<Integer,String> textMaps = new HashMap<Integer,String>(16);
+
+		CommonRequest commonRequest = SpeechRecognitionUtil.buildCommonRequestByFileUrl(fileUrl);
+		IAcsClient client = SpeechRecognitionUtil.getClient();
+		CommonResponse postResponse = client.getCommonResponse(commonRequest);
+
+		String speechRecognitionResult = "";
+		String taskId = SpeechRecognitionUtil.getTaskId(postResponse);
+
+		if(StringUtils.isNotBlank(taskId)) {
+			CommonRequest getRequest = SpeechRecognitionUtil.buildCommonRequestByTaskId(taskId);
+			textMaps = SpeechRecognitionUtil.doGetSpeechRecognitionResultCallBack(client, getRequest);
+		}
+
+		return textMaps;
+	}
+
+	/**
+	 * 获取回调识别结果
+	 * @param client
+	 * @return String
+	 * @throws ClientException
+	 */
+	private static Map<Integer,String> doGetSpeechRecognitionResultCallBack(IAcsClient client, CommonRequest request) throws ClientException {
+		String speechRecognitionResult = "";
+		String statusText = "";
+
+		Map<Integer,String> textMaps = new HashMap<Integer,String>(16);
+
+		/*
+		 * 提交录音文件识别结果查询请求，以轮询的方式进行识别结果的查询。
+		 * 直到服务端返回的状态描述为“SUCCESS”/“SUCCESS_WITH_NO_VALID_FRAGMENT”，或者为错误描述，则结束轮询。
+		 */
+		while (true) {
+			CommonResponse getResponse = client.getCommonResponse(request);
+			if (getResponse.getHttpStatus() != 200) {
+				logger.error("识别结果查询请求失败，Http错误码：" + getResponse.getHttpStatus());
+				logger.error("识别结果查询请求失败：" + getResponse.getData());
+				break;
+			}
+
+			JSONObject result = JSONObject.parseObject(getResponse.getData());
+			logger.debug("识别查询结果：" + result.toJSONString());
+
+			statusText = result.getString(KEY_STATUS_TEXT);
+			if ("RUNNING".equals(statusText) || "QUEUEING".equals(statusText)) {
+				try {
+					Thread.sleep(3000); // 继续轮询
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			} else {
+				JSONArray arr = result.getJSONObject("Result").getJSONArray("Sentences");
+				for (int i = 0; i < arr.size(); i++) {
+					JSONObject o = arr.getJSONObject(i);
+					Integer beginTime = Integer.parseInt(o.getString("BeginTime"));
+					String text = o.getString("Text");
+					textMaps.put(beginTime,text);
+				}
+				logger.info("识别结果:{}", textMaps);
+				break;
+			}
+		}
+
+		if ("SUCCESS".equals(statusText) || "SUCCESS_WITH_NO_VALID_FRAGMENT".equals(statusText)) {
+			logger.warn("录音文件识别成功！");
+		} else {
+			logger.warn("录音文件识别失败！");
+			textMaps = null;
+		}
+
+		return textMaps;
+	}
+
     public static void main(String args[]) throws Exception {
         // naxions 音频地址
-        String fileUrl = "https://nuoxin-virtual-rep-storage.oss-cn-beijing.aliyuncs.com/virtual/2018112317/42b7f644-4199-4d8d-9a55-41eeb1d97585.mp3";
-		System.out.println("识别结果：" + SpeechRecognitionUtil.getSpeechRecognitionResult(fileUrl));
+//        String fileUrl = "https://nuoxin-virtual-rep-storage.oss-cn-beijing.aliyuncs.com/virtual/2018112317/42b7f644-4199-4d8d-9a55-41eeb1d97585.mp3";
+		String fileUrl = "https://nuoxin-virtual-rep-storage.oss-cn-beijing.aliyuncs.com/virtual/2019030811/c90dfefd-8d31-4b8e-a93a-3ccd9f19d3f1_left.wav";
+//		System.out.println("识别结果：" + SpeechRecognitionUtil.getSpeechRecognitionResult(fileUrl));
+		System.out.println("识别结果：" + SpeechRecognitionUtil.getSpeechRecognitionResultCallBack(fileUrl));
+
+		//下载阿里云中的录音文件
+//		ossDownLoad("https://nuoxin-virtual-rep-storage.oss-cn-beijing.aliyuncs.com/virtual/2018112317/42b7f644-4199-4d8d-9a55-41eeb1d97585.mp3");
+//		String sourceFileName = LOCAL_PATH+OSS_HTTP_URL.substring((OSS_HTTP_URL.lastIndexOf("/")));
+//		String targeFileName = LOCAL_PATH+OSS_HTTP_URL.substring((OSS_HTTP_URL.lastIndexOf("/")));
+//		targeFileName = targeFileName.substring(0,targeFileName.length()-3)+"wav";
+//		AudioConvertUtil.mp3ToWav(sourceFileName,targeFileName);
+
+		//区分wav左右声道，并保存到本地
+//		String wavSourceFileName = LOCAL_PATH+OSS_HTTP_URL.substring((OSS_HTTP_URL.lastIndexOf("/")));
+//		wavSourceFileName = wavSourceFileName.substring(0,wavSourceFileName.length()-3)+"wav";
+//		String leftTargeFileName = LOCAL_PATH+OSS_HTTP_URL.substring((OSS_HTTP_URL.lastIndexOf("/")));
+//		leftTargeFileName = leftTargeFileName.substring(0,leftTargeFileName.length()-4)+"_left.wav";
+//		String rightTargeFileName = LOCAL_PATH+OSS_HTTP_URL.substring((OSS_HTTP_URL.lastIndexOf("/")));
+//		rightTargeFileName = rightTargeFileName.substring(0,rightTargeFileName.length()-4)+"_right.wav";
+//		AudioConvertUtil.steroToMono(wavSourceFileName,leftTargeFileName,rightTargeFileName);
+
+		//把左右声道上传到阿里云
+//		String leftOSSPath = getFileOSSPathByLocalFilePath(leftTargeFileName);
+//		String rightOSSPath = getFileOSSPathByLocalFilePath(rightTargeFileName);
+
+//		System.out.println("leftOSSPath:"+leftOSSPath);
+//		System.out.println("rightOSSPath:"+rightOSSPath);
     }
 
 }

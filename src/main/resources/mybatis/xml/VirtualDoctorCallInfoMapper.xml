@@ -266,9 +266,9 @@
 
 	<!-- 保存电话记录 -->
 	<insert id="saveCallInfo" keyProperty="id" useGeneratedKeys="true" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.call.CallRequestBean">
-		INSERT INTO virtual_doctor_call_info(sin_token,visit_channel, virtual_doctor_id, mobile, virtual_drug_user_id, status, status_name, call_time, call_url, type, product_id)
+		INSERT INTO virtual_doctor_call_info(sin_token,visit_channel, virtual_doctor_id, mobile, virtual_drug_user_id, status, status_name, call_time, call_url, type, product_id, create_time)
 		VALUES
-		(#{sinToken},#{visitChannel}, #{doctorId}, #{mobile}, #{drugUserId}, #{status}, #{statusName}, #{times}, #{url}, #{type}, #{productId})
+		(#{sinToken},#{visitChannel}, #{doctorId}, #{mobile}, #{drugUserId}, #{status}, #{statusName}, #{times}, #{url}, #{type}, #{productId}, #{createTime})
 	</insert>
 
 
@@ -419,4 +419,1048 @@
 		ORDER BY
 			DATE_FORMAT(next_visit_time, '%Y-%m-%d')
 	</select>
+
+	<!-- 拜访医院总数 -->
+	<select id="getVisitHospitalCount" resultType="java.lang.Integer">
+
+		SELECT
+		COUNT(*)
+		FROM
+		(
+		SELECT DISTINCT
+		h.id
+		FROM
+		doctor d
+		INNER JOIN hospital h ON d.hospital_id = h.id
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		INNER JOIN virtual_doctor_call_info v ON d.id = v.virtual_doctor_id
+		AND v.product_id = #{productId}
+		WHERE
+		dud.is_available = 1
+		AND dud.prod_id = #{productId}
+		AND du.id IN
+
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+
+		AND v.virtual_drug_user_id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+
+		<if test="startTime!=null and startTime !=''">
+			AND DATE_FORMAT(v.create_time, '%Y-%m-%d') >=DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+		</if>
+
+		<if test="endTime!=null and endTime !=''">
+			AND DATE_FORMAT(v.create_time, '%Y-%m-%d') &lt;=DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+		</if>
+
+
+		UNION
+
+		SELECT DISTINCT
+		h.id
+		FROM
+		doctor d
+		INNER JOIN hospital h ON d.hospital_id = h.id
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		INNER JOIN t_meeting_attend_details tmad ON d.id = tmad.doctor_id
+		INNER JOIN t_meeting_data tmd ON tmad.meeting_id = tmd.id
+		WHERE
+		dud.is_available = 1
+		AND dud.prod_id = #{productId}
+		AND du.id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		AND (
+		tmd.product_id = #{productId}
+		OR tmad.item_id IN (
+		SELECT
+		id
+		FROM
+		drug_product
+		WHERE
+		product_id = #{productId}
+		)
+		)
+
+
+		<if test="startTime!=null and startTime !=''">
+			AND DATE_FORMAT(tmad.attend_start_time, '%Y-%m-%d') >=DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+		</if>
+
+		<if test="endTime!=null and endTime !=''">
+			AND DATE_FORMAT(tmad.attend_start_time, '%Y-%m-%d') &lt;=DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+		</if>
+
+
+		UNION
+		SELECT DISTINCT
+		h.id
+		FROM
+		doctor d
+		INNER JOIN hospital h ON d.hospital_id = h.id
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		INNER JOIN virtual_message vm ON d.id = vm.doctor_id
+		AND vm.message_type = 1
+		WHERE
+		dud.is_available = 1
+		AND dud.prod_id = #{productId}
+		AND du.id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		AND vm.drug_user_id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+
+		<if test="startTime!=null and startTime !=''">
+			AND DATE_FORMAT(vm.message_time, '%Y-%m-%d') >=DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+		</if>
+
+		<if test="endTime!=null and endTime !=''">
+			AND DATE_FORMAT(vm.message_time, '%Y-%m-%d') &lt;=DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+		</if>
+
+		UNION
+		SELECT DISTINCT
+		h.id
+		FROM
+		doctor d
+		INNER JOIN hospital h ON d.hospital_id = h.id
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		INNER JOIN activity_share a ON d.id = a.share_person_id
+		AND a.share_type = 2
+		WHERE
+		dud.is_available = 1
+		AND dud.prod_id = #{productId}
+		AND du.id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		AND a.drug_user_id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		AND a.data_id IN (
+		SELECT DISTINCT
+		content_id
+		FROM
+		t_content_product
+		WHERE
+		product_id = #{productId}
+		)
+
+		<if test="startTime!=null and startTime !=''">
+			AND DATE_FORMAT(a.create_time, '%Y-%m-%d') >=DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+		</if>
+
+		<if test="endTime!=null and endTime !=''">
+			AND DATE_FORMAT(a.create_time, '%Y-%m-%d') &lt;=DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+		</if>
+
+
+		UNION
+		SELECT DISTINCT
+		h.id
+		FROM
+		doctor d
+		INNER JOIN hospital h ON d.hospital_id = h.id
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		INNER JOIN wx_users wu ON d.id = wu.doctor_id
+		INNER JOIN wx_user_read wur ON wu.id = wur.user_id
+		WHERE
+		dud.is_available = 1
+		AND dud.prod_id = #{productId}
+		AND du.id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		AND wur.content_id IN (
+		SELECT DISTINCT
+		content_id
+		FROM
+		t_content_product
+		WHERE
+		product_id = #{productId}
+		)
+
+		<if test="startTime!=null and startTime !=''">
+			AND DATE_FORMAT(wur.create_time, '%Y-%m-%d') >=DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+		</if>
+
+		<if test="endTime!=null and endTime !=''">
+			AND DATE_FORMAT(wur.create_time, '%Y-%m-%d') &lt;=DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+		</if>
+
+
+		) t
+
+	</select>
+
+
+	<!-- 拜访医生总数 -->
+	<select id="getVisitDoctorCount" resultType="java.lang.Integer">
+
+		SELECT
+		COUNT(*)
+		FROM
+		(
+		SELECT DISTINCT
+		d.id
+		FROM
+		doctor d
+		INNER JOIN hospital h ON d.hospital_id = h.id
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		INNER JOIN virtual_doctor_call_info v ON d.id = v.virtual_doctor_id
+		AND v.product_id = #{productId}
+		WHERE
+		dud.is_available = 1
+		AND dud.prod_id = #{productId}
+		AND du.id IN
+
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+
+		AND v.virtual_drug_user_id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+
+		<if test="startTime!=null and startTime !=''">
+			AND DATE_FORMAT(v.create_time, '%Y-%m-%d') >=DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+		</if>
+
+		<if test="endTime!=null and endTime !=''">
+			AND DATE_FORMAT(v.create_time, '%Y-%m-%d') &lt;=DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+		</if>
+
+
+		UNION
+
+		SELECT DISTINCT
+		d.id
+		FROM
+		doctor d
+		INNER JOIN hospital h ON d.hospital_id = h.id
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		INNER JOIN t_meeting_attend_details tmad ON d.id = tmad.doctor_id
+		INNER JOIN t_meeting_data tmd ON tmad.meeting_id = tmd.id
+		WHERE
+		dud.is_available = 1
+		AND dud.prod_id = #{productId}
+		AND du.id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		AND (
+		tmd.product_id = #{productId}
+		OR tmad.item_id IN (
+		SELECT
+		id
+		FROM
+		drug_product
+		WHERE
+		product_id = #{productId}
+		)
+		)
+
+
+		<if test="startTime!=null and startTime !=''">
+			AND DATE_FORMAT(tmad.attend_start_time, '%Y-%m-%d') >=DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+		</if>
+
+		<if test="endTime!=null and endTime !=''">
+			AND DATE_FORMAT(tmad.attend_start_time, '%Y-%m-%d') &lt;=DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+		</if>
+
+
+		UNION
+		SELECT DISTINCT
+		d.id
+		FROM
+		doctor d
+		INNER JOIN hospital h ON d.hospital_id = h.id
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		INNER JOIN virtual_message vm ON d.id = vm.doctor_id
+		AND vm.message_type = 1
+		WHERE
+		dud.is_available = 1
+		AND dud.prod_id = #{productId}
+		AND du.id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		AND vm.drug_user_id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+
+		<if test="startTime!=null and startTime !=''">
+			AND DATE_FORMAT(vm.message_time, '%Y-%m-%d') >=DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+		</if>
+
+		<if test="endTime!=null and endTime !=''">
+			AND DATE_FORMAT(vm.message_time, '%Y-%m-%d') &lt;=DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+		</if>
+
+		UNION
+		SELECT DISTINCT
+		d.id
+		FROM
+		doctor d
+		INNER JOIN hospital h ON d.hospital_id = h.id
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		INNER JOIN activity_share a ON d.id = a.share_person_id
+		AND a.share_type = 2
+		WHERE
+		dud.is_available = 1
+		AND dud.prod_id = #{productId}
+		AND du.id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		AND a.drug_user_id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		AND a.data_id IN (
+		SELECT DISTINCT
+		content_id
+		FROM
+		t_content_product
+		WHERE
+		product_id = #{productId}
+		)
+
+		<if test="startTime!=null and startTime !=''">
+			AND DATE_FORMAT(a.create_time, '%Y-%m-%d') >=DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+		</if>
+
+		<if test="endTime!=null and endTime !=''">
+			AND DATE_FORMAT(a.create_time, '%Y-%m-%d') &lt;=DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+		</if>
+
+
+		UNION
+		SELECT DISTINCT
+		d.id
+		FROM
+		doctor d
+		INNER JOIN hospital h ON d.hospital_id = h.id
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		INNER JOIN wx_users wu ON d.id = wu.doctor_id
+		INNER JOIN wx_user_read wur ON wu.id = wur.user_id
+		WHERE
+		dud.is_available = 1
+		AND dud.prod_id = #{productId}
+		AND du.id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		AND wur.content_id IN (
+		SELECT DISTINCT
+		content_id
+		FROM
+		t_content_product
+		WHERE
+		product_id = #{productId}
+		)
+
+		<if test="startTime!=null and startTime !=''">
+			AND DATE_FORMAT(wur.create_time, '%Y-%m-%d') >=DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+		</if>
+
+		<if test="endTime!=null and endTime !=''">
+			AND DATE_FORMAT(wur.create_time, '%Y-%m-%d') &lt;=DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+		</if>
+
+
+		) t
+
+	</select>
+
+
+	<!-- 得到接触/覆盖/成功医院数量 -->
+	<select id="getVisitTypeHospitalCount" resultType="java.lang.Integer">
+		  SELECT
+				COUNT(*)
+			FROM
+				(
+					SELECT DISTINCT
+						h.id
+					FROM
+						doctor d
+					INNER JOIN hospital h ON d.hospital_id = h.id
+					INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+					INNER JOIN drug_user du ON dud.drug_user_id = du.id
+					INNER JOIN virtual_doctor_call_info v ON d.id = v.virtual_doctor_id
+					INNER JOIN virtual_doctor_call_info_mend m ON v.id = m.call_id
+					INNER JOIN virtual_doctor_call_info_result r ON m.id = r.mend_id
+					INNER JOIN virtual_product_visit_result pr ON r.result_id = pr.id
+					WHERE
+						dud.is_available = 1
+					AND dud.prod_id = #{productId}
+					AND du.id IN
+					<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+						#{drugUserId}
+					</foreach>
+
+					AND v.virtual_drug_user_id IN
+					<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+						#{drugUserId}
+					</foreach>
+
+					<if test="startTime!=null and startTime !=''">
+						AND DATE_FORMAT(v.create_time, '%Y-%m-%d') >=DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+					</if>
+
+					<if test="endTime!=null and endTime !=''">
+						AND DATE_FORMAT(v.create_time, '%Y-%m-%d') &lt;=DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+					</if>
+
+					AND v.product_id = #{productId}
+					AND pr.visit_type LIKE CONCAT('%', #{visitType}, '%')
+					UNION
+						SELECT DISTINCT
+							h.id
+						FROM
+							doctor d
+						INNER JOIN hospital h ON d.hospital_id = h.id
+						INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+						INNER JOIN drug_user du ON dud.drug_user_id = du.id
+						INNER JOIN virtual_message vm ON d.id = vm.doctor_id
+						AND vm.user_type = 2
+						WHERE
+							dud.is_available = 1
+						AND du.id IN
+						<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+							#{drugUserId}
+						</foreach>
+						AND dud.prod_id = #{productId}
+						AND vm.drug_user_id IN
+						<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+							#{drugUserId}
+						</foreach>
+
+						<if test="startTime!=null and startTime !=''">
+							AND DATE_FORMAT(vm.message_time, '%Y-%m-%d') >=DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+						</if>
+
+						<if test="endTime!=null and endTime !=''">
+							AND DATE_FORMAT(vm.message_time, '%Y-%m-%d') &lt;=DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+						</if>
+
+						UNION
+							SELECT DISTINCT
+								h.id
+							FROM
+								doctor d
+							INNER JOIN hospital h ON d.hospital_id = h.id
+							INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+							INNER JOIN drug_user du ON dud.drug_user_id = du.id
+							INNER JOIN t_meeting_attend_details tmad ON d.id = tmad.doctor_id
+							INNER JOIN t_meeting_data tmd ON tmad.meeting_id = tmd.id
+							WHERE
+								dud.is_available = 1
+							AND dud.prod_id = #{productId}
+							AND du.id IN
+							<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+								#{drugUserId}
+							</foreach>
+							AND (
+								tmd.product_id = #{productId}
+								OR tmad.item_id IN (
+									SELECT
+										id
+									FROM
+										drug_product
+									WHERE
+										product_id = #{productId}
+								)
+							)
+
+
+							<if test="startTime!=null and startTime !=''">
+								AND DATE_FORMAT(tmad.attend_start_time, '%Y-%m-%d') >=DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+							</if>
+
+							<if test="endTime!=null and endTime !=''">
+								AND DATE_FORMAT(tmad.attend_start_time, '%Y-%m-%d') &lt;=DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+							</if>
+
+
+							UNION
+								SELECT DISTINCT
+									h.id
+								FROM
+									doctor d
+								INNER JOIN hospital h ON d.hospital_id = h.id
+								INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+								INNER JOIN drug_user du ON dud.drug_user_id = du.id
+								INNER JOIN activity_read ar ON d.id = ar.read_person_id
+								LEFT JOIN activity_read_ip ari ON ar.read_token = ari.read_token
+								WHERE
+									dud.is_available = 1
+								AND dud.prod_id = #{productId}
+								AND du.id IN
+								<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+									#{drugUserId}
+								</foreach>
+								AND (
+									ari.isp IS NULL
+									OR ari.isp != '阿里云'
+								)
+								AND ar.drug_user_id IN
+
+								<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+									#{drugUserId}
+								</foreach>
+								AND ar.data_id IN (
+									SELECT DISTINCT
+										content_id
+									FROM
+										t_content_product
+									WHERE
+										product_id = #{productId}
+								)
+
+							<if test="startTime!=null and startTime !=''">
+								AND DATE_FORMAT(ar.create_time, '%Y-%m-%d') >=DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+							</if>
+
+							<if test="endTime!=null and endTime !=''">
+								AND DATE_FORMAT(ar.create_time, '%Y-%m-%d') &lt;=DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+							</if>
+
+								UNION
+									SELECT DISTINCT
+										h.id
+									FROM
+										doctor d
+									INNER JOIN hospital h ON d.hospital_id = h.id
+									INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+									INNER JOIN drug_user du ON dud.drug_user_id = du.id
+									INNER JOIN wx_users wu ON d.id = wu.doctor_id
+									INNER JOIN wx_user_read wur ON wu.id = wur.user_id
+									WHERE
+										dud.is_available = 1
+									AND dud.prod_id = #{productId}
+									AND du.id IN
+									<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+										#{drugUserId}
+									</foreach>
+									AND wur.content_id IN (
+										SELECT DISTINCT
+											content_id
+										FROM
+											t_content_product
+										WHERE
+											product_id = #{productId}
+									)
+
+									<if test="startTime!=null and startTime !=''">
+										AND DATE_FORMAT(wur.create_time, '%Y-%m-%d') >=DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+									</if>
+
+									<if test="endTime!=null and endTime !=''">
+										AND DATE_FORMAT(wur.create_time, '%Y-%m-%d') &lt;=DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+									</if>
+
+				) t
+	</select>
+
+
+	<!-- 得到接触/覆盖/成功过医生数量 -->
+	<select id="getVisitTypeDoctorCount" resultType="java.lang.Integer">
+		SELECT
+		COUNT(*)
+		FROM
+		(
+		SELECT DISTINCT
+		d.id
+		FROM
+		doctor d
+		INNER JOIN hospital h ON d.hospital_id = h.id
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		INNER JOIN virtual_doctor_call_info v ON d.id = v.virtual_doctor_id
+		INNER JOIN virtual_doctor_call_info_mend m ON v.id = m.call_id
+		INNER JOIN virtual_doctor_call_info_result r ON m.id = r.mend_id
+		INNER JOIN virtual_product_visit_result pr ON r.result_id = pr.id
+		WHERE
+		dud.is_available = 1
+		AND dud.prod_id = #{productId}
+		AND du.id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+
+		AND v.virtual_drug_user_id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+
+		<if test="startTime!=null and startTime !=''">
+			AND DATE_FORMAT(v.create_time, '%Y-%m-%d') >=DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+		</if>
+
+		<if test="endTime!=null and endTime !=''">
+			AND DATE_FORMAT(v.create_time, '%Y-%m-%d') &lt;=DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+		</if>
+
+		AND v.product_id = #{productId}
+		AND pr.visit_type LIKE CONCAT('%', #{visitType}, '%')
+		UNION
+		SELECT DISTINCT
+		d.id
+		FROM
+		doctor d
+		INNER JOIN hospital h ON d.hospital_id = h.id
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		INNER JOIN virtual_message vm ON d.id = vm.doctor_id
+		AND vm.user_type = 2
+		WHERE
+		dud.is_available = 1
+		AND du.id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		AND dud.prod_id = #{productId}
+		AND vm.drug_user_id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+
+		<if test="startTime!=null and startTime !=''">
+			AND DATE_FORMAT(vm.message_time, '%Y-%m-%d') >=DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+		</if>
+
+		<if test="endTime!=null and endTime !=''">
+			AND DATE_FORMAT(vm.message_time, '%Y-%m-%d') &lt;=DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+		</if>
+
+		UNION
+		SELECT DISTINCT
+		d.id
+		FROM
+		doctor d
+		INNER JOIN hospital h ON d.hospital_id = h.id
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		INNER JOIN t_meeting_attend_details tmad ON d.id = tmad.doctor_id
+		INNER JOIN t_meeting_data tmd ON tmad.meeting_id = tmd.id
+		WHERE
+		dud.is_available = 1
+		AND dud.prod_id = #{productId}
+		AND du.id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		AND (
+		tmd.product_id = #{productId}
+		OR tmad.item_id IN (
+		SELECT
+		id
+		FROM
+		drug_product
+		WHERE
+		product_id = #{productId}
+		)
+		)
+
+
+		<if test="startTime!=null and startTime !=''">
+			AND DATE_FORMAT(tmad.attend_start_time, '%Y-%m-%d') >=DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+		</if>
+
+		<if test="endTime!=null and endTime !=''">
+			AND DATE_FORMAT(tmad.attend_start_time, '%Y-%m-%d') &lt;=DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+		</if>
+
+
+		UNION
+		SELECT DISTINCT
+		d.id
+		FROM
+		doctor d
+		INNER JOIN hospital h ON d.hospital_id = h.id
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		INNER JOIN activity_read ar ON d.id = ar.read_person_id
+		LEFT JOIN activity_read_ip ari ON ar.read_token = ari.read_token
+		WHERE
+		dud.is_available = 1
+		AND dud.prod_id = #{productId}
+		AND du.id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		AND (
+		ari.isp IS NULL
+		OR ari.isp != '阿里云'
+		)
+		AND ar.drug_user_id IN
+
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		AND ar.data_id IN (
+		SELECT DISTINCT
+		content_id
+		FROM
+		t_content_product
+		WHERE
+		product_id = #{productId}
+		)
+
+		<if test="startTime!=null and startTime !=''">
+			AND DATE_FORMAT(ar.create_time, '%Y-%m-%d') >=DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+		</if>
+
+		<if test="endTime!=null and endTime !=''">
+			AND DATE_FORMAT(ar.create_time, '%Y-%m-%d') &lt;=DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+		</if>
+
+		UNION
+		SELECT DISTINCT
+		d.id
+		FROM
+		doctor d
+		INNER JOIN hospital h ON d.hospital_id = h.id
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		INNER JOIN wx_users wu ON d.id = wu.doctor_id
+		INNER JOIN wx_user_read wur ON wu.id = wur.user_id
+		WHERE
+		dud.is_available = 1
+		AND dud.prod_id = #{productId}
+		AND du.id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		AND wur.content_id IN (
+		SELECT DISTINCT
+		content_id
+		FROM
+		t_content_product
+		WHERE
+		product_id = #{productId}
+		)
+
+		<if test="startTime!=null and startTime !=''">
+			AND DATE_FORMAT(wur.create_time, '%Y-%m-%d') >=DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+		</if>
+
+		<if test="endTime!=null and endTime !=''">
+			AND DATE_FORMAT(wur.create_time, '%Y-%m-%d') &lt;=DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+		</if>
+
+		) t
+	</select>
+
+
+
+	<!-- 电话外呼量 -->
+	<select id="getCallCount" resultType="java.lang.Integer">
+		SELECT
+			COUNT(DISTINCT v.id)
+		FROM
+			doctor d
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		INNER JOIN virtual_doctor_call_info v
+		ON d.id=v.virtual_doctor_id
+		WHERE
+			dud.is_available = 1
+		AND dud.prod_id = #{productId}
+		AND du.id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		AND v.product_id=#{productId}
+		AND v.virtual_drug_user_id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		AND v.visit_channel=1
+
+		<if test="startTime!=null and startTime !=''">
+			AND DATE_FORMAT(v.create_time, '%Y-%m-%d') >=DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+		</if>
+
+		<if test="endTime!=null and endTime !=''">
+			AND DATE_FORMAT(v.create_time, '%Y-%m-%d') &lt;=DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+		</if>
+
+
+
+	</select>
+
+
+	<!-- 电话接通量 -->
+	<select id="getConnectCallCount" resultType="java.lang.Integer">
+		SELECT
+		COUNT(DISTINCT v.id)
+		FROM
+		doctor d
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		INNER JOIN virtual_doctor_call_info v
+		ON d.id=v.virtual_doctor_id
+		WHERE
+		dud.is_available = 1
+		AND dud.prod_id = #{productId}
+		AND du.id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		AND v.product_id=#{productId}
+		AND v.virtual_drug_user_id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		AND v.visit_channel=1
+		AND (v.status_name='answer' OR (call_url IS NOT NULL AND call_url!=''))
+
+		<if test="startTime!=null and startTime !=''">
+			AND DATE_FORMAT(v.create_time, '%Y-%m-%d') >=DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+		</if>
+
+		<if test="endTime!=null and endTime !=''">
+			AND DATE_FORMAT(v.create_time, '%Y-%m-%d') &lt;=DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+		</if>
+
+	</select>
+
+
+
+	<!-- 通话时长 -->
+	<select id="getCallTime" resultType="java.lang.String">
+
+		<!-- 修改前 -->
+		<!--
+		SELECT
+		ROUND(IFNULL(SUM(v.call_time), 0)/60,1) callTime
+		FROM
+		doctor d
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		INNER JOIN virtual_doctor_call_info v
+		ON d.id=v.virtual_doctor_id
+		WHERE
+		dud.is_available = 1
+		AND dud.prod_id = #{productId}
+		AND du.id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		AND v.product_id=#{productId}
+		AND v.virtual_drug_user_id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		AND v.visit_channel=1
+		AND (v.status_name='answer' OR (call_url IS NOT NULL AND call_url!=''))
+
+		<if test="startTime!=null and startTime !=''">
+			AND DATE_FORMAT(v.create_time, '%Y-%m-%d') >=DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+		</if>
+
+		<if test="endTime!=null and endTime !=''">
+			AND DATE_FORMAT(v.create_time, '%Y-%m-%d') &lt;=DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+		</if>
+
+		-->
+
+
+
+		SELECT
+		ROUND(IFNULL(SUM(v.call_time), 0)/60,1) callTime
+		FROM
+		virtual_doctor_call_info v
+		WHERE
+		v.product_id = #{productId}
+		AND v.virtual_drug_user_id IN
+
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+
+		AND v.visit_channel = 1
+		AND (
+		v.status_name = 'answer'
+		OR (
+		call_url IS NOT NULL
+		AND call_url != ''
+		)
+		)
+
+		<if test="startTime!=null and startTime !=''">
+			AND DATE_FORMAT(v.create_time, '%Y-%m-%d') >=DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+		</if>
+
+		<if test="endTime!=null and endTime !=''">
+			AND DATE_FORMAT(v.create_time, '%Y-%m-%d') &lt;=DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+		</if>
+
+		AND v.virtual_doctor_id IN (
+		SELECT
+		id
+		FROM
+		(
+		SELECT DISTINCT
+		d.id
+		FROM
+		doctor d
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		WHERE
+		dud.prod_id = #{productId}
+		AND dud.drug_user_id IN
+
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+
+		AND dud.is_available = 1
+		) t
+		)
+
+	</select>
+
+
+	<!-- 面谈次数 -->
+	<select id="interviewVisit" resultType="java.lang.Integer">
+		SELECT
+		COUNT(DISTINCT v.id)
+		FROM
+		doctor d
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		INNER JOIN virtual_doctor_call_info v
+		ON d.id=v.virtual_doctor_id
+		WHERE
+		dud.is_available = 1
+		AND dud.prod_id = #{productId}
+		AND du.id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		AND v.product_id=#{productId}
+		AND v.virtual_drug_user_id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		AND v.visit_channel=5
+
+		<if test="startTime!=null and startTime !=''">
+			AND DATE_FORMAT(v.create_time, '%Y-%m-%d') >=DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+		</if>
+
+		<if test="endTime!=null and endTime !=''">
+			AND DATE_FORMAT(v.create_time, '%Y-%m-%d') &lt;=DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+		</if>
+	</select>
+
+
+	<!-- 其他次数 -->
+	<select id="otherVisit" resultType="java.lang.Integer">
+		SELECT
+		COUNT(DISTINCT v.id)
+		FROM
+		doctor d
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		INNER JOIN virtual_doctor_call_info v
+		ON d.id=v.virtual_doctor_id
+		WHERE
+		dud.is_available = 1
+		AND dud.prod_id = #{productId}
+		AND du.id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		AND v.product_id=#{productId}
+		AND v.virtual_drug_user_id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		AND v.visit_channel IN (2,3,4)
+
+		<if test="startTime!=null and startTime !=''">
+			AND DATE_FORMAT(v.create_time, '%Y-%m-%d') >=DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+		</if>
+
+		<if test="endTime!=null and endTime !=''">
+			AND DATE_FORMAT(v.create_time, '%Y-%m-%d') &lt;=DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+		</if>
+	</select>
+
+	<!-- 分割录音文件并上传阿里云 -->
+	<insert id="saveSplitSpeechAliyunPath" parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualSplitSpeechAliyunPathParams">
+		INSERT INTO virtual_split_speech_aliyun_path (
+			targe_url,
+			source_url,
+			type,
+			create_time
+		)
+		VALUES
+		(
+			#{targeUrl},
+			#{sourceUrl},
+			#{type},
+			NOW()
+		)
+	</insert>
+
+	<!-- 根据左右声道的阿里云地址进行语音识别，进行入库 -->
+	<insert id="saveSpeechRecognitionResultCallInfo" parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualSplitSpeechCallInfoParams">
+		INSERT INTO virtual_split_speech_call_info (
+			sin_token,
+			type,
+			begin_time,
+			virtual_drug_user_id,
+			text,
+			create_time
+		)
+		VALUES
+		<foreach collection="list" item="item" separator=",">
+			(
+			#{item.sinToken},
+			#{item.type},
+			#{item.beginTime},
+			#{item.virtualDrugUserId},
+			#{item.text},
+			NOW()
+			)
+		</foreach>
+
+	</insert>
+
+    <!-- 根据sin_token获取virtual_doctor_call_info表中的id-->
+    <select id="getCallInfoBySinToken" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualSplitSpeechCallInfoParams">
+      SELECT t.id,t.sin_token sinToken,t.virtual_drug_user_id virtualDrugUserId FROM virtual_doctor_call_info t WHERE t.sin_token = #{sinToken}
+    </select>
+
+    <!-- 根据id获取virtual_doctor_call_info表中的sin_token-->
+    <select id="getCallInfoById" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualSplitSpeechCallInfoParams">
+      SELECT t.id,t.sin_token sinToken,t.virtual_drug_user_id virtualDrugUserId FROM virtual_doctor_call_info t WHERE t.id = #{id}
+    </select>
 </mapper>

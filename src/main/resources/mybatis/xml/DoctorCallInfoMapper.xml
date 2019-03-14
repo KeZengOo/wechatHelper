@@ -244,7 +244,8 @@
         hcpPotential,
         isHasDrug,
         isTarget,
-        isHasAe
+        isHasAe,
+        is_app_read
         FROM (
         SELECT
         vdci.id callId,du.name drugUserName,IFNULL(date_format(vdci.create_time, '%Y-%m-%d %H:%i:%s'),'')  visitTime,call_dud.doctorId,call_dud.doctorName,
@@ -260,7 +261,7 @@
         IFNULL(vdci.remark,'') remark,
         IFNULL(vdct.call_text,'') callText,
         "" shareContent,IFNULL(GROUP_CONCAT(vppvr.visit_result),vdci.status_name) visitResultStr,IFNULL(vdcim.`attitude`,'') attitude,IFNULL(date_format(vdcim.`next_visit_time`, '%Y-%m-%d %H:%i:%s'),'') nextVisitTime
-        ,call_dud.clientLevel,IFNULL(vdcim.`hcp_potential`,'未知') hcpPotential,IFNULL(vdcim.is_has_drug,'未知') isHasDrug,IFNULL(vdcim.`is_target`,'未知') isTarget,IFNULL(vdcim.`is_has_ae`,'未知')  isHasAe
+        ,call_dud.clientLevel,IFNULL(vdcim.`hcp_potential`,'未知') hcpPotential,IFNULL(vdcim.is_has_drug,'未知') isHasDrug,IFNULL(vdcim.`is_target`,'未知') isTarget,IFNULL(vdcim.`is_has_ae`,'未知')  isHasAe, 0 is_app_read
         FROM
         virtual_doctor_call_info vdci
         INNER JOIN drug_user du ON vdci.virtual_drug_user_id=du.id
@@ -346,7 +347,8 @@
             '' remark,
             '' callText,
             IFNULL(ai.title,'') shareContent,'' visitResultStr,'' attitude,'' nextVisitTime
-            ,content_dud.clientLevel,'未知' hcpPotential,'未知' isHasDrug,'未知' isTarget,'未知'  isHasAe
+            ,content_dud.clientLevel,'未知' hcpPotential,'未知' isHasDrug,'未知' isTarget,'未知'  isHasAe,
+            0 is_app_read
             FROM
             activity_share a
             INNER JOIN (
@@ -406,9 +408,101 @@
 
             GROUP BY a.id
 
+            UNION ALL
 
+            SELECT
+            wx.id callId,
+            '' drugUserName,
+            IFNULL(
+            date_format(
+            wx.`create_time`,
+            '%Y-%m-%d %H:%i:%s'
+            ),
+            ''
+            ) visitTime,
+            wx.doctor_id,
+            wx.user_name,
+            wx_dud.hospitalId,
+            wx_dud.hospitalName,
+            wx_dud.depart,
+            wx_dud.hospitalLevel,
+            '' isRecruit,
+            '内容分享' visitType,
+            6 visitChannel,
+            '' remark,
+            '' callText,
+            wx.title shareContent,
+            '' visitResultStr,
+            '' attitude,
+            '' nextVisitTime,
+            wx_dud.clientLevel,
+            '未知' hcpPotential,
+            '未知' isHasDrug,
+            '未知' isTarget,
+            '未知' isHasAe,
+            1 is_app_read
+            FROM
+            (
+            SELECT
+            wur.id,
+            dud.doctor_id,
+            wur.user_id,
+            wur.user_name,
+            wur.content_id,
+            ai.title,
+            wur.create_time
+            FROM
+            wx_user_read wur
+            INNER JOIN wx_users wu ON wur.user_id = wu.id
+
+            <if test="startTime!=null and startTime!=''">
+                and date_format(wur.create_time,'%Y-%m-%d') &gt;=#{startTime}
+            </if>
+            <if test="endTime!=null and endTime!=''">
+                and date_format(wur.create_time,'%Y-%m-%d') &lt;=#{endTime}
+            </if>
+            INNER JOIN drug_user_doctor dud ON dud.doctor_id = wu.doctor_id
+            AND dud.drug_user_id in
+
+            <foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+                #{drugUserId}
+            </foreach>
+
+            AND dud.prod_id = #{productId}
+            AND dud.is_available = 1
+            LEFT JOIN activity_info ai ON wur.content_id = ai.id
+            ) wx
+            INNER JOIN (
+            SELECT DISTINCT
+            d.id doctorId,
+            d.`name` doctorName,
+            IFNULL(d.hospital_id, 0) hospitalId,
+            IFNULL(d.hospital_name, '') hospitalName,
+            IFNULL(d.depart, '') depart,
+            IFNULL(h. LEVEL, '0') AS hospitalLevel,
+            IFNULL(dv.client_level, '') clientLevel,
+            du.`name` drugUserName
+            FROM
+            doctor d
+            LEFT JOIN hospital h ON d.hospital_id = h.id
+            INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+            INNER JOIN drug_user du ON dud.drug_user_id = du.id
+            LEFT JOIN doctor_virtual dv ON d.id = dv.doctor_id
+            AND dv.product_id = #{productId}
+            WHERE
+            dud.is_available = 1
+            AND dud.prod_id = #{productId}
+            AND du.id IN
+            <foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+                #{drugUserId}
+            </foreach>
+
+            ) wx_dud ON wx.doctor_id = wx_dud.doctorId
 
         </if>
+
+
+
         ) b
         WHERE 1=1
 
@@ -611,7 +705,70 @@
                 </foreach>
             </if>
 
+            UNION ALL
+
+            SELECT
+            wx.id callId,
+            6 visitChannel
+            FROM
+            (
+            SELECT
+            wur.id,
+            dud.doctor_id,
+            wur.user_id,
+            wur.user_name,
+            wur.content_id,
+            ai.title,
+            wur.create_time
+            FROM
+            wx_user_read wur
+            INNER JOIN wx_users wu ON wur.user_id = wu.id
+            <if test="startTime!=null and startTime!=''">
+                and date_format(wur.create_time,'%Y-%m-%d') &gt;=#{startTime}
+            </if>
+            <if test="endTime!=null and endTime!=''">
+                and date_format(wur.create_time,'%Y-%m-%d') &lt;=#{endTime}
+            </if>
+            INNER JOIN drug_user_doctor dud ON dud.doctor_id = wu.doctor_id
+            AND dud.drug_user_id in
+
+            <foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+                #{drugUserId}
+            </foreach>
+
+            AND dud.prod_id = #{productId}
+            AND dud.is_available = 1
+            LEFT JOIN activity_info ai ON wur.content_id = ai.id
+            ) wx
+            INNER JOIN (
+            SELECT DISTINCT
+            d.id doctorId,
+            d.`name` doctorName,
+            IFNULL(d.hospital_id, 0) hospitalId,
+            IFNULL(d.hospital_name, '') hospitalName,
+            IFNULL(d.depart, '') depart,
+            IFNULL(h. LEVEL, '0') AS hospitalLevel,
+            IFNULL(dv.client_level, '') clientLevel,
+            du.`name` drugUserName
+            FROM
+            doctor d
+            LEFT JOIN hospital h ON d.hospital_id = h.id
+            INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+            INNER JOIN drug_user du ON dud.drug_user_id = du.id
+            LEFT JOIN doctor_virtual dv ON d.id = dv.doctor_id
+            AND dv.product_id = #{productId}
+            WHERE
+            dud.is_available = 1
+            AND dud.prod_id = #{productId}
+            AND du.id IN
+            <foreach collection="drugUserIds" item="drugUserId" open="(" close=")" separator=",">
+                #{drugUserId}
+            </foreach>
+
+            ) wx_dud ON wx.doctor_id = wx_dud.doctorId
         </if>
+
+
         ) b
         WHERE 1=1
 

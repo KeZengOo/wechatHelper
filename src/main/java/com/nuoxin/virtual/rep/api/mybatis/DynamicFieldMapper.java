@@ -7,6 +7,7 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorDynam
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.questionnaire.ProductQuestionnaireRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DoctorDynamicFieldRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DynamicFieldProductRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.statistics.DailyStatisticsRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.customer.DoctorDynamicFieldResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorBasicInfoResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpBasicInfoHistoryResponseBean;
@@ -14,9 +15,11 @@ import com.nuoxin.virtual.rep.api.web.controller.response.hcp.HcpDynamicRequestB
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.*;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.DoctorDynamicExtendResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.SearchDynamicFieldResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.single.DoctorAddDynamicFieldResponseBean;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -339,4 +342,37 @@ public interface DynamicFieldMapper {
      * @return
      */
     List<SearchDynamicFieldResponseBean> getSearchDynamicField(Long productId);
+
+    /**
+     * 查询动态字段，用于医生新增回显
+     * @param doctorId
+     * @param classification
+     * @return
+     */
+    List<DoctorBasicDynamicFieldValueResponseBean> getDoctorAddDynamicField(@Param(value = "doctorId") Long doctorId, @Param(value = "classification") Integer classification);
+
+
+    /**
+     * 得到有需求的医生人数
+     * @param bean
+     * @return
+     */
+    Integer getDemandDoctor(DailyStatisticsRequestBean bean);
+
+    /**
+     * 根据产品和医生列表获得医生处方列表
+     * @param productId
+     * @param doctorList
+     * @return
+     */
+    List<PrescriptionResponseBean> getPrescriptionListByDoctorList(@Param(value = "productId") Long productId, @Param(value = "doctorList") List<Long> doctorList);
+
+
+    /**
+     * 判断是否有医生需求字段
+     * @param productId
+     * @return 有的话大于0
+     */
+    Integer hasDemandField(@Param(value = "productId") Long productId);
+
 }

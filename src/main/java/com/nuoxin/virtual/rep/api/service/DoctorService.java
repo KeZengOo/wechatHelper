@@ -13,6 +13,8 @@ import com.nuoxin.virtual.rep.api.entity.v2_5.DoctorExcelBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorQuateParams;
 import com.nuoxin.virtual.rep.api.entity.v2_5.HospitalProvinceBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorMendParams;
+import com.nuoxin.virtual.rep.api.enums.OnOffLineEnum;
+import com.nuoxin.virtual.rep.api.enums.SaleUserTypeEnum;
 import com.nuoxin.virtual.rep.api.mybatis.*;
 import com.nuoxin.virtual.rep.api.service.v2_5.NewDoctorService;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
@@ -1028,9 +1030,50 @@ public class DoctorService extends BaseService {
         for (int i = 0, leng = list.size(); i < leng; i++) {
             DoctorExcelBean excel = list.get(i);
             int errorLine = i+2;
+
+
+            if(StringUtils.isBlank(excel.getDrugUserEmail())){
+                throw new Exception("第（"+errorLine+"）行销售邮箱为空");
+            }
+
+
+            DrugUser user = drugUserService.findByEmail(excel.getDrugUserEmail());
+            if(user==null){
+                throw new Exception("第（"+errorLine+"）行销售不存在");
+            }
+
+            List<Long> productIdList = drugUserMapper.getProductIdListByEmail(excel.getDrugUserEmail());
+            if (CollectionsUtil.isEmptyList(productIdList) || (!productIdList.contains(productId))){
+                throw new Exception("第（"+errorLine+"）行销售不在选定的产品下");
+            }
+
+
+
+
             if(StringUtils.isBlank(excel.getDoctorName())){
                 throw new Exception("第（"+errorLine+"）行姓名为空");
             }
+
+            if(StringUtils.isBlank(excel.getHospitalName())){
+                throw new Exception("第（"+errorLine+"）行医院为空");
+            }
+
+
+            // 如果是线下代表医生的处理
+            Integer saleType = user.getSaleType();
+            if (saleType == OnOffLineEnum.OFFLINE.getUserType()){
+                // 线下代表录入的的医生可以没有手机号，以医生的姓名和医院校验唯一性
+                Integer doctorCount = doctorMapper.getDoctorCount(excel.getDoctorName(), excel.getHospitalName());
+                if (doctorCount !=null && doctorCount > 0){
+                    throw new Exception("第（"+errorLine+"）行医生已经存在！");
+                }
+
+                // 线下代表医生可以不用输入手机号，创建一个假的手机号，假的手机号以123 开头
+                if (StringUtil.isEmpty(excel.getMobile())){
+                    excel.setMobile("123" + StringUtil.getUuidRemoveLine());
+                }
+            }
+
 
             String mobiles = excel.getMobile();
             if (StringUtils.isEmpty(mobiles)){
@@ -1047,15 +1090,13 @@ public class DoctorService extends BaseService {
             }
 
             for (String telephone:mobileArray){
+                // 如果是线下代表导入的，并且手机号是123开头的则不进行校验
+                if (user.getSaleType() == OnOffLineEnum.OFFLINE.getUserType() && excel.getMobile().startsWith("123")){
+                    continue;
+                }
+
                 boolean mobileMatcher = RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, telephone);
                 if (!mobileMatcher){
-//                    boolean fixPhoneMatch = RegularUtils.isMatcher(RegularUtils.MATCH_FIX_PHONE, telephone);
-//                    if (!fixPhoneMatch){
-//                        throw new BusinessException(ErrorEnum.ERROR, "第（"+ errorLine +"）行联系方式:" + telephone + " 输入不合法！");
-//                    }
-
-
-
                     throw new BusinessException(ErrorEnum.ERROR, "第（"+ errorLine +"）行手机号:" + telephone + " 输入不合法！");
                 }
             }
@@ -1071,16 +1112,10 @@ public class DoctorService extends BaseService {
                 throw new BusinessException(ErrorEnum.ERROR, "第（"+ errorLine +"）行手机号已经存在！");
             }
 
-
-            if (StringUtils.isEmpty(excel.getHospitalName())){
-                throw new Exception("第（"+ errorLine +"）行医院为空");
-            }
             if (StringUtils.isEmpty(excel.getDrugUserName())){
                 throw new Exception("第（"+ errorLine +"）行销售代表姓名为空");
             }
-            if(StringUtils.isBlank(excel.getDrugUserEmail())){
-                throw new Exception("第（"+errorLine+"）行销售邮箱为空");
-            }
+
 
             String sex = excel.getSex();
             if (StringUtils.isNotEmtity(sex)){
@@ -1089,15 +1124,7 @@ public class DoctorService extends BaseService {
                 }
             }
 
-            DrugUser user = drugUserService.findByEmail(excel.getDrugUserEmail());
-            if(user==null){
-                throw new Exception("第（"+errorLine+"）行销售不存在");
-            }
 
-            List<Long> productIdList = drugUserMapper.getProductIdListByEmail(excel.getDrugUserEmail());
-            if (CollectionsUtil.isEmptyList(productIdList) || (!productIdList.contains(productId))){
-                throw new Exception("第（"+errorLine+"）行销售不在选定的产品下");
-            }
 
 
             map.put(excel.getDrugUserEmail(),user.getId());

@@ -1,5 +1,6 @@
 package com.nuoxin.virtual.rep.api.service.v2_5.impl;
 
+import java.io.FileOutputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -8,30 +9,35 @@ import javax.annotation.Resource;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.entity.Doctor;
+import com.nuoxin.virtual.rep.api.entity.DrugUser;
+import com.nuoxin.virtual.rep.api.entity.ProductLine;
+import com.nuoxin.virtual.rep.api.entity.v2_5.DynamicFieldResponse;
+import com.nuoxin.virtual.rep.api.entity.v2_5.DynamicFieldValueResponse;
 import com.nuoxin.virtual.rep.api.enums.ClassificationEnum;
 import com.nuoxin.virtual.rep.api.enums.MeetingTimeTypeEnum;
 import com.nuoxin.virtual.rep.api.enums.SearchTypeEnum;
 import com.nuoxin.virtual.rep.api.mybatis.*;
-import com.nuoxin.virtual.rep.api.utils.DateUtil;
-import com.nuoxin.virtual.rep.api.utils.StringUtil;
+import com.nuoxin.virtual.rep.api.service.DrugUserService;
+import com.nuoxin.virtual.rep.api.service.ProductLineService;
+import com.nuoxin.virtual.rep.api.utils.*;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.excel.SheetRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.SearchDynamicFieldRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DoctorPotentialClassificationRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.*;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.plan.VisitDoctorResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.*;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.nuoxin.virtual.rep.api.common.bean.PageRequestBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.CustomerFollowUpPageResponseBean;
 import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v2_5.CustomerFollowUpService;
-import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
-import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.ListRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.ScreenRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.SearchRequestBean;
 
@@ -47,6 +53,9 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	private static final Logger logger = LoggerFactory.getLogger(CustomerFollowUpServiceImpl.class);
 	
 	private static final List<Object> tableHeaders = new ArrayList<>(20);
+
+	@Value("${download.file.path}")
+	private String downloadPath;
 
 	@Resource
 	private DrugUserDoctorQuateMapper drugUserDoctorQuateMapper;
@@ -68,6 +77,12 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 
 	@Resource
 	private DynamicFieldMapper dynamicFieldMapper;
+
+	@Autowired
+	private DrugUserService drugUserService;
+
+	@Autowired
+	private ProductLineService productLineService;
 
 
 	/**
@@ -395,6 +410,197 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		}
 
 		return searchDynamicFieldList;
+	}
+
+	@Override
+	public String getExportExcelName(SearchRequestBean searchReq) throws Exception{
+		this.fileSearchType(searchReq);
+		this.handleSearchValueList(searchReq);
+		//设置不分页标志
+		searchReq.setNonPagingFlag(1);
+		List<CustomerFollowListBean> list = doctorMapper.getList(searchReq);
+		if(CollectionsUtil.isEmptyList(list)){
+			throw new BusinessException(ErrorEnum.SYSTEM_REQUEST_PARAM_ERROR, "无数据返回");
+		}
+
+		//医生id列表
+		List<Long> doctorIds = new ArrayList<Long>();
+		Set<Long> ids = new HashSet<>();
+		//医生-基础信息map
+		Map<Long, CustomerFollowListBean> doctorInfoMap = new HashMap<Long, CustomerFollowListBean>();
+
+		list.forEach(d->{
+			doctorIds.add(d.getDoctorId());
+			ids.add(d.getDoctorId());
+			doctorInfoMap.put(d.getDoctorId(), d);
+				}
+		);
+
+		//产品id,目前产品数量为1
+		Long productId = searchReq.getProductLineIds().get(0);
+		Long drugUserId = searchReq.getVirtualDrugUserIds().get(0);
+		//医药代表
+		DrugUser drugUser = drugUserService.findById(drugUserId);
+		//产品信息
+		ProductLine product = productLineService.findById(productId);
+
+		//动态字段列表
+		List<DynamicFieldResponse> dynamicTitleList = dynamicFieldMapper.getProductDynamicField(productId);
+
+		//动态字段value列表
+		List<DynamicFieldValueResponse> dynamicFieldValueList = dynamicFieldMapper.getProductDynamicFieldValue(productId, ids);
+		Map<Long, List<DynamicFieldValueResponse>> doctorDynamicFieldMap = dynamicFieldValueList.stream().collect(Collectors.groupingBy(DynamicFieldValueResponse::getDoctorId));
+
+		//医生拜访结果
+		Map<Long, List<VisitResultResponseBean>> visitResultListMap = new HashMap<>();
+		List<VisitResultResponseBean> visitResultList = drugUserDoctorQuateResultMapper.getVisitResultList(doctorIds, searchReq.getProductLineIds());
+		if (CollectionsUtil.isNotEmptyList(visitResultList)){
+			Map<Long, List<VisitResultResponseBean>> groupByVisitResultList = visitResultList.stream().collect(Collectors.groupingBy(VisitResultResponseBean::getDoctorId));
+			if (CollectionsUtil.isNotEmptyMap(groupByVisitResultList)){
+				visitResultListMap = groupByVisitResultList;
+			}
+		}
+
+		//获得处方信息
+		List<PrescriptionResponseBean> prescriptionList = dynamicFieldMapper.getPrescriptionListByDoctorList(productId, doctorIds);
+		Map<Long, List<PrescriptionResponseBean>> prescriptionListMap = new HashMap<>();
+		if (CollectionsUtil.isNotEmptyList(prescriptionList)){
+			Map<Long, List<PrescriptionResponseBean>> groupByPrescriptionList = prescriptionList.stream().collect(Collectors.groupingBy(PrescriptionResponseBean::getDoctorId));
+			if (CollectionsUtil.isNotEmptyMap(groupByPrescriptionList)){
+				prescriptionListMap = groupByPrescriptionList;
+			}
+		}
+
+		List<LinkedHashMap<String, Object>> mapList = new ArrayList<LinkedHashMap<String, Object>>();
+		for(CustomerFollowListBean d : list){
+			LinkedHashMap<String, Object> detailMap = new LinkedHashMap<String, Object>();
+			Long doctorId = d.getDoctorId();
+			//固定字段值
+			detailMap.put("drug_userId", drugUser == null ? "" : drugUser.getName());
+			detailMap.put("doctor_id", doctorId);
+			detailMap.put("doctor_gender", d.getGender() == 0 ? "男" : d.getGender() == 1 ? "女" : "未知");
+			detailMap.put("doctor_dept", d.getDepartment());
+			detailMap.put("doctor_title", d.getTitle());
+			detailMap.put("hospital_id", d.getHospitalId());
+			detailMap.put("hospital_name", d.getHospitalName());
+			//detailMap.put("hospital_level", d.getHospitalLevel());
+			detailMap.put("hospital_levelName", d.getHospitalLevel() == null ? "" : HospitalLevelUtil.getLevelNameByLevelCode(d.getHospitalLevel().toString()));
+			detailMap.put("hospital_province", d.getProvince());
+			detailMap.put("hospital_city", d.getCity());
+			detailMap.put("product_id", productId);
+			detailMap.put("product_name", product == null ? "" : product.getName());
+
+			//处方信息固定值
+			List<PrescriptionResponseBean> tempPresList = prescriptionListMap.containsKey(doctorId) ? prescriptionListMap.get(doctorId): null;
+			PrescriptionResponseBean prescription = null;
+			if(CollectionsUtil.isNotEmptyList(tempPresList)){
+				prescription = tempPresList.get(0);
+			}
+			detailMap.put("prescription_hasDrug", prescription == null ? "" : processPrescriptionShowFlag(prescription.getHasDrug()));
+			detailMap.put("prescription_target", prescription == null ? "" : processPrescriptionShowFlag(prescription.getTarget()));
+			detailMap.put("prescription_recruit", prescription == null ? "" : processPrescriptionShowFlag(prescription.getRecruit()));
+			detailMap.put("prescription_breakOff", prescription == null ? "" : processPrescriptionShowFlag(prescription.getBreakOff()));
+
+			detailMap.put("visit_result", visitResultListMap.containsKey(doctorId) ? processVisitResult(visitResultListMap.get(doctorId)) : "");
+
+			//填充动态字段值
+			List<DynamicFieldValueResponse> valueList = doctorDynamicFieldMap.containsKey(doctorId) ? doctorDynamicFieldMap.get(doctorId) : null;
+			if(CollectionsUtil.isNotEmptyList(valueList)){
+				valueList.forEach(v -> {
+					if (v.getProp() !=null && (!"".equals(v.getProp().trim()))) {
+						detailMap.put(v.getProp(), v.getValue() == null ? "" : v.getValue());
+					}
+				});
+			}
+
+			mapList.add(detailMap);
+		}
+
+		return getExportExcelName(mapList, dynamicTitleList);
+	}
+
+	//拜访记录结果展示
+	private String processVisitResult(List<VisitResultResponseBean> resultList){
+		if(CollectionsUtil.isEmptyList(resultList)){
+			return "";
+		}
+		Set<String> resultSet = new HashSet<String>();
+		resultList.forEach(r->{
+			resultSet.add(r.getVisitResult() == null ? "" : r.getVisitResult());
+		 }
+		);
+		return String.join(",", resultSet);
+	}
+
+	//处方信息结果展示
+	private String processPrescriptionShowFlag(Integer flag){
+		if(flag == null) return "未知";
+		return flag == 1 ? "是" : flag == 0 ? "否" : "未知";
+	}
+
+	private Map<String, String> getTitleMap(List<DynamicFieldResponse> list){
+		Map<String, String> titleMap = new LinkedHashMap<>();
+		titleMap.put("drug_userId", "代表_姓名");
+		titleMap.put("doctor_id", "医生_id");
+		titleMap.put("doctor_gender", "医生_性别");
+		titleMap.put("doctor_dept", "医生_科室");
+		titleMap.put("doctor_title", "医生_职称");
+		titleMap.put("hospital_id", "医院_id");
+		titleMap.put("hospital_name", "医院_名称");
+		titleMap.put("hospital_levelName", "医院_等级");
+		titleMap.put("hospital_province", "医院_省份");
+		titleMap.put("hospital_city", "医院_城市");
+		titleMap.put("product_id", "产品_id");
+		titleMap.put("product_name", "产品_名称");
+		titleMap.put("prescription_hasDrug", "处方信息_是否有药");
+		titleMap.put("prescription_target", "处方信息_是否目标医生");
+		titleMap.put("prescription_recruit", "处方信息_是否招募");
+		titleMap.put("prescription_breakOff", "处方信息_是否脱落");
+		titleMap.put("visit_result", "拜访记录_拜访结果");
+
+		list.sort((DynamicFieldResponse d1, DynamicFieldResponse d2) -> d1.getClassification().compareTo(d2.getClassification()));
+
+		list.forEach(x->{
+			String prefix = "";
+			switch (x.getClassification()){
+				case 1 : prefix = "医生_";
+				break;
+				case 2: prefix = "处方信息_";
+				break;
+				case 3: prefix = "拜访记录_";
+				break;
+				case 5: prefix = "医院_";
+				break;
+			}
+			titleMap.put(x.getProp(), prefix + x.getLable());
+		});
+		return titleMap;
+	}
+
+	private String getExportExcelName(List<LinkedHashMap<String, Object>> mapList, List<DynamicFieldResponse> dynamicTitleList) throws Exception{
+		List<SheetRequestBean> sheetList = new ArrayList<>();
+		SheetRequestBean sheetRequestBean = new SheetRequestBean();
+		sheetRequestBean.setDataList(mapList);
+		sheetRequestBean.setTitleMap(getTitleMap(dynamicTitleList));
+		sheetRequestBean.setSheetName("医生详情表");
+		sheetList.add(sheetRequestBean);
+		HSSFWorkbook wb = ExportExcel.excelLinkedHashMapExport(sheetList);
+
+		String fileName = "virtual_app_doctorList_"  + DateUtil.getDateSecondString(new Date()) + ".xls";
+		String fullFileName = downloadPath + fileName;
+		FileOutputStream exportXls = null;
+		try{
+			exportXls = new FileOutputStream(fullFileName);
+			wb.write(exportXls);
+			exportXls.flush();
+		}catch (Exception e){
+			e.printStackTrace();
+
+		}finally {
+			exportXls.close();
+
+		}
+		return fileName;
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -640,7 +640,7 @@
         -->
 
         <!-- 2019-01-02 修改后  -->
-        SELECT field_name lable,CONCAT("field",(@i:=@i+1)) prop
+        SELECT field_name lable,CONCAT("field",(@i:=@i+1)) prop,classification
         FROM virtual_doctor_dynamic_field,(SELECT @i:=0)  t2
         WHERE product_id=#{productId}
         OR classification IN (1,5)
@@ -843,6 +843,92 @@
                 WHERE
                     product_id=#{productId}
                 AND classification IN (2, 3)
+    </select>
+
+    <!--  -->
+    <select id="getDoctorAddDynamicField" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorBasicDynamicFieldValueResponseBean">
+
+        SELECT DISTINCT
+            v3.id dynamicFieldId,
+            v3.field_name dynamicFieldName,
+            v3.field_value dynamicFieldSelectValue,
+            t.selectValue dynamicFieldValue,
+            t.dynamic_extend_value dynamicExtendValue,
+            v3.required,
+            v3.classification,
+            v3.type,
+            t.id
+        FROM
+            virtual_doctor_dynamic_field v3
+        LEFT JOIN (
+            SELECT
+                v.id fieldId,
+                v.field_name fieldName,
+                v2.dynamic_field_value selectValue,
+                v2.dynamic_extend_value,
+                v2.id
+            FROM
+                virtual_doctor_dynamic_field v
+            INNER JOIN virtual_doctor_dynamic_field_value v2 ON v.id = v2.dynamic_field_id
+            WHERE
+                v2.doctor_id = #{doctorId}
+            AND v.classification = #{classification}
+        ) t ON v3.id = t.fieldId
+        WHERE
+            v3.classification = #{classification}
+        ORDER BY
+            v3.id
+
+
+    </select>
+
+
+
+    <!--得到有医生需求的人数-->
+    <select id="getDemandDoctor" resultType="java.lang.Integer">
+        SELECT
+            COUNT(DISTINCT d.id)
+        FROM
+            doctor d
+        INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+        INNER JOIN drug_user du ON dud.drug_user_id = du.id
+        INNER JOIN virtual_doctor_dynamic_field v ON dud.prod_id = v.product_id
+        INNER JOIN virtual_doctor_dynamic_field_value v2 ON v.id = v2.dynamic_field_id
+        AND d.id = v2.doctor_id
+        WHERE
+            dud.is_available = 1
+        AND dud.prod_id = #{productId}
+        AND du.id IN
+        <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+            #{drugUserId}
+        </foreach>
+        AND v.field_name = '医生需求'
+
+        <if test="startTime!=null and startTime !=''">
+            AND DATE_FORMAT(v2.create_time, '%Y-%m-%d') >=DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+        </if>
+
+        <if test="endTime!=null and endTime !=''">
+            AND DATE_FORMAT(v2.create_time, '%Y-%m-%d') &lt;=DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+        </if>
+    </select>
+
+    <!-- 根据产品ID和医生列表得到处方信息列表  -->
+    <select id="getPrescriptionListByDoctorList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.PrescriptionResponseBean">
+        SELECT doctor_id doctorId, hcp_potential potential, is_has_drug hasDrug, is_target target, is_recruit recruit, is_break_off breakOff
+        FROM drug_user_doctor_quate
+        WHERE product_id=#{productId}
+        and doctor_id in
+        <foreach collection="doctorList" item="item"  separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        ORDER BY create_time Desc
+    </select>
+
+
+    <select id="hasDemandField" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM virtual_doctor_dynamic_field WHERE product_id=#{productId}
+        AND field_name='医生需求'
     </select>
 
 </mapper>

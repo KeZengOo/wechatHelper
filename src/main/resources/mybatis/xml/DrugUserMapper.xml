@@ -204,5 +204,14 @@
     <select id="getRoleIdByDrugUserId" resultType="java.lang.String">
         SELECT GROUP_CONCAT(role_id) FROM role_user WHERE user_id=#{drugUserId}
     </select>
+
+    <!-- 得到多个代表名字 -->
+    <select id="getDrugUserNameList" resultType="java.lang.String">
+        SELECT GROUP_CONCAT(DISTINCT du.name SEPARATOR '、') FROM drug_user du
+        WHERE du.id IN
+        <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+            #{drugUserId}
+        </foreach>
+    </select>
     
 </mapper>

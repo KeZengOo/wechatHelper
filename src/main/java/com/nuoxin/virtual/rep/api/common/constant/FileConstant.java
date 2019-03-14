@@ -14,4 +14,11 @@ public interface FileConstant {
 	 * WAV文件尾缀
 	 */
 	String WAV_SUFFIX = ".wav";
+
+	/**
+	 * 文件保存路径
+	 * 服务器本地地址：/home/nuoxin/stagging/split_speech
+	 * 本机地址：D:/mp3
+	 */
+	String LOCAL_PATH = "/home/nuoxin/stagging/split_speech";
 }

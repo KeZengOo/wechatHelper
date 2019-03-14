@@ -1,6 +1,9 @@
 package com.nuoxin.virtual.rep.api.service;
 
 import java.io.File;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -30,6 +33,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
@@ -330,8 +334,8 @@ public class DoctorCallService extends BaseService {
      * @param bean CallRequestBean 对象
      * @return 返回 CallRequestBean 对象
      */
-    @Transactional(readOnly = false)
-    public CallRequestBean save(CallRequestBean bean){
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    public CallRequestBean save(CallRequestBean bean) throws ParseException {
 //        DoctorCallInfo info = new DoctorCallInfo();
 //        info.setSinToken(bean.getSinToken());
 //        info.setStatus(bean.getStatus());
@@ -352,6 +356,11 @@ public class DoctorCallService extends BaseService {
 //        if (doctor != null){
 //            bean.setDoctorId(doctor.getId());
 //        }
+        if(bean.getCreateTime() == null){
+            DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String createTime = format.format(new Date());
+            bean.setCreateTime(createTime);
+        }
         virtualDoctorCallInfoService.saveCallInfo(bean);
         
 //        Long infoId = info.getId();
@@ -362,7 +371,16 @@ public class DoctorCallService extends BaseService {
         infoDetails.setCallId(bean.getId());
         infoDetails.setStatus(bean.getStatus());
         infoDetails.setStatusName(bean.getStatusName());
-        infoDetails.setCreateTime(new Date());
+        if(bean.getCreateTime() != null && !bean.getCreateTime().equals("")){
+            DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            Date date = null;
+            date = format.parse(bean.getCreateTime());
+            infoDetails.setCreateTime(date);
+        }
+        else
+        {
+            infoDetails.setCreateTime(new Date());
+        }
         doctorCallInfoDetailsRepository.save(infoDetails);
         
         return bean;

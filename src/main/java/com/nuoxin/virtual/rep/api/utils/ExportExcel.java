@@ -61,6 +61,37 @@ public final class ExportExcel {
         return workbook;
     }
 
+
+    /**
+     *
+     * @param dataList 按照列排列的数据
+     *        对象集合,包含标题，每个List<String> 是一列数据
+     * @param desc sheet数据说明
+     * @param sheetName
+     *        sheet名称和表头值
+     */
+    public static HSSFWorkbook excelExport(List<List<String>> dataList,String desc, String sheetName) {
+        // 初始化workbook
+        initHSSFWorkbook(sheetName);
+        // 填充数据
+        HSSFRow headRow = sheet.createRow(0);
+        HSSFCell headCell = headRow.createCell(0);
+        headCell.setCellValue(desc);
+        int columnSize = dataList.size();
+        int rowSize = dataList.get(0).size();
+        for (int i = 0; i < rowSize; i++) {
+            HSSFRow row = sheet.createRow(i + 1);
+            for (int j =0 ; j < columnSize; j++){
+                HSSFCell cell = row.createCell(j);
+                cell.setCellValue(dataList.get(j).get(i));
+            }
+        }
+
+        return workbook;
+    }
+
+
+
     /**
      * 单个sheet
      * @param dataList

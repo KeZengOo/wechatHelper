@@ -53,5 +53,71 @@
             
     </select>
 
+    <!-- 在客户聊天记录中，当前代表在过去N天内是否与医生有微信聊天记录  -->
+    <select id="wechatChatRecordIsExist" resultType="java.lang.Integer">
+        SELECT
+            count(1)
+        FROM
+            virtual_message t
+        WHERE
+            t.message_type = 1
+        AND t.drug_user_id = #{drugUserId}
+        AND t.doctor_id = #{doctorId}
+        AND t.message_time > date_sub(NOW(), INTERVAL #{dayNum} DAY)
+    </select>
+
+    <!-- 一个自然天内，存在多少条微信的拜访记录 -->
+    <select id="wechatVisitLogCountOneDay" resultType="java.lang.Integer">
+        SELECT
+            count(1)
+        FROM
+            virtual_doctor_call_info t
+        WHERE
+            t.visit_channel = 2
+        AND t.virtual_drug_user_id = #{drugUserId}
+        AND t.virtual_doctor_id = #{doctorId}
+        AND t.create_time > date_sub(NOW(), INTERVAL 1 DAY)
+    </select>
+
+    <!-- 微信聊天记录天数和一天内可添加微信拜访记录的配置表 -->
+    <select id="virtualWechatVisitCountAndCycleConfig" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualWechatVisitCountAndCycleConfigParams">
+        SELECT id,add_count addCount ,cycle_count cycleCount FROM virtual_wechat_visit_count_and_cycle_config LIMIT 1
+    </select>
+
+    <!-- 在客户聊天记录中，当前代表在过去N天内是否与医生有微信聊天记录的日期 -->
+    <select id="wechatChatRecordDate" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualWechatDate">
+        SELECT
+            DATE_FORMAT(t.message_time, '%Y-%c-%e') existDate,count(t.message_time) dayCount
+        FROM
+            virtual_message t
+        WHERE
+            t.message_type = 1
+        AND t.drug_user_id = #{drugUserId}
+        AND t.doctor_id = #{doctorId}
+        AND t.message_time > date_sub(NOW(), INTERVAL #{dayNum} DAY)
+        GROUP BY
+            existDate
+    </select>
+
+    <!-- 当前代表在过去N天内是否存在微信拜访记录日期 -->
+    <select id="wechatVisitLogsDate" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualWechatDate">
+        SELECT
+            DATE_FORMAT(t.create_time, '%Y-%c-%e') existDate, count(t.create_time) dayCount
+        FROM
+            virtual_doctor_call_info t
+        WHERE
+            t.visit_channel = 2
+        AND t.virtual_drug_user_id = #{drugUserId}
+        AND t.virtual_doctor_id = #{doctorId}
+        AND t.product_id = #{productId}
+        AND t.create_time > date_sub(NOW(), INTERVAL #{dayNum} DAY)
+        GROUP BY
+            existDate;
+    </select>
+
+    <!-- 得到产品名称 -->
+    <select id="getProductName" resultType="java.lang.String">
+        SELECT prod_name FROM product_line WHERE prod_id=#{productId}
+    </select>
 
 </mapper>

@@ -11,8 +11,17 @@
         	(#{index.doctorId}, #{index.doctorName}, #{index.doctorEmail}, 
         	#{index.drugUserId}, #{index.drugUserName}, #{index.drugUserEmail},
         	#{index.prodId}, NOW())
-    	</foreach >
-	</insert>		
+    	</foreach>
+	</insert>
+
+
+	<update id="updateDrugUserDoctorAvailable">
+		UPDATE drug_user_doctor SET is_available=0
+		WHERE drug_user_id=#{drugUserId}
+		AND doctor_id=#{doctorId}
+		AND prod_id=#{prodId}
+	</update>
+
 	
 	<insert id="saveDrugUserDoctorsOneToOne">
 		INSERT INTO drug_user_doctor_one_to_one 
@@ -22,6 +31,13 @@
         	(#{index.drugUserId}, #{index.doctorId}, #{index.isAddWechat}, NOW())
     	</foreach >
 	</insert>
+
+
+	<delete id="deleteDrugUserDoctorsOneToOne">
+		DELETE FROM drug_user_doctor_one_to_one
+		WHERE drug_user_id=#{drugUserId}
+		AND doctor_id=#{doctorId}
+	</delete>
 
 	<select id="selectDrugUserDoctors" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsResponse">
 		SELECT DISTINCT user_id AS drugUserId,t1.name AS drugUserName FROM `product_user` t JOIN drug_user t1 ON t.user_id=t1.id
@@ -58,6 +74,34 @@
 	<select id="getDrugUserIdByProductId" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsResponse">
 		SELECT DISTINCT user_id AS drugUserId,t1.name AS drugUserName FROM `product_user` t JOIN drug_user t1 ON t.user_id=t1.id
 		WHERE t.prod_id = #{productId} AND t1.status=1 AND t1.`leader_path` LIKE #{leaderPath}
+	</select>
+
+
+	<!-- 添加微信的医生人数 -->
+	<select id="addWechatDoctor" resultType="java.lang.Integer">
+		SELECT
+			COUNT(DISTINCT d.id)
+		FROM
+			doctor d
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		INNER JOIN drug_user_doctor_one_to_one o
+		ON dud.doctor_id=o.doctor_id AND dud.drug_user_id=o.drug_user_id
+		WHERE dud.is_available=1
+		AND dud.prod_id=#{productId}
+		AND du.id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+		AND o.is_add_wechat=1
+
+		<if test="startTime!=null and startTime !=''">
+			AND DATE_FORMAT(o.create_time, '%Y-%m-%d') >=DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+		</if>
+
+		<if test="endTime!=null and endTime !=''">
+			AND DATE_FORMAT(o.create_time, '%Y-%m-%d') &lt;=DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+		</if>
 	</select>
 
 </mapper>

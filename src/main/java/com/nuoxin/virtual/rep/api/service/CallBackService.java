@@ -1,6 +1,7 @@
 package com.nuoxin.virtual.rep.api.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 
 import com.nuoxin.virtual.rep.api.web.controller.request.call.Call7mmorRequestBean;
@@ -49,4 +50,17 @@ public interface CallBackService {
 	 */
 	void handleNotAliyunCallUrl();
 
+	/**
+	 * 分割录音文件并上传阿里云
+	 */
+	Map<String,String> splitSpeechAliyunUrlUpdate(String ossFilePath);
+
+	/**
+	 * 根据左右声道的阿里云地址进行语音识别，进行入库
+	 * @param pathMaps
+	 * @param sinToken
+	 * @param callId
+	 * @return boolean
+	 */
+	boolean saveSpeechRecognitionResultCallInfo(Map<String,String> pathMaps, String sinToken,Integer callId);
 }
