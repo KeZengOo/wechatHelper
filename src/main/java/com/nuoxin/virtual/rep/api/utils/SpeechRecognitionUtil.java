@@ -2,6 +2,7 @@ package com.nuoxin.virtual.rep.api.utils;
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.common.utils.BinaryUtil;
 import com.aliyun.oss.model.ObjectMetadata;
+import com.nuoxin.virtual.rep.api.common.constant.FileConstant;
 import com.nuoxin.virtual.rep.api.common.util.FileUtils;
 import com.nuoxin.virtual.rep.api.common.util.OSSContentTypeUtil;
 import com.nuoxin.virtual.rep.api.config.AliyunConfig;
@@ -67,9 +68,7 @@ public class SpeechRecognitionUtil {
 	 * 	4.分别进行语音识别转成文本
 	 * 	5.入库
 	 */
-	private static final String OSS_HTTP_URL = "https://nuoxin-virtual-rep-storage.oss-cn-beijing.aliyuncs.com/virtual/2018112317/42b7f644-4199-4d8d-9a55-41eeb1d97585.mp3";
-
-	private static final String LOCAL_PATH = "D:/mp3";
+//	private static final String OSS_HTTP_URL = "https://nuoxin-virtual-rep-storage.oss-cn-beijing.aliyuncs.com/virtual/2018112317/42b7f644-4199-4d8d-9a55-41eeb1d97585.mp3";
 
 	public static Integer ossDownLoad(String ossHttpUrl){
 		BufferedInputStream bis=null;
@@ -84,7 +83,7 @@ public class SpeechRecognitionUtil {
 			bis = new BufferedInputStream(is);
 
 			//名字截取 可以省略
-			File file = new File(LOCAL_PATH+ossHttpUrl.substring((ossHttpUrl.lastIndexOf("/"))));
+			File file = new File(FileConstant.LOCAL_PATH+ossHttpUrl.substring((ossHttpUrl.lastIndexOf("/"))));
 			FileOutputStream fos = new FileOutputStream(file);
 			bos = new BufferedOutputStream(fos);
 			int b = 0;
@@ -383,9 +382,9 @@ public class SpeechRecognitionUtil {
     public static void main(String args[]) throws Exception {
         // naxions 音频地址
 //        String fileUrl = "https://nuoxin-virtual-rep-storage.oss-cn-beijing.aliyuncs.com/virtual/2018112317/42b7f644-4199-4d8d-9a55-41eeb1d97585.mp3";
-		String fileUrl = "https://nuoxin-virtual-rep-storage.oss-cn-beijing.aliyuncs.com/virtual/2019030811/c90dfefd-8d31-4b8e-a93a-3ccd9f19d3f1_left.wav";
+//		String fileUrl = "https://nuoxin-virtual-rep-storage.oss-cn-beijing.aliyuncs.com/virtual/2019030811/c90dfefd-8d31-4b8e-a93a-3ccd9f19d3f1_left.wav";
 //		System.out.println("识别结果：" + SpeechRecognitionUtil.getSpeechRecognitionResult(fileUrl));
-		System.out.println("识别结果：" + SpeechRecognitionUtil.getSpeechRecognitionResultCallBack(fileUrl));
+//		System.out.println("识别结果：" + SpeechRecognitionUtil.getSpeechRecognitionResultCallBack(fileUrl));
 
 		//下载阿里云中的录音文件
 //		ossDownLoad("https://nuoxin-virtual-rep-storage.oss-cn-beijing.aliyuncs.com/virtual/2018112317/42b7f644-4199-4d8d-9a55-41eeb1d97585.mp3");

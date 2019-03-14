@@ -215,6 +215,7 @@ public abstract class BaseCallBackImpl implements CallBackService{
 	 */
 	@Override
 	public Map<String,String> splitSpeechAliyunUrlUpdate(String ossFilePath){
+		logger.info("ossFilePath:{}", "语音文件上传到阿里云后的地址："+ossFilePath);
 		Map<String,String> pathMaps = new HashMap<String,String>(16);
 		String local = FileConstant.LOCAL_PATH;
 		int num = ossFilePath.indexOf("\\");
