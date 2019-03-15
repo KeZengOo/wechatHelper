@@ -337,6 +337,12 @@
 			#{drugUserId}
 		</foreach>
 
+		AND q.drug_user_id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+
+
 		<if test="startTime!=null and startTime !=''">
 			AND DATE_FORMAT(q.create_time, '%Y-%m-%d') >=DATE_FORMAT(#{startTime}, '%Y-%m-%d')
 		</if>
@@ -364,6 +370,11 @@
 		AND dud.prod_id = #{productId}
 		AND q.is_recruit = 1
 		AND du.id IN
+		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+			#{drugUserId}
+		</foreach>
+
+		AND q.drug_user_id IN
 		<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
 			#{drugUserId}
 		</foreach>
