@@ -183,9 +183,11 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 					//分割录音文件并上传阿里云，返回左右声道的阿里云地址
 					Map<String,String> pathMap = splitSpeechAliyunUrlUpdate(callInfo.getCallUrl());
 					logger.info("pathMap={}, 分割录音文件并上传阿里云，返回左右声道的阿里云地址", pathMap);
-					//根据左右声道的阿里云地址进行语音识别，进行入库
-					boolean result_is_save = saveSpeechRecognitionResultCallInfo(pathMap, callInfo.getSinToken());
-					logger.info("result_is_save={}, 根据左右声道的阿里云地址进行语音识别，进行入库是否成功！", result_is_save);
+					if(pathMap.size() > 0){
+						//根据左右声道的阿里云地址进行语音识别，进行入库
+						boolean result_is_save = saveSpeechRecognitionResultCallInfo(pathMap, callInfo.getSinToken());
+						logger.info("result_is_save={}, 根据左右声道的阿里云地址进行语音识别，进行入库是否成功！", result_is_save);
+					}
 				}
 			}).start();
 //			//分割录音文件并上传阿里云，返回左右声道的阿里云地址

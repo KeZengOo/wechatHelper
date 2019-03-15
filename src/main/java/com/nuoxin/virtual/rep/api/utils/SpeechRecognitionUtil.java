@@ -387,8 +387,9 @@ public class SpeechRecognitionUtil {
 //		System.out.println("识别结果：" + SpeechRecognitionUtil.getSpeechRecognitionResultCallBack(fileUrl));
 
 		//下载阿里云中的录音文件
-//		ossDownLoad("https://nuoxin-virtual-rep-storage.oss-cn-beijing.aliyuncs.com/virtual/2018112317/42b7f644-4199-4d8d-9a55-41eeb1d97585.mp3");
-//		String sourceFileName = LOCAL_PATH+OSS_HTTP_URL.substring((OSS_HTTP_URL.lastIndexOf("/")));
+//		Integer result = ossDownLoad("https://nuoxin-virtual-rep-storage.oss-cn-beijing.aliyuncs.com/virtual/2018100315/2630b4fe-9737-4cc9-8d64-2f094c7cc070.mp3");
+//		System.out.println(result);
+		//		String sourceFileName = LOCAL_PATH+OSS_HTTP_URL.substring((OSS_HTTP_URL.lastIndexOf("/")));
 //		String targeFileName = LOCAL_PATH+OSS_HTTP_URL.substring((OSS_HTTP_URL.lastIndexOf("/")));
 //		targeFileName = targeFileName.substring(0,targeFileName.length()-3)+"wav";
 //		AudioConvertUtil.mp3ToWav(sourceFileName,targeFileName);

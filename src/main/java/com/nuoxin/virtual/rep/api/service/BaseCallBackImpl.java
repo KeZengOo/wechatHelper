@@ -45,6 +45,7 @@ public abstract class BaseCallBackImpl implements CallBackService{
 	@Resource
 	private DoctorCallInfoRepository callInfoDao;
 
+
 	/**
 	 * 父类通用回调处理
 	 * @param result ConvertResult 对象
@@ -63,9 +64,11 @@ public abstract class BaseCallBackImpl implements CallBackService{
 				//分割录音文件并上传阿里云，返回左右声道的阿里云地址
 				Map<String,String> pathMap = splitSpeechAliyunUrlUpdate(callOssUrl);
 				logger.info("pathMap={}, 分割录音文件并上传阿里云，返回左右声道的阿里云地址", pathMap);
-				//根据左右声道的阿里云地址进行语音识别，进行入库
-				boolean result_is_save = saveSpeechRecognitionResultCallInfo(pathMap, sinToken);
-				logger.info("result_is_save={}, 根据左右声道的阿里云地址进行语音识别，进行入库是否成功！", result_is_save);
+				if(pathMap.size() > 0){
+					//根据左右声道的阿里云地址进行语音识别，进行入库
+					boolean result_is_save = saveSpeechRecognitionResultCallInfo(pathMap, sinToken);
+					logger.info("result_is_save={}, 根据左右声道的阿里云地址进行语音识别，进行入库是否成功！", result_is_save);
+				}
 			}
 		}).start();
 
@@ -231,10 +234,15 @@ public abstract class BaseCallBackImpl implements CallBackService{
 		Integer result =SpeechRecognitionUtil.ossDownLoad(ossFilePath);
 		//如果在阿里云上存在下载的文件
 		if(result == 1){
-			String sourceFileName = local+ossFilePath.substring((ossFilePath.lastIndexOf("/")));
-			String targeFileName = local+ossFilePath.substring((ossFilePath.lastIndexOf("/")));
-			targeFileName = targeFileName.substring(0,targeFileName.length()-3)+"wav";
-			AudioConvertUtil.mp3ToWav(sourceFileName,targeFileName);
+			String fileType = ossFilePath.substring(ossFilePath.length()-4,ossFilePath.length());
+			String sourceFileName = "";
+			String targeFileName = "";
+			if(fileType.equals(FileConstant.MP3_SUFFIX)){
+				sourceFileName = local+ossFilePath.substring((ossFilePath.lastIndexOf("/")));
+				targeFileName = local+ossFilePath.substring((ossFilePath.lastIndexOf("/")));
+				targeFileName = targeFileName.substring(0,targeFileName.length()-3)+"wav";
+				AudioConvertUtil.mp3ToWav(sourceFileName,targeFileName);
+			}
 
 			//区分wav左右声道，并保存到本地
 			String wavSourceFileName = local+ossFilePath.substring((ossFilePath.lastIndexOf("/")));
