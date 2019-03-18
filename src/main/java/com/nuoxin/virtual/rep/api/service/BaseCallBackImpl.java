@@ -251,21 +251,24 @@ public abstract class BaseCallBackImpl implements CallBackService{
 			leftTargeFileName = leftTargeFileName.substring(0,leftTargeFileName.length()-4)+"_left.wav";
 			String rightTargeFileName = local+ossFilePath.substring((ossFilePath.lastIndexOf("/")));
 			rightTargeFileName = rightTargeFileName.substring(0,rightTargeFileName.length()-4)+"_right.wav";
-			AudioConvertUtil.steroToMono(wavSourceFileName,leftTargeFileName,rightTargeFileName);
 
-			//把左右声道上传到阿里云
-			String leftOSSPath = getFileOSSPathByLocalFilePath(leftTargeFileName);
-			String rightOSSPath = getFileOSSPathByLocalFilePath(rightTargeFileName);
+			try {
+				AudioConvertUtil.steroToMono(wavSourceFileName,leftTargeFileName,rightTargeFileName);
+				//把左右声道上传到阿里云
+				String leftOSSPath = getFileOSSPathByLocalFilePath(leftTargeFileName);
+				String rightOSSPath = getFileOSSPathByLocalFilePath(rightTargeFileName);
 
-			//把阿里云地址存入新表中（未设计）
-			callInfoMapper.saveSplitSpeechAliyunPath(ossFilePath,leftOSSPath,1);
-			callInfoMapper.saveSplitSpeechAliyunPath(ossFilePath,rightOSSPath,2);
-			//根据阿里云URL进行语音识别
+				//把阿里云地址存入新表中（未设计）
+				callInfoMapper.saveSplitSpeechAliyunPath(ossFilePath,leftOSSPath,1);
+				callInfoMapper.saveSplitSpeechAliyunPath(ossFilePath,rightOSSPath,2);
+				//根据阿里云URL进行语音识别
 
-			pathMaps.put("leftOSSPath",leftOSSPath);
-			pathMaps.put("rightOSSPath",rightOSSPath);
+				pathMaps.put("leftOSSPath",leftOSSPath);
+				pathMaps.put("rightOSSPath",rightOSSPath);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
-
 		return pathMaps;
 	}
 
