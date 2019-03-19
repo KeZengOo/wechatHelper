@@ -64,28 +64,21 @@ public class LoginValidationInterceptor extends HandlerInterceptorAdapter {
         String encryptAuthToken = request.getParameter("userid");
         if (StringUtil.isEmpty(encryptAuthToken)){
             Cookie cookie = CookieUtil.getCookie(request, UserConstant.IDENTIFIER);
-            if(cookie == null) {
-                throw new NeedLoginException(ErrorEnum.LOGIN_NO);
+            if(cookie != null) {
+                encryptAuthToken = cookie.getValue();
             }
-            encryptAuthToken = cookie.getValue();
         }
 
-
-        if (StringUtil.isEmpty(encryptAuthToken)){
-            throw new NeedLoginException(ErrorEnum.LOGIN_NO);
+        if (StringUtil.isNotEmpty(encryptAuthToken)){
+            String email = Aes128Util.decryptAES(encryptAuthToken);
+            if (StringUtil.isNotEmpty(email)){
+                DrugUser drugUser = drugUserRepository.findFirstByEmail(email);
+                if (drugUser != null){
+                    request.setAttribute(SessionConfig.DEFAULT_REQUEST_DRUG_USER, drugUser);
+                    return true;
+                }
+            }
         }
-
-        String email = Aes128Util.decryptAES(encryptAuthToken);
-        if (StringUtil.isEmpty(email)){
-            throw new NeedLoginException(ErrorEnum.LOGIN_NO);
-        }
-
-        DrugUser drugUser = drugUserRepository.findFirstByEmail(email);
-        if (drugUser != null){
-            request.setAttribute(SessionConfig.DEFAULT_REQUEST_DRUG_USER, drugUser);
-            return true;
-        }
-
 
         String servletPath = request.getServletPath();
 		logger.info("接口【{}】请求开始登录验证",servletPath);
