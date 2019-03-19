@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.ShortUrlWhiteMapper">
+
+    <!-- 得到总数，判断白名单是否存在 -->
+    <select id="getUrlWhiteCount" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM short_url_white_list WHERE domain_name=#{url}
+    </select>
+
+</mapper>

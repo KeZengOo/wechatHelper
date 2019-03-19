@@ -1,11 +1,18 @@
 package com.nuoxin.virtual.rep.api.web.intercept;
 
+import com.nuoxin.virtual.rep.api.common.constant.user.UserConstant;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
+import com.nuoxin.virtual.rep.api.common.exception.NeedLoginException;
 import com.nuoxin.virtual.rep.api.config.SessionConfig;
+import com.nuoxin.virtual.rep.api.dao.DrugUserRepository;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
+import com.nuoxin.virtual.rep.api.mybatis.ShortUrlWhiteMapper;
 import com.nuoxin.virtual.rep.api.service.SecurityService;
+import com.nuoxin.virtual.rep.api.utils.Aes128Util;
+import com.nuoxin.virtual.rep.api.utils.CookieUtil;
 import com.nuoxin.virtual.rep.api.utils.StringUtil;
+import com.nuoxin.virtual.rep.api.utils.UrlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +20,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
+import javax.annotation.Resource;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -27,6 +36,12 @@ public class LoginValidationInterceptor extends HandlerInterceptorAdapter {
 	@Autowired
 	private SecurityService sercurityService;
 
+	@Resource
+	private DrugUserRepository drugUserRepository;
+
+	@Resource
+    private ShortUrlWhiteMapper shortUrlWhiteMapper;
+
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		if(request.getMethod().equals("OPTIONS")){
@@ -39,8 +54,40 @@ public class LoginValidationInterceptor extends HandlerInterceptorAdapter {
 //
 
 		//TODO 虚拟代表版HCP360 请求不需要验证，根据白名单判断
+//        String requestURI = request.getRequestURI();
+//        String domainNameByUrl = UrlUtil.getDomainNameByUrl(requestURI);
+//        Integer urlWhiteCount = shortUrlWhiteMapper.getUrlWhiteCount(domainNameByUrl);
+//        if (urlWhiteCount!=null && urlWhiteCount > 0){
+//        }
 
-		String servletPath = request.getServletPath();
+
+        String encryptAuthToken = request.getParameter("userid");
+        if (StringUtil.isEmpty(encryptAuthToken)){
+            Cookie cookie = CookieUtil.getCookie(request, UserConstant.IDENTIFIER);
+            if(cookie == null) {
+                throw new NeedLoginException(ErrorEnum.LOGIN_NO);
+            }
+            encryptAuthToken = cookie.getValue();
+        }
+
+
+        if (StringUtil.isEmpty(encryptAuthToken)){
+            throw new NeedLoginException(ErrorEnum.LOGIN_NO);
+        }
+
+        String email = Aes128Util.decryptAES(encryptAuthToken);
+        if (StringUtil.isEmpty(email)){
+            throw new NeedLoginException(ErrorEnum.LOGIN_NO);
+        }
+
+        DrugUser drugUser = drugUserRepository.findFirstByEmail(email);
+        if (drugUser != null){
+            request.setAttribute(SessionConfig.DEFAULT_REQUEST_DRUG_USER, drugUser);
+            return true;
+        }
+
+
+        String servletPath = request.getServletPath();
 		logger.info("接口【{}】请求开始登录验证",servletPath);
 		sercurityService.sessionValidation(request);
 		DrugUser user = sercurityService.getDrugUser(request);
