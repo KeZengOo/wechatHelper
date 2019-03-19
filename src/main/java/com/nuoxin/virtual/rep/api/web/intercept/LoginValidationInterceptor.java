@@ -61,7 +61,7 @@ public class LoginValidationInterceptor extends HandlerInterceptorAdapter {
 //        }
 
 
-        String encryptAuthToken = request.getParameter("userid");
+        String encryptAuthToken = request.getParameter("auth-token");
         if (StringUtil.isEmpty(encryptAuthToken)){
             Cookie cookie = CookieUtil.getCookie(request, UserConstant.IDENTIFIER);
             if(cookie != null) {
