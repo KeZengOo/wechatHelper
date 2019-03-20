@@ -5,10 +5,7 @@ import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
 import com.nuoxin.virtual.rep.api.common.util.mem.SessionMemUtils;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
-import com.nuoxin.virtual.rep.api.service.DrugUserService;
-import com.nuoxin.virtual.rep.api.service.EmailService;
-import com.nuoxin.virtual.rep.api.service.LoginService;
-import com.nuoxin.virtual.rep.api.service.SecurityService;
+import com.nuoxin.virtual.rep.api.service.*;
 import com.nuoxin.virtual.rep.api.web.controller.request.LoginRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.UpdatePwdRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserCallDetaiBean;
@@ -16,6 +13,7 @@ import com.nuoxin.virtual.rep.api.web.controller.response.LoginResponseBean;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,6 +39,8 @@ public class LoginController extends BaseController {
 	private EmailService emailService;
 	@Autowired
 	private SessionMemUtils memUtils;
+	@Autowired
+	private TestSlaveService testSlaveService;
 
 	@SuppressWarnings("unchecked")
 	@ApiOperation(value = "虚拟代表登录", notes = "虚拟代表登录")
@@ -174,4 +174,13 @@ public class LoginController extends BaseController {
 		return loginBean;
 	}
 
+	@ApiOperation(value = "多数据源-从数据源测试接口", notes = "多数据源-从数据源测试接口")
+	@PostMapping("/slaveTest")
+	@ResponseBody
+	public DefaultResponseBean<String> slaveTest(@RequestParam("productId") Long productId) {
+		String name = testSlaveService.getProductName(productId);
+		DefaultResponseBean<String> responseBean = new DefaultResponseBean<>();
+		responseBean.setData(name);
+		return responseBean;
+	}
 }
