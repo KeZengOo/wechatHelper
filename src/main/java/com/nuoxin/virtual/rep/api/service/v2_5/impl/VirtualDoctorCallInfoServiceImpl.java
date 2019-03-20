@@ -406,12 +406,17 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		if (StringUtils.isBlank(nextVisitTime)){
 			callVisitParams.setNextVisitTime(null);
 		}
-		callInfoMendMapper.saveVirtualDoctorCallInfoMend(callVisitParams);
+		Long callId = callVisitParams.getCallId();
+		Integer count = callInfoMendMapper.getVirtualDoctorCallInfoMendCount(callId);
+		if (count == null || count== 0){
+			callInfoMendMapper.saveVirtualDoctorCallInfoMend(callVisitParams);
 
-		if (saveRequest instanceof SaveCallInfoRequest){
-			SaveCallInfoRequest saveCallInfoRequest = (SaveCallInfoRequest) saveRequest;
-			this.saveCallInfoResult(callVisitParams.getId(), saveCallInfoRequest.getVisitResultId());
+			if (saveRequest instanceof SaveCallInfoRequest){
+				SaveCallInfoRequest saveCallInfoRequest = (SaveCallInfoRequest) saveRequest;
+				this.saveCallInfoResult(callVisitParams.getId(), saveCallInfoRequest.getVisitResultId());
+			}
 		}
+
 
 
 	}

@@ -3,6 +3,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorCallInfoMendMapper">
 
+	<select id="getVirtualDoctorCallInfoMendCount" resultType="java.lang.Integer">
+	  	SELECT COUNT(*) FROM virtual_doctor_call_info_mend WHERE call_id=#{callId}
+	</select>
+
 	<!-- 保存问卷作答 -->
 	<insert id="saveVirtualDoctorCallInfoMend" keyProperty="id" useGeneratedKeys="true"
 		parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoParams">
