@@ -14,6 +14,14 @@ import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoParams;
  * @author xiekaiyu
  */
 public interface VirtualDoctorCallInfoMendMapper {
+
+
+	/**
+	 * 查询总数，判断是否已经存在
+	 * @param callId
+	 * @return
+	 */
+	Integer getVirtualDoctorCallInfoMendCount(@Param(value = "callId") Long callId);
 	
 	/**
 	 * 保存扩展信息
