@@ -74,6 +74,7 @@ public class LoginValidationInterceptor extends HandlerInterceptorAdapter {
             if (StringUtil.isNotEmpty(email)){
                 DrugUser drugUser = drugUserRepository.findFirstByEmail(email);
                 if (drugUser != null){
+					drugUser.setLeaderPath(drugUser.getLeaderPath() + "%");
 					sercurityService.saveSession(request, response, drugUser);
                     request.setAttribute(SessionConfig.DEFAULT_REQUEST_DRUG_USER, drugUser);
                     return true;
