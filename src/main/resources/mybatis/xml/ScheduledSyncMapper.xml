@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.ScheduledSyncMapper">
+
+    <!-- 根据创建时间获取大于该时间的角色list -->
+    <select id="getRoleListByCreateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.RoleParams">
+        SELECT
+            t.id,
+            t.role_name roleName,
+            t.create_date createDate,
+            t.update_date updateDate
+        FROM
+            role t
+        WHERE
+            t.create_date > #{createTime}
+    </select>
+
+    <!-- 根据更新时间获取大于该时间的角色list -->
+    <select id="getRoleListByUpdateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.RoleParams">
+        SELECT
+            t.id,
+            t.role_name roleName,
+            t.create_date createDate,
+            t.update_date updateDate
+        FROM
+            role t
+        WHERE
+            t.update_date > #{updateTime}
+    </select>
+</mapper>
