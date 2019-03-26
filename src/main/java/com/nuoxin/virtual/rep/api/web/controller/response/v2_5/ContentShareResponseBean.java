@@ -53,4 +53,7 @@ public class ContentShareResponseBean implements Serializable {
     @ApiModelProperty(value = "评论内容")
     List<ContentCommentResponseBean> commentList = new ArrayList<>();
 
+    @ApiModelProperty(value = "内容问卷")
+    private ContentQuestionnaireResponseBean questionnaire;
+
 }

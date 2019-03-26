@@ -4,7 +4,10 @@ import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse;
 import com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsParams;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.share.ShareRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ContentCommentResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ContentQuestionnaireResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ContentShareResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.wechat.ContentOptionResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.wechat.ContentQuestionnaireAnswerResponseBean;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;
 
@@ -95,6 +98,40 @@ public interface ActivityShareMapper {
 	 * @return
 	 */
 	List<ContentCommentResponseBean> getContentCommentList(@Param(value = "doctorId") Long doctorId,@Param(value = "contentId") Long contentId);
+
+
+	/**
+	 * 得到内容的问卷
+	 * @param doctorId
+	 * @param contentId
+	 * @return
+	 */
+	ContentQuestionnaireResponseBean getContentQuestionnaire(@Param(value = "doctorId") Long doctorId, @Param(value = "contentId") Long contentId);
+
+
+	/**
+	 * 得到问卷的题目
+	 * @param questionnaireId
+	 * @return
+	 */
+	List<ContentQuestionnaireAnswerResponseBean> getContentQuestionnaireQuestion(@Param(value = "questionnaireId") Long questionnaireId);
+
+
+	/**
+	 * 问题选项
+	 * @param questionId
+	 * @return
+	 */
+	List<ContentOptionResponseBean> getQuestionOptions(@Param(value = "questionId") Long questionId);
+
+	/**
+	 * 得到医生的问卷答案
+	 * @param contentId
+	 * @param doctorId
+	 * @param questionnaireId
+	 * @return
+	 */
+	List<String> getQuestionDoctorAnswers(@Param(value = "contentId") Long contentId,@Param(value = "doctorId") Long doctorId,@Param(value = "questionnaireId") Long questionnaireId);
 
 	/**
 	 * 新增分享类型

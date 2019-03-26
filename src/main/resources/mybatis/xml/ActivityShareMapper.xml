@@ -727,6 +727,64 @@
 			create_time DESC
 	</select>
 
+	<!-- 内容问卷 -->
+	<select id="getContentQuestionnaire" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ContentQuestionnaireResponseBean">
+		SELECT
+		q.id questionnaireId,
+		q.title questionnaireTitle,
+		COUNT(*) AS answerCount,
+		DATE_FORMAT(
+			min(a.create_time),
+			'%Y-%m-%d %H:%i:%s'
+			) answerTime
+		FROM
+			content_questionnaire_answers a
+		INNER JOIN doctor d ON a.telephone = d.telephone
+		INNER JOIN content_questionnaire q ON a.questionnaire_id = q.id
+		WHERE
+			d.id = #{doctorId}
+		AND a.content_id = #{contentId}
+		GROUP BY
+			q.id
+	</select>
+
+	<!-- 得到问卷的题目 -->
+	<select id="getContentQuestionnaireQuestion" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.wechat.ContentQuestionnaireAnswerResponseBean">
+		SELECT
+		id questionId,
+		title questionTitle,
+		`type`
+	FROM
+		content_questionnaire_questions
+	WHERE
+		questionnaire_id = #{questionnaireId}
+	</select>
+
+	<!-- 得到问题的选项 -->
+	<select id="getQuestionOptions" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.wechat.ContentOptionResponseBean">
+		SELECT
+			id optionId,
+			CONCAT(option_key, '.', `option`) `option`
+		FROM
+			content_questionnaire_options
+		WHERE
+			question_id = #{questionId}
+	</select>
+
+
+	<!-- 得到问题的选项 -->
+	<select id="getQuestionDoctorAnswers" resultType="java.lang.String">
+		SELECT
+			c.answer
+		FROM
+			content_questionnaire_answers c
+		INNER JOIN doctor d ON c.telephone = d.telephone
+		WHERE
+			content_id = #{contentId}
+		AND d.id = #{doctorId}
+		AND c.questionnaire_id=#{questionnaireId}
+	</select>
+
 	<insert id="addShareStatus">
 		INSERT INTO activity_share_extend(activity_share_id, share_status)
 		VALUES(#{shareId}, #{shareStatus})

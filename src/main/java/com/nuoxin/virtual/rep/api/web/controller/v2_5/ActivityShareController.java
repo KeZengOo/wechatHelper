@@ -6,12 +6,14 @@ import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.v2_5.ShareService;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorDynamicFieldValueListRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorQuestionnaireDetailRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.share.QuestionnaireRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.share.ShareRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.share.ShareStatusRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ContentShareResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorBasicDynamicFieldValueListResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DynamicFieldQuestionDetailResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ProductDynamicFieldQuestionnaireResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.wechat.ContentQuestionnaireAnswerResponseBean;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
@@ -44,6 +46,23 @@ public class ActivityShareController extends NewBaseController{
         PageResponseBean<ContentShareResponseBean> contentShareList = shareService.getContentShareList(user, bean);
         DefaultResponseBean<PageResponseBean<ContentShareResponseBean>> responseBean = new DefaultResponseBean<>();
         responseBean.setData(contentShareList);
+
+        return responseBean;
+    }
+
+
+    @SuppressWarnings("unchecked")
+    @ApiOperation(value = "问卷详情", notes = "问卷详情")
+    @PostMapping(value = "/questionnaire/detail")
+    public DefaultResponseBean<List<ContentQuestionnaireAnswerResponseBean>> getContentQuestionnaireAnswer(HttpServletRequest request, @RequestBody QuestionnaireRequestBean bean) {
+        DrugUser user = super.getDrugUser(request);
+        if(user == null) {
+            return super.getLoginErrorResponse();
+        }
+
+        List<ContentQuestionnaireAnswerResponseBean> contentQuestionnaireAnswer = shareService.getContentQuestionnaireAnswer(bean);
+        DefaultResponseBean<List<ContentQuestionnaireAnswerResponseBean>> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(contentQuestionnaireAnswer);
 
         return responseBean;
     }

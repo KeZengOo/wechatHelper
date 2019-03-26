@@ -8,10 +8,14 @@ import com.nuoxin.virtual.rep.api.enums.ShareStatusEnum;
 import com.nuoxin.virtual.rep.api.mybatis.ActivityShareMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.ShareService;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.share.QuestionnaireRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.share.ShareRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.share.ShareStatusRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ContentCommentResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ContentQuestionnaireResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ContentShareResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.wechat.ContentOptionResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.wechat.ContentQuestionnaireAnswerResponseBean;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -31,7 +35,7 @@ public class ShareServiceImpl implements ShareService{
 
     @Override
     public PageResponseBean<ContentShareResponseBean> getContentShareList(DrugUser user,  ShareRequestBean bean) {
-        bean.setLeaderPath(user.getLeaderPath() +"%");
+        bean.setLeaderPath(user.getLeaderPath());
         Integer page = bean.getPage();
         Integer pageSize = bean.getPageSize();
         bean.setCurrentSize(page  * pageSize);
@@ -44,10 +48,18 @@ public class ShareServiceImpl implements ShareService{
         if (contentShareListCount != null && contentShareListCount > 0){
             contentShareList = activityShareMapper.getContentShareList(bean);
             if (CollectionsUtil.isNotEmptyList(contentShareList)){
+                // TODO 改成一次查询
                 for (ContentShareResponseBean contentShareResponseBean:contentShareList){
+                    // 评论
                     List<ContentCommentResponseBean> contentCommentList = activityShareMapper.getContentCommentList(bean.getDoctorId(), contentShareResponseBean.getContentId());
                     if (CollectionsUtil.isNotEmptyList(contentCommentList)){
                         contentShareResponseBean.setCommentList(contentCommentList);
+                    }
+
+                    // 问卷答题
+                    ContentQuestionnaireResponseBean questionnaire = activityShareMapper.getContentQuestionnaire(bean.getDoctorId(), contentShareResponseBean.getContentId());
+                    if (questionnaire != null){
+                        contentShareResponseBean.setQuestionnaire(questionnaire);
                     }
                 }
             }
@@ -56,6 +68,31 @@ public class ShareServiceImpl implements ShareService{
 
         PageResponseBean<ContentShareResponseBean> pageResponseBean = new PageResponseBean<>(bean, contentShareListCount, contentShareList);
         return pageResponseBean;
+    }
+
+    @Override
+    public List<ContentQuestionnaireAnswerResponseBean> getContentQuestionnaireAnswer(QuestionnaireRequestBean bean) {
+
+        List<ContentQuestionnaireAnswerResponseBean> contentQuestionnaireQuestions = activityShareMapper.getContentQuestionnaireQuestion(bean.getQuestionnaireId());
+        if (CollectionsUtil.isNotEmptyList(contentQuestionnaireQuestions)){
+            // TODO 题目不多才这样写
+            for (ContentQuestionnaireAnswerResponseBean contentQuestionnaireQuestion : contentQuestionnaireQuestions) {
+                Long questionId = contentQuestionnaireQuestion.getQuestionId();
+                List<ContentOptionResponseBean> questionOptions = activityShareMapper.getQuestionOptions(questionId);
+                List<String> questionDoctorAnswers = activityShareMapper.getQuestionDoctorAnswers(bean.getContentId(), bean.getDoctorId(), bean.getQuestionnaireId());
+
+                if (CollectionsUtil.isNotEmptyList(questionOptions)){
+                    contentQuestionnaireQuestion.setOptionList(questionOptions);
+                }
+
+                if (CollectionsUtil.isNotEmptyList(questionDoctorAnswers)){
+                    contentQuestionnaireQuestion.setAnswerList(questionDoctorAnswers);
+                }
+
+            }
+        }
+
+        return contentQuestionnaireQuestions;
     }
 
     @Override
