@@ -1,6 +1,8 @@
 package com.nuoxin.virtual.rep.api.slave.mybatis;
 
+import com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorQuateBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.RoleParams;
+import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoMendBean;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -40,4 +42,58 @@ public interface ScheduledSyncSlaveMapper {
      * @return boolean
      */
     boolean syncUpdateRoleList(@Param(value = "id") Long id, @Param(value = "roleName") String roleName, @Param(value = "createTime") String createTime,@Param(value = "updateTime") String updateTime);
+
+    /**
+     * 得到从库最新的销售与医生关系指标创建时间
+     * @return String
+     */
+    String getDrugUserDoctorQuateNewCreateTime();
+
+    /**
+     * 得到从库最新的销售与医生关系指标更新时间
+     * @return String
+     */
+    String getDrugUserDoctorQuateNewUpdateTime();
+
+    /**
+     * 同步产品数据到从库
+     * @param list
+     * @return boolean
+     */
+    boolean syncDrugUserDoctorQuateList(List<DrugUserDoctorQuateBean> list);
+
+    /**
+     * 同步角色数据到从库 update
+     * @param drugUserDoctorQuateBean
+     * @return boolean
+     */
+    boolean syncUpdateDrugUserDoctorQuateList(@Param(value = "drugUserDoctorQuateBean") DrugUserDoctorQuateBean drugUserDoctorQuateBean);
+
+    /**
+     * 得到从库最新的电话拜访扩展创建时间
+     * @return String
+     */
+    String getVirtualDoctorCallInfoMendNewCreateTime();
+
+    /**
+     * 得到从库最新的电话拜访扩展更新时间
+     * @return String
+     */
+    String getVirtualDoctorCallInfoMendNewUpdateTime();
+
+    /**
+     * 同步产品数据到从库
+     * @param list
+     * @return boolean
+     */
+    boolean syncVirtualDoctorCallInfoMendList(List<VirtualDoctorCallInfoMendBean> list);
+
+    /**
+     * 同步角色数据到从库 update
+     * @param virtualDoctorCallInfoMendBean
+     * @return boolean
+     */
+    boolean syncUpdateVirtualDoctorCallInfoMendList(@Param(value = "virtualDoctorCallInfoMendBean") VirtualDoctorCallInfoMendBean virtualDoctorCallInfoMendBean);
+
+
 }

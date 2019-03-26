@@ -27,4 +27,105 @@
         WHERE
             t.update_date > #{updateTime}
     </select>
+
+    <!-- 根据创建时间获取大于该时间的销售与医生关系指标list -->
+    <select id="getDrugUserDoctorQuateListByCreateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorQuateBean">
+        SELECT
+            t.`id` id,
+            t.`doctor_id` doctorId,
+            t.`drug_user_id` drugUserId,
+            t.`product_id` productId,
+            t.`is_has_drug` isHasDrug,
+            t.`is_target` isTarget,
+            t.`is_has_ae` isHasAe,
+            t.`is_recruit` isRecruit,
+            t.`is_break_off` isBreakOff,
+            t.`hcp_potential` hcpPotential,
+            t.`create_time` createTime,
+            t.`update_time` updateTime,
+            t.`is_available` isAvailable
+        FROM
+            drug_user_doctor_quate t
+        WHERE
+            t.create_time > #{createTime}
+    </select>
+
+    <!-- 根据更新时间获取大于该时间的销售与医生关系指标list -->
+    <select id="getDrugUserDoctorQuateListByUpdateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorQuateBean">
+        SELECT
+            t.`id` id,
+            t.`doctor_id` doctorId,
+            t.`drug_user_id` drugUserId,
+            t.`product_id` productId,
+            t.`is_has_drug` isHasDrug,
+            t.`is_target` isTarget,
+            t.`is_has_ae` isHasAe,
+            t.`is_recruit` isRecruit,
+            t.`is_break_off` isBreakOff,
+            t.`hcp_potential` hcpPotential,
+            t.`create_time` createTime,
+            t.`update_time` updateTime,
+            t.`is_available` isAvailable
+        FROM
+            drug_user_doctor_quate t
+        WHERE
+            t.update_time > #{updateTime}
+    </select>
+
+    <!-- 根据创建时间获取大于该时间的角色list -->
+    <select id="getVirtualDoctorCallInfoMendListByCreateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoMendBean">
+        SELECT
+            t.`id` id,
+            t.`virtual_drug_user_id` virtualDrugUserId,
+            t.`virtual_doctor_id` virtualDoctorId,
+            t.`product_id` productId,
+            t.`next_visit_time` nextVisitTime,
+            t.`create_time` createTime,
+            t.`update_time` updateTime,
+            t.`visit_result` visitResult,
+            t.`call_id` callId,
+            t.`attitude` attitude,
+            t.`doctor_questionnaire_id` doctorQuestionnaireId,
+            t.`hcp_potential` hcpPotential,
+            t.`is_break_off` isBreakOff,
+            t.`is_has_ae` isHasAe,
+            t.`is_target` isTarget,
+            t.`is_has_drug` isHasDrug,
+            t.`is_recruit` isRecruit,
+            t.`recruit_time` recruitTime,
+            t.`drop_out_time` dropOutTime
+        FROM
+            virtual_doctor_call_info_mend t
+        WHERE
+            t.create_time > #{createTime}
+    </select>
+
+    <!-- 根据更新时间获取大于该时间的角色list -->
+    <select id="getVirtualDoctorCallInfoMendListByUpdateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoMendBean">
+        SELECT
+            t.`id` id,
+            t.`virtual_drug_user_id` virtualDrugUserId,
+            t.`virtual_doctor_id` virtualDoctorId,
+            t.`product_id` productId,
+            t.`next_visit_time` nextVisitTime,
+            t.`create_time` createTime,
+            t.`update_time` updateTime,
+            t.`visit_result` visitResult,
+            t.`call_id` callId,
+            t.`attitude` attitude,
+            t.`doctor_questionnaire_id` doctorQuestionnaireId,
+            t.`hcp_potential` hcpPotential,
+            t.`is_break_off` isBreakOff,
+            t.`is_has_ae` isHasAe,
+            t.`is_target` isTarget,
+            t.`is_has_drug` isHasDrug,
+            t.`is_recruit` isRecruit,
+            t.`recruit_time` recruitTime,
+            t.`drop_out_time` dropOutTime
+        FROM
+            virtual_doctor_call_info_mend t
+        WHERE
+            t.update_time > #{updateTime}
+    </select>
+
 </mapper>

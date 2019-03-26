@@ -7,6 +7,7 @@ import lombok.Data;
 /**
  * 角色表
  * @author wujiang
+ * @date 2019-03-25
  */
 @ApiModel("角色表")
 @Data

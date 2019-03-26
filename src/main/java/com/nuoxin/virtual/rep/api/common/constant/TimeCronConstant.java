@@ -15,4 +15,14 @@ public interface TimeCronConstant {
 	 */
 	String ROLE_CRON = "0 0 23 * * ?";
 
+	/**
+	 * 销售与医生关系指标表同步定时任务timer
+	 */
+	String DRUG_USER_DOCTOR_QUATE_CRON = "0 0 23 * * ?";
+
+	/**
+	 * 电话拜访扩展表同步定时任务timer
+	 */
+	String VIRTUAL_DOCTOR_CALL_INFO_MEND_CRON = "0 9 20 * * ?";
+
 }

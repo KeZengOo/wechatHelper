@@ -4,12 +4,12 @@
 
     <!-- 得到从库最新的角色创建时间 -->
     <select id="getRoleNewCreateTime" resultType="java.lang.String">
-        SELECT DATE_FORMAT(t.create_time,'%Y-%c-%d %T:%i:%s') create_time FROM enterprise_role t ORDER BY t.create_time DESC LIMIT 1
+        SELECT DATE_FORMAT(t.create_time,'%Y-%c-%d %T') create_time FROM enterprise_role t ORDER BY t.create_time DESC LIMIT 1
     </select>
 
     <!-- 得到从库最新的角色更新时间 -->
     <select id="getRoleNewUpdateTime" resultType="java.lang.String">
-        SELECT DATE_FORMAT(t.update_time,'%Y-%c-%d %T:%i:%s') update_time FROM enterprise_role t ORDER BY t.update_time DESC LIMIT 1
+        SELECT DATE_FORMAT(t.update_time,'%Y-%c-%d %T') update_time FROM enterprise_role t ORDER BY t.update_time DESC LIMIT 1
     </select>
 
     <!-- 同步角色数据到从库 insert -->
@@ -29,5 +29,148 @@
         t.update_time = #{updateTime}
         WHERE
             id = #{id}
+    </update>
+
+    <!-- 得到从库最新的销售与医生关系指标创建时间 -->
+    <select id="getDrugUserDoctorQuateNewCreateTime" resultType="java.lang.String">
+        SELECT DATE_FORMAT(t.create_time,'%Y-%c-%d %T') create_time FROM drug_user_doctor_quate t ORDER BY t.create_time DESC LIMIT 1
+    </select>
+
+    <!-- 得到从库最新的销售与医生关系指标更新时间 -->
+    <select id="getDrugUserDoctorQuateNewUpdateTime" resultType="java.lang.String">
+        SELECT DATE_FORMAT(t.update_time,'%Y-%c-%d %T') update_time FROM drug_user_doctor_quate t ORDER BY t.update_time DESC LIMIT 1
+    </select>
+
+    <!-- 同步角色数据到从库 insert -->
+    <insert id="syncDrugUserDoctorQuateList">
+        INSERT INTO drug_user_doctor_quate (
+        `doctor_id`,
+        `drug_user_id`,
+        `product_id`,
+        `is_has_drug`,
+        `is_target`,
+        `is_has_ae`,
+        `is_recruit`,
+        `is_break_off`,
+        `hcp_potential`,
+        `create_time`,
+        `update_time`,
+        `is_available`
+        )
+        VALUES
+        <foreach collection="list" item="list" separator=",">
+            (
+            #{list.doctorId},
+            #{list.drugUserId},
+            #{list.productId},
+            #{list.isHasDrug},
+            #{list.isTarget},
+            #{list.isHasAe},
+            #{list.isRecruit},
+            #{list.isBreakOff},
+            #{list.hcpPotential},
+            #{list.create_time},
+            #{list.updateTime},
+            #{list.isAvailable}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 同步角色数据到从库 update -->
+    <update id="syncUpdateDrugUserDoctorQuateList" parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorQuateBean">
+        UPDATE drug_user_doctor_quate t
+        SET
+          t.`is_has_drug` = #{drugUserDoctorQuateBean.isHasDrug},
+          t.`is_target` = #{drugUserDoctorQuateBean.isTarget},
+          t.`is_has_ae` = #{drugUserDoctorQuateBean.isHasAe},
+          t.`is_recruit` = #{drugUserDoctorQuateBean.isRecruit},
+          t.`is_break_off` = #{drugUserDoctorQuateBean.isBreakOff},
+          t.`hcp_potential` = #{drugUserDoctorQuateBean.hcpPotential},
+          t.`is_available` = #{drugUserDoctorQuateBean.isAvailable},
+          t.`update_time` = #{drugUserDoctorQuateBean.updateTime},
+        WHERE
+            doctor_id = #{drugUserDoctorQuateBean.doctorId}
+        AND drug_user_id = #{drugUserDoctorQuateBean.drugUserId}
+        AND product_id = #{drugUserDoctorQuateBean.productId}
+    </update>
+
+    <!-- 得到从库最新的电话拜访扩展创建时间 -->
+    <select id="getVirtualDoctorCallInfoMendNewCreateTime" resultType="java.lang.String">
+        SELECT DATE_FORMAT(t.create_time,'%Y-%c-%d %T') create_time FROM virtual_doctor_call_info_mend t ORDER BY t.create_time DESC LIMIT 1
+    </select>
+
+    <!-- 得到从库最新的电话拜访扩展更新时间 -->
+    <select id="getVirtualDoctorCallInfoMendNewUpdateTime" resultType="java.lang.String">
+        SELECT DATE_FORMAT(t.update_time,'%Y-%c-%d %T') update_time FROM virtual_doctor_call_info_mend t ORDER BY t.update_time DESC LIMIT 1
+    </select>
+
+    <!-- 同步角色数据到从库 insert -->
+    <insert id="syncVirtualDoctorCallInfoMendList">
+        INSERT INTO virtual_doctor_call_info_mend (
+            `virtual_drug_user_id`,
+            `virtual_doctor_id`,
+            `product_id`,
+            `next_visit_time`,
+            `create_time`,
+            `update_time`,
+            `visit_result`,
+            `call_id`,
+            `attitude`,
+            `doctor_questionnaire_id`,
+            `hcp_potential`,
+            `is_break_off`,
+            `is_has_ae`,
+            `is_target`,
+            `is_has_drug`,
+            `is_recruit`,
+            `recruit_time`,
+            `drop_out_time`
+        )
+        VALUES
+        <foreach collection="list" item="list" separator=",">
+            (
+            #{list.virtualDrugUserId},
+            #{list.virtualDoctorId},
+            #{list.productId},
+            #{list.nextVisitTime},
+            #{list.createTime},
+            #{list.updateTime},
+            #{list.visitResult},
+            #{list.callId},
+            #{list.attitude},
+            #{list.doctorQuestionnaireId},
+            #{list.hcpPotential},
+            #{list.isBreakOff},
+            #{list.isHasAe},
+            #{list.isTarget},
+            #{list.isHasDrug},
+            #{list.isRecruit},
+            #{list.recruitTime},
+            #{list.dropOutTime}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 同步角色数据到从库 update -->
+    <update id="syncUpdateVirtualDoctorCallInfoMendList" parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoMendBean">
+        UPDATE virtual_doctor_call_info_mend t
+        SET t.`virtual_drug_user_id` = #{virtualDoctorCallInfoMendBean.virtualDrugUserId},
+         t.`virtual_doctor_id` = #{virtualDoctorCallInfoMendBean.virtualDoctorId},
+         t.`product_id` = #{virtualDoctorCallInfoMendBean.productId},
+         t.`next_visit_time` = #{virtualDoctorCallInfoMendBean.nextVisitTime},
+         t.`update_time` = #{virtualDoctorCallInfoMendBean.updateTime},
+         t.`visit_result` = #{virtualDoctorCallInfoMendBean.visitResult},
+         t.`attitude` = #{virtualDoctorCallInfoMendBean.attitude},
+         t.`doctor_questionnaire_id` = #{virtualDoctorCallInfoMendBean.doctorQuestionnaireId},
+         t.`hcp_potential` = #{virtualDoctorCallInfoMendBean.hcpPotential},
+         t.`is_break_off` = #{virtualDoctorCallInfoMendBean.isBreakOff},
+         t.`is_has_ae` = #{virtualDoctorCallInfoMendBean.isHasAe},
+         t.`is_target` = #{virtualDoctorCallInfoMendBean.isTarget},
+         t.`is_has_drug` = #{virtualDoctorCallInfoMendBean.isHasDrug},
+         t.`is_recruit` = #{virtualDoctorCallInfoMendBean.isRecruit},
+         t.`recruit_time` = #{virtualDoctorCallInfoMendBean.recruitTime},
+         t.`drop_out_time` = #{virtualDoctorCallInfoMendBean.dropOutTime}
+        WHERE
+            t.`call_id` = #{virtualDoctorCallInfoMendBean.callId}
     </update>
 </mapper>

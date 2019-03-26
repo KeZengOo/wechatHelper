@@ -2,8 +2,10 @@ package com.nuoxin.virtual.rep.api.service;
 
 import com.nuoxin.virtual.rep.api.common.constant.TimeCronConstant;
 import com.nuoxin.virtual.rep.api.entity.ProductLine;
+import com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorQuateBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.EnterpriseProductParams;
 import com.nuoxin.virtual.rep.api.entity.v2_5.RoleParams;
+import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoMendBean;
 import com.nuoxin.virtual.rep.api.mybatis.ProductLineMapper;
 import com.nuoxin.virtual.rep.api.mybatis.ScheduledSyncMapper;
 import com.nuoxin.virtual.rep.api.slave.mybatis.ProductSlaveMapper;
@@ -44,7 +46,7 @@ public class ScheduledServiceImpl {
     /**
      * 产品同步
      */
-    @Scheduled(cron = TimeCronConstant.PRODUCT_CRON)
+//    @Scheduled(cron = TimeCronConstant.PRODUCT_CRON)
     public void productSync(){
         //------------------------------------------------同步插入--------------------------------------------------
         //获取从库产品表的最新数据时间
@@ -119,5 +121,74 @@ public class ScheduledServiceImpl {
     /**
      * 销售与医生关系指标表同步 drug_user_doctor_quate
      */
+    @Scheduled(cron = TimeCronConstant.DRUG_USER_DOCTOR_QUATE_CRON)
+    public void DrugUserDoctorQuateSync(){
+        //------------------------------------------------同步插入--------------------------------------------------
+        //获取从库角色表的最新数据时间
+        String createTime = scheduledSyncSlaveMapper.getDrugUserDoctorQuateNewCreateTime();
+        if(createTime == null)
+        {
+            //如果从库为空的话便默认一个时间
+            createTime = "2000-01-01 00:00:00";
+        }
+        logger.info("获取从库的销售与医生关系指标最新数据时间："+ createTime);
+        //根据从库产品表最新数据时间获取主库产品表最新数据list
+        List<DrugUserDoctorQuateBean> drugUserDoctorQuateParamsList = scheduledSyncMapper.getDrugUserDoctorQuateListByCreateTime(createTime);
+        logger.info("根据从库销售与医生关系指标最新数据时间获取主库销售与医生关系指标表最新数据list："+ drugUserDoctorQuateParamsList);
 
+        if(drugUserDoctorQuateParamsList.size() >  0){
+            //把主库最新的产品数据插入从库的产品表中
+            boolean result = scheduledSyncSlaveMapper.syncDrugUserDoctorQuateList(drugUserDoctorQuateParamsList);
+            logger.info("把主库最新的销售与医生关系指标数据插入从库的销售与医生关系指标表中："+ result);
+        }
+
+        //------------------------------------------------同步更新--------------------------------------------------
+        //获取从库角色表的最新更新数据时间
+        String updateTime = scheduledSyncSlaveMapper.getDrugUserDoctorQuateNewUpdateTime();
+        //根据更新时间获取大于该时间的产品list
+        List<DrugUserDoctorQuateBean> drugUserDoctorQuateListByUpdateTimeList = scheduledSyncMapper.getDrugUserDoctorQuateListByUpdateTime(updateTime);
+        if(drugUserDoctorQuateListByUpdateTimeList.size() > 0){
+            drugUserDoctorQuateListByUpdateTimeList.forEach(updateRole -> {
+                boolean updateResult = scheduledSyncSlaveMapper.syncUpdateDrugUserDoctorQuateList(updateRole);
+                logger.info("把主库更新后的销售与医生关系指标数据更新到从库的销售与医生关系指标表中："+ updateResult);
+            });
+        }
+    }
+
+    /**
+     * 电话拜访扩展表同步 virtual_doctor_call_info_mend
+     */
+    @Scheduled(cron = TimeCronConstant.VIRTUAL_DOCTOR_CALL_INFO_MEND_CRON)
+    public void VirtualDoctorCallInfoMendSync(){
+        //------------------------------------------------同步插入--------------------------------------------------
+        //获取从库角色表的最新数据时间
+        String createTime = scheduledSyncSlaveMapper.getVirtualDoctorCallInfoMendNewCreateTime();
+        if(createTime == null)
+        {
+            //如果从库为空的话便默认一个时间
+            createTime = "2000-01-01 00:00:00";
+        }
+        logger.info("获取从库的销售与医生关系指标最新数据时间："+ createTime);
+        //根据从库产品表最新数据时间获取主库产品表最新数据list
+        List<VirtualDoctorCallInfoMendBean> virtualDoctorCallInfoMendList = scheduledSyncMapper.getVirtualDoctorCallInfoMendListByCreateTime(createTime);
+        logger.info("根据从库销售与医生关系指标最新数据时间获取主库销售与医生关系指标表最新数据list："+ virtualDoctorCallInfoMendList);
+
+        if(virtualDoctorCallInfoMendList.size() >  0){
+            //把主库最新的产品数据插入从库的产品表中
+            boolean result = scheduledSyncSlaveMapper.syncVirtualDoctorCallInfoMendList(virtualDoctorCallInfoMendList);
+            logger.info("把主库最新的销售与医生关系指标数据插入从库的销售与医生关系指标表中："+ result);
+        }
+
+        //------------------------------------------------同步更新--------------------------------------------------
+        //获取从库角色表的最新更新数据时间
+        String updateTime = scheduledSyncSlaveMapper.getVirtualDoctorCallInfoMendNewUpdateTime();
+        //根据更新时间获取大于该时间的产品list
+        List<VirtualDoctorCallInfoMendBean> virtualDoctorCallInfoMendListByUpdateTimeList = scheduledSyncMapper.getVirtualDoctorCallInfoMendListByUpdateTime(updateTime);
+        if(virtualDoctorCallInfoMendListByUpdateTimeList.size() > 0){
+            virtualDoctorCallInfoMendListByUpdateTimeList.forEach(updateRole -> {
+                boolean updateResult = scheduledSyncSlaveMapper.syncUpdateVirtualDoctorCallInfoMendList(updateRole);
+                logger.info("把主库更新后的销售与医生关系指标数据更新到从库的销售与医生关系指标表中："+ updateResult);
+            });
+        }
+    }
 }
