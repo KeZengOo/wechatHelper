@@ -2,10 +2,7 @@ package com.nuoxin.virtual.rep.api.service;
 
 import com.nuoxin.virtual.rep.api.common.constant.TimeCronConstant;
 import com.nuoxin.virtual.rep.api.entity.ProductLine;
-import com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorQuateBean;
-import com.nuoxin.virtual.rep.api.entity.v2_5.EnterpriseProductParams;
-import com.nuoxin.virtual.rep.api.entity.v2_5.RoleParams;
-import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoMendBean;
+import com.nuoxin.virtual.rep.api.entity.v2_5.*;
 import com.nuoxin.virtual.rep.api.mybatis.ProductLineMapper;
 import com.nuoxin.virtual.rep.api.mybatis.ScheduledSyncMapper;
 import com.nuoxin.virtual.rep.api.slave.mybatis.ProductSlaveMapper;
@@ -148,8 +145,8 @@ public class ScheduledServiceImpl {
         //根据更新时间获取大于该时间的产品list
         List<DrugUserDoctorQuateBean> drugUserDoctorQuateListByUpdateTimeList = scheduledSyncMapper.getDrugUserDoctorQuateListByUpdateTime(updateTime);
         if(drugUserDoctorQuateListByUpdateTimeList.size() > 0){
-            drugUserDoctorQuateListByUpdateTimeList.forEach(updateRole -> {
-                boolean updateResult = scheduledSyncSlaveMapper.syncUpdateDrugUserDoctorQuateList(updateRole);
+            drugUserDoctorQuateListByUpdateTimeList.forEach(updateList -> {
+                boolean updateResult = scheduledSyncSlaveMapper.syncUpdateDrugUserDoctorQuateList(updateList);
                 logger.info("把主库更新后的销售与医生关系指标数据更新到从库的销售与医生关系指标表中："+ updateResult);
             });
         }
@@ -168,15 +165,15 @@ public class ScheduledServiceImpl {
             //如果从库为空的话便默认一个时间
             createTime = "2000-01-01 00:00:00";
         }
-        logger.info("获取从库的销售与医生关系指标最新数据时间："+ createTime);
+        logger.info("获取从库的电话拜访扩展最新数据时间："+ createTime);
         //根据从库产品表最新数据时间获取主库产品表最新数据list
         List<VirtualDoctorCallInfoMendBean> virtualDoctorCallInfoMendList = scheduledSyncMapper.getVirtualDoctorCallInfoMendListByCreateTime(createTime);
-        logger.info("根据从库销售与医生关系指标最新数据时间获取主库销售与医生关系指标表最新数据list："+ virtualDoctorCallInfoMendList);
+        logger.info("根据从库电话拜访扩展最新数据时间获取主库电话拜访扩展表最新数据list："+ virtualDoctorCallInfoMendList);
 
         if(virtualDoctorCallInfoMendList.size() >  0){
             //把主库最新的产品数据插入从库的产品表中
             boolean result = scheduledSyncSlaveMapper.syncVirtualDoctorCallInfoMendList(virtualDoctorCallInfoMendList);
-            logger.info("把主库最新的销售与医生关系指标数据插入从库的销售与医生关系指标表中："+ result);
+            logger.info("把主库最新的电话拜访扩展数据插入从库的电话拜访扩展表中："+ result);
         }
 
         //------------------------------------------------同步更新--------------------------------------------------
@@ -185,10 +182,86 @@ public class ScheduledServiceImpl {
         //根据更新时间获取大于该时间的产品list
         List<VirtualDoctorCallInfoMendBean> virtualDoctorCallInfoMendListByUpdateTimeList = scheduledSyncMapper.getVirtualDoctorCallInfoMendListByUpdateTime(updateTime);
         if(virtualDoctorCallInfoMendListByUpdateTimeList.size() > 0){
-            virtualDoctorCallInfoMendListByUpdateTimeList.forEach(updateRole -> {
-                boolean updateResult = scheduledSyncSlaveMapper.syncUpdateVirtualDoctorCallInfoMendList(updateRole);
-                logger.info("把主库更新后的销售与医生关系指标数据更新到从库的销售与医生关系指标表中："+ updateResult);
+            virtualDoctorCallInfoMendListByUpdateTimeList.forEach(updateList -> {
+                boolean updateResult = scheduledSyncSlaveMapper.syncUpdateVirtualDoctorCallInfoMendList(updateList);
+                logger.info("把主库更新后的电话拜访扩展数据更新到从库的电话拜访扩展表中："+ updateResult);
             });
         }
     }
+
+    /**
+     * 销售代表给医生打电话表同步 virtual_doctor_call_info
+     */
+    @Scheduled(cron = TimeCronConstant.VIRTUAL_DOCTOR_CALL_INFO_CRON)
+    public void VirtualDoctorCallInfoSync(){
+        //------------------------------------------------同步插入--------------------------------------------------
+        //获取从库角色表的最新数据时间
+        String createTime = scheduledSyncSlaveMapper.getVirtualDoctorCallInfoNewCreateTime();
+        if(createTime == null)
+        {
+            //如果从库为空的话便默认一个时间
+            createTime = "2000-01-01 00:00:00";
+        }
+        logger.info("获取从库的销售代表给医生打电话最新数据时间："+ createTime);
+        //根据从库产品表最新数据时间获取主库产品表最新数据list
+        List<VirtualDoctorCallInfoBean> virtualDoctorCallInfoList = scheduledSyncMapper.getVirtualDoctorCallInfoListByCreateTime(createTime);
+        logger.info("根据从库销售代表给医生打电话最新数据时间获取主库销售代表给医生打电话最新数据list："+ virtualDoctorCallInfoList);
+
+        if(virtualDoctorCallInfoList.size() >  0){
+            //把主库最新的产品数据插入从库的产品表中
+            boolean result = scheduledSyncSlaveMapper.syncVirtualDoctorCallInfoList(virtualDoctorCallInfoList);
+            logger.info("把主库最新的销售代表给医生打电话数据插入从库的销售代表给医生打电话表中："+ result);
+        }
+
+        //------------------------------------------------同步更新--------------------------------------------------
+        //获取从库角色表的最新更新数据时间
+        String updateTime = scheduledSyncSlaveMapper.getVirtualDoctorCallInfoNewUpdateTime();
+        //根据更新时间获取大于该时间的产品list
+        List<VirtualDoctorCallInfoBean> virtualDoctorCallInfoListByUpdateTimeList = scheduledSyncMapper.getVirtualDoctorCallInfoListByUpdateTime(updateTime);
+        if(virtualDoctorCallInfoListByUpdateTimeList.size() > 0){
+            virtualDoctorCallInfoListByUpdateTimeList.forEach(updateList -> {
+                boolean updateResult = scheduledSyncSlaveMapper.syncUpdateVirtualDoctorCallInfoList(updateList);
+                logger.info("把主库更新后的销售代表给医生打电话数据更新到从库的销售代表给医生打电话表中："+ updateResult);
+            });
+        }
+    }
+
+    /**
+     * 医院表同步 hospital---->enterprise_hci
+     */
+    @Scheduled(cron = TimeCronConstant.ENTERPRISE_HCI_CRON)
+    public void enterpriseHciSync(){
+        Integer productId = 150;
+        //------------------------------------------------同步插入--------------------------------------------------
+        //获取从库角色表的最新数据时间
+        String createTime = scheduledSyncSlaveMapper.getEnterpriseHciCreateTime();
+        if(createTime == null)
+        {
+            //如果从库为空的话便默认一个时间
+            createTime = "2000-01-01 00:00:00";
+        }
+        logger.info("获取从库的医院最新数据时间："+ createTime);
+        //根据从库产品表最新数据时间获取主库产品表最新数据list
+        List<HospitalBean> hospitalList = scheduledSyncMapper.getHospitalListByCreateTime(productId,createTime);
+        logger.info("根据从库医院最新数据时间获取主库医院最新数据list："+ hospitalList);
+
+        if(hospitalList.size() >  0){
+            //把主库最新的产品数据插入从库的产品表中
+            boolean result = scheduledSyncSlaveMapper.syncEnterpriseHciList(hospitalList);
+            logger.info("把主库最新的医院数据插入从库的医院表中："+ result);
+        }
+
+        //------------------------------------------------同步更新--------------------------------------------------
+        //获取从库角色表的最新更新数据时间
+        String updateTime = scheduledSyncSlaveMapper.getEnterpriseHciUpdateTime();
+        //根据更新时间获取大于该时间的产品list
+        List<HospitalBean> hospitalListByUpdateTimeList = scheduledSyncMapper.getHospitalListByUpdateTime(productId,updateTime);
+        if(hospitalListByUpdateTimeList.size() > 0){
+            hospitalListByUpdateTimeList.forEach(updateList -> {
+                boolean updateResult = scheduledSyncSlaveMapper.syncUpdateEnterpriseHciList(updateList);
+                logger.info("把主库更新后的医院数据更新到从库的医院表中："+ updateResult);
+            });
+        }
+    }
+
 }

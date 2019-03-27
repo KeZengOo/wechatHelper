@@ -23,6 +23,16 @@ public interface TimeCronConstant {
 	/**
 	 * 电话拜访扩展表同步定时任务timer
 	 */
-	String VIRTUAL_DOCTOR_CALL_INFO_MEND_CRON = "0 9 20 * * ?";
+	String VIRTUAL_DOCTOR_CALL_INFO_MEND_CRON = "0 0 23 * * ?";
+
+	/**
+	 * 销售代表给医生打电话表同步定时任务timer
+	 */
+	String VIRTUAL_DOCTOR_CALL_INFO_CRON = "0 0 23 * * ?";
+
+	/**
+	 * 医院表同步定时任务timer
+	 */
+	String ENTERPRISE_HCI_CRON = "0 47 18 * * ?";
 
 }

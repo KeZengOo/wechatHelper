@@ -1,8 +1,6 @@
 package com.nuoxin.virtual.rep.api.slave.mybatis;
 
-import com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorQuateBean;
-import com.nuoxin.virtual.rep.api.entity.v2_5.RoleParams;
-import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoMendBean;
+import com.nuoxin.virtual.rep.api.entity.v2_5.*;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -96,4 +94,57 @@ public interface ScheduledSyncSlaveMapper {
     boolean syncUpdateVirtualDoctorCallInfoMendList(@Param(value = "virtualDoctorCallInfoMendBean") VirtualDoctorCallInfoMendBean virtualDoctorCallInfoMendBean);
 
 
+    /**
+     * 得到从库最新的销售代表给医生打电话创建时间
+     * @return String
+     */
+    String getVirtualDoctorCallInfoNewCreateTime();
+
+    /**
+     * 得到从库最新的销售代表给医生打电话更新时间
+     * @return String
+     */
+    String getVirtualDoctorCallInfoNewUpdateTime();
+
+    /**
+     * 同步产品数据到从库
+     * @param list
+     * @return boolean
+     */
+    boolean syncVirtualDoctorCallInfoList(List<VirtualDoctorCallInfoBean> list);
+
+    /**
+     * 同步角色数据到从库 update
+     * @param virtualDoctorCallInfoBean
+     * @return boolean
+     */
+    boolean syncUpdateVirtualDoctorCallInfoList(@Param(value = "virtualDoctorCallInfo") VirtualDoctorCallInfoBean virtualDoctorCallInfoBean);
+
+
+
+    /**
+     * 得到从库最新的诺和医院信息创建时间
+     * @return String
+     */
+    String getEnterpriseHciCreateTime();
+
+    /**
+     * 得到从库最新的诺和医院信息更新时间
+     * @return String
+     */
+    String getEnterpriseHciUpdateTime();
+
+    /**
+     * 同步产品数据到从库
+     * @param list
+     * @return boolean
+     */
+    boolean syncEnterpriseHciList(List<HospitalBean> list);
+
+    /**
+     * 同步角色数据到从库 update
+     * @param hospitalBean
+     * @return boolean
+     */
+    boolean syncUpdateEnterpriseHciList(@Param(value = "hospitalBean") HospitalBean hospitalBean);
 }

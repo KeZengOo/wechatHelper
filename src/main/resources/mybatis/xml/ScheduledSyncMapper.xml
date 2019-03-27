@@ -128,4 +128,159 @@
             t.update_time > #{updateTime}
     </select>
 
+    <!-- 根据创建时间获取大于该时间的销售代表给医生打电话list -->
+    <select id="getVirtualDoctorCallInfoListByCreateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoBean">
+        SELECT
+            t.id id,
+            t.`sin_token` sinToken,
+            t.`is_retry` isRetry,
+            t.`visit_channel` visitChannel,
+            t.`virtual_doctor_id` virtualDoctorId,
+            t.`mobile` mobile,
+            t.`virtual_drug_user_id` virtualDrugUserId,
+            t.`status` status,
+            t.`status_name` statusName,
+            t.`call_time` callTime,
+            t.`call_url` callUrl,
+            t.`doctor_questionnaire_id` doctorQuestionnaireId,
+            t.`remark` remark,
+            t.`create_time` createTime,
+            t.`update_time` updateTime,
+            t.`type` `type`,
+            t.`info_json` infoJson,
+            t.`product_id` productId,
+            t.`follow_up_type` followUpType,
+            t.`del_flag` delFlag
+        FROM
+            virtual_doctor_call_info t
+        WHERE
+            t.create_time > #{createTime}
+    </select>
+
+    <!-- 根据更新时间获取大于该时间的销售代表给医生打电话list -->
+    <select id="getVirtualDoctorCallInfoListByUpdateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoBean">
+        SELECT
+            t.id id,
+            t.`sin_token` sinToken,
+            t.`is_retry` isRetry,
+            t.`visit_channel` visitChannel,
+            t.`virtual_doctor_id` virtualDoctorId,
+            t.`mobile` mobile,
+            t.`virtual_drug_user_id` virtualDrugUserId,
+            t.`status` status,
+            t.`status_name` statusName,
+            t.`call_time` callTime,
+            t.`call_url` callUrl,
+            t.`doctor_questionnaire_id` doctorQuestionnaireId,
+            t.`remark` remark,
+            t.`create_time` createTime,
+            t.`update_time` updateTime,
+            t.`type` `type`,
+            t.`info_json` infoJson,
+            t.`product_id` productId,
+            t.`follow_up_type` followUpType,
+            t.`del_flag` delFlag
+        FROM
+            virtual_doctor_call_info t
+        WHERE
+            t.update_time > #{updateTime}
+    </select>
+
+    <!-- 根据创建时间获取大于该时间的医院list -->
+    <select id="getHospitalListByCreateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.HospitalBean">
+        SELECT
+            t.id,
+            t.`name`,
+            CASE
+                WHEN t.`level` = '11' THEN
+                    '一级甲等'
+                WHEN t.`level` = '12' THEN
+                    '一级乙等'
+                WHEN t.`level` = '13' THEN
+                    '一级丙等'
+                WHEN t.`level` = '21' THEN
+                    '二级甲等'
+                WHEN t.`level` = '22' THEN
+                    '二级乙等'
+                WHEN t.`level` = '23' THEN
+                    '二级丙等'
+                WHEN t.`level` = '31' THEN
+                    '三级甲等'
+                WHEN t.`level` = '32' THEN
+                    '三级乙等'
+                WHEN t.`level` = '33' THEN
+                    '三级丙等'
+                WHEN t.`level` = '40' THEN
+                    '特级医院'
+                WHEN t.`level` = '50' THEN
+                    '民营医院'
+                ELSE
+                    '未知'
+                END `level`,
+            t.create_time createTime,
+            t.update_time updateTime
+        FROM
+            hospital t
+        JOIN (
+            SELECT
+                d.hospital_id
+            FROM
+                doctor d
+            JOIN drug_user_doctor u ON d.id = u.doctor_id
+            AND u.prod_id = #{prodId}
+            GROUP BY
+                d.hospital_id
+        ) h ON t.id = h.hospital_id
+        WHERE
+            t.create_time > #{createTime} AND t.`name` != '';
+    </select>
+
+    <!-- 根据更新时间获取大于该时间的医院list -->
+    <select id="getHospitalListByUpdateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.HospitalBean">
+        SELECT
+            t.id,
+            t.`name`,
+            CASE
+                WHEN t.`level` = '11' THEN
+                    '一级甲等'
+                WHEN t.`level` = '12' THEN
+                    '一级乙等'
+                WHEN t.`level` = '13' THEN
+                    '一级丙等'
+                WHEN t.`level` = '21' THEN
+                    '二级甲等'
+                WHEN t.`level` = '22' THEN
+                    '二级乙等'
+                WHEN t.`level` = '23' THEN
+                    '二级丙等'
+                WHEN t.`level` = '31' THEN
+                    '三级甲等'
+                WHEN t.`level` = '32' THEN
+                    '三级乙等'
+                WHEN t.`level` = '33' THEN
+                    '三级丙等'
+                WHEN t.`level` = '40' THEN
+                    '特级医院'
+                WHEN t.`level` = '50' THEN
+                    '民营医院'
+                ELSE
+                    '未知'
+                END `level`,
+            t.create_time createTime,
+            t.update_time updateTime
+        FROM
+            hospital t
+        JOIN (
+            SELECT
+                d.hospital_id
+            FROM
+                doctor d
+            JOIN drug_user_doctor u ON d.id = u.doctor_id
+            AND u.prod_id = #{prodId}
+            GROUP BY
+                d.hospital_id
+        ) h ON t.id = h.hospital_id
+        WHERE
+            t.update_time > #{updateTime} AND t.`name` != '';
+    </select>
 </mapper>

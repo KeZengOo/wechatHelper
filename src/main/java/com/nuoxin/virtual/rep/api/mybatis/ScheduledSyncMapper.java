@@ -1,8 +1,6 @@
 package com.nuoxin.virtual.rep.api.mybatis;
 
-import com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorQuateBean;
-import com.nuoxin.virtual.rep.api.entity.v2_5.RoleParams;
-import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoMendBean;
+import com.nuoxin.virtual.rep.api.entity.v2_5.*;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -56,4 +54,33 @@ public interface ScheduledSyncMapper {
      */
     List<VirtualDoctorCallInfoMendBean> getVirtualDoctorCallInfoMendListByUpdateTime(@Param(value = "updateTime") String updateTime);
 
+    /**
+     * 根据创建时间获取大于该时间的销售代表给医生打电话list
+     * @param createTime
+     * @return list
+     */
+    List<VirtualDoctorCallInfoBean> getVirtualDoctorCallInfoListByCreateTime(@Param(value = "createTime") String createTime);
+
+    /**
+     * 根据更新时间获取大于该时间的销售代表给医生打电话list
+     * @param updateTime
+     * @return list
+     */
+    List<VirtualDoctorCallInfoBean> getVirtualDoctorCallInfoListByUpdateTime(@Param(value = "updateTime") String updateTime);
+
+    /**
+     * 根据创建时间获取大于该时间的医院list
+     * @param prodId
+     * @param createTime
+     * @return list
+     */
+    List<HospitalBean> getHospitalListByCreateTime(@Param(value = "prodId") Integer prodId, @Param(value = "createTime") String createTime);
+
+    /**
+     * 根据更新时间获取大于该时间的医院list
+     * @param prodId
+     * @param updateTime
+     * @return list
+     */
+    List<HospitalBean> getHospitalListByUpdateTime(@Param(value = "prodId") Integer prodId, @Param(value = "updateTime") String updateTime);
 }
