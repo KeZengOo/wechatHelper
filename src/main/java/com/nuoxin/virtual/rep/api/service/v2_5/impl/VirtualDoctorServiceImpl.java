@@ -92,27 +92,48 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
     public DoctorAddResponseBean getDoctorAddEcho(DoctorSingleAddEchoRequestBean bean) {
 
         List<String> telephones = bean.getTelephones();
+        DoctorDetailsResponseBean doctorDetail = null;
         if (CollectionsUtil.isEmptyList(telephones)){
-            throw new BusinessException(ErrorEnum.ERROR, "联系方式不能为空！");
+            //
+            String doctorName = bean.getDoctorName();
+            String hospitalName = bean.getHospitalName();
+            if (StringUtil.isEmpty(doctorName) || StringUtil.isEmpty(hospitalName)){
+                return null;
+            }
+
+            Integer doctorCount = doctorMapper.getDoctorCount(doctorName, hospitalName);
+            if (doctorCount == null || doctorCount == 0){
+               return  null;
+            }
+
+            if (doctorCount > 1){
+                throw new BusinessException(ErrorEnum.ERROR, "医生已经存在！");
+            }
+
+
+            doctorDetail = doctorMapper.getDoctorListByName(bean.getDrugUserId(), bean.getDoctorName(), bean.getHospitalName()).get(0);
+
+        }else {
+            // 去掉座机号
+            List<String> mobileList =  this.removeFixTelephone(telephones);
+            if (CollectionsUtil.isEmptyList(mobileList)){
+                return null;
+            }
+
+            List<Doctor> doctors = doctorMapper.selectDoctorByMobiles(mobileList);
+            if (CollectionsUtil.isEmptyList(doctors)){
+                return null;
+            }
+
+            if (doctors.size() > 1){
+                throw new BusinessException(ErrorEnum.ERROR, "联系方式属于多个医生！");
+            }
+
+            doctorDetail = doctorMapper.getDoctorListByTelephones(bean.getTelephones(), bean.getDrugUserId()).get(0);
         }
 
-        // 去掉座机号
-        List<String> mobileList =  this.removeFixTelephone(telephones);
-        if (CollectionsUtil.isEmptyList(mobileList)){
-            return null;
-        }
 
 
-        List<Doctor> doctors = doctorMapper.selectDoctorByMobiles(mobileList);
-        if (CollectionsUtil.isEmptyList(doctors)){
-            return null;
-        }
-
-        if (doctors.size() > 1){
-            throw new BusinessException(ErrorEnum.ERROR, "联系方式属于多个医生！");
-        }
-
-        DoctorDetailsResponseBean doctorDetail = doctorMapper.getDoctorListByTelephones(bean.getTelephones(), bean.getDrugUserId()).get(0);
 
         Long doctorId = doctorDetail.getDoctorId();
         DoctorAddResponseBean doctorAddResponseBean = new DoctorAddResponseBean();

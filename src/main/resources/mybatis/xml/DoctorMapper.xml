@@ -84,7 +84,12 @@
 
 	<!-- 以下是虚拟工作台 v2.5 后用到的 -->
 	<select id="getDoctorIdByMobile" resultType="java.lang.Long">
-		SELECT id FROM doctor WHERE telephone=#{mobile}
+		SELECT doctor_id FROM (
+		SELECT id doctor_id FROM doctor WHERE telephone=#{mobile}
+		UNION
+		SELECT doctor_id FROM doctor_telephone WHERE telephone=#{mobile}
+		) t
+		LIMIT 1
 	</select>
 
 
@@ -1503,6 +1508,34 @@
 	</select>
 
 
+	<!-- 根据医生姓名和医院获取详情 -->
+	<select id="getDoctorListByName" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorDetailsResponseBean">
+			SELECT DISTINCT
+				d.id doctorId,
+				d.`name` doctorName,
+				d.sex,
+				dm.wechat,
+				dm.address,
+				d.email,
+				h.id hospitalId,
+				d.hospital_name hospitalName,
+				h.`level` hospitalLevel,
+				h.province,
+				h.city,
+				d.depart department,
+				d.positions,
+				IFNULL(dudoto.is_add_wechat, 0) addWechat
+			FROM
+				doctor d
+			LEFT JOIN hospital h ON d.hospital_id = h.id
+			LEFT JOIN doctor_mend dm
+			ON d.id=dm.virtual_doctor_id
+			LEFT JOIN drug_user_doctor_one_to_one dudoto
+			ON  dudoto.doctor_id=d.id
+			AND dudoto.drug_user_id=#{drugUserId}
+			WHERE d.hospital_name=#{hospitalName}
+			AND d.name=#{doctorName}
+	</select>
 
 	<select id="getDoctorList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorDetailsResponseBean">
 		SELECT DISTINCT

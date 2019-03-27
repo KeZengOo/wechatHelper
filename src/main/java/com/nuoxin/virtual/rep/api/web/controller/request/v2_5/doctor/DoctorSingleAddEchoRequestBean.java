@@ -26,7 +26,10 @@ public class DoctorSingleAddEchoRequestBean implements Serializable {
     @JsonIgnore
     private Long drugUserId;
 
+    @ApiModelProperty(value = "医生姓名")
+    private String doctorName;
 
-
+    @ApiModelProperty(value = "医院姓名")
+    private String hospitalName;
 
 }
