@@ -8,6 +8,7 @@ import com.nuoxin.virtual.rep.api.config.SessionConfig;
 import com.nuoxin.virtual.rep.api.dao.DrugUserRepository;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.mybatis.ShortUrlWhiteMapper;
+import com.nuoxin.virtual.rep.api.service.RoleUserService;
 import com.nuoxin.virtual.rep.api.service.SecurityService;
 import com.nuoxin.virtual.rep.api.utils.Aes128Util;
 import com.nuoxin.virtual.rep.api.utils.CookieUtil;
@@ -42,6 +43,9 @@ public class LoginValidationInterceptor extends HandlerInterceptorAdapter {
 	@Resource
     private ShortUrlWhiteMapper shortUrlWhiteMapper;
 
+	@Autowired
+	private RoleUserService roleUserService;
+
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		if(request.getMethod().equals("OPTIONS")){
@@ -75,6 +79,7 @@ public class LoginValidationInterceptor extends HandlerInterceptorAdapter {
                 DrugUser drugUser = drugUserRepository.findFirstByEmail(email);
                 if (drugUser != null){
 					drugUser.setLeaderPath(drugUser.getLeaderPath() + "%");
+					drugUser.setRoleId(roleUserService.checkVirtualRole(drugUser.getId()));
 					sercurityService.saveSession(request, response, drugUser);
                     request.setAttribute(SessionConfig.DEFAULT_REQUEST_DRUG_USER, drugUser);
                     return true;
