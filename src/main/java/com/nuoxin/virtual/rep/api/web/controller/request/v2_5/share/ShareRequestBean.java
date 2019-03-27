@@ -25,4 +25,8 @@ public class ShareRequestBean extends PageRequestBean implements Serializable {
 
 
 
+    private Integer timeType;
+
+
+
 }
