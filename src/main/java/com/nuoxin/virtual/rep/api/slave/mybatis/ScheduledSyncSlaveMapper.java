@@ -93,7 +93,6 @@ public interface ScheduledSyncSlaveMapper {
      */
     boolean syncUpdateVirtualDoctorCallInfoMendList(@Param(value = "virtualDoctorCallInfoMendBean") VirtualDoctorCallInfoMendBean virtualDoctorCallInfoMendBean);
 
-
     /**
      * 得到从库最新的销售代表给医生打电话创建时间
      * @return String
@@ -120,8 +119,6 @@ public interface ScheduledSyncSlaveMapper {
      */
     boolean syncUpdateVirtualDoctorCallInfoList(@Param(value = "virtualDoctorCallInfo") VirtualDoctorCallInfoBean virtualDoctorCallInfoBean);
 
-
-
     /**
      * 得到从库最新的诺和医院信息创建时间
      * @return String
@@ -147,4 +144,64 @@ public interface ScheduledSyncSlaveMapper {
      * @return boolean
      */
     boolean syncUpdateEnterpriseHciList(@Param(value = "hospitalBean") HospitalBean hospitalBean);
+
+    /**
+     * 得到从库最新的诺和内部会议记录创建时间
+     * @return String
+     */
+    String getEnterpriseInternalMeetingCreateTime();
+
+    /**
+     * 得到从库最新的诺和内部会议记录更新时间
+     * @return String
+     */
+    String getEnterpriseInternalMeetingUpdateTime();
+
+    /**
+     * 同步产品数据到从库
+     * @param list
+     * @return boolean
+     */
+    boolean syncEnterpriseInternalMeetingList(List<EnterpriseInternalMeetingBean> list);
+
+    /**
+     * 同步角色数据到从库 update
+     * @param enterpriseInternalMeetingBean
+     * @return boolean
+     */
+    boolean syncUpdateEnterpriseInternalMeetingList(@Param(value = "enterpriseInternalMeetingBean") EnterpriseInternalMeetingBean enterpriseInternalMeetingBean);
+
+
+
+    /**
+     * 得到从库最新的医生参加诺和内部会议详情表创建时间
+     * @return String
+     */
+    String getEnterpriseMeetingAttendDetailsCreateTime();
+
+    /**
+     * 得到从库最新的医生参加诺和内部会议详情表更新时间
+     * @return String
+     */
+    String getEnterpriseMeetingAttendDetailsUpdateTime();
+
+    /**
+     * 同步产品数据到从库
+     * @param list
+     * @return boolean
+     */
+    boolean syncEnterpriseMeetingAttendDetailsList(List<EnterpriseMeetingAttendDetailsBean> list);
+
+    /**
+     * 同步角色数据到从库 update
+     * @param enterpriseMeetingAttendDetailsBean
+     * @return boolean
+     */
+    boolean syncUpdateEnterpriseMeetingAttendDetailsList(@Param(value = "enterpriseMeetingAttendDetails") EnterpriseMeetingAttendDetailsBean enterpriseMeetingAttendDetailsBean);
+
+    /**
+     * 获取BusinessCodeAndMeetingId关系
+     * @return list
+     */
+    List<EnterpriseMeetingAttendDetailsBean> getBusinessCodeAndMeetingIdList();
 }

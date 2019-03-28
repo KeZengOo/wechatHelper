@@ -283,4 +283,79 @@
         WHERE
             t.update_time > #{updateTime} AND t.`name` != '';
     </select>
+
+
+    <!-- 根据创建时间获取大于该时间的诺和内部会议记录list -->
+    <select id="getEnterpriseInternalMeetingListByCreateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.EnterpriseInternalMeetingBean">
+        SELECT
+            t.id,
+            t.title,
+            t.start_time startTime,
+            t.end_time endTime,
+            t.speaker,
+            t.create_time createTime,
+            t.update_time updateTime,
+            substring_index(t.`start_time`, "-", 1) `year`
+        FROM
+            t_meeting_data t
+        WHERE
+            t.create_time > #{createTime} AND  t.product_id = #{prodId}
+    </select>
+
+    <!-- 根据更新时间获取大于该时间的诺和内部会议记录list -->
+    <select id="getEnterpriseInternalMeetingListByUpdateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.EnterpriseInternalMeetingBean">
+        SELECT
+            t.id,
+            t.title,
+            t.start_time startTime,
+            t.end_time endTime,
+            t.speaker,
+            t.create_time createTime,
+            t.update_time updateTime,
+            substring_index(t.`start_time`, "-", 1) `year`
+        FROM
+            t_meeting_data t
+        WHERE
+            t.update_time > #{updateTime} AND  t.product_id = #{prodId}
+    </select>
+
+    <!-- 根据创建时间获取大于该时间的医生参加诺和内部会议详情表list -->
+    <select id="getEnterpriseMeetingAttendDetailsListByCreateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.EnterpriseMeetingAttendDetailsBean">
+        SELECT
+            t.id,
+            t.doctor_id doctorId,
+            t.doctor_name doctorName,
+            d.id businessCode,
+            t.attend_start_time attendStartTime,
+            o.hospital_name hospitalName,
+            o.depart,
+            t.create_time createTime,
+            t.update_time updateTime
+        FROM
+            t_meeting_attend_details t
+        LEFT JOIN t_meeting_data d ON t.meeting_id = d.id
+        JOIN doctor o ON t.doctor_id = o.id
+        WHERE
+            t.create_time > #{createTime} AND  d.product_id = #{prodId}
+    </select>
+
+    <!-- 根据更新时间获取大于该时间的医生参加诺和内部会议详情表list -->
+    <select id="getEnterpriseMeetingAttendDetailsListByUpdateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.EnterpriseMeetingAttendDetailsBean">
+        SELECT
+            t.id,
+            t.doctor_id doctorId,
+            t.doctor_name doctorName,
+            d.id businessCode,
+            t.attend_start_time attendStartTime,
+            o.hospital_name hospitalName,
+            o.depart,
+            t.create_time createTime,
+            t.update_time updateTime
+        FROM
+            t_meeting_attend_details t
+        LEFT JOIN t_meeting_data d ON t.meeting_id = d.id
+        JOIN doctor o ON t.doctor_id = o.id
+        WHERE
+            t.update_time > #{updateTime} AND  d.product_id = #{prodId}
+    </select>
 </mapper>

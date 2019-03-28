@@ -195,7 +195,7 @@ public class ScheduledServiceImpl {
     @Scheduled(cron = TimeCronConstant.VIRTUAL_DOCTOR_CALL_INFO_CRON)
     public void VirtualDoctorCallInfoSync(){
         //------------------------------------------------同步插入--------------------------------------------------
-        //获取从库角色表的最新数据时间
+        //获取从库的最新数据时间
         String createTime = scheduledSyncSlaveMapper.getVirtualDoctorCallInfoNewCreateTime();
         if(createTime == null)
         {
@@ -203,18 +203,18 @@ public class ScheduledServiceImpl {
             createTime = "2000-01-01 00:00:00";
         }
         logger.info("获取从库的销售代表给医生打电话最新数据时间："+ createTime);
-        //根据从库产品表最新数据时间获取主库产品表最新数据list
+        //根据从库最新数据时间获取主库最新数据list
         List<VirtualDoctorCallInfoBean> virtualDoctorCallInfoList = scheduledSyncMapper.getVirtualDoctorCallInfoListByCreateTime(createTime);
         logger.info("根据从库销售代表给医生打电话最新数据时间获取主库销售代表给医生打电话最新数据list："+ virtualDoctorCallInfoList);
 
         if(virtualDoctorCallInfoList.size() >  0){
-            //把主库最新的产品数据插入从库的产品表中
+            //把主库最新的数据插入从库中
             boolean result = scheduledSyncSlaveMapper.syncVirtualDoctorCallInfoList(virtualDoctorCallInfoList);
             logger.info("把主库最新的销售代表给医生打电话数据插入从库的销售代表给医生打电话表中："+ result);
         }
 
         //------------------------------------------------同步更新--------------------------------------------------
-        //获取从库角色表的最新更新数据时间
+        //获取从库的最新更新数据时间
         String updateTime = scheduledSyncSlaveMapper.getVirtualDoctorCallInfoNewUpdateTime();
         //根据更新时间获取大于该时间的产品list
         List<VirtualDoctorCallInfoBean> virtualDoctorCallInfoListByUpdateTimeList = scheduledSyncMapper.getVirtualDoctorCallInfoListByUpdateTime(updateTime);
@@ -233,7 +233,7 @@ public class ScheduledServiceImpl {
     public void enterpriseHciSync(){
         Integer productId = 150;
         //------------------------------------------------同步插入--------------------------------------------------
-        //获取从库角色表的最新数据时间
+        //获取从库的最新数据时间
         String createTime = scheduledSyncSlaveMapper.getEnterpriseHciCreateTime();
         if(createTime == null)
         {
@@ -241,18 +241,18 @@ public class ScheduledServiceImpl {
             createTime = "2000-01-01 00:00:00";
         }
         logger.info("获取从库的医院最新数据时间："+ createTime);
-        //根据从库产品表最新数据时间获取主库产品表最新数据list
+        //根据从库最新数据时间获取主库最新数据list
         List<HospitalBean> hospitalList = scheduledSyncMapper.getHospitalListByCreateTime(productId,createTime);
         logger.info("根据从库医院最新数据时间获取主库医院最新数据list："+ hospitalList);
 
         if(hospitalList.size() >  0){
-            //把主库最新的产品数据插入从库的产品表中
+            //把主库最新的数据插入从库的表中
             boolean result = scheduledSyncSlaveMapper.syncEnterpriseHciList(hospitalList);
             logger.info("把主库最新的医院数据插入从库的医院表中："+ result);
         }
 
         //------------------------------------------------同步更新--------------------------------------------------
-        //获取从库角色表的最新更新数据时间
+        //获取从库的最新更新数据时间
         String updateTime = scheduledSyncSlaveMapper.getEnterpriseHciUpdateTime();
         //根据更新时间获取大于该时间的产品list
         List<HospitalBean> hospitalListByUpdateTimeList = scheduledSyncMapper.getHospitalListByUpdateTime(productId,updateTime);
@@ -263,5 +263,98 @@ public class ScheduledServiceImpl {
             });
         }
     }
+
+    /**
+     * 会议表同步 t_meeting_data
+     */
+    @Scheduled(cron = TimeCronConstant.T_MEETING_DATA_CRON)
+    public void enterpriseInternalMeetingSync(){
+        Integer productId = 150;
+        //------------------------------------------------同步插入--------------------------------------------------
+        //获取从库的最新数据时间
+        String createTime = scheduledSyncSlaveMapper.getEnterpriseInternalMeetingCreateTime();
+        if(createTime == null)
+        {
+            //如果从库为空的话便默认一个时间
+            createTime = "2000-01-01 00:00:00";
+        }
+        logger.info("获取从库的会议表最新数据时间："+ createTime);
+        //根据从库表最新数据时间获取主库表最新数据list
+        List<EnterpriseInternalMeetingBean> enterpriseInternalMeetingList = scheduledSyncMapper.getEnterpriseInternalMeetingListByCreateTime(productId,createTime);
+        logger.info("根据从库会议表最新数据时间获取主库会议表最新数据list："+ enterpriseInternalMeetingList);
+
+        if(enterpriseInternalMeetingList.size() >  0){
+            //把主库最新的数据插入从库的表中
+            boolean result = scheduledSyncSlaveMapper.syncEnterpriseInternalMeetingList(enterpriseInternalMeetingList);
+            logger.info("把主库最新的会议表数据插入从库的会议表表中："+ result);
+        }
+
+        //------------------------------------------------同步更新--------------------------------------------------
+        //获取从库最新更新数据时间
+        String updateTime = scheduledSyncSlaveMapper.getEnterpriseInternalMeetingUpdateTime();
+        //根据更新时间获取大于该时间的产品list
+        List<EnterpriseInternalMeetingBean> virtualDoctorCallInfoListByUpdateTimeList = scheduledSyncMapper.getEnterpriseInternalMeetingListByUpdateTime(productId,updateTime);
+        if(virtualDoctorCallInfoListByUpdateTimeList.size() > 0){
+            virtualDoctorCallInfoListByUpdateTimeList.forEach(updateList -> {
+                boolean updateResult = scheduledSyncSlaveMapper.syncUpdateEnterpriseInternalMeetingList(updateList);
+                logger.info("把主库更新后的会议表数据更新到从库的会议表表中："+ updateResult);
+            });
+        }
+    }
+
+
+    /**
+     * 会议参会信息同步 t_meeting_attend_details
+     */
+    @Scheduled(cron = TimeCronConstant.T_MEETING_ATTEND_DETAILS_CRON)
+    public void enterpriseMeetingAttendDetailsSync(){
+        Integer productId = 150;
+        //------------------------------------------------同步插入--------------------------------------------------
+        //获取从库的最新数据时间
+        String createTime = scheduledSyncSlaveMapper.getEnterpriseMeetingAttendDetailsCreateTime();
+        if(createTime == null)
+        {
+            //如果从库为空的话便默认一个时间
+            createTime = "2000-01-01 00:00:00";
+        }
+        logger.info("获取从库的会议参会信息最新数据时间："+ createTime);
+        //根据从库表最新数据时间获取主库表最新数据list
+        List<EnterpriseMeetingAttendDetailsBean> enterpriseMeetingAttendDetailsList = scheduledSyncMapper.getEnterpriseMeetingAttendDetailsListByCreateTime(productId,createTime);
+        logger.info("根据从库会议参会信息最新数据时间获取主库会议参会信息最新数据list："+ enterpriseMeetingAttendDetailsList);
+        List<EnterpriseMeetingAttendDetailsBean> newMeetingList = new ArrayList<EnterpriseMeetingAttendDetailsBean>();
+        if(enterpriseMeetingAttendDetailsList.size() >  0){
+            //获取BusinessCodeAndMeetingId关系
+            List<EnterpriseMeetingAttendDetailsBean> getBusinessCodeAndMeetingIdList = scheduledSyncSlaveMapper.getBusinessCodeAndMeetingIdList();
+            //循环需要插入的数据，并把meetingId放入EnterpriseMeetingAttendDetailsBean对象中
+            for (int i = 0; i < enterpriseMeetingAttendDetailsList.size(); i++){
+                //BusinessCodeAndMeetingId关系list循环
+                for (int j = 0; j < getBusinessCodeAndMeetingIdList.size(); j++){
+                    if(enterpriseMeetingAttendDetailsList.get(i).getBusinessCode().equals(getBusinessCodeAndMeetingIdList.get(j).getBusinessCode())) {
+                        EnterpriseMeetingAttendDetailsBean e  = new EnterpriseMeetingAttendDetailsBean();
+                        e = enterpriseMeetingAttendDetailsList.get(i);
+                        e.setMeetingId(getBusinessCodeAndMeetingIdList.get(j).getId().toString());
+                        newMeetingList.add(e);
+                    }
+                }
+            }
+
+            //把主库最新的数据插入从库的表中
+            boolean result = scheduledSyncSlaveMapper.syncEnterpriseMeetingAttendDetailsList(newMeetingList);
+            logger.info("把主库最新的会议参会信息数据插入从库的会议参会信息中："+ result);
+        }
+
+        //------------------------------------------------同步更新--------------------------------------------------
+        //获取从库最新更新数据时间
+        String updateTime = scheduledSyncSlaveMapper.getEnterpriseMeetingAttendDetailsUpdateTime();
+        //根据更新时间获取大于该时间的产品list
+        List<EnterpriseMeetingAttendDetailsBean> enterpriseMeetingAttendDetailsListByUpdateTimeList = scheduledSyncMapper.getEnterpriseMeetingAttendDetailsListByUpdateTime(productId,updateTime);
+        if(enterpriseMeetingAttendDetailsListByUpdateTimeList.size() > 0){
+            enterpriseMeetingAttendDetailsListByUpdateTimeList.forEach(updateList -> {
+                boolean updateResult = scheduledSyncSlaveMapper.syncUpdateEnterpriseMeetingAttendDetailsList(updateList);
+                logger.info("把主库更新后的会议参会信息数据更新到从库的会议参会信息中："+ updateResult);
+            });
+        }
+    }
+
 
 }

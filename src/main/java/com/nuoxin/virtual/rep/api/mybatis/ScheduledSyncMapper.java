@@ -83,4 +83,38 @@ public interface ScheduledSyncMapper {
      * @return list
      */
     List<HospitalBean> getHospitalListByUpdateTime(@Param(value = "prodId") Integer prodId, @Param(value = "updateTime") String updateTime);
+
+
+    /**
+     * 根据创建时间获取大于该时间的诺和内部会议记录list
+     * @param prodId
+     * @param createTime
+     * @return list
+     */
+    List<EnterpriseInternalMeetingBean> getEnterpriseInternalMeetingListByCreateTime(@Param(value = "prodId") Integer prodId,@Param(value = "createTime") String createTime);
+
+    /**
+     * 根据更新时间获取大于该时间的诺和内部会议记录list
+     * @param prodId
+     * @param updateTime
+     * @return list
+     */
+    List<EnterpriseInternalMeetingBean> getEnterpriseInternalMeetingListByUpdateTime(@Param(value = "prodId") Integer prodId,@Param(value = "updateTime") String updateTime);
+
+    /**
+     * 根据创建时间获取大于该时间的医生参加诺和内部会议详情表list
+     * @param prodId
+     * @param createTime
+     * @return list
+     */
+    List<EnterpriseMeetingAttendDetailsBean> getEnterpriseMeetingAttendDetailsListByCreateTime(@Param(value = "prodId") Integer prodId,@Param(value = "createTime") String createTime);
+
+    /**
+     * 根据更新时间获取大于该时间的医生参加诺和内部会议详情表list
+     * @param prodId
+     * @param updateTime
+     * @return list
+     */
+    List<EnterpriseMeetingAttendDetailsBean> getEnterpriseMeetingAttendDetailsListByUpdateTime(@Param(value = "prodId") Integer prodId,@Param(value = "updateTime") String updateTime);
+
 }
