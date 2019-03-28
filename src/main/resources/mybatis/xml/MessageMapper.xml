@@ -921,4 +921,41 @@
         </if>
     </select>
 
+
+    <!-- 导入微信聊天消息补偿 -->
+    <update id="reUpdateMessageContact">
+        UPDATE
+        virtual_wechat_contact v
+        INNER JOIN virtual_message vm
+        ON v.user_name=vm.wechat_number
+        SET vm.doctor_id=v.doctor_id
+        WHERE v.doctor_id!=0 AND vm.doctor_id=0
+    </update>
+
+    <update id="reUpdateMessageContactAlias">
+        UPDATE
+        virtual_wechat_contact v
+        INNER JOIN virtual_message vm
+        ON v.alias=vm.wechat_number
+        SET vm.doctor_id=v.doctor_id
+        WHERE v.doctor_id!=0 AND vm.doctor_id=0
+    </update>
+
+    <update id="reUpdateSendMessage">
+        update virtual_message vm INNER JOIN (
+        SELECT id, (SELECT name FROM drug_user WHERE id = drug_user_id) AS drugUserName, drug_user_id user_id
+        FROM virtual_message WHERE wechat_message_status='发送' AND create_time >= DATE_FORMAT(NOW(),'%Y-%m-%d')
+        ) t ON vm.id=t.id
+        SET vm.user_id=t.user_id,vm.nickname=t.drugUserName, vm.user_type=1
+    </update>
+
+    <update id="reUpdateReceiveMessage">
+        update
+        virtual_message vm INNER JOIN (
+        SELECT id, (SELECT name FROM doctor WHERE id = doctor_id) AS doctorName, doctor_id user_id
+        FROM virtual_message WHERE wechat_message_status='接收' AND create_time >= DATE_FORMAT(NOW(),'%Y-%m-%d')
+        ) t ON vm.id=t.id
+        SET vm.user_id=t.user_id,vm.nickname=t.doctorName, vm.user_type=2
+    </update>
+
 </mapper>
