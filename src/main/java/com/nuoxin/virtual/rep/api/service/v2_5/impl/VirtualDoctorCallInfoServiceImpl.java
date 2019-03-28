@@ -261,25 +261,22 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public PageResponseBean<List<CallVisitBean>> getCallVisitList(CallInfoListRequest request, String leaderPath) {
+	public PageResponseBean<List<CallVisitBean>> getCallVisitList(CallInfoListRequest listRequest) {
 		PageResponseBean<List<CallVisitBean>> pageResponse = null;
 
-		Long virtualDoctorId = request.getVirtualDoctorId();
-		int count = callInfoMapper.getCallVisitCount(leaderPath, virtualDoctorId);
+		int count = callInfoMapper.getCallVisitCount(listRequest);
 		if (count > 0) {
-			int currentSize = request.getCurrentSize();
-			int pageSize = request.getPageSize();
 			// 获取电话拜访信息
-			List<CallVisitBean> list = callInfoMapper.getCallVisitList(leaderPath, virtualDoctorId, currentSize, pageSize);
+			List<CallVisitBean> list = callInfoMapper.getCallVisitList(listRequest);
 			if (CollectionsUtil.isNotEmptyList(list)) {
 				// 获取电话拜访扩展信息
 				this.getVirtualDoctorCallInfoMend(list);
 			}
-			pageResponse = new PageResponseBean(request, count, list);
+			pageResponse = new PageResponseBean(listRequest, count, list);
 		} 
 		
 		if (pageResponse == null) {
-			pageResponse = new PageResponseBean(request, 0, Collections.emptyList());
+			pageResponse = new PageResponseBean(listRequest, 0, Collections.emptyList());
 		}
 		
 		return pageResponse;

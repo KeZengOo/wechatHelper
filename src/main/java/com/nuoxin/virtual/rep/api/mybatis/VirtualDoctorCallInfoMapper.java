@@ -5,6 +5,7 @@ import java.util.List;
 import com.nuoxin.virtual.rep.api.entity.v2_5.*;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.CallRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.VisitHistoryRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.CallInfoListRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.VisitCountRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.statistics.DailyStatisticsRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CallTelephoneReponseBean;
@@ -19,24 +20,17 @@ public interface VirtualDoctorCallInfoMapper {
 
 	/**
 	 * 根据过滤条件计算数据总数
-	 * @param virtualDrugUserIds
-	 * @param virtualDoctorId
+	 * @param listRequest
 	 * @return 返回记录总条数
 	 */
-	int getCallVisitCount(@Param(value = "leaderPath") String leaderPath,
-			@Param(value = "virtualDoctorId") Long virtualDoctorId);
+	int getCallVisitCount(CallInfoListRequest listRequest);
 
 	/**
 	 * 根据过滤条件获取拜访列表信息
-	 * @param virtualDrugUserIds
-	 * @param virtualDoctorId
-	 * @param currentSize
-	 * @param pageSize
+	 * @param listRequest
 	 * @return
 	 */
-	List<CallVisitBean> getCallVisitList(@Param(value = "leaderPath") String leaderPath,
-			@Param(value = "virtualDoctorId") Long virtualDoctorId, @Param(value = "currentSize") Integer currentSize,
-			@Param(value = "pageSize") Integer pageSize);
+	List<CallVisitBean> getCallVisitList(CallInfoListRequest listRequest);
 	
 	/**
 	 * 保存电话拜访信息

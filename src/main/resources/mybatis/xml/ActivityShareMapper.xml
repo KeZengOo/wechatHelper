@@ -667,6 +667,23 @@
 			LEFT JOIN activity_share_extend ase ON a.id = ase.activity_share_id
 			WHERE
 				a.share_person_id = #{doctorId}
+
+
+		<if test="timeType != null and timeType == 1">
+			AND a.create_time >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)
+		</if>
+
+		<if test="timeType != null and timeType == 2">
+			AND a.create_time >= DATE_SUB(CURDATE(), INTERVAL 3 MONTH)
+		</if>
+
+		<if test="drugUserIdList !=null and drugUserIdList.size >0">
+			AND a.drug_user_id IN
+			<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+				#{drugUserId}
+			</foreach>
+		</if>
+
 			AND a.data_id IN (
 				SELECT DISTINCT
 					content_id
@@ -696,6 +713,22 @@
 		INNER JOIN activity_info ai ON a.data_id = ai.id
 		WHERE
 			a.share_person_id = #{doctorId}
+
+		<if test="timeType != null and timeType == 1">
+			AND a.create_time >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)
+		</if>
+
+		<if test="timeType != null and timeType == 2">
+			AND a.create_time >= DATE_SUB(CURDATE(), INTERVAL 3 MONTH)
+		</if>
+
+		<if test="drugUserIdList !=null and drugUserIdList.size >0">
+			AND a.drug_user_id IN
+			<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+				#{drugUserId}
+			</foreach>
+		</if>
+
 		AND a.data_id IN (
 			SELECT DISTINCT
 				content_id

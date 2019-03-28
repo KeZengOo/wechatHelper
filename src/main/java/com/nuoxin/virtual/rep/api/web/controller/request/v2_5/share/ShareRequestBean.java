@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 分享记录请求参数
@@ -23,10 +24,10 @@ public class ShareRequestBean extends PageRequestBean implements Serializable {
     @ApiModelProperty(value = "前端不用传", hidden = true)
     private String leaderPath;
 
-
-
+    @ApiModelProperty(value = "时间筛选，0或者null为全部，1是近一个月，2是近三个")
     private Integer timeType;
 
-
+    @ApiModelProperty(value = "选择的互动代表ID")
+    private List<Long> drugUserIdList;
 
 }

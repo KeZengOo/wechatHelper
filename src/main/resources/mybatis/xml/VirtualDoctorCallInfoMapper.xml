@@ -27,6 +27,24 @@
 	    	ON pu.user_id=du.id
 	    	WHERE du.leader_path LIKE CONCAT(#{leaderPath},'%')
 	    )
+
+
+		<if test="timeType != null and timeType == 1">
+			AND v.create_time >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)
+		</if>
+
+		<if test="timeType != null and timeType == 2">
+			AND v.create_time >= DATE_SUB(CURDATE(), INTERVAL 3 MONTH)
+		</if>
+
+		<if test="drugUserIdList !=null and drugUserIdList.size >0">
+			AND v.virtual_drug_user_id IN
+			<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+				#{drugUserId}
+			</foreach>
+		</if>
+
+
 	</select>
 	
 	<select id="getCallVisitList" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitBean">
@@ -59,7 +77,22 @@
 	    	ON pu.user_id=du.id
 	    	WHERE du.leader_path LIKE CONCAT(#{leaderPath},'%')
 	    )
-		
+
+		<if test="timeType != null and timeType == 1">
+			AND v.create_time >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)
+		</if>
+
+		<if test="timeType != null and timeType == 2">
+			AND v.create_time >= DATE_SUB(CURDATE(), INTERVAL 3 MONTH)
+		</if>
+
+		<if test="drugUserIdList !=null and drugUserIdList.size >0">
+			AND v.virtual_drug_user_id IN
+			<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+				#{drugUserId}
+			</foreach>
+		</if>
+
 		ORDER BY createTime DESC
 		LIMIT #{currentSize}, #{pageSize}
 	</select>

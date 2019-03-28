@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.io.Serializable;
+import java.util.List;
 
 @ApiModel(value = "微信消息请求参数")
 public class MessageRequestBean extends PageRequestBean implements Serializable{
@@ -51,6 +52,14 @@ public class MessageRequestBean extends PageRequestBean implements Serializable{
 
     @ApiModelProperty(value = "前端不用传")
     private String leaderPath;
+
+
+    @ApiModelProperty(value = "时间筛选，0或者null为全部，1是近一个月，2是近三个")
+    private Integer timeType;
+
+    @ApiModelProperty(value = "选择的互动代表ID")
+    private List<Long> drugUserIdList;
+
 
 
     public Long getId() {
@@ -158,5 +167,22 @@ public class MessageRequestBean extends PageRequestBean implements Serializable{
 
     public void setLeaderPath(String leaderPath) {
         this.leaderPath = leaderPath;
+    }
+
+
+    public Integer getTimeType() {
+        return timeType;
+    }
+
+    public void setTimeType(Integer timeType) {
+        this.timeType = timeType;
+    }
+
+    public List<Long> getDrugUserIdList() {
+        return drugUserIdList;
+    }
+
+    public void setDrugUserIdList(List<Long> drugUserIdList) {
+        this.drugUserIdList = drugUserIdList;
     }
 }

@@ -22,11 +22,10 @@ public interface VirtualDoctorCallInfoService {
 	
 	/**
 	 * 根据 leaderPath 获取电话拜访列表
-	 * @param request
-	 * @param leaderPath
+	 * @param listRequest
 	 * @return
 	 */
-	PageResponseBean<List<CallVisitBean>> getCallVisitList(CallInfoListRequest request, String leaderPath);
+	PageResponseBean<List<CallVisitBean>> getCallVisitList(CallInfoListRequest listRequest);
 	
 	CallVisitStatisticsBean getCallVisitListStatistics(Long virtualDoctorId, String leaderPath);
 	

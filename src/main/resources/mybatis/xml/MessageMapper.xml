@@ -480,11 +480,22 @@
             and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &lt;=date_format(#{endTime},'%Y-%m-%d %H:%i:%s')
         </if>
 
-        <!-- 不要按时间倒叙啦，不然对话是反的
-        ORDER BY vm.message_time DESC
-        -->
+        <if test="timeType != null and timeType == 1">
+            AND vm.message_time >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)
+        </if>
 
-        ORDER BY vm.message_time
+        <if test="timeType != null and timeType == 2">
+            AND vm.message_time >= DATE_SUB(CURDATE(), INTERVAL 3 MONTH)
+        </if>
+
+        <if test="drugUserIdList !=null and drugUserIdList.size >0">
+            AND vm.drug_user_id IN
+            <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+                #{drugUserId}
+            </foreach>
+        </if>
+
+        ORDER BY vm.message_time DESC
         LIMIT #{currentSize},#{pageSize}
 
 
@@ -548,6 +559,21 @@
             and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &lt;=date_format(#{endTime},'%Y-%m-%d %H:%i:%s')
         </if>
 
+        <if test="timeType != null and timeType == 1">
+            AND vm.message_time >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)
+        </if>
+
+        <if test="timeType != null and timeType == 2">
+            AND vm.message_time >= DATE_SUB(CURDATE(), INTERVAL 3 MONTH)
+        </if>
+
+        <if test="drugUserIdList !=null and drugUserIdList.size >0">
+            AND vm.drug_user_id IN
+            <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+                #{drugUserId}
+            </foreach>
+        </if>
+
 
 
 
@@ -587,6 +613,7 @@
         </if>
 
         and du.leader_path like #{leaderPath}
+
         order by vei.create_time desc
         limit #{currentSize}, #{pageSize}
 
