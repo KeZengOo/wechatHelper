@@ -203,7 +203,7 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
     public Long saveVirtualDoctor(SaveVirtualDoctorRequest request, DrugUser user) {
 
         long virtualDoctorId = 0;
-        this.checkSaveVirtualDoctorParam(request);
+        this.checkSaveVirtualDoctorParam(request, user);
         int hospitalId = this.getHospiTalId(request);
         if (hospitalId > 0) {
 
@@ -424,7 +424,7 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
      *
      * @param request
      */
-    private void checkSaveVirtualDoctorParam(SaveVirtualDoctorRequest request) {
+    private void checkSaveVirtualDoctorParam(SaveVirtualDoctorRequest request, DrugUser user) {
 
         String name = request.getName();
         if (StringUtil.isEmpty(name)) {
@@ -433,7 +433,21 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 
         List<String> telephones = request.getTelephones();
         if (CollectionsUtil.isEmptyList(telephones)) {
-            throw new BusinessException(ErrorEnum.ERROR, "联系方式不能为空！");
+            // 线下代表新增医生可以不用输入手机号
+            if (user.getSaleType().equals(OnOffLineEnum.OFFLINE.getUserType())){
+                Integer doctorCount = doctorMapper.getDoctorCount(request.getName(), request.getHospital());
+                if (doctorCount !=null && doctorCount > 0){
+                    throw new BusinessException(ErrorEnum.ERROR, "医生已经存在！");
+                }else {
+                    // 线下代表新增的医生如果没有手机号就造一个
+                    String fTelephone = StringUtil.getUuidRemoveLine();
+                    telephones = new ArrayList<>();
+                    telephones.add(fTelephone);
+                }
+            }else {
+                throw new BusinessException(ErrorEnum.ERROR, "联系方式不能为空！");
+            }
+
         }
 
         List<String> collectTelephone = telephones.stream().map(String::trim).distinct().collect(Collectors.toList());
@@ -441,23 +455,26 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
             throw new BusinessException(ErrorEnum.ERROR, "联系方式不能重复");
         }
 
-        for (String telephone : telephones) {
-            boolean mobileMatcher = RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, telephone);
-            if (!mobileMatcher) {
-                boolean fixPhoneMatch = RegularUtils.isMatcher(RegularUtils.MATCH_FIX_PHONE, telephone);
-                if (!fixPhoneMatch) {
-                    throw new BusinessException(ErrorEnum.ERROR, "联系方式:" + telephone + " 输入不合法！");
+        // 线下代表输入医生没有手机号不用校验
+        if (user.getSaleType().equals(OnOffLineEnum.ONLINE.getUserType())) {
+            for (String telephone : telephones) {
+                boolean mobileMatcher = RegularUtils.isMatcher(RegularUtils.MATCH_TELEPHONE, telephone);
+                if (!mobileMatcher) {
+                    boolean fixPhoneMatch = RegularUtils.isMatcher(RegularUtils.MATCH_FIX_PHONE, telephone);
+                    if (!fixPhoneMatch) {
+                        throw new BusinessException(ErrorEnum.ERROR, "联系方式:" + telephone + " 输入不合法！");
+                    }
+
+                    // 如果是座机号校验号码和姓名是否唯一
+                    List<String> nameList = doctorMapper.doctorNameCountByMobile(telephone);
+                    if (CollectionsUtil.isNotEmptyList(nameList) && nameList.contains(name)) {
+                        throw new BusinessException(ErrorEnum.ERROR, "姓名为:" + name + ",联系方式为:" + telephone + " 的医生已经存在！");
+                    }
+
                 }
 
-                // 如果是座机号校验号码和姓名是否唯一
-                List<String> nameList = doctorMapper.doctorNameCountByMobile(telephone);
-                if (CollectionsUtil.isNotEmptyList(nameList) && nameList.contains(name)) {
-                    throw new BusinessException(ErrorEnum.ERROR, "姓名为:" + name + ",联系方式为:" + telephone + " 的医生已经存在！");
-                }
-
+                // 手机号不校验是否存在，如果存在信息更新
             }
-
-            // 手机号不校验是否存在，如果存在信息更新
         }
 
     }
