@@ -22,6 +22,7 @@ import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.wechat.WechatAndr
 import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 import com.vdurmont.emoji.EmojiParser;
 import org.apache.commons.csv.CSVRecord;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -96,6 +97,18 @@ public class WechatServiceImpl implements WechatService {
             this.saveOrUpdateContactList(drugUserId, bean.getUploadFileTime(), contactList);
         }
 
+        this.reUpdateContact();
+
+    }
+
+    @Async
+    public void reUpdateContact() {
+        try {
+            messageMapper.reUpdateMessageContact();
+            messageMapper.reUpdateMessageContactAlias();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -115,6 +128,20 @@ public class WechatServiceImpl implements WechatService {
         List<WechatMessageRequestBean> wechatMessageList = this.getWechatMessageList(drugUserId, bean.getUploadFileTime(), contactStrList);
         this.saveOrUpdateWechatMessageList(wechatMessageList);
 
+
+        this.reUpdateMessage();
+    }
+
+    @Async
+    public void reUpdateMessage() {
+        try {
+            messageMapper.reUpdateMessageContact();
+            messageMapper.reUpdateMessageContactAlias();
+            messageMapper.reUpdateSendMessage();
+            messageMapper.reUpdateReceiveMessage();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
     }
 

@@ -102,6 +102,16 @@ public interface MessageMapper {
      */
     Integer doctorWechatNum(DailyStatisticsRequestBean bean);
 
+    /**
+     * 导入微信聊天消息补偿
+     */
 
+    void reUpdateMessageContact();
+
+    void reUpdateMessageContactAlias();
+
+    void reUpdateSendMessage();
+
+    void reUpdateReceiveMessage();
 
 }
