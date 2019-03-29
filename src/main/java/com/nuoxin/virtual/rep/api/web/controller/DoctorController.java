@@ -313,6 +313,23 @@ public class DoctorController extends BaseController {
         return responseBean;
     }
 
+
+    @ApiOperation(value = "查询产品下的代表", notes = "查询产品下的代表")
+    @GetMapping("/relation/{productId}")
+    public DefaultResponseBean<List<DrugUserResponseBean>> relationProductDrugUser(@PathVariable Long productId,
+                                                                            HttpServletRequest request, HttpServletResponse response){
+        DefaultResponseBean<List<DrugUserResponseBean>> responseBean = new DefaultResponseBean();
+        DrugUser user = super.getLoginUser(request);
+        if(user==null){
+            responseBean.setCode(300);
+            responseBean.setMessage("登录失效");
+            return responseBean;
+        }
+        responseBean.setData(drugUserService.relationDrugUser(productId));
+        return responseBean;
+    }
+
+
     @ApiOperation(value = "联系计划page", notes = "联系计划page")
     @PostMapping("/contact/plan/page")
     public DefaultResponseBean<PageResponseBean<ContactPlanResponseBean>> pageContactPlan(@RequestBody ContactPlanQueryRequestBean bean,

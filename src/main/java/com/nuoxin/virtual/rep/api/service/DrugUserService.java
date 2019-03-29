@@ -77,6 +77,16 @@ public class DrugUserService {
     }
 
 
+    /**
+     * 关联productId的企业用户
+     * @param productId
+     * @return
+     */
+    public List<DrugUserResponseBean> relationDrugUser(Long productId){
+        return drugUserMapper.relationDrugUser(null,productId);
+    }
+
+
 
 
     /**

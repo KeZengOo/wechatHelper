@@ -114,7 +114,16 @@
     </resultMap>
 
     <select id="relationDrugUser" resultMap="drugUserResponseBean">
-      select du.id,du.name from product_user pu join drug_user du on pu.user_id=du.id where du.leader_path like #{leaderPath,jdbcType=VARCHAR} and pu.prod_id = #{productId} group by du.id
+      select du.id,du.name
+      from product_user pu
+      join drug_user du
+      on pu.user_id=du.id
+      where pu.prod_id = #{productId}
+      <if test="leaderPath !=null and leaderPath!=''">
+         AND du.leader_path like #{leaderPath,jdbcType=VARCHAR}
+      </if>
+
+      group by du.id
 
     </select>
     
