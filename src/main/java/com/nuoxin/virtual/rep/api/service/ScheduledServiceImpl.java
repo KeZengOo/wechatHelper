@@ -432,4 +432,57 @@ public class ScheduledServiceImpl {
         }
     }
 
+    /**
+     * 代表-医生-产品关联表同步 drug_user_doctor
+     */
+    @Scheduled(cron = TimeCronConstant.ENTERPRISE_SALE_REP_PRODUCT_HCP_CRON)
+    public void enterpriseSaleRepProductHcpSync(){
+        Integer productId = 150;
+        //------------------------------------------------同步插入--------------------------------------------------
+        //获取从库的最新数据时间
+        String createTime = scheduledSyncSlaveMapper.getEnterpriseSaleRepProductHcpCreateTime();
+        if(createTime == null)
+        {
+            //如果从库为空的话便默认一个时间
+            createTime = "2000-01-01 00:00:00";
+        }
+        logger.info("获取从库的代表-医生-产品关联表信息最新数据时间："+ createTime);
+        //根据从库表最新数据时间获取主库表最新数据list
+        List<EnterpriseSaleRepProductHcpBean> enterpriseSaleRepProductHcpList = scheduledSyncMapper.getEnterpriseSaleRepProductHcpListByCreateTime(productId,createTime);
+        logger.info("根据从库代表-医生-产品关联表最新数据时间获取主库代表-医生-产品关联表最新数据list："+ enterpriseSaleRepProductHcpList);
+        List<EnterpriseSaleRepProductHcpBean> newSaleRepProductHcpList = new ArrayList<EnterpriseSaleRepProductHcpBean>();
+        if(enterpriseSaleRepProductHcpList.size() >  0){
+            //获取产品id和coded的list
+            List<EnterpriseSaleRepProductHcpBean> getIdAndCodedList = scheduledSyncSlaveMapper.getProductIdAndCodedList();
+            //循环需要插入的数据，并把meetingId放入EnterpriseMeetingAttendDetailsBean对象中
+            for (int i = 0; i < enterpriseSaleRepProductHcpList.size(); i++){
+                //idAndCode关系list循环
+                for (int j = 0; j < getIdAndCodedList.size(); j++){
+                    if(enterpriseSaleRepProductHcpList.get(i).getProductCode().equals(getIdAndCodedList.get(j).getProductCode())) {
+                        EnterpriseSaleRepProductHcpBean e  = new EnterpriseSaleRepProductHcpBean();
+                        e = enterpriseSaleRepProductHcpList.get(i);
+                        e.setProductId(getIdAndCodedList.get(j).getProductId());
+                        newSaleRepProductHcpList.add(e);
+                    }
+                }
+            }
+
+            //把主库最新的数据插入从库的表中
+            boolean result = scheduledSyncSlaveMapper.syncEnterpriseSaleRepProductHcpList(newSaleRepProductHcpList);
+            logger.info("把主库最新的代表-医生-产品关联表数据插入从库的代表-医生-产品关联表中："+ result);
+        }
+
+        //------------------------------------------------同步更新--------------------------------------------------
+        //获取从库最新更新数据时间
+        String updateTime = scheduledSyncSlaveMapper.getEnterpriseSaleRepProductHcpUpdateTime();
+        //根据更新时间获取大于该时间的产品list
+        List<EnterpriseSaleRepProductHcpBean> enterpriseSaleRepProductHcpListByUpdateTimeList = scheduledSyncMapper.getEnterpriseSaleRepProductHcpListByUpdateTime(productId,updateTime);
+        if(enterpriseSaleRepProductHcpListByUpdateTimeList.size() > 0){
+            enterpriseSaleRepProductHcpListByUpdateTimeList.forEach(updateList -> {
+                boolean updateResult = scheduledSyncSlaveMapper.syncUpdateEnterpriseSaleRepProductHcpList(updateList);
+                logger.info("把主库更新后的代表-医生-产品关联表数据更新到从库的代表-医生-产品关联表中："+ updateResult);
+            });
+        }
+
+    }
 }

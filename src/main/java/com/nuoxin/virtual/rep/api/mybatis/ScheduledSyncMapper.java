@@ -149,4 +149,20 @@ public interface ScheduledSyncMapper {
      */
     List<EnterpriseSaleRepBean> getEnterpriseSaleRepListByUpdateTime(@Param(value = "prodId") Integer prodId,@Param(value = "updateTime") String updateTime);
 
+    /**
+     * 根据创建时间获取大于该时间的代表-医生-产品关联表list
+     * @param prodId
+     * @param createTime
+     * @return list
+     */
+    List<EnterpriseSaleRepProductHcpBean> getEnterpriseSaleRepProductHcpListByCreateTime(@Param(value = "prodId") Integer prodId,@Param(value = "createTime") String createTime);
+
+    /**
+     * 根据更新时间获取大于该时间的代表-医生-产品关联表list
+     * @param prodId
+     * @param updateTime
+     * @return list
+     */
+    List<EnterpriseSaleRepProductHcpBean> getEnterpriseSaleRepProductHcpListByUpdateTime(@Param(value = "prodId") Integer prodId,@Param(value = "updateTime") String updateTime);
+
 }

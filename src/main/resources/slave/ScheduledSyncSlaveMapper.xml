@@ -523,4 +523,64 @@
         t.`sale_rep_code` = #{enterpriseSaleRepBean.id}
     </update>
 
+    <!-- 得到从库最新的角色用户映射表创建时间 -->
+    <select id="getEnterpriseSaleRepProductHcpCreateTime" resultType="java.lang.String">
+        SELECT DATE_FORMAT(t.create_time,'%Y-%c-%d %T') create_time FROM enterprise_sale_rep_product_hcp t ORDER BY t.create_time DESC LIMIT 1
+    </select>
+
+    <!-- 得到从库最新的角色用户映射表更新时间 -->
+    <select id="getEnterpriseSaleRepProductHcpUpdateTime" resultType="java.lang.String">
+        SELECT DATE_FORMAT(t.update_time,'%Y-%c-%d %T') update_time FROM enterprise_sale_rep_product_hcp t ORDER BY t.update_time DESC LIMIT 1
+    </select>
+
+    <!-- 同步角色数据到从库 insert -->
+    <insert id="syncEnterpriseSaleRepProductHcpList">
+        INSERT INTO enterprise_sale_rep_product_hcp (
+        `id`,
+        `sale_rep_code`,
+        `sale_rep_name`,
+        `customer_code`,
+        `hcp_name`,
+        `product_id`,
+        `product_code`,
+        `product_name`,
+        `create_time`,
+        `update_time`
+        )
+        VALUES
+        <foreach collection="list" item="list" separator=",">
+            (
+            #{list.id},
+            #{list.saleRepCode},
+            #{list.saleRepName},
+            #{list.customerCode},
+            #{list.hcpName},
+            #{list.productId},
+            #{list.productCode},
+            #{list.productName},
+            #{list.createTime},
+            #{list.updateTime}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 同步角色数据到从库 update -->
+    <update id="syncUpdateEnterpriseSaleRepProductHcpList" parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.EnterpriseSaleRepProductHcpBean">
+        UPDATE enterprise_sale_rep_product_hcp t
+        SET
+        t.`sale_rep_code` = #{enterpriseSaleRepProductHcpBean.saleRepCode},
+        t.`sale_rep_name` = #{enterpriseSaleRepProductHcpBean.saleRepName},
+        t.`customer_code` = #{enterpriseSaleRepProductHcpBean.customerCode},
+        t.`hcp_name` = #{enterpriseSaleRepProductHcpBean.hcpName},
+        t.`product_code` = #{enterpriseSaleRepProductHcpBean.productCode},
+        t.`product_name` = #{enterpriseSaleRepProductHcpBean.productName},
+        t.`update_time` = #{enterpriseSaleRepProductHcpBean.updateTime}
+        WHERE
+        t.`id` = #{enterpriseSaleRepProductHcpBean.id}
+    </update>
+
+    <!-- 获取产品id和coded的list -->
+    <select id="getProductIdAndCodedList" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.EnterpriseSaleRepProductHcpBean">
+        SELECT t.id productId,t.`code` productCode FROM enterprise_product t
+    </select>
 </mapper>

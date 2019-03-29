@@ -53,5 +53,10 @@ public interface TimeCronConstant {
 	/**
 	 * 角色用户映射表同步定时任务timer
 	 */
-	String ENTERPRISE_SALE_REP_CRON = "0 29 15 * * ?";
+	String ENTERPRISE_SALE_REP_CRON = "0 0 23 * * ?";
+
+	/**
+	 * 代表-医生-产品关联表同步定时任务timer
+	 */
+	String ENTERPRISE_SALE_REP_PRODUCT_HCP_CRON = "0 23 17 * * ?";
 }

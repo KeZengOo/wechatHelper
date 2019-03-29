@@ -257,4 +257,36 @@ public interface ScheduledSyncSlaveMapper {
      */
     boolean syncUpdateEnterpriseSaleRepList(@Param(value = "enterpriseSaleRepBean") EnterpriseSaleRepBean enterpriseSaleRepBean);
 
+
+    /**
+     * 得到从库最新的角色用户映射表创建时间
+     * @return String
+     */
+    String getEnterpriseSaleRepProductHcpCreateTime();
+
+    /**
+     * 得到从库最新的角色用户映射表更新时间
+     * @return String
+     */
+    String getEnterpriseSaleRepProductHcpUpdateTime();
+
+    /**
+     * 同步产品数据到从库
+     * @param list
+     * @return boolean
+     */
+    boolean syncEnterpriseSaleRepProductHcpList(List<EnterpriseSaleRepProductHcpBean> list);
+
+    /**
+     * 同步角色数据到从库 update
+     * @param enterpriseSaleRepProductHcpBean
+     * @return boolean
+     */
+    boolean syncUpdateEnterpriseSaleRepProductHcpList(@Param(value = "enterpriseSaleRepProductHcpBean") EnterpriseSaleRepProductHcpBean enterpriseSaleRepProductHcpBean);
+
+    /**
+     * 获取产品id和coded的list
+     * @return list
+     */
+    List<EnterpriseSaleRepProductHcpBean> getProductIdAndCodedList();
 }

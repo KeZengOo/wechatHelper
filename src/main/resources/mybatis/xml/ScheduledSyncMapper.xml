@@ -409,8 +409,7 @@
             d.modify_time > #{updateTime} AND  u.prod_id = #{prodId}
     </select>
 
-
-    <!-- 根据创建时间获取大于该时间的角色用户映射表表list -->
+    <!-- 根据创建时间获取大于该时间的角色用户映射表list -->
     <select id="getEnterpriseSaleRepListByCreateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.EnterpriseSaleRepBean">
         SELECT
             t.id,
@@ -432,7 +431,7 @@
             d.drug_user_id
     </select>
 
-    <!-- 根据更新时间获取大于该时间的角色用户映射表表list -->
+    <!-- 根据更新时间获取大于该时间的角色用户映射表list -->
     <select id="getEnterpriseSaleRepListByUpdateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.EnterpriseSaleRepBean">
         SELECT
             t.id,
@@ -452,5 +451,43 @@
             t.modify_time > #{updateTime} AND  d.prod_id = #{prodId}
         GROUP BY
             d.drug_user_id
+    </select>
+
+    <!-- 根据创建时间获取大于该时间的代表-医生-产品关联表list -->
+    <select id="getEnterpriseSaleRepProductHcpListByCreateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.EnterpriseSaleRepProductHcpBean">
+        SELECT
+            d.id,
+            d.doctor_id customerCode,
+            d.doctor_name hcpName,
+            d.drug_user_id saleRepCode,
+            d.drug_user_name saleRepName,
+            d.prod_id productCode,
+            p.prod_name productName,
+            d.created_time createTime,
+            d.modify_time updateTime
+        FROM
+            drug_user_doctor d
+        LEFT JOIN product_line p ON d.prod_id = p.prod_id
+        WHERE
+            d.created_time > #{createTime} AND  d.prod_id = #{prodId}
+    </select>
+
+    <!-- 根据更新时间获取大于该时间的代表-医生-产品关联表list -->
+    <select id="getEnterpriseSaleRepProductHcpListByUpdateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.EnterpriseSaleRepProductHcpBean">
+        SELECT
+            d.id,
+            d.doctor_id customerCode,
+            d.doctor_name hcpName,
+            d.drug_user_id saleRepCode,
+            d.drug_user_name saleRepName,
+            d.prod_id productCode,
+            p.prod_name productName,
+            d.created_time createTime,
+            d.modify_time updateTime
+        FROM
+            drug_user_doctor d
+        LEFT JOIN product_line p ON d.prod_id = p.prod_id
+        WHERE
+            d.modify_time > #{updateTime} AND  d.prod_id = #{prodId}
     </select>
 </mapper>
