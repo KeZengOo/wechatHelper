@@ -43,5 +43,15 @@ public interface TimeCronConstant {
 	/**
 	 * 医生参加诺和内部会议详情表同步定时任务timer
 	 */
-	String T_MEETING_ATTEND_DETAILS_CRON = "0 44 19 * * ?";
+	String T_MEETING_ATTEND_DETAILS_CRON = "0 0 23 * * ?";
+
+	/**
+	 * 医生表同步定时任务timer
+	 */
+	String ENTERPRISE_HCP_CRON = "0 0 23 * * ?";
+
+	/**
+	 * 角色用户映射表同步定时任务timer
+	 */
+	String ENTERPRISE_SALE_REP_CRON = "0 29 15 * * ?";
 }

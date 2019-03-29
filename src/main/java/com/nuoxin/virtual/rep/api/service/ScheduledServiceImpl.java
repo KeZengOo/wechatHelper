@@ -286,7 +286,7 @@ public class ScheduledServiceImpl {
         if(enterpriseInternalMeetingList.size() >  0){
             //把主库最新的数据插入从库的表中
             boolean result = scheduledSyncSlaveMapper.syncEnterpriseInternalMeetingList(enterpriseInternalMeetingList);
-            logger.info("把主库最新的会议表数据插入从库的会议表表中："+ result);
+            logger.info("把主库最新的会议表数据插入从库的会议表中："+ result);
         }
 
         //------------------------------------------------同步更新--------------------------------------------------
@@ -297,7 +297,7 @@ public class ScheduledServiceImpl {
         if(virtualDoctorCallInfoListByUpdateTimeList.size() > 0){
             virtualDoctorCallInfoListByUpdateTimeList.forEach(updateList -> {
                 boolean updateResult = scheduledSyncSlaveMapper.syncUpdateEnterpriseInternalMeetingList(updateList);
-                logger.info("把主库更新后的会议表数据更新到从库的会议表表中："+ updateResult);
+                logger.info("把主库更新后的会议表数据更新到从库的会议表中："+ updateResult);
             });
         }
     }
@@ -356,5 +356,80 @@ public class ScheduledServiceImpl {
         }
     }
 
+    /**
+     * 医生信息同步 doctor
+     */
+    @Scheduled(cron = TimeCronConstant.ENTERPRISE_HCP_CRON)
+    public void enterpriseHcpSync(){
+        Integer productId = 150;
+        //------------------------------------------------同步插入--------------------------------------------------
+        //获取从库的最新数据时间
+        String createTime = scheduledSyncSlaveMapper.getEnterpriseHcpCreateTime();
+        if(createTime == null)
+        {
+            //如果从库为空的话便默认一个时间
+            createTime = "2000-01-01 00:00:00";
+        }
+        logger.info("获取从库的医生表最新数据时间："+ createTime);
+        //根据从库表最新数据时间获取主库表最新数据list
+        List<EnterpriseHcpBean> enterpriseHcpList = scheduledSyncMapper.getEnterpriseHcpBeanListByCreateTime(productId,createTime);
+        logger.info("根据从库医生表最新数据时间获取主库医生表最新数据list："+ enterpriseHcpList);
+
+        if(enterpriseHcpList.size() >  0){
+            //把主库最新的数据插入从库的表中
+            boolean result = scheduledSyncSlaveMapper.syncEnterpriseHcpList(enterpriseHcpList);
+            logger.info("把主库最新的医生表数据插入从库的医生表中："+ result);
+        }
+
+        //------------------------------------------------同步更新--------------------------------------------------
+        //获取从库最新更新数据时间
+        String updateTime = scheduledSyncSlaveMapper.getEnterpriseHcpUpdateTime();
+        //根据更新时间获取大于该时间的产品list
+        List<EnterpriseHcpBean> enterpriseHcpListByUpdateTimeList = scheduledSyncMapper.getEnterpriseHcpBeanListByUpdateTime(productId,updateTime);
+        if(enterpriseHcpListByUpdateTimeList.size() > 0){
+            enterpriseHcpListByUpdateTimeList.forEach(updateList -> {
+                boolean updateResult = scheduledSyncSlaveMapper.syncUpdateEnterpriseHcpList(updateList);
+                logger.info("把主库更新后的医生表数据更新到从库的医生表中："+ updateResult);
+            });
+        }
+    }
+
+    /**
+     * 角色用户映射表同步 drug_user
+     */
+    @Scheduled(cron = TimeCronConstant.ENTERPRISE_SALE_REP_CRON)
+    public void enterpriseSaleRepSync(){
+        Integer productId = 150;
+        //------------------------------------------------同步插入--------------------------------------------------
+        //获取从库的最新数据时间
+        String createTime = scheduledSyncSlaveMapper.getEnterpriseSaleRepCreateTime();
+        if(createTime == null)
+        {
+            //如果从库为空的话便默认一个时间
+            createTime = "2000-01-01 00:00:00";
+        }
+        logger.info("获取从库的角色用户映射表最新数据时间："+ createTime);
+        //根据从库表最新数据时间获取主库表最新数据list
+        List<EnterpriseSaleRepBean> enterpriseSaleRepList = scheduledSyncMapper.getEnterpriseSaleRepListByCreateTime(productId,createTime);
+        logger.info("根据从库角色用户映射表最新数据时间获取主库角色用户映射表最新数据list："+ enterpriseSaleRepList);
+
+        if(enterpriseSaleRepList.size() >  0){
+            //把主库最新的数据插入从库的表中
+            boolean result = scheduledSyncSlaveMapper.syncEnterpriseSaleRepList(enterpriseSaleRepList);
+            logger.info("把主库最新的角色用户映射表数据插入从库的角色用户映射表中："+ result);
+        }
+
+        //------------------------------------------------同步更新--------------------------------------------------
+        //获取从库最新更新数据时间
+        String updateTime = scheduledSyncSlaveMapper.getEnterpriseSaleRepUpdateTime();
+        //根据更新时间获取大于该时间的产品list
+        List<EnterpriseSaleRepBean> enterpriseSaleRepListByUpdateTimeList = scheduledSyncMapper.getEnterpriseSaleRepListByUpdateTime(productId,updateTime);
+        if(enterpriseSaleRepListByUpdateTimeList.size() > 0){
+            enterpriseSaleRepListByUpdateTimeList.forEach(updateList -> {
+                boolean updateResult = scheduledSyncSlaveMapper.syncUpdateEnterpriseSaleRepList(updateList);
+                logger.info("把主库更新后的角色用户映射表数据更新到从库的角色用户映射表中："+ updateResult);
+            });
+        }
+    }
 
 }

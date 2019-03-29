@@ -117,4 +117,36 @@ public interface ScheduledSyncMapper {
      */
     List<EnterpriseMeetingAttendDetailsBean> getEnterpriseMeetingAttendDetailsListByUpdateTime(@Param(value = "prodId") Integer prodId,@Param(value = "updateTime") String updateTime);
 
+    /**
+     * 根据创建时间获取大于该时间的医生详情表list
+     * @param prodId
+     * @param createTime
+     * @return list
+     */
+    List<EnterpriseHcpBean> getEnterpriseHcpBeanListByCreateTime(@Param(value = "prodId") Integer prodId,@Param(value = "createTime") String createTime);
+
+    /**
+     * 根据更新时间获取大于该时间的医生详情表list
+     * @param prodId
+     * @param updateTime
+     * @return list
+     */
+    List<EnterpriseHcpBean> getEnterpriseHcpBeanListByUpdateTime(@Param(value = "prodId") Integer prodId,@Param(value = "updateTime") String updateTime);
+
+    /**
+     * 根据创建时间获取大于该时间的角色用户映射表list
+     * @param prodId
+     * @param createTime
+     * @return list
+     */
+    List<EnterpriseSaleRepBean> getEnterpriseSaleRepListByCreateTime(@Param(value = "prodId") Integer prodId,@Param(value = "createTime") String createTime);
+
+    /**
+     * 根据更新时间获取大于该时间的角色用户映射表list
+     * @param prodId
+     * @param updateTime
+     * @return list
+     */
+    List<EnterpriseSaleRepBean> getEnterpriseSaleRepListByUpdateTime(@Param(value = "prodId") Integer prodId,@Param(value = "updateTime") String updateTime);
+
 }

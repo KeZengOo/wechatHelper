@@ -204,4 +204,57 @@ public interface ScheduledSyncSlaveMapper {
      * @return list
      */
     List<EnterpriseMeetingAttendDetailsBean> getBusinessCodeAndMeetingIdList();
+
+    /**
+     * 得到从库最新的医生详情表创建时间
+     * @return String
+     */
+    String getEnterpriseHcpCreateTime();
+
+    /**
+     * 得到从库最新的医生详情表更新时间
+     * @return String
+     */
+    String getEnterpriseHcpUpdateTime();
+
+    /**
+     * 同步产品数据到从库
+     * @param list
+     * @return boolean
+     */
+    boolean syncEnterpriseHcpList(List<EnterpriseHcpBean> list);
+
+    /**
+     * 同步角色数据到从库 update
+     * @param enterpriseHcpBean
+     * @return boolean
+     */
+    boolean syncUpdateEnterpriseHcpList(@Param(value = "enterpriseHcpBean") EnterpriseHcpBean enterpriseHcpBean);
+
+    /**
+     * 得到从库最新的角色用户映射表表创建时间
+     * @return String
+     */
+    String getEnterpriseSaleRepCreateTime();
+
+    /**
+     * 得到从库最新的角色用户映射表表更新时间
+     * @return String
+     */
+    String getEnterpriseSaleRepUpdateTime();
+
+    /**
+     * 同步产品数据到从库
+     * @param list
+     * @return boolean
+     */
+    boolean syncEnterpriseSaleRepList(List<EnterpriseSaleRepBean> list);
+
+    /**
+     * 同步角色数据到从库 update
+     * @param enterpriseSaleRepBean
+     * @return boolean
+     */
+    boolean syncUpdateEnterpriseSaleRepList(@Param(value = "enterpriseSaleRepBean") EnterpriseSaleRepBean enterpriseSaleRepBean);
+
 }

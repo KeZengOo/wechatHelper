@@ -358,4 +358,99 @@
         WHERE
             t.update_time > #{updateTime} AND  d.product_id = #{prodId}
     </select>
+
+    <!-- 根据创建时间获取大于该时间的医生详情表list -->
+    <select id="getEnterpriseHcpBeanListByCreateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.EnterpriseHcpBean">
+        SELECT
+            DISTINCT d.`id`,
+            d.`name`,
+            d.`hospital_id` hospitalId,
+            d.`hospital_name` hospitalName,
+            d.`depart`,
+            CASE
+        WHEN d.`sex` = 0 THEN
+            '男'
+        WHEN d.`sex` = 1 THEN
+            '女'
+        ELSE
+            '未知'
+        END `sex`,
+         d.`create_time` createTime,
+         d.`modify_time` modifyTime
+        FROM
+            doctor d
+        JOIN drug_user_doctor u ON d.id = u.doctor_id
+        WHERE
+            d.create_time > #{createTime} AND  u.prod_id = #{prodId}
+    </select>
+
+    <!-- 根据更新时间获取大于该时间的医生详情表list -->
+    <select id="getEnterpriseHcpBeanListByUpdateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.EnterpriseHcpBean">
+        SELECT
+            DISTINCT d.`id`,
+            d.`name`,
+            d.`hospital_id` hospitalId,
+            d.`hospital_name` hospitalName,
+            d.`depart`,
+            CASE
+        WHEN d.`sex` = 0 THEN
+            '男'
+        WHEN d.`sex` = 1 THEN
+            '女'
+        ELSE
+            '未知'
+        END `sex`,
+         d.`create_time` createTime,
+         d.`modify_time` modifyTime
+        FROM
+            doctor d
+        JOIN drug_user_doctor u ON d.id = u.doctor_id
+        WHERE
+            d.modify_time > #{updateTime} AND  u.prod_id = #{prodId}
+    </select>
+
+
+    <!-- 根据创建时间获取大于该时间的角色用户映射表表list -->
+    <select id="getEnterpriseSaleRepListByCreateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.EnterpriseSaleRepBean">
+        SELECT
+            t.id,
+            t.`name`,
+            t.email,
+            t.`status`,
+            t.create_time createTime,
+            t.modify_time modifyTime,
+            u.role_id roleId,
+            r.role_name roleName
+        FROM
+            drug_user t
+        LEFT JOIN drug_user_doctor d ON t.id = d.drug_user_id
+        LEFT JOIN role_user u ON t.id = u.user_id
+        LEFT JOIN role r ON u.role_id = r.id
+        WHERE
+            t.create_time > #{createTime} AND  d.prod_id = #{prodId}
+        GROUP BY
+            d.drug_user_id
+    </select>
+
+    <!-- 根据更新时间获取大于该时间的角色用户映射表表list -->
+    <select id="getEnterpriseSaleRepListByUpdateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.EnterpriseSaleRepBean">
+        SELECT
+            t.id,
+            t.`name`,
+            t.email,
+            t.`status`,
+            t.create_time createTime,
+            t.modify_time modifyTime,
+            u.role_id roleId,
+            r.role_name roleName
+        FROM
+            drug_user t
+        LEFT JOIN drug_user_doctor d ON t.id = d.drug_user_id
+        LEFT JOIN role_user u ON t.id = u.user_id
+        LEFT JOIN role r ON u.role_id = r.id
+        WHERE
+            t.modify_time > #{updateTime} AND  d.prod_id = #{prodId}
+        GROUP BY
+            d.drug_user_id
+    </select>
 </mapper>

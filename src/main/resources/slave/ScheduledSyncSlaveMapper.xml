@@ -419,4 +419,108 @@
             enterprise_internal_meeting t
     </select>
 
+    <!-- 得到从库最新的医生表创建时间 -->
+    <select id="getEnterpriseHcpCreateTime" resultType="java.lang.String">
+        SELECT DATE_FORMAT(t.create_time,'%Y-%c-%d %T') create_time FROM enterprise_hcp t ORDER BY t.create_time DESC LIMIT 1
+    </select>
+
+    <!-- 得到从库最新的医生表更新时间 -->
+    <select id="getEnterpriseHcpUpdateTime" resultType="java.lang.String">
+        SELECT DATE_FORMAT(t.update_time,'%Y-%c-%d %T') update_time FROM enterprise_hcp t ORDER BY t.update_time DESC LIMIT 1
+    </select>
+
+    <!-- 同步角色数据到从库 insert -->
+    <insert id="syncEnterpriseHcpList">
+        INSERT INTO enterprise_hcp (
+        id,
+        `customer_code`,
+        `hcp_name`,
+        `gender`,
+        `ins_code`,
+        `hospital_name`,
+        `department`,
+        `create_time`,
+        `update_time`
+        )
+        VALUES
+        <foreach collection="list" item="list" separator=",">
+            (
+            #{list.id},
+            #{list.id},
+            #{list.name},
+            #{list.sex},
+            #{list.hospitalId},
+            #{list.hospitalName},
+            #{list.depart},
+            #{list.createTime},
+            #{list.modifyTime}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 同步角色数据到从库 update -->
+    <update id="syncUpdateEnterpriseHcpList" parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.EnterpriseHcpBean">
+        UPDATE enterprise_hcp t
+        SET
+        t.`hcp_name` = #{enterpriseHcpBean.name},
+        t.`gender` = #{enterpriseHcpBean.sex},
+        t.`ins_code` = #{enterpriseHcpBean.hospitalId},
+        t.`hospital_name` = #{enterpriseHcpBean.hospitalName},
+        t.`department` = #{enterpriseHcpBean.depart},
+        t.`update_time` = #{enterpriseHcpBean.modifyTime}
+        WHERE
+        t.`id` = #{enterpriseHcpBean.id}
+    </update>
+
+    <!-- 得到从库最新的角色用户映射表创建时间 -->
+    <select id="getEnterpriseSaleRepCreateTime" resultType="java.lang.String">
+        SELECT DATE_FORMAT(t.create_time,'%Y-%c-%d %T') create_time FROM enterprise_sale_rep t ORDER BY t.create_time DESC LIMIT 1
+    </select>
+
+    <!-- 得到从库最新的角色用户映射表更新时间 -->
+    <select id="getEnterpriseSaleRepUpdateTime" resultType="java.lang.String">
+        SELECT DATE_FORMAT(t.update_time,'%Y-%c-%d %T') update_time FROM enterprise_sale_rep t ORDER BY t.update_time DESC LIMIT 1
+    </select>
+
+    <!-- 同步角色数据到从库 insert -->
+    <insert id="syncEnterpriseSaleRepList">
+        INSERT INTO enterprise_sale_rep (
+        `sale_rep_code`,
+        `sale_rep_name`,
+        `sale_rep_email`,
+        `role_id`,
+        `role_name`,
+        `status`,
+        `create_time`,
+        `update_time`
+        )
+        VALUES
+        <foreach collection="list" item="list" separator=",">
+            (
+            #{list.id},
+            #{list.name},
+            #{list.email},
+            #{list.roleId},
+            #{list.roleName},
+            #{list.status},
+            #{list.createTime},
+            #{list.modifyTime}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 同步角色数据到从库 update -->
+    <update id="syncUpdateEnterpriseSaleRepList" parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.EnterpriseSaleRepBean">
+        UPDATE enterprise_sale_rep t
+        SET
+        t.`sale_rep_name` = #{enterpriseSaleRepBean.name},
+        t.`sale_rep_email` = #{enterpriseSaleRepBean.email},
+        t.`role_id` = #{enterpriseSaleRepBean.roleId},
+        t.`role_name` = #{enterpriseSaleRepBean.roleName},
+        t.`status` = #{enterpriseSaleRepBean.status},
+        t.`update_time` = #{enterpriseSaleRepBean.modifyTime}
+        WHERE
+        t.`sale_rep_code` = #{enterpriseSaleRepBean.id}
+    </update>
+
 </mapper>
