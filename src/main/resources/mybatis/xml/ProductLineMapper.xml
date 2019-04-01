@@ -120,4 +120,27 @@
         SELECT prod_name FROM product_line WHERE prod_id=#{productId}
     </select>
 
+    <!-- 根据时间获取大于该时间的产品list -->
+    <select id="getProductListByCreateTime" resultType="com.nuoxin.virtual.rep.api.entity.ProductLine">
+      SELECT
+            t.prod_id id,
+            t.prod_name `name`,
+            t.prod_desc `desc`
+        FROM
+            product_line t
+        WHERE
+            t.create_date > #{createTime}
+    </select>
+
+    <!-- 根据更新时间获取大于该时间的产品list -->
+    <select id="getProductListByUpdateTime" resultType="com.nuoxin.virtual.rep.api.entity.ProductLine">
+      SELECT
+            t.prod_id id,
+            t.prod_name `name`,
+            t.prod_desc `desc`
+        FROM
+            product_line t
+        WHERE
+            t.update_date > #{updateTime}
+    </select>
 </mapper>

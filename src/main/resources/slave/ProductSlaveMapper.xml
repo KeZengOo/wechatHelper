@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.slave.mybatis.ProductSlaveMapper">
+
+    <!-- 得到从库最新的产品创建时间 -->
+    <select id="getProductNewCreateTime" resultType="java.lang.String">
+        SELECT DATE_FORMAT(t.create_time,'%Y-%c-%d %T:%i:%s') create_time FROM enterprise_product t ORDER BY t.create_time DESC LIMIT 1
+    </select>
+
+    <!-- 同步产品数据到从库 insert -->
+    <insert id="syncProductList">
+        INSERT INTO enterprise_product (`code`,`name`,descriptions)
+        VALUES
+        <foreach collection="list" item="list" separator=",">
+            (#{list.id},#{list.name},#{list.desc})
+        </foreach>
+    </insert>
+
+    <!-- 同步产品数据到从库 update -->
+    <update id="syncUpdateProductList">
+      UPDATE enterprise_product t
+        SET `name` = #{name},
+         descriptions = #{descriptions},
+         create_time = NOW()
+        WHERE
+            `code` = #{code}
+    </update>
+</mapper>

@@ -1,0 +1,586 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.slave.mybatis.ScheduledSyncSlaveMapper">
+
+    <!-- 得到从库最新的角色创建时间 -->
+    <select id="getRoleNewCreateTime" resultType="java.lang.String">
+        SELECT DATE_FORMAT(t.create_time,'%Y-%c-%d %T') create_time FROM enterprise_role t ORDER BY t.create_time DESC LIMIT 1
+    </select>
+
+    <!-- 得到从库最新的角色更新时间 -->
+    <select id="getRoleNewUpdateTime" resultType="java.lang.String">
+        SELECT DATE_FORMAT(t.update_time,'%Y-%c-%d %T') update_time FROM enterprise_role t ORDER BY t.update_time DESC LIMIT 1
+    </select>
+
+    <!-- 同步角色数据到从库 insert -->
+    <insert id="syncRoleList">
+        INSERT INTO enterprise_role (`id`,role_name,create_time,update_time)
+        VALUES
+        <foreach collection="list" item="list" separator=",">
+            (#{list.id},#{list.roleName},#{list.createDate},#{list.updateDate})
+        </foreach>
+    </insert>
+
+    <!-- 同步角色数据到从库 update -->
+    <update id="syncUpdateRoleList">
+        UPDATE enterprise_role t
+        SET t.role_name = #{roleName},
+        t.create_time = #{createTime},
+        t.update_time = #{updateTime}
+        WHERE
+            id = #{id}
+    </update>
+
+    <!-- 得到从库最新的销售与医生关系指标创建时间 -->
+    <select id="getDrugUserDoctorQuateNewCreateTime" resultType="java.lang.String">
+        SELECT DATE_FORMAT(t.create_time,'%Y-%c-%d %T') create_time FROM drug_user_doctor_quate t ORDER BY t.create_time DESC LIMIT 1
+    </select>
+
+    <!-- 得到从库最新的销售与医生关系指标更新时间 -->
+    <select id="getDrugUserDoctorQuateNewUpdateTime" resultType="java.lang.String">
+        SELECT DATE_FORMAT(t.update_time,'%Y-%c-%d %T') update_time FROM drug_user_doctor_quate t ORDER BY t.update_time DESC LIMIT 1
+    </select>
+
+    <!-- 同步角色数据到从库 insert -->
+    <insert id="syncDrugUserDoctorQuateList">
+        INSERT INTO drug_user_doctor_quate (
+        `doctor_id`,
+        `drug_user_id`,
+        `product_id`,
+        `is_has_drug`,
+        `is_target`,
+        `is_has_ae`,
+        `is_recruit`,
+        `is_break_off`,
+        `hcp_potential`,
+        `create_time`,
+        `update_time`,
+        `is_available`
+        )
+        VALUES
+        <foreach collection="list" item="list" separator=",">
+            (
+            #{list.doctorId},
+            #{list.drugUserId},
+            #{list.productId},
+            #{list.isHasDrug},
+            #{list.isTarget},
+            #{list.isHasAe},
+            #{list.isRecruit},
+            #{list.isBreakOff},
+            #{list.hcpPotential},
+            #{list.create_time},
+            #{list.updateTime},
+            #{list.isAvailable}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 同步角色数据到从库 update -->
+    <update id="syncUpdateDrugUserDoctorQuateList" parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorQuateBean">
+        UPDATE drug_user_doctor_quate t
+        SET
+          t.`is_has_drug` = #{drugUserDoctorQuateBean.isHasDrug},
+          t.`is_target` = #{drugUserDoctorQuateBean.isTarget},
+          t.`is_has_ae` = #{drugUserDoctorQuateBean.isHasAe},
+          t.`is_recruit` = #{drugUserDoctorQuateBean.isRecruit},
+          t.`is_break_off` = #{drugUserDoctorQuateBean.isBreakOff},
+          t.`hcp_potential` = #{drugUserDoctorQuateBean.hcpPotential},
+          t.`is_available` = #{drugUserDoctorQuateBean.isAvailable},
+          t.`update_time` = #{drugUserDoctorQuateBean.updateTime},
+        WHERE
+            doctor_id = #{drugUserDoctorQuateBean.doctorId}
+        AND drug_user_id = #{drugUserDoctorQuateBean.drugUserId}
+        AND product_id = #{drugUserDoctorQuateBean.productId}
+    </update>
+
+    <!-- 得到从库最新的电话拜访扩展创建时间 -->
+    <select id="getVirtualDoctorCallInfoMendNewCreateTime" resultType="java.lang.String">
+        SELECT DATE_FORMAT(t.create_time,'%Y-%c-%d %T') create_time FROM virtual_doctor_call_info_mend t ORDER BY t.create_time DESC LIMIT 1
+    </select>
+
+    <!-- 得到从库最新的电话拜访扩展更新时间 -->
+    <select id="getVirtualDoctorCallInfoMendNewUpdateTime" resultType="java.lang.String">
+        SELECT DATE_FORMAT(t.update_time,'%Y-%c-%d %T') update_time FROM virtual_doctor_call_info_mend t ORDER BY t.update_time DESC LIMIT 1
+    </select>
+
+    <!-- 同步角色数据到从库 insert -->
+    <insert id="syncVirtualDoctorCallInfoMendList">
+        INSERT INTO virtual_doctor_call_info_mend (
+            `virtual_drug_user_id`,
+            `virtual_doctor_id`,
+            `product_id`,
+            `next_visit_time`,
+            `create_time`,
+            `update_time`,
+            `visit_result`,
+            `call_id`,
+            `attitude`,
+            `doctor_questionnaire_id`,
+            `hcp_potential`,
+            `is_break_off`,
+            `is_has_ae`,
+            `is_target`,
+            `is_has_drug`,
+            `is_recruit`,
+            `recruit_time`,
+            `drop_out_time`
+        )
+        VALUES
+        <foreach collection="list" item="list" separator=",">
+            (
+            #{list.virtualDrugUserId},
+            #{list.virtualDoctorId},
+            #{list.productId},
+            #{list.nextVisitTime},
+            #{list.createTime},
+            #{list.updateTime},
+            #{list.visitResult},
+            #{list.callId},
+            #{list.attitude},
+            #{list.doctorQuestionnaireId},
+            #{list.hcpPotential},
+            #{list.isBreakOff},
+            #{list.isHasAe},
+            #{list.isTarget},
+            #{list.isHasDrug},
+            #{list.isRecruit},
+            #{list.recruitTime},
+            #{list.dropOutTime}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 同步角色数据到从库 update -->
+    <update id="syncUpdateVirtualDoctorCallInfoMendList" parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoMendBean">
+        UPDATE virtual_doctor_call_info_mend t
+        SET t.`virtual_drug_user_id` = #{virtualDoctorCallInfoMendBean.virtualDrugUserId},
+         t.`virtual_doctor_id` = #{virtualDoctorCallInfoMendBean.virtualDoctorId},
+         t.`product_id` = #{virtualDoctorCallInfoMendBean.productId},
+         t.`next_visit_time` = #{virtualDoctorCallInfoMendBean.nextVisitTime},
+         t.`update_time` = #{virtualDoctorCallInfoMendBean.updateTime},
+         t.`visit_result` = #{virtualDoctorCallInfoMendBean.visitResult},
+         t.`attitude` = #{virtualDoctorCallInfoMendBean.attitude},
+         t.`doctor_questionnaire_id` = #{virtualDoctorCallInfoMendBean.doctorQuestionnaireId},
+         t.`hcp_potential` = #{virtualDoctorCallInfoMendBean.hcpPotential},
+         t.`is_break_off` = #{virtualDoctorCallInfoMendBean.isBreakOff},
+         t.`is_has_ae` = #{virtualDoctorCallInfoMendBean.isHasAe},
+         t.`is_target` = #{virtualDoctorCallInfoMendBean.isTarget},
+         t.`is_has_drug` = #{virtualDoctorCallInfoMendBean.isHasDrug},
+         t.`is_recruit` = #{virtualDoctorCallInfoMendBean.isRecruit},
+         t.`recruit_time` = #{virtualDoctorCallInfoMendBean.recruitTime},
+         t.`drop_out_time` = #{virtualDoctorCallInfoMendBean.dropOutTime}
+        WHERE
+            t.`call_id` = #{virtualDoctorCallInfoMendBean.callId}
+    </update>
+
+
+    <!-- 得到从库最新的销售代表给医生打电话创建时间 -->
+    <select id="getVirtualDoctorCallInfoNewCreateTime" resultType="java.lang.String">
+        SELECT DATE_FORMAT(t.create_time,'%Y-%c-%d %T') create_time FROM virtual_doctor_call_info t ORDER BY t.create_time DESC LIMIT 1
+    </select>
+
+    <!-- 得到从库最新的销售代表给医生打电话更新时间 -->
+    <select id="getVirtualDoctorCallInfoNewUpdateTime" resultType="java.lang.String">
+        SELECT DATE_FORMAT(t.update_time,'%Y-%c-%d %T') update_time FROM virtual_doctor_call_info t ORDER BY t.update_time DESC LIMIT 1
+    </select>
+
+    <!-- 同步角色数据到从库 insert -->
+    <insert id="syncVirtualDoctorCallInfoList">
+        INSERT INTO virtual_doctor_call_info (
+        `id`,
+        `sin_token`,
+        `is_retry`,
+        `visit_channel`,
+        `virtual_doctor_id`,
+        `mobile`,
+        `virtual_drug_user_id`,
+        `status`,
+        `status_name`,
+        `call_time`,
+        `call_url`,
+        `doctor_questionnaire_id`,
+        `remark`,
+        `create_time`,
+        `update_time`,
+        `type`,
+        `info_json`,
+        `product_id`,
+        `follow_up_type`,
+        `del_flag`
+        )
+        VALUES
+        <foreach collection="list" item="list" separator=",">
+            (
+            #{list.id},
+            #{list.sinToken},
+            #{list.isRetry},
+            #{list.visitChannel},
+            #{list.virtualDoctorId},
+            #{list.mobile},
+            #{list.virtualDrugUserId},
+            #{list.status},
+            #{list.statusName},
+            #{list.callTime},
+            #{list.callUrl},
+            #{list.doctorQuestionnaireId},
+            #{list.remark},
+            #{list.createTime},
+            #{list.updateTime},
+            #{list.type},
+            #{list.infoJson},
+            #{list.productId},
+            #{list.followUpType},
+            #{list.delFlag}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 同步角色数据到从库 update -->
+    <update id="syncUpdateVirtualDoctorCallInfoList" parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoBean">
+        UPDATE virtual_doctor_call_info t
+        SET
+            t.`is_retry` = #{virtualDoctorCallInfo.isRetry},
+            t.`visit_channel` = #{virtualDoctorCallInfo.visitChannel},
+            t.`virtual_doctor_id` = #{virtualDoctorCallInfo.virtualDoctorId},
+            t.`mobile` = #{virtualDoctorCallInfo.mobile},
+            t.`virtual_drug_user_id` = #{virtualDoctorCallInfo.virtualDrugUserId},
+            t.`status` = #{virtualDoctorCallInfo.status},
+            t.`status_name` = #{virtualDoctorCallInfo.statusName},
+            t.`call_time` = #{virtualDoctorCallInfo.callTime},
+            t.`call_url` = #{virtualDoctorCallInfo.callUrl},
+            t.`doctor_questionnaire_id` = #{virtualDoctorCallInfo.doctorQuestionnaireId},
+            t.`remark` = #{virtualDoctorCallInfo.remark},
+            t.`update_time` = #{virtualDoctorCallInfo.updateTime},
+            t.`type` = #{virtualDoctorCallInfo.type},
+            t.`info_json` = #{virtualDoctorCallInfo.infoJson},
+            t.`product_id` = #{virtualDoctorCallInfo.productId},
+            t.`follow_up_type` = #{virtualDoctorCallInfo.followUpType},
+            t.`del_flag` = #{virtualDoctorCallInfo.delFlag}
+        WHERE
+            t.`sin_token` = #{virtualDoctorCallInfo.sinToken}
+    </update>
+
+    <!-- 得到从库最新的诺和医院信息创建时间 -->
+    <select id="getEnterpriseHciCreateTime" resultType="java.lang.String">
+        SELECT DATE_FORMAT(t.create_time,'%Y-%c-%d %T') create_time FROM enterprise_hci t ORDER BY t.create_time DESC LIMIT 1
+    </select>
+
+    <!-- 得到从库最新的诺和医院信息更新时间 -->
+    <select id="getEnterpriseHciUpdateTime" resultType="java.lang.String">
+        SELECT DATE_FORMAT(t.update_time,'%Y-%c-%d %T') update_time FROM enterprise_hci t ORDER BY t.update_time DESC LIMIT 1
+    </select>
+
+    <!-- 同步角色数据到从库 insert -->
+    <insert id="syncEnterpriseHciList">
+        INSERT INTO enterprise_hci (
+        `ins_code`,
+        `name`,
+        `level`,
+        `create_time`,
+        `update_time`
+        )
+        VALUES
+        <foreach collection="list" item="list" separator=",">
+            (
+            #{list.id},
+            #{list.name},
+            #{list.level},
+            #{list.createTime},
+            #{list.updateTime}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 同步角色数据到从库 update -->
+    <update id="syncUpdateEnterpriseHciList" parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoBean">
+        UPDATE enterprise_hci t
+        SET
+            t.`name` = #{hospitalBean.name},
+            t.`level` = #{hospitalBean.level},
+            t.`update_time` = #{hospitalBean.updateTime}
+        WHERE
+            t.`ins_code` = #{hospitalBean.id}
+    </update>
+
+
+    <!-- 得到从库最新的诺和内部会议记录创建时间 -->
+    <select id="getEnterpriseInternalMeetingCreateTime" resultType="java.lang.String">
+        SELECT DATE_FORMAT(t.create_time,'%Y-%c-%d %T') create_time FROM enterprise_internal_meeting t ORDER BY t.create_time DESC LIMIT 1
+    </select>
+
+    <!-- 得到从库最新的诺和内部会议记录更新时间 -->
+    <select id="getEnterpriseInternalMeetingUpdateTime" resultType="java.lang.String">
+        SELECT DATE_FORMAT(t.update_time,'%Y-%c-%d %T') update_time FROM enterprise_internal_meeting t ORDER BY t.update_time DESC LIMIT 1
+    </select>
+
+    <!-- 同步角色数据到从库 insert -->
+    <insert id="syncEnterpriseInternalMeetingList">
+        INSERT INTO enterprise_internal_meeting (
+        `business_code`,
+        `name`,
+        `start_date`,
+        `end_date`,
+        `invite_speaker`,
+        `create_time`,
+        `update_time`,
+        `year`
+        )
+        VALUES
+        <foreach collection="list" item="list" separator=",">
+            (
+            #{list.id},
+            #{list.title},
+            #{list.startTime},
+            #{list.endTime},
+            #{list.speaker},
+            #{list.createTime},
+            #{list.updateTime},
+            #{list.year}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 同步角色数据到从库 update -->
+    <update id="syncUpdateEnterpriseInternalMeetingList" parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.EnterpriseInternalMeetingBean">
+        UPDATE enterprise_internal_meeting t
+        SET t.`name` = #{enterpriseInternalMeetingBean.title},
+        t.`start_date` = #{enterpriseInternalMeetingBean.startTime},
+        t.`end_date` = #{enterpriseInternalMeetingBean.endTime},
+        t.`invite_speaker` = #{enterpriseInternalMeetingBean.speaker},
+        t.`update_time` = #{enterpriseInternalMeetingBean.updateTime},
+        t.`year` = substring_index(t.`start_date`, "-", 1)
+        WHERE
+        t.`business_code` = #{enterpriseInternalMeetingBean.id}
+    </update>
+
+    <!-- 得到从库最新的医生参加诺和内部会议详情表创建时间 -->
+    <select id="getEnterpriseMeetingAttendDetailsCreateTime" resultType="java.lang.String">
+        SELECT DATE_FORMAT(t.create_time,'%Y-%c-%d %T') create_time FROM enterprise_internal_meeting_attendance t ORDER BY t.create_time DESC LIMIT 1
+    </select>
+
+    <!-- 得到从库最新的医生参加诺和内部会议详情表更新时间 -->
+    <select id="getEnterpriseMeetingAttendDetailsUpdateTime" resultType="java.lang.String">
+        SELECT DATE_FORMAT(t.update_time,'%Y-%c-%d %T') update_time FROM enterprise_internal_meeting_attendance t ORDER BY t.update_time DESC LIMIT 1
+    </select>
+
+    <!-- 同步角色数据到从库 insert -->
+    <insert id="syncEnterpriseMeetingAttendDetailsList">
+        INSERT INTO enterprise_internal_meeting_attendance (
+        id,
+        `customer_code`,
+        `hcp_name`,
+        `dept`,
+        `hci_name`,
+        `business_code`,
+        `meeting_id`,
+        `attending_time`,
+        `create_time`,
+        `update_time`
+        )
+        VALUES
+        <foreach collection="list" item="list" separator=",">
+            (
+            #{list.id},
+            #{list.doctorId},
+            #{list.doctorName},
+            #{list.depart},
+            #{list.hospitalName},
+            #{list.businessCode},
+            #{list.meetingId},
+            #{list.attendStartTime},
+            #{list.createTime},
+            #{list.updateTime}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 同步角色数据到从库 update -->
+    <update id="syncUpdateEnterpriseMeetingAttendDetailsList" parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.EnterpriseMeetingAttendDetailsBean">
+        UPDATE enterprise_internal_meeting_attendance t
+        SET
+        t.`customer_code` = #{enterpriseMeetingAttendDetails.doctorId},
+        t.`hcp_name` = #{enterpriseMeetingAttendDetails.doctorName},
+        t.`dept` = #{enterpriseMeetingAttendDetails.depart},
+        t.`hci_name` = #{enterpriseMeetingAttendDetails.hospitalName},
+        t.`business_code` = #{enterpriseMeetingAttendDetails.businessCode},
+        t.`attending_time` = #{enterpriseMeetingAttendDetails.attendStartTime},
+        t.`update_time` = #{enterpriseMeetingAttendDetails.updateTime}
+        WHERE
+        t.`id` = #{enterpriseMeetingAttendDetails.id}
+    </update>
+
+    <!-- 获取BusinessCodeAndMeetingId关系 -->
+    <select id="getBusinessCodeAndMeetingIdList" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.EnterpriseMeetingAttendDetailsBean">
+        SELECT
+            t.id,
+            t.business_code businessCode
+        FROM
+            enterprise_internal_meeting t
+    </select>
+
+    <!-- 得到从库最新的医生表创建时间 -->
+    <select id="getEnterpriseHcpCreateTime" resultType="java.lang.String">
+        SELECT DATE_FORMAT(t.create_time,'%Y-%c-%d %T') create_time FROM enterprise_hcp t ORDER BY t.create_time DESC LIMIT 1
+    </select>
+
+    <!-- 得到从库最新的医生表更新时间 -->
+    <select id="getEnterpriseHcpUpdateTime" resultType="java.lang.String">
+        SELECT DATE_FORMAT(t.update_time,'%Y-%c-%d %T') update_time FROM enterprise_hcp t ORDER BY t.update_time DESC LIMIT 1
+    </select>
+
+    <!-- 同步角色数据到从库 insert -->
+    <insert id="syncEnterpriseHcpList">
+        INSERT INTO enterprise_hcp (
+        id,
+        `customer_code`,
+        `hcp_name`,
+        `gender`,
+        `ins_code`,
+        `hospital_name`,
+        `department`,
+        `create_time`,
+        `update_time`
+        )
+        VALUES
+        <foreach collection="list" item="list" separator=",">
+            (
+            #{list.id},
+            #{list.id},
+            #{list.name},
+            #{list.sex},
+            #{list.hospitalId},
+            #{list.hospitalName},
+            #{list.depart},
+            #{list.createTime},
+            #{list.modifyTime}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 同步角色数据到从库 update -->
+    <update id="syncUpdateEnterpriseHcpList" parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.EnterpriseHcpBean">
+        UPDATE enterprise_hcp t
+        SET
+        t.`hcp_name` = #{enterpriseHcpBean.name},
+        t.`gender` = #{enterpriseHcpBean.sex},
+        t.`ins_code` = #{enterpriseHcpBean.hospitalId},
+        t.`hospital_name` = #{enterpriseHcpBean.hospitalName},
+        t.`department` = #{enterpriseHcpBean.depart},
+        t.`update_time` = #{enterpriseHcpBean.modifyTime}
+        WHERE
+        t.`id` = #{enterpriseHcpBean.id}
+    </update>
+
+    <!-- 得到从库最新的角色用户映射表创建时间 -->
+    <select id="getEnterpriseSaleRepCreateTime" resultType="java.lang.String">
+        SELECT DATE_FORMAT(t.create_time,'%Y-%c-%d %T') create_time FROM enterprise_sale_rep t ORDER BY t.create_time DESC LIMIT 1
+    </select>
+
+    <!-- 得到从库最新的角色用户映射表更新时间 -->
+    <select id="getEnterpriseSaleRepUpdateTime" resultType="java.lang.String">
+        SELECT DATE_FORMAT(t.update_time,'%Y-%c-%d %T') update_time FROM enterprise_sale_rep t ORDER BY t.update_time DESC LIMIT 1
+    </select>
+
+    <!-- 同步角色数据到从库 insert -->
+    <insert id="syncEnterpriseSaleRepList">
+        INSERT INTO enterprise_sale_rep (
+        `sale_rep_code`,
+        `sale_rep_name`,
+        `sale_rep_email`,
+        `role_id`,
+        `role_name`,
+        `status`,
+        `create_time`,
+        `update_time`
+        )
+        VALUES
+        <foreach collection="list" item="list" separator=",">
+            (
+            #{list.id},
+            #{list.name},
+            #{list.email},
+            #{list.roleId},
+            #{list.roleName},
+            #{list.status},
+            #{list.createTime},
+            #{list.modifyTime}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 同步角色数据到从库 update -->
+    <update id="syncUpdateEnterpriseSaleRepList" parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.EnterpriseSaleRepBean">
+        UPDATE enterprise_sale_rep t
+        SET
+        t.`sale_rep_name` = #{enterpriseSaleRepBean.name},
+        t.`sale_rep_email` = #{enterpriseSaleRepBean.email},
+        t.`role_id` = #{enterpriseSaleRepBean.roleId},
+        t.`role_name` = #{enterpriseSaleRepBean.roleName},
+        t.`status` = #{enterpriseSaleRepBean.status},
+        t.`update_time` = #{enterpriseSaleRepBean.modifyTime}
+        WHERE
+        t.`sale_rep_code` = #{enterpriseSaleRepBean.id}
+    </update>
+
+    <!-- 得到从库最新的角色用户映射表创建时间 -->
+    <select id="getEnterpriseSaleRepProductHcpCreateTime" resultType="java.lang.String">
+        SELECT DATE_FORMAT(t.create_time,'%Y-%c-%d %T') create_time FROM enterprise_sale_rep_product_hcp t ORDER BY t.create_time DESC LIMIT 1
+    </select>
+
+    <!-- 得到从库最新的角色用户映射表更新时间 -->
+    <select id="getEnterpriseSaleRepProductHcpUpdateTime" resultType="java.lang.String">
+        SELECT DATE_FORMAT(t.update_time,'%Y-%c-%d %T') update_time FROM enterprise_sale_rep_product_hcp t ORDER BY t.update_time DESC LIMIT 1
+    </select>
+
+    <!-- 同步角色数据到从库 insert -->
+    <insert id="syncEnterpriseSaleRepProductHcpList">
+        INSERT INTO enterprise_sale_rep_product_hcp (
+        `id`,
+        `sale_rep_code`,
+        `sale_rep_name`,
+        `customer_code`,
+        `hcp_name`,
+        `product_id`,
+        `product_code`,
+        `product_name`,
+        `create_time`,
+        `update_time`
+        )
+        VALUES
+        <foreach collection="list" item="list" separator=",">
+            (
+            #{list.id},
+            #{list.saleRepCode},
+            #{list.saleRepName},
+            #{list.customerCode},
+            #{list.hcpName},
+            #{list.productId},
+            #{list.productCode},
+            #{list.productName},
+            #{list.createTime},
+            #{list.updateTime}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 同步角色数据到从库 update -->
+    <update id="syncUpdateEnterpriseSaleRepProductHcpList" parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.EnterpriseSaleRepProductHcpBean">
+        UPDATE enterprise_sale_rep_product_hcp t
+        SET
+        t.`sale_rep_code` = #{enterpriseSaleRepProductHcpBean.saleRepCode},
+        t.`sale_rep_name` = #{enterpriseSaleRepProductHcpBean.saleRepName},
+        t.`customer_code` = #{enterpriseSaleRepProductHcpBean.customerCode},
+        t.`hcp_name` = #{enterpriseSaleRepProductHcpBean.hcpName},
+        t.`product_code` = #{enterpriseSaleRepProductHcpBean.productCode},
+        t.`product_name` = #{enterpriseSaleRepProductHcpBean.productName},
+        t.`update_time` = #{enterpriseSaleRepProductHcpBean.updateTime}
+        WHERE
+        t.`id` = #{enterpriseSaleRepProductHcpBean.id}
+    </update>
+
+    <!-- 获取产品id和coded的list -->
+    <select id="getProductIdAndCodedList" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.EnterpriseSaleRepProductHcpBean">
+        SELECT t.id productId,t.`code` productCode FROM enterprise_product t
+    </select>
+</mapper>

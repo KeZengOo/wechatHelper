@@ -16,7 +16,6 @@ public class VirtualDoctorCallInfoParams{
 	private Long virtualDoctorId;
 	private Integer doctorQuestionnaireId;
 	private Integer productId;
-	
 	private String mobile;
 	private Integer type;
 	private String visitResult="";
@@ -28,7 +27,6 @@ public class VirtualDoctorCallInfoParams{
 	private String statusName;
 	private Long callTime;
 	private String callUrl;
-	
 	@ApiModelProperty(value = "医生潜力 3高,2中,1低,-1未知")
 	private Integer hcpPotential;
 	@ApiModelProperty(value = "是否有药 1.有,0.无,-1未知")
