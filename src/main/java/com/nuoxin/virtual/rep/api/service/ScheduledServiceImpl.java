@@ -44,38 +44,38 @@ public class ScheduledServiceImpl {
      * 产品同步
      */
 //    @Scheduled(cron = TimeCronConstant.PRODUCT_CRON)
-    public void productSync(){
-        //------------------------------------------------同步插入--------------------------------------------------
-        //获取从库产品表的最新数据时间
-        String createTime = productSlaveMapper.getProductNewCreateTime();
-        if(createTime == null)
-        {
-            //如果从库为空的话便默认一个时间
-            createTime = "2000-01-01 00:00:00";
-        }
-        logger.info("获取从库的产品最新数据时间："+ createTime);
-        //根据从库产品表最新数据时间获取主库产品表最新数据list
-        List<ProductLine> productLineList = productLineMapper.getProductListByCreateTime(createTime);
-        logger.info("根据从库产品表最新数据时间获取主库产品表最新数据list："+ productLineList);
-
-        if(productLineList.size() >  0){
-            //把主库最新的产品数据插入从库的产品表中
-            boolean result = productSlaveMapper.syncProductList(productLineList);
-            logger.info("把主库最新的产品数据插入从库的产品表中："+ result);
-        }
-
-        //------------------------------------------------同步更新--------------------------------------------------
-        //获取从库产品表的最新数据时间
-        String updateTime = productSlaveMapper.getProductNewCreateTime();
-        //根据更新时间获取大于该时间的产品list
-        List<ProductLine> productListByUpdateTimeList = productLineMapper.getProductListByUpdateTime(updateTime);
-        if(productListByUpdateTimeList.size() > 0){
-            productListByUpdateTimeList.forEach(updateProduct -> {
-                boolean updateResult = productSlaveMapper.syncUpdateProductList(updateProduct.getName(),updateProduct.getDesc(),updateProduct.getId().toString());
-                logger.info("把主库更新后的产品数据更新到从库的产品表中："+ updateResult);
-            });
-        }
-    }
+//    public void productSync(){
+//        //------------------------------------------------同步插入--------------------------------------------------
+//        //获取从库产品表的最新数据时间
+//        String createTime = productSlaveMapper.getProductNewCreateTime();
+//        if(createTime == null)
+//        {
+//            //如果从库为空的话便默认一个时间
+//            createTime = "2000-01-01 00:00:00";
+//        }
+//        logger.info("获取从库的产品最新数据时间："+ createTime);
+//        //根据从库产品表最新数据时间获取主库产品表最新数据list
+//        List<ProductLine> productLineList = productLineMapper.getProductListByCreateTime(createTime);
+//        logger.info("根据从库产品表最新数据时间获取主库产品表最新数据list："+ productLineList);
+//
+//        if(productLineList.size() >  0){
+//            //把主库最新的产品数据插入从库的产品表中
+//            boolean result = productSlaveMapper.syncProductList(productLineList);
+//            logger.info("把主库最新的产品数据插入从库的产品表中："+ result);
+//        }
+//
+//        //------------------------------------------------同步更新--------------------------------------------------
+//        //获取从库产品表的最新数据时间
+//        String updateTime = productSlaveMapper.getProductNewCreateTime();
+//        //根据更新时间获取大于该时间的产品list
+//        List<ProductLine> productListByUpdateTimeList = productLineMapper.getProductListByUpdateTime(updateTime);
+//        if(productListByUpdateTimeList.size() > 0){
+//            productListByUpdateTimeList.forEach(updateProduct -> {
+//                boolean updateResult = productSlaveMapper.syncUpdateProductList(updateProduct.getName(),updateProduct.getDesc(),updateProduct.getId().toString());
+//                logger.info("把主库更新后的产品数据更新到从库的产品表中："+ updateResult);
+//            });
+//        }
+//    }
 
 
     /**
