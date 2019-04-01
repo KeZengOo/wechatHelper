@@ -23,6 +23,8 @@ import java.util.List;
 /**
  * 两个库同步的定时任务类（营销中心库和虚拟代表版HCP360库）
  * 创建任务类
+ * @author wujiang
+ * @date 2019-03-25
  */
 @Slf4j
 @Component
@@ -82,7 +84,8 @@ public class ScheduledServiceImpl {
      * 角色同步
      */
     @Scheduled(cron = TimeCronConstant.ROLE_CRON)
-    public void roleSync(){
+    public ScheduleSyncResult roleSync(){
+        ScheduleSyncResult scheduleSyncResult = new ScheduleSyncResult();
         //------------------------------------------------同步插入--------------------------------------------------
         //获取从库角色表的最新数据时间
         String createTime = scheduledSyncSlaveMapper.getRoleNewCreateTime();
@@ -99,6 +102,7 @@ public class ScheduledServiceImpl {
         if(roleParamsList.size() >  0){
             //把主库最新的产品数据插入从库的产品表中
             boolean result = scheduledSyncSlaveMapper.syncRoleList(roleParamsList);
+            scheduleSyncResult.setInsertResult(result);
             logger.info("把主库最新的角色数据插入从库的角色表中："+ result);
         }
 
@@ -110,16 +114,20 @@ public class ScheduledServiceImpl {
         if(roleListByUpdateTimeList.size() > 0){
             roleListByUpdateTimeList.forEach(updateRole -> {
                 boolean updateResult = scheduledSyncSlaveMapper.syncUpdateRoleList(updateRole.getId(),updateRole.getRoleName(),updateRole.getCreateDate(),updateRole.getUpdateDate());
+                scheduleSyncResult.setUpdateResult(updateResult);
                 logger.info("把主库更新后的角色数据更新到从库的角色表中："+ updateResult);
             });
         }
+
+        return scheduleSyncResult;
     }
 
     /**
      * 销售与医生关系指标表同步 drug_user_doctor_quate
      */
     @Scheduled(cron = TimeCronConstant.DRUG_USER_DOCTOR_QUATE_CRON)
-    public void DrugUserDoctorQuateSync(){
+    public ScheduleSyncResult drugUserDoctorQuateSync(){
+        ScheduleSyncResult scheduleSyncResult = new ScheduleSyncResult();
         //------------------------------------------------同步插入--------------------------------------------------
         //获取从库角色表的最新数据时间
         String createTime = scheduledSyncSlaveMapper.getDrugUserDoctorQuateNewCreateTime();
@@ -136,6 +144,7 @@ public class ScheduledServiceImpl {
         if(drugUserDoctorQuateParamsList.size() >  0){
             //把主库最新的产品数据插入从库的产品表中
             boolean result = scheduledSyncSlaveMapper.syncDrugUserDoctorQuateList(drugUserDoctorQuateParamsList);
+            scheduleSyncResult.setInsertResult(result);
             logger.info("把主库最新的销售与医生关系指标数据插入从库的销售与医生关系指标表中："+ result);
         }
 
@@ -147,16 +156,19 @@ public class ScheduledServiceImpl {
         if(drugUserDoctorQuateListByUpdateTimeList.size() > 0){
             drugUserDoctorQuateListByUpdateTimeList.forEach(updateList -> {
                 boolean updateResult = scheduledSyncSlaveMapper.syncUpdateDrugUserDoctorQuateList(updateList);
+                scheduleSyncResult.setUpdateResult(updateResult);
                 logger.info("把主库更新后的销售与医生关系指标数据更新到从库的销售与医生关系指标表中："+ updateResult);
             });
         }
+        return scheduleSyncResult;
     }
 
     /**
      * 电话拜访扩展表同步 virtual_doctor_call_info_mend
      */
     @Scheduled(cron = TimeCronConstant.VIRTUAL_DOCTOR_CALL_INFO_MEND_CRON)
-    public void VirtualDoctorCallInfoMendSync(){
+    public ScheduleSyncResult virtualDoctorCallInfoMendSync(){
+        ScheduleSyncResult scheduleSyncResult = new ScheduleSyncResult();
         //------------------------------------------------同步插入--------------------------------------------------
         //获取从库角色表的最新数据时间
         String createTime = scheduledSyncSlaveMapper.getVirtualDoctorCallInfoMendNewCreateTime();
@@ -173,6 +185,7 @@ public class ScheduledServiceImpl {
         if(virtualDoctorCallInfoMendList.size() >  0){
             //把主库最新的产品数据插入从库的产品表中
             boolean result = scheduledSyncSlaveMapper.syncVirtualDoctorCallInfoMendList(virtualDoctorCallInfoMendList);
+            scheduleSyncResult.setInsertResult(result);
             logger.info("把主库最新的电话拜访扩展数据插入从库的电话拜访扩展表中："+ result);
         }
 
@@ -184,16 +197,19 @@ public class ScheduledServiceImpl {
         if(virtualDoctorCallInfoMendListByUpdateTimeList.size() > 0){
             virtualDoctorCallInfoMendListByUpdateTimeList.forEach(updateList -> {
                 boolean updateResult = scheduledSyncSlaveMapper.syncUpdateVirtualDoctorCallInfoMendList(updateList);
+                scheduleSyncResult.setUpdateResult(updateResult);
                 logger.info("把主库更新后的电话拜访扩展数据更新到从库的电话拜访扩展表中："+ updateResult);
             });
         }
+        return scheduleSyncResult;
     }
 
     /**
      * 销售代表给医生打电话表同步 virtual_doctor_call_info
      */
     @Scheduled(cron = TimeCronConstant.VIRTUAL_DOCTOR_CALL_INFO_CRON)
-    public void VirtualDoctorCallInfoSync(){
+    public ScheduleSyncResult virtualDoctorCallInfoSync(){
+        ScheduleSyncResult scheduleSyncResult = new ScheduleSyncResult();
         //------------------------------------------------同步插入--------------------------------------------------
         //获取从库的最新数据时间
         String createTime = scheduledSyncSlaveMapper.getVirtualDoctorCallInfoNewCreateTime();
@@ -210,6 +226,7 @@ public class ScheduledServiceImpl {
         if(virtualDoctorCallInfoList.size() >  0){
             //把主库最新的数据插入从库中
             boolean result = scheduledSyncSlaveMapper.syncVirtualDoctorCallInfoList(virtualDoctorCallInfoList);
+            scheduleSyncResult.setInsertResult(result);
             logger.info("把主库最新的销售代表给医生打电话数据插入从库的销售代表给医生打电话表中："+ result);
         }
 
@@ -221,16 +238,19 @@ public class ScheduledServiceImpl {
         if(virtualDoctorCallInfoListByUpdateTimeList.size() > 0){
             virtualDoctorCallInfoListByUpdateTimeList.forEach(updateList -> {
                 boolean updateResult = scheduledSyncSlaveMapper.syncUpdateVirtualDoctorCallInfoList(updateList);
+                scheduleSyncResult.setUpdateResult(updateResult);
                 logger.info("把主库更新后的销售代表给医生打电话数据更新到从库的销售代表给医生打电话表中："+ updateResult);
             });
         }
+        return scheduleSyncResult;
     }
 
     /**
      * 医院表同步 hospital---->enterprise_hci
      */
     @Scheduled(cron = TimeCronConstant.ENTERPRISE_HCI_CRON)
-    public void enterpriseHciSync(){
+    public ScheduleSyncResult enterpriseHciSync(){
+        ScheduleSyncResult scheduleSyncResult = new ScheduleSyncResult();
         Integer productId = 150;
         //------------------------------------------------同步插入--------------------------------------------------
         //获取从库的最新数据时间
@@ -248,6 +268,7 @@ public class ScheduledServiceImpl {
         if(hospitalList.size() >  0){
             //把主库最新的数据插入从库的表中
             boolean result = scheduledSyncSlaveMapper.syncEnterpriseHciList(hospitalList);
+            scheduleSyncResult.setInsertResult(result);
             logger.info("把主库最新的医院数据插入从库的医院表中："+ result);
         }
 
@@ -259,16 +280,19 @@ public class ScheduledServiceImpl {
         if(hospitalListByUpdateTimeList.size() > 0){
             hospitalListByUpdateTimeList.forEach(updateList -> {
                 boolean updateResult = scheduledSyncSlaveMapper.syncUpdateEnterpriseHciList(updateList);
+                scheduleSyncResult.setUpdateResult(updateResult);
                 logger.info("把主库更新后的医院数据更新到从库的医院表中："+ updateResult);
             });
         }
+        return scheduleSyncResult;
     }
 
     /**
      * 会议表同步 t_meeting_data
      */
     @Scheduled(cron = TimeCronConstant.T_MEETING_DATA_CRON)
-    public void enterpriseInternalMeetingSync(){
+    public ScheduleSyncResult enterpriseInternalMeetingSync(){
+        ScheduleSyncResult scheduleSyncResult = new ScheduleSyncResult();
         Integer productId = 150;
         //------------------------------------------------同步插入--------------------------------------------------
         //获取从库的最新数据时间
@@ -286,6 +310,7 @@ public class ScheduledServiceImpl {
         if(enterpriseInternalMeetingList.size() >  0){
             //把主库最新的数据插入从库的表中
             boolean result = scheduledSyncSlaveMapper.syncEnterpriseInternalMeetingList(enterpriseInternalMeetingList);
+            scheduleSyncResult.setInsertResult(result);
             logger.info("把主库最新的会议表数据插入从库的会议表中："+ result);
         }
 
@@ -297,9 +322,11 @@ public class ScheduledServiceImpl {
         if(virtualDoctorCallInfoListByUpdateTimeList.size() > 0){
             virtualDoctorCallInfoListByUpdateTimeList.forEach(updateList -> {
                 boolean updateResult = scheduledSyncSlaveMapper.syncUpdateEnterpriseInternalMeetingList(updateList);
+                scheduleSyncResult.setUpdateResult(updateResult);
                 logger.info("把主库更新后的会议表数据更新到从库的会议表中："+ updateResult);
             });
         }
+        return scheduleSyncResult;
     }
 
 
@@ -307,7 +334,8 @@ public class ScheduledServiceImpl {
      * 会议参会信息同步 t_meeting_attend_details
      */
     @Scheduled(cron = TimeCronConstant.T_MEETING_ATTEND_DETAILS_CRON)
-    public void enterpriseMeetingAttendDetailsSync(){
+    public ScheduleSyncResult enterpriseMeetingAttendDetailsSync(){
+        ScheduleSyncResult scheduleSyncResult = new ScheduleSyncResult();
         Integer productId = 150;
         //------------------------------------------------同步插入--------------------------------------------------
         //获取从库的最新数据时间
@@ -340,6 +368,7 @@ public class ScheduledServiceImpl {
 
             //把主库最新的数据插入从库的表中
             boolean result = scheduledSyncSlaveMapper.syncEnterpriseMeetingAttendDetailsList(newMeetingList);
+            scheduleSyncResult.setInsertResult(result);
             logger.info("把主库最新的会议参会信息数据插入从库的会议参会信息中："+ result);
         }
 
@@ -351,16 +380,19 @@ public class ScheduledServiceImpl {
         if(enterpriseMeetingAttendDetailsListByUpdateTimeList.size() > 0){
             enterpriseMeetingAttendDetailsListByUpdateTimeList.forEach(updateList -> {
                 boolean updateResult = scheduledSyncSlaveMapper.syncUpdateEnterpriseMeetingAttendDetailsList(updateList);
+                scheduleSyncResult.setUpdateResult(updateResult);
                 logger.info("把主库更新后的会议参会信息数据更新到从库的会议参会信息中："+ updateResult);
             });
         }
+        return scheduleSyncResult;
     }
 
     /**
      * 医生信息同步 doctor
      */
     @Scheduled(cron = TimeCronConstant.ENTERPRISE_HCP_CRON)
-    public void enterpriseHcpSync(){
+    public ScheduleSyncResult enterpriseHcpSync(){
+        ScheduleSyncResult scheduleSyncResult = new ScheduleSyncResult();
         Integer productId = 150;
         //------------------------------------------------同步插入--------------------------------------------------
         //获取从库的最新数据时间
@@ -378,6 +410,7 @@ public class ScheduledServiceImpl {
         if(enterpriseHcpList.size() >  0){
             //把主库最新的数据插入从库的表中
             boolean result = scheduledSyncSlaveMapper.syncEnterpriseHcpList(enterpriseHcpList);
+            scheduleSyncResult.setInsertResult(result);
             logger.info("把主库最新的医生表数据插入从库的医生表中："+ result);
         }
 
@@ -389,16 +422,19 @@ public class ScheduledServiceImpl {
         if(enterpriseHcpListByUpdateTimeList.size() > 0){
             enterpriseHcpListByUpdateTimeList.forEach(updateList -> {
                 boolean updateResult = scheduledSyncSlaveMapper.syncUpdateEnterpriseHcpList(updateList);
+                scheduleSyncResult.setUpdateResult(updateResult);
                 logger.info("把主库更新后的医生表数据更新到从库的医生表中："+ updateResult);
             });
         }
+        return scheduleSyncResult;
     }
 
     /**
      * 角色用户映射表同步 drug_user
      */
     @Scheduled(cron = TimeCronConstant.ENTERPRISE_SALE_REP_CRON)
-    public void enterpriseSaleRepSync(){
+    public ScheduleSyncResult enterpriseSaleRepSync(){
+        ScheduleSyncResult scheduleSyncResult = new ScheduleSyncResult();
         Integer productId = 150;
         //------------------------------------------------同步插入--------------------------------------------------
         //获取从库的最新数据时间
@@ -416,6 +452,7 @@ public class ScheduledServiceImpl {
         if(enterpriseSaleRepList.size() >  0){
             //把主库最新的数据插入从库的表中
             boolean result = scheduledSyncSlaveMapper.syncEnterpriseSaleRepList(enterpriseSaleRepList);
+            scheduleSyncResult.setInsertResult(result);
             logger.info("把主库最新的角色用户映射表数据插入从库的角色用户映射表中："+ result);
         }
 
@@ -427,16 +464,19 @@ public class ScheduledServiceImpl {
         if(enterpriseSaleRepListByUpdateTimeList.size() > 0){
             enterpriseSaleRepListByUpdateTimeList.forEach(updateList -> {
                 boolean updateResult = scheduledSyncSlaveMapper.syncUpdateEnterpriseSaleRepList(updateList);
+                scheduleSyncResult.setUpdateResult(updateResult);
                 logger.info("把主库更新后的角色用户映射表数据更新到从库的角色用户映射表中："+ updateResult);
             });
         }
+        return scheduleSyncResult;
     }
 
     /**
      * 代表-医生-产品关联表同步 drug_user_doctor
      */
     @Scheduled(cron = TimeCronConstant.ENTERPRISE_SALE_REP_PRODUCT_HCP_CRON)
-    public void enterpriseSaleRepProductHcpSync(){
+    public ScheduleSyncResult enterpriseSaleRepProductHcpSync(){
+        ScheduleSyncResult scheduleSyncResult = new ScheduleSyncResult();
         Integer productId = 150;
         //------------------------------------------------同步插入--------------------------------------------------
         //获取从库的最新数据时间
@@ -469,6 +509,7 @@ public class ScheduledServiceImpl {
 
             //把主库最新的数据插入从库的表中
             boolean result = scheduledSyncSlaveMapper.syncEnterpriseSaleRepProductHcpList(newSaleRepProductHcpList);
+            scheduleSyncResult.setInsertResult(result);
             logger.info("把主库最新的代表-医生-产品关联表数据插入从库的代表-医生-产品关联表中："+ result);
         }
 
@@ -480,9 +521,10 @@ public class ScheduledServiceImpl {
         if(enterpriseSaleRepProductHcpListByUpdateTimeList.size() > 0){
             enterpriseSaleRepProductHcpListByUpdateTimeList.forEach(updateList -> {
                 boolean updateResult = scheduledSyncSlaveMapper.syncUpdateEnterpriseSaleRepProductHcpList(updateList);
+                scheduleSyncResult.setUpdateResult(updateResult);
                 logger.info("把主库更新后的代表-医生-产品关联表数据更新到从库的代表-医生-产品关联表中："+ updateResult);
             });
         }
-
+        return scheduleSyncResult;
     }
 }
