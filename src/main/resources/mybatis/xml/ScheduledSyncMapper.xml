@@ -1,0 +1,493 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.ScheduledSyncMapper">
+
+    <!-- 根据创建时间获取大于该时间的角色list -->
+    <select id="getRoleListByCreateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.RoleParams">
+        SELECT
+            t.id,
+            t.role_name roleName,
+            t.create_date createDate,
+            t.update_date updateDate
+        FROM
+            role t
+        WHERE
+            t.create_date > #{createTime}
+    </select>
+
+    <!-- 根据更新时间获取大于该时间的角色list -->
+    <select id="getRoleListByUpdateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.RoleParams">
+        SELECT
+            t.id,
+            t.role_name roleName,
+            t.create_date createDate,
+            t.update_date updateDate
+        FROM
+            role t
+        WHERE
+            t.update_date > #{updateTime}
+    </select>
+
+    <!-- 根据创建时间获取大于该时间的销售与医生关系指标list -->
+    <select id="getDrugUserDoctorQuateListByCreateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorQuateBean">
+        SELECT
+            t.`id` id,
+            t.`doctor_id` doctorId,
+            t.`drug_user_id` drugUserId,
+            t.`product_id` productId,
+            t.`is_has_drug` isHasDrug,
+            t.`is_target` isTarget,
+            t.`is_has_ae` isHasAe,
+            t.`is_recruit` isRecruit,
+            t.`is_break_off` isBreakOff,
+            t.`hcp_potential` hcpPotential,
+            t.`create_time` createTime,
+            t.`update_time` updateTime,
+            t.`is_available` isAvailable
+        FROM
+            drug_user_doctor_quate t
+        WHERE
+            t.create_time > #{createTime}
+    </select>
+
+    <!-- 根据更新时间获取大于该时间的销售与医生关系指标list -->
+    <select id="getDrugUserDoctorQuateListByUpdateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorQuateBean">
+        SELECT
+            t.`id` id,
+            t.`doctor_id` doctorId,
+            t.`drug_user_id` drugUserId,
+            t.`product_id` productId,
+            t.`is_has_drug` isHasDrug,
+            t.`is_target` isTarget,
+            t.`is_has_ae` isHasAe,
+            t.`is_recruit` isRecruit,
+            t.`is_break_off` isBreakOff,
+            t.`hcp_potential` hcpPotential,
+            t.`create_time` createTime,
+            t.`update_time` updateTime,
+            t.`is_available` isAvailable
+        FROM
+            drug_user_doctor_quate t
+        WHERE
+            t.update_time > #{updateTime}
+    </select>
+
+    <!-- 根据创建时间获取大于该时间的角色list -->
+    <select id="getVirtualDoctorCallInfoMendListByCreateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoMendBean">
+        SELECT
+            t.`id` id,
+            t.`virtual_drug_user_id` virtualDrugUserId,
+            t.`virtual_doctor_id` virtualDoctorId,
+            t.`product_id` productId,
+            t.`next_visit_time` nextVisitTime,
+            t.`create_time` createTime,
+            t.`update_time` updateTime,
+            t.`visit_result` visitResult,
+            t.`call_id` callId,
+            t.`attitude` attitude,
+            t.`doctor_questionnaire_id` doctorQuestionnaireId,
+            t.`hcp_potential` hcpPotential,
+            t.`is_break_off` isBreakOff,
+            t.`is_has_ae` isHasAe,
+            t.`is_target` isTarget,
+            t.`is_has_drug` isHasDrug,
+            t.`is_recruit` isRecruit,
+            t.`recruit_time` recruitTime,
+            t.`drop_out_time` dropOutTime
+        FROM
+            virtual_doctor_call_info_mend t
+        WHERE
+            t.create_time > #{createTime}
+    </select>
+
+    <!-- 根据更新时间获取大于该时间的角色list -->
+    <select id="getVirtualDoctorCallInfoMendListByUpdateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoMendBean">
+        SELECT
+            t.`id` id,
+            t.`virtual_drug_user_id` virtualDrugUserId,
+            t.`virtual_doctor_id` virtualDoctorId,
+            t.`product_id` productId,
+            t.`next_visit_time` nextVisitTime,
+            t.`create_time` createTime,
+            t.`update_time` updateTime,
+            t.`visit_result` visitResult,
+            t.`call_id` callId,
+            t.`attitude` attitude,
+            t.`doctor_questionnaire_id` doctorQuestionnaireId,
+            t.`hcp_potential` hcpPotential,
+            t.`is_break_off` isBreakOff,
+            t.`is_has_ae` isHasAe,
+            t.`is_target` isTarget,
+            t.`is_has_drug` isHasDrug,
+            t.`is_recruit` isRecruit,
+            t.`recruit_time` recruitTime,
+            t.`drop_out_time` dropOutTime
+        FROM
+            virtual_doctor_call_info_mend t
+        WHERE
+            t.update_time > #{updateTime}
+    </select>
+
+    <!-- 根据创建时间获取大于该时间的销售代表给医生打电话list -->
+    <select id="getVirtualDoctorCallInfoListByCreateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoBean">
+        SELECT
+            t.id id,
+            t.`sin_token` sinToken,
+            t.`is_retry` isRetry,
+            t.`visit_channel` visitChannel,
+            t.`virtual_doctor_id` virtualDoctorId,
+            t.`mobile` mobile,
+            t.`virtual_drug_user_id` virtualDrugUserId,
+            t.`status` status,
+            t.`status_name` statusName,
+            t.`call_time` callTime,
+            t.`call_url` callUrl,
+            t.`doctor_questionnaire_id` doctorQuestionnaireId,
+            t.`remark` remark,
+            t.`create_time` createTime,
+            t.`update_time` updateTime,
+            t.`type` `type`,
+            t.`info_json` infoJson,
+            t.`product_id` productId,
+            t.`follow_up_type` followUpType,
+            t.`del_flag` delFlag
+        FROM
+            virtual_doctor_call_info t
+        WHERE
+            t.create_time > #{createTime}
+    </select>
+
+    <!-- 根据更新时间获取大于该时间的销售代表给医生打电话list -->
+    <select id="getVirtualDoctorCallInfoListByUpdateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoBean">
+        SELECT
+            t.id id,
+            t.`sin_token` sinToken,
+            t.`is_retry` isRetry,
+            t.`visit_channel` visitChannel,
+            t.`virtual_doctor_id` virtualDoctorId,
+            t.`mobile` mobile,
+            t.`virtual_drug_user_id` virtualDrugUserId,
+            t.`status` status,
+            t.`status_name` statusName,
+            t.`call_time` callTime,
+            t.`call_url` callUrl,
+            t.`doctor_questionnaire_id` doctorQuestionnaireId,
+            t.`remark` remark,
+            t.`create_time` createTime,
+            t.`update_time` updateTime,
+            t.`type` `type`,
+            t.`info_json` infoJson,
+            t.`product_id` productId,
+            t.`follow_up_type` followUpType,
+            t.`del_flag` delFlag
+        FROM
+            virtual_doctor_call_info t
+        WHERE
+            t.update_time > #{updateTime}
+    </select>
+
+    <!-- 根据创建时间获取大于该时间的医院list -->
+    <select id="getHospitalListByCreateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.HospitalBean">
+        SELECT
+            t.id,
+            t.`name`,
+            CASE
+                WHEN t.`level` = '11' THEN
+                    '一级甲等'
+                WHEN t.`level` = '12' THEN
+                    '一级乙等'
+                WHEN t.`level` = '13' THEN
+                    '一级丙等'
+                WHEN t.`level` = '21' THEN
+                    '二级甲等'
+                WHEN t.`level` = '22' THEN
+                    '二级乙等'
+                WHEN t.`level` = '23' THEN
+                    '二级丙等'
+                WHEN t.`level` = '31' THEN
+                    '三级甲等'
+                WHEN t.`level` = '32' THEN
+                    '三级乙等'
+                WHEN t.`level` = '33' THEN
+                    '三级丙等'
+                WHEN t.`level` = '40' THEN
+                    '特级医院'
+                WHEN t.`level` = '50' THEN
+                    '民营医院'
+                ELSE
+                    '未知'
+                END `level`,
+            t.create_time createTime,
+            t.update_time updateTime
+        FROM
+            hospital t
+        JOIN (
+            SELECT
+                d.hospital_id
+            FROM
+                doctor d
+            JOIN drug_user_doctor u ON d.id = u.doctor_id
+            AND u.prod_id = #{prodId}
+            GROUP BY
+                d.hospital_id
+        ) h ON t.id = h.hospital_id
+        WHERE
+            t.create_time > #{createTime} AND t.`name` != '';
+    </select>
+
+    <!-- 根据更新时间获取大于该时间的医院list -->
+    <select id="getHospitalListByUpdateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.HospitalBean">
+        SELECT
+            t.id,
+            t.`name`,
+            CASE
+                WHEN t.`level` = '11' THEN
+                    '一级甲等'
+                WHEN t.`level` = '12' THEN
+                    '一级乙等'
+                WHEN t.`level` = '13' THEN
+                    '一级丙等'
+                WHEN t.`level` = '21' THEN
+                    '二级甲等'
+                WHEN t.`level` = '22' THEN
+                    '二级乙等'
+                WHEN t.`level` = '23' THEN
+                    '二级丙等'
+                WHEN t.`level` = '31' THEN
+                    '三级甲等'
+                WHEN t.`level` = '32' THEN
+                    '三级乙等'
+                WHEN t.`level` = '33' THEN
+                    '三级丙等'
+                WHEN t.`level` = '40' THEN
+                    '特级医院'
+                WHEN t.`level` = '50' THEN
+                    '民营医院'
+                ELSE
+                    '未知'
+                END `level`,
+            t.create_time createTime,
+            t.update_time updateTime
+        FROM
+            hospital t
+        JOIN (
+            SELECT
+                d.hospital_id
+            FROM
+                doctor d
+            JOIN drug_user_doctor u ON d.id = u.doctor_id
+            AND u.prod_id = #{prodId}
+            GROUP BY
+                d.hospital_id
+        ) h ON t.id = h.hospital_id
+        WHERE
+            t.update_time > #{updateTime} AND t.`name` != '';
+    </select>
+
+
+    <!-- 根据创建时间获取大于该时间的诺和内部会议记录list -->
+    <select id="getEnterpriseInternalMeetingListByCreateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.EnterpriseInternalMeetingBean">
+        SELECT
+            t.id,
+            t.title,
+            t.start_time startTime,
+            t.end_time endTime,
+            t.speaker,
+            t.create_time createTime,
+            t.update_time updateTime,
+            substring_index(t.`start_time`, "-", 1) `year`
+        FROM
+            t_meeting_data t
+        WHERE
+            t.create_time > #{createTime} AND  t.product_id = #{prodId}
+    </select>
+
+    <!-- 根据更新时间获取大于该时间的诺和内部会议记录list -->
+    <select id="getEnterpriseInternalMeetingListByUpdateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.EnterpriseInternalMeetingBean">
+        SELECT
+            t.id,
+            t.title,
+            t.start_time startTime,
+            t.end_time endTime,
+            t.speaker,
+            t.create_time createTime,
+            t.update_time updateTime,
+            substring_index(t.`start_time`, "-", 1) `year`
+        FROM
+            t_meeting_data t
+        WHERE
+            t.update_time > #{updateTime} AND  t.product_id = #{prodId}
+    </select>
+
+    <!-- 根据创建时间获取大于该时间的医生参加诺和内部会议详情表list -->
+    <select id="getEnterpriseMeetingAttendDetailsListByCreateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.EnterpriseMeetingAttendDetailsBean">
+        SELECT
+            t.id,
+            t.doctor_id doctorId,
+            t.doctor_name doctorName,
+            d.id businessCode,
+            t.attend_start_time attendStartTime,
+            o.hospital_name hospitalName,
+            o.depart,
+            t.create_time createTime,
+            t.update_time updateTime
+        FROM
+            t_meeting_attend_details t
+        LEFT JOIN t_meeting_data d ON t.meeting_id = d.id
+        JOIN doctor o ON t.doctor_id = o.id
+        WHERE
+            t.create_time > #{createTime} AND  d.product_id = #{prodId}
+    </select>
+
+    <!-- 根据更新时间获取大于该时间的医生参加诺和内部会议详情表list -->
+    <select id="getEnterpriseMeetingAttendDetailsListByUpdateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.EnterpriseMeetingAttendDetailsBean">
+        SELECT
+            t.id,
+            t.doctor_id doctorId,
+            t.doctor_name doctorName,
+            d.id businessCode,
+            t.attend_start_time attendStartTime,
+            o.hospital_name hospitalName,
+            o.depart,
+            t.create_time createTime,
+            t.update_time updateTime
+        FROM
+            t_meeting_attend_details t
+        LEFT JOIN t_meeting_data d ON t.meeting_id = d.id
+        JOIN doctor o ON t.doctor_id = o.id
+        WHERE
+            t.update_time > #{updateTime} AND  d.product_id = #{prodId}
+    </select>
+
+    <!-- 根据创建时间获取大于该时间的医生详情表list -->
+    <select id="getEnterpriseHcpBeanListByCreateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.EnterpriseHcpBean">
+        SELECT
+            DISTINCT d.`id`,
+            d.`name`,
+            d.`hospital_id` hospitalId,
+            d.`hospital_name` hospitalName,
+            d.`depart`,
+            CASE
+        WHEN d.`sex` = 0 THEN
+            '男'
+        WHEN d.`sex` = 1 THEN
+            '女'
+        ELSE
+            '未知'
+        END `sex`,
+         d.`create_time` createTime,
+         d.`modify_time` modifyTime
+        FROM
+            doctor d
+        JOIN drug_user_doctor u ON d.id = u.doctor_id
+        WHERE
+            d.create_time > #{createTime} AND  u.prod_id = #{prodId}
+    </select>
+
+    <!-- 根据更新时间获取大于该时间的医生详情表list -->
+    <select id="getEnterpriseHcpBeanListByUpdateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.EnterpriseHcpBean">
+        SELECT
+            DISTINCT d.`id`,
+            d.`name`,
+            d.`hospital_id` hospitalId,
+            d.`hospital_name` hospitalName,
+            d.`depart`,
+            CASE
+        WHEN d.`sex` = 0 THEN
+            '男'
+        WHEN d.`sex` = 1 THEN
+            '女'
+        ELSE
+            '未知'
+        END `sex`,
+         d.`create_time` createTime,
+         d.`modify_time` modifyTime
+        FROM
+            doctor d
+        JOIN drug_user_doctor u ON d.id = u.doctor_id
+        WHERE
+            d.modify_time > #{updateTime} AND  u.prod_id = #{prodId}
+    </select>
+
+    <!-- 根据创建时间获取大于该时间的角色用户映射表list -->
+    <select id="getEnterpriseSaleRepListByCreateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.EnterpriseSaleRepBean">
+        SELECT
+            t.id,
+            t.`name`,
+            t.email,
+            t.`status`,
+            t.create_time createTime,
+            t.modify_time modifyTime,
+            u.role_id roleId,
+            r.role_name roleName
+        FROM
+            drug_user t
+        LEFT JOIN drug_user_doctor d ON t.id = d.drug_user_id
+        LEFT JOIN role_user u ON t.id = u.user_id
+        LEFT JOIN role r ON u.role_id = r.id
+        WHERE
+            t.create_time > #{createTime} AND  d.prod_id = #{prodId}
+        GROUP BY
+            d.drug_user_id
+    </select>
+
+    <!-- 根据更新时间获取大于该时间的角色用户映射表list -->
+    <select id="getEnterpriseSaleRepListByUpdateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.EnterpriseSaleRepBean">
+        SELECT
+            t.id,
+            t.`name`,
+            t.email,
+            t.`status`,
+            t.create_time createTime,
+            t.modify_time modifyTime,
+            u.role_id roleId,
+            r.role_name roleName
+        FROM
+            drug_user t
+        LEFT JOIN drug_user_doctor d ON t.id = d.drug_user_id
+        LEFT JOIN role_user u ON t.id = u.user_id
+        LEFT JOIN role r ON u.role_id = r.id
+        WHERE
+            t.modify_time > #{updateTime} AND  d.prod_id = #{prodId}
+        GROUP BY
+            d.drug_user_id
+    </select>
+
+    <!-- 根据创建时间获取大于该时间的代表-医生-产品关联表list -->
+    <select id="getEnterpriseSaleRepProductHcpListByCreateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.EnterpriseSaleRepProductHcpBean">
+        SELECT
+            d.id,
+            d.doctor_id customerCode,
+            d.doctor_name hcpName,
+            d.drug_user_id saleRepCode,
+            d.drug_user_name saleRepName,
+            d.prod_id productCode,
+            p.prod_name productName,
+            d.created_time createTime,
+            d.modify_time updateTime
+        FROM
+            drug_user_doctor d
+        LEFT JOIN product_line p ON d.prod_id = p.prod_id
+        WHERE
+            d.created_time > #{createTime} AND  d.prod_id = #{prodId}
+    </select>
+
+    <!-- 根据更新时间获取大于该时间的代表-医生-产品关联表list -->
+    <select id="getEnterpriseSaleRepProductHcpListByUpdateTime" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.EnterpriseSaleRepProductHcpBean">
+        SELECT
+            d.id,
+            d.doctor_id customerCode,
+            d.doctor_name hcpName,
+            d.drug_user_id saleRepCode,
+            d.drug_user_name saleRepName,
+            d.prod_id productCode,
+            p.prod_name productName,
+            d.created_time createTime,
+            d.modify_time updateTime
+        FROM
+            drug_user_doctor d
+        LEFT JOIN product_line p ON d.prod_id = p.prod_id
+        WHERE
+            d.modify_time > #{updateTime} AND  d.prod_id = #{prodId}
+    </select>
+</mapper>

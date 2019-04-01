@@ -93,6 +93,14 @@ public interface ProductLineMapper extends MyMapper<ProductLine> {
      */
     String getProductName(Long productId);
 
+    /**
+     * 根据时间获取大于该时间的产品list
+     */
+    List<ProductLine> getProductListByCreateTime(@Param(value = "createTime") String createTime);
 
+    /**
+     * 根据更新时间获取大于该时间的产品list
+     */
+    List<ProductLine> getProductListByUpdateTime(@Param(value = "updateTime") String createTime);
 
 }
