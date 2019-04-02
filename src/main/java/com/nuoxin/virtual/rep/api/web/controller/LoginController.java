@@ -39,8 +39,7 @@ public class LoginController extends BaseController {
 	private EmailService emailService;
 	@Autowired
 	private SessionMemUtils memUtils;
-	@Autowired
-	private TestSlaveService testSlaveService;
+
 
 	@SuppressWarnings("unchecked")
 	@ApiOperation(value = "虚拟代表登录", notes = "虚拟代表登录")
@@ -174,13 +173,4 @@ public class LoginController extends BaseController {
 		return loginBean;
 	}
 
-	@ApiOperation(value = "多数据源-从数据源测试接口", notes = "多数据源-从数据源测试接口")
-	@PostMapping("/slaveTest")
-	@ResponseBody
-	public DefaultResponseBean<String> slaveTest(@RequestParam("productId") Long productId) {
-		String name = testSlaveService.getProductName(productId);
-		DefaultResponseBean<String> responseBean = new DefaultResponseBean<>();
-		responseBean.setData(name);
-		return responseBean;
-	}
 }
