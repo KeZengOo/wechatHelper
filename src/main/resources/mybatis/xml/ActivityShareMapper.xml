@@ -765,7 +765,7 @@
 		SELECT
 		q.id questionnaireId,
 		q.title questionnaireTitle,
-		COUNT(*) AS answerCount,
+		COUNT(*) AS answerNum,
 		DATE_FORMAT(
 			min(a.create_time),
 			'%Y-%m-%d %H:%i:%s'
