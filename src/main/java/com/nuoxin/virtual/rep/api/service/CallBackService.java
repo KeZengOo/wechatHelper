@@ -59,8 +59,7 @@ public interface CallBackService {
 	 * 根据左右声道的阿里云地址进行语音识别，进行入库
 	 * @param pathMaps
 	 * @param sinToken
-	 * @param callId
 	 * @return boolean
 	 */
-	boolean saveSpeechRecognitionResultCallInfo(Map<String,String> pathMaps, String sinToken,Integer callId);
+	boolean saveSpeechRecognitionResultCallInfo(Map<String,String> pathMaps, String sinToken);
 }

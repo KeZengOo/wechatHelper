@@ -24,11 +24,10 @@ import com.nuoxin.virtual.rep.api.entity.DoctorCallInfo;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoParams;
 import com.nuoxin.virtual.rep.api.mybatis.DoctorMapper;
 import com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorCallInfoMapper;
-import ws.schild.jave.*;
 
 @Transactional
 @Service
-public abstract class BaseCallBackImpl implements CallBackService {
+public abstract class BaseCallBackImpl implements CallBackService{
 	
 	private static final Logger logger = LoggerFactory.getLogger(BaseCallBackImpl.class);
 
@@ -45,7 +44,8 @@ public abstract class BaseCallBackImpl implements CallBackService {
 	private DoctorMapper doctorMapper;
 	@Resource
 	private DoctorCallInfoRepository callInfoDao;
-	
+
+
 	/**
 	 * 父类通用回调处理
 	 * @param result ConvertResult 对象
@@ -54,7 +54,29 @@ public abstract class BaseCallBackImpl implements CallBackService {
 		String sinToken = result.getSinToken();
 		String audioFileDownloadUrl = result.getMonitorFilenameUrl();
 		String callOssUrl = this.processFile(audioFileDownloadUrl, sinToken);
-		
+		logger.info("callOssUrl={}, processCallBack方法中获取的地址："+ callOssUrl);
+
+		//异步（分割录音文件并上传阿里云，返回左右声道的阿里云地址 并且 根据左右声道的阿里云地址进行语音识别，进行入库）
+		new Thread(new Runnable(){
+			@Override
+			public void run() {
+				logger.info("runCallOssUrl={}, processCallBack方法中获取的地址："+ callOssUrl);
+				//分割录音文件并上传阿里云，返回左右声道的阿里云地址
+				Map<String,String> pathMap = splitSpeechAliyunUrlUpdate(callOssUrl);
+				logger.info("pathMap={}, 分割录音文件并上传阿里云，返回左右声道的阿里云地址", pathMap);
+				if(pathMap.size() > 0){
+					//根据左右声道的阿里云地址进行语音识别，进行入库
+					boolean result_is_save = saveSpeechRecognitionResultCallInfo(pathMap, sinToken);
+					logger.info("result_is_save={}, 根据左右声道的阿里云地址进行语音识别，进行入库是否成功！", result_is_save);
+				}
+			}
+		}).start();
+
+//		//分割录音文件并上传阿里云，返回左右声道的阿里云地址
+//		Map<String,String> pathMap = splitSpeechAliyunUrlUpdate(callOssUrl);
+//		//根据左右声道的阿里云地址进行语音识别，进行入库
+//		boolean result_is_save = saveSpeechRecognitionResultCallInfo(pathMap, sinToken,0);
+
 		result.setMonitorFilenameUrl(callOssUrl);
 
 		DoctorCallInfo info = this.getDoctorCallInfoBySinToken(sinToken);
@@ -120,9 +142,11 @@ public abstract class BaseCallBackImpl implements CallBackService {
 	protected String processFile(String audioFileUrl, String sinToken) {
 		String fileName = sinToken.concat(FileConstant.MP3_SUFFIX);
 		fileService.processLocalFile(audioFileUrl, fileName, path);
-		
+
 		String fullFileName = path.concat(fileName);
+		logger.info("文件处理方法的文件名：",fullFileName);
 		String ossUrl = ossService.uploadFile(new File(fullFileName));
+		logger.info("文件处理处理方法中的ossUrl！ossUrl={}", ossUrl);
 		
 		// 这里走了补偿机制.即:当上传至阿里失败时写入回调时供应商传递过来的文件下载链接
 		if (StringUtils.isBlank(ossUrl)) {
@@ -198,9 +222,11 @@ public abstract class BaseCallBackImpl implements CallBackService {
 	 */
 	@Override
 	public Map<String,String> splitSpeechAliyunUrlUpdate(String ossFilePath){
-		Map<String,String> pathMaps = new HashMap<String,String>();
+		logger.info("ossFilePath:{}", "语音文件上传到阿里云后的地址："+ossFilePath);
+		Map<String,String> pathMaps = new HashMap<String,String>(16);
 		String local = FileConstant.LOCAL_PATH;
-		if(ossFilePath.indexOf("\\")> -1)
+		int num = ossFilePath.indexOf("\\");
+		if(num> -1)
 		{
 			ossFilePath = ossFilePath.replace("\\","/");
 		}
@@ -208,10 +234,15 @@ public abstract class BaseCallBackImpl implements CallBackService {
 		Integer result =SpeechRecognitionUtil.ossDownLoad(ossFilePath);
 		//如果在阿里云上存在下载的文件
 		if(result == 1){
-			String sourceFileName = local+ossFilePath.substring((ossFilePath.lastIndexOf("/")));
-			String targeFileName = local+ossFilePath.substring((ossFilePath.lastIndexOf("/")));
-			targeFileName = targeFileName.substring(0,targeFileName.length()-3)+"wav";
-			AudioConvertUtil.mp3ToWav(sourceFileName,targeFileName);
+			String fileType = ossFilePath.substring(ossFilePath.length()-4,ossFilePath.length());
+			String sourceFileName = "";
+			String targeFileName = "";
+			if(fileType.equals(FileConstant.MP3_SUFFIX)){
+				sourceFileName = local+ossFilePath.substring((ossFilePath.lastIndexOf("/")));
+				targeFileName = local+ossFilePath.substring((ossFilePath.lastIndexOf("/")));
+				targeFileName = targeFileName.substring(0,targeFileName.length()-3)+"wav";
+				AudioConvertUtil.mp3ToWav(sourceFileName,targeFileName);
+			}
 
 			//区分wav左右声道，并保存到本地
 			String wavSourceFileName = local+ossFilePath.substring((ossFilePath.lastIndexOf("/")));
@@ -220,21 +251,24 @@ public abstract class BaseCallBackImpl implements CallBackService {
 			leftTargeFileName = leftTargeFileName.substring(0,leftTargeFileName.length()-4)+"_left.wav";
 			String rightTargeFileName = local+ossFilePath.substring((ossFilePath.lastIndexOf("/")));
 			rightTargeFileName = rightTargeFileName.substring(0,rightTargeFileName.length()-4)+"_right.wav";
-			AudioConvertUtil.steroToMono(wavSourceFileName,leftTargeFileName,rightTargeFileName);
 
-			//把左右声道上传到阿里云
-			String leftOSSPath = getFileOSSPathByLocalFilePath(leftTargeFileName);
-			String rightOSSPath = getFileOSSPathByLocalFilePath(rightTargeFileName);
+			try {
+				AudioConvertUtil.steroToMono(wavSourceFileName,leftTargeFileName,rightTargeFileName);
+				//把左右声道上传到阿里云
+				String leftOSSPath = getFileOSSPathByLocalFilePath(leftTargeFileName);
+				String rightOSSPath = getFileOSSPathByLocalFilePath(rightTargeFileName);
 
-			//把阿里云地址存入新表中（未设计）
-			callInfoMapper.saveSplitSpeechAliyunPath(ossFilePath,leftOSSPath,1);
-			callInfoMapper.saveSplitSpeechAliyunPath(ossFilePath,rightOSSPath,2);
-			//根据阿里云URL进行语音识别
+				//把阿里云地址存入新表中（未设计）
+				callInfoMapper.saveSplitSpeechAliyunPath(ossFilePath,leftOSSPath,1);
+				callInfoMapper.saveSplitSpeechAliyunPath(ossFilePath,rightOSSPath,2);
+				//根据阿里云URL进行语音识别
 
-			pathMaps.put("leftOSSPath",leftOSSPath);
-			pathMaps.put("rightOSSPath",rightOSSPath);
+				pathMaps.put("leftOSSPath",leftOSSPath);
+				pathMaps.put("rightOSSPath",rightOSSPath);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
-
 		return pathMaps;
 	}
 
@@ -258,7 +292,7 @@ public abstract class BaseCallBackImpl implements CallBackService {
 	 * @return
 	 */
 	@Override
-	public boolean saveSpeechRecognitionResultCallInfo(Map<String,String> pathMaps, String sinToken, Integer callId){
+	public boolean saveSpeechRecognitionResultCallInfo(Map<String,String> pathMaps, String sinToken){
 		Map<Integer,String> leftMapText = new HashMap<Integer,String>(16);
 		Map<Integer,String> rightMapText = new HashMap<Integer,String>(16);
 		Integer virtualDrugUserId = 0;
@@ -267,18 +301,32 @@ public abstract class BaseCallBackImpl implements CallBackService {
 		if(sinToken != null && sinToken != ""){
 			//通过sinToken查询virtual_doctor_call_info表
 			vss = callInfoMapper.getCallInfoBySinToken(sinToken);
-			virtualDrugUserId = vss.getVirtualDrugUserId();
-		}else if(callId != null && callId != 0)
-		{
-			//通过callId查询virtual_doctor_call_info表
-			vss = callInfoMapper.getCallInfoById(callId);
-			sinToken = vss.getSinToken();
-			virtualDrugUserId = vss.getVirtualDrugUserId();
+			if(null != vss){
+				if(vss.getVirtualDrugUserId() == null){
+					virtualDrugUserId = 0;
+				}
+				else
+				{
+					virtualDrugUserId = vss.getVirtualDrugUserId();
+				}
+			}
 		}
 
 		String leftPath = pathMaps.get("leftOSSPath");
 		String rightPath = pathMaps.get("rightOSSPath");
 		try {
+			int leftNum = leftPath.indexOf("\\");
+			if(leftNum> -1)
+			{
+				leftPath = leftPath.replace("\\","/");
+			}
+
+			int rightNum = rightPath.indexOf("\\");
+			if(rightNum> -1)
+			{
+				rightPath = rightPath.replace("\\","/");
+			}
+
 			leftMapText = SpeechRecognitionUtil.getSpeechRecognitionResultCallBack(leftPath);
 			rightMapText = SpeechRecognitionUtil.getSpeechRecognitionResultCallBack(rightPath);
 			List<VirtualSplitSpeechCallInfoParams> leftList = new ArrayList<VirtualSplitSpeechCallInfoParams>();
