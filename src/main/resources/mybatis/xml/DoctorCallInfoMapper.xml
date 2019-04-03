@@ -500,7 +500,6 @@
             <if test="doctorId !=null and doctorId !=0">
                 and d.id = #{doctorId}
             </if>
-
             ) wx_dud ON wx.doctor_id = wx_dud.doctorId
 
         </if>
@@ -772,7 +771,7 @@
             <if test="doctorId !=null and doctorId !=0">
                 and d.id = #{doctorId}
             </if>
-            
+
             ) wx_dud ON wx.doctor_id = wx_dud.doctorId
         </if>
 
