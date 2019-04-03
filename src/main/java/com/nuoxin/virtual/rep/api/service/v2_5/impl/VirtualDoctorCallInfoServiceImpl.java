@@ -89,8 +89,9 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 			if (virtualQuestionaireId != null && virtualQuestionaireId > 0){
 				this.doSaveVirtualQuestionnaireRecord(saveRequest);
 			}
-			
-			this.alterRelationShip(saveRequest);
+
+			// 电话保存的信息不会覆盖掉
+			//this.alterRelationShip(saveRequest);
 			return true;
 		}
 
@@ -109,7 +110,8 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		Long callId = saveRequest.getCallInfoId();
 		if (callId != null && callId > 0) {
 			this.saveCallInfo(saveRequest);
-			this.alterRelationShip(saveRequest);
+			// 电话未接通的信息不保存到最终的结果里面
+//			this.alterRelationShip(saveRequest);
 
 			return true;
 		}
