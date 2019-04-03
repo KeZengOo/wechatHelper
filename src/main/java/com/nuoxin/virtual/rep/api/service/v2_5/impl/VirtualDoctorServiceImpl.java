@@ -227,7 +227,10 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
                 doctorDynamicFieldService.addDoctorBasicDynamicFieldValue(doctorBasicDynamicField);
 
                 // 更新医生的电话拜访信息
-                virtualDoctorCallInfoMapper.updateCallInfoDoctorId(request.getTelephones(), virtualDoctorId);
+                if (CollectionsUtil.isNotEmptyList(request.getTelephones())){
+                    virtualDoctorCallInfoMapper.updateCallInfoDoctorId(request.getTelephones(), virtualDoctorId);
+                }
+
             }
         }
 
