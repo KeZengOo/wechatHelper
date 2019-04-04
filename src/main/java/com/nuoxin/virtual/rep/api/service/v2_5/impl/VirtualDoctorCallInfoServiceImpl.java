@@ -90,7 +90,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 				this.doSaveVirtualQuestionnaireRecord(saveRequest);
 			}
 			
-			this.alterRelationShip(saveRequest);
+//			this.alterRelationShip(saveRequest);
 			return true;
 		}
 
@@ -109,7 +109,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		Long callId = saveRequest.getCallInfoId();
 		if (callId != null && callId > 0) {
 			this.saveCallInfo(saveRequest);
-			this.alterRelationShip(saveRequest);
+//			this.alterRelationShip(saveRequest);
 
 			return true;
 		}
