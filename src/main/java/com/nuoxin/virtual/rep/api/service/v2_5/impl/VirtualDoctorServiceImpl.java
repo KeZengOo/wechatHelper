@@ -203,9 +203,10 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
     public Long saveVirtualDoctor(SaveVirtualDoctorRequest request, DrugUser user) {
 
         long virtualDoctorId = 0;
+
         this.checkSaveVirtualDoctorParam(request, user);
-        int hospitalId = this.getHospiTalId(request);
-        if (hospitalId > 0) {
+        Integer hospitalId = this.getHospiTalId(request);
+        if (hospitalId!=null && hospitalId > 0) {
 
             Long doctorId = request.getDoctorId();
             if (doctorId != null && doctorId > 0){
@@ -274,7 +275,7 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
             }
         }
 
-        int hospitalId = this.getHospiTalId(request);
+        Integer hospitalId = this.getHospiTalId(request);
         this.updateDoctor(request, hospitalId);
 
 
@@ -553,8 +554,12 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
      *
      * @param request
      */
-    private int getHospiTalId(UpdateVirtualDoctorRequest request) {
+    private Integer getHospiTalId(UpdateVirtualDoctorRequest request) {
         int hospitalId;
+        String hospital = request.getHospital();
+        if (StringUtil.isEmpty(hospital)){
+            return null;
+        }
 
         HospitalProvinceBean hospitalProvince = hospitalMapper.getHospital(request.getHospital());
         if (hospitalProvince != null) {
@@ -790,7 +795,7 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
      * @param hospitalId
      * @return 成功返回主键值
      */
-    private void updateDoctor(UpdateVirtualDoctorRequest request, int hospitalId) {
+    private void updateDoctor(UpdateVirtualDoctorRequest request, Integer hospitalId) {
         Long id = request.getId();
         if (id == null || id == 0) {
             throw new BusinessException(ErrorEnum.ERROR, "医生ID不能为空！");
@@ -813,8 +818,14 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 
         param.setProvince(request.getProvince());
         param.setCity(request.getCity());
-        param.setHospital(request.getHospital());
-        param.setHospitalId(hospitalId);
+        if (hospitalId == null || hospitalId== 0 || StringUtil.isEmpty(request.getHospital())){
+            param.setHospital(null);
+            param.setHospitalId(null);
+        }else {
+            param.setHospital(request.getHospital());
+            param.setHospitalId(hospitalId);
+        }
+
         param.setId(id);
 
         virtualDoctorMapper.updateVirtualDoctor(param);
