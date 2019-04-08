@@ -269,7 +269,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
 //                isUpload = false;
 //                uploadData();
                   Toast.makeText(mActivity,"功能暂时下线",Toast.LENGTH_LONG).show() ;
-                //startUpdate3();
+                  //startUpdate3();
                 break;
             //强制更新所有聊天记录
             case (R.id.tv_title):
@@ -594,7 +594,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
         Cursor c1 = null;
         try {
             //新建文件保存联系人信息
-            file1 = new File(Environment.getExternalStorageDirectory().getPath() + "/" + et_name.getText().toString().trim() + "_contact_file" + ".csv");
+            file1 = new File(Environment.getExternalStorageDirectory().getPath() + "/" + et_name.getText().toString().trim() + "ΞcontactΞfile" + ".csv");
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file1), "UTF-8"));
             contactCsvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader("userName", "nickName", "alias", "conRemark", "type"));
             // 查询所有联系人verifyFlag!=0:公众号等类型，群里面非好友的类型为4，未知类型2）
@@ -620,7 +620,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
             //判断是否需要将聊天记录上传,若需要就上传,不然就导出到本地
             if (isUpload) {
                 //上传联系人
-                upLoadFiles(baseUrl + "contact/import?uploadTime=" + currentTime, file1, et_name.getText().toString().trim() + "_contact_file.cvs", false);
+                upLoadFiles(baseUrl + "contact/import?uploadTime=" + currentTime, file1, false);
                 //联系人上传后再获取并上传聊天记录
                 getReMessageData(db);
 
@@ -660,7 +660,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
         }
         try {
             //新建文件保存聊天记录
-            file2 = new File(Environment.getExternalStorageDirectory().getPath() + "/" + et_name.getText().toString().trim() + "_message_file" + ".csv");
+            file2 = new File(Environment.getExternalStorageDirectory().getPath() + "/" + et_name.getText().toString().trim() + "ΞmessageΞfile" + ".csv");
             // 防止出现乱码 utf-8
             BufferedWriter writer2 = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file2), "UTF-8"));
             messageCsvPrinter = new CSVPrinter(writer2, CSVFormat.DEFAULT.withHeader("talker", "content", "createTime", "imgPath", "isSend", "type"));
@@ -743,7 +743,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
 
         }
         //上传聊天记录
-        upLoadFiles(baseUrl + "message/import?uploadTime=" + currentTime, file2, et_name.getText().toString().trim() + "_message_file.cvs", true);
+        upLoadFiles(baseUrl + "message/import?uploadTime=" + currentTime, file2,true);
        //上传聊天记录的同时获取聊天室信息
         getChatRoomData(db);
     }
@@ -755,7 +755,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
 
         try {
             //新建文件保存聊天记录
-            file2 = new File(Environment.getExternalStorageDirectory().getPath() + "/" + et_name.getText().toString().trim() + "_chatRoom_file" + ".csv");
+            file2 = new File(Environment.getExternalStorageDirectory().getPath() + "/" + et_name.getText().toString().trim() + "ΞchatRoomΞfile" + ".csv");
             // 防止出现乱码 utf-8
             BufferedWriter writer2 = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file2), "UTF-8"));
             messageCsvPrinter = new CSVPrinter(writer2, CSVFormat.DEFAULT.withHeader("chatroomname", "memberlist", "displayname", "roomowner"));
@@ -794,14 +794,14 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
             }
         }
         //上传群聊信息
-        //upLoadFiles(baseUrl + "message/import?uploadTime=" + currentTime, file2, et_name.getText().toString().trim() + "_message_file.cvs", true);
+        upLoadFiles(baseUrl + "message/import?uploadTime=" + currentTime, file2, true);
     }
 
     /**
      * @param url
      * @throws Exception isSave 用来表示只有消息表上传成功时,才保存上传时间到 sp
      */
-    private void upLoadFiles(String url, File file, String name, final boolean isMessage) {
+    private void upLoadFiles(String url, File file, final boolean isMessage) {
         if (isDebug) {
             Log.e("query网址", url + file.getName());
         }
@@ -825,7 +825,6 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
         if (file.exists()) {
             String TYPE = "application/octet-stream";
             RequestBody fileBody = RequestBody.create(MediaType.parse(TYPE), file);
-
             RequestBody requestBody = builder
                     .setType(MultipartBody.FORM)
                     .addFormDataPart("file", file.getName(), fileBody)
@@ -933,10 +932,10 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
      */
     public void exportMessageToSD(SQLiteDatabase db) {
         Cursor c2 = null;
-        String isSend = "";
+        String isSend ;
         try {
             //新建文件保存聊天记录
-            file2 = new File(Environment.getExternalStorageDirectory().getPath() + "/" + "聊天记录_message_file" + ".csv");
+            file2 = new File(Environment.getExternalStorageDirectory().getPath() + "/" + "聊天记录ΞmessageΞfile" + ".csv");
             // 防止出现乱码 utf-8
             BufferedWriter writer2 = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file2), "UTF-8"));
             messageCsvPrinter = new CSVPrinter(writer2, CSVFormat.DEFAULT.withHeader("微信号", "消息状态", "消息类型","聊天消息", "聊天时间"));

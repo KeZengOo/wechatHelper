@@ -346,7 +346,7 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
         String name;
         try {
             //新建文件保存联系人信息
-            file1 = new File(Environment.getExternalStorageDirectory().getPath() + "/联系人信息" + "_contact_file" + ".csv");
+            file1 = new File(Environment.getExternalStorageDirectory().getPath() + "/联系人信息" + "ΞcontactΞfile" + ".csv");
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file1), "UTF-8"));
             contactCsvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader("默认微信号", "昵称", "微信号", "备注", "标签"));
         } catch (IOException e) {
@@ -457,9 +457,9 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
     /**
      * 请求失败的弹窗处理
      *
-     * @param s
+     * @param description
      */
-    private void getUploadTimeError(final String s) {
+    private void getUploadTimeError(final String description) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -471,7 +471,7 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
                     iv_fail = loadingDialog.findViewById(R.id.iv_fail);
                 }
                 loadingDialog.setCancelable(true);
-                mRemindText.setText(s);
+                mRemindText.setText(description);
                 loadingView.setVisibility(View.INVISIBLE);
                 iv_success.setVisibility(View.INVISIBLE);
                 iv_fail.setVisibility(View.VISIBLE);

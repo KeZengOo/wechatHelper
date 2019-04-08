@@ -108,6 +108,7 @@
             android:textColor="#FFFFFF"
             android:textSize="18dp" />
         <Button
+            android:visibility="invisible"
             android:id="@+id/btn_export_all_message"
             android:layout_width="match_parent"
             android:layout_height="50dp"
@@ -126,7 +127,8 @@
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:layout_marginTop="20dp"
-            android:background="#b5b5b5"></ImageView>
+            android:background="#b5b5b5">
+        </ImageView>
 
         <TextView
             android:layout_gravity="center_horizontal"
@@ -148,6 +150,8 @@
             android:gravity="center"
             android:text="我们将会上传您和医生的聊天记录,保存到工作台中,不会采集您的个人隐私,请您放心使用此工具,谢谢!"
             android:textColor="#b5b5b5"
-            android:textSize="16dp"></TextView>
+            android:textSize="16dp">
+
+        </TextView>
     </LinearLayout>/>
 </RelativeLayout>
