@@ -37,4 +37,7 @@ public class PrescriptionResponseBean implements Serializable {
     @ApiModelProperty(value = "是否脱落:1是,0否,-1未知")
     private Integer breakOff;
 
+    @ApiModelProperty(value = "是否有AE")
+    private Integer isHasAe;
+
 }

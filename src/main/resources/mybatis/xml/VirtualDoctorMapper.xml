@@ -165,7 +165,8 @@
 		is_target=#{target},
 		is_recruit=#{recruit},
 		is_break_off=#{breakOff},
-		hcp_potential=#{potential}
+		hcp_potential=#{potential},
+		is_has_ae=#{isHasAe}
 		WHERE doctor_id=#{doctorId}
 		AND product_id=#{productId}
 	</update>

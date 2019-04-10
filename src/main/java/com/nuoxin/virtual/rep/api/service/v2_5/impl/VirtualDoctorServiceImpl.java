@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
-import javax.transaction.Transactional;
-import javax.transaction.Transactional.TxType;
 
 import com.nuoxin.virtual.rep.api.common.enums.ClassificationEnum;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
@@ -45,6 +43,8 @@ import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorParams;
 import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualDoctorService;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 医生业务实现类
@@ -199,7 +199,7 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
     }
 
     @Override
-    @Transactional(value = TxType.REQUIRED, rollbackOn = Exception.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public Long saveVirtualDoctor(SaveVirtualDoctorRequest request, DrugUser user) {
 
         long virtualDoctorId = 0;
@@ -252,7 +252,7 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
     }
 
     @Override
-    @Transactional(value = TxType.REQUIRED, rollbackOn = Exception.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public void updateVirtualDoctor(UpdateVirtualDoctorRequest request, DrugUser user) {
         Long roleId = user.getRoleId();
         this.checkUpdateVirtualDoctorParam(request, roleId);

@@ -6,6 +6,7 @@ import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitBean;
 import com.nuoxin.virtual.rep.api.entity.v2_5.CallVisitStatisticsBean;
+import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoParams;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.CallRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.CallInfoListRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.SaveCallInfoRequest;
@@ -73,6 +74,7 @@ public interface VirtualDoctorCallInfoService {
 	 * @return
 	 */
 	List<VisitCountResponseBean> getVisitCountList(VisitCountRequestBean bean);
+
 
 
 	/**

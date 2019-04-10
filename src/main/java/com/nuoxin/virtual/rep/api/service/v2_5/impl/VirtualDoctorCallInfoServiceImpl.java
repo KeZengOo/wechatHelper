@@ -6,15 +6,14 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
-import javax.transaction.Transactional;
-import javax.transaction.Transactional.TxType;
+
 
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.enums.RecruitEnum;
 import com.nuoxin.virtual.rep.api.enums.RoleTypeEnum;
-import com.nuoxin.virtual.rep.api.enums.UserTypeEnum;
+
 import com.nuoxin.virtual.rep.api.mybatis.*;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.CallRequestBean;
@@ -39,6 +38,8 @@ import com.nuoxin.virtual.rep.api.service.v2_5.VirtualDoctorCallInfoService;
 import com.nuoxin.virtual.rep.api.service.v2_5.VirtualQuestionnaireService;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.questionnaire.SaveVirtualQuestionnaireRecordRequestBean;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 电话拜访实现类
@@ -75,8 +76,8 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		// TODO @田存
 		return null;
 	}
-	
-	@Transactional(value = TxType.REQUIRED, rollbackOn = Exception.class)
+
+	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 	@Override
 	public boolean saveConnectedCallInfo(SaveCallInfoRequest saveRequest) {
 		this.configSaveCallInfoRequestValue(saveRequest);
@@ -101,8 +102,8 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 
 		return false;
 	}
-	
-	@Transactional(value = TxType.REQUIRED, rollbackOn = Exception.class)
+
+	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 	@Override
 	public boolean saveUnconnectedCallInfo(SaveCallInfoUnConnectedRequest saveRequest) {
 		this.configSaveCallInfoUnConnectedRequest(saveRequest);
@@ -197,6 +198,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		return list;
 	}
 
+
 	/**
 	 * 其他没有查询出来的日期，补充上0
 	 * @param date
@@ -247,7 +249,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	}
 
 	@Override
-	@Transactional(value = TxType.REQUIRED, rollbackOn = Exception.class)
+	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 	public void test() {
 
 		List<VisitHistoryRequestBean> visitHistoryList = callInfoMapper.getVisitHistoryList();
