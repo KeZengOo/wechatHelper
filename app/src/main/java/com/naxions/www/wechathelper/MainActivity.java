@@ -162,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
     /**
      * baseUrl
      */
-  
+
     //sql 语句
      String contactSql = "select * from rcontact where verifyFlag = 0 and type != 4 and type != 2 and type != 0 and type != 33 and nickname != ''and nickname != '文件传输助手'";
      String messageSql = "select * from message where  createTime >";
@@ -540,6 +540,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
         SQLiteDatabaseHook hook = new SQLiteDatabaseHook() {
             @Override
             public void preKey(SQLiteDatabase database) {
+
             }
 
             @Override
@@ -592,6 +593,8 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
      */
     public void getRecontactData(SQLiteDatabase db) {
         Cursor c1 = null;
+        boolean b ;
+
         try {
             //新建文件保存联系人信息
             file1 = new File(Environment.getExternalStorageDirectory().getPath() + "/" + et_name.getText().toString().trim() + "ΞcontactΞfile" + ".csv");
@@ -602,16 +605,26 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
             while (c1.moveToNext()) {
                 String userName = c1.getString(c1.getColumnIndex("username"));
                 String nickName = c1.getString(c1.getColumnIndex("nickname"));
+
                 String alias = c1.getString(c1.getColumnIndex("alias"));
                 String conRemark = c1.getString(c1.getColumnIndex("conRemark"));
                 String type = c1.getString(c1.getColumnIndex("type"));
-                boolean b = FilterUtil.filterPhoneNumber(conRemark);
+               // System.out.println("222hahahahahaha"+nickName+conRemark);
+
+                if(conRemark.isEmpty()){
+                    conRemark = nickName;
+                    b = FilterUtil.filterPhoneNumber(nickName);
+                }else{
+                    b = FilterUtil.filterPhoneNumber(conRemark);
+                }
+                System.out.println(b);
                 if (b) {
                     if (isDebug) {
                         Log.e("contact", "userName=" + userName + "nickName=" + nickName + "alias=" + alias + "conRemark=" + conRemark + "type=" + type);
+                    }
                         //将联系人信息写入 csv 文件
                         contactCsvPrinter.printRecord(FilterUtil.filterEmoji(userName), FilterUtil.filterEmoji(nickName), FilterUtil.filterEmoji(alias), FilterUtil.filterEmoji(conRemark), type);
-                    }
+
                 }
             }
             contactCsvPrinter.printRecord();
@@ -794,7 +807,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
             }
         }
         //上传群聊信息
-        upLoadFiles(baseUrl + "message/import?uploadTime=" + currentTime, file2, true);
+        //upLoadFiles(baseUrl + "message/import?uploadTime=" + currentTime, file2, true);
     }
 
     /**

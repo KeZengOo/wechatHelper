@@ -46,7 +46,7 @@
             android:maxLines="1"
             android:singleLine="true"
             android:textColor="#586066"
-            android:theme="@style/MyEditText" />
+            android:theme="@style/MyEditText"/>
 
         <TextView
             android:id="@+id/tv_updateTime"
