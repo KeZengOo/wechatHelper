@@ -107,9 +107,22 @@ public class MeetingService extends BaseService {
             if (meetingVo != null) {
                 meeting.setTitle(meetingVo.getTitle());
                 meeting.setSpeaker(meetingVo.getSpeaker());
-                meeting.setMeetingStartTime(DateUtil.getDateTimeString(meetingVo.getMeetingStartTime()));
-                meeting.setMeetingEndTime(DateUtil.getDateTimeString(meetingVo.getMeetingEndTime()));
-             
+                if(StringUtils.isEmpty(meetingVo.getMeetingStartTime())){
+                    meeting.setMeetingStartTime("");
+                }
+                else
+                {
+                    meeting.setMeetingStartTime(DateUtil.getDateTimeString(meetingVo.getMeetingStartTime()));
+                }
+
+                if(StringUtils.isEmpty(meetingVo.getMeetingEndTime())){
+                    meeting.setMeetingEndTime("");
+                }
+                else
+                {
+                    meeting.setMeetingEndTime(DateUtil.getDateTimeString(meetingVo.getMeetingEndTime()));
+                }
+
                 ProductLine productLine = productLineRepository.getOne(productId);
                 if (productLine != null){
                     meeting.setProductId(productId);
