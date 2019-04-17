@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.entity.v2_5.MeetingNoRemindParams;
 import com.nuoxin.virtual.rep.api.enums.MeetingTimeTypeEnum;
 import com.nuoxin.virtual.rep.api.mybatis.ProductVisitFrequencyMapper;
@@ -108,7 +109,8 @@ public class MeetingService extends BaseService {
                 meeting.setTitle(meetingVo.getTitle());
                 meeting.setSpeaker(meetingVo.getSpeaker());
                 if(StringUtils.isEmpty(meetingVo.getMeetingStartTime())){
-                    meeting.setMeetingStartTime("");
+
+                    throw new BusinessException(ErrorEnum.ERROR, "会议开始时间输入不合法！");
                 }
                 else
                 {
@@ -116,7 +118,7 @@ public class MeetingService extends BaseService {
                 }
 
                 if(StringUtils.isEmpty(meetingVo.getMeetingEndTime())){
-                    meeting.setMeetingEndTime("");
+                    throw new BusinessException(ErrorEnum.ERROR, "会议结束时间输入不合法！");
                 }
                 else
                 {
