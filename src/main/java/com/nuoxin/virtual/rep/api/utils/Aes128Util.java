@@ -208,7 +208,7 @@ public class Aes128Util {
     public static void main(String[] args) {
 
         String content = "中文测试";
-        String encryptResultStr = encryptAES("min.liang@naxions.com");
+        String encryptResultStr = encryptAES("dongwei.zhang@naxions.com");
         System.out.println("加密前: "+content);
         System.out.println("加密后: "+encryptResultStr);
         System.out.println("解密后: "+decryptAES(encryptResultStr)); // RTNGRjJBMDRERkJFQTdBRUQ0NjBGNjRENzA5Q0QzOTk=

@@ -553,9 +553,20 @@
 
 			<!-- 根据 virtualDrugUserIds 获取对应的 doctorIds -->
 			SELECT
-				doctor_id,min(DATE_FORMAT(modify_time,'%Y-%m-%d %H:%i:%s')) doctorCreateTime,
+				a.doctor_id,min(DATE_FORMAT(modify_time,'%Y-%m-%d %H:%i:%s')) doctorCreateTime,
+				<!--
 				IF(drug_user_id=#{drugUserId},1,0) click
-			FROM drug_user_doctor
+				-->
+				(SELECT IF(COUNT(*) >=1,1,0) FROM drug_user_doctor WHERE is_available=1 AND doctor_id=a.doctor_id AND drug_user_id IN
+				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+					#{virtualDrugUserId}
+				</foreach>
+				AND prod_id IN
+				<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
+					#{productLineId}
+				</foreach>
+				) as click
+			FROM drug_user_doctor a
 			WHERE is_available=1 AND drug_user_id IN
 				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
 		   			#{virtualDrugUserId}

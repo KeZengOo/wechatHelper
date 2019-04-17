@@ -257,6 +257,7 @@
         CASE WHEN vdci.visit_channel=1 THEN "电话" WHEN vdci.visit_channel=2 THEN "微信" WHEN vdci.visit_channel=3 THEN "短信"
         WHEN vdci.visit_channel=4 THEN "邮件"
         WHEN vdci.visit_channel=5 THEN "面谈"
+        WHEN vdci.visit_channel=7 THEN "线下电话"
         else "" END visitType,vdci.visit_channel visitChannel,
         IFNULL(vdci.remark,'') remark,
         IFNULL(vdct.call_text,'') callText,
