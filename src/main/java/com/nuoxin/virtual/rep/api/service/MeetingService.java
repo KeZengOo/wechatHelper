@@ -123,7 +123,7 @@ public class MeetingService extends BaseService {
                     meeting.setMeetingEndTime(DateUtil.getDateTimeString(meetingVo.getMeetingEndTime()));
                 }
 
-                ProductLine productLine = productLineRepository.getOne(productId);
+                ProductLine productLine = productLineRepository.findOne(productId);
                 if (productLine != null){
                     meeting.setProductId(productId);
                     meeting.setProductName(productLine.getName());
