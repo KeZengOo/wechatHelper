@@ -220,4 +220,41 @@
 		REPLACE INTO drug_user_doctor_one_to_one(is_add_wechat, doctor_id, drug_user_id) VALUES(#{addWechat}, #{doctorId}, #{drugUserId})
 	</insert>
 
+	<select id="getDoctorInteract" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorInteractResponseBean">
+		SELECT
+			(
+				SELECT
+					COUNT(*)
+				FROM
+					virtual_doctor_call_info
+				WHERE
+					virtual_drug_user_id = #{drugUserId}
+				AND virtual_doctor_id = #{doctorId}
+				AND visit_channel = 2
+			) wechatVisitCount,
+			(
+				SELECT
+					COUNT(*)
+				FROM
+					activity_read ar
+				LEFT JOIN activity_read_ip ari ON ar.read_token = ari.read_token
+				WHERE
+					(
+						ari.isp IS NULL
+						OR ari.isp != '阿里云'
+					)
+				AND ar.drug_user_id = #{drugUserId}
+				AND read_person_id = #{doctorId}
+			) readCount,
+			(
+				SELECT
+					COUNT(DISTINCT tmd.id)
+				FROM
+					t_meeting_data tmd
+				INNER JOIN t_meeting_attend_details tmad ON tmd.id = tmad.meeting_id
+				WHERE
+					tmad.doctor_id = #{doctorId}
+			) meetingCount
+	</select>
+
 </mapper>

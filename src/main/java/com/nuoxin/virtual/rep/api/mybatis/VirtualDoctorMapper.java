@@ -8,6 +8,7 @@ import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorMendParams;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorMiniResponse;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorParams;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.PrescriptionRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorInteractResponseBean;
 import org.apache.ibatis.annotations.Param;
 
 /**
@@ -106,7 +107,12 @@ public interface VirtualDoctorMapper {
 	 */
 	void updateIsAddWechat(@Param(value = "doctorId") Long doctorId,@Param(value = "drugUserId") Long drugUserId,@Param(value = "addWechat") Integer addWechat);
 
-
-
+	/**
+	 * 查询医生的互动数据
+	 * @param drugUserId
+	 * @param doctorId
+	 * @return
+	 */
+	DoctorInteractResponseBean getDoctorInteract(@Param(value = "drugUserId") Long drugUserId,@Param(value = "doctorId") Long doctorId);
 
 }

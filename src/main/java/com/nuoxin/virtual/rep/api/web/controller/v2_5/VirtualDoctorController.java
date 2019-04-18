@@ -10,11 +10,13 @@ import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.enums.OnOffLineEnum;
 import com.nuoxin.virtual.rep.api.enums.RoleTypeEnum;
+import com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorMapper;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorSingleAddEchoRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.PrescriptionRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.UpdateVirtualDoctorRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorDetailsResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorInteractResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.single.DoctorAddResponseBean;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -41,6 +43,24 @@ public class VirtualDoctorController extends NewBaseController {
 	@Resource
 	private VirtualDoctorService virtualDoctorService;
 
+	@Resource
+	private VirtualDoctorMapper virtualDoctorMapper;
+
+	@SuppressWarnings("unchecked")
+	@ApiOperation(value = "医生的互动数据用于推荐")
+	@RequestMapping(value = "/interact/{drugUserId}/{doctorId}", method = { RequestMethod.GET })
+	public DefaultResponseBean<DoctorInteractResponseBean> getDoctorInteract(HttpServletRequest request,@PathVariable(value = "drugUserId") Long drugUserId,
+																			 @PathVariable(value = "doctorId") Long doctorId) {
+		DrugUser user = this.getDrugUser(request);
+		if (user == null) {
+			return super.getLoginErrorResponse();
+		}
+
+		DoctorInteractResponseBean doctorInteract = virtualDoctorMapper.getDoctorInteract(drugUserId, doctorId);
+		DefaultResponseBean<DoctorInteractResponseBean> responseBean = new DefaultResponseBean<>();
+		responseBean.setData(doctorInteract);
+		return responseBean;
+	}
 
 	@SuppressWarnings("unchecked")
 	@ApiOperation(value = "添加单个客户医生信息前医生信息回显")
