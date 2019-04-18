@@ -9,6 +9,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -38,6 +39,31 @@ public class CallBackController extends BaseController {
 	@Resource(name = "sevenMoor")
 	private CallBackService callBackService;
 
+
+	/**
+	 * 七陌回调入口方法 默认超时时间为10s<br>
+	 * 参考链接 https://developer.7moor.com/event/
+	 * @param request
+	 * @param response
+	 * @return ResponseEntity<?>
+	 */
+	@ApiOperation(value = "电话接通后回调接口方法", notes = "电话接通后回调接口方法")
+	@RequestMapping("/7moor/connect")
+	public ResponseEntity<?> connect(HttpServletRequest request, HttpServletResponse response) {
+		ResponseEntity<?> responseEntity = new ResponseEntity<>(HttpStatus.OK);
+		// 参数转换
+		ConcurrentMap<String, String> paramsMap = this.getParamsMap(request);
+		if (CollectionsUtil.isNotEmptyMap(paramsMap)) {
+			logger.info("回调后的参数：{}", JSONObject.toJSONString(paramsMap));
+
+		} else {
+			logger.error("7moor 接通回调传参异常,响应给 7moor 500");
+			responseEntity = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+		return responseEntity;
+	}
+
 	/**
 	 * 七陌回调入口方法 默认超时时间为10s<br> 
 	 * 参考链接 https://developer.7moor.com/event/
@@ -45,7 +71,7 @@ public class CallBackController extends BaseController {
 	 * @param response
 	 * @return ResponseEntity<?>
 	 */
-	@ApiOperation(value = "回调接口方法", notes = "回调接口方法")
+	@ApiOperation(value = "通话结束后回调接口方法", notes = "通话结束后回调接口方法")
 	@RequestMapping("/7moor")
 	public ResponseEntity<?> callback(HttpServletRequest request, HttpServletResponse response) {
 		ResponseEntity<?> responseEntity = new ResponseEntity<>(HttpStatus.OK);
