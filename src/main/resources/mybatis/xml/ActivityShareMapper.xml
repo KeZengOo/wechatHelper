@@ -628,20 +628,26 @@
 					SELECT
 						IFNULL(count(*), 0)
 					FROM
-						activity_read
+						activity_read rea
+						LEFT JOIN activity_read_ip ari
+						ON rea.read_token=ari.reak_token
 					WHERE
-						data_id = a.data_id
-					AND read_person_id = #{doctorId}
+						rea.data_id = a.data_id
+					AND rea.read_person_id = #{doctorId}
+					AND (ari.isp IS NULL OR ari.isp!='阿里云')
 				) readCount,
 				(
 					SELECT
-						IFNULL(sum(read_time), 0)
+						IFNULL(sum(rea.read_time), 0)
 					FROM
-						activity_read
+						activity_read rea
+						LEFT JOIN activity_read_ip ari
+						ON rea.read_token=ari.read_token
 					WHERE
 						data_id = a.data_id
 					AND read_person_id = #{doctorId}
-				) readTime,
+					AND (ari.isp IS NULL OR ari.isp!='阿里云')
+			) readTime,
 				(
 					SELECT
 
