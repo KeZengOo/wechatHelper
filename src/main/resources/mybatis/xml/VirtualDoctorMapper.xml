@@ -228,8 +228,10 @@
 				FROM
 					virtual_doctor_call_info
 				WHERE
-					virtual_drug_user_id = #{drugUserId}
-				AND virtual_doctor_id = #{doctorId}
+				virtual_doctor_id = #{doctorId}
+				<if test="drugUserId!=null and drugUserId !=0">
+					AND virtual_drug_user_id = #{drugUserId}
+				</if>
 				AND visit_channel = 2
 			) wechatVisitCount,
 			(
@@ -243,7 +245,10 @@
 						ari.isp IS NULL
 						OR ari.isp != '阿里云'
 					)
-				AND ar.drug_user_id = #{drugUserId}
+				<if test="drugUserId !=null and drugUserId !=0">
+					AND ar.drug_user_id = #{drugUserId}
+				</if>
+
 				AND read_person_id = #{doctorId}
 			) readCount,
 			(
