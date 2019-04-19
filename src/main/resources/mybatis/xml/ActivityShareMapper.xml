@@ -630,7 +630,7 @@
 					FROM
 						activity_read rea
 						LEFT JOIN activity_read_ip ari
-						ON rea.read_token=ari.reak_token
+						ON rea.read_token=ari.read_token
 					WHERE
 						rea.data_id = a.data_id
 					AND rea.read_person_id = #{doctorId}
