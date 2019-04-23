@@ -797,6 +797,21 @@
 
     </select>
 
+    <!-- 根据产品ID 得到拜访记录信息ID  -->
+    <select id="getVisitIdList" resultType="java.lang.Long">
+        SELECT
+            DISTINCT c.id
+        FROM
+        (SELECT id
+         FROM drug_user_doctor_quate
+         WHERE product_id=#{productId}
+         AND doctor_id=#{doctorId}
+         ORDER BY create_time DESC LIMIT 1) a
+        INNER JOIN drug_user_doctor_quate_result b ON a.id = b.quate_id
+        INNER JOIN virtual_product_visit_result c ON b.result_id = c.id
+
+    </select>
+
 
     <!-- 得到产品下的扩展动态字段 目前：1潜力，2分型 -->
     <select id="getExtendDoctorDynamicField" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.DoctorDynamicExtendResponseBean">

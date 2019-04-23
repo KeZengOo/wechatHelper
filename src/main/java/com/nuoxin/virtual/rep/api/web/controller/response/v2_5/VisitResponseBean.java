@@ -21,4 +21,7 @@ public class VisitResponseBean implements Serializable {
     @ApiModelProperty(value = "拜访结果")
     private List<String> visitResult = new ArrayList<>();
 
+    @ApiModelProperty(value = "拜访结果ID")
+    private List<Long> visitResultId = new ArrayList<>();
+
 }

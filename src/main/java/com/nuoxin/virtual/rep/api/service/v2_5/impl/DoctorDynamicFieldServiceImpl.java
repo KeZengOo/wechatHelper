@@ -317,9 +317,15 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
             if (CollectionsUtil.isNotEmptyList(result)){
                VisitResponseBean visitResponseBean = new VisitResponseBean();
                visitResponseBean.setVisitResult(result);
+                List<Long> visitIdList = dynamicFieldMapper.getVisitIdList(doctorId, product.getProductId());
+                if (CollectionsUtil.isNotEmptyList(visitIdList)){
+                    visitResponseBean.setVisitResultId(visitIdList);
+                }
                productDynamicFieldQuestionnaireResponseBean.setVisit(visitResponseBean);
 
            }
+
+
 
             // 医生的选中的分型
             List<ProductClassificationResponseBean> doctorClassificationList = productClassificationMapper.getDoctorClassificationList(product.getProductId(), doctorId);
