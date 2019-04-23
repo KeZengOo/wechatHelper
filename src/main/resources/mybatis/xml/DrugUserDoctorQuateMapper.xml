@@ -195,6 +195,7 @@
 	<!-- 全部医生的产品信息 -->
 	<select id="getAllProductInfoListByProductIdList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ProductInfoResponse">
 
+		<!--
 		SELECT
 			tt.prod_id productId,
 			tt.prod_name productName,
@@ -247,6 +248,51 @@
 					q.doctor_id,
 					q.product_id
 			) tt ON qu.id = tt.quateId
+		-->
+
+
+
+
+
+
+		SELECT
+		qq.productId,
+		qq.productName,
+		q.doctor_id doctorId,
+		q.is_recruit isRecruit,
+		q.hcp_potential doctorPotential,
+		q.is_has_drug isHasDrug,
+		q.create_time
+		FROM
+		drug_user_doctor_quate q
+		INNER JOIN (
+		SELECT
+		doctor_id,
+		max(id) maxId,
+		pl.prod_id productId,
+		pl.prod_name productName
+		FROM
+		drug_user_doctor_quate q
+		INNER JOIN product_line pl ON q.product_id = pl.prod_id
+		WHERE
+		product_id IN
+		<foreach item="id" index="index" collection="productIdList"
+				 open="(" separator="," close=")">
+			#{id}
+		</foreach>
+
+		AND doctor_id
+		IN
+
+		<foreach item="doctorId" index="index" collection="doctorIdList"
+				 open="(" separator="," close=")">
+			#{doctorId}
+		</foreach>
+
+		GROUP BY
+		doctor_id
+		) qq ON q.id = qq.maxId
+
 
 	</select>
 
