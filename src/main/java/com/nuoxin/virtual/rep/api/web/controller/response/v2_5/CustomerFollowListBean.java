@@ -102,5 +102,8 @@ public class CustomerFollowListBean implements Serializable {
     @ApiModelProperty(value = "是否是脱落客户 1是,0否,-1/null 未知")
     private Integer isBreakOff;
 
+    @ApiModelProperty(value = "代表姓名")
+    private String drugUserName;
+
 
 }

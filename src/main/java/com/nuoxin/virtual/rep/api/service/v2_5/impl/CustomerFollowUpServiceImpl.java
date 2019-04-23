@@ -448,7 +448,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 		Long productId = searchReq.getProductLineIds().get(0);
 		Long drugUserId = searchReq.getVirtualDrugUserIds().get(0);
 		//医药代表
-		DrugUser drugUser = drugUserService.findById(drugUserId);
+//		DrugUser drugUser = drugUserService.findById(drugUserId);
 		//产品信息
 		ProductLine product = productLineService.findById(productId);
 
@@ -484,7 +484,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 			LinkedHashMap<String, Object> detailMap = new LinkedHashMap<String, Object>();
 			Long doctorId = d.getDoctorId();
 			//固定字段值
-			detailMap.put("drug_userId", drugUser == null ? "" : drugUser.getName());
+			detailMap.put("drug_userId", d.getDrugUserName() == null ? "" : d.getDrugUserName());
 			detailMap.put("doctor_id", doctorId);
 			detailMap.put("doctor_gender", d.getGender() == 0 ? "男" : d.getGender() == 1 ? "女" : "未知");
 			detailMap.put("doctor_dept", d.getDepartment());
