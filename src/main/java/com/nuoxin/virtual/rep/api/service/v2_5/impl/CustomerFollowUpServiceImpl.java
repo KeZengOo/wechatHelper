@@ -76,6 +76,9 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	private HolidayMapper holidayMapper;
 
 	@Resource
+	private DrugUserMapper drugUserMapper;
+
+	@Resource
 	private DynamicFieldMapper dynamicFieldMapper;
 
 	@Autowired
@@ -141,6 +144,11 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 	 * @param pageRequest
 	 */
 	private void fileSearchType(SearchRequestBean pageRequest) {
+
+		List<Long> virtualDrugUserIds = pageRequest.getVirtualDrugUserIds();
+		Integer manager = drugUserMapper.getMangerCount(virtualDrugUserIds);
+		pageRequest.setManager(manager);
+
 		Integer searchType = pageRequest.getSearchType();
 		// 现在改成了只能一个产品
 		Long productId = pageRequest.getProductLineIds().get(0);

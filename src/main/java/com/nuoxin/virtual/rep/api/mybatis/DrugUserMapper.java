@@ -109,4 +109,11 @@ public interface DrugUserMapper extends MyMapper<DrugUser> {
      * @return
      */
 	String getDrugUserNameList(@Param(value = "drugUserIdList") List<Long> drugUserIdList);
+
+    /**
+     * 查询是包含管理员
+     * @param drugUserIdList
+     * @return
+     */
+	Integer getMangerCount(@Param(value = "drugUserIdList") List<Long> drugUserIdList);
 }

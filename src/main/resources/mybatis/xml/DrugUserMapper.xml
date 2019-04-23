@@ -222,5 +222,19 @@
             #{drugUserId}
         </foreach>
     </select>
+
+    <select id="getMangerCount" resultType="java.lang.Integer">
+        SELECT
+            COUNT(*)
+        FROM
+            drug_user du
+        INNER JOIN role_user ru ON du.id = ru.user_id
+        WHERE
+            ru.role_id = 102
+        AND du.id IN
+        <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+            #{drugUserId}
+        </foreach>
+    </select>
     
 </mapper>
