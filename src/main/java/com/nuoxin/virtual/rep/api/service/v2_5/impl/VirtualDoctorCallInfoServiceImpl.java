@@ -91,8 +91,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 				this.doSaveVirtualQuestionnaireRecord(saveRequest);
 			}
 
-			// 电话保存的信息不会覆盖掉
-			//this.alterRelationShip(saveRequest);
+			this.alterRelationShip(saveRequest);
 			return true;
 		}
 
@@ -468,6 +467,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 			relationShipParams.setIsTarget(saveRequest.getIsTarget()); // 是否目标客户
 			relationShipParams.setIsHasAe(saveRequest.getIsHasAe()); //是否AE
 			relationShipParams.setHcpPotential(saveRequest.getHcpPotential());
+			relationShipParams.setAttitude(saveRequest.getAttitude());
 			visitResultId = saveRequest.getVisitResultId();
 
 			Integer productId = saveRequest.getProductId();

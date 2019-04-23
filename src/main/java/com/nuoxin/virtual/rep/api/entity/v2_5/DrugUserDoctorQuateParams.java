@@ -17,4 +17,5 @@ public class DrugUserDoctorQuateParams {
 	private Integer isRecruit;
 	private Integer isBreakOff;
 	private Integer hcpPotential;
+	private Integer attitude;
 }

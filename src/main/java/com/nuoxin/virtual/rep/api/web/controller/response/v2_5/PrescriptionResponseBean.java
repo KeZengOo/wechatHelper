@@ -40,4 +40,6 @@ public class PrescriptionResponseBean implements Serializable {
     @ApiModelProperty(value = "是否有AE")
     private Integer isHasAe;
 
+    @ApiModelProperty(value = "态度")
+    private Integer attitude;
 }
