@@ -9,6 +9,7 @@ import javax.transaction.Transactional;
 import com.aliyuncs.exceptions.ClientException;
 import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualSplitSpeechCallInfoParams;
 import com.nuoxin.virtual.rep.api.utils.AudioConvertUtil;
+import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.utils.SpeechRecognitionUtil;
 import com.nuoxin.virtual.rep.api.utils.StringUtil;
 import org.slf4j.Logger;
@@ -353,8 +354,14 @@ public abstract class BaseCallBackImpl implements CallBackService{
 				rightList.add(v);
 			}
 
-			callInfoMapper.saveSpeechRecognitionResultCallInfo(leftList);
-			callInfoMapper.saveSpeechRecognitionResultCallInfo(rightList);
+			if (CollectionsUtil.isNotEmptyList(leftList)){
+				callInfoMapper.saveSpeechRecognitionResultCallInfo(leftList);
+			}
+
+			if (CollectionsUtil.isNotEmptyList(rightList)){
+				callInfoMapper.saveSpeechRecognitionResultCallInfo(rightList);
+			}
+
 			return true;
 		} catch (ClientException e) {
 			e.printStackTrace();
