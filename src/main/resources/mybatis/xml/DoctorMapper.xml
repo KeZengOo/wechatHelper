@@ -425,62 +425,83 @@
 
 		<!-- 处方信息固定字段高级搜索 -->
 		<if test="hasDrug !=null">
-			AND d.id IN (SELECT DISTINCT doctor_id FROM drug_user_doctor_quate WHERE drug_user_id IN
-			<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
-				#{virtualDrugUserId}
-			</foreach>
+			AND d.id IN (SELECT DISTINCT doctor_id FROM drug_user_doctor_quate WHERE
+			is_has_drug=#{hasDrug}
+
+			<if test="manager==null or manager==0">
+				AND drug_user_id IN
+				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+					#{virtualDrugUserId}
+				</foreach>
+			</if>
+
 
 			AND product_id IN
 			<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
 				#{productLineId}
 			</foreach>
 
-			and is_has_drug=#{hasDrug}
+
 			)
 		</if>
 
 		<if test="target !=null">
-			AND d.id IN (SELECT DISTINCT doctor_id FROM drug_user_doctor_quate WHERE drug_user_id IN
-			<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
-				#{virtualDrugUserId}
-			</foreach>
+			AND d.id IN (SELECT DISTINCT doctor_id FROM drug_user_doctor_quate WHERE
+			is_target=#{target}
+
+			<if test="manager == null or manager == 0">
+				AND drug_user_id IN
+				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+					#{virtualDrugUserId}
+				</foreach>
+			</if>
+
 
 			AND product_id IN
 			<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
 				#{productLineId}
 			</foreach>
 
-			and is_target=#{target}
 			)
 		</if>
 
 		<if test="recruit !=null">
-			AND d.id IN (SELECT DISTINCT doctor_id FROM drug_user_doctor_quate WHERE drug_user_id IN
-			<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
-				#{virtualDrugUserId}
-			</foreach>
+			AND d.id IN (SELECT DISTINCT doctor_id FROM drug_user_doctor_quate WHERE
+			is_recruit=#{recruit}
+
+			<if test="manager==null or manager==0">
+				AND drug_user_id IN
+				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+					#{virtualDrugUserId}
+				</foreach>
+			</if>
+
 
 			AND product_id IN
 			<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
 				#{productLineId}
 			</foreach>
 
-			and is_recruit=#{recruit}
 			)
 		</if>
 
 		<if test="breakOff !=null">
-			AND d.id IN (SELECT DISTINCT doctor_id FROM drug_user_doctor_quate WHERE drug_user_id IN
-			<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
-				#{virtualDrugUserId}
-			</foreach>
+			AND d.id IN (SELECT DISTINCT doctor_id FROM drug_user_doctor_quate WHERE
+			is_break_off=#{breakOff}
+
+			<if test="manager==null or manager==0">
+				AND drug_user_id IN
+				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+					#{virtualDrugUserId}
+				</foreach>
+			</if>
+
 
 			AND product_id IN
 			<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
 				#{productLineId}
 			</foreach>
 
-			and is_break_off=#{breakOff}
 			)
 		</if>
 
@@ -506,15 +527,20 @@
 			SELECT DISTINCT q.doctor_id FROM drug_user_doctor_quate q
 			INNER JOIN drug_user_doctor_quate_result r
 			ON q.id=r.quate_id
-			WHERE q.drug_user_id IN
-			<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
-				#{virtualDrugUserId}
-			</foreach>
+			WHERE
 
-			AND q.product_id IN
+			q.product_id IN
 			<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
 				#{productLineId}
 			</foreach>
+
+			<if test="manager==null or manager==1">
+				AND q.drug_user_id IN
+				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+					#{virtualDrugUserId}
+				</foreach>
+			</if>
+
 
 			AND r.result_id IN
 			<foreach collection="interviewResult" item="resultId" open="(" close=")" separator=",">
@@ -892,62 +918,83 @@
 
 		<!-- 处方信息固定字段高级搜索 -->
 		<if test="hasDrug !=null">
-			AND d.id IN (SELECT DISTINCT doctor_id FROM drug_user_doctor_quate WHERE drug_user_id IN
-			<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
-				#{virtualDrugUserId}
-			</foreach>
+			AND d.id IN (SELECT DISTINCT doctor_id FROM drug_user_doctor_quate WHERE
+			is_has_drug=#{hasDrug}
+
+			<if test="manager==null or manager==0">
+				AND drug_user_id IN
+				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+					#{virtualDrugUserId}
+				</foreach>
+			</if>
+
 
 			AND product_id IN
 			<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
 				#{productLineId}
 			</foreach>
 
-			and is_has_drug=#{hasDrug}
+
 			)
 		</if>
 
 		<if test="target !=null">
-			AND d.id IN (SELECT DISTINCT doctor_id FROM drug_user_doctor_quate WHERE drug_user_id IN
-			<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
-				#{virtualDrugUserId}
-			</foreach>
+			AND d.id IN (SELECT DISTINCT doctor_id FROM drug_user_doctor_quate WHERE
+			is_target=#{target}
+
+			<if test="manager == null or manager == 0">
+				AND drug_user_id IN
+				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+					#{virtualDrugUserId}
+				</foreach>
+			</if>
+
 
 			AND product_id IN
 			<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
 				#{productLineId}
 			</foreach>
 
-			and is_target=#{target}
 			)
 		</if>
 
 		<if test="recruit !=null">
-			AND d.id IN (SELECT DISTINCT doctor_id FROM drug_user_doctor_quate WHERE drug_user_id IN
-			<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
-				#{virtualDrugUserId}
-			</foreach>
+			AND d.id IN (SELECT DISTINCT doctor_id FROM drug_user_doctor_quate WHERE
+			is_recruit=#{recruit}
+
+			<if test="manager==null or manager==0">
+				AND drug_user_id IN
+				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+					#{virtualDrugUserId}
+				</foreach>
+			</if>
+
 
 			AND product_id IN
 			<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
 				#{productLineId}
 			</foreach>
 
-			and is_recruit=#{recruit}
 			)
 		</if>
 
 		<if test="breakOff !=null">
-			AND d.id IN (SELECT DISTINCT doctor_id FROM drug_user_doctor_quate WHERE drug_user_id IN
-			<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
-				#{virtualDrugUserId}
-			</foreach>
+			AND d.id IN (SELECT DISTINCT doctor_id FROM drug_user_doctor_quate WHERE
+			is_break_off=#{breakOff}
+
+			<if test="manager==null or manager==0">
+				AND drug_user_id IN
+				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+					#{virtualDrugUserId}
+				</foreach>
+			</if>
+
 
 			AND product_id IN
 			<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
 				#{productLineId}
 			</foreach>
 
-			and is_break_off=#{breakOff}
 			)
 		</if>
 
@@ -973,15 +1020,20 @@
 			SELECT DISTINCT q.doctor_id FROM drug_user_doctor_quate q
 			INNER JOIN drug_user_doctor_quate_result r
 			ON q.id=r.quate_id
-			WHERE q.drug_user_id IN
-			<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
-				#{virtualDrugUserId}
-			</foreach>
+			WHERE
 
-			AND q.product_id IN
+			q.product_id IN
 			<foreach collection="productLineIds" item="productLineId" open="(" close=")" separator=",">
 				#{productLineId}
 			</foreach>
+
+			<if test="manager==null or manager==1">
+				AND q.drug_user_id IN
+				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+					#{virtualDrugUserId}
+				</foreach>
+			</if>
+
 
 			AND r.result_id IN
 			<foreach collection="interviewResult" item="resultId" open="(" close=")" separator=",">
