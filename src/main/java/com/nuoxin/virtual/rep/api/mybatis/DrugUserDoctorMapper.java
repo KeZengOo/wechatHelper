@@ -55,7 +55,7 @@ public interface DrugUserDoctorMapper {
 	 */
 	Integer selectDrugUserDoctorsCount(StatisticsParams statisticsParams);
 	
-	List<ProductBean>getProducts(@Param(value = "virtualDrugUserId")Long virtualDrugUserId, 
+	List<ProductBean> getProducts(@Param(value = "virtualDrugUserId")Long virtualDrugUserId,
 			                                          @Param(value = "virtualDoctorId")Long virtualDoctorId);
 
 	List<StatisticsResponse> getDrugUserIdByProductId(@Param(value = "productId")Integer productId,

@@ -6,14 +6,13 @@ import com.nuoxin.virtual.rep.api.dao.DoctorRepository;
 import com.nuoxin.virtual.rep.api.dao.DrugUserRepository;
 import com.nuoxin.virtual.rep.api.entity.Doctor;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
+import com.nuoxin.virtual.rep.api.entity.v2_5.ProductBean;
 import com.nuoxin.virtual.rep.api.enums.MessageTypeEnum;
 import com.nuoxin.virtual.rep.api.enums.UserTypeEnum;
-import com.nuoxin.virtual.rep.api.mybatis.DoctorMapper;
-import com.nuoxin.virtual.rep.api.mybatis.DrugUserWechatMapper;
-import com.nuoxin.virtual.rep.api.mybatis.MessageMapper;
-import com.nuoxin.virtual.rep.api.mybatis.WechatContactMapper;
+import com.nuoxin.virtual.rep.api.mybatis.*;
 import com.nuoxin.virtual.rep.api.service.v2_5.WechatService;
 import com.nuoxin.virtual.rep.api.utils.*;
+import com.nuoxin.virtual.rep.api.web.controller.request.call.CallRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.wechat.WechatAndroidContactRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.wechat.WechatAndroidMessageRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.wechat.WechatMessageRequestBean;
@@ -22,6 +21,8 @@ import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.wechat.WechatAndr
 import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 import com.vdurmont.emoji.EmojiParser;
 import org.apache.commons.csv.CSVRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,6 +38,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author tiancun
@@ -44,6 +46,8 @@ import java.util.stream.Collectors;
  */
 @Service
 public class WechatServiceImpl implements WechatService {
+
+    private static final Logger logger = LoggerFactory.getLogger(WechatServiceImpl.class);
 
     @Resource
     private DrugUserWechatMapper drugUserWechatMapper;
@@ -64,18 +68,17 @@ public class WechatServiceImpl implements WechatService {
     @Resource
     private DoctorMapper doctorMapper;
 
+    @Resource
+    private DrugUserDoctorMapper drugUserDoctorMapper;
+
+    @Resource
+    private VirtualDoctorCallInfoMapper virtualDoctorCallInfoMapper;
 
     /**
      * 每次批量插入的数量
      */
     public static final int BATCH_INSERT_SIZE = 1000;
 
-
-    private static List<String> filterCharList = new ArrayList<>();
-
-    static {
-        filterCharList.add("\uD83E\uDDE7");
-    }
 
 
     @Override
@@ -202,6 +205,106 @@ public class WechatServiceImpl implements WechatService {
             messageMapper.batchInsertWechatMessage(addWechatMessageList);
 
         }
+
+        // 微信聊天导出成功之后，自动记录微信拜访次数
+        List<CallRequestBean> callRequestBeanList = this.handleWechatMessageList(duplicateRemovalWechatMessageList);
+        this.addWechatVisit(callRequestBeanList);
+    }
+
+    /**
+     * 新增
+     * @param callRequestBeanList
+     */
+    private void addWechatVisit(List<CallRequestBean> callRequestBeanList) {
+        if (CollectionsUtil.isEmptyList(callRequestBeanList)){
+            return;
+        }
+
+        callRequestBeanList.forEach(c->{
+            Integer count = virtualDoctorCallInfoMapper.getCountByCallRequest(c);
+            if (count == null || count == 0){
+                virtualDoctorCallInfoMapper.saveCallInfo(c);
+            }
+        });
+
+    }
+
+    /**
+     * 获得医生回复的数据，去重获得代表医生拜访数据
+     * @param wechatMessageList
+     */
+    private List<CallRequestBean> handleWechatMessageList(List<WechatMessageRequestBean> wechatMessageList) {
+        if (CollectionsUtil.isEmptyList(wechatMessageList)){
+            return null;
+        }
+
+        // 2 代表是医生回复的，只有医生回复才算拜访
+        List<WechatMessageRequestBean> doctorWechatMessageList = wechatMessageList.stream().filter(w -> w.getUserType().equals(2)).distinct().collect(Collectors.toList());
+        if (CollectionsUtil.isEmptyList(doctorWechatMessageList)){
+            return null;
+        }
+
+        List<WechatMessageRequestBean> handleWechatMessageList = new ArrayList<>();
+        for (WechatMessageRequestBean wechatMessage : doctorWechatMessageList) {
+            Long doctorId = wechatMessage.getDoctorId();
+            Long drugUserId = wechatMessage.getDrugUserId();
+            String messageTime = wechatMessage.getMessageTime();
+            String dateString = "";
+            try {
+                Date date = DateUtil.stringToDate(messageTime, DateUtil.DATE_FORMAT_YYYY_MM_DD);
+                dateString = DateUtil.getDateString(date);
+            }catch (Exception e){
+                logger.error("日期转换出错", e.getMessage(), e);
+                continue;
+            }
+
+            WechatMessageRequestBean handleWechatMessage = new WechatMessageRequestBean();
+            handleWechatMessage.setMessageTime(dateString);
+            handleWechatMessage.setDoctorId(doctorId);
+            handleWechatMessage.setDrugUserId(drugUserId);
+            handleWechatMessageList.add(handleWechatMessage);
+        }
+
+        List<WechatMessageRequestBean> collect = handleWechatMessageList.stream().distinct().collect(Collectors.toList());
+        List<CallRequestBean> list = this.getCallRequestList(collect);
+
+        return list;
+
+
+
+    }
+
+
+    private List<CallRequestBean> getCallRequestList(List<WechatMessageRequestBean> messageList) {
+        if (CollectionsUtil.isEmptyList(messageList)){
+            return null;
+        }
+
+        List<CallRequestBean> list = new ArrayList<>();
+        for (WechatMessageRequestBean wechatMessageRequestBean : messageList) {
+            Long drugUserId = wechatMessageRequestBean.getDrugUserId();
+            Long doctorId = wechatMessageRequestBean.getDoctorId();
+            List<ProductBean> products = drugUserDoctorMapper.getProducts(drugUserId, doctorId);
+            if (CollectionsUtil.isEmptyList(products)){
+                continue;
+            }
+
+            products.forEach(p->{
+                CallRequestBean callRequestBean = new CallRequestBean();
+                callRequestBean.setSinToken(StringUtil.getUuid());
+                // 2是微信拜访
+                callRequestBean.setVisitChannel(2);
+                callRequestBean.setDoctorId(doctorId);
+                callRequestBean.setDrugUserId(drugUserId);
+                callRequestBean.setCreateTime(wechatMessageRequestBean.getMessageTime());
+                callRequestBean.setProductId(Long.valueOf(p.getProductId()));
+                list.add(callRequestBean);
+            });
+
+        }
+
+        return list;
+
 
     }
 

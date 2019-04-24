@@ -227,5 +227,12 @@ public interface VirtualDoctorCallInfoMapper {
 	 * @return sinToken
 	 */
 	VirtualSplitSpeechCallInfoParams getCallInfoById(@Param(value = "id") Integer id);
+
+	/**
+	 * 查询总数，判断是否存在
+	 * @param bean
+	 * @return
+	 */
+	Integer getCountByCallRequest(CallRequestBean bean);
 }
 
