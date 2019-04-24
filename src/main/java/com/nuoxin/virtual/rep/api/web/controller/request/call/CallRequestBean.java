@@ -43,6 +43,9 @@ public class CallRequestBean implements Serializable {
     @NotNull(message = "医生ID不能为空")
     private Long doctorId;
 
+    @ApiModelProperty(value = "消息时间")
+    private String messageTime;
+
     public String getCreateTime() {
         return createTime;
     }
@@ -146,5 +149,14 @@ public class CallRequestBean implements Serializable {
 
     public void setVisitChannel(Integer visitChannel) {
         this.visitChannel = visitChannel;
+    }
+
+
+    public String getMessageTime() {
+        return messageTime;
+    }
+
+    public void setMessageTime(String messageTime) {
+        this.messageTime = messageTime;
     }
 }

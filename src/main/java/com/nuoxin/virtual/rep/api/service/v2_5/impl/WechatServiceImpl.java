@@ -298,6 +298,7 @@ public class WechatServiceImpl implements WechatService {
                 callRequestBean.setDrugUserId(drugUserId);
                 callRequestBean.setCreateTime(wechatMessageRequestBean.getMessageTime());
                 callRequestBean.setProductId(Long.valueOf(p.getProductId()));
+                callRequestBean.setMessageTime(wechatMessageRequestBean.getMessageTime());
                 list.add(callRequestBean);
             });
 
