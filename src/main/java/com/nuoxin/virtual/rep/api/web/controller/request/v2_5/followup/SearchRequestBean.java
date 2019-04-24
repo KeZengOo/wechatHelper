@@ -111,4 +111,8 @@ public class SearchRequestBean extends ListRequestBean {
 	@ApiModelProperty(value = "不分页标志,前端不传递")
 	private Integer NonPagingFlag;
 
+
+	@ApiModelProperty(value = "是否包含管理员")
+	private Integer manager;
+
 }

@@ -31,8 +31,6 @@ public class ScreenRequestBean extends PageRequestBean {
 	@ApiModelProperty(value="虚拟代表ids")
 	private List<Long> virtualDrugUserIds;
 
-	@ApiModelProperty(value = "是否包含管理员")
-	private Integer manager;
 
 	/**
 	 * 产品线 id
