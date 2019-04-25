@@ -30,29 +30,37 @@ public class QuestionnaireController {
     @ApiOperation(value = "添加单个客户医生信息")
     @RequestMapping(value = "/wenJuanLogin", method = { RequestMethod.GET })
     public String wenJuanLogin(){
-
         //当前时间戳
         long timestamp = System.currentTimeMillis()/1000;
         System.out.println("timestamp："+timestamp);
 
-        Map<String, Object> requestEntity = new HashMap<String, Object>();
-        requestEntity.put(WenJuanApiConstant.WJ_APPKEY,WenJuanApiConstant.WJ_APPKEY_VALUE);
-        requestEntity.put(WenJuanApiConstant.WJ_USER,WenJuanApiConstant.WJ_USER_VALUE);
-        requestEntity.put(WenJuanApiConstant.WJ_TIMESTAMP,timestamp);
-
         //生产MD5_signature签名
-        String md5Signature = WenJuanApiConstant.WJ_APPKEY_VALUE+timestamp+WenJuanApiConstant.WJ_USER_VALUE+WenJuanApiConstant.WJ_APPSECRET_VALUE;
+        String md5Signature = WenJuanApiConstant.WJ_APPKEY_VALUE
+                +timestamp+WenJuanApiConstant.WJ_USER_VALUE
+                +WenJuanApiConstant.WJ_APPSECRET_VALUE;
         System.out.println("md5Signature："+md5Signature);
         String md5Result = MD5Util.MD5Encode(md5Signature,"utf8");
         System.out.println("md5Result："+md5Result);
 
-        requestEntity.put(WenJuanApiConstant.WJ_SIGNATURE,md5Result);
         String url =WenJuanApiConstant.URL+WenJuanApiConstant.LOGIN+"?"+WenJuanApiConstant.WJ_APPKEY+"="+WenJuanApiConstant.WJ_APPKEY_VALUE
-                +"&"+WenJuanApiConstant.WJ_USER+"="+WenJuanApiConstant.WJ_USER_VALUE+"&"+WenJuanApiConstant.WJ_TIMESTAMP+"="+timestamp+
-                "&"+WenJuanApiConstant.WJ_SIGNATURE+"="+md5Result;
+                +"&"+WenJuanApiConstant.WJ_USER+"="+WenJuanApiConstant.WJ_USER_VALUE
+                +"&"+WenJuanApiConstant.WJ_TIMESTAMP+"="+timestamp
+                +"&"+WenJuanApiConstant.WJ_SIGNATURE+"="+md5Result;
         System.out.println("url："+url);
         String result = restTemplate.getForObject(url,String.class);
 
-        return result;
+
+        String projectMd5Signature = WenJuanApiConstant.WJ_APPKEY_VALUE
+                +"json"
+                +timestamp
+                +WenJuanApiConstant.WJ_APPSECRET_VALUE;
+        String projectMd5SignatureResult = MD5Util.MD5Encode(projectMd5Signature,"utf8");
+
+        String projectUrl = WenJuanApiConstant.URL+WenJuanApiConstant.GET_PROJ_LIST+"?"+WenJuanApiConstant.WJ_APPKEY+"="+WenJuanApiConstant.WJ_APPKEY_VALUE
+                +"&wj_datatype=json"
+                +"&"+WenJuanApiConstant.WJ_TIMESTAMP+"="+timestamp+"&"+WenJuanApiConstant.WJ_SIGNATURE+"="+projectMd5SignatureResult;
+
+        String projectResult = restTemplate.getForObject(projectUrl,String.class);
+        return projectResult;
     }
 }

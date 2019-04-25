@@ -23,6 +23,11 @@ public interface WenJuanApiConstant {
     String LOGIN = "login/";
 
     /**
+     * 获取项目列表接口
+     */
+    String GET_PROJ_LIST = "get_proj_list/";
+
+    /**
      * wj_appkey
      */
     String WJ_APPKEY = "wj_appkey";
