@@ -190,8 +190,10 @@ public class ExcelUtils<E> {
 				break;
 			}
 
-			if (o == null)
+			if (o == null){
 				return;
+			}
+
 
 			for (Field field : fields) {
 				field.setAccessible(true);
