@@ -814,7 +814,7 @@
         <!-- 2018-09-29 修改后 -->
         SELECT
         message_dud.drugUserId,
-        COUNT(DISTINCT vm.doctor_id)
+        COUNT(DISTINCT vm.doctor_id) total
         FROM
         virtual_message vm
         INNER JOIN (
