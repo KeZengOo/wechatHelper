@@ -14,10 +14,15 @@ public interface WechatService {
     /**
      * 处理安卓微信导入的联系人
      * @param file
-     * @param bean
      */
-    void handleWechatUserFile(MultipartFile file, WechatAndroidMessageRequestBean bean);
+    void handleWechatUserFile(MultipartFile file);
 
+
+    /**
+     * 处理安卓群聊微信导入的联系人
+     * @param file
+     */
+    void handleChatroomWechatUserFile(MultipartFile file);
 
 
     /**

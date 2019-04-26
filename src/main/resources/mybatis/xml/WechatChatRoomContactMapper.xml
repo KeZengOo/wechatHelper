@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.WechatChatRoomContactMapper">
+
+    <!-- 删除微信群聊存在的联系 -->
+    <delete id="deleteByChatRoomIdList">
+        DELETE FROM virtual_wechat_chatroom_contact
+        WHERE chatroom_id IN
+        <foreach collection="chatRoomIdList" item="chatRoomId" open="(" close=")" separator=",">
+            #{chatRoomId}
+        </foreach>
+    </delete>
+
+    <!-- 批量插入 -->
+    <insert id="batchInsert">
+        INSERT INTO virtual_wechat_chatroom_contact
+        (chatroom_id, chatroom_name, member_id, member_name,
+        room_owner_id, rom_drug_user_name, drug_user_id,
+        drug_user_name, doctor_id, doctor_name, telephone
+        )
+        VALUES
+        <foreach collection ="list" item="c" separator =",">
+            (#{c.chatroomId}, #{c.chatroomName}, #{c.memberId}, #{c.memberName},
+            #{c.roomOwnerId}, #{c.roomDrugUserName},#{c.drugUserId},
+            #{c.drugUserName}, #{c.doctorId}, #{c.doctorName}, #{telephone}
+            )
+        </foreach>
+    </insert>
+</mapper>

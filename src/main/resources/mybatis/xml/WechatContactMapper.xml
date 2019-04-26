@@ -18,10 +18,10 @@
 
     <insert id="batchInsert">
 
-        INSERT INTO virtual_wechat_contact(drug_user_id, upload_time, user_name,nickname,alias,con_remark, doctor_id, telephone)
+        INSERT INTO virtual_wechat_contact(drug_user_id, user_name,nickname,alias,con_remark, doctor_id, telephone)
         VALUES
         <foreach collection="list" item="c" separator=",">
-            (#{drugUserId},#{uploadTime},#{c.userName},#{c.nickName}, #{c.alias}, #{c.conRemark}, #{c.doctorId}, #{c.telephone})
+            (#{drugUserId},#{c.userName},#{c.nickName}, #{c.alias}, #{c.conRemark}, #{c.doctorId}, #{c.telephone})
         </foreach>
 
     </insert>
@@ -74,6 +74,12 @@
                         LIMIT 1
                     )
             ) AS messageUploadTimeValue
+    </select>
+
+    <!-- 根据微信号获得昵称 -->
+    <select id="getNickNameByUseName" resultType="java.lang.String">
+        SELECT nickname FROM virtual_wechat_contact
+        WHERE user_name=#{userName}
     </select>
 
 </mapper>

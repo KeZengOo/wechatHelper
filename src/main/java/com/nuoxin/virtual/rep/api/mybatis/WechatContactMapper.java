@@ -27,10 +27,9 @@ public interface WechatContactMapper {
     /**
      * 批量插入
      * @param drugUserId
-     * @param uploadTime
      * @param list
      */
-    void batchInsert(@Param(value = "drugUserId") Long drugUserId,@Param(value = "uploadTime") Long uploadTime,
+    void batchInsert(@Param(value = "drugUserId") Long drugUserId,
                      @Param(value = "list") List<WechatAndroidContactRequestBean> list);
 
     /**
@@ -54,4 +53,10 @@ public interface WechatContactMapper {
      */
     WechatAndroidUploadTimeResponseBean getUploadTime(@Param(value = "wechatNumber") String wechatNumber);
 
+    /**
+     * 根据微信号获得昵称
+     * @param userName 微信号
+     * @return
+     */
+    String getNickNameByUseName(@Param(value = "userName") String userName);
 }

@@ -1,6 +1,7 @@
 package com.nuoxin.virtual.rep.api.service.v2_5.impl;
 
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
+import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.common.exception.FileFormatException;
 import com.nuoxin.virtual.rep.api.dao.DoctorRepository;
 import com.nuoxin.virtual.rep.api.dao.DrugUserRepository;
@@ -13,6 +14,7 @@ import com.nuoxin.virtual.rep.api.mybatis.*;
 import com.nuoxin.virtual.rep.api.service.v2_5.WechatService;
 import com.nuoxin.virtual.rep.api.utils.*;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.CallRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.wechat.WechatAndroidChatroomContactRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.wechat.WechatAndroidContactRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.wechat.WechatAndroidMessageRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.wechat.WechatMessageRequestBean;
@@ -56,6 +58,9 @@ public class WechatServiceImpl implements WechatService {
     private WechatContactMapper wechatContactMapper;
 
     @Resource
+    private WechatChatRoomContactMapper wechatChatRoomContactMapper;
+
+    @Resource
     private DrugUserRepository drugUserRepository;
 
     @Resource
@@ -82,7 +87,7 @@ public class WechatServiceImpl implements WechatService {
 
 
     @Override
-    public void handleWechatUserFile(MultipartFile file, WechatAndroidMessageRequestBean bean) {
+    public void handleWechatUserFile(MultipartFile file) {
         Long drugUserId = this.checkWechatUserFile(file);
 
         InputStream inputStream = null;
@@ -97,12 +102,52 @@ public class WechatServiceImpl implements WechatService {
 
         if (CollectionsUtil.isNotEmptyList(contactList)) {
 
-            this.saveOrUpdateContactList(drugUserId, bean.getUploadFileTime(), contactList);
+            this.saveOrUpdateContactList(drugUserId, contactList);
         }
 
         this.reUpdateContact();
 
     }
+
+    @Override
+    public void handleChatroomWechatUserFile(MultipartFile file) {
+
+        Long drugUserId = this.checkWechatUserFile(file);
+        InputStream inputStream = null;
+        try {
+            inputStream = file.getInputStream();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // 格式 chatroomname,memberlist,displayname,roomowner,selfDisplayName
+        List<CSVRecord> chatroomContactStrList = this.handleCsvFile(inputStream, new String[]{"talker", "content", "createTime", "imgPath", "isSend", "type"});
+        List<WechatAndroidChatroomContactRequestBean> chatroomConcatList = this.getWechatChatroomConcatList(drugUserId,chatroomContactStrList);
+        this.saveOrUpdateChatRoomContactList(chatroomConcatList);
+
+
+    }
+
+    /**
+     * 保存群聊的群成员，如果群存在删除掉重新录入
+     * @param chatroomConcatList
+     */
+    private void saveOrUpdateChatRoomContactList(List<WechatAndroidChatroomContactRequestBean> chatroomConcatList) {
+        if (CollectionsUtil.isEmptyList(chatroomConcatList)){
+            return;
+        }
+
+        List<String> chatRoomIdList = chatroomConcatList.stream().map(WechatAndroidChatroomContactRequestBean::getChatroomId).distinct().collect(Collectors.toList());
+        if (CollectionsUtil.isEmptyList(chatRoomIdList)){
+            return;
+        }
+
+        wechatChatRoomContactMapper.deleteByChatRoomIdList(chatRoomIdList);
+        wechatChatRoomContactMapper.batchInsert(chatroomConcatList);
+
+
+    }
+
 
     @Async
     public void reUpdateContact() {
@@ -318,11 +363,6 @@ public class WechatServiceImpl implements WechatService {
         for (WechatMessageRequestBean wechatMessage : wechatMessageList) {
             // 处理emoji表情
             String message = wechatMessage.getMessage();
-//            if (EmojiUtil.containsEmoji(message)){
-//                String s1 = EmojiParser.removeAllEmojis(message);
-//                final String s = EmojiUtil.handleEmojiStr(message);
-//                wechatMessage.setMessage(s);
-//            }
             String s = EmojiParser.removeAllEmojis(message);
             wechatMessage.setMessage(s);
             Integer count = messageMapper.getCountByTypeAndWechatNumAndTime(MessageTypeEnum.WECHAT.getMessageType(), wechatMessage.getWechatNumber(), wechatMessage.getMessageTime());
@@ -411,12 +451,6 @@ public class WechatServiceImpl implements WechatService {
             wechatMessage.setWechatNumber(talker);
             wechatMessage.setTelephone(telephone);
             wechatMessage.setWechatMessageStatus(wechatMessageStatus);
-//            if (EmojiUtil.containsEmoji(content)){
-//                String s = EmojiUtil.handleEmojiStr(content);
-//                wechatMessage.setMessage(s);
-//            }else {
-//                wechatMessage.setMessage(content);
-//            }
 
             String s = EmojiParser.removeAllEmojis(content);
             wechatMessage.setMessage(s);
@@ -444,7 +478,7 @@ public class WechatServiceImpl implements WechatService {
      * @param id
      * @param contactList
      */
-    private void saveOrUpdateContactList(Long id, String uploadTime, List<WechatAndroidContactRequestBean> contactList) {
+    private void saveOrUpdateContactList(Long id, List<WechatAndroidContactRequestBean> contactList) {
         if (CollectionsUtil.isEmptyList(contactList)) {
             return;
         }
@@ -474,10 +508,9 @@ public class WechatServiceImpl implements WechatService {
         }
 
 
-        Date date = DateUtil.stringToDate(uploadTime, DateUtil.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS__SSS);
-        long time = date.getTime();
+
         if (CollectionsUtil.isNotEmptyList(addContactList)) {
-            wechatContactMapper.batchInsert(id, time, addContactList);
+            wechatContactMapper.batchInsert(id, addContactList);
         }
 
 
@@ -488,7 +521,11 @@ public class WechatServiceImpl implements WechatService {
         }
     }
 
-
+    /**
+     * 得到联系人入库数据
+     * @param contactList
+     * @return
+     */
     private List<WechatAndroidContactRequestBean> getWechatContactList(List<CSVRecord> contactList) {
         if (CollectionsUtil.isEmptyList(contactList)) {
             return null;
@@ -518,16 +555,11 @@ public class WechatServiceImpl implements WechatService {
             String conRemark = contactList.get(i).get("conRemark");
             Matcher matcher = RegularUtils.getMatcher(RegularUtils.MATCH_ELEVEN_NUM, conRemark);
             if (!matcher.find()) {
-                // 先去掉异常，因为现在好多医生还没有备注上手机号
-                //throw new FileFormatException(ErrorEnum.ERROR, "微信号为："+ userName + "联系人备注中没有包含手机号");
                 wechatAndroidContact.setDoctorId(0L);
                 wechatAndroidContact.setTelephone("");
             } else {
                 String telephone = matcher.group();
                 Long doctorId = doctorMapper.getDoctorIdByMobile(telephone);
-//                if (doctorId == null || doctorId == 0){
-//                    throw new FileFormatException(ErrorEnum.ERROR, "微信号为："+ userName + "联系人备注中包含的手机号对应医生不存在");
-//                }
                 if (doctorId == null) {
                     doctorId = 0L;
                 }
@@ -544,13 +576,117 @@ public class WechatServiceImpl implements WechatService {
     }
 
     /**
+     * 得到微信群联系人入库数据
+     * @param chatroomContactStrList
+     * @return
+     */
+    private List<WechatAndroidChatroomContactRequestBean> getWechatChatroomConcatList(Long drugUserId, List<CSVRecord> chatroomContactStrList) {
+        if (CollectionsUtil.isEmptyList(chatroomContactStrList)){
+            return null;
+        }
+
+        List<WechatAndroidChatroomContactRequestBean> list = new ArrayList<>();
+
+        DrugUser drugUser = drugUserRepository.findFirstById(drugUserId);
+        for (CSVRecord csvRecord : chatroomContactStrList) {
+            String chatRoomId = csvRecord.get("chatroomname");
+            String chatRoomName = wechatContactMapper.getNickNameByUseName(chatRoomId);
+            String memberIdListStr = csvRecord.get("memberlist");
+            String displayNameListStr = csvRecord.get("displayname");
+            String roomOwnerId = csvRecord.get("roomowner");
+            String selfDisplayName = csvRecord.get("selfDisplayName");
+            
+            // 群成员ID以 ; 分割，名字以 、 分割，两个数量如果不一致给出错误提示
+            String[] memberIdList = this.checkMemberIdListStr(memberIdListStr);
+            String[] displayNameList = this.checkDisplayNameListStr(displayNameListStr);
+            if (memberIdList.length !=displayNameList.length){
+                throw new BusinessException(ErrorEnum.ERROR, "群成员备注中不能包含符号、");
+            }
+
+            for (int i = 0; i < memberIdList.length; i++) {
+                String memberId = memberIdList[i];
+                String displayName = displayNameList[i];
+                WechatAndroidChatroomContactRequestBean chatRoomConcat = new WechatAndroidChatroomContactRequestBean();
+                chatRoomConcat.setChatroomId(chatRoomId);
+                chatRoomConcat.setChatroomName(chatRoomName);
+                chatRoomConcat.setMemberId(memberId);
+                chatRoomConcat.setMemberName(displayName);
+                chatRoomConcat.setRoomOwnerId(roomOwnerId);
+                chatRoomConcat.setRoomDrugUserName(selfDisplayName);
+                chatRoomConcat.setDrugUserId(drugUserId);
+                chatRoomConcat.setDrugUserName(drugUser.getName());
+                Long doctorId = 0L;
+                String doctorName = "";
+                String telephone = "";
+                Matcher matcher = RegularUtils.getMatcher(RegularUtils.MATCH_ELEVEN_NUM, displayName);
+                if (matcher.find()) {
+                    telephone = matcher.group();
+                    Doctor doctor = doctorMapper.findTopByMobile(telephone);
+                    if (doctor != null) {
+                        doctorId = doctor.getId();
+                        doctorName = doctor.getName();
+                    }
+                }
+                chatRoomConcat.setDoctorId(doctorId);
+                chatRoomConcat.setDoctorName(doctorName);
+                chatRoomConcat.setTelephone(telephone);
+
+                list.add(chatRoomConcat);
+            }
+        }
+
+        return list;
+
+    }
+
+
+    /**
+     * 检查群成员ID字段，返回全成员ID数组
+     * @param memberIdListStr
+     * @return
+     */
+    private String[] checkMemberIdListStr(String memberIdListStr) {
+        if (StringUtil.isEmpty(memberIdListStr)){
+            throw new BusinessException(ErrorEnum.ERROR, "群成员ID字段不能为空！");
+        }
+
+        String[] memberIdList = memberIdListStr.split(";");
+        if (CollectionsUtil.isEmptyArray(memberIdList)){
+            throw new BusinessException(ErrorEnum.ERROR, "群成员ID不能为空！");
+        }
+
+        return memberIdList;
+
+    }
+
+
+    /**
+     * 检查群成员ID字段，返回全成员ID数组
+     * @param displayNameListStr
+     * @return
+     */
+    private String[] checkDisplayNameListStr(String displayNameListStr) {
+        if (StringUtil.isEmpty(displayNameListStr)){
+            throw new BusinessException(ErrorEnum.ERROR, "群成员名字段不能为空！");
+        }
+
+        String[] displayNameList = displayNameListStr.split("、");
+        if (CollectionsUtil.isEmptyArray(displayNameList)){
+            throw new BusinessException(ErrorEnum.ERROR, "群成员名不能为空！");
+        }
+
+        return displayNameList;
+
+    }
+
+
+    /**
      * 检查文件
      *
      * @param file
      * @return 成功返回代表ID
      */
     private Long checkWechatUserFile(MultipartFile file) {
-
 
         String originalFilename = file.getOriginalFilename();
         if (StringUtil.isEmpty(originalFilename)) {
@@ -566,7 +702,7 @@ public class WechatServiceImpl implements WechatService {
             throw new FileFormatException(ErrorEnum.ERROR, "文件名称不能为空");
         }
 
-        String[] splitStr = fileName.split("_");
+        String[] splitStr = fileName.split("Ξ");
         if (CollectionsUtil.isEmptyArray(splitStr)) {
             throw new FileFormatException(ErrorEnum.ERROR, "不合法的文件命名，必须包含代表微信号");
         }

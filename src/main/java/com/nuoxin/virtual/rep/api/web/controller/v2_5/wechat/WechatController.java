@@ -36,18 +36,22 @@ public class WechatController extends NewBaseController {
     @ApiOperation(value = "安卓手机微信联系人导入接口", notes = "安卓手机微信联系人导入接口")
     @PostMapping("/contact/import")
     @ResponseBody
-    public DefaultResponseBean<Boolean> importWechatUserFile(HttpServletRequest request, MultipartFile file){
+    public DefaultResponseBean<Boolean> importWechatUserFile(MultipartFile file){
 
-        String uploadTime = request.getParameter("uploadTime");
-        if (StringUtil.isEmpty(uploadTime)){
-            throw new FileFormatException(ErrorEnum.ERROR, "上传时间uploadTime不能为空");
-        }
+        wechatService.handleWechatUserFile(file);
 
+        DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(true);
 
-        WechatAndroidMessageRequestBean bean = new WechatAndroidMessageRequestBean();
-        bean.setUploadFileTime(uploadTime);
-        wechatService.handleWechatUserFile(file,bean);
+        return responseBean;
+    }
 
+    @ApiOperation(value = "安卓手机微信群聊联系人导入接口", notes = "安卓手机微信群聊联系人导入接口")
+    @PostMapping("/chatroom/contact/import")
+    @ResponseBody
+    public DefaultResponseBean<Boolean> handleChatroomWechatUserFile(MultipartFile file){
+
+        wechatService.handleChatroomWechatUserFile(file);
         DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
         responseBean.setData(true);
 
