@@ -14,12 +14,10 @@ import com.nuoxin.virtual.rep.api.mybatis.*;
 import com.nuoxin.virtual.rep.api.service.v2_5.WechatService;
 import com.nuoxin.virtual.rep.api.utils.*;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.CallRequestBean;
-import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.wechat.WechatAndroidChatroomContactRequestBean;
-import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.wechat.WechatAndroidContactRequestBean;
-import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.wechat.WechatAndroidMessageRequestBean;
-import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.wechat.WechatMessageRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.wechat.*;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.wechat.WechatAndroidContactResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.wechat.WechatAndroidUploadTimeResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.wechat.WechatChatRoomMemberResponseBean;
 import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 import com.vdurmont.emoji.EmojiParser;
 import org.apache.commons.csv.CSVRecord;
@@ -38,6 +36,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -78,6 +77,9 @@ public class WechatServiceImpl implements WechatService {
 
     @Resource
     private VirtualDoctorCallInfoMapper virtualDoctorCallInfoMapper;
+
+    @Resource
+    private VirtualMessageChatRoomMapper virtualMessageChatRoomMapper;
 
     /**
      * 每次批量插入的数量
@@ -128,6 +130,55 @@ public class WechatServiceImpl implements WechatService {
 
     }
 
+
+    @Override
+    public void handleWechatMessageFile(MultipartFile file, WechatAndroidMessageRequestBean bean) {
+
+        Long drugUserId = this.checkWechatUserFile(file);
+        InputStream inputStream = null;
+        try {
+            inputStream = file.getInputStream();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // 格式 talker,content,createTime,imgPath,isSend,type
+        List<CSVRecord> messageStrList = this.handleCsvFile(inputStream, new String[]{"talker", "content", "createTime", "imgPath", "isSend", "type"});
+
+        // 提取出群聊的消息
+        if (CollectionsUtil.isNotEmptyList(messageStrList)){
+            List<CSVRecord> chatRoomMessage = messageStrList.stream().filter(c -> c.get("talker").contains("@chatroom")).collect(Collectors.toList());
+            if (CollectionsUtil.isNotEmptyList(chatRoomMessage)){
+                // 根据文件得到微信号
+                String drugUserWechat = this.getWechatNumberByFile(file);
+                List<WechatChatRoomMessageRequestBean> wechatChatRoomMessageList = this.getWechatChatRoomMessageList(drugUserId, drugUserWechat, chatRoomMessage);
+                if (CollectionsUtil.isNotEmptyList(wechatChatRoomMessageList)){
+                    virtualMessageChatRoomMapper.batchInsert(wechatChatRoomMessageList);
+                }
+            }
+        }
+
+        List<WechatMessageRequestBean> wechatMessageList = this.getWechatMessageList(drugUserId, bean.getUploadFileTime(), messageStrList);
+        this.saveOrUpdateWechatMessageList(wechatMessageList);
+
+
+        this.reUpdateMessage();
+    }
+
+    /**
+     * 从名字中获得微信号
+     * @param file
+     * @return
+     */
+    private String getWechatNumberByFile(MultipartFile file) {
+
+        String originalFilename = file.getOriginalFilename();
+        String fileName = originalFilename.substring(0, originalFilename.lastIndexOf("."));
+        String wechat = fileName.split("Ξ")[0];
+        return wechat;
+    }
+
+
     /**
      * 保存群聊的群成员，如果群存在删除掉重新录入
      * @param chatroomConcatList
@@ -159,25 +210,87 @@ public class WechatServiceImpl implements WechatService {
         }
     }
 
-    @Override
-    public void handleWechatMessageFile(MultipartFile file, WechatAndroidMessageRequestBean bean) {
 
-        Long drugUserId = this.checkWechatUserFile(file);
-        InputStream inputStream = null;
-        try {
-            inputStream = file.getInputStream();
-        } catch (IOException e) {
-            e.printStackTrace();
+
+    /**
+     * 处理微信群聊消息入库
+     * @param drugUserId
+     * @param drugUserWechat
+     * @param chatRoomMessageList
+     * @return
+     */
+    private List<WechatChatRoomMessageRequestBean> getWechatChatRoomMessageList(Long drugUserId,String drugUserWechat, List<CSVRecord> chatRoomMessageList) {
+        if (CollectionsUtil.isEmptyList(chatRoomMessageList)){
+            return null;
+        }
+        // "talker", "content", "createTime", "imgPath", "isSend", "type"
+        List<WechatChatRoomMessageRequestBean> list = new ArrayList<>();
+        for (CSVRecord csvRecord : chatRoomMessageList) {
+            String chatRoomId = csvRecord.get("talker");
+            String content = csvRecord.get("content");
+            String createTime = csvRecord.get("createTime");
+            String imgPath = csvRecord.get("imgPath");
+            String isSend = csvRecord.get("isSend");
+            String type = csvRecord.get("type");
+
+            String memberId = "";
+            String memberName = "";
+            String wechatMessageStatus = "";
+            String wechatMessage = "";
+
+            if (StringUtil.isEmpty(content)){
+                continue;
+            }
+
+            List<WechatChatRoomMemberResponseBean> wechatChatRoomMemberList = wechatChatRoomContactMapper.getWechatChatRoomMemberList(chatRoomId);
+
+            if (StringUtil.isNotEmpty(isSend) && "1".equals(isSend)){
+                wechatMessageStatus = "发送";
+                DrugUser drugUser = drugUserRepository.findFirstById(drugUserId);
+                memberName = drugUser.getName();
+                memberId = drugUserWechat;
+                wechatMessage = content;
+            }
+
+            if (StringUtil.isNotEmpty(isSend) && "0".equals(isSend)){
+                wechatMessageStatus = "接收";
+                if (CollectionsUtil.isNotEmptyList(wechatChatRoomMemberList)){
+                    final String memberIdStr = content.split(":")[0];
+                    memberId = content.split(":")[0];
+                    Optional<String> first = wechatChatRoomMemberList.stream().filter(w -> w.getMemberId().equals(memberIdStr)).map(WechatChatRoomMemberResponseBean::getMemberName).findFirst();
+                    if (first.isPresent()){
+                        memberName = first.get();
+                    }
+                }
+
+                wechatMessage = content.substring(content.indexOf(":") +1);
+            }
+
+
+
+            Integer messageCount = virtualMessageChatRoomMapper.getMessageCount(chatRoomId, memberId, wechatMessage, createTime);
+            if (messageCount !=null && messageCount > 0){
+                continue;
+            }
+
+            WechatChatRoomMessageRequestBean wechatChatRoomMessageRequestBean = new WechatChatRoomMessageRequestBean();
+            wechatChatRoomMessageRequestBean.setChatRoomId(chatRoomId);
+            wechatChatRoomMessageRequestBean.setDrugUserId(drugUserId);
+            wechatChatRoomMessageRequestBean.setMemberId(memberId);
+            wechatChatRoomMessageRequestBean.setMemberName(memberName);
+            wechatChatRoomMessageRequestBean.setWechatMessageStatus(wechatMessageStatus);
+            wechatChatRoomMessageRequestBean.setWechatMessageType(type);
+            wechatChatRoomMessageRequestBean.setWechatMessage(wechatMessage);
+            wechatChatRoomMessageRequestBean.setFilePath(imgPath);
+
+            Date sd = DateUtil.stringToDate(createTime, DateUtil.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS__SSS);
+            String dateTimeString = DateUtil.getDateTimeString(sd);
+            wechatChatRoomMessageRequestBean.setMessageTime(dateTimeString);
+            list.add(wechatChatRoomMessageRequestBean);
         }
 
-        // 格式 talker,content,createTime,imgPath,isSend,type
-        List<CSVRecord> contactStrList = this.handleCsvFile(inputStream, new String[]{"talker", "content", "createTime", "imgPath", "isSend", "type"});
+        return list;
 
-        List<WechatMessageRequestBean> wechatMessageList = this.getWechatMessageList(drugUserId, bean.getUploadFileTime(), contactStrList);
-        this.saveOrUpdateWechatMessageList(wechatMessageList);
-
-
-        this.reUpdateMessage();
     }
 
     @Async
@@ -376,8 +489,8 @@ public class WechatServiceImpl implements WechatService {
         return list;
     }
 
-    private List<WechatMessageRequestBean> getWechatMessageList(Long drugUserId, String uploadTime, List<CSVRecord> contactList) {
-        if (CollectionsUtil.isEmptyList(contactList)) {
+    private List<WechatMessageRequestBean> getWechatMessageList(Long drugUserId, String uploadTime, List<CSVRecord> messageStrList) {
+        if (CollectionsUtil.isEmptyList(messageStrList)) {
             return null;
         }
 
@@ -391,19 +504,19 @@ public class WechatServiceImpl implements WechatService {
 
         DrugUser drugUser = drugUserRepository.findFirstById(drugUserId);
 
-        for (int i = 0; i < contactList.size(); i++) {
+        for (int i = 0; i < messageStrList.size(); i++) {
             if (i == 0) {
                 continue;// 标题过滤
             }
 
             // 格式：talker,content,createTime,imgPath,isSend,type
 
-            String talker = contactList.get(i).get("talker");
-            String content = contactList.get(i).get("content");
-            String createTime = contactList.get(i).get("createTime");
-            String imgPath = contactList.get(i).get("imgPath");
-            String isSend = contactList.get(i).get("isSend");
-            String type = contactList.get(i).get("type");
+            String talker = messageStrList.get(i).get("talker");
+            String content = messageStrList.get(i).get("content");
+            String createTime = messageStrList.get(i).get("createTime");
+            String imgPath = messageStrList.get(i).get("imgPath");
+            String isSend = messageStrList.get(i).get("isSend");
+            String type = messageStrList.get(i).get("type");
 
             Long userId = 0L;
             Integer userType = 0;

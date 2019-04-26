@@ -4,6 +4,7 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.wechat.WechatAndro
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.wechat.WechatAndroidContactRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.wechat.WechatAndroidContactResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.wechat.WechatAndroidUploadTimeResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.wechat.WechatChatRoomMemberResponseBean;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -28,5 +29,12 @@ public interface WechatChatRoomContactMapper {
      * @param list
      */
     void batchInsert(List<WechatAndroidChatroomContactRequestBean> list);
+
+    /**
+     * 得到微信群成员
+     * @param chatRoomId
+     * @return
+     */
+    List<WechatChatRoomMemberResponseBean> getWechatChatRoomMemberList(@Param(value = "chatRoomId") String chatRoomId);
 
 }

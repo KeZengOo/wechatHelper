@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.VirtualMessageChatRoomMapper">
+
+    <!-- 查询总数，判断是否存在 -->
+    <select id="getMessageCount" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM virtual_message_chatroom
+        WHERE chatroom_id=#{chatRoomId}
+        AND member_id=#{memberId}
+        AND wechat_message=#{wechatMessage}
+        AND DATE_FORMAT(message_time, '%Y-%m-%d %Y:%i:%s')=DATE_FORMAT(#{messageTime}, '%Y-%m-%d %Y:%i:%s')
+    </select>
+
+    <!-- 批量插入群聊消息 -->
+    <insert id="batchInsert">
+        INSERT INTO virtual_message_chatroom
+        (
+        chatroom_id,
+        doctor_id,
+        drug_user_id,
+        member_id,
+        member_name,
+        telephone,
+        wechat_message_status,
+        wechat_message_type,
+        wechat_message,
+        file_path,
+        message_time
+        )
+        VALUES
+        <foreach collection ="list" item="c" separator =",">
+            (
+            #{c.chatRoomId},
+            #{c.doctorId},
+            #{c.drugUserId},
+            #{c.memberId},
+            #{c.memberName},
+            #{c.telephone},
+            #{c.wechatMessageStatus},
+            #{c.wechatMessageType},
+            #{c.wechatMessage},
+            #{c.filePath},
+            #{c.messageTime}
+            )
+        </foreach>
+    </insert>
+
+</mapper>

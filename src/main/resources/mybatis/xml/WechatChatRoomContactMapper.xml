@@ -26,4 +26,13 @@
             )
         </foreach>
     </insert>
+
+
+    <!-- 得到微信群成员 -->
+    <select id="getWechatChatRoomMemberList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.wechat.WechatChatRoomMemberResponseBean">
+        SELECT member_id memberId,
+        IF(doctor_name IS NOT NULL AND doctor_name !='', doctor_name, member_name) memberName
+        FROM virtual_wechat_chatroom_contact
+        WHERE chatroom_id=#{chatRoomId}
+    </select>
 </mapper>
