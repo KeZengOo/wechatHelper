@@ -22,7 +22,7 @@
         <foreach collection ="list" item="c" separator =",">
             (#{c.chatroomId}, #{c.chatroomName}, #{c.memberId}, #{c.memberName},
             #{c.roomOwnerId}, #{c.roomDrugUserName},#{c.drugUserId},
-            #{c.drugUserName}, #{c.doctorId}, #{c.doctorName}, #{telephone}
+            #{c.drugUserName}, #{c.doctorId}, #{c.doctorName}, #{c.telephone}
             )
         </foreach>
     </insert>

@@ -121,7 +121,7 @@ public class WechatServiceImpl implements WechatService {
         }
 
         // 格式 chatroomname,memberlist,displayname,roomowner,selfDisplayName
-        List<CSVRecord> chatroomContactStrList = this.handleCsvFile(inputStream, new String[]{"talker", "content", "createTime", "imgPath", "isSend", "type"});
+        List<CSVRecord> chatroomContactStrList = this.handleCsvFile(inputStream, new String[]{"chatroomname", "memberlist", "displayname", "roomowner", "selfDisplayName"});
         List<WechatAndroidChatroomContactRequestBean> chatroomConcatList = this.getWechatChatroomConcatList(drugUserId,chatroomContactStrList);
         this.saveOrUpdateChatRoomContactList(chatroomConcatList);
 
@@ -731,6 +731,13 @@ public class WechatServiceImpl implements WechatService {
         }
 
         List<CSVRecord> records = CSVUtils.readCSV(inputStream, headers);
+
+        // 第一行是标题，要去掉
+        if (CollectionsUtil.isNotEmptyList(records)){
+            records.remove(0);
+        }
+
+
         return records;
     }
 
