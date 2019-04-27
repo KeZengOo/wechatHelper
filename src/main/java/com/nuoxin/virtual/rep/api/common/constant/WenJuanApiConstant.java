@@ -23,6 +23,21 @@ public interface WenJuanApiConstant {
     String LOGIN = "login/";
 
     /**
+     * 查看第几页
+     */
+    String WJ_PAGE = "wj_page";
+
+    /**
+     *每页包含多少条目
+     */
+    String WJ_PAGESIZE = "wj_pagesize";
+
+    /**
+     *每页包含多少条目
+     */
+    int WJ_PAGESIZE_VALUE = 50;
+
+    /**
      * 获取项目列表接口
      */
     String GET_PROJ_LIST = "get_proj_list/";
