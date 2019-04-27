@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.WenJuanQuestionnaireMapper">
+
+    <insert id="saveWenJuanProject">
+        INSERT INTO wj_project (
+            `user`,
+            `short_id`,
+            `project_id`,
+            `title`,
+            `status`,
+            `create_time`,
+            `update_time`,
+            `respondent_count`,
+            `ptype`
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.user},#{item.shortId},#{item.projectId},#{item.title},#{item.status},#{item.createTime},#{item.updateTime},#{item.respondentCount},#{item.ptype})
+        </foreach>
+
+    </insert>
+
+    <!-- 获取库中所有项目的短id -->
+    <select id="shortIdList" resultType="java.lang.String">
+        SELECT t.short_id FROM wj_project t
+    </select>
+</mapper>
