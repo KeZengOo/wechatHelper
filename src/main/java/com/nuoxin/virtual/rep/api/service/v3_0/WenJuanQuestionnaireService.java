@@ -1,5 +1,7 @@
 package com.nuoxin.virtual.rep.api.service.v3_0;
 
+import com.nuoxin.virtual.rep.api.entity.v3_0.ScheduleResult;
+
 /**
  * 问卷网
  * @author wujiang
@@ -8,9 +10,14 @@ package com.nuoxin.virtual.rep.api.service.v3_0;
 public interface WenJuanQuestionnaireService {
 
     /**
+     * 问卷网登录接口
+     * @return String
+     */
+    String wenJuanLogin();
+
+    /**
      * 保存项目列表
-     * @param projectResult
      * @return
      */
-    boolean saveWenJuanProject(String projectResult);
+    ScheduleResult saveWenJuanProject();
 }
