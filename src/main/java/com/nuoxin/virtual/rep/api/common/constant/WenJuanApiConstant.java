@@ -28,6 +28,16 @@ public interface WenJuanApiConstant {
     String GET_PROJ_LIST = "get_proj_list/";
 
     /**
+     * 数据类型
+     */
+    String WJ_DATATYPE = "wj_datatype";
+
+    /**
+     * 数据类型 json
+     */
+    String WJ_DATATYPE_JSON = "json";
+
+    /**
      * wj_appkey
      */
     String WJ_APPKEY = "wj_appkey";
