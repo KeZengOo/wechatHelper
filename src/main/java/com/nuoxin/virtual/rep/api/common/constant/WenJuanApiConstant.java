@@ -23,6 +23,21 @@ public interface WenJuanApiConstant {
     String LOGIN = "login/";
 
     /**
+     * 获取项目列表接口
+     */
+    String GET_PROJ_LIST = "get_proj_list/";
+
+    /**
+     * 获取答卷列表接口
+     */
+    String GET_RSPD_DETAIL_LIST = "get_rspd_detail_list/";
+
+    /**
+     * 查看答题者最新一条答卷详情接口
+     */
+    String GET_RSPD_DETAIL = "get_rspd_detail/";
+
+    /**
      * 查看第几页
      */
     String WJ_PAGE = "wj_page";
@@ -38,9 +53,9 @@ public interface WenJuanApiConstant {
     int WJ_PAGESIZE_VALUE = 50;
 
     /**
-     * 获取项目列表接口
+     *  第N题循环数
      */
-    String GET_PROJ_LIST = "get_proj_list/";
+    int Q_VALUE = 1000;
 
     /**
      * 数据类型
@@ -53,6 +68,11 @@ public interface WenJuanApiConstant {
     String WJ_DATATYPE_JSON = "json";
 
     /**
+     * 答题者标识，由第三方开发者提供，查看数据详情时，对应source(来源)字段
+     */
+    String WJ_RESPONDENT = "wj_respondent";
+
+    /**
      * wj_appkey
      */
     String WJ_APPKEY = "wj_appkey";
@@ -63,9 +83,14 @@ public interface WenJuanApiConstant {
     String WJ_APPKEY_VALUE = "wjrk1gycdidtoip31u";
 
     /**
-     * wj_user
+     * wj_user 用户code
      */
     String WJ_USER = "wj_user";
+
+    /**
+     * wj_short_id 项目短id
+     */
+    String WJ_SHORT_ID = "wj_short_id";
 
     /**
      * wj_user_value

@@ -1,5 +1,6 @@
 package com.nuoxin.virtual.rep.api.entity.v3_0;
 
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -8,6 +9,7 @@ import lombok.Data;
  * @author wujiang
  * @date 20190426
  */
+@ApiModel("问卷网-项目表")
 @Data
 public class WenJuanProject {
 

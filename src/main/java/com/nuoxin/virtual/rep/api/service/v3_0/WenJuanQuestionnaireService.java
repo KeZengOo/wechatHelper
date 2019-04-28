@@ -17,7 +17,19 @@ public interface WenJuanQuestionnaireService {
 
     /**
      * 保存项目列表
-     * @return
+     * @return ScheduleResult
      */
     ScheduleResult saveWenJuanProject();
+
+    /**
+     * 获取答卷详情列表
+     * @return ScheduleResult
+     */
+    ScheduleResult saveWenJuanAnswerSheetInfo();
+
+    /**
+     * 获取答题者最新一条答卷详情
+     * @return ScheduleResult
+     */
+    ScheduleResult saveWenJuanNewAnswerSheetInfo();
 }

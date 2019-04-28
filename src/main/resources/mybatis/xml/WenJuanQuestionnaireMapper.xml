@@ -25,4 +25,78 @@
     <select id="shortIdList" resultType="java.lang.String">
         SELECT t.short_id FROM wj_project t
     </select>
+
+    <!-- 查询项目列表 -->
+    <select id="projectList" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.WenJuanProjectUserAndShortId">
+    SELECT
+        t.`user`,
+        t.`short_id` AS shortId
+    FROM
+        wj_project t
+    </select>
+
+    <!-- 保存问卷网-答卷详情列表 -->
+    <insert id="saveAnswerSheet">
+        INSERT INTO wj_answer_sheet (
+        `rspd_status`,
+        `weixin_addr`,
+        `weixin_sex`,
+        `weixin_nickname`,
+        `score`,
+        `seq`,
+        `source`,
+        `time_used`,
+        `ip`,
+        `finish`,
+        `start`,
+        `create_time`,
+        `short_id`,
+        `user`
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.rspdStatus},#{item.weixinAddr},#{item.weixinSex},#{item.weixinNickname},#{item.score},
+            #{item.seq},#{item.source},#{item.timeUsed},#{item.ip},#{item.finish},#{item.start},NOW(),#{item.shortId},#{item.user})
+        </foreach>
+    </insert>
+
+    <!-- 保存问卷网-答卷详情列表 -->
+    <insert id="saveAnswer">
+        INSERT INTO wj_answer (
+        `answer`,
+        `type_desc`,
+        `title`,
+        `seq`,
+        `create_time`,
+        `short_id`,
+        `user`,
+        `q_top`
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.answer},#{item.typeDesc},#{item.title},#{item.seq},NOW(),
+            #{item.shortId},#{item.user},#{item.qTop})
+        </foreach>
+    </insert>
+
+    <!-- 查询问卷网-答卷详情列表 -->
+    <select id="getAnswerSheetList" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.WenJuanAnswerSheet">
+        SELECT
+            t.`rspd_status` AS rspdStatus,
+            t.`weixin_addr` AS weixinAddr,
+            t.`weixin_sex` AS weixinSex,
+            t.`weixin_nickname` AS weixinNickname,
+            t.`score`,
+            t.`seq`,
+            t.`source`,
+            t.`time_used` AS timeUsed,
+            t.`ip`,
+            t.`finish`,
+            t.`start`,
+            t.`short_id` AS shortId,
+            t.`user`
+        FROM
+            wj_answer_sheet t
+    </select>
+
 </mapper>

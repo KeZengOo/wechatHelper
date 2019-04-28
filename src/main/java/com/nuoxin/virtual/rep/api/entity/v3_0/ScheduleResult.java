@@ -14,4 +14,10 @@ import lombok.Data;
 public class ScheduleResult {
     @ApiModelProperty(value = "插入返回值")
     private boolean result;
+
+    @ApiModelProperty(value = "插入答卷详情列表返回值")
+    private boolean answerSheetResult;
+
+    @ApiModelProperty(value = "插入答卷答案表返回值")
+    private boolean answerResult;
 }
