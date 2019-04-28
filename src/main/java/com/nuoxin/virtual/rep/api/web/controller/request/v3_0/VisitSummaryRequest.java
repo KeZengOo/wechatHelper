@@ -14,13 +14,7 @@ import java.util.List;
  */
 @Data
 @ApiModel(value = "拜访数据汇总请求参数")
-public class VisitSummaryRequest implements Serializable {
+public class VisitSummaryRequest extends CommonRequest implements Serializable {
     private static final long serialVersionUID = -2644359249400599116L;
-
-    @ApiModelProperty(value = "产品ID")
-    private Long productId;
-
-    @ApiModelProperty(value = "代表拜访ID列表")
-    private List<Long> drugUserIdList;
 
 }

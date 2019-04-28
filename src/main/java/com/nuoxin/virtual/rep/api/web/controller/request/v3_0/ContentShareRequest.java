@@ -14,14 +14,8 @@ import java.util.List;
  */
 @ApiModel(value = "内容请求参数")
 @Data
-public class ContentShareRequest implements Serializable {
+public class ContentShareRequest extends CommonRequest implements Serializable {
     private static final long serialVersionUID = -3491283969415738407L;
-
-    @ApiModelProperty(value = "产品ID")
-    private Long productId;
-
-    @ApiModelProperty(value = "代表ID列表")
-    private List<Long> drugUserIdList;
 
     @ApiModelProperty(value = "分享方式：1 微信，2短信，3邮件")
     private Integer shareType;

@@ -23,4 +23,5 @@ public class VisitRequest extends DoctorBaseRequest implements Serializable {
     private String visitEndTime;
 
 
+
 }
