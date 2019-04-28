@@ -536,6 +536,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 			callVisitParams.setIsHasDrug(saveCallInfoRequest.getIsHasDrug()); // 是否有药
 			callVisitParams.setIsTarget(saveCallInfoRequest.getIsTarget()); // 是否目标
 			callVisitParams.setHcpPotential(saveCallInfoRequest.getHcpPotential()); // 潜力
+			callVisitParams.setIsCover(saveCallInfoRequest.getIsCover());
 
 			Integer recruit = saveCallInfoRequest.getIsRecruit();
 			if (RecruitEnum.SUCCESS_RECRUIT.getType().equals(recruit)){

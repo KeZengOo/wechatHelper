@@ -13,11 +13,12 @@
 		INSERT INTO virtual_doctor_call_info_mend
 		(virtual_drug_user_id, virtual_doctor_id, doctor_questionnaire_id, product_id,
 		 next_visit_time, visit_result, call_id, attitude, create_time, 
-		 hcp_potential, is_break_off, is_has_ae, is_target,is_has_drug, is_recruit, recruit_time, drop_out_time)
+		 hcp_potential, is_break_off, is_has_ae, is_target,is_has_drug, is_recruit, is_cover, recruit_time, drop_out_time)
 		VALUES
 		(#{virtualDrugUserId}, #{virtualDoctorId}, #{doctorQuestionnaireId}, #{productId},
 		#{nextVisitTime}, #{visitResult}, #{callId}, #{attitude}, NOW(),
 		#{hcpPotential},#{isBreakOff},#{isHasAe},#{isTarget},#{isHasDrug}, #{isRecruit},
+		#{isCover},
 		#{recruitTime},
 		#{dropOutTime}
 		)
