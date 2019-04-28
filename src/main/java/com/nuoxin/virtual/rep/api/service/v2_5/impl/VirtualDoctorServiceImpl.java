@@ -256,7 +256,8 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
     public void updateVirtualDoctor(UpdateVirtualDoctorRequest request, DrugUser user) {
         Long roleId = user.getRoleId();
         this.checkUpdateVirtualDoctorParam(request, roleId);
-        if (RoleTypeEnum.MANAGER.getType().equals(roleId)) {
+        // TODO @田存 修改角色
+        if (RoleTypeEnum.MANAGER.getType().equals(roleId) || RoleTypeEnum.PROJECT_MANAGER.getType().equals(roleId)) {
             Integer isAddWechat = request.getIsAddWechat();
             if (isAddWechat != null) {
                 throw new BusinessException(ErrorEnum.ERROR, "管理员不能修改是否添加微信字段！");
@@ -445,6 +446,7 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
                 }else {
                     // 线下代表新增的医生如果没有手机号就造一个
                     String fTelephone = StringUtil.getUuidRemoveLine();
+                    fTelephone = "f_" + fTelephone;
                     telephones = new ArrayList<>();
                     telephones.add(fTelephone);
                 }

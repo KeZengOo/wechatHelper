@@ -253,7 +253,8 @@ public class StatisticalController extends NewBaseController {
 			return super.getParamsErrorResponse("ProductId is null");
 		}
 		List<StatisticsResponse> data = new ArrayList<>();
-		if (RoleTypeEnum.MANAGER.getType().equals(user.getRoleId())){
+		if (RoleTypeEnum.MANAGER.getType().equals(user.getRoleId())
+				|| RoleTypeEnum.PROJECT_MANAGER.getType().equals(user.getRoleId())){
 			List<StatisticsResponse> list =drugUserDoctorMapper.getDrugUserIdByProductId(productId,user.getLeaderPath());
 			if (CollectionsUtil.isNotEmptyList(list)){
 				data = list;

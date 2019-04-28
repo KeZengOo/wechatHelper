@@ -157,7 +157,10 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 
 		Long roleId = drugUser.getRoleId();
 		Long drugUserId = drugUser.getId();
-		if (RoleTypeEnum.SALE.getType().equals(roleId)){
+		// TODO @田存 角色修改
+		if (RoleTypeEnum.SALE.getType().equals(roleId)
+				|| RoleTypeEnum.RECRUIT_SALE.getType().equals(roleId)
+				|| RoleTypeEnum.COVER_SALE.getType().equals(roleId)){
 			List<Long> idList = new ArrayList<>(1);
 			idList.add(drugUserId);
 			List<ProductResponseBean> productList = productLineMapper.getListByDrugUserId(idList);
@@ -166,7 +169,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 			}
 		}
 
-		if (RoleTypeEnum.MANAGER.getType().equals(roleId)){
+		if (RoleTypeEnum.MANAGER.getType().equals(roleId) || RoleTypeEnum.PROJECT_MANAGER.getType().equals(roleId)){
 			List<Long> drugUserIdList = drugUserMapper.getSubordinateIdsByLeaderPath(drugUser.getLeaderPath());
 			if (CollectionsUtil.isNotEmptyList(drugUserIdList)){
 				List<ProductResponseBean> productList = productLineMapper.getListByDrugUserId(drugUserIdList);
@@ -536,6 +539,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 			callVisitParams.setIsHasDrug(saveCallInfoRequest.getIsHasDrug()); // 是否有药
 			callVisitParams.setIsTarget(saveCallInfoRequest.getIsTarget()); // 是否目标
 			callVisitParams.setHcpPotential(saveCallInfoRequest.getHcpPotential()); // 潜力
+			callVisitParams.setIsCover(saveCallInfoRequest.getIsCover());
 
 			Integer recruit = saveCallInfoRequest.getIsRecruit();
 			if (RecruitEnum.SUCCESS_RECRUIT.getType().equals(recruit)){

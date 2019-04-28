@@ -37,6 +37,9 @@ public class VirtualDoctorCallInfoParams{
 	private Integer isHasAe;
 	@ApiModelProperty(value = "是否有 招募 1.是,0.非,-1未知")
 	private Integer isRecruit;
+
+	@ApiModelProperty(value = "是否覆盖，0是未开始，1是覆盖中，2是退出项目")
+	private Integer isCover;
 	@ApiModelProperty(value = "是否脱落1.是,0.非,-1未知")
 	private Integer isBreakOff;
 

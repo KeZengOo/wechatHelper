@@ -8,7 +8,11 @@ package com.nuoxin.virtual.rep.api.enums;
 public enum RoleTypeEnum {
 
     MANAGER(102L, "管理员"),
-    SALE(101L,"普通销售");
+    SALE(101L,"普通销售"),
+    PROJECT_MANAGER(103L, "项目管理员"),
+    RECRUIT_SALE(104L, "招募代表"),
+    COVER_SALE(105L, "覆盖代表");
+
 
 
     private Long type;
