@@ -2,6 +2,7 @@ package com.nuoxin.virtual.rep.api.service;
 
 import com.nuoxin.virtual.rep.api.dao.RoleUserRepository;
 import com.nuoxin.virtual.rep.api.entity.RoleUser;
+import com.nuoxin.virtual.rep.api.enums.RoleTypeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +26,11 @@ public class RoleUserService {
         List<RoleUser> list = roleUserRepository.findByUserId(drugUserId);
         if(list!=null && !list.isEmpty()){
             for (RoleUser roleUser:list) {
-                if(roleUser.getRoleId()==101 || roleUser.getRoleId()==102){
+                if(RoleTypeEnum.SALE.getType().equals(roleUser.getRoleId())
+                        || RoleTypeEnum.MANAGER.getType().equals(roleUser.getRoleId())
+                        || RoleTypeEnum.PROJECT_MANAGER.getType().equals(roleUser.getRoleId())
+                        || RoleTypeEnum.RECRUIT_SALE.getType().equals(roleUser.getRoleId())
+                        || RoleTypeEnum.COVER_SALE.getType().equals(roleUser.getRoleId())){
                     return roleUser.getRoleId();
                 }
             }

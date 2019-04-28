@@ -80,7 +80,8 @@ public class StatisticalServiceImpl implements StatisticalService {
     private void fillDrugUserIdList(StatisticsParams statisticsParams) {
         Long drugUserId = statisticsParams.getDrugUserId();
         String roleId = drugUserMapper.getRoleIdByDrugUserId(drugUserId);
-        if (StringUtil.isNotEmpty(roleId) && roleId.contains(RoleTypeEnum.MANAGER.getType() + "")){
+        if ((StringUtil.isNotEmpty(roleId) && roleId.contains(RoleTypeEnum.MANAGER.getType() + ""))
+                || (StringUtil.isNotEmpty(roleId) && roleId.contains(RoleTypeEnum.PROJECT_MANAGER.getType() + ""))){
             String leaderPath = drugUserMapper.getLeaderPathById(drugUserId);
             List<Long> drugUserIdList = drugUserMapper.getSubordinateIdsByLeaderPath(leaderPath);
             statisticsParams.setDrugUserIds(drugUserIdList);
@@ -239,7 +240,8 @@ public class StatisticalServiceImpl implements StatisticalService {
             Long drugUserId = s.getDrugUserId();
             statisticsParams.setDrugUserId(drugUserId);
             String roleId = drugUserMapper.getRoleIdByDrugUserId(drugUserId);
-            if (StringUtil.isNotEmpty(roleId) && roleId.contains(RoleTypeEnum.MANAGER.getType()+"")){
+            if ((StringUtil.isNotEmpty(roleId) && roleId.contains(RoleTypeEnum.MANAGER.getType()+""))
+                    || (StringUtil.isNotEmpty(roleId) && roleId.contains(RoleTypeEnum.PROJECT_MANAGER.getType()+""))){
                 String leaderPath = drugUserMapper.getLeaderPathById(drugUserId);
                 List<Long> drugUserIdList = drugUserMapper.getSubordinateIdsByLeaderPath(leaderPath);
                 if (CollectionsUtil.isNotEmptyList(drugUserIdList)){
