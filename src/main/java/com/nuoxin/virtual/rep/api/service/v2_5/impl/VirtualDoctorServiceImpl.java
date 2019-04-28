@@ -446,6 +446,7 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
                 }else {
                     // 线下代表新增的医生如果没有手机号就造一个
                     String fTelephone = StringUtil.getUuidRemoveLine();
+                    fTelephone = "f_" + fTelephone;
                     telephones = new ArrayList<>();
                     telephones.add(fTelephone);
                 }
