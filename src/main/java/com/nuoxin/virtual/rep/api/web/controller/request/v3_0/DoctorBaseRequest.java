@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 医生请求参数的基类
@@ -18,6 +19,9 @@ public class DoctorBaseRequest implements Serializable {
 
     @ApiModelProperty(value = "产品ID")
     private Long productId;
+
+    @ApiModelProperty(value = "代表ID列表")
+    private List<Long> drugUserIdList;
 
     @ApiModelProperty(value = "0未招募，1招募， -1 未知")
     private Integer recruit;
