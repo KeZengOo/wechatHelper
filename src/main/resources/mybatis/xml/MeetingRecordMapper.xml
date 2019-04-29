@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.MeetingRecordMapper">
+
+    <!-- 会议记录查询列表 -->
+    <select id="getMeetingRecordList" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingRecordParams">
+        SELECT
+            t.id,
+            t.product_id AS productId,
+            t.product_name AS productName,
+            t.title,
+            t.start_time AS startTime,
+            t.end_time AS endTime,
+            COUNT(DISTINCT d.doctor_id) doctorCount
+        FROM
+            t_meeting_data t
+        LEFT JOIN t_meeting_attend_details d ON t.id = d.meeting_id
+        AND d.type = 1
+        WHERE
+            1 = 1
+        AND product_id != ''
+        <if test="meetingRecordRequest.productId != 0 and meetingRecordRequest.productId != null">
+            AND t.product_id = #{meetingRecordRequest.productId}
+        </if>
+        GROUP BY
+            t.id
+        LIMIT #{meetingRecordRequest.currentSize},#{meetingRecordRequest.pageSize}
+    </select>
+
+    <!-- 会议记录查询列表总数 -->
+    <select id="getMeetingRecordListCount" resultType="java.lang.Integer">
+        SELECT
+            COUNT(1)
+        FROM
+            t_meeting_data t
+
+        WHERE
+            1 = 1
+        AND t.product_id != ''
+        <if test="meetingRecordRequest.productId != 0 and meetingRecordRequest.productId != null">
+            AND t.product_id = #{meetingRecordRequest.productId}
+        </if>
+
+    </select>
+
+    <!-- 获取产品下的所有招募医生 -->
+    <select id="getRecruitHcpAllCountByProduct" resultType="java.lang.Integer">
+        SELECT
+            count(t.doctor_id)
+        FROM
+            (
+                SELECT
+                    t.doctor_id
+                FROM
+                    drug_user_doctor_quate t
+                WHERE
+                    t.product_id = #{productId}
+                AND t.is_recruit = 1
+                GROUP BY
+                    t.doctor_id
+            ) t
+    </select>
+
+</mapper>
