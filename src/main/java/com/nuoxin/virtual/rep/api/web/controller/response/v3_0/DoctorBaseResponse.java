@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,10 +28,10 @@ public class DoctorBaseResponse implements Serializable {
     private String sex;
 
     @ApiModelProperty(value = "职称")
-    private String position;
+    private String positions;
 
     @ApiModelProperty(value = "医生联系方式")
-    private List<String> telephoneList;
+    private List<String> telephoneList = new ArrayList<>();
 
     @ApiModelProperty(value = "医院ID")
     private Long hospitalId;

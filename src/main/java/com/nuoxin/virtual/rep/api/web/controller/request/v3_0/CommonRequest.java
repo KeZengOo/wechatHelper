@@ -1,8 +1,10 @@
 package com.nuoxin.virtual.rep.api.web.controller.request.v3_0;
 
+import com.nuoxin.virtual.rep.api.common.bean.PageRequestBean;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
 
 import java.io.Serializable;
 import java.util.List;
@@ -13,7 +15,7 @@ import java.util.List;
  */
 @Data
 @ApiModel(value = "共性的请求参数")
-public class CommonRequest implements Serializable {
+public class CommonRequest extends PageRequestBean implements Serializable {
     private static final long serialVersionUID = 2563597192660555795L;
 
     @ApiModelProperty(value = "产品ID列表")

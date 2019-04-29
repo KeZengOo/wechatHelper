@@ -5,12 +5,17 @@ import java.util.List;
 import com.nuoxin.virtual.rep.api.entity.Doctor;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.SaveDoctorTelephoneRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.SearchRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.MyDoctorRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.call.CallDoctorResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorDetailsResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.plan.VisitDoctorResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.DoctorClassificationResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.DoctorPotentialResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DoctorBaseResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DoctorTelephoneResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DoctorVisitResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.MyDoctorResponse;
 import org.apache.ibatis.annotations.Param;
 
 import com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean;
@@ -67,39 +72,6 @@ public interface DoctorMapper{
      * @return
      */
     Doctor findTopByMobile(@Param(value = "mobile") String mobile);
-
-
-//    /**
-//     * 根据过滤条件获取医生总条数
-//     * @param virtualDrugUserIds 虚拟代表 ID
-//     * @param search 搜索内容(mobile,department,doctorName)
-//     * @param productLineIds 产品线 IDs
-//     * @return 返回符合过滤条件的医生总条
-//     */
-//    int getListCount(@Param(value = "virtualDrugUserIds") List<Long> virtualDrugUserIds,
-//    		                  @Param(value = "search")  String search,
-//    		                  @Param(value = "productLineIds") List<Long> productLineIds);
-//
-//    /**
-//     * 根据过滤条件获取医生拜访列表信息(不含对应的产品信息)
-//     * @param virtualDrugUserIds 虚拟代表 ID
-//     * @param currentSize startIndex
-//     * @param pageSize offset
-//     * @param search  搜索内容(mobile,department,doctorName)
-//     * @param productLineIds 产品线 IDs
-//     * @param order  排序规则
-//     * @return 返回符合过滤条件的医生列表信息
-//     */
-//    List<CustomerFollowListBean> getList(@Param(value = "virtualDrugUserIds") List<Long> virtualDrugUserIds,
-//    		                                                    @Param(value = "currentSize")int currentSize,
-//    		                                                    @Param(value = "pageSize")int pageSize,
-//    		                                                    @Param(value = "search")String search,
-//    		                                                    @Param(value = "productLineIds") List<Long> productLineIds,
-//                                                                @Param(value = "order") Integer order,
-//                                         @Param(value = "minValue") Integer minValue,
-//                                         @Param(value = "drugUserId") Long drugUserId);
-
-
 
     /**
      * 根据过滤条件获取医生总条数
@@ -292,4 +264,39 @@ public interface DoctorMapper{
     Integer getDoctorCount(@Param(value = "doctorName") String doctorName,@Param(value = "hospitalName") String hospitalName);
 
 
+
+
+
+    /*************************************  V3.0.1相关  ****************************************/
+
+
+    /**
+     * 得到我的客户基本信息列表
+     * @param request
+     * @return
+     */
+    List<MyDoctorResponse> getMyDoctorList(MyDoctorRequest request);
+
+    /**
+     * 得到我的客户基本信息列表总数
+     * @param request
+     * @return
+     */
+    Integer getMyDoctorListCount(MyDoctorRequest request);
+
+
+    /**
+     * 得到医生的拜访结果
+     * @param visitIdList
+     * @return
+     */
+    List<DoctorVisitResponse> getDoctorVisitList(@Param(value = "visitIdList") List<Long> visitIdList);
+
+
+    /**
+     * 获取多个医生手机号
+     * @param doctorIdList
+     * @return
+     */
+    List<DoctorTelephoneResponse> getDoctorTelephoneList(@Param(value = "doctorIdList") List<Long> doctorIdList);
 }

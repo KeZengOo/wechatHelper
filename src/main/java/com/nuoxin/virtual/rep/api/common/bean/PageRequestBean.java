@@ -49,11 +49,11 @@ public class PageRequestBean implements Serializable {
 
 	public Integer getCurrentSize() {
 		if(page < 1) {
-			page = 1;
+			page = DEFAULT_PAGE;
 		}
 		
 		if(pageSize == 0) {
-			pageSize=10;
+			pageSize = DEFAULT_SIZE;
 		}
 		this.currentSize = (this.page - 1) * this.pageSize;
 		return currentSize;

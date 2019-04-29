@@ -1,5 +1,6 @@
 package com.nuoxin.virtual.rep.api.web.controller.response.v3_0;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -13,8 +14,11 @@ import java.io.Serializable;
  */
 @ApiModel(value = "医生列表返回数据")
 @Data
-public class DoctorResponse extends DoctorBaseResponse implements Serializable {
+public class MyDoctorResponse extends DoctorBaseResponse implements Serializable {
     private static final long serialVersionUID = 4482881991099415089L;
+
+    @JsonIgnore
+    private Long maxVisitId;
 
     @ApiModelProperty(value = "上一次拜访时间")
     private String lastVisitTime;
