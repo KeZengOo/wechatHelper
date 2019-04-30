@@ -22,6 +22,15 @@
         <if test="meetingRecordRequest.productId != 0 and meetingRecordRequest.productId != null">
             AND t.product_id = #{meetingRecordRequest.productId}
         </if>
+
+        <if test="meetingRecordRequest.startTimeBefore != '' and meetingRecordRequest.startTimeBefore != null">
+            AND t.start_time &gt;= #{meetingRecordRequest.startTimeBefore}
+        </if>
+
+        <if test="meetingRecordRequest.startTimeAfter != '' and meetingRecordRequest.startTimeAfter != null">
+            AND t.start_time &lt;= #{meetingRecordRequest.startTimeAfter}
+        </if>
+
         GROUP BY
             t.id
         LIMIT #{meetingRecordRequest.currentSize},#{meetingRecordRequest.pageSize}
@@ -39,6 +48,14 @@
         AND t.product_id != ''
         <if test="meetingRecordRequest.productId != 0 and meetingRecordRequest.productId != null">
             AND t.product_id = #{meetingRecordRequest.productId}
+        </if>
+
+        <if test="meetingRecordRequest.startTimeBefore != '' and meetingRecordRequest.startTimeBefore != null">
+            AND t.start_time &gt;= #{meetingRecordRequest.startTimeBefore}
+        </if>
+
+        <if test="meetingRecordRequest.startTimeAfter != '' and meetingRecordRequest.startTimeAfter != null">
+            AND t.start_time &lt;= #{meetingRecordRequest.startTimeAfter}
         </if>
 
     </select>
@@ -59,6 +76,39 @@
                 GROUP BY
                     t.doctor_id
             ) t
+    </select>
+
+    <!-- 查询每个会议的主题列表 -->
+    <select id="getMeetingSubjectListByProductIdAndMeetingName" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingSubjectParams">
+        SELECT
+            t.id,
+            t.product_id AS productId,
+            t.meeting_name AS meetingName,
+            t.subject_name AS subjectName,
+            t.speaker,
+            t.start_time AS startTime,
+            t.end_time AS endTime
+        FROM
+            t_meeting_subject t
+        WHERE
+            t.product_id = #{productId}
+        AND t.meeting_name = #{meetingName}
+    </select>
+
+    <!-- 根据会议ID查询会议详情 -->
+    <select id="getMeetingInfoByMeetingId" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingRecordParams">
+        SELECT
+            t.id,
+            t.product_id AS productId,
+            t.product_name AS productName,
+            t.title,
+            t.start_time AS startTime,
+            t.end_time AS endTime
+        FROM
+            t_meeting_data t
+        WHERE
+            1 = 1
+        AND id = #{meetingId}
     </select>
 
 </mapper>

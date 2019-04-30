@@ -2,7 +2,9 @@ package com.nuoxin.virtual.rep.api.service.v3_0.impl;
 
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingRecordParams;
+import com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingSubjectParams;
 import com.nuoxin.virtual.rep.api.entity.v3_0.request.MeetingRecordRequest;
+import com.nuoxin.virtual.rep.api.entity.v3_0.request.MeetingSubjectRequest;
 import com.nuoxin.virtual.rep.api.mybatis.MeetingRecordMapper;
 import com.nuoxin.virtual.rep.api.service.v3_0.MeetingRecordService;
 import io.swagger.models.auth.In;
@@ -57,4 +59,27 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
         }
         return new PageResponseBean(meetingRecordRequest, getMeetingRecordListCount, newList);
     }
+
+    @Override
+    public List<MeetingSubjectParams> getMeetingSubjectListByProductIdAndMeetingName(MeetingSubjectRequest meetingSubjectRequest) {
+
+        List<MeetingSubjectParams> newList = new ArrayList<MeetingSubjectParams>();
+        List<MeetingSubjectParams> list = meetingRecordMapper.getMeetingSubjectListByProductIdAndMeetingName(meetingSubjectRequest.getProductId(),meetingSubjectRequest.getMeetingName());
+
+        //获取会议明细
+        MeetingRecordParams meetingRecordParams = meetingRecordMapper.getMeetingInfoByMeetingId(meetingSubjectRequest.getMeetingId());
+        //计算两个时间差
+        long diff = meetingRecordParams.getEndTime().getTime() - meetingRecordParams.getStartTime().getTime();
+        int hours = (int) (diff/(1000 * 60 * 60));
+
+        list.forEach(n -> {
+            MeetingSubjectParams m = new MeetingSubjectParams();
+            m=n;
+            m.setDuration(hours+"");
+            newList.add(m);
+        });
+
+        return newList;
+    }
+
 }

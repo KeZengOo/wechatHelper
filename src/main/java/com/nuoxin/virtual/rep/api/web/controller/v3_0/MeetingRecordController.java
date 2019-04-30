@@ -4,7 +4,9 @@ import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.entity.v3_0.ScheduleResult;
 import com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingRecordParams;
+import com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingSubjectParams;
 import com.nuoxin.virtual.rep.api.entity.v3_0.request.MeetingRecordRequest;
+import com.nuoxin.virtual.rep.api.entity.v3_0.request.MeetingSubjectRequest;
 import com.nuoxin.virtual.rep.api.service.v3_0.MeetingRecordService;
 import com.nuoxin.virtual.rep.api.service.v3_0.WenJuanQuestionnaireService;
 import io.swagger.annotations.Api;
@@ -32,7 +34,7 @@ public class MeetingRecordController {
     @Resource
     private MeetingRecordService meetingRecordService;
 
-    @ApiOperation(value = "问卷网项目接口")
+    @ApiOperation(value = "会议记录查询列表")
     @RequestMapping(value = "/getMeetingRecordList", method = { RequestMethod.POST})
     public DefaultResponseBean<PageResponseBean<List<MeetingRecordParams>>> getMeetingRecordList(@RequestBody @Valid MeetingRecordRequest meetingRecordRequest){
         PageResponseBean<List<MeetingRecordParams>> list = meetingRecordService.getMeetingRecordList(meetingRecordRequest);
@@ -41,4 +43,12 @@ public class MeetingRecordController {
         return responseBean;
     }
 
+    @ApiOperation(value = "查询每个会议的主题列表")
+    @RequestMapping(value = "/getMeetingSubjectListByProductIdAndMeetingName", method = { RequestMethod.POST})
+    public DefaultResponseBean<List<MeetingSubjectParams>> getMeetingSubjectListByProductIdAndMeetingName(@RequestBody @Valid MeetingSubjectRequest meetingSubjectRequest){
+        List<MeetingSubjectParams> list = meetingRecordService.getMeetingSubjectListByProductIdAndMeetingName(meetingSubjectRequest);
+        DefaultResponseBean<List<MeetingSubjectParams>> responseBean = new DefaultResponseBean<List<MeetingSubjectParams>>();
+        responseBean.setData(list);
+        return responseBean;
+    }
 }
