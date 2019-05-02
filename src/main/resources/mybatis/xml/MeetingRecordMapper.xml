@@ -111,4 +111,40 @@
         AND id = #{meetingId}
     </select>
 
+    <!-- 参会列表 -->
+    <select id="getMeetingAttendDetailsListByMeetingId" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingAttendDetailsParams">
+        SELECT
+            t.doctor_id AS doctorId,
+            t.doctor_name AS doctorName,
+            d.hospital_id AS hospitalId,
+            d.hospital_name AS hospitalName,
+            t.attend_start_time AS attendStartTime,
+            t.attend_end_time AS attendEndTime,
+            t.attend_sum_time AS attendSumTime,
+            t.meeting_id AS meetingId,
+            t.type
+        FROM
+            t_meeting_attend_details t
+        LEFT JOIN doctor d ON t.doctor_id = d.id
+        WHERE
+            1 = 1
+        AND t.doctor_id != ''
+        AND t.meeting_id = #{meetingAttendDetailsRequest.meetingId}
+        AND t.type = 1
+        LIMIT #{meetingAttendDetailsRequest.currentSize},#{meetingAttendDetailsRequest.pageSize}
+    </select>
+
+    <!-- 参会总数 -->
+    <select id="getMeetingAttendDetailsCountByMeetingId" resultType="java.lang.Integer">
+        SELECT
+            COUNT(1)
+        FROM
+            t_meeting_attend_details t
+        LEFT JOIN doctor d ON t.doctor_id = d.id
+        WHERE
+            1 = 1
+        AND t.doctor_id != ''
+        AND t.meeting_id = #{meetingId}
+        AND t.type = 1
+    </select>
 </mapper>

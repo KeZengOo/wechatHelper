@@ -1,7 +1,9 @@
 package com.nuoxin.virtual.rep.api.mybatis;
 
+import com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingAttendDetailsParams;
 import com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingRecordParams;
 import com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingSubjectParams;
+import com.nuoxin.virtual.rep.api.entity.v3_0.request.MeetingAttendDetailsRequest;
 import com.nuoxin.virtual.rep.api.entity.v3_0.request.MeetingRecordRequest;
 import org.apache.ibatis.annotations.Param;
 
@@ -39,15 +41,28 @@ public interface MeetingRecordMapper {
      * 查询每个会议的主题列表
      * @param productId
      * @param meetingName
-     * @return
+     * @return list
      */
     List<MeetingSubjectParams> getMeetingSubjectListByProductIdAndMeetingName(@Param("productId") Integer productId,@Param("meetingName") String meetingName);
 
     /**
      * 根据会议ID查询会议详情
      * @param meetingId
-     * @return
+     * @return MeetingRecordParams
      */
     MeetingRecordParams getMeetingInfoByMeetingId(@Param("meetingId") String meetingId);
 
+    /**
+     * 参会列表
+     * @param meetingAttendDetailsRequest
+     * @return list
+     */
+    List<MeetingAttendDetailsParams> getMeetingAttendDetailsListByMeetingId(@Param("meetingAttendDetailsRequest") MeetingAttendDetailsRequest meetingAttendDetailsRequest);
+
+    /**
+     * 参会总数
+     * @param meetingId
+     * @return int
+     */
+    Integer getMeetingAttendDetailsCountByMeetingId(@Param("meetingId") String meetingId);
 }

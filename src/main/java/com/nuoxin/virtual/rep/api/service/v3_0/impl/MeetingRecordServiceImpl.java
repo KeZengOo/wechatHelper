@@ -1,8 +1,10 @@
 package com.nuoxin.virtual.rep.api.service.v3_0.impl;
 
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
+import com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingAttendDetailsParams;
 import com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingRecordParams;
 import com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingSubjectParams;
+import com.nuoxin.virtual.rep.api.entity.v3_0.request.MeetingAttendDetailsRequest;
 import com.nuoxin.virtual.rep.api.entity.v3_0.request.MeetingRecordRequest;
 import com.nuoxin.virtual.rep.api.entity.v3_0.request.MeetingSubjectRequest;
 import com.nuoxin.virtual.rep.api.mybatis.MeetingRecordMapper;
@@ -81,5 +83,22 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
 
         return newList;
     }
+
+    @Override
+    public PageResponseBean<List<MeetingAttendDetailsParams>> getMeetingAttendDetailsListByMeetingId(MeetingAttendDetailsRequest meetingAttendDetailsRequest) {
+
+        //参会列表
+        List<MeetingAttendDetailsParams> meetingAttendDetailsParamsList = meetingRecordMapper.getMeetingAttendDetailsListByMeetingId(meetingAttendDetailsRequest);
+
+        //参会总数
+        Integer meetingAttendDetailsCount = meetingRecordMapper.getMeetingAttendDetailsCountByMeetingId(meetingAttendDetailsRequest.getMeetingId());
+
+        //把每小段时长放在一个数组里
+
+        //计算总时长
+
+        return new PageResponseBean(meetingAttendDetailsRequest, meetingAttendDetailsCount, meetingAttendDetailsParamsList);
+    }
+
 
 }

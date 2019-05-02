@@ -3,8 +3,10 @@ package com.nuoxin.virtual.rep.api.web.controller.v3_0;
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.entity.v3_0.ScheduleResult;
+import com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingAttendDetailsParams;
 import com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingRecordParams;
 import com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingSubjectParams;
+import com.nuoxin.virtual.rep.api.entity.v3_0.request.MeetingAttendDetailsRequest;
 import com.nuoxin.virtual.rep.api.entity.v3_0.request.MeetingRecordRequest;
 import com.nuoxin.virtual.rep.api.entity.v3_0.request.MeetingSubjectRequest;
 import com.nuoxin.virtual.rep.api.service.v3_0.MeetingRecordService;
@@ -48,6 +50,15 @@ public class MeetingRecordController {
     public DefaultResponseBean<List<MeetingSubjectParams>> getMeetingSubjectListByProductIdAndMeetingName(@RequestBody @Valid MeetingSubjectRequest meetingSubjectRequest){
         List<MeetingSubjectParams> list = meetingRecordService.getMeetingSubjectListByProductIdAndMeetingName(meetingSubjectRequest);
         DefaultResponseBean<List<MeetingSubjectParams>> responseBean = new DefaultResponseBean<List<MeetingSubjectParams>>();
+        responseBean.setData(list);
+        return responseBean;
+    }
+
+    @ApiOperation(value = "参会查询列表")
+    @RequestMapping(value = "/getMeetingAttendDetailsListByMeetingId", method = { RequestMethod.POST})
+    public DefaultResponseBean<PageResponseBean<List<MeetingAttendDetailsParams>>> getMeetingAttendDetailsListByMeetingId(@RequestBody @Valid MeetingAttendDetailsRequest meetingAttendDetailsRequest){
+        PageResponseBean<List<MeetingAttendDetailsParams>> list = meetingRecordService.getMeetingAttendDetailsListByMeetingId(meetingAttendDetailsRequest);
+        DefaultResponseBean<PageResponseBean<List<MeetingAttendDetailsParams>>> responseBean = new DefaultResponseBean<PageResponseBean<List<MeetingAttendDetailsParams>>>();
         responseBean.setData(list);
         return responseBean;
     }
