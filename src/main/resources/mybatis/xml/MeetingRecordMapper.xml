@@ -118,6 +118,7 @@
             t.doctor_name AS doctorName,
             d.hospital_id AS hospitalId,
             d.hospital_name AS hospitalName,
+            d.depart,
             t.attend_start_time AS attendStartTime,
             t.attend_end_time AS attendEndTime,
             t.attend_sum_time AS attendSumTime,
@@ -131,19 +132,47 @@
         AND t.doctor_id != ''
         AND t.meeting_id = #{meetingAttendDetailsRequest.meetingId}
         AND t.type = 1
+        GROUP BY t.doctor_id
         LIMIT #{meetingAttendDetailsRequest.currentSize},#{meetingAttendDetailsRequest.pageSize}
     </select>
 
     <!-- 参会总数 -->
     <select id="getMeetingAttendDetailsCountByMeetingId" resultType="java.lang.Integer">
+SELECT
+	COUNT(m.doctor_id)
+FROM
+	(
+		SELECT
+			t.doctor_id
+		FROM
+			t_meeting_attend_details t
+		LEFT JOIN doctor d ON t.doctor_id = d.id
+		WHERE
+			1 = 1
+		AND t.doctor_id != ''
+		AND t.meeting_id = #{meetingId}
+		AND t.type = 1
+		GROUP BY
+			t.doctor_id
+	) m
+    </select>
+
+    <!-- 根据医生ID和会议ID查询该医生的所有参会时间 -->
+    <select id="getMeetingTimeByDoctorIdAndMeetingID" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingAttendDetailsParams">
         SELECT
-            COUNT(1)
+            t.doctor_id AS doctorId,
+            t.attend_start_time AS attendStartTime,
+            t.attend_end_time AS attendEndTime,
+            t.attend_sum_time AS attendSumTime,
+            t.meeting_id AS meetingId,
+            t.type
         FROM
             t_meeting_attend_details t
         LEFT JOIN doctor d ON t.doctor_id = d.id
         WHERE
             1 = 1
         AND t.doctor_id != ''
+        AND t.doctor_id = #{doctorId}
         AND t.meeting_id = #{meetingId}
         AND t.type = 1
     </select>

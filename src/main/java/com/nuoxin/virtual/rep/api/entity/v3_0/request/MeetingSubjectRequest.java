@@ -17,7 +17,7 @@ public class MeetingSubjectRequest {
     @ApiModelProperty(value = "产品ID")
     private Integer productId;
     @ApiModelProperty(value = "会议Id")
-    private String meetingId;
+    private Long meetingId;
     @ApiModelProperty(value = "会议名称")
     private String meetingName;
 }

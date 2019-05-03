@@ -24,6 +24,8 @@ public class MeetingAttendDetailsParams {
     private Integer hospitalId;
     @ApiModelProperty("医院姓名")
     private String hospitalName;
+    @ApiModelProperty("科室")
+    private String depart;
     @ApiModelProperty("参会开始时间")
     private Date attendStartTime;
     @ApiModelProperty("参会结束时间")
@@ -36,5 +38,9 @@ public class MeetingAttendDetailsParams {
     private Long meetingId;
     @ApiModelProperty("类型")
     private Integer type;
+    @ApiModelProperty("该医生所有参会开始时间和结束时间数组")
+    private String[] attendTimeArray;
+    @ApiModelProperty("该医生所有参会时长数组")
+    private String[] attendSumTimeArray;
 
 }

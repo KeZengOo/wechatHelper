@@ -50,7 +50,7 @@ public interface MeetingRecordMapper {
      * @param meetingId
      * @return MeetingRecordParams
      */
-    MeetingRecordParams getMeetingInfoByMeetingId(@Param("meetingId") String meetingId);
+    MeetingRecordParams getMeetingInfoByMeetingId(@Param("meetingId") Long meetingId);
 
     /**
      * 参会列表
@@ -64,5 +64,13 @@ public interface MeetingRecordMapper {
      * @param meetingId
      * @return int
      */
-    Integer getMeetingAttendDetailsCountByMeetingId(@Param("meetingId") String meetingId);
+    Integer getMeetingAttendDetailsCountByMeetingId(@Param("meetingId") Long meetingId);
+
+    /**
+     * 根据医生ID和会议ID查询该医生的所有参会时间
+     * @param meetingId
+     * @param doctorId
+     * @return
+     */
+    List<MeetingAttendDetailsParams> getMeetingTimeByDoctorIdAndMeetingID(@Param("doctorId") Long doctorId, @Param("meetingId") Long meetingId);
 }

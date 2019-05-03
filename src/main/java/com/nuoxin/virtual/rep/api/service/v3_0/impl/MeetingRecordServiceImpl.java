@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -93,11 +94,41 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
         //参会总数
         Integer meetingAttendDetailsCount = meetingRecordMapper.getMeetingAttendDetailsCountByMeetingId(meetingAttendDetailsRequest.getMeetingId());
 
+        List<MeetingAttendDetailsParams> newList = new ArrayList<MeetingAttendDetailsParams>();
+
+        SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-mm-dd  HH:mm:ss");
+
         //把每小段时长放在一个数组里
+        meetingAttendDetailsParamsList.forEach(n ->{
+            MeetingAttendDetailsParams m = new MeetingAttendDetailsParams();
+            List<MeetingAttendDetailsParams> list = meetingRecordMapper.getMeetingTimeByDoctorIdAndMeetingID(n.getDoctorId(),n.getMeetingId());
+            //开始时间和结束时间数组
+            String[] times = new String[list.size()];
+            //每个会议时段的时长数组
+            String[] timeSum = new String[list.size()];
+            //参会总时长
+            Integer timeSumCount = 0;
+
+            for (int i = 0; i < list.size(); i++){
+                times[i] = dateFormat.format(list.get(i).getAttendStartTime());
+                timeSum[i] = list.get(i).getAttendSumTime()+"分";
+                timeSumCount += list.get(i).getAttendSumTime();
+            }
+
+            m.setDoctorId(n.getDoctorId());
+            m.setDoctorName(n.getDoctorName());
+            m.setHospitalId(n.getHospitalId());
+            m.setHospitalName(n.getHospitalName());
+            m.setDepart(n.getDepart());
+            m.setAttendSumCountTime(timeSumCount);
+            m.setAttendTimeArray(times);
+            m.setAttendSumTimeArray(timeSum);
+            newList.add(m);
+        });
 
         //计算总时长
 
-        return new PageResponseBean(meetingAttendDetailsRequest, meetingAttendDetailsCount, meetingAttendDetailsParamsList);
+        return new PageResponseBean(meetingAttendDetailsRequest, meetingAttendDetailsCount, newList);
     }
 
 

@@ -15,5 +15,5 @@ import java.util.Date;
 @Data
 public class MeetingAttendDetailsRequest extends PageRequestBean {
     @ApiModelProperty("会议ID")
-    private String meetingId;
+    private Long meetingId;
 }
