@@ -126,8 +126,6 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
             newList.add(m);
         });
 
-        //计算总时长
-
         return new PageResponseBean(meetingAttendDetailsRequest, meetingAttendDetailsCount, newList);
     }
 
