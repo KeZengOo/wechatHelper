@@ -2134,7 +2134,7 @@
 	<select id="getDoctorVisitList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DoctorVisitResponse">
 		SELECT
 			v.id maxVisitId,
-			DATE_FORMAT( v.create_time, '%Y-%m-%d %H:%i:%s' ) lastVisitTime,
+			v.create_time lastVisitTime,
 			du.id visitDrugUserId,
 			du.NAME visitDrugUserName,
 			IFNULL( GROUP_CONCAT( r.visit_result ), '' ) visitResult

@@ -236,5 +236,42 @@
             #{drugUserId}
         </foreach>
     </select>
+
+    <!-- 根据代表邮箱查询代表角色种类，去重  -->
+    <select id="getRoleIdList" resultType="java.lang.Long">
+        SELECT DISTINCT
+            ru.role_id
+        FROM
+            drug_user du
+            INNER JOIN role_user ru ON du.id = ru.user_id
+        WHERE
+            ru.role_id > 100
+            AND du.email IN
+        <foreach collection="drugUserEmailList" item="drugUserEmail" open="(" close=")" separator=",">
+            #{drugUserEmail}
+        </foreach>
+    </select>
+
+
+    <!-- 查询代表角色种类，去重  -->
+    <select id="getDrugUserList" resultType="com.nuoxin.virtual.rep.api.entity.DrugUser">
+        SELECT DISTINCT
+            du.id,
+            du.name,
+            du.email,
+            ru.role_id roleId
+        FROM
+            drug_user_doctor dud
+            INNER JOIN drug_user du ON dud.drug_user_id = du.id
+            INNER JOIN role_user ru ON du.id = ru.user_id
+        WHERE
+            dud.is_available = 1
+            AND dud.doctor_id IN ( SELECT id doctor_id FROM doctor WHERE telephone = #{telephone}
+            UNION
+            SELECT doctor_id FROM doctor_telephone WHERE telephone = #{telephone} )
+            AND dud.prod_id = #{productId}
+            AND ru.role_id =#{roleId}
+    </select>
+
     
 </mapper>

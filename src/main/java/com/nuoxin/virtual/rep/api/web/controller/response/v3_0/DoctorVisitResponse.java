@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 医生拜访返回的字段
@@ -21,7 +22,7 @@ public class DoctorVisitResponse implements Serializable {
     private Long maxVisitId;
 
     @ApiModelProperty(value = "上一次拜访时间")
-    private String lastVisitTime;
+    private Date lastVisitTime;
 
     @ApiModelProperty(value = "拜访的代表ID")
     private Long visitDrugUserId;

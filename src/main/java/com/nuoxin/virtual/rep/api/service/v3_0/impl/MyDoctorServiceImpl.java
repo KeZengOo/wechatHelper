@@ -1,22 +1,29 @@
 package com.nuoxin.virtual.rep.api.service.v3_0.impl;
 
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
+import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
+import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.mybatis.DoctorMapper;
+import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v3_0.MyDoctorService;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
+import com.nuoxin.virtual.rep.api.utils.ExcelUtils;
 import com.nuoxin.virtual.rep.api.utils.RegularUtils;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.MyDoctorRequest;
+import com.nuoxin.virtual.rep.api.web.controller.request.vo.DoctorVo;
 import com.nuoxin.virtual.rep.api.web.controller.response.message.MessageResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DoctorTelephoneResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DoctorVisitResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.MyDoctorResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -29,8 +36,14 @@ import java.util.stream.Stream;
 @Service
 public class MyDoctorServiceImpl implements MyDoctorService {
 
+    private static final Logger logger = LoggerFactory.getLogger(MyDoctorServiceImpl.class);
+
+
     @Resource
     private DoctorMapper doctorMapper;
+
+    @Resource
+    private CommonService commonService;
 
 
     @Override
@@ -87,7 +100,15 @@ public class MyDoctorServiceImpl implements MyDoctorService {
             Optional<DoctorVisitResponse> first = doctorVisitList.stream().filter(dv -> (dv.getMaxVisitId().equals(m.getMaxVisitId()))).findFirst();
             if (first.isPresent()) {
                 DoctorVisitResponse doctorVisitResponse = first.get();
-                m.setLastVisitTime(doctorVisitResponse.getLastVisitTime());
+                Date lastVisitDate = doctorVisitResponse.getLastVisitTime();
+                if (lastVisitDate !=null){
+                    long visitTimeDelta = System.currentTimeMillis() - lastVisitDate.getTime();
+                    String lastVisitTime = commonService.alterLastVisitTimeContent(visitTimeDelta);
+                    m.setLastVisitTime(lastVisitTime);
+                }else{
+                    m.setLastVisitTime("无");
+                }
+
                 m.setVisitDrugUserId(doctorVisitResponse.getVisitDrugUserId());
                 m.setVisitDrugUserName(doctorVisitResponse.getVisitDrugUserName());
                 m.setVisitResult(doctorVisitResponse.getVisitResult());
@@ -97,6 +118,8 @@ public class MyDoctorServiceImpl implements MyDoctorService {
         return new PageResponseBean<>(request, count, myDoctorList);
 
     }
+
+
 
 
     /**

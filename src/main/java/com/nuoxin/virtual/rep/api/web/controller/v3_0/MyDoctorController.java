@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -34,14 +35,26 @@ public class MyDoctorController {
 
     @ApiOperation(value = "列表", notes = "列表")
     @PostMapping(value = "/list")
-    public DefaultResponseBean<PageResponseBean<MyDoctorResponse>> getDoctorPage(HttpServletRequest request, @RequestBody MyDoctorRequest bean) {
+    public DefaultResponseBean<PageResponseBean<MyDoctorResponse>> getDoctorPage(@RequestBody MyDoctorRequest request) {
 
 
-        PageResponseBean<MyDoctorResponse> doctorPage = myDoctorService.getDoctorPage(bean);
+        PageResponseBean<MyDoctorResponse> doctorPage = myDoctorService.getDoctorPage(request);
         DefaultResponseBean<PageResponseBean<MyDoctorResponse>> responseBean = new DefaultResponseBean<>();
         responseBean.setData(doctorPage);
         return responseBean;
     }
+
+
+//    @ApiOperation(value = "导入医生", notes = "导入医生")
+//    @PostMapping(value = "/import")
+//    public DefaultResponseBean<Boolean> doctorImport(MultipartFile file) {
+//
+//
+//        //myDoctorService.doctorImport(file);
+//        DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
+//        responseBean.setData(true);
+//        return responseBean;
+//    }
 
 
 

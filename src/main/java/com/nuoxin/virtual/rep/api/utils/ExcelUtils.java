@@ -2,6 +2,7 @@ package com.nuoxin.virtual.rep.api.utils;
 
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -12,8 +13,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
+import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.formula.functions.T;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
@@ -40,9 +44,13 @@ public class ExcelUtils<E> {
 	private E e;
 	private int etimes = 0;
 
+	private Class<E> clazz;
+
 	public ExcelUtils(E e) {
 		this.e = e;
 	}
+
+
 
 	/**
 	 * 重载方法从文件输入流中读取数据，<br>
@@ -71,6 +79,44 @@ public class ExcelUtils<E> {
 
 		return list;
 	}
+
+
+	/**
+	 * 读取多个sheet文件
+	 * 重载方法从文件输入流中读取数据，<br>
+	 * 最好是所有的单元格都是文本格式，<br>
+	 * 日期格式要求yyyy-MM-dd HH:mm:ss,布尔类型0：真，1：假
+	 * @param edf 数据格式化，如果没有要格式化的，传null
+	 * @param inputStream  Excel文件输入流，支持xlsx 和 xls 后缀的文件
+	 * @return List<E>
+	 * @throws Exception
+	 */
+	public Map<String, List<E>> readFromFileMulSheet(ExcelDataFormatter edf, InputStream inputStream) throws Exception {
+		Workbook wb = null;
+		Map<String, List<E>> map = new HashMap<>();
+		try {
+			wb = WorkbookFactory.create(inputStream);
+			int numberOfSheets = wb.getNumberOfSheets();
+			for (int i = 0; i < numberOfSheets; i++){
+				Sheet sheet = wb.getSheetAt(i);
+				String sheetName = sheet.getSheetName();
+				List<E> list = this.convertExcelToList(edf, sheet, this.getTextToMap());
+				map.put(sheetName, list);
+			}
+		} catch (InvalidFormatException e){
+			throw new InvalidFormatException("非Excel格式文件,文件需要另存为Excel格式");
+		} catch (Exception e) {
+			logger.error("Exception", e);
+		} finally {
+			if (wb != null) {
+				wb.close();
+			}
+		}
+
+		return map;
+	}
+
+
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -120,10 +166,6 @@ public class ExcelUtils<E> {
 				continue;
 			}
 
-			/*if (row.getCell(0) == null) {
-				continue;
-			}*/
-
 			e = get();
 
 			for (int i = 0; i < columnCount; i++) {
@@ -141,6 +183,55 @@ public class ExcelUtils<E> {
 
 		return list;
 	}
+
+
+	private List<E> convertExcelToList(ExcelDataFormatter edf, Sheet sheet, Map<String, String> textToKey) throws Exception {
+		Field[] fields = ReflectUtils.getClassFieldsAndSuperClassFields(e.getClass());
+		Row title = sheet.getRow(0);
+
+		// 标题数组，后面用到，根据索引去标题名称，通过标题名称去字段名称用到 textToKey
+		String[] titles = new String[title.getPhysicalNumberOfCells()];
+		for (int i = 0; i < title.getPhysicalNumberOfCells(); i++) {
+			titles[i] = title.getCell(i).getStringCellValue();
+		}
+
+		List<E> list = new ArrayList<E>(sheet.getLastRowNum());
+
+		int rowIndex = 0;
+		int columnCount = titles.length;
+		Cell cell = null;
+		Row row = null;
+		E e = null;
+
+		for (Iterator<Row> it = sheet.rowIterator(); it.hasNext();) {
+			row = it.next();
+			if (row == null) {
+				break;
+			}
+
+			if (rowIndex++ == 0) {
+				continue;
+			}
+
+			e = get();
+
+			for (int i = 0; i < columnCount; i++) {
+				cell = row.getCell(i);
+				if (cell == null) {
+					continue;
+				}
+
+				etimes = 0;
+				readCellContent(textToKey.get(titles[i]), fields, cell, e, edf);
+			}
+
+			list.add(e);
+		}
+
+		return list;
+	}
+
+
 
 	@SuppressWarnings("unchecked")
 	private E get() throws InstantiationException, IllegalAccessException {

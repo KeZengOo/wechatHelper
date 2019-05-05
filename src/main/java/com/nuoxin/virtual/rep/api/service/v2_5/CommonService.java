@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 通用业务接口
@@ -35,7 +36,7 @@ public interface CommonService {
 	/**
 	 * 上次拜访时间,不保留小数<br>
 	 * 按分钟,小时,天显示 
-	 * @param minuteInterval
+	 * @param delta
 	 * @return
 	 */
 	String alterLastVisitTimeContent(long delta);
@@ -50,4 +51,14 @@ public interface CommonService {
 	 * @return
 	 */
 	String alterNextVisitTimeContent(Date nextVisitTime);
+
+
+
+
+	/**
+	 * 根据现有的医生模板导入医生
+	 * @param file
+	 */
+	void doctorImport(MultipartFile file);
+
 }
