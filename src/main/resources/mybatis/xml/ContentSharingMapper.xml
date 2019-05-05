@@ -146,4 +146,65 @@
                 ) p
     </select>
 
+    <!-- 内容阅读记录列表 -->
+    <select id="getContentReadLogsListPage" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.ContentReadLogsParams">
+        SELECT
+            t.id,
+            t.data_id AS dataId,
+            d.id AS doctorId,
+            d.`name` AS doctorName,
+            d.hospital_name AS hospitalName,
+            d.depart,
+            t.create_time AS createTime,
+            t.read_time AS readTime
+        FROM
+            activity_read t
+        JOIN activity_read_ip ip ON t.read_token = ip.read_token
+        JOIN doctor d ON t.read_person_id = d.id
+        WHERE
+            1 = 1
+        AND (
+            ip.isp IS NULL
+            OR ip.isp != '阿里云'
+        )
+        AND t.data_id = #{contentReadLogsRequest.dataId}
+        GROUP BY t.data_id,d.id
+        LIMIT #{contentReadLogsRequest.currentSize},#{contentReadLogsRequest.pageSize}
+    </select>
+
+    <!-- 内容阅读记录列表Count -->
+    <select id="getContentReadLogsListCount" resultType="java.lang.Integer">
+        SELECT
+            COUNT(m.id)
+        FROM
+            (
+                SELECT
+                    t.id
+                FROM
+                    activity_read t
+                JOIN activity_read_ip ip ON t.read_token = ip.read_token
+                JOIN doctor d ON t.read_person_id = d.id
+                WHERE
+                    1 = 1
+                AND (
+                    ip.isp IS NULL
+                    OR ip.isp != '阿里云'
+                )
+                AND t.data_id = #{contentReadLogsRequest.dataId}
+                GROUP BY
+                    t.data_id,
+                    d.id
+            ) m
+    </select>
+
+    <!-- 根据内容ID和医生ID查询阅读时间数组和阅读时长数组 -->
+    <select id="getReadTimeAndReadDurationByDataIdAndDoctorId" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.ContentReadLogsTimeParams">
+        SELECT
+            t.create_time AS createTime,t.read_time AS readTime
+        FROM
+            activity_read t
+        WHERE
+            t.read_person_id = #{doctorId}
+        AND t.data_id = #{dataId}
+    </select>
 </mapper>
