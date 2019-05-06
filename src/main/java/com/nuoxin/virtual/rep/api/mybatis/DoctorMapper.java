@@ -299,4 +299,12 @@ public interface DoctorMapper{
      * @return
      */
     List<DoctorTelephoneResponse> getDoctorTelephoneList(@Param(value = "doctorIdList") List<Long> doctorIdList);
+
+    /**
+     * 保存医生的手机号
+     * @param doctorId
+     * @param telephoneList
+     */
+    void saveTelephoneList(Long doctorId,@Param(value = "telephoneList") List<String> telephoneList);
+
 }

@@ -106,4 +106,28 @@
 		</if>
 	</select>
 
+	<!-- 得到重复数据ID，用来删除 -->
+	<select id="getAvailableDeleteIdList" resultType="java.lang.Long">
+		SELECT
+			dud.id
+		FROM
+			drug_user_doctor dud
+		WHERE
+			dud.is_available = #{available}
+		GROUP BY
+			dud.drug_user_id,
+			dud.doctor_id,
+			dud.prod_id
+		HAVING
+			COUNT(*) > 1
+	</select>
+
+	<delete id="deleteByIdList">
+		DELETE FROM drug_user_doctor
+		WHERE id IN
+		<foreach collection="list" item="id" open="(" close=")" separator=",">
+			#{id}
+		</foreach>
+	</delete>
+
 </mapper>

@@ -11,11 +11,19 @@ import javax.annotation.Resource;
 import com.alibaba.fastjson.JSONObject;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
+import com.nuoxin.virtual.rep.api.dao.DoctorRepository;
 import com.nuoxin.virtual.rep.api.dao.DrugUserRepository;
 import com.nuoxin.virtual.rep.api.dao.ProductLineRepository;
+import com.nuoxin.virtual.rep.api.entity.Doctor;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.ProductLine;
+import com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorParams;
+import com.nuoxin.virtual.rep.api.entity.v2_5.HospitalProvinceBean;
+import com.nuoxin.virtual.rep.api.mybatis.DoctorMapper;
+import com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorMapper;
+import com.nuoxin.virtual.rep.api.mybatis.HospitalMapper;
 import com.nuoxin.virtual.rep.api.utils.*;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.wechat.WechatMessageRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.vo.DoctorVo;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DoctorImportErrorDetailResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DoctorImportErrorResponse;
@@ -42,10 +50,27 @@ public class CommonServiceImpl implements CommonService {
 	private DrugUserMapper drugUserMapper;
 
 	@Resource
+	private DoctorMapper doctorMapper;
+
+	@Resource
+	private HospitalMapper hospitalMapper;
+
+	@Resource
+	private DrugUserDoctorMapper drugUserDoctorMapper;
+
+	@Resource
 	private ProductLineRepository productLineRepository;
 
 	@Resource
 	private DrugUserRepository drugUserRepository;
+
+	@Resource
+	private DoctorRepository doctorRepository;
+
+	/**
+	 * 批量插入的条数限制
+	 */
+	private final int BATCH_INSERT_SIZE = 1000;
 
 	@Override
 	public List<Long> getSubordinateIds(String leaderPath) {
@@ -95,8 +120,8 @@ public class CommonServiceImpl implements CommonService {
 
 
 	@Override
-	public void doctorImport(MultipartFile file) {
-		InputStream inputStream = null;
+	public Map<String,DoctorImportErrorResponse> doctorImport(MultipartFile file) {
+		InputStream inputStream;
 		ExcelUtils<DoctorVo> excelUtils = new ExcelUtils<>(new DoctorVo());
 		Map<String, List<DoctorVo>> doctorListMap;
 		try {
@@ -111,7 +136,24 @@ public class CommonServiceImpl implements CommonService {
 		}
 
 		//新增或者更新，并且返回错误
-		Map<String,List<DoctorImportErrorResponse>> errorMap = this.saveOrUpdateDoctorMap(doctorListMap);
+		Map<String,DoctorImportErrorResponse> errorMap = this.saveOrUpdateDoctorMap(doctorListMap);
+		return errorMap;
+
+	}
+
+	@Override
+	public Long getHospitalId(HospitalProvinceBean hospitalProvinceBean) {
+		HospitalProvinceBean hospitalProvince = hospitalMapper.getHospital(hospitalProvinceBean.getName());
+		if (hospitalProvince == null) {
+			hospitalProvince = new HospitalProvinceBean();
+			hospitalProvince.setCity(hospitalProvinceBean.getCity());
+			hospitalProvince.setProvince(hospitalProvinceBean.getProvince());
+			hospitalProvince.setLevel(hospitalProvinceBean.getLevel());
+			hospitalProvince.setName(hospitalProvinceBean.getName());
+			hospitalMapper.saveHospital(hospitalProvince);
+		}
+
+		return Long.valueOf(hospitalProvince.getId());
 
 	}
 
@@ -120,12 +162,13 @@ public class CommonServiceImpl implements CommonService {
 	 * @param doctorListMap
 	 * @return
 	 */
-	private Map<String,List<DoctorImportErrorResponse>> saveOrUpdateDoctorMap(Map<String, List<DoctorVo>> doctorListMap) {
+	private Map<String,DoctorImportErrorResponse> saveOrUpdateDoctorMap(Map<String, List<DoctorVo>> doctorListMap) {
 		if (CollectionsUtil.isEmptyMap(doctorListMap)){
 			throw new BusinessException(ErrorEnum.ERROR, "导入医生Excel为空！");
 		}
 
-		Map<String,List<DoctorImportErrorResponse>> errorMap = new HashMap<>();
+		Map<String,DoctorImportErrorResponse> errorMap = new HashMap<>();
+		List<DrugUserDoctorParams> drugUserDoctorParamsList = new ArrayList<>();
 		for (Map.Entry<String, List<DoctorVo>> entry: doctorListMap.entrySet()){
 			String productName = entry.getKey();
 			ProductLine product = productLineRepository.findFirstByName(productName);
@@ -144,20 +187,10 @@ public class CommonServiceImpl implements CommonService {
 			doctorImportError.setSheetName(productName);
 			doctorImportError.setTotalNum(doctorVos.size());
 
-			// 统计重复的手机号
-			List<Map.Entry<String, Long>> repeatTelephone = doctorVos.stream().map(DoctorVo::getTelephone)
-					.collect(Collectors.groupingBy(t -> t, Collectors.counting())).entrySet().stream().filter(map -> (map.getValue() > 1L)).collect(Collectors.toList());
-			if (CollectionsUtil.isNotEmptyList(repeatTelephone)){
-				Long repeatCount = 0L;
-				for (Map.Entry<String, Long> rt : repeatTelephone) {
-					Long value = rt.getValue();
-					repeatCount += value;
-				}
-				doctorImportError.setRepeatNum(repeatCount.intValue());
-			}
-
-
-
+			// 统计重复的数据，不同的行包含相同的手机号并且对应的代表一样就算重复
+			Integer repeatNum = 0;
+			Integer successNum = 0;
+			Integer failNum = 0;
 
 			for (int i = 0; i < doctorVos.size(); i++) {
 				DoctorVo doctorVo = doctorVos.get(0);
@@ -172,11 +205,17 @@ public class CommonServiceImpl implements CommonService {
 				String sex = doctorVo.getSex();
 				String positions = doctorVo.getPositions();
 				String telephone = doctorVo.getTelephone();
+				List<String> telephoneList = new ArrayList<>();
+				int row = 0;
+				if (telephone.contains("，")){
+					telephone = telephone.replace("，", ",");
+				}
+
 				String drugUserEmail = doctorVo.getDrugUserEmail();
 				if (StringUtil.isEmpty(province)){
 					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
 					doctorImportErrorDetail.setError("医院所在省为空！");
-					doctorImportErrorDetail.setRowNum(i++);
+					doctorImportErrorDetail.setRowNum(row);
 					detailList.add(doctorImportErrorDetail);
 					continue;
 				}
@@ -184,7 +223,7 @@ public class CommonServiceImpl implements CommonService {
 				if (StringUtil.isEmpty(city)){
 					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
 					doctorImportErrorDetail.setError("医院所在市为空！");
-					doctorImportErrorDetail.setRowNum(i++);
+					doctorImportErrorDetail.setRowNum(row);
 					detailList.add(doctorImportErrorDetail);
 					continue;
 				}
@@ -192,16 +231,20 @@ public class CommonServiceImpl implements CommonService {
 				if (StringUtil.isEmpty(hospitalName)){
 					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
 					doctorImportErrorDetail.setError("医院名称为空！");
-					doctorImportErrorDetail.setRowNum(i++);
+					doctorImportErrorDetail.setRowNum(row);
 					detailList.add(doctorImportErrorDetail);
 					continue;
 				}
+
+
+				// 判断医院是否是目标医院
+
 
 				if (StringUtil.isNotEmpty(hospitalLevel) && (!"0".equals(hospitalLevel))
 						&& (!HospitalLevelUtil.getLevelNameByLevelCode(hospitalLevel).equals("未知"))){
 					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
 					doctorImportErrorDetail.setError("医院级别输入不合法！");
-					doctorImportErrorDetail.setRowNum(i++);
+					doctorImportErrorDetail.setRowNum(row);
 					detailList.add(doctorImportErrorDetail);
 					continue;
 				}
@@ -210,7 +253,7 @@ public class CommonServiceImpl implements CommonService {
 				if (StringUtil.isEmpty(doctorName)){
 					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
 					doctorImportErrorDetail.setError("医生姓名为空！");
-					doctorImportErrorDetail.setRowNum(i++);
+					doctorImportErrorDetail.setRowNum(row);
 					detailList.add(doctorImportErrorDetail);
 					continue;
 				}
@@ -219,25 +262,80 @@ public class CommonServiceImpl implements CommonService {
 				if (StringUtil.isEmpty(telephone)){
 					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
 					doctorImportErrorDetail.setError("医生手机号为空！");
-					doctorImportErrorDetail.setRowNum(i++);
+					doctorImportErrorDetail.setRowNum(row);
 					detailList.add(doctorImportErrorDetail);
 					continue;
 				}
 
-				if (!RegularUtils.isMatcher(RegularUtils.MATCH_ELEVEN_NUM, telephone)){
+				if (telephone.contains(",")){
+					String[] telephoneArray = telephone.split(",");
+					if (CollectionsUtil.isEmptyArray(telephoneArray)){
+						DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
+						doctorImportErrorDetail.setError("医生手机号为空！");
+						doctorImportErrorDetail.setRowNum(row);
+						detailList.add(doctorImportErrorDetail);
+						continue;
+					}
+
+					for (String t : telephoneArray) {
+						if (!RegularUtils.isMatcher(RegularUtils.MATCH_ELEVEN_NUM, t)){
+							DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
+							doctorImportErrorDetail.setError("医生手机号输入不合法，手机号：" + telephone);
+							doctorImportErrorDetail.setRowNum(row);
+							detailList.add(doctorImportErrorDetail);
+							continue;
+						}
+
+						telephoneList.add(t);
+					}
+				}else {
+					if (!RegularUtils.isMatcher(RegularUtils.MATCH_ELEVEN_NUM, telephone)){
+						DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
+						doctorImportErrorDetail.setError("医生手机号输入不合法，手机号：" + telephone);
+						doctorImportErrorDetail.setRowNum(row);
+						detailList.add(doctorImportErrorDetail);
+						continue;
+					}
+
+					telephoneList.add(telephone);
+				}
+
+				if (CollectionsUtil.isEmptyList(telephoneList)){
 					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
 					doctorImportErrorDetail.setError("医生手机号输入不合法，手机号：" + telephone);
-					doctorImportErrorDetail.setRowNum(i++);
+					doctorImportErrorDetail.setRowNum(row);
 					detailList.add(doctorImportErrorDetail);
 					continue;
 				}
+
+
+				// 统计重复的数据
+				boolean repeatFlag = false;
+				for (String s : telephoneList) {
+					List<DoctorVo> filterDoctorVoList = doctorVos.stream().filter(dv -> (dv.getTelephone().contains(s) && dv.getDrugUserEmail().equals(drugUserEmail))).collect(Collectors.toList());
+					if (CollectionsUtil.isNotEmptyList(filterDoctorVoList) && filterDoctorVoList.size() > 1){
+						DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
+						doctorImportErrorDetail.setError("数据重复，医生手机号包含:" + s + "，代表邮箱为：" + drugUserEmail);
+						doctorImportErrorDetail.setRowNum(row);
+						detailList.add(doctorImportErrorDetail);
+						repeatNum ++;
+						repeatFlag = true;
+						continue;
+					}
+				}
+
+				// 有重复的不能添加
+				if (repeatFlag){
+					continue;
+				}
+
 
 
 				if (StringUtil.isNotEmpty(sex)){
 					if (!(sex.equals("男") || sex.equals("女"))){
 						DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
 						doctorImportErrorDetail.setError("医生性别只能输入男或者女！");
-						doctorImportErrorDetail.setRowNum(i++);
+						doctorImportErrorDetail.setRowNum(row);
 						detailList.add(doctorImportErrorDetail);
 						continue;
 					}
@@ -257,47 +355,49 @@ public class CommonServiceImpl implements CommonService {
 				if (StringUtil.isEmpty(drugUserEmail)){
 					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
 					doctorImportErrorDetail.setError("代表工作邮箱为空！");
-					doctorImportErrorDetail.setRowNum(i++);
+					doctorImportErrorDetail.setRowNum(row);
 					detailList.add(doctorImportErrorDetail);
 					continue;
-				}
-
-
-				List<Long> productIdList = drugUserMapper.getProductIdListByEmail(drugUserEmail);
-				if (CollectionsUtil.isNotEmptyList(productIdList) || (!productIdList.contains(product.getId()))){
-					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
-					doctorImportErrorDetail.setError("邮箱：" + drugUserEmail + " 对应代表不在指定产品：" + productName + " 下！");
-					doctorImportErrorDetail.setRowNum(i++);
-					detailList.add(doctorImportErrorDetail);
-					continue;
-				}
-
-				// 判断同一个医生是否有不同的代表且同一个角色
-				List<DoctorVo> doctorDrugUserList = doctorVos.stream().filter(d -> (d.getTelephone().equals(telephone))).collect(Collectors.toList());
-				if (CollectionsUtil.isNotEmptyList(doctorDrugUserList) && doctorDrugUserList.size() > 1){
-					List<String> drugUserEmailList = doctorDrugUserList.stream().map(DoctorVo::getDrugUserEmail).distinct().collect(Collectors.toList());
-					// 查询角色数量
-					if (CollectionsUtil.isNotEmptyList(drugUserEmailList)){
-						List<Long> roleIdList = drugUserMapper.getRoleIdList(drugUserEmailList);
-						if (CollectionsUtil.isNotEmptyList(roleIdList) && roleIdList.size() > 1){
-							DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
-							doctorImportErrorDetail.setError("手机号为：" + telephone + " 数据重复，对应的代表"+ drugUserEmailList.toString() +"角色相同！");
-							doctorImportErrorDetail.setRowNum(i++);
-							detailList.add(doctorImportErrorDetail);
-							continue;
-						}
-					}
-
 				}
 
 				DrugUser drugUser = drugUserRepository.findFirstByEmail(drugUserEmail);
 				if (drugUser == null){
 					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
 					doctorImportErrorDetail.setError("代表邮箱为：" + drugUserEmail + " 对应代表不存在！");
-					doctorImportErrorDetail.setRowNum(i++);
+					doctorImportErrorDetail.setRowNum(row);
 					detailList.add(doctorImportErrorDetail);
 					continue;
 				}
+
+				List<Long> productIdList = drugUserMapper.getProductIdListByEmail(drugUserEmail);
+				if (CollectionsUtil.isNotEmptyList(productIdList) || (!productIdList.contains(product.getId()))){
+					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
+					doctorImportErrorDetail.setError("邮箱：" + drugUserEmail + " 对应代表不在指定产品：" + productName + " 下！");
+					doctorImportErrorDetail.setRowNum(row);
+					detailList.add(doctorImportErrorDetail);
+					continue;
+				}
+
+				// 判断同一个医生是否有不同的代表且同一个角色
+				for (String te: telephoneList){
+					List<DoctorVo> doctorDrugUserList = doctorVos.stream().filter(d -> (d.getTelephone().contains(te))).collect(Collectors.toList());
+					if (CollectionsUtil.isNotEmptyList(doctorDrugUserList) && doctorDrugUserList.size() > 1){
+						List<String> drugUserEmailList = doctorDrugUserList.stream().map(DoctorVo::getDrugUserEmail).distinct().collect(Collectors.toList());
+						// 查询角色数量
+						if (CollectionsUtil.isNotEmptyList(drugUserEmailList)){
+							List<Long> roleIdList = drugUserMapper.getRoleIdList(drugUserEmailList);
+							if (CollectionsUtil.isNotEmptyList(roleIdList) && roleIdList.size() > 1){
+								DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
+								doctorImportErrorDetail.setError("手机号为：" + telephone + " 数据重复，对应的代表"+ drugUserEmailList.toString() +"角色相同！");
+								doctorImportErrorDetail.setRowNum(row);
+								detailList.add(doctorImportErrorDetail);
+								continue;
+							}
+						}
+
+					}
+				}
+
 
 
 				List<DrugUser> drugUserList = drugUserMapper.getDrugUserList(telephone, product.getId(), drugUser.getRoleId());
@@ -305,18 +405,113 @@ public class CommonServiceImpl implements CommonService {
 					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
 					List<String> drugUserNameList = drugUserList.stream().map(DrugUser::getName).distinct().collect(Collectors.toList());
 					doctorImportErrorDetail.setError("手机号为：" + telephone + " 医生已经关联同一角色代表:" + drugUserNameList);
-					doctorImportErrorDetail.setRowNum(i++);
+					doctorImportErrorDetail.setRowNum(row);
 					detailList.add(doctorImportErrorDetail);
 					continue;
 				}
 
+				Doctor doctor = new Doctor();
+				List<Doctor> doctors = doctorMapper.selectDoctorByMobiles(telephoneList);
+				if (CollectionsUtil.isNotEmptyList(doctors)){
+					doctor = doctors.get(0);
+				}
+
+				HospitalProvinceBean hospitalProvinceBean = new HospitalProvinceBean();
+				hospitalProvinceBean.setName(hospitalName);
+				hospitalProvinceBean.setProvince(province);
+				hospitalProvinceBean.setCity(city);
+				hospitalProvinceBean.setLevel(Integer.valueOf(hospitalLevel));
+				Long hospitalId = this.getHospitalId(hospitalProvinceBean);
+				doctor.setMobile(telephoneList.get(0));
+				doctor.setTelephoneList(telephoneList);
+				doctor.setSex(Integer.valueOf(sex));
+				doctor.setHospitalId(hospitalId);
+				doctor.setHospitalName(hospitalName);
+				doctor.setDepartment(depart);
+				doctor.setDoctorLevel(positions);
+				doctor.setName(doctorName);
+
+				Long doctorId;
+				try {
+					Doctor saveDoctor = doctorRepository.save(doctor);
+					doctorId = saveDoctor.getId();
+					successNum ++;
+				}catch (Exception e){
+					logger.error("导入医生出错，doctorTelephones={}, drugUserEmail={}", telephone, drugUserEmail, e);
+					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
+					doctorImportErrorDetail.setError("代表邮箱：" + drugUserEmail + " 手机号为：" + telephone + " 导入失败");
+					doctorImportErrorDetail.setRowNum(row);
+					detailList.add(doctorImportErrorDetail);
+					failNum ++;
+					continue;
+				}
+
+				// 保存医生的手机号
+				this.saveDoctorTelephone(doctorId, telephoneList);
+
+				// 保存医生和代表的关联
+				DrugUserDoctorParams drugUserDoctorParams = new DrugUserDoctorParams();
+				drugUserDoctorParams.setDoctorEmail(doctor.getEmail());
+				drugUserDoctorParams.setDoctorId(doctorId);
+				drugUserDoctorParams.setDoctorName(doctorName);
+				drugUserDoctorParams.setDrugUserId(drugUser.getId());
+				drugUserDoctorParams.setDrugUserName(drugUser.getName());
+				drugUserDoctorParams.setDrugUserEmail(drugUserEmail);
+				drugUserDoctorParams.setProdId(product.getId().intValue());
+				drugUserDoctorParamsList.add(drugUserDoctorParams);
 			}
 
-			//doctorVos.stream().
-			return null;
+			doctorImportError.setSuccessNum(successNum);
+			doctorImportError.setFailNum(failNum);
+			errorMap.put(productName, doctorImportError);
 		}
 
-		return null;
+		// 批量保存代表医生的关联关系
+		this.batchAddDrugUserDoctor(drugUserDoctorParamsList);
+
+		return errorMap;
+
+	}
+
+	/**
+	 * 批量保存代表医生关联关系
+	 * @param drugUserDoctorParamsList
+	 */
+	private void batchAddDrugUserDoctor(List<DrugUserDoctorParams> drugUserDoctorParamsList) {
+		if (CollectionsUtil.isEmptyList(drugUserDoctorParamsList)){
+			return;
+		}
+
+		// 每次最多插入1000条
+		int size = drugUserDoctorParamsList.size();
+		int totalPage = PageUtil.getTotalPage(size, BATCH_INSERT_SIZE);
+		List<DrugUserDoctorParams> subDrugUserDoctorParamsList = null;
+		for (int i = 0; i < totalPage; i++) {
+			if (i == (totalPage - 1)) {
+
+				subDrugUserDoctorParamsList = drugUserDoctorParamsList.subList(i * BATCH_INSERT_SIZE, i * BATCH_INSERT_SIZE + (size - i * BATCH_INSERT_SIZE));
+			} else {
+				subDrugUserDoctorParamsList = drugUserDoctorParamsList.subList(i * BATCH_INSERT_SIZE, i * BATCH_INSERT_SIZE + BATCH_INSERT_SIZE);
+			}
+
+			List<DrugUserDoctorParams> addDrugUserDoctorParamsList = new ArrayList<>(subDrugUserDoctorParamsList);
+			if (CollectionsUtil.isNotEmptyList(addDrugUserDoctorParamsList)){
+				drugUserDoctorMapper.saveDrugUserDoctors(addDrugUserDoctorParamsList);
+			}
+		}
+
+		// 删除掉重复的
+		List<Long> availableDeleteIdList = drugUserDoctorMapper.getAvailableDeleteIdList(1);
+		while(CollectionsUtil.isNotEmptyList(availableDeleteIdList)){
+			drugUserDoctorMapper.deleteByIdList(availableDeleteIdList);
+			availableDeleteIdList = drugUserDoctorMapper.getAvailableDeleteIdList(1);
+		}
+
+		List<Long> noAvailableDeleteIdList = drugUserDoctorMapper.getAvailableDeleteIdList(0);
+		while(CollectionsUtil.isNotEmptyList(noAvailableDeleteIdList)){
+			drugUserDoctorMapper.deleteByIdList(noAvailableDeleteIdList);
+			noAvailableDeleteIdList = drugUserDoctorMapper.getAvailableDeleteIdList(0);
+		}
 	}
 
 
@@ -337,6 +532,25 @@ public class CommonServiceImpl implements CommonService {
 
 		return delta;
 	}
+
+
+	/**
+	 * 新增医生ID
+	 * @param doctorId
+	 * @param doctorTelephoneList
+	 */
+	private void saveDoctorTelephone(Long doctorId, List<String> doctorTelephoneList){
+		List<String> doctorTelephones = doctorMapper.getDoctorTelephone(doctorId);
+		if (CollectionsUtil.isNotEmptyList(doctorTelephones)){
+			doctorTelephoneList.addAll(doctorTelephones);
+		}
+		List<String> distinctTelephoneList = doctorTelephoneList.stream().distinct().collect(Collectors.toList());
+		if (CollectionsUtil.isNotEmptyList(distinctTelephoneList)){
+			doctorMapper.deleteDoctorTelephone(doctorId);
+			doctorMapper.saveTelephoneList(doctorId, distinctTelephoneList);
+		}
+	}
+
 	
 	public static void main(String[] args) throws ParseException {
 		CommonService s = new CommonServiceImpl();

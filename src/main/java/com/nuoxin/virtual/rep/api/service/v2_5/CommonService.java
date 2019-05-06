@@ -2,8 +2,11 @@ package com.nuoxin.virtual.rep.api.service.v2_5;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
+import com.nuoxin.virtual.rep.api.entity.v2_5.HospitalProvinceBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DoctorImportErrorResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -59,6 +62,13 @@ public interface CommonService {
 	 * 根据现有的医生模板导入医生
 	 * @param file
 	 */
-	void doctorImport(MultipartFile file);
+	Map<String, DoctorImportErrorResponse> doctorImport(MultipartFile file);
+
+	/**
+	 * 根据医院名称得到医院ID,如果没有医院新增返回ID
+	 * @param hospitalProvinceBean
+	 * @return
+	 */
+	Long getHospitalId(HospitalProvinceBean hospitalProvinceBean);
 
 }

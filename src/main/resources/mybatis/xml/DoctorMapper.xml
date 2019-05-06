@@ -1439,12 +1439,14 @@
 			<if test="name !=null and name !=''">
 				name=#{name},
 			</if>
-			<if test="hospitalId !=null ">
-				hospital_id=#{hospitalId},
+			<if test="hospitalId !=null and hospitalId !=0 and hospitalName !=null and hospitalName !=''">
+				hospital_id=#{hospitalId}, hospital_name=#{hospitalName},
 			</if>
+			<!--
 			<if test="hospitalName !=null and hospitalName !=''">
 				hospital_name=#{hospitalName},
 			</if>
+			-->
 			<if test="province !=null and province !=''">
 				provice=#{province},
 			</if>
@@ -2168,5 +2170,15 @@
 		</foreach>
 
 	</select>
+
+	<insert id="saveTelephoneList">
+		INSERT INTO doctor_telephone(doctor_id, telephone)
+		VALUES
+		<foreach collection ="telephoneList" item="t" separator =",">
+			(#{doctorId}, #{t})
+		</foreach>
+
+	</insert>
+
 
 </mapper>

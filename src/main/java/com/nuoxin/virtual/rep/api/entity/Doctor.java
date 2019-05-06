@@ -37,6 +37,7 @@ public class Doctor extends IdEntity {
     @Column(name = "telephone")
     private String mobile;
 
+
     /**
      * 医生的多个联系方式
      */
@@ -189,4 +190,5 @@ public class Doctor extends IdEntity {
     public void setTelephoneList(List<String> telephoneList) {
         this.telephoneList = telephoneList;
     }
+
 }
