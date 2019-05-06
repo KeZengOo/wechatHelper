@@ -639,7 +639,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
             //判断是否需要将聊天记录上传,若需要就上传,不然就导出到本地
             if (isUpload) {
                 //上传联系人
-                upLoadFiles(baseUrl + "contact/import?uploadTime=" + currentTime, file1, false);
+                upLoadFiles(baseUrl + "contact/import?uploadTime=" + currentTime, file1, 1);
                 //联系人上传后再获取并上传群聊记录
                 getChatRoomData(db);
 
@@ -705,12 +705,10 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
             if (c3 != null) {
                 c3.close();
             }
-            if (db != null) {
-                db.close();
-            }
+
         }
         //上传群聊信息
-        upLoadFiles(baseUrl + "chatroom/contact/import?uploadTime=" + currentTime, file2, true);
+        upLoadFiles(baseUrl + "chatroom/contact/import?uploadTime=" + currentTime, file2, 2);
         //获取消息记录
         getReMessageData(db);
     }
@@ -735,7 +733,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
 
             //判断是否强制更新所有人
             if (iselectAll) {
-                c2 = db.rawQuery(messageSql + "0", null);
+                c2 = db.rawQuery(messageSql + "1556509061000", null);
                 Log.e("query", "更新全部记录" + messageSql + "0");
             } else {
                 c2 = db.rawQuery(messageSql + longLastUpdateTime, null);
@@ -808,10 +806,13 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
             if (c2 != null) {
                 c2.close();
             }
+            if (db != null) {
+                db.close();
+            }
 
         }
         //上传聊天记录
-        upLoadFiles(baseUrl + "message/import?uploadTime=" + currentTime, file2,true);
+        upLoadFiles(baseUrl + "message/import?uploadTime=" + currentTime, file2,3);
 
     }
 
@@ -819,8 +820,9 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
     /**
      * @param url
      * @throws Exception isSave 用来表示只有消息表上传成功时,才保存上传时间到 sp
+     * type  1 = 联系人    2 = 群聊  3 =  消息记录
      */
-    private void upLoadFiles(String url, File file, final boolean isMessage) {
+    private void upLoadFiles(String url, File file, final int type) {
         if (isDebug) {
             Log.e("query网址", url + file.getName());
         }
@@ -829,11 +831,21 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
             @Override
             public void run() {
                 if (mRemindText != null) {
-                    if (isMessage) {
-                        mRemindText.setText("正在向工作台上传聊天记录,请稍候");
-                    } else {
-                        mRemindText.setText("正在向工作台上传联系人,请稍候");
+                    switch (type) {
+                        case 1:
+                            mRemindText.setText("正在向工作台上传联系人,请稍候");
+                            break;
+                        case 2:
+                            mRemindText.setText("正在向工作台上传群聊,请稍候");
+                            break;
+                        case 3:
+                            mRemindText.setText("正在向工作台上传聊天记录,请稍候");
+                            break;
+                            default:
+                            mRemindText.setText("正在向工作台上传文件,请稍候");
+                                break;
                     }
+
                 }
             }
         });
@@ -864,10 +876,20 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
                         Log.e("query上传文件失败的返回错误", e.toString());
                     }
                     //上传失败
-                    if (isMessage) {
-                        getUploadTimeError("聊天记录上传失败请联系开发人员");
-                    } else {
-                        getUploadTimeError("联系人上传失败请联系开发人员");
+
+                    switch (type) {
+                        case 1:
+                            getUploadTimeError("联系人上传失败请联系开发人员");
+                            break;
+                        case 2:
+                            getUploadTimeError("群聊记录上传失败请联系开发人员");
+                            break;
+                        case 3:
+                            mRemindText.setText("聊天记录上传失败请联系开发人员");
+                            break;
+                        default:
+                            getUploadTimeError("上传失败请联系开发人员");
+                            break;
                     }
 
                     runOnUiThread(new Runnable() {
@@ -893,15 +915,27 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
                         e.printStackTrace();
                     }
                     if (isDebug) {
-                        if (isMessage) {
-                            Log.e("query上传聊天文件的返回值", string);
-                        } else {
-                            Log.e("query上传联系人文件的返回值", string);
+
+                        switch (type) {
+                            case 1:
+                                Log.e("query上传联系人文件的返回值", string);
+                                break;
+                            case 2:
+                                Log.e("query群聊记录上传文件的返回值", string);
+                                break;
+                            case 3:
+                                Log.e("query上传聊天文件的返回值", string);
+                                break;
+                            default:
+                                Log.e("query上传文件的返回值", string);
+                                break;
                         }
+
+
                     }
                     if (SUCCESS_CODE.equals(updateCode.toString())) {
                         //上传消息记录成功,重新赋值时间并保存sp时间
-                        if (isMessage) {
+                        if (type==3) {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -927,19 +961,31 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
                                     }
                                 }
                             });
-                        } else {
+                        } else if(type==1){
                             if (isDebug) {
                                 Log.e("query联系人上传成功", EMPTY);
                             }
+                        }else {
+                            if (isDebug) {
+                                Log.e("query群聊上传成功", EMPTY);
+                            }
                         }
-
                     } else {
-
-                        if (isMessage) {
-                            getUploadTimeError("聊天记录上传失败," + description);
-                        } else {
-                            getUploadTimeError("联系人上传失败" + description);
+                        switch (type) {
+                            case 1:
+                                getUploadTimeError("联系人上传失败" + description);
+                                break;
+                            case 2:
+                                getUploadTimeError("群聊记录上传失败" + description);
+                                break;
+                            case 3:
+                                getUploadTimeError("聊天记录上传失败," + description);
+                                break;
+                            default:
+                                getUploadTimeError("文件上传失败请联系开发人员");
+                                break;
                         }
+
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
