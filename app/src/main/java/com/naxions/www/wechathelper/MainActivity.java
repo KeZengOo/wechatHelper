@@ -110,6 +110,8 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
      */
     private TextView tv_updateTime;
     private TextView tv_title;
+    //描述
+    private TextView des_text;
     /**
      * 正在上传提示的 loadingView
      */
@@ -162,9 +164,12 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
     /**
      * baseUrl
      */
-
+    //测试
+     String baseUrl = "http://123.56.95.29:7083/android/wechat/";
+    //正式
+//   String baseUrl = "http://47.93.121.23:10001/android/wechat/";
     //sql 语句
-     String contactSql = "select * from rcontact where verifyFlag = 0 and type != 4 and type != 2 and type != 0 and type != 33 and nickname != ''and nickname != '文件传输助手'";
+     String contactSql = "select * from rcontact where verifyFlag = 0 and  type != 2 and type != 0 and type != 33 and nickname != ''and nickname != '文件传输助手'";
      String messageSql = "select * from message where  createTime >";
      String chatroomSql = "select * from chatroom";
     /**
@@ -215,6 +220,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
         tv_title = findViewById(R.id.tv_title);
         btn_export_all_message = findViewById(R.id.btn_export_all_message);
         et_name = findViewById(R.id.et_name);
+        des_text = findViewById(R.id.des_text);
         btn_updateData.setOnClickListener(this);
         btn_export.setOnClickListener(this);
         tv_title.setOnClickListener(this);
@@ -253,13 +259,13 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            //上传按钮
+            //上传聊天记录按钮
             case (R.id.btn_updateData):
                 iselectAll = false;
                 isUpload = true;
                 uploadData();
                 break;
-            //导出按钮
+            //导出联系人按钮
             case (R.id.btn_export):
                 startActivity(new Intent(mActivity, ExportActivity.class));
                 break;
@@ -593,7 +599,8 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
      */
     public void getRecontactData(SQLiteDatabase db) {
         Cursor c1 = null;
-        boolean b ;
+        //取消联系人的电话号码过滤
+       // boolean b ;
 
         try {
             //新建文件保存联系人信息
@@ -609,23 +616,22 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
                 String alias = c1.getString(c1.getColumnIndex("alias"));
                 String conRemark = c1.getString(c1.getColumnIndex("conRemark"));
                 String type = c1.getString(c1.getColumnIndex("type"));
-               // System.out.println("222hahahahahaha"+nickName+conRemark);
-
                 if(conRemark.isEmpty()){
                     conRemark = nickName;
-                    b = FilterUtil.filterPhoneNumber(nickName);
+               //     取消电话号码过滤,防止因为昵称带电话所以备注为空时不会录入医生
+               //     b = FilterUtil.filterPhoneNumber(nickName);
                 }else{
-                    b = FilterUtil.filterPhoneNumber(conRemark);
+               //     b = FilterUtil.filterPhoneNumber(conRemark);
                 }
-                System.out.println(b);
-                if (b) {
+               // System.out.println(b);
+               // if (b) {
                     if (isDebug) {
                         Log.e("contact", "userName=" + userName + "nickName=" + nickName + "alias=" + alias + "conRemark=" + conRemark + "type=" + type);
                     }
                         //将联系人信息写入 csv 文件
                         contactCsvPrinter.printRecord(FilterUtil.filterEmoji(userName), FilterUtil.filterEmoji(nickName), FilterUtil.filterEmoji(alias), FilterUtil.filterEmoji(conRemark), type);
 
-                }
+               // }
             }
             contactCsvPrinter.printRecord();
             contactCsvPrinter.flush();
@@ -634,8 +640,9 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
             if (isUpload) {
                 //上传联系人
                 upLoadFiles(baseUrl + "contact/import?uploadTime=" + currentTime, file1, false);
-                //联系人上传后再获取并上传聊天记录
-                getReMessageData(db);
+                //联系人上传后再获取并上传群聊记录
+                getChatRoomData(db);
+
 
             } else {
                 exportMessageToSD(db);
@@ -659,6 +666,54 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
         }
     }
 
+    //获取群的信息并上传
+    private void getChatRoomData(SQLiteDatabase db) {
+        Cursor c3 = null;
+        try {
+    //新建文件保存聊天记录
+            file2 = new File(Environment.getExternalStorageDirectory().getPath() + "/" + et_name.getText().toString().trim() + "ΞchatRoomΞfile" + ".csv");
+            // 防止出现乱码 utf-8
+            BufferedWriter writer2 = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file2), "UTF-8"));
+            messageCsvPrinter = new CSVPrinter(writer2, CSVFormat.DEFAULT.withHeader("chatroomname", "memberlist", "displayname", "roomowner","selfDisplayName"));
+
+            c3 = db.rawQuery(chatroomSql, null);
+
+            while (c3.moveToNext()) {
+                String chatroomname = c3.getString(c3.getColumnIndex("chatroomname"));
+                String memberlist = c3.getString(c3.getColumnIndex("memberlist"));
+                String displayname = c3.getString(c3.getColumnIndex("displayname"));
+                String roomowner = c3.getString(c3.getColumnIndex("roomowner"));
+                String selfDisplayName = c3.getString(c3.getColumnIndex("selfDisplayName"));
+                messageCsvPrinter.printRecord(chatroomname,memberlist, FilterUtil.filterEmoji(displayname),FilterUtil.filterEmoji(roomowner),selfDisplayName);
+                }
+
+            messageCsvPrinter.printRecord();
+            messageCsvPrinter.flush();
+
+        } catch (Exception e) {
+            if (isDebug) {
+                Log.e("openWxDb", "读取数据库信息失败" + e.toString());
+            }
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    getUploadTimeError("读取数据库信息失败");
+
+                }
+            });
+        } finally {
+            if (c3 != null) {
+                c3.close();
+            }
+            if (db != null) {
+                db.close();
+            }
+        }
+        //上传群聊信息
+        upLoadFiles(baseUrl + "chatroom/contact/import?uploadTime=" + currentTime, file2, true);
+        //获取消息记录
+        getReMessageData(db);
+    }
 
 
     /**
@@ -757,58 +812,9 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
         }
         //上传聊天记录
         upLoadFiles(baseUrl + "message/import?uploadTime=" + currentTime, file2,true);
-       //上传聊天记录的同时获取聊天室信息
-        getChatRoomData(db);
+
     }
 
-
-    //获取群聊的信息并上传
-    private void getChatRoomData(SQLiteDatabase db) {
-        Cursor c3 = null;
-
-        try {
-            //新建文件保存聊天记录
-            file2 = new File(Environment.getExternalStorageDirectory().getPath() + "/" + et_name.getText().toString().trim() + "ΞchatRoomΞfile" + ".csv");
-            // 防止出现乱码 utf-8
-            BufferedWriter writer2 = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file2), "UTF-8"));
-            messageCsvPrinter = new CSVPrinter(writer2, CSVFormat.DEFAULT.withHeader("chatroomname", "memberlist", "displayname", "roomowner"));
-
-            c3 = db.rawQuery(chatroomSql, null);
-
-            while (c3.moveToNext()) {
-                String chatroomname = c3.getString(c3.getColumnIndex("chatroomname"));
-                String memberlist = c3.getString(c3.getColumnIndex("memberlist"));
-                String displayname = c3.getString(c3.getColumnIndex("displayname"));
-                String roomowner = c3.getString(c3.getColumnIndex("roomowner"));
-
-                messageCsvPrinter.printRecord(chatroomname,memberlist, FilterUtil.filterEmoji(displayname),FilterUtil.filterEmoji(roomowner));
-                }
-
-            messageCsvPrinter.printRecord();
-            messageCsvPrinter.flush();
-
-        } catch (Exception e) {
-            if (isDebug) {
-                Log.e("openWxDb", "读取数据库信息失败" + e.toString());
-            }
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    getUploadTimeError("读取数据库信息失败");
-
-                }
-            });
-        } finally {
-            if (c3 != null) {
-                c3.close();
-            }
-            if (db != null) {
-                db.close();
-            }
-        }
-        //上传群聊信息
-        //upLoadFiles(baseUrl + "message/import?uploadTime=" + currentTime, file2, true);
-    }
 
     /**
      * @param url
@@ -853,7 +859,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
                 private String description;
 
                 @Override
-                public void onFailure(Call call, IOException e) {
+                public void onFailure(Call call, final IOException e) {
                     if (isDebug) {
                         Log.e("query上传文件失败的返回错误", e.toString());
                     }
@@ -863,6 +869,15 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
                     } else {
                         getUploadTimeError("联系人上传失败请联系开发人员");
                     }
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            //失败原因显示
+                            des_text.setText(e.toString());
+
+                        }
+                    });
                 }
 
                 @Override
@@ -928,6 +943,8 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                //失败原因显示
+                                des_text.setText(description);
                                 Toast.makeText(getApplicationContext(), description, Toast.LENGTH_LONG).show();
                             }
                         });
@@ -937,7 +954,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
             });
         }
     }
-    
+
     /**
      * 获取聊天记录并保存在本地
      *
