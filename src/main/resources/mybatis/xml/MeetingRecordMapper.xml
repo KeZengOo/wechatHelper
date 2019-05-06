@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.MeetingRecordMapper">
+
+    <!-- 会议记录查询列表 -->
+    <select id="getMeetingRecordList" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingRecordParams">
+        SELECT
+            t.id,
+            t.product_id AS productId,
+            t.product_name AS productName,
+            t.title,
+            t.start_time AS startTime,
+            t.end_time AS endTime,
+            COUNT(DISTINCT d.doctor_id) doctorCount
+        FROM
+            t_meeting_data t
+        LEFT JOIN t_meeting_attend_details d ON t.id = d.meeting_id
+        AND d.type = 1
+        WHERE
+            1 = 1
+        AND product_id != ''
+        <if test="meetingRecordRequest.productId != 0 and meetingRecordRequest.productId != null">
+            AND t.product_id = #{meetingRecordRequest.productId}
+        </if>
+
+        <if test="meetingRecordRequest.startTimeBefore != '' and meetingRecordRequest.startTimeBefore != null">
+            AND t.start_time &gt;= #{meetingRecordRequest.startTimeBefore}
+        </if>
+
+        <if test="meetingRecordRequest.startTimeAfter != '' and meetingRecordRequest.startTimeAfter != null">
+            AND t.start_time &lt;= #{meetingRecordRequest.startTimeAfter}
+        </if>
+
+        GROUP BY
+            t.id
+        LIMIT #{meetingRecordRequest.currentSize},#{meetingRecordRequest.pageSize}
+    </select>
+
+    <!-- 会议记录查询列表总数 -->
+    <select id="getMeetingRecordListCount" resultType="java.lang.Integer">
+        SELECT
+            COUNT(1)
+        FROM
+            t_meeting_data t
+
+        WHERE
+            1 = 1
+        AND t.product_id != ''
+        <if test="meetingRecordRequest.productId != 0 and meetingRecordRequest.productId != null">
+            AND t.product_id = #{meetingRecordRequest.productId}
+        </if>
+
+        <if test="meetingRecordRequest.startTimeBefore != '' and meetingRecordRequest.startTimeBefore != null">
+            AND t.start_time &gt;= #{meetingRecordRequest.startTimeBefore}
+        </if>
+
+        <if test="meetingRecordRequest.startTimeAfter != '' and meetingRecordRequest.startTimeAfter != null">
+            AND t.start_time &lt;= #{meetingRecordRequest.startTimeAfter}
+        </if>
+
+    </select>
+
+    <!-- 获取产品下的所有招募医生 -->
+    <select id="getRecruitHcpAllCountByProduct" resultType="java.lang.Integer">
+        SELECT
+            count(t.doctor_id)
+        FROM
+            (
+                SELECT
+                    t.doctor_id
+                FROM
+                    drug_user_doctor_quate t
+                WHERE
+                    t.product_id = #{productId}
+                AND t.is_recruit = 1
+                GROUP BY
+                    t.doctor_id
+            ) t
+    </select>
+
+    <!-- 查询每个会议的主题列表 -->
+    <select id="getMeetingSubjectListByProductIdAndMeetingName" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingSubjectParams">
+        SELECT
+            t.id,
+            t.product_id AS productId,
+            t.meeting_name AS meetingName,
+            t.subject_name AS subjectName,
+            t.speaker,
+            t.start_time AS startTime,
+            t.end_time AS endTime
+        FROM
+            t_meeting_subject t
+        WHERE
+            t.product_id = #{productId}
+        AND t.meeting_name = #{meetingName}
+    </select>
+
+    <!-- 根据会议ID查询会议详情 -->
+    <select id="getMeetingInfoByMeetingId" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingRecordParams">
+        SELECT
+            t.id,
+            t.product_id AS productId,
+            t.product_name AS productName,
+            t.title,
+            t.start_time AS startTime,
+            t.end_time AS endTime
+        FROM
+            t_meeting_data t
+        WHERE
+            1 = 1
+        AND id = #{meetingId}
+    </select>
+
+    <!-- 参会列表 -->
+    <select id="getMeetingAttendDetailsListByMeetingId" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingAttendDetailsParams">
+        SELECT
+            t.doctor_id AS doctorId,
+            t.doctor_name AS doctorName,
+            d.hospital_id AS hospitalId,
+            d.hospital_name AS hospitalName,
+            d.depart,
+            t.attend_start_time AS attendStartTime,
+            t.attend_end_time AS attendEndTime,
+            t.attend_sum_time AS attendSumTime,
+            t.meeting_id AS meetingId,
+            t.type
+        FROM
+            t_meeting_attend_details t
+        LEFT JOIN doctor d ON t.doctor_id = d.id
+        WHERE
+            1 = 1
+        AND t.doctor_id != ''
+        AND t.meeting_id = #{meetingAttendDetailsRequest.meetingId}
+        AND t.type = 1
+        GROUP BY t.doctor_id
+        LIMIT #{meetingAttendDetailsRequest.currentSize},#{meetingAttendDetailsRequest.pageSize}
+    </select>
+
+    <!-- 参会总数 -->
+    <select id="getMeetingAttendDetailsCountByMeetingId" resultType="java.lang.Integer">
+SELECT
+	COUNT(m.doctor_id)
+FROM
+	(
+		SELECT
+			t.doctor_id
+		FROM
+			t_meeting_attend_details t
+		LEFT JOIN doctor d ON t.doctor_id = d.id
+		WHERE
+			1 = 1
+		AND t.doctor_id != ''
+		AND t.meeting_id = #{meetingId}
+		AND t.type = 1
+		GROUP BY
+			t.doctor_id
+	) m
+    </select>
+
+    <!-- 根据医生ID和会议ID查询该医生的所有参会时间 -->
+    <select id="getMeetingTimeByDoctorIdAndMeetingID" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingAttendDetailsParams">
+        SELECT
+            t.doctor_id AS doctorId,
+            t.attend_start_time AS attendStartTime,
+            t.attend_end_time AS attendEndTime,
+            t.attend_sum_time AS attendSumTime,
+            t.meeting_id AS meetingId,
+            t.type
+        FROM
+            t_meeting_attend_details t
+        LEFT JOIN doctor d ON t.doctor_id = d.id
+        WHERE
+            1 = 1
+        AND t.doctor_id != ''
+        AND t.doctor_id = #{doctorId}
+        AND t.meeting_id = #{meetingId}
+        AND t.type = 1
+    </select>
+</mapper>

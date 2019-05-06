@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.ContentSharingMapper">
+
+    <!-- 内容分享列表 -->
+    <select id="getContentSharingListPage" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.ContentSharingParams">
+            SELECT
+                m.id,
+                m.title,
+                m.time,
+                m.share_type AS shareType,
+                m.drug_user_id AS drugUserId,
+                m.drug_user_name AS drugUserName,
+                count(m.title) AS peopleNumber,
+                SUM(m.read_time) AS totalDuration,
+                p.product_id AS productId,
+                l.prod_name AS prodName,
+                u.sale_type AS saleType
+            FROM
+                (
+                    SELECT
+                        t.id,
+                        t.title,
+                        t.time,
+                        r.share_type,
+                        r.data_id,
+                        r.drug_user_id,
+                        r.drug_user_name,
+                        r.read_person_id,
+                        r.read_person_name,
+                        r.read_time
+                    FROM
+                        activity_info t
+                    LEFT JOIN activity_read r ON t.id = r.data_id
+                    JOIN activity_read_ip ip ON r.read_token = ip.read_token
+                    WHERE
+                        1 = 1
+                    AND t.id = r.data_id
+                    AND (
+                        ip.isp IS NULL
+                        OR ip.isp != '阿里云'
+                    )
+                    AND r.read_person_id != ''
+                    GROUP BY
+                        read_person_id,
+                        id
+                ) m
+            JOIN t_content_product p ON p.content_id = m.id
+            JOIN product_line l ON p.product_id = l.prod_id
+            JOIN drug_user u ON m.drug_user_id = u.id
+
+            WHERE
+              1 = 1
+
+            <if test="contentSharingRequest.productId != 0 and contentSharingRequest.productId != null">
+                 AND l.prod_id = #{contentSharingRequest.productId}
+            </if>
+
+            <if test="contentSharingRequest.drugUserId != 0 and contentSharingRequest.drugUserId != null">
+                 AND m.drug_user_id = #{contentSharingRequest.drugUserId}
+            </if>
+
+            <if test="contentSharingRequest.shareType != 0 and contentSharingRequest.shareType != null">
+                 AND m.share_type = #{contentSharingRequest.shareType}
+            </if>
+
+            <if test="contentSharingRequest.startTimeBefore != '' and contentSharingRequest.startTimeBefore != null">
+                 AND m.time &gt;= #{contentSharingRequest.startTimeBefore}
+            </if>
+
+            <if test="contentSharingRequest.startTimeAfter != '' and contentSharingRequest.startTimeAfter != null">
+                 AND m.time &lt;= #{contentSharingRequest.startTimeAfter}
+            </if>
+
+            GROUP BY
+                title
+            LIMIT #{contentSharingRequest.currentSize},#{contentSharingRequest.pageSize}
+
+    </select>
+
+    <!-- 内容分享列表总数 -->
+    <select id="getContentSharingListCount" resultType="java.lang.Integer">
+            SELECT
+                count(p.id)
+            FROM
+                (
+                    SELECT
+                        m.id
+                    FROM
+                        (
+                            SELECT
+                                t.id,
+                                t.title,
+                                t.time,
+                                r.share_type,
+                                r.data_id,
+                                r.drug_user_id,
+                                r.drug_user_name,
+                                r.read_person_id,
+                                r.read_person_name,
+                                r.read_time
+                            FROM
+                                activity_info t
+                            LEFT JOIN activity_read r ON t.id = r.data_id
+                            JOIN activity_read_ip ip ON r.read_token = ip.read_token
+                            WHERE
+                                1 = 1
+                            AND t.id = r.data_id
+                            AND (
+                                ip.isp IS NULL
+                                OR ip.isp != '阿里云'
+                            )
+                            AND r.read_person_id != ''
+                            GROUP BY
+                                read_person_id,
+                                id
+                        ) m
+                    JOIN t_content_product p ON p.content_id = m.id
+                    JOIN product_line l ON p.product_id = l.prod_id
+                    JOIN drug_user u ON m.drug_user_id = u.id
+
+                    WHERE
+                    1 = 1
+
+                    <if test="contentSharingRequest.productId != 0 and contentSharingRequest.productId != null">
+                        AND l.prod_id = #{contentSharingRequest.productId}
+                    </if>
+
+                    <if test="contentSharingRequest.drugUserId != 0 and contentSharingRequest.drugUserId != null">
+                        AND m.drug_user_id = #{contentSharingRequest.drugUserId}
+                    </if>
+
+                    <if test="contentSharingRequest.shareType != 0 and contentSharingRequest.shareType != null">
+                        AND m.share_type = #{contentSharingRequest.shareType}
+                    </if>
+
+                    <if test="contentSharingRequest.startTimeBefore != '' and contentSharingRequest.startTimeBefore != null">
+                        AND m.time &gt;= #{contentSharingRequest.startTimeBefore}
+                    </if>
+
+                    <if test="contentSharingRequest.startTimeAfter != '' and contentSharingRequest.startTimeAfter != null">
+                        AND m.time &lt;= #{contentSharingRequest.startTimeAfter}
+                    </if>
+                    GROUP BY
+                        title
+                ) p
+    </select>
+
+    <!-- 内容阅读记录列表 -->
+    <select id="getContentReadLogsListPage" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.ContentReadLogsParams">
+        SELECT
+            t.id,
+            t.data_id AS dataId,
+            d.id AS doctorId,
+            d.`name` AS doctorName,
+            d.hospital_name AS hospitalName,
+            d.depart,
+            t.create_time AS createTime,
+            t.read_time AS readTime
+        FROM
+            activity_read t
+        JOIN activity_read_ip ip ON t.read_token = ip.read_token
+        JOIN doctor d ON t.read_person_id = d.id
+        WHERE
+            1 = 1
+        AND (
+            ip.isp IS NULL
+            OR ip.isp != '阿里云'
+        )
+        AND t.data_id = #{contentReadLogsRequest.dataId}
+        GROUP BY t.data_id,d.id
+        LIMIT #{contentReadLogsRequest.currentSize},#{contentReadLogsRequest.pageSize}
+    </select>
+
+    <!-- 内容阅读记录列表Count -->
+    <select id="getContentReadLogsListCount" resultType="java.lang.Integer">
+        SELECT
+            COUNT(m.id)
+        FROM
+            (
+                SELECT
+                    t.id
+                FROM
+                    activity_read t
+                JOIN activity_read_ip ip ON t.read_token = ip.read_token
+                JOIN doctor d ON t.read_person_id = d.id
+                WHERE
+                    1 = 1
+                AND (
+                    ip.isp IS NULL
+                    OR ip.isp != '阿里云'
+                )
+                AND t.data_id = #{contentReadLogsRequest.dataId}
+                GROUP BY
+                    t.data_id,
+                    d.id
+            ) m
+    </select>
+
+    <!-- 根据内容ID和医生ID查询阅读时间数组和阅读时长数组 -->
+    <select id="getReadTimeAndReadDurationByDataIdAndDoctorId" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.ContentReadLogsTimeParams">
+        SELECT
+            t.create_time AS createTime,t.read_time AS readTime
+        FROM
+            activity_read t
+        WHERE
+            t.read_person_id = #{doctorId}
+        AND t.data_id = #{dataId}
+    </select>
+</mapper>
