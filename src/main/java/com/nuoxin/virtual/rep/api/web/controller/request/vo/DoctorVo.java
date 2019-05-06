@@ -43,7 +43,7 @@ public class DoctorVo {
     @Excel(name = "科室名称")
     private String depart;
 
-    @Excel(name = "职称")
+    @Excel(name = "医生职称")
     private String positions;
 
     @Excel(name = "代表工作邮箱", width = 50)

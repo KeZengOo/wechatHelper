@@ -252,6 +252,22 @@
         </foreach>
     </select>
 
+    <select id="getRoleIdListByDoctor" resultType="com.nuoxin.virtual.rep.api.entity.DrugUser">
+        SELECT DISTINCT
+            du.email,
+            ru.role_id roleId
+        FROM
+            drug_user du
+            INNER JOIN drug_user_doctor dud ON du.id = dud.drug_user_id
+            INNER JOIN role_user ru ON du.id = ru.user_id
+        WHERE
+            dud.is_available = 1
+            AND dud.doctor_id=#{doctorId}
+            AND du.id != #{drugUserId}
+            AND dud.prod_id=#{productId}
+            AND ru.role_id > 100
+    </select>
+
 
     <!-- 查询代表角色种类，去重  -->
     <select id="getDrugUserList" resultType="com.nuoxin.virtual.rep.api.entity.DrugUser">

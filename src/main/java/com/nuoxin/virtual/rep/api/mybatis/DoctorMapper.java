@@ -305,6 +305,6 @@ public interface DoctorMapper{
      * @param doctorId
      * @param telephoneList
      */
-    void saveTelephoneList(Long doctorId,@Param(value = "telephoneList") List<String> telephoneList);
+    void saveTelephoneList(@Param(value = "doctorId") Long doctorId,@Param(value = "telephoneList") List<String> telephoneList);
 
 }

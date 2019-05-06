@@ -9,6 +9,7 @@ import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.share.ShareRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.MyDoctorRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ContentShareResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DoctorImportErrorResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.MyDoctorResponse;
 import com.nuoxin.virtual.rep.api.web.controller.v2_5.NewBaseController;
 import io.swagger.annotations.Api;
@@ -23,6 +24,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 我的客户相关接口
@@ -58,11 +60,11 @@ public class MyDoctorController extends NewBaseController {
 
     @ApiOperation(value = "导入医生", notes = "导入医生")
     @PostMapping(value = "/import")
-    public DefaultResponseBean<Boolean> doctorImport(MultipartFile file) {
+    public DefaultResponseBean<Map<String, DoctorImportErrorResponse>> doctorImport(MultipartFile file) {
 
-        commonService.doctorImport(file);
-        DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
-        responseBean.setData(true);
+        Map<String, DoctorImportErrorResponse> map = commonService.doctorImport(file);
+        DefaultResponseBean<Map<String, DoctorImportErrorResponse>> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(map);
         return responseBean;
     }
 

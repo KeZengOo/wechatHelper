@@ -128,6 +128,15 @@ public interface DrugUserMapper extends MyMapper<DrugUser> {
 	List<Long> getRoleIdList(@Param(value = "drugUserEmailList") List<String> drugUserEmailList);
 
     /**
+     * 根据代表邮箱查询代表角色种类，去重
+     * @param drugUserId
+     * @param doctorId
+     * @param productId
+     * @return
+     */
+    List<DrugUser> getRoleIdListByDoctor(@Param(value = "drugUserId") Long drugUserId, @Param(value = "doctorId") Long doctorId,@Param(value = "productId") Long productId);
+
+    /**
      * 得到代表角色种类，去重
      * @param telephone
      * @param productId
