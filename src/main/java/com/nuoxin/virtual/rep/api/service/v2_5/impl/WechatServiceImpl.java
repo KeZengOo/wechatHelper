@@ -713,7 +713,7 @@ public class WechatServiceImpl implements WechatService {
             String[] memberIdList = this.checkMemberIdListStr(memberIdListStr);
             String[] displayNameList = this.checkDisplayNameListStr(displayNameListStr);
             if (memberIdList.length !=displayNameList.length){
-                throw new BusinessException(ErrorEnum.ERROR, "群成员备注中不能包含符号、");
+                throw new BusinessException(ErrorEnum.ERROR, "群成员昵称和备注中不能包含符号、");
             }
 
             for (int i = 0; i < memberIdList.length; i++) {
