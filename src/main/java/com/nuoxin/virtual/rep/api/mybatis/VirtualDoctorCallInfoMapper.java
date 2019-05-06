@@ -234,5 +234,16 @@ public interface VirtualDoctorCallInfoMapper {
 	 * @return
 	 */
 	Integer getCountByCallRequest(CallRequestBean bean);
+
+
+	/*********************************  V3.0.1相关  ******************************************/
+
+	/**
+	 * 新增拜访的目的
+	 * @param callId
+	 * @param purposeList
+	 */
+	void addCallPurpose(@Param(value = "callId") Long callId,@Param(value = "purposeList") List<String> purposeList);
+
 }
 

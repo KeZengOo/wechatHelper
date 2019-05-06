@@ -99,6 +99,12 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 
 		callInfoMapper.updateCallProduct(callId, productId.longValue());
 
+
+		// 保存电话拜访的目的
+		List<String> purposeList = saveRequest.getPurposeList();
+		if (CollectionsUtil.isNotEmptyList(purposeList)){
+			callInfoMapper.addCallPurpose(callId, purposeList);
+		}
 		return false;
 	}
 

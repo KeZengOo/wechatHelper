@@ -1531,4 +1531,19 @@
 			AND product_id = #{productId}
 			AND DATE_FORMAT( #{messageTime}, '%Y-%m-%d' ) = DATE_FORMAT( create_time, '%Y-%m-%d' )
 	</select>
+
+
+	<!-- 新增拜访的目的 -->
+	<insert id="addCallPurpose">
+		INSERT INTO virtual_doctor_call_purpose(call_id, item)
+		VALUES
+		<foreach collection="purposeList" item="purpose" separator=",">
+			(
+			#{callId},
+			#{purpose}
+			)
+		</foreach>
+
+	</insert>
+
 </mapper>

@@ -64,4 +64,7 @@ public class SaveCallInfoRequest  extends BaseCallInfoRequest{
 	
 	@NotNull(message="questions is null")
 	List<VirtualQuestionRequestBean> questions = new ArrayList<>();
+
+	@ApiModelProperty(value = "拜访目的")
+	List<String> purposeList = new ArrayList<>();
 }
