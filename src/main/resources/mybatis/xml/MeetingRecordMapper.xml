@@ -176,4 +176,59 @@ FROM
         AND t.meeting_id = #{meetingId}
         AND t.type = 1
     </select>
+
+    <!-- 导入Excel -->
+    <insert id="saveExcel">
+        INSERT INTO t_meeting_subject (
+            meeting_name,
+            subject_name,
+            speaker,
+            start_time,
+            end_time
+        )
+        VALUES
+        <foreach collection="list" item="list" separator=",">
+            (#{list.meetingName}, #{list.subjectName},#{list.speaker},#{list.startTime},#{list.endTime})
+        </foreach>
+    </insert>
+
+    <!--参会导入Excel -->
+    <insert id="saveMeetingParticipantsExcel">
+        INSERT INTO t_meeting_attend_details (
+        meeting_id,
+        doctor_id,
+        doctor_name,
+        doctor_tel,
+        attend_sum_time,
+        attend_start_time,
+        `type`,
+        attend_end_time
+        )
+        VALUES
+        <foreach collection="list" item="list" separator=",">
+            (#{list.meetingId}, #{list.doctorId},#{list.doctorName},#{list.doctorTel},#{list.attendSumTime},#{list.attendStartTime},#{list.type},#{list.attendEndTime})
+        </foreach>
+    </insert>
+
+    <!--根据meetingId获取会议项目ID -->
+    <select id="getMeetingItemIdByMeetingId" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingParticipantsParams">
+        SELECT
+            t.item_id AS itemId
+        FROM
+            t_meeting_data t
+        WHERE
+            t.id = #{meetingId}
+    </select>
+
+    <!--根据医生手机号获取医生信息 -->
+    <select id="getDoctorInfoByDoctorTel" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingParticipantsParams">
+        SELECT
+            d.id AS doctorId,
+            d.`name`
+        FROM
+            doctor d
+        LEFT JOIN doctor_telephone p ON d.telephone = p.telephone
+        WHERE
+            p.telephone = #{doctorTel};
+    </select>
 </mapper>

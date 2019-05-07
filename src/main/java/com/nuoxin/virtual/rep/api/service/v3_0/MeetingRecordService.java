@@ -7,8 +7,10 @@ import com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingSubjectParams;
 import com.nuoxin.virtual.rep.api.entity.v3_0.request.MeetingAttendDetailsRequest;
 import com.nuoxin.virtual.rep.api.entity.v3_0.request.MeetingRecordRequest;
 import com.nuoxin.virtual.rep.api.entity.v3_0.request.MeetingSubjectRequest;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 会议记录查询
@@ -36,4 +38,19 @@ public interface MeetingRecordService {
      * @return list
      */
     PageResponseBean<List<MeetingAttendDetailsParams>> getMeetingAttendDetailsListByMeetingId(MeetingAttendDetailsRequest meetingAttendDetailsRequest);
+
+    /**
+     * 导入会议列表
+     * @param file
+     * @return map
+     */
+    Map<String, Object> meetingImport(MultipartFile file);
+
+    /**
+     * 导入参会列表
+     * @param file
+     * @param meetId
+     * @return map
+     */
+    Map<String, Object> meetingParticipantsImport(MultipartFile file, String meetId);
 }

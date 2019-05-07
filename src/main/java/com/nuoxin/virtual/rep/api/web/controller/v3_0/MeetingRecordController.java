@@ -13,15 +13,15 @@ import com.nuoxin.virtual.rep.api.service.v3_0.MeetingRecordService;
 import com.nuoxin.virtual.rep.api.service.v3_0.WenJuanQuestionnaireService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import io.swagger.annotations.ApiParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 会议记录查询
@@ -62,4 +62,25 @@ public class MeetingRecordController {
         responseBean.setData(list);
         return responseBean;
     }
+
+    @ApiOperation(value = "导入会议列表")
+    @RequestMapping(value = "/meetingImport", method = {RequestMethod.POST})
+    public DefaultResponseBean<Map<String, Object>> meetingImport(@RequestParam("file") @ApiParam("会议列表文件") MultipartFile file) {
+        Map<String, Object> result = meetingRecordService.meetingImport(file);
+        DefaultResponseBean<Map<String, Object>> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(result);
+        responseBean.setMessage("");
+        return responseBean;
+    }
+
+    @ApiOperation(value = "导入参会列表")
+    @RequestMapping(value = "/meetingParticipantsImport", method = {RequestMethod.POST})
+    public DefaultResponseBean<Map<String, Object>> meetingParticipantsImport(@RequestParam("file") @ApiParam("参会列表文件") MultipartFile file, @RequestParam("meetingId") String meetingId) {
+        Map<String, Object> result = meetingRecordService.meetingParticipantsImport(file,meetingId);
+        DefaultResponseBean<Map<String, Object>> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(result);
+        responseBean.setMessage("");
+        return responseBean;
+    }
+
 }
