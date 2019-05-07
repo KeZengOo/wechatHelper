@@ -18,7 +18,10 @@
 	<update id="updateDrugUserDoctorAvailable">
 		UPDATE drug_user_doctor SET is_available=0
 		WHERE drug_user_id=#{drugUserId}
-		AND doctor_id=#{doctorId}
+		<if test="doctorId !=null">
+			AND doctor_id=#{doctorId}
+		</if>
+
 		AND prod_id=#{prodId}
 	</update>
 

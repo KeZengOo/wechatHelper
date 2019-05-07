@@ -57,4 +57,14 @@ public class CommonPoolController {
         return responseBean;
     }
 
+
+    @ApiOperation(value = "导入医生转代表", notes = "导入医生转代表")
+    @PostMapping(value = "/drug/user/doctor/transfer")
+    public DefaultResponseBean<Map<String, DoctorImportErrorResponse>> drugUserDoctorTransfer(MultipartFile file) {
+        Map<String, DoctorImportErrorResponse> map = commonService.drugUserDoctorTransfer(file);
+        DefaultResponseBean<Map<String, DoctorImportErrorResponse>> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(map);
+        return responseBean;
+    }
+
 }

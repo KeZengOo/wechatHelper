@@ -18,6 +18,7 @@ import java.util.List;
 public class UpdateVirtualDoctorRequest {
 
 	@ApiModelProperty(value = "医生ID")
+	@NotNull(message = "医生ID不能为空！")
 	private Long id;
 
 	@ApiModelProperty(value = "医生姓名")

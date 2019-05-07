@@ -61,9 +61,18 @@ public interface CommonService {
 
 	/**
 	 * 根据现有的医生模板导入医生
-	 * @param file
+	 * @param file 导入的文件
+	 * @return 导出遇到的错误
 	 */
 	Map<String, DoctorImportErrorResponse> doctorImport(MultipartFile file);
+
+
+	/**
+	 * 根据现有的医生模板导入医生
+	 * @param file
+	 * @return 导出遇到的错误
+	 */
+	Map<String, DoctorImportErrorResponse> drugUserDoctorTransfer(MultipartFile file);
 
 	/**
 	 * 根据医院名称得到医院ID,如果没有医院新增返回ID
@@ -78,4 +87,17 @@ public interface CommonService {
 	 * @return
 	 */
 	List<String> filterInvalidTelephones(List<DoctorTelephoneResponse> doctorTelephones);
+
+	/**
+	 * 产品名称和ID对应关系
+	 * @return
+	 */
+	Map<String, Long> getProductNameIdMap();
+
+	/**
+	 * 产品ID和名称对应关系
+	 * @return
+	 */
+	Map<Long, String> getProductIdNameMap();
+
 }
