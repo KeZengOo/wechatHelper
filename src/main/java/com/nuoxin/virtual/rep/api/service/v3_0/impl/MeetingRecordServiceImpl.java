@@ -1,7 +1,10 @@
 package com.nuoxin.virtual.rep.api.service.v3_0.impl;
 
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
+import com.nuoxin.virtual.rep.api.entity.v3_0.excel.MeetingParticipantsExcel;
+import com.nuoxin.virtual.rep.api.entity.v3_0.excel.MeetingSubjectExcel;
 import com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingAttendDetailsParams;
+import com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingParticipantsParams;
 import com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingRecordParams;
 import com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingSubjectParams;
 import com.nuoxin.virtual.rep.api.entity.v3_0.request.MeetingAttendDetailsRequest;
@@ -9,21 +12,31 @@ import com.nuoxin.virtual.rep.api.entity.v3_0.request.MeetingRecordRequest;
 import com.nuoxin.virtual.rep.api.entity.v3_0.request.MeetingSubjectRequest;
 import com.nuoxin.virtual.rep.api.mybatis.MeetingRecordMapper;
 import com.nuoxin.virtual.rep.api.service.v3_0.MeetingRecordService;
-import io.swagger.models.auth.In;
+import com.nuoxin.virtual.rep.api.utils.ExcelUtils;
+import com.nuoxin.virtual.rep.api.utils.excel.RegularUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.formula.functions.T;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
 import javax.annotation.Resource;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * 会议记录查询
  * @author wujiang
  * @date 20190429
  */
+@Slf4j
 @Service
 public class MeetingRecordServiceImpl implements MeetingRecordService {
 
@@ -129,5 +142,189 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
         return new PageResponseBean(meetingAttendDetailsRequest, meetingAttendDetailsCount, newList);
     }
 
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    public Map<String, Object> meetingImport(MultipartFile file) {
+        Map<String, Object> map =new HashMap<String, Object>(2);
+
+        boolean flag = false;
+        String originalFilename = file.getOriginalFilename();
+        if (!originalFilename.endsWith(RegularUtils.EXTENSION_XLS) && !originalFilename.endsWith(RegularUtils.EXTENSION_XLSX)) {
+            log.error("文件格式错误");
+            map.put("flag",flag);
+            map.put("message","文件格式错误");
+            return map;
+        }
+
+        List<MeetingSubjectExcel> meetingSubjectExcels = new ArrayList<MeetingSubjectExcel>();
+        InputStream inputStream = null;
+        ExcelUtils<MeetingSubjectExcel> excelUtils = new ExcelUtils<>(new MeetingSubjectExcel());
+
+        try {
+            inputStream = file.getInputStream();
+            meetingSubjectExcels = excelUtils.readFromFile(null, inputStream);
+        } catch (Exception e) {
+            log.error("读取上传的excel文件失败。。", e);
+            map.put("flag",flag);
+            map.put("message","读取上传的excel文件失败。。");
+            return map;
+        } finally {
+            if(inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    log.error("IOException", e);
+                }
+            }
+        }
+
+        List<MeetingSubjectExcel> meetingTemps = new ArrayList<MeetingSubjectExcel>();
+
+        for (MeetingSubjectExcel h : meetingSubjectExcels) {
+            MeetingSubjectExcel meetingSubjectExcel = new MeetingSubjectExcel();
+
+            if (h != null) {
+                try {
+                    if(null != h.getMeetingName() && null != h.getSubjectName() && null != h.getSpeaker() && null != h.getStartTime() && null != h.getEndTime())
+                    {
+                        meetingSubjectExcel.setMeetingName(h.getMeetingName());
+                        meetingSubjectExcel.setSubjectName(h.getSubjectName());
+                        meetingSubjectExcel.setSpeaker(h.getSpeaker());
+                        meetingSubjectExcel.setStartTime(h.getStartTime());
+                        meetingSubjectExcel.setEndTime(h.getEndTime());
+                        meetingTemps.add(meetingSubjectExcel);
+                    }
+                    else
+                    {
+                        map.put("flag",false);
+                        map.put("message","上传数据存在空值");
+                        return map;
+                    }
+                } catch (Exception e) {
+                    log.error("IOException", e);
+                }
+            }
+        }
+
+        //把list存到mysql
+        boolean result = false;
+        try {
+            result = meetingRecordMapper.saveExcel(meetingTemps);
+            flag = result;
+            map.put("flag",flag);
+            map.put("message","上传会议成功");
+        } catch (Exception e) {
+            log.error("IOException", e);
+            map.put("flag",flag);
+            map.put("message","上传会议失败");
+        }
+        return map;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    @Override
+    public Map<String, Object> meetingParticipantsImport(MultipartFile file, String meetingId) {
+
+        Map<String, Object> map =new HashMap<String, Object>(2);
+
+        boolean flag = false;
+        String originalFilename = file.getOriginalFilename();
+        if (!originalFilename.endsWith(RegularUtils.EXTENSION_XLS) && !originalFilename.endsWith(RegularUtils.EXTENSION_XLSX)) {
+            log.error("文件格式错误");
+            map.put("flag",flag);
+            map.put("message","文件格式错误");
+            return map;
+        }
+
+        List<MeetingParticipantsExcel> meetingParticipantsExcels = new ArrayList<MeetingParticipantsExcel>();
+        InputStream inputStream = null;
+        ExcelUtils<MeetingParticipantsExcel> excelUtils = new ExcelUtils<>(new MeetingParticipantsExcel());
+
+        try {
+            inputStream = file.getInputStream();
+            meetingParticipantsExcels = excelUtils.readFromFile(null, inputStream);
+        } catch (Exception e) {
+            log.error("读取上传的excel文件失败。。", e);
+            map.put("flag",flag);
+            map.put("message","读取上传的excel文件失败。。");
+            return map;
+        } finally {
+            if(inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    log.error("IOException", e);
+                }
+            }
+        }
+
+        List<MeetingParticipantsExcel> meetingParticipantsTemps = new ArrayList<MeetingParticipantsExcel>();
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        for (MeetingParticipantsExcel h : meetingParticipantsExcels) {
+            MeetingParticipantsExcel meetingParticipantsExcel = new MeetingParticipantsExcel();
+            if (h != null) {
+                try {
+                    if(null != h.getDoctorTel() && null != h.getAttendStartTime() && null != h.getAttendEndTime())
+                    {
+                        //根据会议ID获取会议项目ID
+                        MeetingParticipantsParams meetingParticipants = meetingRecordMapper.getMeetingItemIdByMeetingId(meetingId);
+                        //根据医生电话号获取医生信息
+                        MeetingParticipantsParams meetingParticipantsDoctorInfo = meetingRecordMapper.getDoctorInfoByDoctorTel(h.getDoctorTel());
+
+                        if(null != meetingParticipants.getItemId() && null != meetingParticipantsDoctorInfo.getDoctorId() && null != meetingParticipantsDoctorInfo.getName()){
+                            meetingParticipantsExcel.setDoctorId(meetingParticipantsDoctorInfo.getDoctorId().toString());
+                            meetingParticipantsExcel.setDoctorName(meetingParticipantsDoctorInfo.getName());
+                            meetingParticipantsExcel.setMeetingId(meetingId);
+                            meetingParticipantsExcel.setAttendStartTime(h.getAttendStartTime());
+                            meetingParticipantsExcel.setAttendEndTime(h.getAttendEndTime());
+
+                            //计算参会分钟差
+                            Date date1 = df.parse(h.getAttendEndTime());
+                            Date date2 = df.parse(h.getAttendStartTime());
+                            long diff = date1.getTime() - date2.getTime();
+                            //计算两个时间之间差了多少分钟
+                            long minutes = diff / (1000 * 60);
+
+                            meetingParticipantsExcel.setAttendSumTime(minutes+"");
+                            meetingParticipantsExcel.setType("1");
+                            meetingParticipantsExcel.setItemId(meetingParticipants.getItemId().toString());
+                            meetingParticipantsExcel.setDoctorTel(h.getDoctorTel());
+                            meetingParticipantsTemps.add(meetingParticipantsExcel);
+                        }
+                        else
+                        {
+                            map.put("flag",false);
+                            map.put("message","上传数据存在空值");
+                            return map;
+                        }
+
+                    }
+                    else
+                    {
+                        map.put("flag",false);
+                        map.put("message","上传数据存在空值");
+                        return map;
+                    }
+                } catch (Exception e) {
+                    log.error("IOException", e);
+                }
+            }
+        }
+
+        //把list存到mysql
+        boolean result = false;
+        try {
+            result = meetingRecordMapper.saveMeetingParticipantsExcel(meetingParticipantsTemps);
+            flag = result;
+            map.put("flag",flag);
+            map.put("message","上传会议成功");
+        } catch (Exception e) {
+            log.error("IOException", e);
+            map.put("flag",flag);
+            map.put("message","上传会议失败");
+        }
+        return map;
+    }
 
 }
