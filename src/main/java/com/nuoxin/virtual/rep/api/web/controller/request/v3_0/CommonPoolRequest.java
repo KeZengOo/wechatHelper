@@ -13,11 +13,12 @@ import java.io.Serializable;
  */
 @Data
 @ApiModel(value = "公共池请求参数")
-public class CommonPoolRequest implements Serializable {
+public class CommonPoolRequest extends DoctorBaseRequest implements Serializable {
     private static final long serialVersionUID = -5912106098368472822L;
 
     @ApiModelProperty(value = "是否关联代表，1是关联，0是未关联，其他展示全部")
     private Integer relationDrugUser;
+
 
 
 

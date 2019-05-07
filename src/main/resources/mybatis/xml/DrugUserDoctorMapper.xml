@@ -122,6 +122,17 @@
 			COUNT(*) > 1
 	</select>
 
+	<!-- 得到要重复删除的 -->
+	<select id="getRepeatDeleteIdList" resultType="java.lang.Long">
+		SELECT DISTINCT
+			b.id
+		FROM
+			( SELECT id, dud.doctor_id, dud.drug_user_id, dud.prod_id, is_available FROM drug_user_doctor dud WHERE dud.is_available = 1 ) a
+			INNER JOIN ( SELECT id, dud.doctor_id, dud.drug_user_id, dud.prod_id, is_available FROM drug_user_doctor dud WHERE dud.is_available = 0 ) b ON a.drug_user_id = b.drug_user_id
+			AND a.doctor_id = b.doctor_id
+			AND a.prod_id = b.prod_id
+	</select>
+
 	<delete id="deleteByIdList">
 		DELETE FROM drug_user_doctor
 		WHERE id IN

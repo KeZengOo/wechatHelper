@@ -39,9 +39,6 @@ public class MyDoctorController extends NewBaseController {
     @Resource
     private MyDoctorService myDoctorService;
 
-    @Resource
-    private CommonService commonService;
-
 
     @ApiOperation(value = "列表", notes = "列表")
     @PostMapping(value = "/list")
@@ -56,18 +53,5 @@ public class MyDoctorController extends NewBaseController {
         responseBean.setData(doctorPage);
         return responseBean;
     }
-
-
-    @ApiOperation(value = "导入医生", notes = "导入医生")
-    @PostMapping(value = "/import")
-    public DefaultResponseBean<Map<String, DoctorImportErrorResponse>> doctorImport(MultipartFile file) {
-
-        Map<String, DoctorImportErrorResponse> map = commonService.doctorImport(file);
-        DefaultResponseBean<Map<String, DoctorImportErrorResponse>> responseBean = new DefaultResponseBean<>();
-        responseBean.setData(map);
-        return responseBean;
-    }
-
-
 
 }

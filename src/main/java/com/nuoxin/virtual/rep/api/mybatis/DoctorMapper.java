@@ -5,6 +5,7 @@ import java.util.List;
 import com.nuoxin.virtual.rep.api.entity.Doctor;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.SaveDoctorTelephoneRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.followup.SearchRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.CommonPoolRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.MyDoctorRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.call.CallDoctorResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorResponseBean;
@@ -12,10 +13,7 @@ import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorDetailsResp
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.plan.VisitDoctorResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.DoctorClassificationResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.DoctorPotentialResponseBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DoctorBaseResponse;
-import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DoctorTelephoneResponse;
-import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DoctorVisitResponse;
-import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.MyDoctorResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.*;
 import org.apache.ibatis.annotations.Param;
 
 import com.nuoxin.virtual.rep.api.web.controller.request.WorkStationRequestBean;
@@ -283,6 +281,22 @@ public interface DoctorMapper{
      * @return
      */
     Integer getMyDoctorListCount(MyDoctorRequest request);
+
+
+    /**
+     * 公共池医生列表
+     * @param request
+     * @return
+     */
+    List<CommonPoolDoctorResponse> getCommonPoolDoctorList(CommonPoolRequest request);
+
+
+    /**
+     * 公共池医生列表总数
+     * @param request
+     * @return
+     */
+    Integer getCommonPoolDoctorListCount(CommonPoolRequest request);
 
 
     /**

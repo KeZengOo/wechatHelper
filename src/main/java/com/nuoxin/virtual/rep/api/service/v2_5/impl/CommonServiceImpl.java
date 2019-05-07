@@ -26,6 +26,7 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.wechat.WechatMessa
 import com.nuoxin.virtual.rep.api.web.controller.request.vo.DoctorVo;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DoctorImportErrorDetailResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DoctorImportErrorResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DoctorTelephoneResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.HospitalResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -531,6 +532,32 @@ public class CommonServiceImpl implements CommonService {
 
 	}
 
+
+	/**
+	 * 过滤掉无效的联系方式
+	 * @param doctorTelephones
+	 * @return
+	 */
+	@Override
+	public List<String> filterInvalidTelephones(List<DoctorTelephoneResponse> doctorTelephones) {
+		if (CollectionsUtil.isEmptyList(doctorTelephones)){
+			return null;
+		}
+
+		List<String> telephoneList = new ArrayList<>();
+		List<String> telephones = doctorTelephones.stream().map(DoctorTelephoneResponse::getTelephone).distinct().collect(Collectors.toList());
+		if (CollectionsUtil.isNotEmptyList(telephones)){
+			for (String telephone : telephones) {
+				if (RegularUtils.isMatcher(RegularUtils.MATCH_ELEVEN_NUM, telephone) || RegularUtils.isMatcher(RegularUtils.MATCH_FIX_PHONE, telephone)){
+					telephoneList.add(telephone);
+				}
+			}
+		}
+
+		return telephoneList;
+	}
+
+
 	/**
 	 * 批量保存代表医生关联关系
 	 * @param drugUserDoctorParamsList
@@ -569,6 +596,11 @@ public class CommonServiceImpl implements CommonService {
 		while(CollectionsUtil.isNotEmptyList(noAvailableDeleteIdList)){
 			drugUserDoctorMapper.deleteByIdList(noAvailableDeleteIdList);
 			noAvailableDeleteIdList = drugUserDoctorMapper.getAvailableDeleteIdList(0);
+		}
+
+		List<Long> repeatDeleteIdList = drugUserDoctorMapper.getRepeatDeleteIdList();
+		if(CollectionsUtil.isNotEmptyList(repeatDeleteIdList)){
+			drugUserDoctorMapper.deleteByIdList(repeatDeleteIdList);
 		}
 	}
 

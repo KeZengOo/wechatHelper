@@ -81,8 +81,9 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	@Override
 	public boolean saveConnectedCallInfo(SaveCallInfoRequest saveRequest) {
 		this.configSaveCallInfoRequestValue(saveRequest);
-		
-		Long callId = saveRequest.getCallInfoId(); // 电话拜访主键值
+
+		// 电话拜访主键值
+		Long callId = saveRequest.getCallInfoId();
 		if (callId != null && callId > 0) {
 			this.saveCallInfo(saveRequest);
 			

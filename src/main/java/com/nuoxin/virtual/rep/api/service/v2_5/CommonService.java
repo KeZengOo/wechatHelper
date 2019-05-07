@@ -7,6 +7,7 @@ import java.util.Map;
 import com.nuoxin.virtual.rep.api.entity.v2_5.HospitalProvinceBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DoctorImportErrorResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DoctorTelephoneResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -71,4 +72,10 @@ public interface CommonService {
 	 */
 	Long getHospitalId(HospitalProvinceBean hospitalProvinceBean);
 
+	/**
+	 * 过滤掉无效的手机号
+	 * @param doctorTelephones
+	 * @return
+	 */
+	List<String> filterInvalidTelephones(List<DoctorTelephoneResponse> doctorTelephones);
 }

@@ -77,6 +77,12 @@ public interface DrugUserDoctorMapper {
 	List<Long> getAvailableDeleteIdList(@Param(value = "available") Integer available);
 
 	/**
+	 * 得到要重复删除的
+	 * @return
+	 */
+	List<Long> getRepeatDeleteIdList();
+
+	/**
 	 * 根据ID删除
 	 * @param list
 	 */

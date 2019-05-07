@@ -1,43 +1,26 @@
 package com.nuoxin.virtual.rep.api.service.v3_0.impl;
 
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
-import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
-import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.mybatis.DoctorMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
-import com.nuoxin.virtual.rep.api.service.v3_0.MyDoctorService;
+import com.nuoxin.virtual.rep.api.service.v3_0.CommonPoolService;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
-import com.nuoxin.virtual.rep.api.utils.ExcelUtils;
-import com.nuoxin.virtual.rep.api.utils.RegularUtils;
-import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.MyDoctorRequest;
-import com.nuoxin.virtual.rep.api.web.controller.request.vo.DoctorVo;
-import com.nuoxin.virtual.rep.api.web.controller.response.message.MessageResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.CommonPoolRequest;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.CommonPoolDoctorResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DoctorTelephoneResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DoctorVisitResponse;
-import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.MyDoctorResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
- * 我的客户相关接口实现
- *
  * @author tiancun
- * @date 2019-04-29
+ * @date 2019-05-07
  */
 @Service
-public class MyDoctorServiceImpl implements MyDoctorService {
-
-    private static final Logger logger = LoggerFactory.getLogger(MyDoctorServiceImpl.class);
-
+public class CommonPoolServiceImpl implements CommonPoolService {
 
     @Resource
     private DoctorMapper doctorMapper;
@@ -45,34 +28,33 @@ public class MyDoctorServiceImpl implements MyDoctorService {
     @Resource
     private CommonService commonService;
 
-
     @Override
-    public PageResponseBean<MyDoctorResponse> getDoctorPage(MyDoctorRequest request) {
+    public PageResponseBean<CommonPoolDoctorResponse> getDoctorPage(CommonPoolRequest request) {
 
-        Integer count = doctorMapper.getMyDoctorListCount(request);
+        Integer count = doctorMapper.getCommonPoolDoctorListCount(request);
         if (count == null){
             count = 0;
         }
-        List<MyDoctorResponse> myDoctorList ;
+        List<CommonPoolDoctorResponse> commonPoolDoctorList ;
         if (count == 0) {
-            myDoctorList = new ArrayList<>();
-            return new PageResponseBean<>(request, count, myDoctorList);
+            commonPoolDoctorList = new ArrayList<>();
+            return new PageResponseBean<>(request, count, commonPoolDoctorList);
         }
 
-        myDoctorList = doctorMapper.getMyDoctorList(request);
-        if (CollectionsUtil.isEmptyList(myDoctorList)) {
-            myDoctorList = new ArrayList<>();
-            return new PageResponseBean<>(request, count, myDoctorList);
+        commonPoolDoctorList = doctorMapper.getCommonPoolDoctorList(request);
+        if (CollectionsUtil.isEmptyList(commonPoolDoctorList)) {
+            commonPoolDoctorList = new ArrayList<>();
+            return new PageResponseBean<>(request, count, commonPoolDoctorList);
 
         }
 
         // 填充医生的手机号
-        List<Long> doctorIdList = myDoctorList.stream().map(MyDoctorResponse::getDoctorId).distinct().collect(Collectors.toList());
+        List<Long> doctorIdList = commonPoolDoctorList.stream().map(CommonPoolDoctorResponse::getDoctorId).distinct().collect(Collectors.toList());
         if (CollectionsUtil.isNotEmptyList(doctorIdList)){
             List<DoctorTelephoneResponse> doctorTelephoneList = doctorMapper.getDoctorTelephoneList(doctorIdList);
             if (CollectionsUtil.isNotEmptyList(doctorTelephoneList)){
                 Map<Long, List<DoctorTelephoneResponse>> doctorTelephoneMap = doctorTelephoneList.stream().collect(Collectors.groupingBy(DoctorTelephoneResponse::getDoctorId));
-                myDoctorList.forEach(m -> {
+                commonPoolDoctorList.forEach(m -> {
                     List<DoctorTelephoneResponse> doctorTelephones = doctorTelephoneMap.get(m.getDoctorId());
                     // 去掉无效的手机号
                     List<String> telephoneList = commonService.filterInvalidTelephones(doctorTelephones);
@@ -86,17 +68,17 @@ public class MyDoctorServiceImpl implements MyDoctorService {
 
         // 填充医生的拜访数
 
-        List<Long> visitIdList = myDoctorList.stream().map(MyDoctorResponse::getMaxVisitId).distinct().collect(Collectors.toList());
+        List<Long> visitIdList = commonPoolDoctorList.stream().map(CommonPoolDoctorResponse::getMaxVisitId).distinct().collect(Collectors.toList());
         if (CollectionsUtil.isEmptyList(visitIdList)) {
-            return new PageResponseBean<>(request, count, myDoctorList);
+            return new PageResponseBean<>(request, count, commonPoolDoctorList);
         }
 
         List<DoctorVisitResponse> doctorVisitList = doctorMapper.getDoctorVisitList(visitIdList);
         if (CollectionsUtil.isEmptyList(doctorVisitList)){
-            return new PageResponseBean<>(request, count, myDoctorList);
+            return new PageResponseBean<>(request, count, commonPoolDoctorList);
         }
 
-        myDoctorList.forEach(m -> {
+        commonPoolDoctorList.forEach(m -> {
             Optional<DoctorVisitResponse> first = doctorVisitList.stream().filter(dv -> (dv.getMaxVisitId().equals(m.getMaxVisitId()))).findFirst();
             if (first.isPresent()) {
                 DoctorVisitResponse doctorVisitResponse = first.get();
@@ -115,14 +97,6 @@ public class MyDoctorServiceImpl implements MyDoctorService {
             }
         });
 
-        return new PageResponseBean<>(request, count, myDoctorList);
-
+        return new PageResponseBean<>(request, count, commonPoolDoctorList);
     }
-
-
-
-
-
-
-
 }
