@@ -1794,7 +1794,15 @@
 		LEFT JOIN
 		(
 		SELECT a.*, IFNULL(GROUP_CONCAT(DISTINCT re.visit_result), '') visitResult FROM drug_user_doctor_quate a INNER JOIN (
-		SELECT max(id) maxId FROM drug_user_doctor_quate GROUP BY doctor_id, product_id
+		SELECT max(id) maxId FROM drug_user_doctor_quate
+		WHERE 1=1
+		<if test="productIdList !=null and productIdList.size > 0">
+			AND product_id IN
+			<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+				#{productId}
+			</foreach>
+		</if>
+		GROUP BY doctor_id, product_id
 		) b ON a.id=b.maxId
 		LEFT JOIN drug_user_doctor_quate_result r
 		ON a.id=r.quate_id
@@ -2016,7 +2024,15 @@
 		LEFT JOIN
 		(
 		SELECT a.*, IFNULL(GROUP_CONCAT(DISTINCT re.visit_result), '') visitResult FROM drug_user_doctor_quate a INNER JOIN (
-		SELECT max(id) maxId FROM drug_user_doctor_quate GROUP BY doctor_id, product_id
+		SELECT max(id) maxId FROM drug_user_doctor_quate
+		WHERE 1=1
+		<if test="productIdList !=null and productIdList.size > 0">
+			AND product_id IN
+			<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+				#{productId}
+			</foreach>
+		</if>
+		GROUP BY doctor_id, product_id
 		) b ON a.id=b.maxId
 		LEFT JOIN drug_user_doctor_quate_result r
 		ON a.id=r.quate_id
@@ -2341,7 +2357,15 @@
 		LEFT JOIN
 		(
 		SELECT a.*, IFNULL(GROUP_CONCAT(DISTINCT re.visit_result), '') visitResult FROM drug_user_doctor_quate a INNER JOIN (
-		SELECT max(id) maxId FROM drug_user_doctor_quate GROUP BY doctor_id, product_id
+		SELECT max(id) maxId FROM drug_user_doctor_quate
+		WHERE 1=1
+		<if test="productIdList !=null and productIdList.size > 0">
+			AND product_id IN
+			<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+				#{productId}
+			</foreach>
+		</if>
+		GROUP BY doctor_id, product_id
 		) b ON a.id=b.maxId
 		LEFT JOIN drug_user_doctor_quate_result r
 		ON a.id=r.quate_id
@@ -2456,7 +2480,15 @@
 		LEFT JOIN
 		(
 		SELECT a.*, IFNULL(GROUP_CONCAT(DISTINCT re.visit_result), '') FROM drug_user_doctor_quate a INNER JOIN (
-		SELECT max(id) maxId FROM drug_user_doctor_quate GROUP BY doctor_id, product_id
+		SELECT max(id) maxId FROM drug_user_doctor_quate
+		WHERE 1=1
+		<if test="productIdList !=null and productIdList.size > 0">
+			AND product_id IN
+			<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+				#{productId}
+			</foreach>
+		</if>
+		GROUP BY doctor_id, product_id
 		) b ON a.id=b.maxId
 		LEFT JOIN drug_user_doctor_quate_result r
 		ON a.id=r.quate_id

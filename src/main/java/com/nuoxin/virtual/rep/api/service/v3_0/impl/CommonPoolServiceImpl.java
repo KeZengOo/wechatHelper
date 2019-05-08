@@ -160,8 +160,8 @@ public class CommonPoolServiceImpl implements CommonPoolService {
         /**
          * 得到导出的字段
          */
-        List<String> titleList = this.getExportDoctorTitle(productIdList);
-        HSSFWorkbook workbook = ExportExcel.excelLinkedHashMapExport(dataMap, titleList, "医生列表");
+        Map<String, String> titleMap = this.getExportDoctorTitle(productIdList);
+        HSSFWorkbook workbook = ExportExcel.excelLinkedHashMapExport(dataMap, titleMap, "医生列表");
         OutputStream ouputStream = null;
         try {
             response.setContentType("application/vnd.ms-excel");
@@ -261,7 +261,7 @@ public class CommonPoolServiceImpl implements CommonPoolService {
             List<DynamicFieldNameValueResponse> dynamicFieldNameValueList = doctorDynamicFieldMap.get(doctorId);
             if (CollectionsUtil.isNotEmptyList(dynamicFieldNameValueList)){
                 dynamicFieldNameValueList.forEach(dy->{
-                    doctorDetailMap.put(dy.getFieldName(), dy.getFieldValue());
+                    doctorDetailMap.put(String.valueOf(dy.getFieldId()), dy.getFieldValue());
                 });
             }
 
@@ -278,37 +278,38 @@ public class CommonPoolServiceImpl implements CommonPoolService {
      * @param productIdList
      * @return
      */
-    private List<String> getExportDoctorTitle(List<Long> productIdList) {
-        List<String> titleList = new ArrayList<>();
-        titleList.add("drugUserId");
-        titleList.add("drugUserName");
-        titleList.add("doctorId");
-        titleList.add("doctorName");
-        titleList.add("sex");
-        titleList.add("depart");
-        titleList.add("positions");
-        titleList.add("hospitalId");
-        titleList.add("hospitalName");
-        titleList.add("province");
-        titleList.add("city");
-        titleList.add("level");
-        titleList.add("productId");
-        titleList.add("productName");
-        titleList.add("isHasDrug");
-        titleList.add("isTarget");
-        titleList.add("isHasAe");
-        titleList.add("isRecruit");
-        titleList.add("isCover");
-        titleList.add("potential");
-        titleList.add("attitude");
-        titleList.add("visitResult");
+    private Map<String, String> getExportDoctorTitle(List<Long> productIdList) {
+        Map<String, String> titleMap = new LinkedHashMap<>();
+        titleMap.put("drugUserId", "代表ID");
+        titleMap.put("drugUserName", "代表姓名");
+        titleMap.put("doctorId", "医生ID");
+        titleMap.put("doctorName", "医生姓名");
+        titleMap.put("sex", "性别");
+        titleMap.put("depart", "科室");
+        titleMap.put("positions", "职称");
+        titleMap.put("hospitalId", "医院ID");
+        titleMap.put("hospitalName", "医院名称");
+        titleMap.put("province", "省份");
+        titleMap.put("city", "城市");
+        titleMap.put("level", "医院等级");
+        titleMap.put("productId", "产品ID");
+        titleMap.put("productName", "产品名称");
+        titleMap.put("isHasDrug", "是否有药");
+        titleMap.put("isTarget", "是否目标");
+        titleMap.put("isHasAe", "是否有AE");
+        titleMap.put("isRecruit", "是否招募");
+        titleMap.put("isCover", "是否覆盖");
+        titleMap.put("potential", "医生潜力");
+        titleMap.put("attitude", "医生态度");
+        titleMap.put("visitResult", "拜访结果");
 
         List<DynamicFieldNameValueResponse> allDynamicFieldList = dynamicFieldMapper.getAllDynamicFieldList(productIdList);
         if (CollectionsUtil.isNotEmptyList(allDynamicFieldList)){
-            List<String> dynamicFieldList = allDynamicFieldList.stream().map(DynamicFieldNameValueResponse::getFieldName).distinct().collect(Collectors.toList());
-            titleList.addAll(dynamicFieldList);
+            allDynamicFieldList.forEach(dy->{
+                titleMap.put(String.valueOf(dy.getFieldId()), dy.getFieldName());
+            });
         }
 
-        return titleList;
+        return titleMap;
     }
 }

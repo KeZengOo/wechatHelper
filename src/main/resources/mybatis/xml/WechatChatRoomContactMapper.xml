@@ -35,4 +35,25 @@
         FROM virtual_wechat_chatroom_contact
         WHERE chatroom_id=#{chatRoomId}
     </select>
+
+
+
+    <!-- 群列表 -->
+    <select id="getWechatChatRoomList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.WechatChatRoomResponse">
+        SELECT
+        DISTINCT
+        chatroom_id chatRoomId,
+        chatroom_name chatRoomName
+        FROM
+        virtual_wechat_chatroom_contact
+        WHERE 1=1
+        <if test="drugUserId !=null and drugUserId!=0">
+            AND drug_user_id = #{drugUserId}
+        </if>
+
+        <if test="doctorId !=null and doctorId !=0">
+            AND doctor_id = #{doctorId}
+        </if>
+
+    </select>
 </mapper>

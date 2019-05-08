@@ -33,6 +33,7 @@ import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.HospitalResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
@@ -882,7 +883,8 @@ public class CommonServiceImpl implements CommonService {
 	/**
 	 * 删除掉重复的记录
 	 */
-	private void deleteRepeatDrugUserDoctorRecord(){
+	@Async
+	public void deleteRepeatDrugUserDoctorRecord(){
 
 		List<Long> availableDeleteIdList = drugUserDoctorMapper.getAvailableDeleteIdList(1);
 		while(CollectionsUtil.isNotEmptyList(availableDeleteIdList)){

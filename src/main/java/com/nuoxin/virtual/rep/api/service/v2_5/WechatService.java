@@ -3,7 +3,10 @@ package com.nuoxin.virtual.rep.api.service.v2_5;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.wechat.WechatAndroidMessageRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.wechat.WechatAndroidUploadTimeResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.WechatChatRoomResponse;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 /**
  * @author tiancun
@@ -34,5 +37,14 @@ public interface WechatService {
 
 
     WechatAndroidUploadTimeResponseBean getWechatAndroidUploadTime(String wechatNumber);
+
+
+    /**
+     * 群列表
+     * @param drugUserId
+     * @param doctorId
+     * @return
+     */
+    List<WechatChatRoomResponse> getWechatChatRoomList(Long drugUserId, Long doctorId);
 
 }

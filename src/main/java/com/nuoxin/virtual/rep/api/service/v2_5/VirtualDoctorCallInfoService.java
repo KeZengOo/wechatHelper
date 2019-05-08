@@ -76,6 +76,13 @@ public interface VirtualDoctorCallInfoService {
 	List<VisitCountResponseBean> getVisitCountList(VisitCountRequestBean bean);
 
 
+	/**
+	 * 更新代表医生状态
+	 * @param drugUserId
+	 * @param doctorId
+	 * @param productId
+	 */
+	void updateDrugUserDoctorAvailable(Long drugUserId, Long doctorId, Long productId);
 
 	/**
 	 * 临时功能

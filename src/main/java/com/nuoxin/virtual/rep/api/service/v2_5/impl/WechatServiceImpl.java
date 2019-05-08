@@ -18,6 +18,7 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.wechat.*;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.wechat.WechatAndroidContactResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.wechat.WechatAndroidUploadTimeResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.wechat.WechatChatRoomMemberResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.WechatChatRoomResponse;
 import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 import com.vdurmont.emoji.EmojiParser;
 import org.apache.commons.csv.CSVRecord;
@@ -331,6 +332,13 @@ public class WechatServiceImpl implements WechatService {
 
 
         return uploadTime;
+    }
+
+    @Override
+    public List<WechatChatRoomResponse> getWechatChatRoomList(Long drugUserId, Long doctorId) {
+        List<WechatChatRoomResponse> wechatChatRoomList = wechatChatRoomContactMapper.getWechatChatRoomList(drugUserId, doctorId);
+        return wechatChatRoomList;
+
     }
 
 

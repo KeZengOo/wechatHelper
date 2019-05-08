@@ -70,6 +70,9 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	private DrugUserMapper drugUserMapper;
 	@Resource
 	private ProductLineMapper productLineMapper;
+
+
+
 	
 	@Override
 	public CallVisitStatisticsBean getCallVisitListStatistics(Long virtualDoctorId, String leaderPath) {
@@ -205,6 +208,12 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		}
 
 		return list;
+	}
+
+	@Override
+	public void updateDrugUserDoctorAvailable(Long drugUserId, Long doctorId, Long productId) {
+
+		drugUserDoctorMapper.updateDrugUserDoctorAvailable(drugUserId, doctorId, productId);
 	}
 
 

@@ -5,6 +5,7 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.wechat.WechatAndro
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.wechat.WechatAndroidContactResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.wechat.WechatAndroidUploadTimeResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.wechat.WechatChatRoomMemberResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.WechatChatRoomResponse;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -36,5 +37,14 @@ public interface WechatChatRoomContactMapper {
      * @return
      */
     List<WechatChatRoomMemberResponseBean> getWechatChatRoomMemberList(@Param(value = "chatRoomId") String chatRoomId);
+
+
+    /**
+     * 群列表
+     * @param drugUserId
+     * @param doctorId
+     * @return
+     */
+    List<WechatChatRoomResponse> getWechatChatRoomList(@Param(value = "drugUserId") Long drugUserId,@Param(value = "doctorId") Long doctorId);
 
 }
