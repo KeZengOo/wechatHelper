@@ -441,7 +441,7 @@ public class CustomerFollowUpServiceImpl implements CustomerFollowUpService{
 			doctorIds.add(d.getDoctorId());
 			ids.add(d.getDoctorId());
 			doctorInfoMap.put(d.getDoctorId(), d);
-				}
+		}
 		);
 
 		//产品id,目前产品数量为1

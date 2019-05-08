@@ -300,11 +300,12 @@ public interface DoctorMapper{
 
 
     /**
-     * 得到医生的拜访结果
-     * @param visitIdList
+     * 得到最新医生的拜访情况
+     * @param doctorIdList
+     * @param productIdList
      * @return
      */
-    List<DoctorVisitResponse> getDoctorVisitList(@Param(value = "visitIdList") List<Long> visitIdList);
+    List<DoctorVisitResponse> getLastDoctorVisitList(@Param(value = "doctorIdList") List<Long> doctorIdList,@Param(value = "productIdList") List<Long> productIdList);
 
 
     /**

@@ -2,11 +2,13 @@ package com.nuoxin.virtual.rep.api.web.controller.v3_0;
 
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
+import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v3_0.CommonPoolService;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.CommonPoolRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.CommonPoolDoctorResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DoctorImportErrorResponse;
+import com.nuoxin.virtual.rep.api.web.controller.v2_5.NewBaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,7 +29,7 @@ import java.util.Map;
 @RestController
 @Api(value = "V3.0.1客户公共池")
 @RequestMapping(value = "/common/pool")
-public class CommonPoolController {
+public class CommonPoolController extends NewBaseController {
 
     @Resource
     private CommonPoolService commonPoolService;
@@ -38,8 +40,8 @@ public class CommonPoolController {
     @ApiOperation(value = "列表", notes = "列表")
     @PostMapping(value = "/doctor/list")
     public DefaultResponseBean<PageResponseBean<CommonPoolDoctorResponse>> getDoctorPage(HttpServletRequest request, @RequestBody CommonPoolRequest bean) {
-
-        PageResponseBean<CommonPoolDoctorResponse> doctorPage = commonPoolService.getDoctorPage(bean);
+        DrugUser drugUser = this.getDrugUser(request);
+        PageResponseBean<CommonPoolDoctorResponse> doctorPage = commonPoolService.getDoctorPage(drugUser, bean);
         DefaultResponseBean<PageResponseBean<CommonPoolDoctorResponse>> responseBean = new DefaultResponseBean<>();
         responseBean.setData(doctorPage);
         return responseBean;

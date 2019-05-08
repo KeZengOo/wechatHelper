@@ -67,5 +67,13 @@ public class DoctorBaseResponse implements Serializable {
     @ApiModelProperty(value = "覆盖状态")
     private String cover;
 
+    @ApiModelProperty(value = "医生潜力")
+    private String potential;
+
+    @ApiModelProperty(value = "态度")
+    private String attitude;
+
+    @ApiModelProperty(value = "医生在登录用户下的产品列表")
+    List<DoctorProductResponse> doctorProductList = new ArrayList<>();
 
 }

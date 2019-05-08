@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 公共池医生返回数据
@@ -19,6 +20,9 @@ public class CommonPoolDoctorResponse extends DoctorBaseResponse implements Seri
 
     @JsonIgnore
     private Long maxVisitId;
+
+    @JsonIgnore
+    private Date lastVisitDate;
 
     @ApiModelProperty(value = "上一次拜访时间")
     private String lastVisitTime;

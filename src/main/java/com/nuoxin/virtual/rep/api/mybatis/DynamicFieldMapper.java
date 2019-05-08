@@ -16,6 +16,7 @@ import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.*;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.DoctorDynamicExtendResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.set.SearchDynamicFieldResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.single.DoctorAddDynamicFieldResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DynamicFieldNameValueResponse;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -382,5 +383,17 @@ public interface DynamicFieldMapper {
      * @return 有的话大于0
      */
     Integer hasDemandField(@Param(value = "productId") Long productId);
+
+
+    /***********************************  V3.0.1接口  **********************************************/
+
+    /**
+     * 得到所有字段，产品字段、基本信息字段
+     * @param productIdList
+     * @return
+     */
+    List<DynamicFieldNameValueResponse> getAllDynamicFieldList(@Param(value = "productIdList") List<Long> productIdList);
+
+
 
 }

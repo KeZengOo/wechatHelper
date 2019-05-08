@@ -48,7 +48,7 @@ public class MyDoctorController extends NewBaseController {
         drugUserIdList.add(drugUser.getId());
         bean.setDrugUserIdList(drugUserIdList);
 
-        PageResponseBean<MyDoctorResponse> doctorPage = myDoctorService.getDoctorPage(bean);
+        PageResponseBean<MyDoctorResponse> doctorPage = myDoctorService.getDoctorPage(drugUser, bean);
         DefaultResponseBean<PageResponseBean<MyDoctorResponse>> responseBean = new DefaultResponseBean<>();
         responseBean.setData(doctorPage);
         return responseBean;
