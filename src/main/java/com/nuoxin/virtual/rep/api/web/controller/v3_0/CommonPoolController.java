@@ -2,6 +2,8 @@ package com.nuoxin.virtual.rep.api.web.controller.v3_0;
 
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
+import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
+import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v3_0.CommonPoolService;
@@ -11,17 +13,14 @@ import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.CommonPoolDoctorR
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DoctorImportErrorResponse;
 import com.nuoxin.virtual.rep.api.web.controller.v2_5.NewBaseController;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -76,7 +75,7 @@ public class CommonPoolController extends NewBaseController {
 
 
     @ApiOperation(value = "导出医生", notes = "导出医生")
-    @PostMapping(value = "/doctor/export")
+    @GetMapping(value = "/doctor/export")
     public void exportDoctorList(HttpServletResponse response, HttpServletRequest request) {
         CommonPoolRequest bean = this.getExportParams(request);
         commonPoolService.exportDoctorList(response, bean);
@@ -97,35 +96,105 @@ public class CommonPoolController extends NewBaseController {
         String drugUserIdStr = request.getParameter("drugUserIdStr");
         String relationDrugUserStr = request.getParameter("relationDrugUser");
 
-        Integer recruit;
-        Integer cover;
-        Integer target;
-        Integer hasDrug;
-        Integer relationDrugUser;
+        Integer recruit = null;
+        Integer cover = null;
+        Integer target = null;
+        Integer hasDrug = null;
+        Integer relationDrugUser = null;
+        List<Long> productIdList = new ArrayList<>();
+        List<Long> drugUserIdList = new ArrayList<>();
 
         if (StringUtil.isNotEmpty(recruitStr)){
-            recruit = Integer.valueOf(recruitStr);
+            try {
+                recruit = Integer.valueOf(recruitStr);
+            }catch (Exception e){
+                throw new BusinessException(ErrorEnum.ERROR, "是否招募输入不合法");
+            }
+
         }
 
         if (StringUtil.isNotEmpty(targetStr)){
-            target = Integer.valueOf(targetStr);
+            try {
+                target = Integer.valueOf(targetStr);
+            }catch (Exception e){
+                throw new BusinessException(ErrorEnum.ERROR, "是否目标输入不合法");
+            }
         }
 
         if (StringUtil.isNotEmpty(coverStr)){
-            cover = Integer.valueOf(coverStr);
+            try {
+                cover = Integer.valueOf(coverStr);
+            }catch (Exception e){
+                throw new BusinessException(ErrorEnum.ERROR, "是否覆盖输入不合法");
+            }
         }
 
         if (StringUtil.isNotEmpty(hasDrugStr)){
-            hasDrug = Integer.valueOf(hasDrugStr);
+
+            try {
+                hasDrug = Integer.valueOf(hasDrugStr);
+            }catch (Exception e){
+                throw new BusinessException(ErrorEnum.ERROR, "是否有药输入不合法");
+            }
         }
 
         if (StringUtil.isNotEmpty(relationDrugUserStr)){
-            relationDrugUser = Integer.valueOf(relationDrugUserStr);
+
+            try {
+                relationDrugUser = Integer.valueOf(relationDrugUserStr);
+            }catch (Exception e){
+                throw new BusinessException(ErrorEnum.ERROR, "是否关联代表输入不合法");
+            }
         }
 
 
-        return null;
+        try {
+            productIdList = this.getIdList(productIdStr);
+        }catch (Exception e){
+            throw new BusinessException(ErrorEnum.ERROR, "产品ID输入不合法，多个以逗号分开");
+        }
+
+        try {
+            drugUserIdList = this.getIdList(drugUserIdStr);
+        }catch (Exception e){
+            throw new BusinessException(ErrorEnum.ERROR, "代表ID输入不合法，多个以逗号分开");
+        }
+
+        CommonPoolRequest commonPoolRequest = new CommonPoolRequest();
+        commonPoolRequest.setRelationDrugUser(relationDrugUser);
+        commonPoolRequest.setCover(cover);
+        commonPoolRequest.setDrugUserIdList(drugUserIdList);
+        commonPoolRequest.setHasDrug(hasDrug);
+        commonPoolRequest.setProductIdList(productIdList);
+        commonPoolRequest.setRecruit(recruit);
+        commonPoolRequest.setSearchKeyword(searchKeyword);
+        commonPoolRequest.setTarget(target);
+
+        return commonPoolRequest;
 
     }
+
+    /**
+     * 截取获得ID
+     * @param str
+     * @return
+     */
+    private List<Long> getIdList(String str){
+        List<Long> idList = new ArrayList<>();
+        if (StringUtil.isNotEmpty(str)){
+            if (str.contains("，")){
+                str = str.replace("，",",");
+            }
+
+            String[] idStrArray = str.split(",");
+            for (String s : idStrArray) {
+                Long id = Long.valueOf(s);
+                idList.add(id);
+            }
+        }
+
+        return idList;
+    }
+
 
 }

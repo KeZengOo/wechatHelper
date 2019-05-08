@@ -199,7 +199,7 @@ public class CommonPoolServiceImpl implements CommonPoolService {
         List<Long> doctorIdList = commonPoolDoctorList.stream().map(CommonPoolDoctorResponse::getDoctorId).distinct().collect(Collectors.toList());
         if (CollectionsUtil.isNotEmptyList(doctorIdList)){
             doctorDynamicFieldValue = dynamicFieldMapper.getDoctorDynamicFieldNameValue(doctorIdList, productIdList.get(0));
-            if (CollectionsUtil.isNotEmptyList(doctorDynamicFieldValue)){
+            if (CollectionsUtil.isEmptyList(doctorDynamicFieldValue)){
                 doctorDynamicFieldValue = new ArrayList<>();
             }
         }
@@ -304,7 +304,7 @@ public class CommonPoolServiceImpl implements CommonPoolService {
         titleList.add("visitResult");
 
         List<DynamicFieldNameValueResponse> allDynamicFieldList = dynamicFieldMapper.getAllDynamicFieldList(productIdList);
-        if (CollectionsUtil.isEmptyList(allDynamicFieldList)){
+        if (CollectionsUtil.isNotEmptyList(allDynamicFieldList)){
             List<String> dynamicFieldList = allDynamicFieldList.stream().map(DynamicFieldNameValueResponse::getFieldName).distinct().collect(Collectors.toList());
             titleList.addAll(dynamicFieldList);
         }
