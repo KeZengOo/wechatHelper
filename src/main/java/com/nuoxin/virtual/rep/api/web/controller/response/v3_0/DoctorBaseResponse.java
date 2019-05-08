@@ -39,6 +39,15 @@ public class DoctorBaseResponse implements Serializable {
     @ApiModelProperty(value = "医院名称")
     private String hospitalName;
 
+    @ApiModelProperty(value = "省份")
+    private String province;
+
+    @ApiModelProperty(value = "城市")
+    private String city;
+
+    @ApiModelProperty(value = "医院等级")
+    private String hospitalLevel;
+
     @ApiModelProperty(value = "科室")
     private String depart;
 
@@ -63,6 +72,9 @@ public class DoctorBaseResponse implements Serializable {
 
     @ApiModelProperty(value = "是否有药")
     private String hasDrug;
+
+    @ApiModelProperty(value = "是否有AE")
+    private String hasAe;
 
     @ApiModelProperty(value = "覆盖状态")
     private String cover;

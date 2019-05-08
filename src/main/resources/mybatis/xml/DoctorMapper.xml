@@ -1693,6 +1693,9 @@
 		d.positions,
 		d.hospital_id hospitalId,
 		d.hospital_name hospitalName,
+		h.province,
+		h.city,
+		h.level hospitalLevel,
 		du.id drugUserId,
 		du.NAME drugUserName,
 		pl.prod_id productId,
@@ -1732,6 +1735,20 @@
 		'临采' ELSE '未知'
 		END
 		) AS hasDrug,
+
+		(
+		CASE
+
+		WHEN q.is_has_ae IS NULL THEN
+		'未知'
+		WHEN q.is_has_ae = 0 THEN
+		'否'
+		WHEN q.is_has_ae = 1 THEN
+		'是'
+		ELSE '未知'
+		END
+		) AS hasAe,
+
 		(
 		CASE
 
@@ -1769,6 +1786,8 @@
 		max(v.id) maxVisitId
 		FROM
 		doctor d
+		LEFT JOIN hospital h
+		ON d.hospital_id=h.id
 		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
 		INNER JOIN drug_user du ON dud.drug_user_id = du.id
 		INNER JOIN product_line pl ON dud.prod_id = pl.prod_id
@@ -2223,6 +2242,9 @@
 		d.positions,
 		d.hospital_id hospitalId,
 		d.hospital_name hospitalName,
+		h.province,
+		h.city,
+		h.level hospitalLevel,
 		IF(dud.is_available=1, du.id, 0) drugUserId,
 		IF(dud.is_available=1, du.NAME, '') drugUserName,
 		pl.prod_id productId,
@@ -2262,6 +2284,20 @@
 		'临采' ELSE '未知'
 		END
 		) AS hasDrug,
+
+		(
+		CASE
+
+		WHEN q.is_has_ae IS NULL THEN
+		'未知'
+		WHEN q.is_has_ae = 0 THEN
+		'否'
+		WHEN q.is_has_ae = 1 THEN
+		'是'
+		ELSE '未知'
+		END
+		) AS hasAe,
+
 		(
 		CASE
 
@@ -2297,6 +2333,8 @@
 		max(v.id) maxVisitId
 		FROM
 		doctor d
+		LEFT JOIN hospital h
+		ON d.hospital_id=h.id
 		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
 		INNER JOIN drug_user du ON dud.drug_user_id = du.id
 		INNER JOIN product_line pl ON dud.prod_id = pl.prod_id
@@ -2395,7 +2433,11 @@
 		dud.prod_id
 
 		ORDER BY max(v.id) DESC
-		LIMIT #{currentSize}, #{pageSize}
+
+		<if test="paginable == null or paginable == 0">
+			LIMIT #{currentSize}, #{pageSize}
+		</if>
+
 
 	</select>
 

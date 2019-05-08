@@ -5,11 +5,13 @@ import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v3_0.CommonPoolService;
+import com.nuoxin.virtual.rep.api.utils.StringUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.CommonPoolRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.CommonPoolDoctorResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DoctorImportErrorResponse;
 import com.nuoxin.virtual.rep.api.web.controller.v2_5.NewBaseController;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +21,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -67,6 +71,61 @@ public class CommonPoolController extends NewBaseController {
         DefaultResponseBean<Map<String, DoctorImportErrorResponse>> responseBean = new DefaultResponseBean<>();
         responseBean.setData(map);
         return responseBean;
+    }
+
+
+
+    @ApiOperation(value = "导出医生", notes = "导出医生")
+    @PostMapping(value = "/doctor/export")
+    public void exportDoctorList(HttpServletResponse response, HttpServletRequest request) {
+        CommonPoolRequest bean = this.getExportParams(request);
+        commonPoolService.exportDoctorList(response, bean);
+    }
+
+    /**
+     * 得到导出传入的参数
+     * @param request
+     * @return
+     */
+    private CommonPoolRequest getExportParams(HttpServletRequest request) {
+        String recruitStr = request.getParameter("recruit");
+        String coverStr = request.getParameter("cover");
+        String targetStr = request.getParameter("target");
+        String hasDrugStr = request.getParameter("hasDrug");
+        String searchKeyword = request.getParameter("searchKeyword");
+        String productIdStr = request.getParameter("productIdStr");
+        String drugUserIdStr = request.getParameter("drugUserIdStr");
+        String relationDrugUserStr = request.getParameter("relationDrugUser");
+
+        Integer recruit;
+        Integer cover;
+        Integer target;
+        Integer hasDrug;
+        Integer relationDrugUser;
+
+        if (StringUtil.isNotEmpty(recruitStr)){
+            recruit = Integer.valueOf(recruitStr);
+        }
+
+        if (StringUtil.isNotEmpty(targetStr)){
+            target = Integer.valueOf(targetStr);
+        }
+
+        if (StringUtil.isNotEmpty(coverStr)){
+            cover = Integer.valueOf(coverStr);
+        }
+
+        if (StringUtil.isNotEmpty(hasDrugStr)){
+            hasDrug = Integer.valueOf(hasDrugStr);
+        }
+
+        if (StringUtil.isNotEmpty(relationDrugUserStr)){
+            relationDrugUser = Integer.valueOf(relationDrugUserStr);
+        }
+
+
+        return null;
+
     }
 
 }

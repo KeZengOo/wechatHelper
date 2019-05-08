@@ -112,6 +112,25 @@ public final class ExportExcel {
 
 
     /**
+     * 单个sheet
+     * @param dataList
+     *        对象集合
+     * @param titleList
+     *        表头信息（对象属性名称->要显示的标题值)[按顺序添加]
+     * @param sheetName
+     *        sheet名称和表头值
+     */
+    public static HSSFWorkbook excelLinkedHashMapExport(List<LinkedHashMap<String,Object>> dataList, List<String> titleList, String sheetName) {
+        // 初始化workbook
+        initHSSFWorkbook(sheetName);
+        // 表头行
+        createHeadRow(titleList);
+        createContentRowMap(dataList, titleList);
+        return workbook;
+    }
+
+
+    /**
      * 多个sheet
      * @param list
      *        对象集合
@@ -186,6 +205,22 @@ public final class ExportExcel {
         }
     }
 
+
+    /**
+     * 创建表头行（第二行创建）
+     * @param titleList 对象属性名称->表头显示名称
+     */
+    private static void createHeadRow(List<String> titleList) {
+        // 第1行创建
+        HSSFRow headRow = sheet.createRow(HEAD_START_POSITION);
+        for (int i = 0; i < titleList.size(); i++) {
+            HSSFCell headCell = headRow.createCell(i);
+            headCell.setCellValue(titleList.get(i));
+        }
+
+    }
+
+
     /**
      * List<对象类型的通用导出></>
      * @param dataList 对象数据集合
@@ -226,6 +261,33 @@ public final class ExportExcel {
                 HSSFRow textRow = sheet.createRow(CONTENT_START_POSITION + i);
                 int j = 0;
                 for (String entry : titleMap.keySet()) {
+                    String value =obj.get(entry)!=null?obj.get(entry).toString():"";
+                    HSSFCell textcell = textRow.createCell(j);
+                    textcell.setCellValue(value);
+                    j++;
+                }
+                i++;
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    /**
+     * List<LinkedHashMap> 导出字段是动态的</>
+     * @param dataList 对象数据集合
+     * @param titleList 表头信息
+     */
+    private static void createContentRowMap(List<LinkedHashMap<String,Object>> dataList, List<String> titleList) {
+        try {
+            int i=0;
+            for (LinkedHashMap obj : dataList) {
+                HSSFRow textRow = sheet.createRow(CONTENT_START_POSITION + i);
+                int j = 0;
+                for (String entry : titleList) {
                     String value =obj.get(entry)!=null?obj.get(entry).toString():"";
                     HSSFCell textcell = textRow.createCell(j);
                     textcell.setCellValue(value);

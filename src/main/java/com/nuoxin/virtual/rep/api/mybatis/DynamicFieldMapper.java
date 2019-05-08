@@ -395,5 +395,12 @@ public interface DynamicFieldMapper {
     List<DynamicFieldNameValueResponse> getAllDynamicFieldList(@Param(value = "productIdList") List<Long> productIdList);
 
 
+    /**
+     * 得到医生填写的动态字段以及值,仅支持单产品
+     * @param doctorIdList
+     * @param productId
+     * @return
+     */
+    List<DynamicFieldNameValueResponse> getDoctorDynamicFieldNameValue(@Param(value = "doctorIdList") List<Long> doctorIdList,@Param(value = "productId") Long productId);
 
 }
