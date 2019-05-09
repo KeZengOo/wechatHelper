@@ -4,6 +4,10 @@ package com.nuoxin.virtual.rep.api.common.enums;
  * Created by fenggang on 7/28/17.
  */
 public enum ErrorEnum {
+    /**
+     * 请求成功
+     */
+    SUCCESS(200, "success"),
 
     LOGIN_NO(300,"登录失效"),
     LOGIN_ERROR(301,"登录错误"),

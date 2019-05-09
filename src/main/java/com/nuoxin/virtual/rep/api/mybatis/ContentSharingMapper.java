@@ -8,6 +8,7 @@ import com.nuoxin.virtual.rep.api.entity.v3_0.request.ContentSharingRequest;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 内容分享
@@ -17,7 +18,7 @@ import java.util.List;
 public interface ContentSharingMapper {
 
     /**
-     * 内容分享列表
+     * 内容分享列表分页
      * @param contentSharingRequest
      * @return list
      */
@@ -52,4 +53,10 @@ public interface ContentSharingMapper {
      */
     List<ContentReadLogsTimeParams> getReadTimeAndReadDurationByDataIdAndDoctorId(@Param("dataId")Long dataId, @Param("doctorId")Long doctorId);
 
+    /**
+     * 内容分享列表
+     * @param contentSharingRequest
+     * @return list
+     */
+    List<Map<String,Object>> getContentSharingList(@Param("contentSharingRequest") ContentSharingRequest contentSharingRequest);
 }

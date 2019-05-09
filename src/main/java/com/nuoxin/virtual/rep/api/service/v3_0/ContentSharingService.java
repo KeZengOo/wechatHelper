@@ -3,9 +3,11 @@ package com.nuoxin.virtual.rep.api.service.v3_0;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.entity.v3_0.params.ContentReadLogsParams;
 import com.nuoxin.virtual.rep.api.entity.v3_0.params.ContentSharingParams;
+import com.nuoxin.virtual.rep.api.entity.v3_0.params.FilePathParams;
 import com.nuoxin.virtual.rep.api.entity.v3_0.request.ContentReadLogsRequest;
 import com.nuoxin.virtual.rep.api.entity.v3_0.request.ContentSharingRequest;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -28,4 +30,20 @@ public interface ContentSharingService {
      * @return list
      */
     PageResponseBean<List<ContentReadLogsParams>> getContentReadLogsListPage(ContentReadLogsRequest contentReadLogsRequest);
+
+
+    /**
+     * 导出内容分享列表
+     * @param contentSharingRequest
+     * @param response
+     */
+    FilePathParams exportFile(ContentSharingRequest contentSharingRequest, HttpServletResponse response);
+
+    /**
+     * 导出内容分享列表下载
+     * @param outPutPath
+     * @param fileName
+     * @param response
+     */
+    void download(String outPutPath, String fileName, HttpServletResponse response);
 }

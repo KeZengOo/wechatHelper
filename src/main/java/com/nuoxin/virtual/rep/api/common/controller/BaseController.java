@@ -122,4 +122,10 @@ public class BaseController {
 		return responseBean;
 	}
 
+	protected DefaultResponseBean successData(Object data) {
+		DefaultResponseBean responseBean = new DefaultResponseBean<>();
+		responseBean.setCode(ErrorEnum.SUCCESS.getStatus());
+		responseBean.setData(data);
+		return responseBean;
+	}
 }

@@ -145,7 +145,7 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public Map<String, Object> meetingImport(MultipartFile file) {
-        Map<String, Object> map =new HashMap<String, Object>(2);
+        Map<String, Object> map =new HashMap<String, Object>(4);
 
         boolean flag = false;
         String originalFilename = file.getOriginalFilename();
@@ -218,6 +218,11 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
             map.put("flag",flag);
             map.put("message","上传会议失败");
         }
+
+        //预计导入条数
+        map.put("estimatedNumber",meetingSubjectExcels.size());
+        //预计导入条数
+        map.put("actualNumber",meetingTemps.size());
         return map;
     }
 
@@ -225,7 +230,7 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
     @Override
     public Map<String, Object> meetingParticipantsImport(MultipartFile file, String meetingId) {
 
-        Map<String, Object> map =new HashMap<String, Object>(2);
+        Map<String, Object> map =new HashMap<String, Object>(4);
 
         boolean flag = false;
         String originalFilename = file.getOriginalFilename();
@@ -324,6 +329,12 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
             map.put("flag",flag);
             map.put("message","上传会议失败");
         }
+
+        //预计导入条数
+        map.put("estimatedNumber",meetingParticipantsExcels.size());
+        //预计导入条数
+        map.put("actualNumber",meetingParticipantsTemps.size());
+
         return map;
     }
 
