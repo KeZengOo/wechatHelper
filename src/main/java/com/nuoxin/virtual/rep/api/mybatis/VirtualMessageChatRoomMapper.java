@@ -1,6 +1,8 @@
 package com.nuoxin.virtual.rep.api.mybatis;
 
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.wechat.WechatChatRoomMessageRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.WechatChatRoomMessageRequest;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.WechatChatRoomMessageResponse;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -31,5 +33,20 @@ public interface VirtualMessageChatRoomMapper {
      * @param list
      */
     void batchInsert(List<WechatChatRoomMessageRequestBean> list);
+
+    /**
+     * 群消息
+     * @param request
+     * @return
+     */
+    List<WechatChatRoomMessageResponse> getWechatChatRoomMessageList(WechatChatRoomMessageRequest request);
+
+
+    /**
+     * 群消息总数
+     * @param request
+     * @return
+     */
+    Integer getWechatChatRoomMessageListCount(WechatChatRoomMessageRequest request);
 
 }

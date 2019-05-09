@@ -6,7 +6,9 @@ import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.v2_5.WechatService;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.CommonPoolRequest;
+import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.WechatChatRoomMessageRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.CommonPoolDoctorResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.WechatChatRoomMessageResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.WechatChatRoomResponse;
 import com.nuoxin.virtual.rep.api.web.controller.v2_5.NewBaseController;
 import io.swagger.annotations.Api;
@@ -40,4 +42,14 @@ public class WechatChatRoomController extends NewBaseController {
         return responseBean;
     }
 
+
+    @ApiOperation(value = "微信群消息", notes = "微信群消息")
+    @PostMapping(value = "/chat/room/message")
+    public DefaultResponseBean<PageResponseBean<WechatChatRoomMessageResponse>> getWechatChatRoomMessagePage(@RequestBody WechatChatRoomMessageRequest request) {
+
+        PageResponseBean<WechatChatRoomMessageResponse> wechatChatRoomMessagePage = wechatService.getWechatChatRoomMessagePage(request);
+        DefaultResponseBean<PageResponseBean<WechatChatRoomMessageResponse>> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(wechatChatRoomMessagePage);
+        return responseBean;
+    }
 }
