@@ -390,11 +390,42 @@
 
 		<if test="isAddWechat !=null">
 			<if test="isAddWechat == 1">
+				<!--
 				AND dm.wechat IS NOT NULL AND dm.wechat!=''
+				-->
+
+				AND d.id IN (
+				SELECT
+				doctor_id
+				FROM
+				drug_user_doctor_one_to_one
+				WHERE
+				is_add_wechat = 1
+				AND drug_user_id IN
+				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+					#{virtualDrugUserId}
+				</foreach>
+				)
 			</if>
 
 			<if test="isAddWechat == 0">
+				<!--
 				AND (dm.wechat IS NULL OR dm.wechat='')
+				-->
+
+				AND d.id IN (
+				SELECT
+				doctor_id
+				FROM
+				drug_user_doctor_one_to_one
+				WHERE
+				(is_add_wechat IS NULL OR is_add_wechat=0)
+				AND drug_user_id IN
+				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+					#{virtualDrugUserId}
+				</foreach>
+				)
+
 			</if>
 		</if>
 
@@ -877,18 +908,44 @@
 		</if>
 
 		<if test="isAddWechat !=null">
-
-
-
 			<if test="isAddWechat == 1">
+				<!--
 				AND dm.wechat IS NOT NULL AND dm.wechat!=''
+				-->
+
+				AND d.id IN (
+				SELECT
+				doctor_id
+				FROM
+				drug_user_doctor_one_to_one
+				WHERE
+				is_add_wechat = 1
+				AND drug_user_id IN
+				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+					#{virtualDrugUserId}
+				</foreach>
+				)
 			</if>
 
 			<if test="isAddWechat == 0">
+				<!--
 				AND (dm.wechat IS NULL OR dm.wechat='')
+				-->
+
+				AND d.id IN (
+				SELECT
+				doctor_id
+				FROM
+				drug_user_doctor_one_to_one
+				WHERE
+				(is_add_wechat IS NULL OR is_add_wechat=0)
+				AND drug_user_id IN
+				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+					#{virtualDrugUserId}
+				</foreach>
+				)
+
 			</if>
-
-
 		</if>
 
 		<if test="startDoctorCreateTime !=null and startDoctorCreateTime !=''">
