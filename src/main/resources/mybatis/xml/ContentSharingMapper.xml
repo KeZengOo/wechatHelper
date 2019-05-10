@@ -289,4 +289,80 @@
         title
     </select>
 
+    <!-- 内容分享列表 -->
+    <select id="getContentSharingCSVList" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.ContentSharingParams">
+        SELECT
+        m.id,
+        m.title,
+        m.time,
+        m.share_type AS shareType,
+        m.drug_user_id AS drugUserId,
+        m.drug_user_name AS drugUserName,
+        count(m.title) AS peopleNumber,
+        SUM(m.read_time) AS totalDuration,
+        p.product_id AS productId,
+        l.prod_name AS prodName,
+        u.sale_type AS saleType
+        FROM
+        (
+        SELECT
+        t.id,
+        t.title,
+        t.time,
+        r.share_type,
+        r.data_id,
+        r.drug_user_id,
+        r.drug_user_name,
+        r.read_person_id,
+        r.read_person_name,
+        r.read_time
+        FROM
+        activity_info t
+        LEFT JOIN activity_read r ON t.id = r.data_id
+        JOIN activity_read_ip ip ON r.read_token = ip.read_token
+        WHERE
+        1 = 1
+        AND r.data_id = t.id
+        <if test="drugUserId != 0 and drugUserId != null">
+            AND r.drug_user_id = #{drugUserId}
+        </if>
+
+        AND (
+        ip.isp IS NULL
+        OR ip.isp != '阿里云'
+        )
+        GROUP BY
+        read_person_id,
+        id
+        ) m
+        JOIN t_content_product p ON p.content_id = m.id
+        JOIN product_line l ON p.product_id = l.prod_id
+        JOIN drug_user u ON u.id = m.drug_user_id
+
+        WHERE
+        1 = 1
+
+        <if test="productId != 0 and productId != null">
+            AND l.prod_id = #{productId}
+        </if>
+
+        <if test="drugUserId != 0 and drugUserId != null">
+            AND m.drug_user_id = #{drugUserId}
+        </if>
+
+        <if test="shareType != 0 and shareType != null">
+            AND m.share_type = #{shareType}
+        </if>
+
+        <if test="startTimeBefore != '' and startTimeBefore != null">
+            AND m.time &gt;= #{startTimeBefore}
+        </if>
+
+        <if test="startTimeAfter != '' and startTimeAfter != null">
+            AND m.time &lt;= #{startTimeAfter}
+        </if>
+
+        GROUP BY
+        title
+    </select>
 </mapper>

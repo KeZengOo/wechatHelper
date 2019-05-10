@@ -8,6 +8,7 @@ import com.nuoxin.virtual.rep.api.entity.v3_0.request.ContentReadLogsRequest;
 import com.nuoxin.virtual.rep.api.entity.v3_0.request.ContentSharingRequest;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -46,4 +47,14 @@ public interface ContentSharingService {
      * @param response
      */
     void download(String outPutPath, String fileName, HttpServletResponse response);
+
+    /**
+     * 导出内容分享列表下载
+     * @param productId
+     * @param drugUserId
+     * @param startTimeAfter
+     * @param startTimeBefore
+     * @param response
+     */
+    void contentSharingExportFile(Integer productId, Integer drugUserId, String startTimeAfter, String startTimeBefore,Integer shareType, HttpServletResponse response);
 }

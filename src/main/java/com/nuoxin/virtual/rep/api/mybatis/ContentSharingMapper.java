@@ -59,4 +59,14 @@ public interface ContentSharingMapper {
      * @return list
      */
     List<Map<String,Object>> getContentSharingList(@Param("contentSharingRequest") ContentSharingRequest contentSharingRequest);
+
+    /**
+     * 内容分享列表
+     * @param productId
+     * @param drugUserId
+     * @param startTimeAfter
+     * @param startTimeBefore
+     * @return list
+     */
+    List<ContentSharingParams> getContentSharingCSVList(@Param("productId")Integer productId, @Param("drugUserId")Integer drugUserId, @Param("startTimeAfter")String startTimeAfter, @Param("startTimeBefore")String startTimeBefore, @Param("shareType") Integer shareType);
 }

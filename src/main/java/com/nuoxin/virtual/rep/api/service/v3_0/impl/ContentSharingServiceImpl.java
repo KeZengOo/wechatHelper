@@ -1,10 +1,7 @@
 package com.nuoxin.virtual.rep.api.service.v3_0.impl;
 
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
-import com.nuoxin.virtual.rep.api.entity.v3_0.params.ContentReadLogsParams;
-import com.nuoxin.virtual.rep.api.entity.v3_0.params.ContentReadLogsTimeParams;
-import com.nuoxin.virtual.rep.api.entity.v3_0.params.ContentSharingParams;
-import com.nuoxin.virtual.rep.api.entity.v3_0.params.FilePathParams;
+import com.nuoxin.virtual.rep.api.entity.v3_0.params.*;
 import com.nuoxin.virtual.rep.api.entity.v3_0.request.ContentReadLogsRequest;
 import com.nuoxin.virtual.rep.api.entity.v3_0.request.ContentSharingRequest;
 import com.nuoxin.virtual.rep.api.mybatis.ContentSharingMapper;
@@ -17,8 +14,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedWriter;
-import java.io.IOException;
+import java.io.*;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -174,5 +171,141 @@ public class ContentSharingServiceImpl implements ContentSharingService {
         } catch (IOException e) {
             log.error("IOException",e);
         }
+    }
+
+    @Override
+    public void contentSharingExportFile(Integer productId, Integer drugUserId, String startTimeAfter, String startTimeBefore, Integer shareType, HttpServletResponse response) {
+        List<ContentSharingParams> list = contentSharingMapper.getContentSharingCSVList(productId, drugUserId, startTimeAfter, startTimeBefore, shareType);
+        List<ContentSharingExcelParams> newList = new ArrayList<ContentSharingExcelParams>();
+        //时间格式转字符串
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        HashMap map = new LinkedHashMap();
+        map.put("1", "ID");
+        map.put("2", "标题");
+        map.put("3", "发布时间");
+        map.put("4", "分享渠道");
+        map.put("5", "代表");
+        map.put("6", "所属产品");
+        map.put("7", "拜访方式");
+        map.put("8", "阅读人数");
+        map.put("9", "阅读总时长");
+        String fileds[] = new String[] { "id", "title", "time", "shareType", "drugUserName", "prodName", "saleType", "peopleNumber", "totalDuration"};
+
+        for(int i = 0; i < list.size(); i++){
+            ContentSharingExcelParams contentSharingExcelParams = new ContentSharingExcelParams();
+            contentSharingExcelParams.setId(list.get(i).getId());
+            contentSharingExcelParams.setTitle(list.get(i).getTitle());
+            String timeStr = simpleDateFormat.format(list.get(i).getTime());
+            contentSharingExcelParams.setTime(timeStr);
+            contentSharingExcelParams.setDrugUserName(list.get(i).getDrugUserName());
+            contentSharingExcelParams.setProdName(list.get(i).getProdName());
+            contentSharingExcelParams.setPeopleNumber(list.get(i).getPeopleNumber().toString());
+            contentSharingExcelParams.setTotalDuration(list.get(i).getTotalDuration().toString());
+
+            if(list.get(i).getSaleType().equals(0)){
+                contentSharingExcelParams.setSaleType("没有类型为经理");
+            }
+            else if(list.get(i).getSaleType().equals(1)){
+                contentSharingExcelParams.setSaleType("是线上销售");
+            }
+            else if(list.get(i).getSaleType().equals(2)){
+                contentSharingExcelParams.setSaleType("是线下销售");
+            }
+
+            if(list.get(i).getShareType().equals(1)){
+                contentSharingExcelParams.setShareType("微信");
+            }
+            else if(list.get(i).getShareType().equals(2)){
+                contentSharingExcelParams.setShareType("短信");
+            }
+            else if(list.get(i).getShareType().equals(3)){
+                contentSharingExcelParams.setShareType("邮件");
+            }
+            newList.add(contentSharingExcelParams);
+        }
+
+        exportCSVFile(response,map,newList,fileds);
+    }
+
+    /**
+     * 导出CSV文件公共方法
+     * @param response
+     * @param map
+     * @param exportData
+     * @param fileds
+     */
+    public void exportCSVFile(HttpServletResponse response, HashMap map, List exportData, String[] fileds) {
+        try {
+            File tempFile = File.createTempFile("vehicle", ".csv");
+            BufferedWriter csvFileOutputStream = null;
+            csvFileOutputStream = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tempFile), "GBK"), 1024);
+            for (Iterator propertyIterator = map.entrySet().iterator(); propertyIterator.hasNext(); ) {
+                java.util.Map.Entry propertyEntry = (java.util.Map.Entry) propertyIterator.next();
+                csvFileOutputStream.write((String) propertyEntry.getValue() != null ? new String(((String) propertyEntry.getValue()).getBytes("GBK"), "GBK") : "");
+                if (propertyIterator.hasNext()) {
+                    csvFileOutputStream.write(",");
+                }
+            }
+            csvFileOutputStream.write("\r\n");
+
+            for (int j = 0; exportData != null && !exportData.isEmpty() && j < exportData.size(); j++) {
+                Class clazz = exportData.get(j).getClass();
+                String[] contents = new String[fileds.length];
+                for (int i = 0; fileds != null && i < fileds.length; i++) {
+                    String filedName = toUpperCaseFirstOne(fileds[i]);
+                    Object obj = null;
+                    try {
+                        Method method = clazz.getMethod(filedName);
+                        method.setAccessible(true);
+                        obj = method.invoke(exportData.get(j));
+                    } catch (Exception e) {
+                    }
+                    String str = String.valueOf(obj);
+                    if (str == null || str.equals("null")) {
+                        str = "";
+                    }
+                    contents[i] = str;
+                }
+                for (int n = 0; n < contents.length; n++) {
+
+                    csvFileOutputStream.write(contents[n]);
+                    csvFileOutputStream.write(",");
+                }
+                csvFileOutputStream.write("\r\n");
+            }
+            csvFileOutputStream.flush();
+
+            java.io.OutputStream out = response.getOutputStream();
+            byte[] b = new byte[10240];
+            java.io.File fileLoad = new java.io.File(tempFile.getCanonicalPath());
+            response.reset();
+            response.setContentType("application/csv");
+            String trueCSVName = "contentSharing.csv";
+            response.setHeader("Content-Disposition", "attachment; filename = "+ new String(trueCSVName.getBytes("GBK"), "ISO8859-1"));
+            long fileLength = fileLoad.length();
+            String length1 = String.valueOf(fileLength);
+            response.setHeader("Content_Length", length1);
+            java.io.FileInputStream in = new java.io.FileInputStream(fileLoad);
+            int n;
+            while ((n = in.read(b)) != -1) {
+                out.write(b, 0, n);
+            }
+            in.close();
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 将第一个字母转换为大写字母并和get拼合成方法
+     * @param origin
+     * @return string
+     */
+    private static String toUpperCaseFirstOne(String origin) {
+        StringBuffer sb = new StringBuffer(origin);
+        sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
+        sb.insert(0, "get");
+        return sb.toString();
     }
 }
