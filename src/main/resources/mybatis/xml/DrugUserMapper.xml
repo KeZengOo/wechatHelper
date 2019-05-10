@@ -186,10 +186,42 @@
         ON dud.doctor_id=d.id
         INNER JOIN virtual_doctor_dynamic_field vddf
         ON pl.prod_id=vddf.product_id
-        WHERE d.id=#{doctorId} And du.leader_path
+        WHERE
+        dud.is_available=1
+        AND
+        d.id=#{doctorId} And du.leader_path
         LIKE #{leaderPath}
 
     </select>
+
+
+    <!-- 查询销售名下某个医生所有设置动态字段的产品 -->
+    <select id="getProductListByDoctorId" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DoctorProductResponse">
+
+        SELECT
+        DISTINCT pl.prod_id productId, pl.prod_name productName, d.id doctorId
+        FROM product_line pl
+        INNER JOIN drug_user_doctor dud
+        ON pl.prod_id=dud.prod_id
+        INNER JOIN drug_user du
+        ON dud.drug_user_id=du.id
+        INNER JOIN doctor d
+        ON dud.doctor_id=d.id
+        INNER JOIN virtual_doctor_dynamic_field vddf
+        ON pl.prod_id=vddf.product_id
+        WHERE
+        dud.is_available=1
+        AND
+        d.id IN
+        <foreach collection="doctorIdList" item="doctorId" open="(" close=")" separator=",">
+            #{doctorId}
+        </foreach>
+
+        And du.leader_path
+        LIKE #{leaderPath}
+
+    </select>
+
 
 
     <!-- 根据ID获得已经拼上%的leaderPath -->
@@ -250,6 +282,22 @@
         <foreach collection="drugUserEmailList" item="drugUserEmail" open="(" close=")" separator=",">
             #{drugUserEmail}
         </foreach>
+    </select>
+
+    <select id="getRoleIdListByDoctor" resultType="com.nuoxin.virtual.rep.api.entity.DrugUser">
+        SELECT DISTINCT
+            du.email,
+            ru.role_id roleId
+        FROM
+            drug_user du
+            INNER JOIN drug_user_doctor dud ON du.id = dud.drug_user_id
+            INNER JOIN role_user ru ON du.id = ru.user_id
+        WHERE
+            dud.is_available = 1
+            AND dud.doctor_id=#{doctorId}
+            AND du.id != #{drugUserId}
+            AND dud.prod_id=#{productId}
+            AND ru.role_id > 100
     </select>
 
 

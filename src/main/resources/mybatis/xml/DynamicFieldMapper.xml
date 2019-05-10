@@ -949,4 +949,46 @@
         AND field_name='医生需求'
     </select>
 
+
+    <!-- 得到所有字段，产品字段、基本信息字段  分类，目前1基本信息，2医生的处方信息，3之前拜访记录，4分析,5是医院信息 目前没有4-->
+    <select id="getAllDynamicFieldList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DynamicFieldNameValueResponse">
+        SELECT
+        id fieldId,
+        field_name fieldName
+        FROM
+        virtual_doctor_dynamic_field
+        WHERE
+        classification IN (1,2,3,5) AND (
+        product_id IS NULL
+        OR product_id = 0
+        OR product_id IN
+        <foreach collection="productIdList" item="productId" separator="," open="(" close=")">
+            #{productId}
+        </foreach>
+        )
+        ORDER BY classification
+    </select>
+
+    <!-- 得到医生填写的动态字段以及值 -->
+    <select id="getDoctorDynamicFieldNameValue" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DynamicFieldNameValueResponse">
+        SELECT
+            v.id fieldId,
+            v.field_name fieldName,
+            v2.doctor_id doctorId,
+            IFNULL( v2.dynamic_field_value, '' ) fieldValue
+        FROM
+            virtual_doctor_dynamic_field v
+            INNER JOIN virtual_doctor_dynamic_field_value v2 ON v.id = v2.dynamic_field_id
+        WHERE
+            v2.doctor_id IN
+            <foreach collection="doctorIdList" item="doctorId" separator="," open="(" close=")">
+                #{doctorId}
+            </foreach>
+            AND v.classification IN ( 1, 2, 3, 5 )
+            AND ( v.product_id = 0 OR v.product_id = #{productId} )
+        GROUP BY
+	    v.id,
+	    v2.doctor_id
+    </select>
+
 </mapper>

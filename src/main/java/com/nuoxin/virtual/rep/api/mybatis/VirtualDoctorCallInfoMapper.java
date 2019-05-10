@@ -8,8 +8,10 @@ import com.nuoxin.virtual.rep.api.web.controller.request.call.VisitHistoryReques
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.CallInfoListRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.VisitCountRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.statistics.DailyStatisticsRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.DrugUserDoctorCallRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CallTelephoneReponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VisitCountResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DrugUserDoctorCallResponse;
 import org.apache.ibatis.annotations.Param;
 
 /**
@@ -234,5 +236,31 @@ public interface VirtualDoctorCallInfoMapper {
 	 * @return
 	 */
 	Integer getCountByCallRequest(CallRequestBean bean);
+
+
+	/*********************************  V3.0.1相关  ******************************************/
+
+	/**
+	 * 新增拜访的目的
+	 * @param callId
+	 * @param purposeList
+	 */
+	void addCallPurpose(@Param(value = "callId") Long callId,@Param(value = "purposeList") List<String> purposeList);
+
+
+	/**
+	 * 电话拜访记录查询
+	 * @param request
+	 * @return
+	 */
+	List<DrugUserDoctorCallResponse> getDrugUserDoctorCallList(DrugUserDoctorCallRequest request);
+
+	/**
+	 * 电话拜访记录查询总数
+	 * @param request
+	 * @return
+	 */
+	Integer getDrugUserDoctorCallListCount(DrugUserDoctorCallRequest request);
+
 }
 

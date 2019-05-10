@@ -10,6 +10,9 @@ public class HospitalLevelUtil {
     private static final Map<String, String> levelMap = new HashMap<String, String>();
     static{
         levelMap.put("0", "未知");
+        levelMap.put("10", "一级");
+        levelMap.put("20", "二级");
+        levelMap.put("30", "三级");
         levelMap.put("11", "一级甲等");
         levelMap.put("12", "一级乙等");
         levelMap.put("13", "一级丙等");

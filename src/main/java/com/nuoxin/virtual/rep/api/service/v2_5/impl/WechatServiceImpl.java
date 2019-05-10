@@ -1,5 +1,6 @@
 package com.nuoxin.virtual.rep.api.service.v2_5.impl;
 
+import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.common.exception.FileFormatException;
@@ -15,9 +16,12 @@ import com.nuoxin.virtual.rep.api.service.v2_5.WechatService;
 import com.nuoxin.virtual.rep.api.utils.*;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.CallRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.wechat.*;
+import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.WechatChatRoomMessageRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.wechat.WechatAndroidContactResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.wechat.WechatAndroidUploadTimeResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.wechat.WechatChatRoomMemberResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.WechatChatRoomMessageResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.WechatChatRoomResponse;
 import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 import com.vdurmont.emoji.EmojiParser;
 import org.apache.commons.csv.CSVRecord;
@@ -331,6 +335,29 @@ public class WechatServiceImpl implements WechatService {
 
 
         return uploadTime;
+    }
+
+    @Override
+    public List<WechatChatRoomResponse> getWechatChatRoomList(Long drugUserId, Long doctorId) {
+        List<WechatChatRoomResponse> wechatChatRoomList = wechatChatRoomContactMapper.getWechatChatRoomList(drugUserId, doctorId);
+        return wechatChatRoomList;
+
+    }
+
+    @Override
+    public PageResponseBean<WechatChatRoomMessageResponse> getWechatChatRoomMessagePage(WechatChatRoomMessageRequest request) {
+
+        Integer count = virtualMessageChatRoomMapper.getWechatChatRoomMessageListCount(request);
+        if (count == null){
+            count = 0;
+        }
+        List<WechatChatRoomMessageResponse> wechatChatRoomMessageList = null;
+        if (count > 0){
+            wechatChatRoomMessageList = virtualMessageChatRoomMapper.getWechatChatRoomMessageList(request);
+        }
+
+        return new PageResponseBean<>(request, count, wechatChatRoomMessageList);
+
     }
 
 
@@ -713,7 +740,7 @@ public class WechatServiceImpl implements WechatService {
             String[] memberIdList = this.checkMemberIdListStr(memberIdListStr);
             String[] displayNameList = this.checkDisplayNameListStr(displayNameListStr);
             if (memberIdList.length !=displayNameList.length){
-                throw new BusinessException(ErrorEnum.ERROR, "群成员备注中不能包含符号、");
+                throw new BusinessException(ErrorEnum.ERROR, "群成员昵称和备注中不能包含符号、");
             }
 
             for (int i = 0; i < memberIdList.length; i++) {

@@ -6,6 +6,7 @@ import com.nuoxin.virtual.rep.api.entity.v2_5.ProductDO;
 import com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.doctor.DoctorResponseBean;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DoctorProductResponse;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -81,6 +82,16 @@ public interface DrugUserMapper extends MyMapper<DrugUser> {
 
 
     /**
+     * 查询销售名下某个医生所有设置动态字段的产品
+     * @param leaderPath
+     * @param doctorIdList
+     * @return
+     */
+    List<DoctorProductResponse> getProductListByDoctorId(@Param(value = "leaderPath") String leaderPath, @Param(value = "doctorIdList") List<Long> doctorIdList);
+
+
+
+    /**
      * 根据ID获得已经拼上%的leaderPath
      * @param id
      * @return
@@ -126,6 +137,15 @@ public interface DrugUserMapper extends MyMapper<DrugUser> {
      * @return
      */
 	List<Long> getRoleIdList(@Param(value = "drugUserEmailList") List<String> drugUserEmailList);
+
+    /**
+     * 根据代表邮箱查询代表角色种类，去重
+     * @param drugUserId
+     * @param doctorId
+     * @param productId
+     * @return
+     */
+    List<DrugUser> getRoleIdListByDoctor(@Param(value = "drugUserId") Long drugUserId, @Param(value = "doctorId") Long doctorId,@Param(value = "productId") Long productId);
 
     /**
      * 得到代表角色种类，去重

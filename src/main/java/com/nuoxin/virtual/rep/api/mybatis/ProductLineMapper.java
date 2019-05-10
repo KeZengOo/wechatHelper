@@ -103,4 +103,22 @@ public interface ProductLineMapper extends MyMapper<ProductLine> {
      */
     List<ProductLine> getProductListByUpdateTime(@Param(value = "updateTime") String createTime);
 
+    /**
+     * 得到全部的产品
+     * @return
+     */
+    List<ProductLine> getAllProductLineList();
+
+
+    /**
+     * 查询总数，用来判断代表是否在某个产品名下
+     * @param email
+     * @param productId
+     * @return
+     */
+    Integer getProductUserCount(@Param(value = "email") String email,@Param(value = "productId") Long productId);
+
+
+
+
 }

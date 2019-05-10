@@ -12,19 +12,20 @@ import lombok.Data;
 public class DoctorVo {
 
 
+    @Excel(name = "医院所在省")
+    private String province;
+    @Excel(name = "医院所在市")
+
+    private String city;
+
     @Excel(name = "医院名称")
     private String hospitalName;
 
-    @Excel(name = "医院所在省")
-    private String province;
-
-    @Excel(name = "医院所在市")
-    private String city;
 
     @Excel(name = "医院地址", width = 200)
     private String address;
 
-    @Excel(name = "医院等级")
+    @Excel(name = "医院级别")
     private String hospitalLevel;
 
     @Excel(name = "药企提供的医院ID")
@@ -42,7 +43,7 @@ public class DoctorVo {
     @Excel(name = "科室名称")
     private String depart;
 
-    @Excel(name = "职称")
+    @Excel(name = "医生职称")
     private String positions;
 
     @Excel(name = "代表工作邮箱", width = 50)

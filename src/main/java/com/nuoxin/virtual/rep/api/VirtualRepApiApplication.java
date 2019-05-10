@@ -11,6 +11,7 @@ import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.async.DeferredResult;
@@ -29,6 +30,7 @@ import static springfox.documentation.schema.AlternateTypeRules.newRule;
 @SpringBootApplication
 //@EnableDiscoveryClient
 @EnableSwagger2
+@EnableAsync
 @EnableScheduling
 @MapperScan(basePackages = "com.nuoxin.virtual.rep.api.mybatis")
 public class VirtualRepApiApplication {

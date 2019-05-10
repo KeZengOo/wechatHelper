@@ -45,4 +45,33 @@
         </foreach>
     </insert>
 
+    <!-- 群消息 -->
+    <select id="getWechatChatRoomMessageList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.WechatChatRoomMessageResponse">
+        SELECT
+            chatroom_id chatRoomId,
+            member_id memberId,
+            member_name member_Name,
+            wechat_message_status wechatMessageStatus,
+            wechat_message_type wechatMessageType,
+            wechat_message wechatMessage,
+            DATE_FORMAT( message_time, '%Y-%m-%d %H:%i:%s' ) messageTime
+        FROM
+            virtual_message_chatroom
+        WHERE
+            chatroom_id = #{chatRoomId}
+            ORDER BY message_time
+
+	        LIMIT #{currentSize}, #{pageSize}
+    </select>
+
+    <!-- 群消息 -->
+    <select id="getWechatChatRoomMessageListCount" resultType="java.lang.Integer">
+        SELECT
+            COUNT(*)
+        FROM
+            virtual_message_chatroom
+        WHERE
+            chatroom_id = #{chatRoomId}
+    </select>
+
 </mapper>

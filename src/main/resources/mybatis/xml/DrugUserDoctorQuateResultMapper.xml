@@ -11,6 +11,15 @@
         </foreach>
     </insert>
 
+    <insert id="batchInsertProductDoctor">
+        INSERT INTO product_doctor_quate_result (quate_id, result_id)
+        VALUES
+        <foreach collection ="resultIdList" item="resultId" separator =",">
+            (#{quateId}, #{resultId})
+        </foreach>
+    </insert>
+
+
     <select id="getVisitResult" resultType="java.lang.String">
         SELECT
             DISTINCT b.visit_result

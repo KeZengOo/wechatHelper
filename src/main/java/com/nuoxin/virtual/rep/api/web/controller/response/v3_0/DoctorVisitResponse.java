@@ -30,8 +30,14 @@ public class DoctorVisitResponse implements Serializable {
     @ApiModelProperty(value = "拜访的代表姓名")
     private String visitDrugUserName;
 
-    @ApiModelProperty(value = "拜访结果")
-    private String visitResult;
+//    @ApiModelProperty(value = "拜访结果")
+//    private String visitResult;
+
+    @ApiModelProperty(value = "医生ID")
+    private Long doctorId;
+
+    @ApiModelProperty(value = "产品ID")
+    private Long productId;
 
 
 

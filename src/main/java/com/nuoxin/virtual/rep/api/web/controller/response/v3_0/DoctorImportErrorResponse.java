@@ -34,6 +34,6 @@ public class DoctorImportErrorResponse implements Serializable {
     private Integer failNum;
 
     @ApiModelProperty(value = "错误明细")
-    private List<DoctorImportErrorResponse> detailList = new ArrayList<>();
+    private List<DoctorImportErrorDetailResponse> detailList = new ArrayList<>();
 
 }

@@ -69,5 +69,23 @@ public interface DrugUserDoctorMapper {
 	Integer addWechatDoctor(DailyStatisticsRequestBean bean);
 
 
+	/**
+	 * 得到重复数据ID，用来删除
+	 * @param available
+	 * @return
+	 */
+	List<Long> getAvailableDeleteIdList(@Param(value = "available") Integer available);
+
+	/**
+	 * 得到要重复删除的
+	 * @return
+	 */
+	List<Long> getRepeatDeleteIdList();
+
+	/**
+	 * 根据ID删除
+	 * @param list
+	 */
+	void deleteByIdList(List<Long> list);
 }
 

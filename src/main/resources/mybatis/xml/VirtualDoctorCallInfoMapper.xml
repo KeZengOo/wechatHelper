@@ -1521,7 +1521,7 @@
 
 	<select id="getCountByCallRequest" resultType="java.lang.Integer">
 		SELECT
-			COUNT( * )
+			COUNT(*)
 		FROM
 			virtual_doctor_call_info
 		WHERE
@@ -1531,4 +1531,269 @@
 			AND product_id = #{productId}
 			AND DATE_FORMAT( #{messageTime}, '%Y-%m-%d' ) = DATE_FORMAT( create_time, '%Y-%m-%d' )
 	</select>
+
+
+	<!-- 新增拜访的目的 -->
+	<insert id="addCallPurpose">
+		INSERT INTO virtual_doctor_call_purpose(call_id, item)
+		VALUES
+		<foreach collection="purposeList" item="purpose" separator=",">
+			(
+			#{callId},
+			#{purpose}
+			)
+		</foreach>
+
+	</insert>
+
+
+	<!-- 电话拜访记录查询 -->
+	<select id="getDrugUserDoctorCallList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DrugUserDoctorCallResponse">
+		SELECT
+			pl.prod_id productId,
+			pl.prod_name productName,
+			du.id drugUserId,
+			du.NAME drugUserName,
+			(
+			CASE
+
+				WHEN du.sale_type IS NULL THEN
+				'未知'
+				WHEN du.sale_type = 0 THEN
+				'经理'
+				WHEN du.sale_type = 1 THEN
+				'线上'
+				WHEN du.sale_type = 2 THEN
+				'线下' ELSE '未知'
+			END
+			) AS drugUserVisitType,
+			d.id doctorId,
+			d.NAME doctorName,
+			d.hospital_id hospitalId,
+			d.hospital_name hospitalName,
+			d.depart,
+			(
+			CASE
+
+					WHEN q.is_cover IS NULL THEN
+					'未知'
+					WHEN q.is_cover = 0 THEN
+					'未开始'
+					WHEN q.is_cover = 1 THEN
+					'覆盖中'
+					WHEN q.is_cover = 2 THEN
+					'退出项目' ELSE '未知'
+				END
+				) AS coverStatus,
+				(
+				CASE
+
+						WHEN q.is_recruit IS NULL THEN
+						'未知'
+						WHEN q.is_recruit = 0 THEN
+						'未招募'
+						WHEN q.is_recruit = 1 THEN
+						'已招募' ELSE '未知'
+					END
+					) AS recruitStatus,
+					IFNULL(COUNT(v.id), 0) callCount,
+					IFNULL(SUM(v.call_time), 0) totalCallSecond,
+					(
+					SELECT
+						COUNT( * )
+					FROM
+						virtual_doctor_call_info
+					WHERE
+						virtual_drug_user_id = v.virtual_drug_user_id
+						AND virtual_doctor_id = v.virtual_doctor_id
+						AND product_id = v.product_id
+						AND visit_channel = 1
+						AND status_name = 'answer'
+						<if test="startTime !=null and endTime !=null">
+						AND v.create_time BETWEEN #{startTime} AND  #{startTime}
+						</if>
+
+					) connectCallCount,
+					MAX( v.create_time ) lastVisitDate,
+					(
+					SELECT
+						IFNULL(call_time, 0)
+					FROM
+						virtual_doctor_call_info
+					WHERE
+						virtual_drug_user_id = v.virtual_drug_user_id
+						AND virtual_doctor_id = v.virtual_doctor_id
+						AND product_id = v.product_id
+						AND visit_channel = 1
+						<if test="startTime !=null and endTime !=null">
+						AND v.create_time BETWEEN #{startTime} AND  #{startTime}
+						</if>
+
+					ORDER BY
+						v.create_time DESC
+						LIMIT 1
+					) lastCallSecond
+				FROM
+					virtual_doctor_call_info v
+					INNER JOIN drug_user du ON v.virtual_drug_user_id = du.id
+					INNER JOIN doctor d ON v.virtual_doctor_id = d.id
+					INNER JOIN product_doctor_quate q ON v.product_id = q.product_id
+					AND v.virtual_doctor_id = q.doctor_id
+					INNER JOIN product_line pl ON v.product_id = pl.prod_id
+				WHERE
+					v.visit_channel = 1
+					<if test="startTime !=null and endTime !=null">
+						AND v.create_time BETWEEN #{startTime} AND  #{startTime}
+					</if>
+
+
+					<if test="drugUserIdList !=null and drugUserIdList.size > 0">
+						AND v.virtual_drug_user_id IN
+						<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+							#{drugUserId}
+						</foreach>
+					</if>
+
+					<if test="productIdList !=null and productIdList.size > 0">
+						AND v.product_id IN
+						<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+							#{productId}
+						</foreach>
+					</if>
+
+
+					<if test="recruit !=null">
+						AND q.is_recruit=#{recruit}
+					</if>
+
+					<if test="cover !=null">
+						AND q.is_cover=#{cover}
+					</if>
+
+					<if test="target !=null">
+						AND q.is_target =#{target}
+					</if>
+
+					<if test="hasDrug!=null">
+						AND q.is_has_drug=#{hasDrug}
+					</if>
+
+					<if test="searchKeyword !=null and searchKeyword !=''">
+						AND d.id IN
+						(
+						SELECT
+						id
+						FROM
+						doctor
+						WHERE
+						telephone LIKE CONCAT('%', #{searchKeyword}, '%')
+						OR NAME LIKE CONCAT('%', #{searchKeyword}, '%')
+						OR hospital_name LIKE CONCAT('%', #{searchKeyword}, '%')
+						OR depart LIKE CONCAT('%', #{searchKeyword}, '%')
+						UNION
+						SELECT
+						doctor_id
+						FROM
+						doctor_telephone
+						WHERE
+						telephone LIKE CONCAT('%', #{searchKeyword}, '%')
+						)
+					</if>
+
+
+				GROUP BY
+					v.virtual_drug_user_id,
+					v.virtual_doctor_id,
+					v.product_id
+				LIMIT #{currentSize}, #{pageSize}
+	</select>
+
+
+
+	<!-- 电话拜访记录查询 -->
+	<select id="getDrugUserDoctorCallListCount" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM (
+		SELECT
+		v.virtual_drug_user_id,
+		v.virtual_doctor_id,
+		v.product_id
+		FROM
+		virtual_doctor_call_info v
+		INNER JOIN drug_user du ON v.virtual_drug_user_id = du.id
+		INNER JOIN doctor d ON v.virtual_doctor_id = d.id
+		INNER JOIN product_doctor_quate q ON v.product_id = q.product_id
+		AND v.virtual_doctor_id = q.doctor_id
+		INNER JOIN product_line pl ON v.product_id = pl.prod_id
+		WHERE
+		v.visit_channel = 1
+		<if test="startTime !=null and endTime !=null">
+			AND v.create_time BETWEEN #{startTime} AND #{ startTime}
+		</if>
+
+
+		<if test="drugUserIdList !=null and drugUserIdList.size > 0">
+			AND v.virtual_drug_user_id IN
+			<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+				#{drugUserId}
+			</foreach>
+		</if>
+
+		<if test="productIdList !=null and productIdList.size > 0">
+			AND v.product_id IN
+			<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+				#{productId}
+			</foreach>
+		</if>
+
+
+		<if test="recruit !=null">
+			AND q.is_recruit=#{recruit}
+		</if>
+
+			<if test="cover !=null">
+				AND q.is_cover=#{cover}
+			</if>
+
+			<if test="target !=null">
+				AND q.is_target =#{target}
+			</if>
+
+			<if test="hasDrug!=null">
+				AND q.is_has_drug=#{hasDrug}
+			</if>
+
+
+
+			<if test="searchKeyword !=null and searchKeyword !=''">
+				AND d.id IN
+				(
+				SELECT
+				id
+				FROM
+				doctor
+				WHERE
+				telephone LIKE CONCAT('%', #{searchKeyword}, '%')
+				OR NAME LIKE CONCAT('%', #{searchKeyword}, '%')
+				OR hospital_name LIKE CONCAT('%', #{searchKeyword}, '%')
+				OR depart LIKE CONCAT('%', #{searchKeyword}, '%')
+				UNION
+				SELECT
+				doctor_id
+				FROM
+				doctor_telephone
+				WHERE
+				telephone LIKE CONCAT('%', #{searchKeyword}, '%')
+				)
+			</if>
+
+
+		GROUP BY
+			v.virtual_drug_user_id,
+			v.virtual_doctor_id,
+			v.product_id
+		) t
+
+	</select>
+
+
 </mapper>

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.DailyReportMapper">
+
+    <!-- 招募的医生数 -->
+    <select id="recruitDoctorNum" resultType="java.lang.Integer">
+        SELECT
+        COUNT(DISTINCT virtual_doctor_id)
+        FROM
+        virtual_doctor_call_info_mend
+        WHERE
+        is_recruit = 1
+
+        <if test="productIdList !=null and productIdList.size > 0">
+            AND product_id IN
+            <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+                #{productId}
+            </foreach>
+        </if>
+
+        <if test="drugUserIdList !=null and drugUserIdList.size > 0">
+            AND virtual_drug_user_id IN
+            <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+                #{drugUserId}
+            </foreach>
+        </if>
+
+        <if test="startTime !=null and endTime !=null">
+            AND create_time BETWEEN #{startTime}  AND #{endTime}
+        </if>
+
+
+
+    </select>
+
+
+    <!-- 活跃覆盖医生(收益) -->
+    <select id="activeCoverDoctorNum" resultType="java.lang.Integer">
+
+        SELECT
+        COUNT( * )
+        FROM
+        (
+        SELECT DISTINCT
+        virtual_doctor_id
+        FROM
+        virtual_doctor_call_info
+        WHERE 1=1
+
+        <if test="productIdList !=null and productIdList.size > 0">
+            AND product_id IN
+            <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+                #{productId}
+            </foreach>
+        </if>
+
+
+        <if test="drugUserIdList !=null and drugUserIdList.size > 0">
+            AND virtual_drug_user_id IN
+            <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+                #{drugUserId}
+            </foreach>
+        </if>
+
+        <if test="startTime !=null and endTime !=null">
+            AND create_time BETWEEN #{startTime}  AND #{endTime}
+        </if>
+
+
+        AND call_time >= 150
+
+        UNION
+        SELECT
+        doctor_id
+        FROM
+        virtual_message
+        WHERE 1=1
+        <if test="drugUserIdList !=null and drugUserIdList.size > 0">
+            AND drug_user_id IN
+            <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+                #{drugUserId}
+            </foreach>
+        </if>
+
+        <if test="startTime !=null and endTime !=null">
+            AND message_time BETWEEN #{startTime}  AND #{endTime}
+        </if>
+
+        GROUP BY doctor_id HAVING COUNT(*) >= 3
+
+        UNION
+        SELECT DISTINCT
+        d.id
+        FROM
+        doctor d
+        INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+        INNER JOIN drug_user du ON dud.drug_user_id = du.id
+        INNER JOIN t_meeting_attend_details tmad ON d.id = tmad.doctor_id
+        INNER JOIN t_meeting_data tmd ON tmad.meeting_id = tmd.id
+        WHERE 1=1
+
+        <if test="startTime !=null and endTime !=null">
+            AND tmad.attend_start_time BETWEEN #{startTime}  AND #{endTime}
+        </if>
+
+        <if test="productIdList !=null and productIdList.size > 0">
+            AND dud.prod_id IN
+            <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+                #{productId}
+            </foreach>
+        </if>
+
+
+        <if test="drugUserIdList !=null and drugUserIdList.size > 0">
+            AND du.id IN
+            <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+                #{drugUserId}
+            </foreach>
+        </if>
+
+
+        <if test="productIdList !=null and productIdList.size > 0">
+            AND tmd.product_id IN
+            <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+                #{productId}
+            </foreach>
+        </if>
+
+
+        ) t
+
+    </select>
+
+</mapper>

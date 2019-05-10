@@ -390,11 +390,42 @@
 
 		<if test="isAddWechat !=null">
 			<if test="isAddWechat == 1">
+				<!--
 				AND dm.wechat IS NOT NULL AND dm.wechat!=''
+				-->
+
+				AND d.id IN (
+				SELECT
+				doctor_id
+				FROM
+				drug_user_doctor_one_to_one
+				WHERE
+				is_add_wechat = 1
+				AND drug_user_id IN
+				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+					#{virtualDrugUserId}
+				</foreach>
+				)
 			</if>
 
 			<if test="isAddWechat == 0">
+				<!--
 				AND (dm.wechat IS NULL OR dm.wechat='')
+				-->
+
+				AND d.id IN (
+				SELECT
+				doctor_id
+				FROM
+				drug_user_doctor_one_to_one
+				WHERE
+				(is_add_wechat IS NULL OR is_add_wechat=0)
+				AND drug_user_id IN
+				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+					#{virtualDrugUserId}
+				</foreach>
+				)
+
 			</if>
 		</if>
 
@@ -877,18 +908,44 @@
 		</if>
 
 		<if test="isAddWechat !=null">
-
-
-
 			<if test="isAddWechat == 1">
+				<!--
 				AND dm.wechat IS NOT NULL AND dm.wechat!=''
+				-->
+
+				AND d.id IN (
+				SELECT
+				doctor_id
+				FROM
+				drug_user_doctor_one_to_one
+				WHERE
+				is_add_wechat = 1
+				AND drug_user_id IN
+				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+					#{virtualDrugUserId}
+				</foreach>
+				)
 			</if>
 
 			<if test="isAddWechat == 0">
+				<!--
 				AND (dm.wechat IS NULL OR dm.wechat='')
+				-->
+
+				AND d.id IN (
+				SELECT
+				doctor_id
+				FROM
+				drug_user_doctor_one_to_one
+				WHERE
+				(is_add_wechat IS NULL OR is_add_wechat=0)
+				AND drug_user_id IN
+				<foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+					#{virtualDrugUserId}
+				</foreach>
+				)
+
 			</if>
-
-
 		</if>
 
 		<if test="startDoctorCreateTime !=null and startDoctorCreateTime !=''">
@@ -1439,12 +1496,14 @@
 			<if test="name !=null and name !=''">
 				name=#{name},
 			</if>
-			<if test="hospitalId !=null ">
-				hospital_id=#{hospitalId},
+			<if test="hospitalId !=null and hospitalId !=0 and hospitalName !=null and hospitalName !=''">
+				hospital_id=#{hospitalId}, hospital_name=#{hospitalName},
 			</if>
+			<!--
 			<if test="hospitalName !=null and hospitalName !=''">
 				hospital_name=#{hospitalName},
 			</if>
+			-->
 			<if test="province !=null and province !=''">
 				provice=#{province},
 			</if>
@@ -1691,6 +1750,9 @@
 		d.positions,
 		d.hospital_id hospitalId,
 		d.hospital_name hospitalName,
+		h.province,
+		h.city,
+		h.level hospitalLevel,
 		du.id drugUserId,
 		du.NAME drugUserName,
 		pl.prod_id productId,
@@ -1730,6 +1792,20 @@
 		'临采' ELSE '未知'
 		END
 		) AS hasDrug,
+
+		(
+		CASE
+
+		WHEN q.is_has_ae IS NULL THEN
+		'未知'
+		WHEN q.is_has_ae = 0 THEN
+		'否'
+		WHEN q.is_has_ae = 1 THEN
+		'是'
+		ELSE '未知'
+		END
+		) AS hasAe,
+
 		(
 		CASE
 
@@ -1743,15 +1819,80 @@
 		'退出项目' ELSE '未知'
 		END
 		) AS cover ,
-		max(v.id) MaxVisitId
+
+
+		(
+		CASE
+
+		WHEN q.hcp_potential IS NULL THEN
+		'未知'
+		WHEN q.hcp_potential = 1 THEN
+		'低'
+		WHEN q.hcp_potential = 2 THEN
+		'中'
+		WHEN q.hcp_potential = 3 THEN
+		'高' ELSE '未知'
+		END
+		) AS potential ,
+
+		q.attitude,
+		IFNULL(GROUP_CONCAT(DISTINCT re.visit_result), '') visitResult,
+		max(v.create_time) lastVisitDate,
+		max(v.id) maxVisitId
 		FROM
 		doctor d
+		LEFT JOIN hospital h
+		ON d.hospital_id=h.id
 		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
 		INNER JOIN drug_user du ON dud.drug_user_id = du.id
 		INNER JOIN product_line pl ON dud.prod_id = pl.prod_id
-		LEFT JOIN drug_user_doctor_quate q ON dud.drug_user_id = q.drug_user_id
-		AND dud.doctor_id = q.doctor_id
+		LEFT JOIN
+
+
+		<!--
+		(
+		SELECT a.*, IFNULL(GROUP_CONCAT(DISTINCT re.visit_result), '') visitResult FROM drug_user_doctor_quate a INNER JOIN (
+		SELECT max(id) maxId FROM drug_user_doctor_quate
+		WHERE 1=1
+		<if test="productIdList !=null and productIdList.size > 0">
+			AND product_id IN
+			<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+				#{productId}
+			</foreach>
+		</if>
+		GROUP BY doctor_id, product_id
+		) b ON a.id=b.maxId
+		LEFT JOIN drug_user_doctor_quate_result r
+		ON a.id=r.quate_id
+		LEFT JOIN virtual_product_visit_result re
+		ON r.result_id=re.id
+		WHERE 1=1
+		<if test="productIdList !=null and productIdList.size > 0">
+			AND a.product_id IN
+			<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+				#{productId}
+			</foreach>
+		</if>
+
+		<if test="productIdList !=null and productIdList.size > 0">
+			AND re.product_id IN
+			<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+				#{productId}
+			</foreach>
+		</if>
+		GROUP BY a.id
+		) q
+		-->
+
+		product_doctor_quate q
+		ON dud.doctor_id = q.doctor_id
 		AND dud.prod_id = q.product_id
+		LEFT JOIN product_doctor_quate_result r
+		ON r.quate_id=q.id
+		LEFT JOIN virtual_product_visit_result re
+		ON r.result_id=re.id
+
+
 		LEFT JOIN virtual_doctor_call_info v
 		ON v.virtual_doctor_id=dud.doctor_id
 		AND v.product_id=dud.prod_id
@@ -1863,6 +2004,17 @@
 			<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
 				#{productId}
 			</foreach>
+
+			AND q.product_id IN
+			<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+				#{productId}
+			</foreach>
+
+			AND re.product_id IN
+			<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+				#{productId}
+			</foreach>
+
 		</if>
 
 		<if test="recruit !=null">
@@ -1947,9 +2099,54 @@
 		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
 		INNER JOIN drug_user du ON dud.drug_user_id = du.id
 		INNER JOIN product_line pl ON dud.prod_id = pl.prod_id
-		LEFT JOIN drug_user_doctor_quate q ON dud.drug_user_id = q.drug_user_id
-		AND dud.doctor_id = q.doctor_id
+		LEFT JOIN
+
+
+		<!--
+		(
+		SELECT a.*, IFNULL(GROUP_CONCAT(DISTINCT re.visit_result), '') visitResult FROM drug_user_doctor_quate a INNER JOIN (
+		SELECT max(id) maxId FROM drug_user_doctor_quate
+		WHERE 1=1
+		<if test="productIdList !=null and productIdList.size > 0">
+			AND product_id IN
+			<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+				#{productId}
+			</foreach>
+		</if>
+		GROUP BY doctor_id, product_id
+		) b ON a.id=b.maxId
+		LEFT JOIN drug_user_doctor_quate_result r
+		ON a.id=r.quate_id
+		LEFT JOIN virtual_product_visit_result re
+		ON r.result_id=re.id
+		WHERE 1=1
+		<if test="productIdList !=null and productIdList.size > 0">
+			AND a.product_id IN
+			<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+				#{productId}
+			</foreach>
+		</if>
+
+		<if test="productIdList !=null and productIdList.size > 0">
+			AND re.product_id IN
+			<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+				#{productId}
+			</foreach>
+		</if>
+		GROUP BY a.id
+		) q
+		-->
+
+		product_doctor_quate q
+		ON dud.doctor_id = q.doctor_id
 		AND dud.prod_id = q.product_id
+		LEFT JOIN product_doctor_quate_result r
+		ON r.quate_id=q.id
+		LEFT JOIN virtual_product_visit_result re
+		ON r.result_id=re.id
+
+
+
 		LEFT JOIN virtual_doctor_call_info v
 		ON v.virtual_doctor_id=dud.doctor_id
 		AND v.product_id=dud.prod_id
@@ -2130,27 +2327,415 @@
 
 	</select>
 
-	<!-- 得到医生的拜访结果 -->
-	<select id="getDoctorVisitList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DoctorVisitResponse">
+	<!-- 公共池医生列表 -->
+	<select id="getCommonPoolDoctorList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.CommonPoolDoctorResponse">
 		SELECT
-			v.id maxVisitId,
-			v.create_time lastVisitTime,
-			du.id visitDrugUserId,
-			du.NAME visitDrugUserName,
-			IFNULL( GROUP_CONCAT( r.visit_result ), '' ) visitResult
+		d.id doctorId,
+		d.NAME doctorName,
+		(
+		CASE
+
+		WHEN d.sex IS NULL THEN
+		'未知'
+		WHEN d.sex = 0 THEN
+		'男'
+		WHEN d.sex = 1 THEN
+		'女' ELSE '未知'
+		END
+		) AS sex,
+		d.depart,
+		d.positions,
+		d.hospital_id hospitalId,
+		d.hospital_name hospitalName,
+		h.province,
+		h.city,
+		h.level hospitalLevel,
+		IF(dud.is_available=1, du.id, 0) drugUserId,
+		IF(dud.is_available=1, du.NAME, '') drugUserName,
+		pl.prod_id productId,
+		pl.prod_name productName,
+		(
+		CASE
+
+		WHEN q.is_target IS NULL THEN
+		'未知'
+		WHEN q.is_target = 0 THEN
+		'否'
+		WHEN q.is_target = 1 THEN
+		'是' ELSE '未知'
+		END
+		) AS target,
+		(
+		CASE
+
+		WHEN q.is_recruit IS NULL THEN
+		'未知'
+		WHEN q.is_recruit = 0 THEN
+		'否'
+		WHEN q.is_recruit = 1 THEN
+		'是' ELSE '未知'
+		END
+		) AS recruit,
+		(
+		CASE
+
+		WHEN q.is_has_drug IS NULL THEN
+		'未知'
+		WHEN q.is_has_drug = 0 THEN
+		'否'
+		WHEN q.is_has_drug = 1 THEN
+		'是'
+		WHEN q.is_has_drug = 2 THEN
+		'临采' ELSE '未知'
+		END
+		) AS hasDrug,
+
+		(
+		CASE
+
+		WHEN q.is_has_ae IS NULL THEN
+		'未知'
+		WHEN q.is_has_ae = 0 THEN
+		'否'
+		WHEN q.is_has_ae = 1 THEN
+		'是'
+		ELSE '未知'
+		END
+		) AS hasAe,
+
+		(
+		CASE
+
+		WHEN q.is_cover IS NULL THEN
+		'未知'
+		WHEN q.is_cover = 0 THEN
+		'未开始'
+		WHEN q.is_cover = 1 THEN
+		'覆盖中'
+		WHEN q.is_cover = 2 THEN
+		'退出项目' ELSE '未知'
+		END
+		) AS cover ,
+
+		(
+		CASE
+
+		WHEN q.hcp_potential IS NULL THEN
+		'未知'
+		WHEN q.hcp_potential = 1 THEN
+		'低'
+		WHEN q.hcp_potential = 2 THEN
+		'中'
+		WHEN q.hcp_potential = 3 THEN
+		'高' ELSE '未知'
+		END
+		) AS potential ,
+
+		q.attitude,
+		max(v.create_time) lastVisitDate,
+		IFNULL(GROUP_CONCAT(DISTINCT re.visit_result),'') visitResult,
+		max(v.id) maxVisitId
 		FROM
-			virtual_doctor_call_info v
-			INNER JOIN drug_user du ON v.virtual_drug_user_id = du.id
-			LEFT JOIN virtual_doctor_call_info_mend m ON v.id = m.call_id
-			LEFT JOIN virtual_doctor_call_info_result re ON m.id=re.mend_id
-			LEFT JOIN virtual_product_visit_result r ON re.result_id = r.id
-		WHERE
-			v.id IN
-			<foreach collection="visitIdList" item="visitId" open="(" close=")" separator=",">
-				#{visitId}
+		doctor d
+		LEFT JOIN hospital h
+		ON d.hospital_id=h.id
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		INNER JOIN product_line pl ON dud.prod_id = pl.prod_id
+		LEFT JOIN
+
+
+		<!--
+		(
+		SELECT a.*, IFNULL(GROUP_CONCAT(DISTINCT re.visit_result), '') visitResult FROM drug_user_doctor_quate a INNER JOIN (
+		SELECT max(id) maxId FROM drug_user_doctor_quate
+		WHERE 1=1
+		<if test="productIdList !=null and productIdList.size > 0">
+			AND product_id IN
+			<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+				#{productId}
 			</foreach>
+		</if>
+		GROUP BY doctor_id, product_id
+		) b ON a.id=b.maxId
+		LEFT JOIN drug_user_doctor_quate_result r
+		ON a.id=r.quate_id
+		LEFT JOIN virtual_product_visit_result re
+		ON r.result_id=re.id
+		WHERE 1=1
+		<if test="productIdList !=null and productIdList.size > 0">
+			AND a.product_id IN
+			<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+				#{productId}
+			</foreach>
+		</if>
+
+		<if test="productIdList !=null and productIdList.size > 0">
+			AND re.product_id IN
+			<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+				#{productId}
+			</foreach>
+		</if>
+		GROUP BY a.id
+		) q
+		-->
+
+		product_doctor_quate q
+		ON dud.doctor_id = q.doctor_id
+		AND dud.prod_id = q.product_id
+		LEFT JOIN product_doctor_quate_result r
+		ON r.quate_id=q.id
+		LEFT JOIN virtual_product_visit_result re
+		ON r.result_id=re.id
+
+
+
+		LEFT JOIN virtual_doctor_call_info v
+		ON v.virtual_doctor_id=dud.doctor_id
+		AND v.product_id=dud.prod_id
+		WHERE
+		1 = 1
+		<if test="drugUserIdList !=null and drugUserIdList.size > 0">
+			AND dud.drug_user_id IN
+			<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+				#{drugUserId}
+			</foreach>
+		</if>
+
+		<if test="productIdList !=null and productIdList.size > 0">
+			AND dud.prod_id IN
+			<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+				#{productId}
+			</foreach>
+		</if>
+
+		<if test="recruit !=null">
+			AND q.is_recruit=#{recruit}
+		</if>
+
+		<if test="cover !=null">
+			AND q.is_cover=#{cover}
+		</if>
+
+		<if test="target !=null">
+			AND q.is_target =#{target}
+		</if>
+
+		<if test="hasDrug!=null">
+			AND q.is_has_drug=#{hasDrug}
+		</if>
+
+		<if test="relationDrugUser !=null and relationDrugUser !=0">
+			AND dud.is_available=#{relationDrugUser}
+		</if>
+
+		<if test="searchKeyword !=null and searchKeyword !=''">
+			AND d.id IN
+			(
+			SELECT
+			id
+			FROM
+			doctor
+			WHERE
+			telephone LIKE CONCAT('%', #{searchKeyword}, '%')
+			OR NAME LIKE CONCAT('%', #{searchKeyword}, '%')
+			OR hospital_name LIKE CONCAT('%', #{searchKeyword}, '%')
+			OR depart LIKE CONCAT('%', #{searchKeyword}, '%')
+			UNION
+			SELECT
+			doctor_id
+			FROM
+			doctor_telephone
+			WHERE
+			telephone LIKE CONCAT('%', #{searchKeyword}, '%')
+			)
+		</if>
+
 		GROUP BY
-			v.id
+		dud.drug_user_id,
+		dud.doctor_id,
+		dud.prod_id
+
+		ORDER BY max(v.id) DESC
+
+		<if test="paginable == null or paginable == 0">
+			LIMIT #{currentSize}, #{pageSize}
+		</if>
+
+
+	</select>
+
+	<!-- 公共池医生列表总数 -->
+	<select id="getCommonPoolDoctorListCount" resultType="java.lang.Integer">
+		SELECT IFNULL(COUNT(*), 0) FROM (
+		SELECT
+		dud.drug_user_id,
+		dud.doctor_id,
+		dud.prod_id
+		FROM
+		doctor d
+		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		INNER JOIN product_line pl ON dud.prod_id = pl.prod_id
+		LEFT JOIN
+
+
+		<!--
+		(
+		SELECT a.*, IFNULL(GROUP_CONCAT(DISTINCT re.visit_result), '') visitResult FROM drug_user_doctor_quate a INNER JOIN (
+		SELECT max(id) maxId FROM drug_user_doctor_quate
+		WHERE 1=1
+		<if test="productIdList !=null and productIdList.size > 0">
+			AND product_id IN
+			<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+				#{productId}
+			</foreach>
+		</if>
+		GROUP BY doctor_id, product_id
+		) b ON a.id=b.maxId
+		LEFT JOIN drug_user_doctor_quate_result r
+		ON a.id=r.quate_id
+		LEFT JOIN virtual_product_visit_result re
+		ON r.result_id=re.id
+		WHERE 1=1
+		<if test="productIdList !=null and productIdList.size > 0">
+			AND a.product_id IN
+			<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+				#{productId}
+			</foreach>
+		</if>
+
+		<if test="productIdList !=null and productIdList.size > 0">
+			AND re.product_id IN
+			<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+				#{productId}
+			</foreach>
+		</if>
+		GROUP BY a.id
+		) q
+		-->
+
+		product_doctor_quate q
+		ON dud.doctor_id = q.doctor_id
+		AND dud.prod_id = q.product_id
+		LEFT JOIN product_doctor_quate_result r
+		ON r.quate_id=q.id
+		LEFT JOIN virtual_product_visit_result re
+		ON r.result_id=re.id
+
+
+
+
+		LEFT JOIN virtual_doctor_call_info v
+		ON v.virtual_doctor_id=dud.doctor_id
+		AND v.product_id=dud.prod_id
+		WHERE
+		1 = 1
+		<if test="drugUserIdList !=null and drugUserIdList.size > 0">
+			AND dud.drug_user_id IN
+			<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+				#{drugUserId}
+			</foreach>
+		</if>
+
+		<if test="productIdList !=null and productIdList.size > 0">
+			AND dud.prod_id IN
+			<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+				#{productId}
+			</foreach>
+		</if>
+
+		<if test="recruit !=null">
+			AND q.is_recruit=#{recruit}
+		</if>
+
+		<if test="cover !=null">
+			AND q.is_cover=#{cover}
+		</if>
+
+		<if test="target !=null">
+			AND q.is_target =#{target}
+		</if>
+
+		<if test="hasDrug!=null">
+			AND q.is_has_drug=#{hasDrug}
+		</if>
+
+		<if test="relationDrugUser !=null and relationDrugUser !=0">
+			AND dud.is_available=#{relationDrugUser}
+		</if>
+
+
+		<if test="searchKeyword !=null and searchKeyword !=''">
+			AND d.id IN
+			(
+			SELECT
+			id
+			FROM
+			doctor
+			WHERE
+			telephone LIKE CONCAT('%', #{searchKeyword}, '%')
+			OR NAME LIKE CONCAT('%', #{searchKeyword}, '%')
+			OR hospital_name LIKE CONCAT('%', #{searchKeyword}, '%')
+			OR depart LIKE CONCAT('%', #{searchKeyword}, '%')
+			UNION
+			SELECT
+			doctor_id
+			FROM
+			doctor_telephone
+			WHERE
+			telephone LIKE CONCAT('%', #{searchKeyword}, '%')
+			)
+		</if>
+
+		GROUP BY
+		dud.drug_user_id,
+		dud.doctor_id,
+		dud.prod_id
+		) t
+
+
+	</select>
+
+
+
+	<!-- 得到医生的拜访结果 -->
+	<select id="getLastDoctorVisitList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DoctorVisitResponse">
+
+		SELECT
+		du.id visitDrugUserId,
+		du.name visitDrugUserName,
+		a.virtual_doctor_id doctorId,
+		a.product_id productId,
+		b.lastVisitTime
+		FROM virtual_doctor_call_info a INNER JOIN (
+		SELECT
+		max(v.create_time) lastVisitTime,
+		max(v.id) maxVisitId,
+		v.virtual_doctor_id,
+		v.product_id
+		FROM
+		virtual_doctor_call_info v
+		INNER JOIN drug_user du
+		ON v.virtual_drug_user_id=du.id
+		WHERE
+		v.virtual_doctor_id IN
+		<foreach collection="doctorIdList" item="doctorId" open="(" close=")" separator=",">
+			#{doctorId}
+		</foreach>
+
+		AND v.product_id IN
+		<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+			#{productId}
+		</foreach>
+		GROUP BY
+		v.virtual_doctor_id,v.product_id
+		) b
+		ON a.virtual_doctor_id=b.virtual_doctor_id AND a.product_id=b.product_id
+		AND DATE_FORMAT(a.create_time, '%Y-%m-%d %H:%i:%s')= DATE_FORMAT(b.lastVisitTime, '%Y-%m-%d %H:%i:%s')
+		INNER JOIN drug_user du
+		ON a.virtual_drug_user_id=du.id
+		GROUP BY a.virtual_doctor_id, a.product_id
 
 
 	</select>
@@ -2168,5 +2753,15 @@
 		</foreach>
 
 	</select>
+
+	<insert id="saveTelephoneList">
+		INSERT INTO doctor_telephone(doctor_id, telephone)
+		VALUES
+		<foreach collection ="telephoneList" item="t" separator =",">
+			(#{doctorId}, #{t})
+		</foreach>
+
+	</insert>
+
 
 </mapper>

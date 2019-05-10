@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.ProductHospitalMapper">
+
+    <!-- 根据产品ID获得医院列表 -->
+    <select id="getHospitalListByPoductId" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.HospitalResponse">
+
+        SELECT
+        DISTINCT
+        hospital_id hospitalId,
+        hospital_name hospitalName,
+        province,
+        city,
+        level hospitalLevel,
+        drug_hospital_id drugHospitalId
+        FROM product_hospital
+        WHERE product_id=#{productId}
+
+    </select>
+
+</mapper>
