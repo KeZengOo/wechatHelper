@@ -502,9 +502,14 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 			}
 		}
 		
-		// 变更关系
+		// 变更代表医生产品关系
 		drugUserDoctorQuateMapper.replaceRelationShipInfo(relationShipParams);
 		this.saveDrugUserDoctorQuateResult(relationShipParams.getId(), visitResultId);
+
+		// 变更产品和医生的关系
+		drugUserDoctorQuateMapper.replaceProductDoctorRelationShipInfo(relationShipParams);
+		this.saveProductDoctorQuateResult(relationShipParams.getId(), visitResultId);
+
 	}
 
 	/**
@@ -513,6 +518,20 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	 * @param visitResultId
 	 */
 	private void saveDrugUserDoctorQuateResult(Long id, List<Long> visitResultId) {
+
+		if (id !=null && id > 0 && CollectionsUtil.isNotEmptyList(visitResultId)){
+			drugUserDoctorQuateResultMapper.batchInsert(id, visitResultId);
+		}
+	}
+
+
+
+	/**
+	 * 保存关系的拜访结果
+	 * @param id
+	 * @param visitResultId
+	 */
+	private void saveProductDoctorQuateResult(Long id, List<Long> visitResultId) {
 
 		if (id !=null && id > 0 && CollectionsUtil.isNotEmptyList(visitResultId)){
 			drugUserDoctorQuateResultMapper.batchInsert(id, visitResultId);

@@ -18,11 +18,20 @@ import java.util.List;
 public interface DrugUserDoctorQuateResultMapper {
 
 	/**
-	 * 批量插入拜访结果
+	 * 批量插入拜访结果 代表医生产品
 	 * @param quateId
 	 * @param resultIdList
 	 */
 	void batchInsert(@Param(value = "quateId") Long quateId,@Param(value = "resultIdList") List<Long> resultIdList);
+
+
+	/**
+	 * 批量插入拜访结果，产品医生
+	 * @param quateId
+	 * @param resultIdList
+	 */
+	void batchInsertProductDoctor(@Param(value = "quateId") Long quateId,@Param(value = "resultIdList") List<Long> resultIdList);
+
 
 	/**
 	 * 获取拜访结果

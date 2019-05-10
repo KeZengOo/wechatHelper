@@ -46,6 +46,15 @@ public interface CommonService {
 	String alterLastVisitTimeContent(long delta);
 
 	/**
+	 * 通话时长 秒
+	 * 按分钟,小时,天显示
+	 * @param seconds
+	 * @return
+	 */
+	String alterCallTimeContent(Long seconds);
+
+
+	/**
 	 * 下次拜访时间<br>
 	 * T = 下次跟进时间-当前日期。<br>
 	 * 当T>0是，显示“T天后”；<br>

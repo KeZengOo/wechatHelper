@@ -21,6 +21,16 @@ public interface DrugUserDoctorQuateMapper {
 	 * @return 返回影响条数
 	 */
 	int replaceRelationShipInfo(DrugUserDoctorQuateParams params);
+
+
+
+	/**
+	 * 变更虚拟产品关联的医生关系信息:是否有药,是否是目标客户,是否有AE
+	 * @param params
+	 * @return 返回影响条数
+	 */
+	int replaceProductDoctorRelationShipInfo(DrugUserDoctorQuateParams params);
+
 	
 	/**
 	 * 指保存至 drug_user_doctor_quate 表

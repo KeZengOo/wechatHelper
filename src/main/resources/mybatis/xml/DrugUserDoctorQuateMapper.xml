@@ -24,6 +24,19 @@
 		VALUE (#{virtualDrugUserId}, #{doctorId}, #{productLineId}, #{isHasDrug}, #{isTarget}, #{isRecruit},#{isCover}
 		#{isHasAe}, #{isBreakOff}, #{hcpPotential}, #{attitude})
 	</insert>
+
+
+
+	<!-- 使用 MYSQL 私有语法, 通过  doctor_id, product_id 创建唯一约束 -->
+	<insert id="replaceProductDoctorRelationShipInfo" keyProperty="id" useGeneratedKeys="true"
+			parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorQuateParams">
+		REPLACE INTO product_doctor_quate
+		(doctor_id,product_id, is_has_drug,is_target,is_recruit,is_cover,
+		is_has_ae, is_break_off, hcp_potential, attitude)
+		VALUE (#{doctorId}, #{productLineId}, #{isHasDrug}, #{isTarget}, #{isRecruit},#{isCover}
+		#{isHasAe}, #{isBreakOff}, #{hcpPotential}, #{attitude})
+	</insert>
+
 	
 	<insert id="saveDrugUserDoctorQuates" parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorQuateParams">
 		INSERT INTO drug_user_doctor_quate 
