@@ -4,80 +4,71 @@
 
     <!-- 内容分享列表分页 -->
     <select id="getContentSharingListPage" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.ContentSharingParams">
-            SELECT
-                m.id,
-                m.title,
-                m.time,
-                m.share_type AS shareType,
-                m.drug_user_id AS drugUserId,
-                m.drug_user_name AS drugUserName,
-                count(m.title) AS peopleNumber,
-                SUM(m.read_time) AS totalDuration,
-                p.product_id AS productId,
-                l.prod_name AS prodName,
-                u.sale_type AS saleType
-            FROM
-                (
-                    SELECT
-                        t.id,
-                        t.title,
-                        t.time,
-                        r.share_type,
-                        r.data_id,
-                        r.drug_user_id,
-                        r.drug_user_name,
-                        r.read_person_id,
-                        r.read_person_name,
-                        r.read_time
-                    FROM
-                        activity_info t
-                    LEFT JOIN activity_read r ON t.id = r.data_id
-                    JOIN activity_read_ip ip ON r.read_token = ip.read_token
-                    WHERE
-                        1 = 1
-                    AND r.data_id = t.id
-                    <if test="contentSharingRequest.drugUserId != 0 and contentSharingRequest.drugUserId != null">
-                        AND r.drug_user_id = #{contentSharingRequest.drugUserId}
-                    </if>
-                    AND (
-                        ip.isp IS NULL
-                        OR ip.isp != '阿里云'
-                    )
-                    GROUP BY
-                        read_person_id,
-                        id
-                ) m
-            JOIN t_content_product p ON p.content_id = m.id
-            JOIN product_line l ON p.product_id = l.prod_id
-            JOIN drug_user u ON u.id = m.drug_user_id
+        SELECT
+            m.id,
+            m.title,
+            m.time,
+            m.share_type AS shareType,
+            m.drug_user_id AS drugUserId,
+            m.drug_user_name AS drugUserName,
+            count(m.title) AS peopleNumber,
+            SUM(m.read_time) AS totalDuration,
+            m.product_id AS productId,
+            m.prod_name AS prodName,
+            m.sale_type AS saleType
+        FROM
+            (
+                SELECT
+                t.id,
+                t.title,
+                t.time,
+                r.share_type,
+                r.data_id,
+                r.drug_user_id,
+                r.drug_user_name,
+                r.read_person_id,
+                r.read_person_name,
+                r.read_time,
+                p.product_id,
+                l.prod_name,
+                u.sale_type
+                FROM
+                activity_info t
+                JOIN activity_read r ON t.id = r.data_id
+                JOIN activity_read_ip ip ON r.read_token = ip.read_token
+                JOIN t_content_product p ON p.content_id = t.id
+                JOIN product_line l ON p.product_id = l.prod_id
+                JOIN drug_user u ON u.id = r.drug_user_id
+                WHERE
+                1 = 1
+                <if test="contentSharingRequest.drugUserId != 0 and contentSharingRequest.drugUserId != null">
+                    AND r.drug_user_id = #{contentSharingRequest.drugUserId}
+                </if>
+                AND r.data_id = t.id
+                <if test="contentSharingRequest.shareType != 0 and contentSharingRequest.shareType != null">
+                    AND r.share_type = #{contentSharingRequest.shareType}
+                </if>
+                AND (
+                ip.isp IS NULL
+                OR ip.isp != '阿里云'
+                )
+                <if test="contentSharingRequest.productId != 0 and contentSharingRequest.productId != null">
+                    AND l.prod_id = #{contentSharingRequest.productId}
+                </if>
+                <if test="contentSharingRequest.startTimeBefore != '' and contentSharingRequest.startTimeBefore != null">
+                    AND t.time &gt;= #{contentSharingRequest.startTimeBefore}
+                </if>
 
-            WHERE
-              1 = 1
-
-            <if test="contentSharingRequest.productId != 0 and contentSharingRequest.productId != null">
-                 AND l.prod_id = #{contentSharingRequest.productId}
-            </if>
-
-            <if test="contentSharingRequest.drugUserId != 0 and contentSharingRequest.drugUserId != null">
-                 AND m.drug_user_id = #{contentSharingRequest.drugUserId}
-            </if>
-
-            <if test="contentSharingRequest.shareType != 0 and contentSharingRequest.shareType != null">
-                 AND m.share_type = #{contentSharingRequest.shareType}
-            </if>
-
-            <if test="contentSharingRequest.startTimeBefore != '' and contentSharingRequest.startTimeBefore != null">
-                 AND m.time &gt;= #{contentSharingRequest.startTimeBefore}
-            </if>
-
-            <if test="contentSharingRequest.startTimeAfter != '' and contentSharingRequest.startTimeAfter != null">
-                 AND m.time &lt;= #{contentSharingRequest.startTimeAfter}
-            </if>
-
-            GROUP BY
-                title
-            LIMIT #{contentSharingRequest.currentSize},#{contentSharingRequest.pageSize}
-
+                <if test="contentSharingRequest.startTimeAfter != '' and contentSharingRequest.startTimeAfter != null">
+                    AND t.time &lt;= #{contentSharingRequest.startTimeAfter}
+                </if>
+                GROUP BY
+                r.read_person_id,
+                t.id
+            ) m
+        GROUP BY
+            title
+        LIMIT #{contentSharingRequest.currentSize},#{contentSharingRequest.pageSize}
     </select>
 
     <!-- 内容分享列表总数 -->
@@ -91,60 +82,53 @@
                     FROM
                         (
                             SELECT
-                                t.id,
-                                t.title,
-                                t.time,
-                                r.share_type,
-                                r.data_id,
-                                r.drug_user_id,
-                                r.drug_user_name,
-                                r.read_person_id,
-                                r.read_person_name,
-                                r.read_time
+                            t.id,
+                            t.title,
+                            t.time,
+                            r.share_type,
+                            r.data_id,
+                            r.drug_user_id,
+                            r.drug_user_name,
+                            r.read_person_id,
+                            r.read_person_name,
+                            r.read_time,
+                            p.product_id,
+                            l.prod_name,
+                            u.sale_type
                             FROM
-                                activity_info t
-                            LEFT JOIN activity_read r ON t.id = r.data_id
+                            activity_info t
+                            JOIN activity_read r ON t.id = r.data_id
                             JOIN activity_read_ip ip ON r.read_token = ip.read_token
+                            JOIN t_content_product p ON p.content_id = t.id
+                            JOIN product_line l ON p.product_id = l.prod_id
+                            JOIN drug_user u ON u.id = r.drug_user_id
                             WHERE
-                                1 = 1
-                            AND r.data_id = t.id
+                            1 = 1
                             <if test="contentSharingRequest.drugUserId != 0 and contentSharingRequest.drugUserId != null">
                                 AND r.drug_user_id = #{contentSharingRequest.drugUserId}
                             </if>
+                            AND r.data_id = t.id
+                            <if test="contentSharingRequest.shareType != 0 and contentSharingRequest.shareType != null">
+                                AND r.share_type = #{contentSharingRequest.shareType}
+                            </if>
                             AND (
-                                ip.isp IS NULL
-                                OR ip.isp != '阿里云'
+                            ip.isp IS NULL
+                            OR ip.isp != '阿里云'
                             )
+                            <if test="contentSharingRequest.productId != 0 and contentSharingRequest.productId != null">
+                                AND l.prod_id = #{contentSharingRequest.productId}
+                            </if>
+                            <if test="contentSharingRequest.startTimeBefore != '' and contentSharingRequest.startTimeBefore != null">
+                                AND t.time &gt;= #{contentSharingRequest.startTimeBefore}
+                            </if>
+
+                            <if test="contentSharingRequest.startTimeAfter != '' and contentSharingRequest.startTimeAfter != null">
+                                AND t.time &lt;= #{contentSharingRequest.startTimeAfter}
+                            </if>
                             GROUP BY
-                                read_person_id,
-                                id
+                            r.read_person_id,
+                            t.id
                         ) m
-                    JOIN t_content_product p ON p.content_id = m.id
-                    JOIN product_line l ON p.product_id = l.prod_id
-                    JOIN drug_user u ON u.id = m.drug_user_id
-
-                    WHERE
-                    1 = 1
-
-                    <if test="contentSharingRequest.productId != 0 and contentSharingRequest.productId != null">
-                        AND l.prod_id = #{contentSharingRequest.productId}
-                    </if>
-
-                    <if test="contentSharingRequest.drugUserId != 0 and contentSharingRequest.drugUserId != null">
-                        AND m.drug_user_id = #{contentSharingRequest.drugUserId}
-                    </if>
-
-                    <if test="contentSharingRequest.shareType != 0 and contentSharingRequest.shareType != null">
-                        AND m.share_type = #{contentSharingRequest.shareType}
-                    </if>
-
-                    <if test="contentSharingRequest.startTimeBefore != '' and contentSharingRequest.startTimeBefore != null">
-                        AND m.time &gt;= #{contentSharingRequest.startTimeBefore}
-                    </if>
-
-                    <if test="contentSharingRequest.startTimeAfter != '' and contentSharingRequest.startTimeAfter != null">
-                        AND m.time &lt;= #{contentSharingRequest.startTimeAfter}
-                    </if>
                     GROUP BY
                         title
                 ) p
@@ -223,68 +207,59 @@
         m.drug_user_name AS drugUserName,
         count(m.title) AS peopleNumber,
         SUM(m.read_time) AS totalDuration,
-        p.product_id AS productId,
-        l.prod_name AS prodName,
-        u.sale_type AS saleType
+        m.product_id AS productId,
+        m.prod_name AS prodName,
+        m.sale_type AS saleType
         FROM
         (
-        SELECT
-        t.id,
-        t.title,
-        t.time,
-        r.share_type,
-        r.data_id,
-        r.drug_user_id,
-        r.drug_user_name,
-        r.read_person_id,
-        r.read_person_name,
-        r.read_time
-        FROM
-        activity_info t
-        LEFT JOIN activity_read r ON t.id = r.data_id
-        JOIN activity_read_ip ip ON r.read_token = ip.read_token
-        WHERE
-        1 = 1
-        AND r.data_id = t.id
-        <if test="contentSharingRequest.drugUserId != 0 and contentSharingRequest.drugUserId != null">
-            AND r.drug_user_id = #{contentSharingRequest.drugUserId}
-        </if>
+            SELECT
+            t.id,
+            t.title,
+            t.time,
+            r.share_type,
+            r.data_id,
+            r.drug_user_id,
+            r.drug_user_name,
+            r.read_person_id,
+            r.read_person_name,
+            r.read_time,
+            p.product_id,
+            l.prod_name,
+            u.sale_type
+            FROM
+            activity_info t
+            JOIN activity_read r ON t.id = r.data_id
+            JOIN activity_read_ip ip ON r.read_token = ip.read_token
+            JOIN t_content_product p ON p.content_id = t.id
+            JOIN product_line l ON p.product_id = l.prod_id
+            JOIN drug_user u ON u.id = r.drug_user_id
+            WHERE
+            1 = 1
+            <if test="contentSharingRequest.drugUserId != 0 and contentSharingRequest.drugUserId != null">
+                AND r.drug_user_id = #{contentSharingRequest.drugUserId}
+            </if>
+            AND r.data_id = t.id
+            <if test="contentSharingRequest.shareType != 0 and contentSharingRequest.shareType != null">
+                AND r.share_type = #{contentSharingRequest.shareType}
+            </if>
+            AND (
+            ip.isp IS NULL
+            OR ip.isp != '阿里云'
+            )
+            <if test="contentSharingRequest.productId != 0 and contentSharingRequest.productId != null">
+                AND l.prod_id = #{contentSharingRequest.productId}
+            </if>
+            <if test="contentSharingRequest.startTimeBefore != '' and contentSharingRequest.startTimeBefore != null">
+                AND t.time &gt;= #{contentSharingRequest.startTimeBefore}
+            </if>
 
-        AND (
-        ip.isp IS NULL
-        OR ip.isp != '阿里云'
-        )
-        GROUP BY
-        read_person_id,
-        id
+            <if test="contentSharingRequest.startTimeAfter != '' and contentSharingRequest.startTimeAfter != null">
+                AND t.time &lt;= #{contentSharingRequest.startTimeAfter}
+            </if>
+            GROUP BY
+            r.read_person_id,
+            t.id
         ) m
-        JOIN t_content_product p ON p.content_id = m.id
-        JOIN product_line l ON p.product_id = l.prod_id
-        JOIN drug_user u ON u.id = m.drug_user_id
-
-        WHERE
-        1 = 1
-
-        <if test="contentSharingRequest.productId != 0 and contentSharingRequest.productId != null">
-            AND l.prod_id = #{contentSharingRequest.productId}
-        </if>
-
-        <if test="contentSharingRequest.drugUserId != 0 and contentSharingRequest.drugUserId != null">
-            AND m.drug_user_id = #{contentSharingRequest.drugUserId}
-        </if>
-
-        <if test="contentSharingRequest.shareType != 0 and contentSharingRequest.shareType != null">
-            AND m.share_type = #{contentSharingRequest.shareType}
-        </if>
-
-        <if test="contentSharingRequest.startTimeBefore != '' and contentSharingRequest.startTimeBefore != null">
-            AND m.time &gt;= #{contentSharingRequest.startTimeBefore}
-        </if>
-
-        <if test="contentSharingRequest.startTimeAfter != '' and contentSharingRequest.startTimeAfter != null">
-            AND m.time &lt;= #{contentSharingRequest.startTimeAfter}
-        </if>
-
         GROUP BY
         title
     </select>
@@ -300,68 +275,59 @@
         m.drug_user_name AS drugUserName,
         count(m.title) AS peopleNumber,
         SUM(m.read_time) AS totalDuration,
-        p.product_id AS productId,
-        l.prod_name AS prodName,
-        u.sale_type AS saleType
+        m.product_id AS productId,
+        m.prod_name AS prodName,
+        m.sale_type AS saleType
         FROM
         (
-        SELECT
-        t.id,
-        t.title,
-        t.time,
-        r.share_type,
-        r.data_id,
-        r.drug_user_id,
-        r.drug_user_name,
-        r.read_person_id,
-        r.read_person_name,
-        r.read_time
-        FROM
-        activity_info t
-        LEFT JOIN activity_read r ON t.id = r.data_id
-        JOIN activity_read_ip ip ON r.read_token = ip.read_token
-        WHERE
-        1 = 1
-        AND r.data_id = t.id
-        <if test="drugUserId != 0 and drugUserId != null">
-            AND r.drug_user_id = #{drugUserId}
-        </if>
+            SELECT
+            t.id,
+            t.title,
+            t.time,
+            r.share_type,
+            r.data_id,
+            r.drug_user_id,
+            r.drug_user_name,
+            r.read_person_id,
+            r.read_person_name,
+            r.read_time,
+            p.product_id,
+            l.prod_name,
+            u.sale_type
+            FROM
+            activity_info t
+            JOIN activity_read r ON t.id = r.data_id
+            JOIN activity_read_ip ip ON r.read_token = ip.read_token
+            JOIN t_content_product p ON p.content_id = t.id
+            JOIN product_line l ON p.product_id = l.prod_id
+            JOIN drug_user u ON u.id = r.drug_user_id
+            WHERE
+            1 = 1
+            <if test="drugUserId != 0 and drugUserId != null">
+                AND r.drug_user_id = #{drugUserId}
+            </if>
+            AND r.data_id = t.id
+            <if test="shareType != 0 and shareType != null">
+                AND r.share_type = #{shareType}
+            </if>
+            AND (
+            ip.isp IS NULL
+            OR ip.isp != '阿里云'
+            )
+            <if test="productId != 0 and productId != null">
+                AND l.prod_id = #{productId}
+            </if>
+            <if test="startTimeBefore != '' and startTimeBefore != null">
+                AND t.time &gt;= #{startTimeBefore}
+            </if>
 
-        AND (
-        ip.isp IS NULL
-        OR ip.isp != '阿里云'
-        )
-        GROUP BY
-        read_person_id,
-        id
+            <if test="startTimeAfter != '' and startTimeAfter != null">
+                AND t.time &lt;= #{startTimeAfter}
+            </if>
+            GROUP BY
+            r.read_person_id,
+            t.id
         ) m
-        JOIN t_content_product p ON p.content_id = m.id
-        JOIN product_line l ON p.product_id = l.prod_id
-        JOIN drug_user u ON u.id = m.drug_user_id
-
-        WHERE
-        1 = 1
-
-        <if test="productId != 0 and productId != null">
-            AND l.prod_id = #{productId}
-        </if>
-
-        <if test="drugUserId != 0 and drugUserId != null">
-            AND m.drug_user_id = #{drugUserId}
-        </if>
-
-        <if test="shareType != 0 and shareType != null">
-            AND m.share_type = #{shareType}
-        </if>
-
-        <if test="startTimeBefore != '' and startTimeBefore != null">
-            AND m.time &gt;= #{startTimeBefore}
-        </if>
-
-        <if test="startTimeAfter != '' and startTimeAfter != null">
-            AND m.time &lt;= #{startTimeAfter}
-        </if>
-
         GROUP BY
         title
     </select>
