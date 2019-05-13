@@ -7,7 +7,7 @@
         SELECT
             m.id,
             m.title,
-            m.time,
+            str_to_date(m.time, '%Y-%m-%d %H') `time`,
             m.share_type AS shareType,
             m.drug_user_id AS drugUserId,
             m.drug_user_name AS drugUserName,
@@ -217,7 +217,7 @@
         SELECT
         m.id,
         m.title,
-        m.time,
+        str_to_date(m.time, '%Y-%m-%d %H') `time`,
         m.share_type AS shareType,
         m.drug_user_id AS drugUserId,
         m.drug_user_name AS drugUserName,
@@ -293,7 +293,7 @@
         SELECT
         m.id,
         m.title,
-        m.time,
+        str_to_date(m.time, '%Y-%m-%d %H') `time`,
         m.share_type AS shareType,
         m.drug_user_id AS drugUserId,
         m.drug_user_name AS drugUserName,

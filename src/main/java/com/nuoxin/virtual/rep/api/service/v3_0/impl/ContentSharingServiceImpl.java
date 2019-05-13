@@ -6,6 +6,7 @@ import com.nuoxin.virtual.rep.api.entity.v3_0.request.ContentReadLogsRequest;
 import com.nuoxin.virtual.rep.api.entity.v3_0.request.ContentSharingRequest;
 import com.nuoxin.virtual.rep.api.mybatis.ContentSharingMapper;
 import com.nuoxin.virtual.rep.api.service.v3_0.ContentSharingService;
+import com.nuoxin.virtual.rep.api.utils.ParseTimeSecondsUtils;
 import com.nuoxin.virtual.rep.api.utils.csv.CSVUtils;
 import com.nuoxin.virtual.rep.api.utils.csv.PublicGlobalCSVExprot;
 import lombok.extern.slf4j.Slf4j;
@@ -45,10 +46,19 @@ public class ContentSharingServiceImpl implements ContentSharingService {
         drugUserIds = Arrays.asList(contentSharingRequest.getDrugUserId());
 
         List<ContentSharingParams> list = contentSharingMapper.getContentSharingListPage(contentSharingRequest,drugUserIds);
+        List<ContentSharingParams> newList = new ArrayList<ContentSharingParams>();
+
+        list.forEach(n->{
+            ContentSharingParams c = new ContentSharingParams();
+            c = n;
+            c.setTime(n.getTime().substring(0,n.getTime().indexOf(".")));
+            c.setTotalDuration(ParseTimeSecondsUtils.secondToTime(Long.parseLong(n.getTotalDuration())));
+            newList.add(c);
+        });
 
         Integer contentSharingCount = contentSharingMapper.getContentSharingListCount(contentSharingRequest,drugUserIds);
 
-        return new PageResponseBean(contentSharingRequest, contentSharingCount, list);
+        return new PageResponseBean(contentSharingRequest, contentSharingCount, newList);
     }
 
     @Override
@@ -66,10 +76,12 @@ public class ContentSharingServiceImpl implements ContentSharingService {
             List<ContentReadLogsTimeParams> logsTimeParams = contentSharingMapper.getReadTimeAndReadDurationByDataIdAndDoctorId(list.get(i).getDataId(),list.get(i).getDoctorId());
             String[] createTimeArray = new String[logsTimeParams.size()];
             String[] readTimeArray = new String[logsTimeParams.size()];
+            String[] readTimeStringArray = new String[logsTimeParams.size()];
 
             for (int j = 0; j<logsTimeParams.size(); j++){
                 createTimeArray[j] = logsTimeParams.get(j).getCreateTime();
                 readTimeArray[j] = logsTimeParams.get(j).getReadTime();
+                readTimeStringArray[j] = ParseTimeSecondsUtils.secondToTime(Long.parseLong(logsTimeParams.get(j).getReadTime()));
             }
             //定义最大值为该数组的第一个数
             int maxIndex = Integer.parseInt(readTimeArray[0]);
@@ -81,8 +93,8 @@ public class ContentSharingServiceImpl implements ContentSharingService {
             }
 
             c.setCreateTime(createTimeArray);
-            c.setReadTime(readTimeArray);
-            c.setMaxReadTime(maxIndex+"");
+            c.setReadTime(readTimeStringArray);
+            c.setMaxReadTime(ParseTimeSecondsUtils.secondToTime(maxIndex));
             newList.add(c);
         }
 

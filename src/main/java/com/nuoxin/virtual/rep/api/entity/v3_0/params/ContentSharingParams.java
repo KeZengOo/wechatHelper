@@ -19,7 +19,7 @@ public class ContentSharingParams {
     @ApiModelProperty("内容标题")
     private String title;
     @ApiModelProperty("内容创建时间")
-    private Date time;
+    private String time;
     @ApiModelProperty("分享渠道1微信，2短信，3邮件")
     private Integer shareType;
     @ApiModelProperty("代表ID")
@@ -29,7 +29,7 @@ public class ContentSharingParams {
     @ApiModelProperty("阅读人数")
     private Integer peopleNumber;
     @ApiModelProperty("总阅读时长-秒")
-    private Integer totalDuration;
+    private String totalDuration;
     @ApiModelProperty("产品ID")
     private Integer productId;
     @ApiModelProperty("产品名称")
