@@ -24,4 +24,6 @@ public class ContentSharingRequest extends PageRequestBean {
     private String startTimeBefore;
     @ApiModelProperty(value = "第二个开始时间")
     private String startTimeAfter;
+    @ApiModelProperty(value = "文章标题")
+    private String title;
 }
