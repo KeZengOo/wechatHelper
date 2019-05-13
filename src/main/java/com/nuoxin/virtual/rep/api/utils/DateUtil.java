@@ -445,6 +445,10 @@ public final class DateUtil {
      * @return
      */
     public static Date stringToDate(String dateString, String dateFormat) {
+        if (StringUtil.isEmpty(dateString)){
+            return null;
+        }
+
         SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
         try {
             return sdf.parse(dateString);

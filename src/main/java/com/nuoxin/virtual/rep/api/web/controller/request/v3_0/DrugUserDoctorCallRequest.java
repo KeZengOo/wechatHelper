@@ -23,5 +23,7 @@ public class DrugUserDoctorCallRequest extends DoctorBaseRequest implements Seri
     @ApiModelProperty(value = "结束时间")
     private Date endTime;
 
+    @ApiModelProperty(value = "是否是可分页的,0和null 可以分页的，其他是可以分页的")
+    private Integer paginable;
 
 }

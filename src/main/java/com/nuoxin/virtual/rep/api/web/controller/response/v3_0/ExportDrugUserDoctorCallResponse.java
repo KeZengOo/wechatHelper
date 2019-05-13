@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.persistence.Transient;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -15,11 +14,8 @@ import java.util.Date;
  * @date 2019-05-09
  */
 @Data
-@ApiModel(value = "代表和医生电话拜访统计数")
-public class DrugUserDoctorCallResponse  implements Serializable{
-
-
-    private static final long serialVersionUID = 2654595322238499752L;
+@ApiModel(value = "导出代表和医生电话拜访统计数")
+public class ExportDrugUserDoctorCallResponse {
 
     @ApiModelProperty(value = "产品ID")
     private Long productId;
@@ -48,7 +44,6 @@ public class DrugUserDoctorCallResponse  implements Serializable{
     @ApiModelProperty(value = "医院名称")
     private String hospitalName;
 
-
     @ApiModelProperty(value = "医生科室")
     private String depart;
 
@@ -70,23 +65,12 @@ public class DrugUserDoctorCallResponse  implements Serializable{
     @ApiModelProperty(value = "接通总时长")
     private String totalCallTime;
 
-    @ApiModelProperty(value = "总通话，单位秒")
-    @JsonIgnore
-    private Long totalCallSecond;
 
     @ApiModelProperty(value = "最后一次拜访时间")
     private String lastVisitTime;
 
-    @ApiModelProperty(value = "最后一次拜访时间")
-    @JsonIgnore
-    private Date lastVisitDate;
-
     @ApiModelProperty(value = "最后一次通话时长")
     private String lastCallTime;
-
-    @ApiModelProperty(value = "最后一次通话，单位秒")
-    @JsonIgnore
-    private Long lastCallSecond;
 
 
 }

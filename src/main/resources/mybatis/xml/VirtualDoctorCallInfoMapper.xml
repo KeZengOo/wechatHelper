@@ -1705,7 +1705,9 @@
 					v.virtual_drug_user_id,
 					v.virtual_doctor_id,
 					v.product_id
-				LIMIT #{currentSize}, #{pageSize}
+					<if test="paginable == null or paginable == 0">
+						LIMIT #{currentSize}, #{pageSize}
+					</if>
 	</select>
 
 
@@ -1795,5 +1797,62 @@
 
 	</select>
 
+
+	<!-- 拜访详情列表 -->
+	<select id="getDrugUserDoctorCallDetailList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DrugUserDoctorCallDetailResponse">
+		SELECT
+			v.id,
+			DATE_FORMAT( v.create_time, '%Y-%m-%d %H:%i:%s' ) create_time,
+			IFNULL( v.call_time, 0 ) callSecond,
+			IFNULL( GROUP_CONCAT( DISTINCT p.item ), '' ) purpose,
+			IFNULL( GROUP_CONCAT( DISTINCT r.visit_result ), '' ) visitResult,
+			IFNULL( v.call_url, '' ) callUrl,
+			IFNULL( t.call_text, '' ) callText
+		FROM
+			virtual_doctor_call_info v
+			LEFT JOIN virtual_doctor_call_text t ON v.sin_token = t.sin_token
+			LEFT JOIN virtual_doctor_call_info_mend m ON v.id = m.call_id
+			LEFT JOIN virtual_doctor_call_info_result re ON m.id = re.mend_id
+			LEFT JOIN virtual_product_visit_result r ON re.result_id = r.id
+			LEFT JOIN virtual_doctor_call_purpose p ON v.id = p.call_id
+		WHERE
+			v.virtual_doctor_id = #{doctorId}
+			AND v.virtual_drug_user_id = #{drugUserId}
+			AND v.product_id = #{productId}
+			<if test="visitChannel !=null and visitChannel !=0">
+				AND v.visit_channel=#{visitChannel}
+			</if>
+
+		GROUP BY
+			v.id
+		ORDER BY
+			v.create_time DESC
+			LIMIT #{currentSize}, #{pageSize}
+	</select>
+
+
+	<!-- 拜访详情列表总数 -->
+	<select id="getDrugUserDoctorCallDetailListCount" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM (
+			SELECT
+				v.id
+			FROM
+				virtual_doctor_call_info v
+				LEFT JOIN virtual_doctor_call_text t ON v.sin_token = t.sin_token
+				LEFT JOIN virtual_doctor_call_info_mend m ON v.id = m.call_id
+				LEFT JOIN virtual_doctor_call_info_result re ON m.id = re.mend_id
+				LEFT JOIN virtual_product_visit_result r ON re.result_id = r.id
+				LEFT JOIN virtual_doctor_call_purpose p ON v.id = p.call_id
+			WHERE
+				v.virtual_doctor_id = #{doctorId}
+				AND v.virtual_drug_user_id = #{drugUserId}
+				AND v.product_id = #{productId}
+				<if test="visitChannel !=null and visitChannel !=0">
+					AND v.visit_channel=#{visitChannel}
+				</if>
+			GROUP BY
+				v.id
+		) t
+	</select>
 
 </mapper>

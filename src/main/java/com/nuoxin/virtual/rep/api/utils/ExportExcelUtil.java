@@ -62,6 +62,8 @@ public class ExportExcelUtil<T>{
         }
     }
 
+
+
     /**
      * <p>
      * 导出带有头部标题行的Excel <br>
@@ -183,6 +185,7 @@ public class ExportExcelUtil<T>{
                         + fieldName.substring(1);
                 try {
                     tCls = t.getClass();
+
                     getMethod = tCls.getMethod(getMethodName, new Class[] {});
                     value = getMethod.invoke(t, new Object[] {});
                     // 判断值的类型后进行强制类型转换

@@ -5,9 +5,12 @@ import sun.misc.BASE64Encoder;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
+ * 字符串操作相关
  * @author tiancun
  * @date 2018-08-20
  */
@@ -106,6 +109,29 @@ public class StringUtil {
         String uuid = UUID.randomUUID().toString();
         uuid = uuid.replace("-", "");
         return uuid;
+    }
+
+
+    /**
+     * 截取获得ID
+     * @param str
+     * @return
+     */
+    public static List<Long> getIdList(String str){
+        List<Long> idList = new ArrayList<>();
+        if (StringUtil.isNotEmpty(str)){
+            if (str.contains("，")){
+                str = str.replace("，",",");
+            }
+
+            String[] idStrArray = str.split(",");
+            for (String s : idStrArray) {
+                Long id = Long.valueOf(s);
+                idList.add(id);
+            }
+        }
+
+        return idList;
     }
 
 }

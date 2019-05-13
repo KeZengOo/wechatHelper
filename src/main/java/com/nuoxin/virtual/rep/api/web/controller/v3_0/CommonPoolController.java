@@ -101,8 +101,8 @@ public class CommonPoolController extends NewBaseController {
         Integer target = null;
         Integer hasDrug = null;
         Integer relationDrugUser = null;
-        List<Long> productIdList = new ArrayList<>();
-        List<Long> drugUserIdList = new ArrayList<>();
+        List<Long> productIdList;
+        List<Long> drugUserIdList;
 
         if (StringUtil.isNotEmpty(recruitStr)){
             try {
@@ -149,16 +149,17 @@ public class CommonPoolController extends NewBaseController {
 
 
         try {
-            productIdList = this.getIdList(productIdStr);
+            productIdList = StringUtil.getIdList(productIdStr);
         }catch (Exception e){
             throw new BusinessException(ErrorEnum.ERROR, "产品ID输入不合法，多个以逗号分开");
         }
 
         try {
-            drugUserIdList = this.getIdList(drugUserIdStr);
+            drugUserIdList = StringUtil.getIdList(drugUserIdStr);
         }catch (Exception e){
             throw new BusinessException(ErrorEnum.ERROR, "代表ID输入不合法，多个以逗号分开");
         }
+
 
         CommonPoolRequest commonPoolRequest = new CommonPoolRequest();
         commonPoolRequest.setRelationDrugUser(relationDrugUser);
@@ -174,27 +175,7 @@ public class CommonPoolController extends NewBaseController {
 
     }
 
-    /**
-     * 截取获得ID
-     * @param str
-     * @return
-     */
-    private List<Long> getIdList(String str){
-        List<Long> idList = new ArrayList<>();
-        if (StringUtil.isNotEmpty(str)){
-            if (str.contains("，")){
-                str = str.replace("，",",");
-            }
 
-            String[] idStrArray = str.split(",");
-            for (String s : idStrArray) {
-                Long id = Long.valueOf(s);
-                idList.add(id);
-            }
-        }
-
-        return idList;
-    }
 
 
 }
