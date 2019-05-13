@@ -64,7 +64,7 @@ public class ContentSharingController extends BaseController {
 
     @ApiOperation(value = "内容分享记录导出文件下載一体")
     @RequestMapping(value = "/exportCSVFile", method = {RequestMethod.GET})
-    public void exportCSVFile(@RequestParam(value = "productId", required = false) Integer productId, @RequestParam(value = "drugUserId", required = false)Integer drugUserId, @RequestParam(value = "startTimeAfter", required = false)String startTimeAfter, @RequestParam(value = "startTimeBefore", required = false)String startTimeBefore, @RequestParam(value = "shareType", required = false) Integer shareType,HttpServletResponse response) {
+    public void exportCSVFile(@RequestParam(value = "productId", required = false) Integer productId, @RequestParam(value = "drugUserId", required = false)Long[] drugUserId, @RequestParam(value = "startTimeAfter", required = false)String startTimeAfter, @RequestParam(value = "startTimeBefore", required = false)String startTimeBefore, @RequestParam(value = "shareType", required = false) Integer shareType,HttpServletResponse response) {
         contentSharingService.contentSharingExportFile(productId, drugUserId, startTimeAfter, startTimeBefore, shareType, response);
     }
 }

@@ -40,9 +40,13 @@ public class ContentSharingServiceImpl implements ContentSharingService {
     @Override
     public PageResponseBean<List<ContentSharingParams>> getContentSharingListPage(ContentSharingRequest contentSharingRequest) {
 
-        List<ContentSharingParams> list = contentSharingMapper.getContentSharingListPage(contentSharingRequest);
+        //代表数组转list
+        List<Long> drugUserIds = new ArrayList<Long>();
+        drugUserIds = Arrays.asList(contentSharingRequest.getDrugUserId());
 
-        Integer contentSharingCount = contentSharingMapper.getContentSharingListCount(contentSharingRequest);
+        List<ContentSharingParams> list = contentSharingMapper.getContentSharingListPage(contentSharingRequest,drugUserIds);
+
+        Integer contentSharingCount = contentSharingMapper.getContentSharingListCount(contentSharingRequest,drugUserIds);
 
         return new PageResponseBean(contentSharingRequest, contentSharingCount, list);
     }
@@ -112,8 +116,11 @@ public class ContentSharingServiceImpl implements ContentSharingService {
 
             //如果hcp_id_temp表中没有数据，那么详情页面不显示数据
             List<Map<String,Object>>  list = Collections.emptyList();
+            //代表数组转list
+            List<Long> drugUserIds = new ArrayList<Long>();
+            drugUserIds = Arrays.asList(contentSharingRequest.getDrugUserId());
 
-            list = contentSharingMapper.getContentSharingList(contentSharingRequest);
+            list = contentSharingMapper.getContentSharingList(contentSharingRequest,drugUserIds);
 
             //时间格式转字符串
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -175,8 +182,11 @@ public class ContentSharingServiceImpl implements ContentSharingService {
     }
 
     @Override
-    public void contentSharingExportFile(Integer productId, Integer drugUserId, String startTimeAfter, String startTimeBefore, Integer shareType, HttpServletResponse response) {
-        List<ContentSharingParams> list = contentSharingMapper.getContentSharingCSVList(productId, drugUserId, startTimeAfter, startTimeBefore, shareType);
+    public void contentSharingExportFile(Integer productId, Long[] drugUserId, String startTimeAfter, String startTimeBefore, Integer shareType, HttpServletResponse response) {
+        //代表数组转list
+        List<Long> drugUserIds = new ArrayList<Long>();
+        drugUserIds = Arrays.asList(drugUserId);
+        List<ContentSharingParams> list = contentSharingMapper.getContentSharingCSVList(productId, drugUserIds, startTimeAfter, startTimeBefore, shareType);
         List<ContentSharingExcelParams> newList = new ArrayList<ContentSharingExcelParams>();
         //时间格式转字符串
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

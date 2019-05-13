@@ -20,16 +20,18 @@ public interface ContentSharingMapper {
     /**
      * 内容分享列表分页
      * @param contentSharingRequest
+     * @param drugUserIds
      * @return list
      */
-    List<ContentSharingParams> getContentSharingListPage(@Param("contentSharingRequest") ContentSharingRequest contentSharingRequest);
+    List<ContentSharingParams> getContentSharingListPage(@Param("contentSharingRequest") ContentSharingRequest contentSharingRequest, @Param("drugUserIds") List<Long> drugUserIds);
 
     /**
      * 内容分享列表Count
      * @param contentSharingRequest
+     * @param drugUserIds
      * @return int
      */
-    Integer getContentSharingListCount(@Param("contentSharingRequest") ContentSharingRequest contentSharingRequest);
+    Integer getContentSharingListCount(@Param("contentSharingRequest") ContentSharingRequest contentSharingRequest, @Param("drugUserIds") List<Long> drugUserIds);
 
     /**
      * 内容阅读记录列表
@@ -56,17 +58,18 @@ public interface ContentSharingMapper {
     /**
      * 内容分享列表
      * @param contentSharingRequest
+     * @param drugUserIds
      * @return list
      */
-    List<Map<String,Object>> getContentSharingList(@Param("contentSharingRequest") ContentSharingRequest contentSharingRequest);
+    List<Map<String,Object>> getContentSharingList(@Param("contentSharingRequest") ContentSharingRequest contentSharingRequest, @Param("drugUserIds") List<Long> drugUserIds);
 
     /**
      * 内容分享列表
      * @param productId
-     * @param drugUserId
+     * @param drugUserIds
      * @param startTimeAfter
      * @param startTimeBefore
      * @return list
      */
-    List<ContentSharingParams> getContentSharingCSVList(@Param("productId")Integer productId, @Param("drugUserId")Integer drugUserId, @Param("startTimeAfter")String startTimeAfter, @Param("startTimeBefore")String startTimeBefore, @Param("shareType") Integer shareType);
+    List<ContentSharingParams> getContentSharingCSVList(@Param("productId")Integer productId, @Param("drugUserIds") List<Long> drugUserIds, @Param("startTimeAfter")String startTimeAfter, @Param("startTimeBefore")String startTimeBefore, @Param("shareType") Integer shareType);
 }

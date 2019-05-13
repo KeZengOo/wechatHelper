@@ -41,8 +41,11 @@
                 JOIN drug_user u ON u.id = r.drug_user_id
                 WHERE
                 1 = 1
-                <if test="contentSharingRequest.drugUserId != 0 and contentSharingRequest.drugUserId != null">
-                    AND r.drug_user_id = #{contentSharingRequest.drugUserId}
+                <if test="drugUserIds.size() > 0 and drugUserIds != null">
+                    AND r.drug_user_id in
+                    <foreach collection="drugUserIds" item="drugUserIds" separator="," open="(" close=")">
+                        #{drugUserIds}
+                    </foreach>
                 </if>
                 AND r.data_id = t.id
                 <if test="contentSharingRequest.shareType != 0 and contentSharingRequest.shareType != null">
@@ -109,8 +112,11 @@
                             JOIN drug_user u ON u.id = r.drug_user_id
                             WHERE
                             1 = 1
-                            <if test="contentSharingRequest.drugUserId != 0 and contentSharingRequest.drugUserId != null">
-                                AND r.drug_user_id = #{contentSharingRequest.drugUserId}
+                            <if test="drugUserIds.size() > 0 and drugUserIds != null">
+                                AND r.drug_user_id in
+                                <foreach collection="drugUserIds" item="drugUserIds" separator="," open="(" close=")">
+                                    #{drugUserIds}
+                                </foreach>
                             </if>
                             AND r.data_id = t.id
                             <if test="contentSharingRequest.shareType != 0 and contentSharingRequest.shareType != null">
@@ -245,8 +251,11 @@
             JOIN drug_user u ON u.id = r.drug_user_id
             WHERE
             1 = 1
-            <if test="contentSharingRequest.drugUserId != 0 and contentSharingRequest.drugUserId != null">
-                AND r.drug_user_id = #{contentSharingRequest.drugUserId}
+            <if test="drugUserIds.size() > 0 and drugUserIds != null">
+                AND r.drug_user_id in
+                <foreach collection="drugUserIds" item="drugUserIds" separator="," open="(" close=")">
+                    #{drugUserIds}
+                </foreach>
             </if>
             AND r.data_id = t.id
             <if test="contentSharingRequest.shareType != 0 and contentSharingRequest.shareType != null">
@@ -318,8 +327,11 @@
             JOIN drug_user u ON u.id = r.drug_user_id
             WHERE
             1 = 1
-            <if test="drugUserId != 0 and drugUserId != null">
-                AND r.drug_user_id = #{drugUserId}
+            <if test="drugUserIds.size() > 0 and drugUserIds != null">
+                AND r.drug_user_id in
+                <foreach collection="drugUserIds" item="drugUserIds" separator="," open="(" close=")">
+                    #{drugUserIds}
+                </foreach>
             </if>
             AND r.data_id = t.id
             <if test="shareType != 0 and shareType != null">

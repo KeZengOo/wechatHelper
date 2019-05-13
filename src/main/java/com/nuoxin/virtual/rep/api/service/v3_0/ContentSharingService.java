@@ -54,7 +54,8 @@ public interface ContentSharingService {
      * @param drugUserId
      * @param startTimeAfter
      * @param startTimeBefore
+     * @param shareType
      * @param response
      */
-    void contentSharingExportFile(Integer productId, Integer drugUserId, String startTimeAfter, String startTimeBefore,Integer shareType, HttpServletResponse response);
+    void contentSharingExportFile(Integer productId, Long[] drugUserId, String startTimeAfter, String startTimeBefore,Integer shareType, HttpServletResponse response);
 }
