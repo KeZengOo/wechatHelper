@@ -43,7 +43,9 @@ public class ContentSharingServiceImpl implements ContentSharingService {
 
         //代表数组转list
         List<Long> drugUserIds = new ArrayList<Long>();
-        drugUserIds = Arrays.asList(contentSharingRequest.getDrugUserId());
+        if(contentSharingRequest.getDrugUserId()!= null){
+            drugUserIds = Arrays.asList(contentSharingRequest.getDrugUserId());
+        }
 
         List<ContentSharingParams> list = contentSharingMapper.getContentSharingListPage(contentSharingRequest,drugUserIds);
         List<ContentSharingParams> newList = new ArrayList<ContentSharingParams>();
@@ -79,7 +81,7 @@ public class ContentSharingServiceImpl implements ContentSharingService {
             String[] readTimeStringArray = new String[logsTimeParams.size()];
 
             for (int j = 0; j<logsTimeParams.size(); j++){
-                createTimeArray[j] = logsTimeParams.get(j).getCreateTime();
+                createTimeArray[j] = logsTimeParams.get(j).getCreateTime().substring(0,logsTimeParams.get(j).getCreateTime().indexOf("."));
                 readTimeArray[j] = logsTimeParams.get(j).getReadTime();
                 readTimeStringArray[j] = ParseTimeSecondsUtils.secondToTime(Long.parseLong(logsTimeParams.get(j).getReadTime()));
             }
