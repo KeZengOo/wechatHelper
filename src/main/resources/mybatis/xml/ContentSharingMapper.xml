@@ -62,6 +62,11 @@
                 <if test="contentSharingRequest.startTimeAfter != '' and contentSharingRequest.startTimeAfter != null">
                     AND t.time &lt;= #{contentSharingRequest.startTimeAfter}
                 </if>
+
+                <if test="contentSharingRequest.title != '' and contentSharingRequest.title != null">
+                    AND t.title &lt;= #{contentSharingRequest.title}
+                </if>
+
                 GROUP BY
                 r.read_person_id,
                 t.id
@@ -125,6 +130,11 @@
                             <if test="contentSharingRequest.startTimeAfter != '' and contentSharingRequest.startTimeAfter != null">
                                 AND t.time &lt;= #{contentSharingRequest.startTimeAfter}
                             </if>
+
+                            <if test="contentSharingRequest.title != '' and contentSharingRequest.title != null">
+                                AND t.title &lt;= #{contentSharingRequest.title}
+                            </if>
+
                             GROUP BY
                             r.read_person_id,
                             t.id
@@ -256,6 +266,11 @@
             <if test="contentSharingRequest.startTimeAfter != '' and contentSharingRequest.startTimeAfter != null">
                 AND t.time &lt;= #{contentSharingRequest.startTimeAfter}
             </if>
+
+            <if test="contentSharingRequest.title != '' and contentSharingRequest.title != null">
+                AND t.title &lt;= #{contentSharingRequest.title}
+            </if>
+
             GROUP BY
             r.read_person_id,
             t.id
@@ -324,6 +339,11 @@
             <if test="startTimeAfter != '' and startTimeAfter != null">
                 AND t.time &lt;= #{startTimeAfter}
             </if>
+
+            <if test="title != '' and title != null">
+                AND t.title &lt;= #{title}
+            </if>
+
             GROUP BY
             r.read_person_id,
             t.id

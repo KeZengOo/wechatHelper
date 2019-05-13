@@ -31,6 +31,10 @@
             AND t.start_time &lt;= #{meetingRecordRequest.startTimeAfter}
         </if>
 
+        <if test="meetingRecordRequest.title != '' and meetingRecordRequest.title != null">
+            AND t.title = #{meetingRecordRequest.title}
+        </if>
+
         GROUP BY
             t.id
         LIMIT #{meetingRecordRequest.currentSize},#{meetingRecordRequest.pageSize}
@@ -42,7 +46,6 @@
             COUNT(1)
         FROM
             t_meeting_data t
-
         WHERE
             1 = 1
         AND t.product_id != ''
@@ -56,6 +59,10 @@
 
         <if test="meetingRecordRequest.startTimeAfter != '' and meetingRecordRequest.startTimeAfter != null">
             AND t.start_time &lt;= #{meetingRecordRequest.startTimeAfter}
+        </if>
+
+        <if test="meetingRecordRequest.title != '' and meetingRecordRequest.title != null">
+            AND t.title = #{meetingRecordRequest.title}
         </if>
 
     </select>
