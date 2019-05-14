@@ -9,16 +9,16 @@
             t.product_id AS productId,
             t.product_name AS productName,
             t.title,
-            t.start_time AS startTime,
-            t.end_time AS endTime,
+            str_to_date(t.start_time, '%Y-%m-%d %H:%i:%s') AS startTime,
+            str_to_date(t.end_time, '%Y-%m-%d %H:%i:%s') AS endTime,
             COUNT(DISTINCT d.doctor_id) doctorCount
         FROM
             t_meeting_data t
-        LEFT JOIN t_meeting_attend_details d ON t.id = d.meeting_id
-        AND d.type = 1
+        LEFT JOIN t_meeting_attend_details d ON t.id = d.meeting_id AND d.type = 1
         WHERE
             1 = 1
         AND product_id != ''
+
         <if test="meetingRecordRequest.productId != 0 and meetingRecordRequest.productId != null">
             AND t.product_id = #{meetingRecordRequest.productId}
         </if>
@@ -32,7 +32,7 @@
         </if>
 
         <if test="meetingRecordRequest.title != '' and meetingRecordRequest.title != null">
-            AND t.title = #{meetingRecordRequest.title}
+            AND t.title LIKE "%"#{meetingRecordRequest.title}"%"
         </if>
 
         GROUP BY
@@ -62,7 +62,7 @@
         </if>
 
         <if test="meetingRecordRequest.title != '' and meetingRecordRequest.title != null">
-            AND t.title = #{meetingRecordRequest.title}
+            AND t.title LIKE "%"#{meetingRecordRequest.title}"%"
         </if>
 
     </select>
@@ -93,8 +93,8 @@
             t.meeting_name AS meetingName,
             t.subject_name AS subjectName,
             t.speaker,
-            t.start_time AS startTime,
-            t.end_time AS endTime
+            str_to_date(t.start_time, '%Y-%m-%d %H:%i:%s') AS startTime,
+            str_to_date(t.end_time, '%Y-%m-%d %H:%i:%s') AS endTime
         FROM
             t_meeting_subject t
         WHERE
@@ -109,8 +109,8 @@
             t.product_id AS productId,
             t.product_name AS productName,
             t.title,
-            t.start_time AS startTime,
-            t.end_time AS endTime
+            str_to_date(t.start_time, '%Y-%m-%d %H:%i:%s') AS startTime,
+            str_to_date(t.end_time, '%Y-%m-%d %H:%i:%s') AS endTime
         FROM
             t_meeting_data t
         WHERE
@@ -121,13 +121,14 @@
     <!-- 参会列表 -->
     <select id="getMeetingAttendDetailsListByMeetingId" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingAttendDetailsParams">
         SELECT
+            t.id,
             t.doctor_id AS doctorId,
             t.doctor_name AS doctorName,
             d.hospital_id AS hospitalId,
             d.hospital_name AS hospitalName,
             d.depart,
-            t.attend_start_time AS attendStartTime,
-            t.attend_end_time AS attendEndTime,
+            str_to_date(t.attend_start_time, '%Y-%m-%d %H:%i:%s') AS attendStartTime,
+            str_to_date(t.attend_end_time, '%Y-%m-%d %H:%i:%s') AS attendEndTime,
             t.attend_sum_time AS attendSumTime,
             t.meeting_id AS meetingId,
             t.type
@@ -168,8 +169,8 @@ FROM
     <select id="getMeetingTimeByDoctorIdAndMeetingID" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingAttendDetailsParams">
         SELECT
             t.doctor_id AS doctorId,
-            t.attend_start_time AS attendStartTime,
-            t.attend_end_time AS attendEndTime,
+            str_to_date(t.attend_start_time, '%Y-%m-%d %H:%i:%s') AS attendStartTime,
+            str_to_date(t.attend_end_time, '%Y-%m-%d %H:%i:%s') AS attendEndTime,
             t.attend_sum_time AS attendSumTime,
             t.meeting_id AS meetingId,
             t.type
@@ -238,4 +239,19 @@ FROM
         WHERE
             p.telephone = #{doctorTel};
     </select>
+
+    <!-- 根据会议标题查询主题数 -->
+    <select id="getSubjectCountByMeetingTitle" resultType="java.lang.Integer">
+        SELECT
+            count(s.id)
+        FROM
+            t_meeting_subject s
+        WHERE
+            s.meeting_name = #{title}
+    </select>
+
+    <!-- 会议编辑，根据会议名称追加会议主题的产品ID -->
+    <update id="updateMeetingSubjectProductIdByMeetingName">
+        UPDATE t_meeting_subject SET product_id = #{productId} WHERE meeting_name = #{meetingName}
+    </update>
 </mapper>

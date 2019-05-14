@@ -196,14 +196,13 @@ public class ContentSharingServiceImpl implements ContentSharingService {
     }
 
     @Override
-    public void contentSharingExportFile(Integer productId, Long[] drugUserId, String startTimeAfter, String startTimeBefore, Integer shareType, HttpServletResponse response) {
+    public void contentSharingExportFile(Integer productId, Long[] drugUserId, String startTimeAfter, String startTimeBefore, Integer shareType, String title, HttpServletResponse response) {
         //代表数组转list
         List<Long> drugUserIds = new ArrayList<Long>();
         drugUserIds = Arrays.asList(drugUserId);
-        List<ContentSharingParams> list = contentSharingMapper.getContentSharingCSVList(productId, drugUserIds, startTimeAfter, startTimeBefore, shareType);
+        List<ContentSharingParams> list = contentSharingMapper.getContentSharingCSVList(productId, drugUserIds, startTimeAfter, startTimeBefore, shareType, title);
         List<ContentSharingExcelParams> newList = new ArrayList<ContentSharingExcelParams>();
         //时间格式转字符串
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         HashMap map = new LinkedHashMap();
         map.put("1", "ID");
         map.put("2", "标题");
@@ -213,19 +212,18 @@ public class ContentSharingServiceImpl implements ContentSharingService {
         map.put("6", "所属产品");
         map.put("7", "拜访方式");
         map.put("8", "阅读人数");
-        map.put("9", "阅读总时长");
+        map.put("9", "阅读总时长-秒");
         String fileds[] = new String[] { "id", "title", "time", "shareType", "drugUserName", "prodName", "saleType", "peopleNumber", "totalDuration"};
 
         for(int i = 0; i < list.size(); i++){
             ContentSharingExcelParams contentSharingExcelParams = new ContentSharingExcelParams();
             contentSharingExcelParams.setId(list.get(i).getId());
             contentSharingExcelParams.setTitle(list.get(i).getTitle());
-            String timeStr = simpleDateFormat.format(list.get(i).getTime());
-            contentSharingExcelParams.setTime(timeStr);
+            contentSharingExcelParams.setTime(list.get(i).getTime().substring(0,list.get(i).getTime().indexOf(".")));
             contentSharingExcelParams.setDrugUserName(list.get(i).getDrugUserName());
             contentSharingExcelParams.setProdName(list.get(i).getProdName());
             contentSharingExcelParams.setPeopleNumber(list.get(i).getPeopleNumber().toString());
-            contentSharingExcelParams.setTotalDuration(list.get(i).getTotalDuration().toString());
+            contentSharingExcelParams.setTotalDuration(list.get(i).getTotalDuration());
 
             if(list.get(i).getSaleType().equals(0)){
                 contentSharingExcelParams.setSaleType("没有类型为经理");

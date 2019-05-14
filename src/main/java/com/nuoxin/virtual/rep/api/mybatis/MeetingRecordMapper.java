@@ -106,4 +106,18 @@ public interface MeetingRecordMapper {
      */
     MeetingParticipantsParams getDoctorInfoByDoctorTel(@Param("doctorTel") String doctorTel);
 
+    /**
+     * 根据会议标题查询主题数
+     * @param title
+     * @return int
+     */
+    Integer getSubjectCountByMeetingTitle(@Param("title") String title);
+
+    /**
+     * 会议编辑，根据会议名称追加会议主题的产品ID
+     * @param meetingName
+     * @param productId
+     * @return int
+     */
+    boolean updateMeetingSubjectProductIdByMeetingName(@Param("meetingName")String meetingName, @Param("productId")Integer productId);
 }

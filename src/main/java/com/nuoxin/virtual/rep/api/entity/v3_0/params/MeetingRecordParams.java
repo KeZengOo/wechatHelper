@@ -23,11 +23,13 @@ public class MeetingRecordParams {
     @ApiModelProperty(value = "演讲主题")
     private String title;
     @ApiModelProperty(value = "演讲开始时间")
-    private Date startTime;
+    private String startTime;
     @ApiModelProperty(value = "演讲结束时间")
-    private Date endTime;
+    private String endTime;
     @ApiModelProperty(value = "参会人数")
     private Integer doctorCount;
     @ApiModelProperty(value = "参会率")
     private String attendanceRate;
+    @ApiModelProperty(value = "主题数量")
+    private Integer subjectNum;
 }

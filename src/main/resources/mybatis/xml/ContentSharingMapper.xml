@@ -7,7 +7,7 @@
         SELECT
             m.id,
             m.title,
-            str_to_date(m.time, '%Y-%m-%d %H') `time`,
+            str_to_date(m.time, '%Y-%m-%d %H:%i:%s') `time`,
             m.share_type AS shareType,
             m.drug_user_id AS drugUserId,
             m.drug_user_name AS drugUserName,
@@ -67,7 +67,7 @@
                 </if>
 
                 <if test="contentSharingRequest.title != '' and contentSharingRequest.title != null">
-                    AND t.title &lt;= #{contentSharingRequest.title}
+                    AND t.title LIKE "%"#{contentSharingRequest.title}"%"
                 </if>
 
                 GROUP BY
@@ -138,7 +138,7 @@
                             </if>
 
                             <if test="contentSharingRequest.title != '' and contentSharingRequest.title != null">
-                                AND t.title &lt;= #{contentSharingRequest.title}
+                                AND t.title LIKE "%"#{contentSharingRequest.title}"%"
                             </if>
 
                             GROUP BY
@@ -217,7 +217,7 @@
         SELECT
         m.id,
         m.title,
-        str_to_date(m.time, '%Y-%m-%d %H') `time`,
+        str_to_date(m.time, '%Y-%m-%d %H:%i:%s') `time`,
         m.share_type AS shareType,
         m.drug_user_id AS drugUserId,
         m.drug_user_name AS drugUserName,
@@ -277,7 +277,7 @@
             </if>
 
             <if test="contentSharingRequest.title != '' and contentSharingRequest.title != null">
-                AND t.title &lt;= #{contentSharingRequest.title}
+                AND t.title LIKE "%"#{contentSharingRequest.title}"%"
             </if>
 
             GROUP BY
@@ -293,7 +293,7 @@
         SELECT
         m.id,
         m.title,
-        str_to_date(m.time, '%Y-%m-%d %H') `time`,
+        str_to_date(m.time, '%Y-%m-%d %H:%i:%s') `time`,
         m.share_type AS shareType,
         m.drug_user_id AS drugUserId,
         m.drug_user_name AS drugUserName,
@@ -353,7 +353,7 @@
             </if>
 
             <if test="title != '' and title != null">
-                AND t.title &lt;= #{title}
+                AND t.title LIKE "%"#{title}"%"
             </if>
 
             GROUP BY
@@ -361,6 +361,6 @@
             t.id
         ) m
         GROUP BY
-        title
+        m.title
     </select>
 </mapper>

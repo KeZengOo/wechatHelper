@@ -25,9 +25,9 @@ public class MeetingSubjectParams {
     @ApiModelProperty(value = "演讲人")
     private String speaker;
     @ApiModelProperty(value = "主题开始时间")
-    private Date startTime;
+    private String startTime;
     @ApiModelProperty(value = "主题结束时间")
-    private Date endTime;
+    private String endTime;
     @ApiModelProperty(value = "时长")
     private String duration;
 }

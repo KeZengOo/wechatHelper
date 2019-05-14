@@ -15,19 +15,18 @@ import com.nuoxin.virtual.rep.api.service.v3_0.MeetingRecordService;
 import com.nuoxin.virtual.rep.api.utils.ExcelUtils;
 import com.nuoxin.virtual.rep.api.utils.excel.RegularUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.formula.functions.T;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -60,6 +59,8 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
             MeetingRecordParams m = new MeetingRecordParams();
             //获取当前产品的招募医生数
             Integer recordNum = meetingRecordMapper.getRecruitHcpAllCountByProduct(list.get(i).getProductId());
+            //根据会议标题查询主题数
+            Integer subjectCount = meetingRecordMapper.getSubjectCountByMeetingTitle(list.get(i).getTitle());
             m = list.get(i);
             if(recordNum > 0){
                 String result = numberFormat.format((float) list.get(i).getDoctorCount() / (float) recordNum * 100);
@@ -70,7 +71,9 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
             {
                 m.setAttendanceRate("0%");
             }
-
+            m.setStartTime(m.getStartTime().substring(0,m.getStartTime().indexOf(".")));
+            m.setEndTime(m.getEndTime().substring(0,m.getEndTime().indexOf(".")));
+            m.setSubjectNum(subjectCount);
             newList.add(m);
         }
         return new PageResponseBean(meetingRecordRequest, getMeetingRecordListCount, newList);
@@ -85,13 +88,23 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
         //获取会议明细
         MeetingRecordParams meetingRecordParams = meetingRecordMapper.getMeetingInfoByMeetingId(meetingSubjectRequest.getMeetingId());
         //计算两个时间差
-        long diff = meetingRecordParams.getEndTime().getTime() - meetingRecordParams.getStartTime().getTime();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:dd");
+        Date startDate = null;
+        Date endDate = null;
+        try {
+            startDate = simpleDateFormat.parse(meetingRecordParams.getStartTime());
+            endDate = simpleDateFormat.parse(meetingRecordParams.getEndTime());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        long diff = endDate.getTime() - startDate.getTime();
         int hours = (int) (diff/(1000 * 60 * 60));
 
         list.forEach(n -> {
             MeetingSubjectParams m = new MeetingSubjectParams();
             m=n;
-            m.setDuration(hours+"");
+            m.setDuration(hours+"小时");
             newList.add(m);
         });
 
@@ -127,7 +140,7 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
                 timeSum[i] = list.get(i).getAttendSumTime()+"分";
                 timeSumCount += list.get(i).getAttendSumTime();
             }
-
+            m.setId(n.getId());
             m.setDoctorId(n.getDoctorId());
             m.setDoctorName(n.getDoctorName());
             m.setHospitalId(n.getHospitalId());
@@ -336,6 +349,12 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
         map.put("actualNumber",meetingParticipantsTemps.size());
 
         return map;
+    }
+
+    @Override
+    public boolean updateMeetingSubjectProductIdByMeetingName(String meetingName, Integer productId) {
+        boolean result = meetingRecordMapper.updateMeetingSubjectProductIdByMeetingName(meetingName,productId);
+        return result;
     }
 
 }

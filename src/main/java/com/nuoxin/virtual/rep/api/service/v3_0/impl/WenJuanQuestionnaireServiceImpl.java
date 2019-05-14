@@ -76,6 +76,7 @@ public class WenJuanQuestionnaireServiceImpl implements WenJuanQuestionnaireServ
                 +page
                 +pageSize
                 +timestamp
+                +WenJuanApiConstant.WJ_USER_VALUE
                 +WenJuanApiConstant.WJ_APPSECRET_VALUE;
         String projectMd5SignatureResult = MD5Util.MD5Encode(projectMd5Signature,"utf8");
 
@@ -84,6 +85,7 @@ public class WenJuanQuestionnaireServiceImpl implements WenJuanQuestionnaireServ
                 +"&"+WenJuanApiConstant.WJ_PAGE+"="+page
                 +"&"+WenJuanApiConstant.WJ_PAGESIZE+"="+pageSize
                 +"&"+WenJuanApiConstant.WJ_TIMESTAMP+"="+timestamp
+                +"&"+WenJuanApiConstant.WJ_USER+"="+WenJuanApiConstant.WJ_USER_VALUE
                 +"&"+WenJuanApiConstant.WJ_SIGNATURE+"="+projectMd5SignatureResult;
 
         return projectUrl;
