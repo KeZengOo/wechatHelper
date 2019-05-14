@@ -105,7 +105,6 @@ public interface MessageMapper {
     /**
      * 导入微信聊天消息补偿
      */
-
     void reUpdateMessageContact();
 
     void reUpdateMessageContactAlias();
@@ -113,5 +112,10 @@ public interface MessageMapper {
     void reUpdateSendMessage();
 
     void reUpdateReceiveMessage();
+
+
+
+
+
 
 }
