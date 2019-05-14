@@ -16,6 +16,9 @@ import java.io.Serializable;
 public class DoctorImportErrorDetailResponse implements Serializable {
     private static final long serialVersionUID = 6698690987539253161L;
 
+    @ApiModelProperty(name = "sheet名称")
+    private String sheetName;
+
     @ApiModelProperty(value = "行号")
     private Integer rowNum;
 

@@ -13,14 +13,17 @@ import java.io.Serializable;
  */
 @Data
 @ApiModel(value = "微信消息请求参数")
-public class WechatMessageRequest implements Serializable {
+public class WechatMessageRequest extends CommonRequest implements Serializable {
     private static final long serialVersionUID = -783498611511449406L;
 
-    @ApiModelProperty(value = "消息类型")
-    private Integer type;
+    @ApiModelProperty(value = "消息类型：默认全部，1是医生，2是群聊")
+    private Integer messageType;
 
     @ApiModelProperty(value = "搜索的关键词")
     private String searchKeyword;
+
+    @ApiModelProperty(value = "是否是可分页的,0和null 可以分页的，其他是可以分页的")
+    private Integer paginable;
 
 
 }

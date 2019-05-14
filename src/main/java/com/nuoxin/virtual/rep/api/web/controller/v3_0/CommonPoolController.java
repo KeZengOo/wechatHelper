@@ -52,21 +52,42 @@ public class CommonPoolController extends NewBaseController {
 
 
 
-    @ApiOperation(value = "导入医生", notes = "导入医生")
+    @ApiOperation(value = "导入医生，不同的sheet错误一块展示", notes = "导入医生，不同的sheet错误一块展示")
     @PostMapping(value = "/doctor/import")
-    public DefaultResponseBean<Map<String, DoctorImportErrorResponse>> doctorImport(MultipartFile file) {
+    public DefaultResponseBean<DoctorImportErrorResponse> doctorImport(MultipartFile file) {
 
-        Map<String, DoctorImportErrorResponse> map = commonService.doctorImport(file);
+        DoctorImportErrorResponse error = commonService.doctorImport(file);
+        DefaultResponseBean<DoctorImportErrorResponse> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(error);
+        return responseBean;
+    }
+
+
+    @ApiOperation(value = "导入医生转代表，不同的sheet错误一块展示", notes = "导入医生转代表，不同的sheet错误一块展示")
+    @PostMapping(value = "/drug/user/doctor/transfer")
+    public DefaultResponseBean<DoctorImportErrorResponse> drugUserDoctorTransfer(MultipartFile file) {
+        DoctorImportErrorResponse error = commonService.drugUserDoctorTransfer(file);
+        DefaultResponseBean<DoctorImportErrorResponse> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(error);
+        return responseBean;
+    }
+
+
+    @ApiOperation(value = "导入医生，不同的sheet错误分开展示", notes = "导入医生，不同的sheet错误分开展示")
+    @PostMapping(value = "/doctor/import/map")
+    public DefaultResponseBean<Map<String, DoctorImportErrorResponse>> doctorImportMap(MultipartFile file) {
+
+        Map<String, DoctorImportErrorResponse> map = commonService.doctorImportMap(file);
         DefaultResponseBean<Map<String, DoctorImportErrorResponse>> responseBean = new DefaultResponseBean<>();
         responseBean.setData(map);
         return responseBean;
     }
 
 
-    @ApiOperation(value = "导入医生转代表", notes = "导入医生转代表")
-    @PostMapping(value = "/drug/user/doctor/transfer")
-    public DefaultResponseBean<Map<String, DoctorImportErrorResponse>> drugUserDoctorTransfer(MultipartFile file) {
-        Map<String, DoctorImportErrorResponse> map = commonService.drugUserDoctorTransfer(file);
+    @ApiOperation(value = "导入医生转代表，不同的sheet错误分开展示", notes = "导入医生转代表，不同的sheet错误分开展示")
+    @PostMapping(value = "/drug/user/doctor/transfer/map")
+    public DefaultResponseBean<Map<String, DoctorImportErrorResponse>> drugUserDoctorTransferMap(MultipartFile file) {
+        Map<String, DoctorImportErrorResponse> map = commonService.drugUserDoctorTransferMap(file);
         DefaultResponseBean<Map<String, DoctorImportErrorResponse>> responseBean = new DefaultResponseBean<>();
         responseBean.setData(map);
         return responseBean;

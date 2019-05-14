@@ -71,17 +71,35 @@ public interface CommonService {
 	/**
 	 * 根据现有的医生模板导入医生
 	 * @param file 导入的文件
-	 * @return 导出遇到的错误
+	 * @return 导出遇到的错误,不同的sheet错误分开展示
 	 */
-	Map<String, DoctorImportErrorResponse> doctorImport(MultipartFile file);
+	Map<String, DoctorImportErrorResponse> doctorImportMap(MultipartFile file);
+
+	/**
+	 * 根据现有的医生模板导入医生
+	 * @param file 导入的文件
+	 * @return 导出遇到的错误,不同的sheet错误一块展示
+	 */
+	DoctorImportErrorResponse doctorImport(MultipartFile file);
+
 
 
 	/**
 	 * 根据现有的医生模板导入医生
 	 * @param file
-	 * @return 导出遇到的错误
+	 * @return 导出遇到的错误，不同的sheet错误分开展示
 	 */
-	Map<String, DoctorImportErrorResponse> drugUserDoctorTransfer(MultipartFile file);
+	Map<String, DoctorImportErrorResponse> drugUserDoctorTransferMap(MultipartFile file);
+
+
+	/**
+	 * 根据现有的医生模板导入医生
+	 * @param file
+	 * @return 导出遇到的错误，不同的sheet错误一块展示
+	 */
+	DoctorImportErrorResponse drugUserDoctorTransfer(MultipartFile file);
+
+
 
 	/**
 	 * 根据医院名称得到医院ID,如果没有医院新增返回ID
