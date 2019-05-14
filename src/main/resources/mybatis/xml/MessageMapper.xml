@@ -470,7 +470,6 @@
         virtual_message vm
         WHERE
         vm.doctor_id = #{doctorId}
-        AND vm.message_type = #{messageType}
 
         <if test="startTime !=null and startTime !=''">
             and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &gt;=date_format(#{startTime},'%Y-%m-%d %H:%i:%s')
@@ -549,7 +548,6 @@
         virtual_message vm
         WHERE
         vm.doctor_id = #{doctorId}
-        AND vm.message_type =#{messageType}
 
         <if test="startTime !=null and startTime !=''">
             and date_format(vm.message_time,'%Y-%m-%d %H:%i:%s') &gt;=date_format(#{startTime},'%Y-%m-%d %H:%i:%s')
