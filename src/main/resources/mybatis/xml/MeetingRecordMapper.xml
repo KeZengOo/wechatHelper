@@ -251,6 +251,6 @@ FROM
 
     <!-- 会议编辑，根据会议名称更新会议的产品ID -->
     <update id="updateMeetingSubjectProductIdByMeetingName">
-        UPDATE t_meeting_data SET product_id = #{productId} WHERE title = #{meetingName}
+        UPDATE t_meeting_data SET product_id = #{productId}, product_name = #{productName} WHERE title = #{meetingName}
     </update>
 </mapper>

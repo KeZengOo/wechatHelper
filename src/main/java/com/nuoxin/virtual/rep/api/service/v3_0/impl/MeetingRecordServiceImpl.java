@@ -352,8 +352,8 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
     }
 
     @Override
-    public boolean updateMeetingSubjectProductIdByMeetingName(String meetingName, Integer productId) {
-        boolean result = meetingRecordMapper.updateMeetingSubjectProductIdByMeetingName(meetingName,productId);
+    public boolean updateMeetingSubjectProductIdByMeetingName(String meetingName, Integer productId, String productName) {
+        boolean result = meetingRecordMapper.updateMeetingSubjectProductIdByMeetingName(meetingName,productId, productName);
         return result;
     }
 

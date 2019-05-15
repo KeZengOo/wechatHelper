@@ -117,7 +117,8 @@ public interface MeetingRecordMapper {
      * 会议编辑，根据会议名称追加会议主题的产品ID
      * @param meetingName
      * @param productId
+     * @param productName
      * @return int
      */
-    boolean updateMeetingSubjectProductIdByMeetingName(@Param("meetingName")String meetingName, @Param("productId")Integer productId);
+    boolean updateMeetingSubjectProductIdByMeetingName(@Param("meetingName")String meetingName, @Param("productId")Integer productId, @Param("productName")String productName);
 }

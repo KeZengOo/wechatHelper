@@ -85,8 +85,8 @@ public class MeetingRecordController {
 
     @ApiOperation(value = "会议编辑，根据会议名称追加会议主题的产品ID")
     @RequestMapping(value = "/updateMeetingSubjectProductIdByMeetingName", method = {RequestMethod.GET})
-    public DefaultResponseBean<Boolean> updateMeetingSubjectProductIdByMeetingName(@RequestParam("meetingName") String meetingName, @RequestParam("productId") Integer productId) {
-        boolean result = meetingRecordService.updateMeetingSubjectProductIdByMeetingName(meetingName,productId);
+    public DefaultResponseBean<Boolean> updateMeetingSubjectProductIdByMeetingName(@RequestParam("meetingName") String meetingName, @RequestParam("productId") Integer productId, @RequestParam("productName") String productName) {
+        boolean result = meetingRecordService.updateMeetingSubjectProductIdByMeetingName(meetingName,productId,productName);
         DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<Boolean>();
         responseBean.setData(result);
         return responseBean;
