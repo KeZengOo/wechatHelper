@@ -55,7 +55,7 @@ public interface MeetingRecordService {
     Map<String, Object> meetingParticipantsImport(MultipartFile file, String meetId);
 
     /**
-     * 会议编辑，根据会议名称追加会议主题的产品ID
+     * 会议编辑，根据会议名称更新会议的产品ID
      * @param meetingName
      * @param productId
      * @return int

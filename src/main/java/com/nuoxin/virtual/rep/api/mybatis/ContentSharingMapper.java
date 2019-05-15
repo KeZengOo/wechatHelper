@@ -31,7 +31,7 @@ public interface ContentSharingMapper {
      * @param drugUserIds
      * @return int
      */
-    Integer getContentSharingListCount(@Param("contentSharingRequest") ContentSharingRequest contentSharingRequest, @Param("drugUserIds") List<Long> drugUserIds);
+    List<ContentSharingParams> getContentSharingListCount(@Param("contentSharingRequest") ContentSharingRequest contentSharingRequest, @Param("drugUserIds") List<Long> drugUserIds);
 
     /**
      * 内容阅读记录列表

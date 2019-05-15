@@ -58,9 +58,9 @@ public class ContentSharingServiceImpl implements ContentSharingService {
             newList.add(c);
         });
 
-        Integer contentSharingCount = contentSharingMapper.getContentSharingListCount(contentSharingRequest,drugUserIds);
+        List<ContentSharingParams> contentSharingCount = contentSharingMapper.getContentSharingListCount(contentSharingRequest,drugUserIds);
 
-        return new PageResponseBean(contentSharingRequest, contentSharingCount, newList);
+        return new PageResponseBean(contentSharingRequest, contentSharingCount.size(), newList);
     }
 
     @Override

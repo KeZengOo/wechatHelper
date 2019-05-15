@@ -80,62 +80,57 @@
     </select>
 
     <!-- 内容分享列表总数 -->
-    <select id="getContentSharingListCount" resultType="java.lang.Integer">
-            SELECT
-                count(p.title)
-            FROM
-                (
-                    SELECT
-                        m.title
-                    FROM
-                        (
-                            SELECT
-                              t.title
-                            FROM
-                            activity_info t
-                            JOIN activity_read r ON t.id = r.data_id
-                            JOIN activity_read_ip ip ON r.read_token = ip.read_token
-                            JOIN t_content_product p ON p.content_id = t.id
-                            JOIN product_line l ON p.product_id = l.prod_id
-                            JOIN drug_user u ON u.id = r.drug_user_id
-                            WHERE
-                            1 = 1
-                            <if test="drugUserIds.size() > 0 and drugUserIds != null">
-                                AND r.drug_user_id in
-                                <foreach collection="drugUserIds" item="drugUserIds" separator="," open="(" close=")">
-                                    #{drugUserIds}
-                                </foreach>
-                            </if>
-                            AND r.data_id = t.id
-                            <if test="contentSharingRequest.shareType != 0 and contentSharingRequest.shareType != null">
-                                AND r.share_type = #{contentSharingRequest.shareType}
-                            </if>
-                            AND (
-                            ip.isp IS NULL
-                            OR ip.isp != '阿里云'
-                            )
-                            <if test="contentSharingRequest.productId != 0 and contentSharingRequest.productId != null">
-                                AND l.prod_id = #{contentSharingRequest.productId}
-                            </if>
-                            <if test="contentSharingRequest.startTimeBefore != '' and contentSharingRequest.startTimeBefore != null">
-                                AND t.time &gt;= #{contentSharingRequest.startTimeBefore}
-                            </if>
+    <select id="getContentSharingListCount" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.ContentSharingParams">
+        SELECT
+            m.title
+        FROM
+            (
+                SELECT
+                  t.title
+                FROM
+                activity_info t
+                JOIN activity_read r ON t.id = r.data_id
+                JOIN activity_read_ip ip ON r.read_token = ip.read_token
+                JOIN t_content_product p ON p.content_id = t.id
+                JOIN product_line l ON p.product_id = l.prod_id
+                JOIN drug_user u ON u.id = r.drug_user_id
+                WHERE
+                1 = 1
+                <if test="drugUserIds.size() > 0 and drugUserIds != null">
+                    AND r.drug_user_id in
+                    <foreach collection="drugUserIds" item="drugUserIds" separator="," open="(" close=")">
+                        #{drugUserIds}
+                    </foreach>
+                </if>
+                AND r.data_id = t.id
+                <if test="contentSharingRequest.shareType != 0 and contentSharingRequest.shareType != null">
+                    AND r.share_type = #{contentSharingRequest.shareType}
+                </if>
+                AND (
+                ip.isp IS NULL
+                OR ip.isp != '阿里云'
+                )
+                <if test="contentSharingRequest.productId != 0 and contentSharingRequest.productId != null">
+                    AND l.prod_id = #{contentSharingRequest.productId}
+                </if>
+                <if test="contentSharingRequest.startTimeBefore != '' and contentSharingRequest.startTimeBefore != null">
+                    AND t.time &gt;= #{contentSharingRequest.startTimeBefore}
+                </if>
 
-                            <if test="contentSharingRequest.startTimeAfter != '' and contentSharingRequest.startTimeAfter != null">
-                                AND t.time &lt;= #{contentSharingRequest.startTimeAfter}
-                            </if>
+                <if test="contentSharingRequest.startTimeAfter != '' and contentSharingRequest.startTimeAfter != null">
+                    AND t.time &lt;= #{contentSharingRequest.startTimeAfter}
+                </if>
 
-                            <if test="contentSharingRequest.title != '' and contentSharingRequest.title != null">
-                                AND t.title LIKE "%"#{contentSharingRequest.title}"%"
-                            </if>
+                <if test="contentSharingRequest.title != '' and contentSharingRequest.title != null">
+                    AND t.title LIKE "%"#{contentSharingRequest.title}"%"
+                </if>
 
-                            GROUP BY
-                            r.read_person_id,
-                            t.id
-                        ) m
-                    GROUP BY
-                    m.title
-                ) p
+                GROUP BY
+                r.read_person_id,
+                t.id
+            ) m
+        GROUP BY
+        m.title
     </select>
 
     <!-- 内容阅读记录列表 -->
