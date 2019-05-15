@@ -82,27 +82,15 @@
     <!-- 内容分享列表总数 -->
     <select id="getContentSharingListCount" resultType="java.lang.Integer">
             SELECT
-                count(p.id)
+                count(p.title)
             FROM
                 (
                     SELECT
-                        m.id
+                        m.title
                     FROM
                         (
                             SELECT
-                            t.id,
-                            t.title,
-                            t.time,
-                            r.share_type,
-                            r.data_id,
-                            r.drug_user_id,
-                            r.drug_user_name,
-                            r.read_person_id,
-                            r.read_person_name,
-                            r.read_time,
-                            p.product_id,
-                            l.prod_name,
-                            u.sale_type
+                              t.title
                             FROM
                             activity_info t
                             JOIN activity_read r ON t.id = r.data_id
@@ -146,7 +134,7 @@
                             t.id
                         ) m
                     GROUP BY
-                        title
+                    m.title
                 ) p
     </select>
 
