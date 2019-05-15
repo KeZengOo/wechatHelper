@@ -133,7 +133,7 @@ public class WenJuanQuestionnaireServiceImpl implements WenJuanQuestionnaireServ
                     wenJuanProject.setProjectId(jsonObject1.getString("project_id"));
                     wenJuanProject.setTitle(jsonObject1.getString("title"));
                     wenJuanProject.setStatus(jsonObject1.getInteger("status"));
-                    wenJuanProject.setUser(jsonObject1.getString("user"));
+                    wenJuanProject.setUser(WenJuanApiConstant.WJ_USER_VALUE);
                     wenJuanProject.setRespondentCount(jsonObject1.getString("respondent_count"));
                     wenJuanProject.setPtype(jsonObject1.getString("ptype"));
                     wenJuanProject.setCreateTime(jsonObject1.getString("create_time"));
