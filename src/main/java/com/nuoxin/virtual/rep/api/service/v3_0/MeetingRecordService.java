@@ -62,4 +62,5 @@ public interface MeetingRecordService {
      * @return boolean
      */
     boolean updateMeetingSubjectProductIdByMeetingName(String meetingName, Integer productId, String productName, Integer id);
+
 }

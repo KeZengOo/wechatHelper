@@ -10,16 +10,12 @@
             t.product_name AS productName,
             t.title,
             str_to_date(t.start_time, '%Y-%m-%d %H:%i:%s') AS startTime,
-            str_to_date(t.end_time, '%Y-%m-%d %H:%i:%s') AS endTime,
-            COUNT(DISTINCT d.doctor_id) doctorCount
+            str_to_date(t.end_time, '%Y-%m-%d %H:%i:%s') AS endTime
         FROM
             t_meeting_data t
-        LEFT JOIN t_meeting_attend_details d ON t.id = d.meeting_id AND d.type = 1
-        LEFT JOIN product_doctor_quate p ON t.product_id = p.product_id
         WHERE
             1 = 1
-        AND product_id != ''
-        AND d.doctor_id = p.doctor_id
+        AND t.product_id != ''
 
         <if test="meetingRecordRequest.productId != 0 and meetingRecordRequest.productId != null">
             AND t.product_id = #{meetingRecordRequest.productId}
@@ -256,4 +252,17 @@ FROM
     <update id="updateMeetingSubjectProductIdByMeetingName">
         UPDATE t_meeting_data SET product_id = #{productId}, product_name = #{productName} WHERE title = #{meetingName} and  id = #{id}
     </update>
+
+    <!-- 根据会议id查询参会人员总数及人员idList -->
+    <select id="getMeetingAttendDetailsParamsListByMeetingId" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingAttendDetailsParams">
+        SELECT DISTINCT t.doctor_id doctorId FROM t_meeting_attend_details t WHERE t.meeting_id = #{meetingId} AND t.doctor_id != ''
+    </select>
+
+    <!-- 根据产品Id筛选医生IDlist -->
+    <select id="getDoctorIdsCountByProductId" resultType="java.lang.Integer">
+        SELECT count(1) FROM product_doctor_quate q WHERE 1=1 AND q.product_id = #{productId} AND q.doctor_id in
+          <foreach collection="list" item="list" separator="," open="(" close=")">
+              #{list.doctorId}
+          </foreach>
+    </select>
 </mapper>

@@ -122,4 +122,18 @@ public interface MeetingRecordMapper {
      * @return int
      */
     boolean updateMeetingSubjectProductIdByMeetingName(@Param("meetingName")String meetingName, @Param("productId")Integer productId, @Param("productName")String productName, @Param("id")Integer id);
+
+    /**
+     * 根据会议id查询参会人员总数及人员idList
+     * @param meetingId
+     */
+    List<MeetingAttendDetailsParams> getMeetingAttendDetailsParamsListByMeetingId(@Param("meetingId")Integer meetingId);
+
+    /**
+     * 根据产品Id筛选医生IDlist
+     * @param productId
+     * @param list
+     * @return int
+     */
+    Integer getDoctorIdsCountByProductId(@Param("productId")Integer productId, @Param("list") List<MeetingAttendDetailsParams> list);
 }
