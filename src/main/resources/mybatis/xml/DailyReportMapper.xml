@@ -5,28 +5,30 @@
     <!-- 招募的医生数 -->
     <select id="recruitDoctorNum" resultType="java.lang.Integer">
         SELECT
-        COUNT(DISTINCT virtual_doctor_id)
+        IFNULL(COUNT(DISTINCT d.id), 0)
         FROM
-        virtual_doctor_call_info_mend
+        virtual_doctor_call_info_mend m
+        INNER JOIN doctor d
+        ON m.virtual_doctor_id=d.id
         WHERE
-        is_recruit = 1
+        m.is_recruit = 1
 
         <if test="productIdList !=null and productIdList.size > 0">
-            AND product_id IN
+            AND m.product_id IN
             <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
                 #{productId}
             </foreach>
         </if>
 
         <if test="drugUserIdList !=null and drugUserIdList.size > 0">
-            AND virtual_drug_user_id IN
+            AND m.virtual_drug_user_id IN
             <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
                 #{drugUserId}
             </foreach>
         </if>
 
         <if test="startTime !=null and endTime !=null">
-            AND create_time BETWEEN #{startTime}  AND #{endTime}
+            AND m.create_time BETWEEN #{startTime}  AND #{endTime}
         </if>
 
 
@@ -34,11 +36,46 @@
     </select>
 
 
+    <!-- 招募的医院数 -->
+    <select id="recruitHospitalNum" resultType="java.lang.Integer">
+        SELECT
+        IFNULL(COUNT(DISTINCT d.hospital_id), 0)
+        FROM
+        virtual_doctor_call_info_mend m
+        INNER JOIN doctor d
+        ON m.virtual_doctor_id=d.id
+        WHERE
+        m.is_recruit = 1
+
+        <if test="productIdList !=null and productIdList.size > 0">
+            AND m.product_id IN
+            <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+                #{productId}
+            </foreach>
+        </if>
+
+        <if test="drugUserIdList !=null and drugUserIdList.size > 0">
+            AND m.virtual_drug_user_id IN
+            <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+                #{drugUserId}
+            </foreach>
+        </if>
+
+        <if test="startTime !=null and endTime !=null">
+            AND m.create_time BETWEEN #{startTime}  AND #{endTime}
+        </if>
+
+
+
+    </select>
+
+
+
     <!-- 活跃覆盖医生(收益) -->
     <select id="activeCoverDoctorNum" resultType="java.lang.Integer">
 
         SELECT
-        COUNT( * )
+        IFNULL(COUNT(*), 0)
         FROM
         (
         SELECT DISTINCT
@@ -70,23 +107,42 @@
         AND call_time >= 150
 
         UNION
-        SELECT
-        doctor_id
+
+        SELECT DISTINCT
+        d.id
         FROM
-        virtual_message
-        WHERE 1=1
+        virtual_message vm
+        INNER JOIN doctor d ON vm.doctor_id = d.id
+        INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+        INNER JOIN drug_user du ON dud.drug_user_id = du.id
+        WHERE
+        dud.is_available = 1
+        AND vm.user_type = 2
+
+        <if test="productIdList !=null and productIdList.size > 0">
+            AND dud.prod_id IN
+            <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+                #{productId}
+            </foreach>
+        </if>
+
+
         <if test="drugUserIdList !=null and drugUserIdList.size > 0">
-            AND drug_user_id IN
+            AND du.id IN
             <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
                 #{drugUserId}
             </foreach>
         </if>
 
         <if test="startTime !=null and endTime !=null">
-            AND message_time BETWEEN #{startTime}  AND #{endTime}
+            AND vm.message_time BETWEEN #{startTime}  AND #{endTime}
         </if>
 
-        GROUP BY doctor_id HAVING COUNT(*) >= 3
+        GROUP BY
+        d.id
+        HAVING
+        COUNT(*) >=3
+
 
         UNION
         SELECT DISTINCT
@@ -126,9 +182,622 @@
             </foreach>
         </if>
 
+        GROUP BY tmad.doctor_id HAVING SUM(tmad.attend_sum_time) >= 10
+
 
         ) t
 
     </select>
+
+    <!--
+      多渠道覆盖医生数，满足任意三项
+     1、单次通话时长大于等于 1分15秒
+     2、医生有微信回复
+     3、存在参会记录
+     4、文章阅读大于等于 50s（包含 app 和小程序）
+     5、医生写过问卷 (暂未提供)
+     -->
+    <select id="mulChannelDoctorNum" resultType="java.lang.Integer">
+
+
+
+        SELECT
+            IFNULL(COUNT(*), 0)
+        FROM
+            (
+                SELECT
+                    dud.doctor_id doctorId
+                FROM
+                    (
+                SELECT DISTINCT
+                    v.virtual_doctor_id doctor_id,
+                    1 channelNum
+                FROM
+                    virtual_doctor_call_info v
+                WHERE
+                    v.visit_channel = 1
+                    AND v.call_time >= 75
+
+
+                        <if test="drugUserIdList !=null and drugUserIdList.size > 0">
+                            AND v.virtual_drug_user_id IN
+                            <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+                                #{drugUserId}
+                            </foreach>
+                        </if>
+
+
+
+                    <if test="productIdList !=null and productIdList.size > 0">
+                        AND v.product_id IN
+                        <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+                            #{productId}
+                        </foreach>
+                    </if>
+
+
+                    <if test="startTime !=null and endTime !=null">
+                        AND v.create_time BETWEEN #{startTime}  AND #{endTime}
+                    </if>
+
+                    UNION ALL
+
+                SELECT DISTINCT
+                    d.id doctor_id,
+                    1 channelNum
+                FROM
+                    virtual_message vm
+                    INNER JOIN doctor d ON vm.doctor_id = d.id
+                    INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+                    INNER JOIN drug_user du ON dud.drug_user_id = du.id
+                WHERE
+                    dud.is_available = 1
+
+                        <if test="drugUserIdList !=null and drugUserIdList.size > 0">
+                            AND du.id IN
+                            <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+                                #{drugUserId}
+                            </foreach>
+                        </if>
+
+                    <if test="productIdList !=null and productIdList.size > 0">
+                        AND dud.prod_id IN
+                        <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+                            #{productId}
+                        </foreach>
+                    </if>
+
+                    <if test="startTime !=null and endTime !=null">
+                        AND vm.message_time BETWEEN #{startTime}  AND #{endTime}
+                    </if>
+
+                    AND vm.user_type = 2
+
+                UNION ALL
+
+                SELECT DISTINCT
+                    d.id doctor_id,
+                    1 channelNum
+                FROM
+                    t_meeting_attend_details tmad
+                    INNER JOIN doctor d ON tmad.doctor_id = d.id
+                    INNER JOIN t_meeting_data tmd ON tmad.meeting_id = tmd.id
+                    INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+                    INNER JOIN drug_user du ON dud.drug_user_id = du.id
+                WHERE
+                    dud.is_available = 1
+
+
+                    <if test="drugUserIdList !=null and drugUserIdList.size > 0">
+                            AND du.id IN
+                            <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+                                #{drugUserId}
+                            </foreach>
+                        </if>
+
+
+                  <if test="productIdList !=null and productIdList.size > 0">
+                        AND dud.prod_id IN
+                        <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+                            #{productId}
+                        </foreach>
+
+
+                        AND tmd.product_id IN
+                        <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+                            #{productId}
+                        </foreach>
+
+                    </if>
+
+
+                    <if test="startTime !=null and endTime !=null">
+                        AND tmad.attend_start_time BETWEEN #{startTime}  AND #{endTime}
+                    </if>
+
+
+              UNION ALL
+
+                SELECT
+                    doctor_id,
+                    channelNum
+                FROM
+                    (
+                SELECT DISTINCT
+                    d.id doctor_id,
+                    1 channelNum
+                FROM
+                    activity_read ar
+                    INNER JOIN doctor d ON ar.read_person_id = d.id
+                    LEFT JOIN activity_read_ip ari ON ar.read_token = ari.read_token
+                WHERE
+                    ( ari.isp IS NULL OR ari.isp != '阿里云' )
+                    AND ar.read_time >= 50
+
+                     <if test="productIdList !=null and productIdList.size > 0">
+
+                         AND ar.data_id IN ( SELECT content_id FROM t_content_product WHERE product_id IN
+
+                        <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+                            #{productId}
+                        </foreach>
+
+                         )
+                    </if>
+
+
+                    <if test="drugUserIdList !=null and drugUserIdList.size > 0">
+                            AND ar.drug_user_id IN
+                            <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+                                #{drugUserId}
+                            </foreach>
+                    </if>
+
+
+                     <if test="startTime !=null and endTime !=null">
+                        AND ar.create_time BETWEEN #{startTime}  AND #{endTime}
+                    </if>
+
+
+
+                  UNION
+
+                SELECT DISTINCT
+                    d.id doctor_id,
+                    1 channelNum
+                FROM
+                    wx_users wu
+                    INNER JOIN doctor d ON wu.doctor_id = d.id
+                    INNER JOIN wx_user_read wur ON wu.id = wur.user_id
+                    INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+                    INNER JOIN drug_user du ON dud.drug_user_id = du.id
+                WHERE
+                    dud.is_available = 1
+
+                    <if test="drugUserIdList !=null and drugUserIdList.size > 0">
+                            AND du.id IN
+                            <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+                                #{drugUserId}
+                            </foreach>
+                        </if>
+
+
+                     <if test="productIdList !=null and productIdList.size > 0">
+
+                         AND dud.prod_id IN
+
+                        <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+                            #{productId}
+                        </foreach>
+
+
+                    </if>
+
+                    AND wur.read_time >= 50
+
+
+                    <if test="productIdList !=null and productIdList.size > 0">
+
+                         AND wur.content_id IN ( SELECT content_id FROM t_content_product WHERE product_id IN
+
+                        <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+                            #{productId}
+                        </foreach>
+
+                         )
+                    </if>
+
+
+                    <if test="startTime !=null and endTime !=null">
+                        AND wur.create_time BETWEEN #{startTime}  AND #{endTime}
+                    </if>
+
+                    ) t
+                    ) dud
+                GROUP BY
+                    dud.doctor_id
+                HAVING
+                    SUM( dud.channelNum ) >= 3
+            ) tt
+
+
+    </select>
+
+
+
+    <!-- 统计产品设置的各个拜访结果下的医生数量 -->
+    <select id="getVisitResultDoctorNumList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.VisitResultDoctorNumStatisticsResponse">
+
+        SELECT
+            CONCAT(r.visit_result, '招募医生数') visitResult,
+            r.id,
+            IFNULL(COUNT( DISTINCT d.id ), 0) doctorNum
+        FROM
+            virtual_doctor_call_info v
+            INNER JOIN doctor d ON v.virtual_doctor_id = d.id
+            INNER JOIN virtual_doctor_call_info_mend m ON v.id = m.call_id
+            INNER JOIN virtual_doctor_call_info_result re ON m.id = re.mend_id
+            INNER JOIN virtual_product_visit_result r ON re.result_id = r.id
+        WHERE 1=1
+
+        <if test="productIdList !=null and productIdList.size > 0">
+
+            AND v.product_id IN
+
+            <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+                #{productId}
+            </foreach>
+
+            AND r.product_id IN
+
+            <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+                #{productId}
+            </foreach>
+        </if>
+
+
+            <if test="drugUserIdList !=null and drugUserIdList.size > 0">
+                AND v.virtual_drug_user_id IN
+                <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+                    #{drugUserId}
+                </foreach>
+            </if>
+
+            <if test="startTime !=null and endTime !=null">
+                AND v.create_time BETWEEN #{startTime}  AND #{endTime}
+            </if>
+
+
+        GROUP BY
+            r.visit_result
+
+    </select>
+
+
+
+
+    <!-- 统计产品设置的各个拜访结果下的医生数量 -->
+    <select id="getVisitResultHospitalNumList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.VisitResultHospitalNumStatisticsResponse">
+
+        SELECT
+        CONCAT(r.visit_result, '招募医院数') visitResult,
+        r.id,
+        IFNULL(COUNT( DISTINCT d.hospital_id ), 0) hospitalNum
+        FROM
+        virtual_doctor_call_info v
+        INNER JOIN doctor d ON v.virtual_doctor_id = d.id
+        INNER JOIN virtual_doctor_call_info_mend m ON v.id = m.call_id
+        INNER JOIN virtual_doctor_call_info_result re ON m.id = re.mend_id
+        INNER JOIN virtual_product_visit_result r ON re.result_id = r.id
+        WHERE 1=1
+
+        <if test="productIdList !=null and productIdList.size > 0">
+
+            AND v.product_id IN
+
+            <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+                #{productId}
+            </foreach>
+
+            AND r.product_id IN
+
+            <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+                #{productId}
+            </foreach>
+        </if>
+
+
+        <if test="drugUserIdList !=null and drugUserIdList.size > 0">
+            AND v.virtual_drug_user_id IN
+            <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+                #{drugUserId}
+            </foreach>
+        </if>
+
+        <if test="startTime !=null and endTime !=null">
+            AND v.create_time BETWEEN #{startTime}  AND #{endTime}
+        </if>
+
+
+        GROUP BY
+        r.visit_result
+
+    </select>
+
+
+    <!-- 微信回复人数 -->
+    <select id="getWechatReplyDoctorNum" resultType="java.lang.Integer">
+
+        SELECT
+            IFNULL(COUNT( DISTINCT vm.user_id ), 0)
+        FROM
+            virtual_message vm
+            INNER JOIN doctor d ON vm.doctor_id = d.id
+            INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+            INNER JOIN drug_user du ON dud.drug_user_id = du.id
+        WHERE
+            dud.is_available = 1
+            AND vm.user_type =2
+            AND vm.wechat_message_type !='撤回提醒'
+            AND vm.wechat_message_type !='系统消息'
+
+            <if test="productIdList !=null and productIdList.size > 0">
+                AND dud.prod_id IN
+                <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+                    #{productId}
+                </foreach>
+            </if>
+
+
+            <if test="drugUserIdList !=null and drugUserIdList.size > 0">
+                AND dud.drug_user_id IN
+                <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+                    #{drugUserId}
+                </foreach>
+            </if>
+
+
+            <if test="startTime !=null and endTime !=null">
+                AND vm.message_time BETWEEN #{startTime}  AND #{endTime}
+            </if>
+
+
+    </select>
+
+
+
+    <!-- 微信回复人次 -->
+    <select id="getWechatReplyDoctorCount" resultType="java.lang.Integer">
+
+        SELECT
+        IFNULL(COUNT(DISTINCT vm.id), 0)
+        FROM
+        virtual_message vm
+        INNER JOIN doctor d ON vm.doctor_id = d.id
+        INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+        INNER JOIN drug_user du ON dud.drug_user_id = du.id
+        WHERE
+        dud.is_available = 1
+        AND vm.user_type =2
+
+        AND vm.wechat_message_type !='撤回提醒'
+        AND vm.wechat_message_type !='系统消息'
+
+        <if test="productIdList !=null and productIdList.size > 0">
+            AND dud.prod_id IN
+            <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+                #{productId}
+            </foreach>
+        </if>
+
+
+        <if test="drugUserIdList !=null and drugUserIdList.size > 0">
+            AND dud.drug_user_id IN
+            <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+                #{drugUserId}
+            </foreach>
+        </if>
+
+
+        <if test="startTime !=null and endTime !=null">
+            AND vm.message_time BETWEEN #{startTime}  AND #{endTime}
+        </if>
+
+
+    </select>
+
+
+    <!-- 添加微信的人数，根据微信聊天消息判断 -->
+    <select id="addWechatDoctorNum" resultType="java.lang.Integer">
+        SELECT
+            IFNULL(COUNT( DISTINCT vm.doctor_id ), 0)
+        FROM
+            virtual_message vm
+            INNER JOIN doctor d ON vm.doctor_id = d.id
+            INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+            INNER JOIN drug_user du ON dud.drug_user_id = du.id
+        WHERE
+            dud.is_available = 1
+            AND vm.message LIKE '你已添加了%，现在可以开始聊天了。'
+            AND wechat_message_type = '系统消息'
+
+            <if test="productIdList !=null and productIdList.size > 0">
+                AND dud.prod_id IN
+                <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+                    #{productId}
+                </foreach>
+            </if>
+
+
+            <if test="drugUserIdList !=null and drugUserIdList.size > 0">
+                AND du.id IN
+                <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+                    #{drugUserId}
+                </foreach>
+            </if>
+
+
+            <if test="startTime !=null and endTime !=null">
+                AND vm.message_time BETWEEN #{startTime}  AND #{endTime}
+            </if>
+
+    </select>
+
+
+    <!-- 有微信医生人数 -->
+    <select id="hasWechatDoctorNum" resultType="java.lang.Integer">
+
+        SELECT
+            IFNULL(COUNT( DISTINCT d.id ), 0)
+        FROM
+            doctor_mend dm
+            INNER JOIN doctor d ON dm.virtual_doctor_id = d.id
+            INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+            INNER JOIN drug_user du ON dud.drug_user_id = du.id
+        WHERE
+            dud.is_available = 1
+            AND dm.wechat IS NOT NULL
+            AND dm.wechat != ''
+
+            <if test="productIdList !=null and productIdList.size > 0">
+                AND dud.prod_id IN
+                <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+                    #{productId}
+                </foreach>
+            </if>
+
+
+            <if test="drugUserIdList !=null and drugUserIdList.size > 0">
+                AND du.id IN
+                <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+                    #{drugUserId}
+                </foreach>
+            </if>
+
+
+            <if test="startTime !=null and endTime !=null">
+                AND dm.create_time BETWEEN #{startTime}  AND #{endTime}
+            </if>
+
+
+    </select>
+
+
+    <!-- 有需求的医生数 -->
+    <select id="hasDemandDoctorNum" resultType="java.lang.Integer">
+        SELECT
+        IFNULL(COUNT(DISTINCT d.id), 0)
+        FROM virtual_doctor_dynamic_field v
+        INNER JOIN virtual_doctor_dynamic_field_value v1
+        ON v.id=v1.dynamic_field_id
+        INNER JOIN doctor d
+        ON v1.doctor_id=d.id
+        INNER JOIN drug_user_doctor dud
+        ON d.id=dud.doctor_id
+        INNER JOIN drug_user du
+        ON dud.drug_user_id=du.id
+        WHERE
+        v.field_name='医生需求'
+
+        <if test="productIdList !=null and productIdList.size > 0">
+            AND dud.prod_id IN
+            <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+                #{productId}
+            </foreach>
+
+            AND v.product_id IN
+            <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+                #{productId}
+            </foreach>
+        </if>
+
+
+        <if test="drugUserIdList !=null and drugUserIdList.size > 0">
+            AND du.id IN
+            <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+                #{drugUserId}
+            </foreach>
+        </if>
+
+
+        <if test="startTime !=null and endTime !=null">
+            AND v1.create_time BETWEEN #{startTime}  AND #{endTime}
+        </if>
+
+    </select>
+
+
+    <!-- 有AE医生人数 -->
+    <select id="hasAeDoctorNum" resultType="java.lang.Integer">
+
+        SELECT
+            IFNULL(COUNT( DISTINCT d.id ), 0)
+        FROM
+            virtual_doctor_call_info_mend m
+            INNER JOIN doctor d ON m.virtual_doctor_id = d.id
+            INNER JOIN drug_user du ON m.virtual_drug_user_id = du.id
+        WHERE
+            m.is_has_ae = 1
+
+
+        <if test="productIdList !=null and productIdList.size > 0">
+            AND m.product_id IN
+            <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+                #{productId}
+            </foreach>
+        </if>
+
+
+        <if test="drugUserIdList !=null and drugUserIdList.size > 0">
+            AND du.id IN
+            <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+                #{drugUserId}
+            </foreach>
+        </if>
+
+
+        <if test="startTime !=null and endTime !=null">
+            AND m.create_time BETWEEN #{startTime}  AND #{endTime}
+        </if>
+
+
+    </select>
+
+
+    <!-- 退出项目医生人数 -->
+    <select id="quitDoctorNum" resultType="java.lang.Integer">
+
+        SELECT
+        IFNULL(COUNT( DISTINCT d.id ),0)
+        FROM
+        virtual_doctor_call_info_mend m
+        INNER JOIN doctor d ON m.virtual_doctor_id = d.id
+        INNER JOIN drug_user du ON m.virtual_drug_user_id = du.id
+        WHERE
+        m.is_cover = 2
+
+        <if test="productIdList !=null and productIdList.size > 0">
+            AND m.product_id IN
+            <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+                #{productId}
+            </foreach>
+        </if>
+
+
+        <if test="drugUserIdList !=null and drugUserIdList.size > 0">
+            AND du.id IN
+            <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+                #{drugUserId}
+            </foreach>
+        </if>
+
+
+        <if test="startTime !=null and endTime !=null">
+            AND m.create_time BETWEEN #{startTime}  AND #{endTime}
+        </if>
+
+
+    </select>
+
 
 </mapper>

@@ -7,6 +7,7 @@ import com.nuoxin.virtual.rep.api.enums.VisitChannelEnum;
 import com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorCallInfoMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v3_0.DrugUserDoctorCallService;
+import com.nuoxin.virtual.rep.api.utils.CalculateUtil;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.utils.ExportExcelUtil;
 import com.nuoxin.virtual.rep.api.utils.ExportExcelWrapper;
@@ -139,17 +140,7 @@ public class DrugUserDoctorCallServiceImpl implements DrugUserDoctorCallService 
                 c.setTotalCallTime(totalCallTime);
                 c.setLastCallTime(lastCallTime);
                 c.setLastVisitTime(lastVisitTime);
-
-                if (callCount !=null && callCount > 0){
-                    if (connectCallCount == null || connectCallCount == 0){
-                        connectRate = "0%";
-                    }else {
-
-                    }
-                    double v = (double) (connectCallCount * 100) / callCount;
-                    String s = String.format("%.2f", v).toString();
-                    connectRate = s.concat("%");
-                }
+                connectRate = CalculateUtil.getPercentage(connectCallCount, callCount, 2);
 
                 c.setConnectRate(connectRate);
 

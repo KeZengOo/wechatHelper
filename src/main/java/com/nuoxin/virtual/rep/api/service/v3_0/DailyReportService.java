@@ -3,6 +3,8 @@ package com.nuoxin.virtual.rep.api.service.v3_0;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.DailyReportRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DailyReportResponse;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * 日报相关业务接口
  * @author tiancun
@@ -11,10 +13,21 @@ import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DailyReportRespon
 public interface DailyReportService {
 
     /**
-     * 日报返回数据
+     * 日报导出
+     * @param response
+     * @param request
+     * @return
+     */
+    void exportDailyReport(HttpServletResponse response, DailyReportRequest request);
+
+
+
+    /**
+     * 日报
      * @param request
      * @return
      */
     DailyReportResponse getDailyReport(DailyReportRequest request);
+
 
 }
