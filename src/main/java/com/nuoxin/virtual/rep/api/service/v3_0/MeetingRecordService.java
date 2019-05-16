@@ -58,7 +58,8 @@ public interface MeetingRecordService {
      * 会议编辑，根据会议名称更新会议的产品ID
      * @param meetingName
      * @param productId
-     * @return int
+     * @param id
+     * @return boolean
      */
-    boolean updateMeetingSubjectProductIdByMeetingName(String meetingName, Integer productId, String productName);
+    boolean updateMeetingSubjectProductIdByMeetingName(String meetingName, Integer productId, String productName, Integer id);
 }

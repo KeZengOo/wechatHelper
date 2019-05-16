@@ -118,7 +118,8 @@ public interface MeetingRecordMapper {
      * @param meetingName
      * @param productId
      * @param productName
+     * @param id
      * @return int
      */
-    boolean updateMeetingSubjectProductIdByMeetingName(@Param("meetingName")String meetingName, @Param("productId")Integer productId, @Param("productName")String productName);
+    boolean updateMeetingSubjectProductIdByMeetingName(@Param("meetingName")String meetingName, @Param("productId")Integer productId, @Param("productName")String productName, @Param("id")Integer id);
 }

@@ -3,7 +3,6 @@ package com.nuoxin.virtual.rep.api.service;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
-
 import com.nuoxin.virtual.rep.api.web.controller.request.call.Call7mmorRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.IdentifyCallUrlRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.call.Call7mmorResponseBean;
@@ -62,4 +61,10 @@ public interface CallBackService {
 	 * @return boolean
 	 */
 	boolean saveSpeechRecognitionResultCallInfo(Map<String,String> pathMaps, String sinToken);
+
+	/**
+	 * 手动刷新电话录音分割-语音转文字
+	 * @return Integer
+	 */
+	Integer manualRefreshRecordingSegmentation();
 }

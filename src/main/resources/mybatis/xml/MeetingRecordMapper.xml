@@ -15,9 +15,11 @@
         FROM
             t_meeting_data t
         LEFT JOIN t_meeting_attend_details d ON t.id = d.meeting_id AND d.type = 1
+        LEFT JOIN product_doctor_quate p ON t.product_id = p.product_id
         WHERE
             1 = 1
         AND product_id != ''
+        AND d.doctor_id = p.doctor_id
 
         <if test="meetingRecordRequest.productId != 0 and meetingRecordRequest.productId != null">
             AND t.product_id = #{meetingRecordRequest.productId}
@@ -76,10 +78,11 @@
                 SELECT
                     t.doctor_id
                 FROM
-                    drug_user_doctor_quate t
+                    product_doctor_quate t
                 WHERE
                     t.product_id = #{productId}
                 AND t.is_recruit = 1
+                AND t.is_available = 1
                 GROUP BY
                     t.doctor_id
             ) t
@@ -251,6 +254,6 @@ FROM
 
     <!-- 会议编辑，根据会议名称更新会议的产品ID -->
     <update id="updateMeetingSubjectProductIdByMeetingName">
-        UPDATE t_meeting_data SET product_id = #{productId}, product_name = #{productName} WHERE title = #{meetingName}
+        UPDATE t_meeting_data SET product_id = #{productId}, product_name = #{productName} WHERE title = #{meetingName} and  id = #{id}
     </update>
 </mapper>

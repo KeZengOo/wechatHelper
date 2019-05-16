@@ -1135,4 +1135,33 @@
 
     </update>
 
+    <!-- 获取销售代表给医生打电话的表呼出数据Count，并且url不为空 -->
+    <select id="getVirtualDoctorCallInfoCount" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM virtual_doctor_call_info t WHERE t.type = 1 AND t.call_url != ''
+    </select>
+
+    <!-- 获取销售代表给医生打电话的表呼出数据，并且url不为空 -->
+    <select id="getVirtualDoctorCallInfoList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.call.CallInfoResponseBean">
+        SELECT
+            t.id,
+            t.sin_token AS sinToken,
+            t.call_url AS callUrl
+        FROM
+            virtual_doctor_call_info t
+        WHERE
+            t.type = 1
+        AND t.call_url != ''
+        AND t.`status` = 1
+        AND t.id NOT IN (
+            SELECT
+                t.id
+            FROM
+                virtual_doctor_call_info t
+            WHERE
+            	  1 = 1
+            AND (t.sin_token LIKE '%42221378%'
+            OR t.call_url LIKE '%47.92.140.240%')
+        )
+        LIMIT #{current},#{page}
+    </select>
 </mapper>

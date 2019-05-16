@@ -97,20 +97,20 @@ public class AudioConvertUtil {
 	}
 	
 	private static void steroToMonoTest () {
-		String sourceFileName = "E:/m/af668ce5-1e0c-40b3-ace6-57bec0681f37.wav";
+		String sourceFileName = "D:/mp3/4222137807273685.wav";
 	
-		String targeFileName = "E:/m/af668ce5-1e0c-40b3-ace6-57bec0681f37_left.wav";
+		String targeFileName = "D:/mp3/4222137807273685_left.wav";
 		int retVal = encode(sourceFileName, targeFileName, SPLIT_TO_MONO, LEFT_MONO);
 		System.out.println(retVal);
 
-		targeFileName = "E:/m/af668ce5-1e0c-40b3-ace6-57bec0681f37_right.wav";
+		targeFileName = "D:/mp3/4222137807273685_right.wav";
 		retVal = encode(sourceFileName, targeFileName, SPLIT_TO_MONO, RIGHT_MONO);
 		System.out.println(retVal);
 	}
 	
 	private static void mp3ToWavTest() {
-		String sourceFileName = "D:/mp3/bedba0bd-25b7-4c5c-a36e-f294010b56df.mp3";
-		String targeFileName = "D:/mp3/bedba0bd-25b7-4c5c-a36e-f294010b56df.wav";
+		String sourceFileName = "D:/mp3/4222137807273685.mp3";
+		String targeFileName = "D:/mp3/4222137807273685.wav";
 		int retVal = encode(sourceFileName, targeFileName, CONVERT_MP3_TO_WAV, null);
 		System.out.println(retVal);
 	}
@@ -129,6 +129,6 @@ public class AudioConvertUtil {
 
 	public static void main(String args[]) throws IllegalArgumentException, InputFormatException, EncoderException {
 		mp3ToWavTest();
-//		steroToMonoTest();
+		steroToMonoTest();
 	}
 }

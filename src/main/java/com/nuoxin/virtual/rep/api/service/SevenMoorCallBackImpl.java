@@ -229,6 +229,34 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 
 	}
 
+	@Override
+	public Integer manualRefreshRecordingSegmentation(){
+		Integer initPages = 1000;
+		Integer num =0;
+
+		//获取销售代表给医生打电话的表有效的语音数据
+		Integer recordCount = doctorCallInfoMapper.getVirtualDoctorCallInfoCount();
+
+		Integer page = recordCount / initPages;
+
+		for (int i = 0; i <= page; i++){
+			int currentNum = i*initPages;
+			List<CallInfoResponseBean> list = doctorCallInfoMapper.getVirtualDoctorCallInfoList(currentNum,initPages);
+			list.forEach(n->{
+				logger.info("callUrl={}, callInfo中获取的地址：", n.getCallUrl());
+				//分割录音文件并上传阿里云，返回左右声道的阿里云地址
+				Map<String,String> pathMap = splitSpeechAliyunUrlUpdate(n.getCallUrl());
+				logger.info("pathMap={}, 分割录音文件并上传阿里云，返回左右声道的阿里云地址", pathMap);
+				if(pathMap.size() > 0){
+					//根据左右声道的阿里云地址进行语音识别，进行入库
+					boolean result_is_save = saveSpeechRecognitionResultCallInfo(pathMap, n.getSinToken());
+					logger.info("result_is_save={}, 根据左右声道的阿里云地址进行语音识别，进行入库是否成功！", result_is_save);
+				}
+			});
+		}
+		return num;
+	}
+
 	/**
 	 * 新增或者更新电话记录
 	 * @param dealingList

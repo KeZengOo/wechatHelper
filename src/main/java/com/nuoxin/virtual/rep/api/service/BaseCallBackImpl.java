@@ -26,6 +26,9 @@ import com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoParams;
 import com.nuoxin.virtual.rep.api.mybatis.DoctorMapper;
 import com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorCallInfoMapper;
 
+/**
+ * @author tiancun
+ */
 @Transactional
 @Service
 public abstract class BaseCallBackImpl implements CallBackService{
