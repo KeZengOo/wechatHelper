@@ -7,6 +7,8 @@ import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.SecurityService;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
  * 新的 BaseController
@@ -25,7 +27,24 @@ public class NewBaseController {
 	protected DrugUser getDrugUser(HttpServletRequest request) {
 		return sercurityService.getDrugUser(request);
 	}
-	
+
+	/**
+	 * 获取Request
+	 * @author dangjunhui
+	 * @return request
+	 */
+	protected HttpServletRequest getRequest() {
+		return ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+	}
+
+	/**
+	 * 根据 request 从会话变量中获取 DrugUser 信息
+	 * @return 成功返回 DrugUser 对象,否则返回 null
+	 */
+	protected DrugUser getDrugUser() {
+		return sercurityService.getDrugUser(getRequest());
+	}
+
 	/**
 	 * 登录错误信息
 	 * @return

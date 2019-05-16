@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.VisitingDataMapper">
+
+	<!-- 查询符合条件的总记录数 -->
+    <select id="getVisitDataCount" resultType="java.lang.Integer">
+		SELECT
+			COUNT(DISTINCT pl.prod_id, du.id)
+		FROM
+			product_line pl
+		JOIN product_user pu ON pu.prod_id = pl.prod_id
+		JOIN drug_user du ON pu.user_id = du.id
+		JOIN role_user ru ON ru.user_id = du.id
+		WHERE du.leader_path LIKE #{leaderPath} AND ru.role_id IN (104, 105)
+		AND pl.prod_id IN
+		<foreach collection="key.productIdList" item="pro" open="(" separator="," close=")">
+			#{pro}
+		</foreach>
+		<if test="key.drugUserIdList != null and key.drugUserIdList.size() > 0">
+			AND du.id IN
+			<foreach collection="key.drugUserIdList" item="uid" open="(" separator="," close=")">
+				#{uid}
+			</foreach>
+		</if>
+    </select>
+
+	<select id="getVisitDataBaseInfo" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.VisitDataBase">
+		  	SELECT
+				pl.prod_id proId,
+				pl.prod_name productName,
+				du.id userId,
+				du.`name` userName,
+				CASE sale_type
+			WHEN 1 THEN
+				'线上'
+			WHEN 2 THEN
+				'线下'
+			ELSE
+				''
+			END visitWay,
+			 GROUP_CONCAT(r.role_name) saleType
+			FROM
+				product_line pl
+			JOIN product_user pu ON pu.prod_id = pl.prod_id
+			JOIN drug_user du ON pu.user_id = du.id
+			JOIN role_user ru ON ru.user_id = du.id
+			LEFT JOIN role r ON ru.role_id = r.id
+			WHERE
+				du.leader_path LIKE #{leaderPath} AND ru.role_id IN (104, 105)
+			AND pl.prod_id IN
+			<foreach collection="key.productIdList" item="pro" open="(" separator="," close=")">
+				#{pro}
+			</foreach>
+		<if test="key.drugUserIdList != null and key.drugUserIdList.size() > 0">
+			AND du.id IN
+			<foreach collection="key.drugUserIdList" item="uid" open="(" separator="," close=")">
+				#{uid}
+			</foreach>
+		</if>
+			GROUP BY
+				pl.prod_id,
+				du.id
+		LIMIT #{k.currentSize}, #{key.pageSize}
+	</select>
+
+	<select id="" >
+		<!-- 拜访医生数 -->
+		SELECT virtual_drug_user_id, COUNT(DISTINCT virtual_doctor_id) num
+		FROM virtual_doctor_call_info WHERE product_id = #{proId} AND create_time BETWEEN #{startTime} AND #{endTime}
+		AND virtual_drug_user_id IN
+		<foreach collection="list" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+		GROUP BY virtual_drug_user_id
+
+		UNION
+		<!-- 接触医生数 -->
+		SELECT a.drug_user_id, COUNT(DISTINCT a.doctor_id) num  FROM `drug_user_doctor_quate` a
+		JOIN drug_user_doctor_quate_result b ON a.id = b.quate_id
+		JOIN virtual_product_visit_result c ON b.result_id = c.id
+		WHERE a.product_id = #{proId} AND a.create_time BETWEEN #{startTime} AND #{endTime} AND c.visit_type LIKE '%1%'
+		AND a.drug_user_id IN
+		<foreach collection="list" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+		GROUP BY a.drug_user_id
+
+		UNION
+		<!-- 成功医生数 -->
+		SELECT a.drug_user_id, COUNT(DISTINCT a.doctor_id) num  FROM `drug_user_doctor_quate` a
+		JOIN drug_user_doctor_quate_result b ON a.id = b.quate_id
+		JOIN virtual_product_visit_result c ON b.result_id = c.id
+		WHERE a.product_id = #{proId} AND a.create_time BETWEEN #{startTime} AND #{endTime} AND c.visit_type LIKE '%2%'
+		AND a.drug_user_id IN
+		<foreach collection="list" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+		GROUP BY a.drug_user_id
+
+		UNION
+		<!-- 招募医生数 -->
+		SELECT a.drug_user_id, COUNT(DISTINCT a.doctor_id) num  FROM `drug_user_doctor_quate` a
+		WHERE a.is_available = 1 AND a.is_recruit = 1 AND a.create_time BETWEEN #{startTime} AND #{endTime}
+		AND a.product_id = #{proId}
+		AND a.drug_user_id IN
+		<foreach collection="list" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+		GROUP BY a.drug_user_id
+
+		UNION
+		<!-- 覆盖医生数 -->
+		SELECT DISTINCT a.virtual_drug_user_id, a.virtual_doctor_id FROM `virtual_doctor_call_info` a
+		WHERE a.visit_channel = 1 AND a.call_time > 75 AND a.create_time BETWEEN #{startTime} AND #{endTime}
+		AND a.product_id = #{proId}
+		AND a.virtual_drug_user_id IN
+		<foreach collection="list" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+		UNION
+		SELECT DISTINCT a.drug_user_id, b.user_id FROM drug_user_doctor a
+		JOIN `virtual_message` b ON a.doctor_id = b.doctor_id AND a.drug_user_id = b.drug_user_id
+		WHERE a.is_available = 1 AND b.message_time BETWEEN #{startTime} AND #{endTime} AND b.user_type = 2
+		AND b.wechat_message_type NOT IN ('系统消息','撤回提醒')
+		AND a.prod_id = #{proId}
+		AND a.drug_user_id IN
+		<foreach collection="list" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+		UNION
+		SELECT DISTINCT c.drug_user_id, a.doctor_id FROM
+		(
+		SELECT DISTINCT b.doctor_id FROM t_meeting_data t
+		JOIN t_meeting_attend_details b ON t.product_id = #{proId} AND t.id = b.meeting_id
+		WHERE  b.attend_start_time BETWEEN #{startTime} AND #{endTime}
+		) a
+		JOIN drug_user_doctor c ON c.prod_id = #{proId}
+		WHERE
+		c.drug_user_id IN
+		<foreach collection="list" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+
+
+
+		UNION
+		<!-- 电话>75 秒 -->
+		SELECT a.virtual_drug_user_id, COUNT(DISTINCT a.virtual_doctor_id) num FROM `virtual_doctor_call_info` a
+		WHERE a.visit_channel = 1 AND a.call_time > 75 AND a.create_time BETWEEN #{startTime} AND #{endTime}
+		AND a.product_id = #{proId}
+		AND a.virtual_drug_user_id IN
+		<foreach collection="list" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+		GROUP BY a.virtual_drug_user_id
+
+		UNION
+		<!-- 微信回复医生信息 -->
+		SELECT a.drug_user_id, COUNT(DISTINCT b.user_id) num FROM drug_user_doctor a
+		JOIN `virtual_message` b ON a.doctor_id = b.doctor_id AND a.drug_user_id = b.drug_user_id
+		WHERE a.is_available = 1 AND b.message_time BETWEEN #{startTime} AND #{endTime} AND b.user_type = 2
+		AND b.wechat_message_type NOT IN ('系统消息','撤回提醒')
+		AND a.prod_id = #{proId}
+		AND a.drug_user_id IN
+		<foreach collection="list" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+		GROUP BY a.drug_user_id
+
+
+		UNION
+		<!-- 参会医生数量 -->
+		SELECT c.drug_user_id, COUNT(DISTINCT a.doctor_id) num FROM
+		(
+		SELECT DISTINCT a.product_id, b.doctor_id FROM t_meeting_data a
+		JOIN t_meeting_attend_details b ON a.id = b.meeting_id
+		WHERE b.attend_start_time BETWEEN #{startTime} AND #{endTime}
+		) a
+		JOIN drug_user_doctor c ON a.product_id = c.prod_id
+		WHERE c.prod_id = #{proId}
+		AND c.drug_user_id IN
+		<foreach collection="list" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+		GROUP BY c.drug_user_id
+
+		<!-- 参加问卷的医生数量 -->
+
+		<!-- 呼出次数 -->
+		SELECT a.product_id, a.virtual_drug_user_id, COUNT(DISTINCT a.sin_token) num FROM `virtual_doctor_call_info` a
+		WHERE a.visit_channel = 1 AND type = 1 AND a.create_time BETWEEN #{startTime} AND #{endTime}
+		AND a.product_id = #{proId}
+		AND a.virtual_drug_user_id IN
+		<foreach collection="list" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+		GROUP BY a.virtual_drug_user_id
+
+		<!-- 接通次数 -->
+		SELECT a.virtual_drug_user_id, COUNT(DISTINCT a.sin_token) num FROM `virtual_doctor_call_info` a
+		WHERE a.visit_channel = 1 AND status_name = 'answer' AND a.create_time BETWEEN #{startTime} AND #{endTime}
+		AND a.product_id = #{proId}
+		AND a.virtual_drug_user_id IN
+		<foreach collection="list" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+		GROUP BY a.virtual_drug_user_id
+
+		<!-- 总时长 -->
+		SELECT a.virtual_drug_user_id, SUM(call_time) num FROM `virtual_doctor_call_info` a
+		WHERE a.visit_channel = 1 AND a.create_time BETWEEN #{startTime} AND #{endTime}
+		AND a.product_id = #{proId}
+		AND a.virtual_drug_user_id IN
+		<foreach collection="list" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+		GROUP BY a.virtual_drug_user_id
+
+		<!-- 发送人数 -->
+		SELECT a.drug_user_id, COUNT(DISTINCT b.doctor_id) num FROM drug_user_doctor a
+		JOIN `virtual_message` b ON a.doctor_id = b.doctor_id AND a.drug_user_id = b.drug_user_id
+		WHERE a.is_available = 1 AND b.doctor_id > 0 AND b.message_time BETWEEN #{startTime} AND #{endTime} AND user_type = 1
+		AND wechat_message_status = '发送'
+		AND a.prod_id = #{proId}
+		AND a.drug_user_id IN
+		<foreach collection="list" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+		GROUP BY a.drug_user_id
+
+		<!-- 微信添加数 -->
+		SELECT	dud.drug_user_id, COUNT(DISTINCT vm.doctor_id) num
+		FROM virtual_message vm
+		INNER JOIN drug_user_doctor dud ON vm.doctor_id = dud.doctor_id
+		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		WHERE dud.is_available = 1
+		AND vm.message_time BETWEEN #{startTime} AND #{endTime}
+		AND vm.message LIKE '你已添加了%，现在可以开始聊天了。'
+		AND vm.wechat_message_type = '系统消息'
+		AND dud.prod_id = #{proId}
+		AND dud.drug_user_id IN
+		<foreach collection="list" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+		GROUP BY dud.drug_user_id
+
+		<!-- 内容分享统计——发送次数 -->
+		SELECT a.product_id, b.drug_user_id, COUNT(DISTINCT b.share_token) num from
+		t_content_product a,
+		(SELECT share_token, drug_user_id, data_id FROM activity_share WHERE
+		drug_user_id IN
+		<foreach collection="list" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+		AND create_time BETWEEN #{startTime} AND #{endTime} ) b
+		WHERE a.product_id = #{proId} AND a.content_id = b.data_id
+		GROUP BY b.drug_user_id, a.product_id
+		<!-- 内容分享统计——阅读人数 总时长-->
+		SELECT b.drug_user_id, COUNT(DISTINCT r.read_person_id) num, SUM(r.read_time) total from
+		t_content_product a INNER JOIN
+		(SELECT share_token, drug_user_id, data_id FROM activity_share WHERE
+		drug_user_id IN
+		<foreach collection="list" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+		) b ON a.content_id = b.data_id
+		INNER JOIN activity_read r ON r.data_id = b.data_id
+		LEFT JOIN activity_read_ip i ON i.read_token = r.read_token
+		WHERE a.product_id = #{proId} AND r.read_person_id > 0
+		AND r.drug_user_id IN
+		<foreach collection="list" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+		AND r.create_time BETWEEN #{startTime} AND #{endTime}
+		AND (i.isp != '阿里云' OR i.isp IS NULL)
+		GROUP BY b.drug_user_id
+		<!-- 内容分享统计——阅读总时长 -->
+
+
+
+		<!-- 内容分享统计—— >50s医生数 -->
+		SELECT b.drug_user_id, COUNT(DISTINCT r.read_person_id) num total from
+		t_content_product a INNER JOIN
+		(SELECT share_token, drug_user_id, data_id FROM activity_share WHERE
+		drug_user_id IN
+		<foreach collection="list" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+		) b ON a.content_id = b.data_id
+		INNER JOIN activity_read r ON r.data_id = b.data_id
+		LEFT JOIN activity_read_ip i ON i.read_token = r.read_token
+		WHERE a.product_id = #{proId} AND r.read_person_id > 0 AND r.read_time > 50
+		AND r.drug_user_id IN
+		<foreach collection="list" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+		AND r.create_time BETWEEN #{startTime} AND #{endTime}
+		AND (i.isp != '阿里云' OR i.isp IS NULL)
+		GROUP BY b.drug_user_id
+
+	</select>
+
+</mapper>
