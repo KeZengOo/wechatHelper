@@ -95,8 +95,8 @@ public class CallInfoScheduleController {
         Integer callId = 1;
 
         Map<String,String> pathMaps = new HashMap<String,String>(16);
-        pathMaps.put("leftOSSPath","https://nuoxin-virtual-rep-storage.oss-cn-beijing.aliyuncs.com/virtual/2019030715/42b7f644-4199-4d8d-9a55-41eeb1d97585_left.wav");
-        pathMaps.put("rightOSSPath","https://nuoxin-virtual-rep-storage.oss-cn-beijing.aliyuncs.com/virtual/2019030715/42b7f644-4199-4d8d-9a55-41eeb1d97585_right.wav");
+        pathMaps.put("leftOSSPath","https://nuoxin-virtual-rep-storage.oss-cn-beijing.aliyuncs.com/virtual/2019051616/af668ce5-1e0c-40b3-ace6-57bec0681f37_left.wav");
+        pathMaps.put("rightOSSPath","https://nuoxin-virtual-rep-storage.oss-cn-beijing.aliyuncs.com/virtual/2019051616/af668ce5-1e0c-40b3-ace6-57bec0681f37_right.wav");
 
         //根据左右声道的阿里云地址进行语音识别，进行入库
 //        boolean result = callBackService.saveSpeechRecognitionResultCallInfo(pathMap);
@@ -111,4 +111,15 @@ public class CallInfoScheduleController {
         return responseBean;
     }
 
+    /**
+     *  手动刷新电话录音分割-语音转文字
+     */
+    @ApiOperation(value = "手动刷新电话录音分割-语音转文字", notes = "手动刷新电话录音分割-语音转文字")
+    @GetMapping(value = "/manual/refresh/recording/segmentation")
+    public DefaultResponseBean<Integer> manualRefreshRecordingSegmentation() {
+        Integer resultNum = callBackService.manualRefreshRecordingSegmentation();
+        DefaultResponseBean<Integer> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(resultNum);
+        return responseBean;
+    }
 }

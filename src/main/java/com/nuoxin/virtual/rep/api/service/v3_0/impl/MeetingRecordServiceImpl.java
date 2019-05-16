@@ -57,13 +57,26 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
 
         for (int i = 0; i < list.size(); i++){
             MeetingRecordParams m = new MeetingRecordParams();
+            //根据会议id查询参会人员总数
+            int doctorNum = 0;
+            //参加会议的医生中属于该产品的医生总数
+            Integer doctorIdCountByProductId = 0;
+            //根据会议id查询参会人员总数及人员idList
+            List<MeetingAttendDetailsParams> doctorIds = meetingRecordMapper.getMeetingAttendDetailsParamsListByMeetingId(list.get(i).getId());
+
+            if(doctorIds.size() > 0)
+            {
+                //根据产品Id筛选医生IDlist
+                doctorIdCountByProductId = meetingRecordMapper.getDoctorIdsCountByProductId(list.get(i).getProductId(),doctorIds);
+            }
+
             //获取当前产品的招募医生数
             Integer recordNum = meetingRecordMapper.getRecruitHcpAllCountByProduct(list.get(i).getProductId());
             //根据会议标题查询主题数
             Integer subjectCount = meetingRecordMapper.getSubjectCountByMeetingTitle(list.get(i).getTitle());
             m = list.get(i);
             if(recordNum > 0){
-                String result = numberFormat.format((float) list.get(i).getDoctorCount() / (float) recordNum * 100);
+                String result = numberFormat.format((float) doctorIdCountByProductId / (float) recordNum * 100);
                 System.out.println("num1和num2的百分比为:" + result + "%");
                 m.setAttendanceRate(result+"%");
             }
@@ -71,6 +84,7 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
             {
                 m.setAttendanceRate("0%");
             }
+            m.setDoctorCount(doctorIdCountByProductId);
             m.setStartTime(m.getStartTime().substring(0,m.getStartTime().indexOf(".")));
             m.setEndTime(m.getEndTime().substring(0,m.getEndTime().indexOf(".")));
             m.setSubjectNum(subjectCount);
@@ -352,8 +366,8 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
     }
 
     @Override
-    public boolean updateMeetingSubjectProductIdByMeetingName(String meetingName, Integer productId, String productName) {
-        boolean result = meetingRecordMapper.updateMeetingSubjectProductIdByMeetingName(meetingName,productId, productName);
+    public boolean updateMeetingSubjectProductIdByMeetingName(String meetingName, Integer productId, String productName,Integer id) {
+        boolean result = meetingRecordMapper.updateMeetingSubjectProductIdByMeetingName(meetingName,productId, productName,id);
         return result;
     }
 

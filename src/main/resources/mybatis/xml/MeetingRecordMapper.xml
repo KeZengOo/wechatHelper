@@ -10,14 +10,12 @@
             t.product_name AS productName,
             t.title,
             str_to_date(t.start_time, '%Y-%m-%d %H:%i:%s') AS startTime,
-            str_to_date(t.end_time, '%Y-%m-%d %H:%i:%s') AS endTime,
-            COUNT(DISTINCT d.doctor_id) doctorCount
+            str_to_date(t.end_time, '%Y-%m-%d %H:%i:%s') AS endTime
         FROM
             t_meeting_data t
-        LEFT JOIN t_meeting_attend_details d ON t.id = d.meeting_id AND d.type = 1
         WHERE
             1 = 1
-        AND product_id != ''
+        AND t.product_id != ''
 
         <if test="meetingRecordRequest.productId != 0 and meetingRecordRequest.productId != null">
             AND t.product_id = #{meetingRecordRequest.productId}
@@ -76,10 +74,11 @@
                 SELECT
                     t.doctor_id
                 FROM
-                    drug_user_doctor_quate t
+                    product_doctor_quate t
                 WHERE
                     t.product_id = #{productId}
                 AND t.is_recruit = 1
+                AND t.is_available = 1
                 GROUP BY
                     t.doctor_id
             ) t
@@ -251,6 +250,19 @@ FROM
 
     <!-- 会议编辑，根据会议名称更新会议的产品ID -->
     <update id="updateMeetingSubjectProductIdByMeetingName">
-        UPDATE t_meeting_data SET product_id = #{productId}, product_name = #{productName} WHERE title = #{meetingName}
+        UPDATE t_meeting_data SET product_id = #{productId}, product_name = #{productName} WHERE title = #{meetingName} and  id = #{id}
     </update>
+
+    <!-- 根据会议id查询参会人员总数及人员idList -->
+    <select id="getMeetingAttendDetailsParamsListByMeetingId" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingAttendDetailsParams">
+        SELECT DISTINCT t.doctor_id doctorId FROM t_meeting_attend_details t WHERE t.meeting_id = #{meetingId} AND t.doctor_id != ''
+    </select>
+
+    <!-- 根据产品Id筛选医生IDlist -->
+    <select id="getDoctorIdsCountByProductId" resultType="java.lang.Integer">
+        SELECT count(1) FROM product_doctor_quate q WHERE 1=1 AND q.product_id = #{productId} AND q.doctor_id in
+          <foreach collection="list" item="list" separator="," open="(" close=")">
+              #{list.doctorId}
+          </foreach>
+    </select>
 </mapper>

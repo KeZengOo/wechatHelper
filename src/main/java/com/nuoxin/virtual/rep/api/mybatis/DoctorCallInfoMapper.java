@@ -140,10 +140,18 @@ public interface DoctorCallInfoMapper {
      */
     void updateNotAliyunCallUrl(@Param(value = "sinToken") String sinToken,@Param(value = "callUrl") String callUrl);
 
+    /**
+     * 获取销售代表给医生打电话的表呼出数据Count，并且url不为空
+     * @return int
+     */
+    Integer getVirtualDoctorCallInfoCount();
 
-
-
-
-
+    /**
+     * 获取销售代表给医生打电话的表呼出数据，并且url不为空
+     * @param current
+     * @param page
+     * @return list
+     */
+    List<CallInfoResponseBean> getVirtualDoctorCallInfoList(@Param(value = "current") Integer current, @Param(value = "page") Integer page);
 
 }
