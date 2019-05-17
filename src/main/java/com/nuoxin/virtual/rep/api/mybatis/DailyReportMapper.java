@@ -31,6 +31,21 @@ public interface DailyReportMapper {
     Integer recruitHospitalNum(DailyReportRequest reportRequest);
 
 
+    /**
+     * 覆盖医生数
+     * @param reportRequest
+     * @return
+     */
+    Integer coverDoctorNum(DailyReportRequest reportRequest);
+
+    /**
+     * 覆盖医院数
+     * @param reportRequest
+     * @return
+     */
+    Integer coverHospitalNum(DailyReportRequest reportRequest);
+
+
 
     /**
      * 活跃覆盖医生(收益)

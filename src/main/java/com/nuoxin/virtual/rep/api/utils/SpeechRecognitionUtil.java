@@ -409,6 +409,11 @@ public class SpeechRecognitionUtil {
 
 //		System.out.println("leftOSSPath:"+leftOSSPath);
 //		System.out.println("rightOSSPath:"+rightOSSPath);
-    }
+
+
+		String speechRecognitionResult = SpeechRecognitionUtil.getSpeechRecognitionResult("https://nuoxin-virtual-rep-storage.oss-cn-beijing.aliyuncs.com/virtual/2019051318/515b42c9-72ef-48b0-819a-859982b6c3a1.mp3");
+		System.out.println(speechRecognitionResult);
+
+	}
 
 }

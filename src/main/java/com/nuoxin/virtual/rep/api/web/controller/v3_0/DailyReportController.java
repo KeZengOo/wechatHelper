@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,12 +37,31 @@ public class DailyReportController extends NewBaseController {
     private DailyReportService dailyReportService;
 
     @ApiOperation(value = "展示数据")
-    @RequestMapping(value = "/detail", method = { RequestMethod.POST})
+    @PostMapping(value = "/detail")
     public DefaultResponseBean<DailyReportResponse> getDailyReport(@RequestBody DailyReportRequest request){
         DailyReportResponse dailyReport = dailyReportService.getDailyReport(request);
         DefaultResponseBean<DailyReportResponse> responseBean = new DefaultResponseBean<>();
         responseBean.setData(dailyReport);
         return responseBean;
+    }
+
+
+    @ApiOperation(value = "导出")
+    @GetMapping(value = "/export")
+    public void exportDailyReport(HttpServletRequest request, HttpServletResponse response){
+        DrugUser drugUser = super.getDrugUser(request);
+        DailyReportRequest bean = this.getExportParmas(request);
+        dailyReportService.exportDailyReport(response, bean, drugUser);
+
+    }
+
+
+
+    private DailyReportRequest getExportParmas(HttpServletRequest request) {
+
+
+
+        return null;
     }
 
 

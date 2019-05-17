@@ -8,6 +8,8 @@
             SELECT * FROM (
             SELECT du.id drugUserId,
             du.name drugUserName,
+            pl.prod_id productId,
+            pl.prod_name productName,
             GROUP_CONCAT(DISTINCT r.role_name) roleName,
             (
             CASE WHEN du.sale_type IS NULL
@@ -121,6 +123,8 @@
             UNION ALL
             SELECT du.id drugUserId,
             du.name drugUserName,
+            pl.prod_id productId,
+            pl.prod_name productName,
             GROUP_CONCAT(DISTINCT r.role_name) roleName,
             (
             CASE WHEN du.sale_type IS NULL

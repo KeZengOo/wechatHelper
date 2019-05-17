@@ -19,6 +19,12 @@ public class WechatMessageSummaryResponse {
     @ApiModelProperty(value = "代表姓名")
     private String drugUserName;
 
+    @ApiModelProperty(value = "产品ID")
+    private Long productId;
+
+    @ApiModelProperty(value = "产品名称")
+    private String productName;
+
     @ApiModelProperty(value = "角色名称")
     private String roleName;
 
