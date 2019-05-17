@@ -14,8 +14,9 @@ public class PublicGlobalCSVExprot {
      * @param map csv中的标题
      * @param exportData 导出的数据list
      * @param fileds 标题对应的实体字段
+     * @param fileName 下载的文件名称
      */
-    public static void exportCSVFile(HttpServletResponse response, HashMap map, List exportData, String[] fileds) {
+    public static void exportCSVFile(HttpServletResponse response, HashMap map, List exportData, String[] fileds, String fileName) {
         try {
             File tempFile = File.createTempFile("vehicle", ".csv");
             BufferedWriter csvFileOutputStream = null;
@@ -61,7 +62,7 @@ public class PublicGlobalCSVExprot {
             java.io.File fileLoad = new java.io.File(tempFile.getCanonicalPath());
             response.reset();
             response.setContentType("application/csv");
-            String trueCSVName = "contentSharing.csv";
+            String trueCSVName = fileName;
             response.setHeader("Content-Disposition", "attachment; filename = "+ new String(trueCSVName.getBytes("GBK"), "ISO8859-1"));
             long fileLength = fileLoad.length();
             String length1 = String.valueOf(fileLength);

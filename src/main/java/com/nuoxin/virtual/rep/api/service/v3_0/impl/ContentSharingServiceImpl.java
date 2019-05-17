@@ -248,7 +248,7 @@ public class ContentSharingServiceImpl implements ContentSharingService {
         }
 
         //调用导出CSV文件公共方法
-        PublicGlobalCSVExprot.exportCSVFile(response,map,newList,fileds);
+        PublicGlobalCSVExprot.exportCSVFile(response,map,newList,fileds,"contentSharing.csv");
     }
 
 

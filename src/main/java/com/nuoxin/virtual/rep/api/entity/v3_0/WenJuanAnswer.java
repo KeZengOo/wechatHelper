@@ -30,5 +30,6 @@ public class WenJuanAnswer {
     private String user;
     @ApiModelProperty(value = "第n题答案")
     private Integer qTop;
-
+    @ApiModelProperty(value = "答题医生电话")
+    private String telPhone;
 }

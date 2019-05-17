@@ -1162,6 +1162,7 @@
             AND (t.sin_token LIKE '%42221378%'
             OR t.call_url LIKE '%47.92.140.240%')
         )
-        LIMIT #{current},#{page}
+          LIMIT #{current},#{page}
+
     </select>
 </mapper>

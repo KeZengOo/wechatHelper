@@ -33,4 +33,8 @@ public class WenJuanProject {
     private String respondentCount;
     @ApiModelProperty(value = "项目类型")
     private String ptype;
+    @ApiModelProperty(value = "产品ID")
+    private Integer productId;
+    @ApiModelProperty(value = "产品名称")
+    private String productName;
 }

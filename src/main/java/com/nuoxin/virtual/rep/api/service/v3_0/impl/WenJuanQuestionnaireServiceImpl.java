@@ -2,22 +2,27 @@ package com.nuoxin.virtual.rep.api.service.v3_0.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.constant.WenJuanApiConstant;
 import com.nuoxin.virtual.rep.api.entity.v3_0.*;
+import com.nuoxin.virtual.rep.api.entity.v3_0.params.WenJuanInfoParams;
+import com.nuoxin.virtual.rep.api.entity.v3_0.request.WenJuanInfoRequest;
+import com.nuoxin.virtual.rep.api.entity.v3_0.request.WenJuanProjectRequest;
 import com.nuoxin.virtual.rep.api.mybatis.WenJuanQuestionnaireMapper;
 import com.nuoxin.virtual.rep.api.service.v3_0.WenJuanQuestionnaireService;
 import com.nuoxin.virtual.rep.api.utils.EmojiUtil;
 import com.nuoxin.virtual.rep.api.utils.MD5Util;
+import com.nuoxin.virtual.rep.api.utils.csv.PublicGlobalCSVExprot;
+import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * 问卷网
@@ -355,6 +360,44 @@ public class WenJuanQuestionnaireServiceImpl implements WenJuanQuestionnaireServ
         return null;
     }
 
+    @Override
+    public PageResponseBean<List<WenJuanProject>> getWenJuanProjectListPage(WenJuanProjectRequest wenJuanProjectRequest) {
+        //问卷列表
+        List<WenJuanProject> wenJuanProjectList = wenJuanQuestionnaireMapper.getWenJuanProjectListPage(wenJuanProjectRequest);
+        //问卷count
+        Integer count = wenJuanQuestionnaireMapper.getWenJuanProjectCount(wenJuanProjectRequest);
+
+        return new PageResponseBean(wenJuanProjectRequest, count, wenJuanProjectList);
+    }
+
+    @Override
+    public boolean wenJuanProductIdAndNameUpdate(Integer projectId, Integer productId, String productName) {
+        return wenJuanQuestionnaireMapper.wenJuanProductIdAndNameUpdate(projectId,productId,productName);
+    }
+
+    @Override
+    public PageResponseBean<List<WenJuanInfoParams>> getWenJuanInfoListPage(WenJuanInfoRequest wenJuanInfoRequest) {
+        //问卷详情列表
+        List<WenJuanInfoParams> wenJuanProjectList = wenJuanQuestionnaireMapper.getWenJuanInfoList(wenJuanInfoRequest);
+        //问卷详情count
+        Integer count = wenJuanQuestionnaireMapper.getWenJuanInfoListCount(wenJuanInfoRequest);
+
+        return new PageResponseBean(wenJuanInfoRequest, count, wenJuanProjectList);
+    }
+
+    @Override
+    public void wenJuanInfoExportFile(String telPhone, String shortId, Integer seq, HttpServletResponse response) {
+        List<WenJuanAnswer> wenJuanAnswerList = wenJuanQuestionnaireMapper.getWenJuanAnswerListByShortIdAndSeq(telPhone,shortId,seq);
+        HashMap map = new LinkedHashMap();
+        map.put("1", "手机号");
+        map.put("2", "题目");
+        map.put("3", "答案");
+        String fileds[] = new String[] { "telPhone", "title", "answer"};
+
+        //调用导出CSV文件公共方法
+        PublicGlobalCSVExprot.exportCSVFile(response,map,wenJuanAnswerList,fileds,"wenJuanInfo.csv");
+    }
+
     /**
      * 问卷网查看答题者最新一条答卷详情URL
      * @param user
@@ -386,11 +429,12 @@ public class WenJuanQuestionnaireServiceImpl implements WenJuanQuestionnaireServ
         return projectUrl;
     }
 
-
     /**
      * 检查数组是否包含某个值
      */
     public static boolean arrayExistValue(String[] arr, String targetValue) {
         return Arrays.asList(arr).contains(targetValue);
     }
+
+
 }

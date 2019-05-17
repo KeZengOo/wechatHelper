@@ -99,4 +99,147 @@
             wj_answer_sheet t
     </select>
 
+    <!-- 问卷列表分页查询 -->
+    <select id="getWenJuanProjectListPage" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.WenJuanProject">
+        SELECT
+            t.`id`,
+            t.`user`,
+            t.`short_id` AS shortId,
+            t.`project_id` AS projectId,
+            t.`title`,
+            t.`status`,
+            t.`create_time` AS createTime,
+            t.`update_time` AS updateTime,
+            t.`respondent_count` AS respondentCount,
+            t.`ptype`,
+            t.`product_id` AS productId,
+            t.`product_name` AS productName
+        FROM
+            wj_project t
+        WHERE 1=1
+        <if test="wenJuanProjectRequest.productId != 0 and wenJuanProjectRequest.productId != null">
+            AND t.`product_id` = #{wenJuanProjectRequest.productId}
+        </if>
+        <if test="wenJuanProjectRequest.startTimeBefore != '' and wenJuanProjectRequest.startTimeBefore != null">
+            AND t.`create_time` &gt;= #{wenJuanProjectRequest.startTimeBefore}
+        </if>
+
+        <if test="wenJuanProjectRequest.startTimeAfter != '' and wenJuanProjectRequest.startTimeAfter != null">
+            AND t.`create_time` &lt;= #{wenJuanProjectRequest.startTimeAfter}
+        </if>
+
+        <if test="wenJuanProjectRequest.title != '' and wenJuanProjectRequest.title != null">
+            AND t.`title` LIKE "%"#{wenJuanProjectRequest.title}"%"
+        </if>
+        LIMIT #{currentSize}, #{pageSize}
+    </select>
+
+    <!-- 问卷列表Count -->
+    <select id="getWenJuanProjectCount" resultType="java.lang.Integer">
+        SELECT
+          count(1)
+        FROM
+          wj_project t
+        WHERE 1=1
+        <if test="wenJuanProjectRequest.productId != 0 and wenJuanProjectRequest.productId != null">
+            AND t.`product_id` = #{wenJuanProjectRequest.productId}
+        </if>
+        <if test="wenJuanProjectRequest.startTimeBefore != '' and wenJuanProjectRequest.startTimeBefore != null">
+            AND t.`create_time` &gt;= #{wenJuanProjectRequest.startTimeBefore}
+        </if>
+
+        <if test="wenJuanProjectRequest.startTimeAfter != '' and wenJuanProjectRequest.startTimeAfter != null">
+            AND t.`create_time` &lt;= #{wenJuanProjectRequest.startTimeAfter}
+        </if>
+
+        <if test="wenJuanProjectRequest.title != '' and wenJuanProjectRequest.title != null">
+            AND t.`title` LIKE "%"#{wenJuanProjectRequest.title}"%"
+        </if>
+    </select>
+
+    <!-- 问卷列表编辑产品 -->
+    <update id="wenJuanProductIdAndNameUpdate">
+        UPDATE wj_project SET product_id = #{productId} , product_name = #{productName} WHERE id = #{projectId}
+    </update>
+
+    <!-- 问卷详情 -->
+    <select id="getWenJuanInfoList" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.WenJuanInfoParams">
+        SELECT
+            w.id,
+            w.short_id AS shortId,
+            m.read_person_id AS readPersonId,
+            m.read_person_name AS readPersonName,
+            m.wechat_openid AS wechatOpenid,
+            m.data_id AS dataId,
+            w.`start`,
+            w.finish,
+            a.title,
+            a.answer,
+            a.seq,
+            a.q_top AS qTop
+        FROM
+            wj_answer_sheet w
+        LEFT JOIN wj_answer a ON w.seq = a.seq
+        LEFT JOIN (
+            SELECT
+                s.id,
+                s.data_id,
+                s.read_person_id,
+                s.read_person_name,
+                s.wechat_openid,
+                s.create_time
+            FROM
+                activity_read s
+            LEFT JOIN activity_info t ON t.id = s.data_id
+            WHERE
+                t.source_from = '问卷'
+            AND t.content LIKE CONCAT('%/', #{shortId}, '/%')
+            AND s.read_person_id != ''
+            AND s.read_person_name != ''
+            AND s.wechat_openid != ''
+            GROUP BY
+                read_person_id
+        ) m ON a.answer = m.wechat_openid
+        WHERE
+            w.short_id = #{shortId}
+        AND a.q_top = 1
+        LIMIT #{currentSize}, #{pageSize}
+    </select>
+
+    <!-- 问卷详情Count -->
+    <select id="getWenJuanInfoListCount" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.WenJuanInfoParams">
+        SELECT
+            COUNT(1)
+        FROM
+            wj_answer_sheet w
+        LEFT JOIN wj_answer a ON w.seq = a.seq
+        LEFT JOIN (
+            SELECT
+                s.id,
+                s.data_id,
+                s.read_person_id,
+                s.read_person_name,
+                s.wechat_openid,
+                s.create_time
+            FROM
+                activity_read s
+            LEFT JOIN activity_info t ON t.id = s.data_id
+            WHERE
+                t.source_from = '问卷'
+            AND t.content LIKE CONCAT('%/', #{shortId}, '/%')
+            AND s.read_person_id != ''
+            AND s.read_person_name != ''
+            AND s.wechat_openid != ''
+            GROUP BY
+                read_person_id
+        ) m ON a.answer = m.wechat_openid
+        WHERE
+            w.short_id = #{shortId}
+        AND a.q_top = 1
+    </select>
+
+    <!-- 根据项目短ID、答卷序号查询问卷答案集 -->
+    <select id="getWenJuanAnswerListByShortIdAndSeq" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.WenJuanAnswer">
+        SELECT #{telPhone} telPhone , t.title, t.answer FROM wj_answer t WHERE t.short_id = #{shortId} AND t.seq = #{seq}
+    </select>
 </mapper>
