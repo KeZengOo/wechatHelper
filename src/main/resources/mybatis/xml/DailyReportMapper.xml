@@ -65,6 +65,72 @@
             AND m.create_time BETWEEN #{startTime}  AND #{endTime}
         </if>
 
+    </select>
+
+
+    <!-- 覆盖的医生数 -->
+    <select id="coverDoctorNum" resultType="java.lang.Integer">
+        SELECT
+        IFNULL(COUNT(DISTINCT d.id), 0)
+        FROM
+        virtual_doctor_call_info_mend m
+        INNER JOIN doctor d
+        ON m.virtual_doctor_id=d.id
+        WHERE
+        m.is_cover = 1
+
+        <if test="productIdList !=null and productIdList.size > 0">
+            AND m.product_id IN
+            <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+                #{productId}
+            </foreach>
+        </if>
+
+        <if test="drugUserIdList !=null and drugUserIdList.size > 0">
+            AND m.virtual_drug_user_id IN
+            <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+                #{drugUserId}
+            </foreach>
+        </if>
+
+        <if test="startTime !=null and endTime !=null">
+            AND m.create_time BETWEEN #{startTime}  AND #{endTime}
+        </if>
+
+
+
+    </select>
+
+
+    <!-- 覆盖的医院数 -->
+    <select id="coverHospitalNum" resultType="java.lang.Integer">
+        SELECT
+        IFNULL(COUNT(DISTINCT d.id), 0)
+        FROM
+        virtual_doctor_call_info_mend m
+        INNER JOIN doctor d
+        ON m.virtual_doctor_id=d.id
+        WHERE
+        m.is_cover = 1
+
+        <if test="productIdList !=null and productIdList.size > 0">
+            AND m.product_id IN
+            <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+                #{productId}
+            </foreach>
+        </if>
+
+        <if test="drugUserIdList !=null and drugUserIdList.size > 0">
+            AND m.virtual_drug_user_id IN
+            <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+                #{drugUserId}
+            </foreach>
+        </if>
+
+        <if test="startTime !=null and endTime !=null">
+            AND m.create_time BETWEEN #{startTime}  AND #{endTime}
+        </if>
+
 
 
     </select>

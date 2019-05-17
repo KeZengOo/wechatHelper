@@ -21,6 +21,12 @@ public class DailyReportResponse implements Serializable {
     @ApiModelProperty(value = "招募医生数")
     private Integer recruitDoctorNum;
 
+    @ApiModelProperty(value = "覆盖医生数")
+    private Integer coverDoctorNum;
+
+    @ApiModelProperty(value = "覆盖医院率")
+    private String coverDoctorRate;
+
     @ApiModelProperty(value = "目标医生数")
     private Integer targetDoctor;
 
@@ -69,6 +75,13 @@ public class DailyReportResponse implements Serializable {
 
     @ApiModelProperty(value = "招募的医院数")
     private Integer recruitHospitalNum;
+
+    @ApiModelProperty(value = "覆盖医院数")
+    private Integer coverHospitalNum;
+
+    @ApiModelProperty(value = "覆盖医院率")
+    private String coverHospitalRate;
+
 
     @ApiModelProperty(value = "未招募医院")
     private Integer noRecruitHospitalNum;

@@ -2,7 +2,9 @@ package com.nuoxin.virtual.rep.api.service.v3_0.impl;
 
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
+import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.v2_5.ProductVisitResultResponse;
+import com.nuoxin.virtual.rep.api.enums.RoleTypeEnum;
 import com.nuoxin.virtual.rep.api.mybatis.DailyReportMapper;
 import com.nuoxin.virtual.rep.api.mybatis.ProductTargetMapper;
 import com.nuoxin.virtual.rep.api.mybatis.VirtualProductVisitResultMapper;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,16 +43,56 @@ public class DailyReportServiceImpl implements DailyReportService {
 
 
     @Override
-    public void exportDailyReport(HttpServletResponse response, DailyReportRequest request) {
+    public void exportDailyReport(HttpServletResponse response, DailyReportRequest request, DrugUser drugUser) {
         List<Long> productIdList = request.getProductIdList();
         if (CollectionsUtil.isEmptyList(productIdList) || productIdList.size() > 1){
             throw new BusinessException(ErrorEnum.ERROR, "只能选择一个产品！");
         }
 
-        Long productId = productIdList.get(0);
-        Map<String, String> titleMap = this.getExportTitle(productId);
-        Map<String, Object> dataMap = this.getExportData(request);
+        if (CollectionsUtil.isEmptyList(request.getDrugUserIdList())){
+            throw new BusinessException(ErrorEnum.ERROR, "代表不能为空！");
+        }
 
+
+        Long productId = productIdList.get(0);
+        Map<String, String> dailyReportTitle = this.getExportDailyReportTitle(productId);
+        List<LinkedHashMap<String, Object>> dailyReportExportData = this.getAllDailyReportExportData(request, drugUser);
+
+
+    }
+
+    /**
+     * 得到全部的日报导出数据
+     * @param request
+     * @param drugUser
+     * @return
+     */
+    private List<LinkedHashMap<String, Object>> getAllDailyReportExportData(DailyReportRequest request, DrugUser drugUser) {
+
+        List<LinkedHashMap<String, Object>> list = new ArrayList<>();
+        Long roleId = drugUser.getRoleId();
+        if (RoleTypeEnum.MANAGER.getType().equals(roleId) || RoleTypeEnum.PROJECT_MANAGER.getType().equals(roleId)){
+
+            List<Long> drugUserIdList = request.getDrugUserIdList();
+            for (Long drugUserId : drugUserIdList) {
+                List<Long> selectDrugUserIdList = new ArrayList<>();
+                selectDrugUserIdList.add(drugUserId);
+                request.setDrugUserIdList(selectDrugUserIdList);
+                LinkedHashMap<String, Object> exportDailyReportData = this.getExportDailyReportData(request);
+                list.add(exportDailyReportData);
+            }
+
+        }else{
+
+            List<Long> drugUserIdList = new ArrayList<>();
+            drugUserIdList.add(drugUser.getId());
+            request.setDrugUserIdList(drugUserIdList);
+            LinkedHashMap<String, Object> exportDailyReportData = this.getExportDailyReportData(request);
+            list.add(exportDailyReportData);
+        }
+
+
+        return list;
 
 
     }
@@ -59,6 +102,13 @@ public class DailyReportServiceImpl implements DailyReportService {
 
         // 招募医生数
         Integer recruitDoctorNum = dailyReportMapper.recruitDoctorNum(request);
+
+        // 覆盖医生数
+        Integer coverDoctorNum = dailyReportMapper.coverDoctorNum(request);
+
+        // 覆盖医院数
+        Integer coverHospitalNum = dailyReportMapper.coverHospitalNum(request);
+
 
         // 未招募医生数
         Integer noRecruitDoctorNum = 0;
@@ -130,6 +180,10 @@ public class DailyReportServiceImpl implements DailyReportService {
 
         List<VisitResultHospitalNumStatisticsResponse> visitResultHospitalNumList = dailyReportMapper.getVisitResultHospitalNumList(request);
 
+        //CalculateUtil.getPercentage();
+
+
+
 
         DailyReportResponse dailyReportResponse = new DailyReportResponse();
         dailyReportResponse.setRecruitDoctorNum(recruitDoctorNum);
@@ -161,7 +215,7 @@ public class DailyReportServiceImpl implements DailyReportService {
      * @param request
      * @return
      */
-    private Map<String, Object> getExportData(DailyReportRequest request){
+    private LinkedHashMap<String, Object> getExportDailyReportData(DailyReportRequest request){
 
         DailyReportResponse dailyReport = this.getDailyReport(request);
         Integer recruitDoctorNum = dailyReport.getRecruitDoctorNum();
@@ -183,7 +237,7 @@ public class DailyReportServiceImpl implements DailyReportService {
         String recruitHospitalRate = dailyReport.getRecruitHospitalRate();
         List<VisitResultHospitalNumStatisticsResponse> visitResultHospitalNumList = dailyReport.getVisitResultHospitalNumList();
 
-        Map<String, Object> dataMap = new LinkedHashMap<>();
+        LinkedHashMap<String, Object> dataMap = new LinkedHashMap<>();
 
         dataMap.put("recruitDoctorNum", recruitDoctorNum);
         dataMap.put("activeCoverDoctorNum", activeCoverDoctorNum);
@@ -231,7 +285,7 @@ public class DailyReportServiceImpl implements DailyReportService {
      * @param productId
      * @return
      */
-    private Map<String, String> getExportTitle(Long productId) {
+    private Map<String, String> getExportDailyReportTitle(Long productId) {
 
         Map<String, String> titleMap = new LinkedHashMap<>();
         titleMap.put("recruitDoctorNum", "招募医生数");

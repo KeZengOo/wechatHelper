@@ -1,5 +1,6 @@
 package com.nuoxin.virtual.rep.api.service.v3_0;
 
+import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.DailyReportRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DailyReportResponse;
 
@@ -16,9 +17,10 @@ public interface DailyReportService {
      * 日报导出
      * @param response
      * @param request
+     * @param drugUser
      * @return
      */
-    void exportDailyReport(HttpServletResponse response, DailyReportRequest request);
+    void exportDailyReport(HttpServletResponse response, DailyReportRequest request, DrugUser drugUser);
 
 
 
