@@ -14,7 +14,7 @@ public class TimeUtil {
      * @param seconds 秒
      * @return 天 时 分 秒
      */
-    public String alterCallTimeContent(Long seconds) {
+    public static String alterCallTimeContent(Long seconds) {
         if (seconds == null || seconds == 0){
             return "";
         }
