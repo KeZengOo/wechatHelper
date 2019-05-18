@@ -6,12 +6,12 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
- * 问卷详情params
+ * 问卷详情Request
  * @author wujiang
  * @date 20190517
  */
 @Data
-@ApiModel("问卷详情params")
+@ApiModel("问卷详情Request")
 public class WenJuanInfoRequest extends PageRequestBean {
     @ApiModelProperty(value = "项目短ID")
     private String shortId;

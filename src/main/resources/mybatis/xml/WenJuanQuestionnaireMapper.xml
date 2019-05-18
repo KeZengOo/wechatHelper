@@ -131,7 +131,7 @@
         <if test="wenJuanProjectRequest.title != '' and wenJuanProjectRequest.title != null">
             AND t.`title` LIKE "%"#{wenJuanProjectRequest.title}"%"
         </if>
-        LIMIT #{currentSize}, #{pageSize}
+        LIMIT #{wenJuanProjectRequest.currentSize}, #{wenJuanProjectRequest.pageSize}
     </select>
 
     <!-- 问卷列表Count -->
@@ -193,7 +193,7 @@
             LEFT JOIN activity_info t ON t.id = s.data_id
             WHERE
                 t.source_from = '问卷'
-            AND t.content LIKE CONCAT('%/', #{shortId}, '/%')
+            AND t.content LIKE CONCAT('%/', #{wenJuanInfoRequest.shortId}, '/%')
             AND s.read_person_id != ''
             AND s.read_person_name != ''
             AND s.wechat_openid != ''
@@ -201,13 +201,13 @@
                 read_person_id
         ) m ON a.answer = m.wechat_openid
         WHERE
-            w.short_id = #{shortId}
+            w.short_id = #{wenJuanInfoRequest.shortId}
         AND a.q_top = 1
-        LIMIT #{currentSize}, #{pageSize}
+        LIMIT #{wenJuanInfoRequest.currentSize}, #{wenJuanInfoRequest.pageSize}
     </select>
 
     <!-- 问卷详情Count -->
-    <select id="getWenJuanInfoListCount" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.WenJuanInfoParams">
+    <select id="getWenJuanInfoListCount" resultType="java.lang.Integer">
         SELECT
             COUNT(1)
         FROM
@@ -226,7 +226,7 @@
             LEFT JOIN activity_info t ON t.id = s.data_id
             WHERE
                 t.source_from = '问卷'
-            AND t.content LIKE CONCAT('%/', #{shortId}, '/%')
+            AND t.content LIKE CONCAT('%/', #{wenJuanInfoRequest.shortId}, '/%')
             AND s.read_person_id != ''
             AND s.read_person_name != ''
             AND s.wechat_openid != ''
@@ -234,7 +234,7 @@
                 read_person_id
         ) m ON a.answer = m.wechat_openid
         WHERE
-            w.short_id = #{shortId}
+            w.short_id = #{wenJuanInfoRequest.shortId}
         AND a.q_top = 1
     </select>
 

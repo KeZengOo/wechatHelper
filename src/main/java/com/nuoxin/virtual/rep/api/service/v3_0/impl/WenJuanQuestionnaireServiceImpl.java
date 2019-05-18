@@ -13,7 +13,6 @@ import com.nuoxin.virtual.rep.api.service.v3_0.WenJuanQuestionnaireService;
 import com.nuoxin.virtual.rep.api.utils.EmojiUtil;
 import com.nuoxin.virtual.rep.api.utils.MD5Util;
 import com.nuoxin.virtual.rep.api.utils.csv.PublicGlobalCSVExprot;
-import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
