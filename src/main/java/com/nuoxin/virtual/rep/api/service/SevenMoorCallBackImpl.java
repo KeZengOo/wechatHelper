@@ -231,16 +231,18 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 
 	@Override
 	public Integer manualRefreshRecordingSegmentation(){
-		Integer initPages = 1000;
+		Integer initPages = 500;
 		Integer num =0;
 
 		//获取销售代表给医生打电话的表有效的语音数据
-		Integer recordCount = doctorCallInfoMapper.getVirtualDoctorCallInfoCount();
+//		Integer recordCount = doctorCallInfoMapper.getVirtualDoctorCallInfoCount();
 
-		Integer page = recordCount / initPages;
+//		Integer page = recordCount / initPages;
+		Integer page = 0;
 
 		for (int i = 0; i <= page; i++){
-			int currentNum = i*initPages;
+//			int currentNum = i*initPages;
+			int currentNum = 0;
 			List<CallInfoResponseBean> list = doctorCallInfoMapper.getVirtualDoctorCallInfoList(currentNum,initPages);
 			list.forEach(n->{
 				logger.info("callUrl={}, callInfo中获取的地址：", n.getCallUrl());
