@@ -30,6 +30,9 @@ public class LoginResponseBean implements Serializable {
     @ApiModelProperty(value = "销售类型，0是没有类型为经理的，1是线上销售，2是线下销售")
     private Integer saleType;
 
+    @ApiModelProperty(value = "线上线下")
+    private String saleTypeName;
+
     private DrugUserCallDetaiBean callBean;
 
 }

@@ -6,8 +6,8 @@ package com.nuoxin.virtual.rep.api.enums;
  */
 public enum  OnOffLineEnum {
 
-    ONLINE(1,"线上代表"),
-    OFFLINE(2,"线下代表"),
+    ONLINE(1,"线上"),
+    OFFLINE(2,"线下"),
     OTHER(0, "经理");
 
 

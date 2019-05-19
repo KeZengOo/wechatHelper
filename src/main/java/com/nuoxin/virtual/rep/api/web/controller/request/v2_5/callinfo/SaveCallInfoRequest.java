@@ -45,7 +45,6 @@ public class SaveCallInfoRequest  extends BaseCallInfoRequest{
 //	@ApiModelProperty(value = "拜访结果,以字符串数组形式传入具体文字如[\"成功招募\",\"成功传递\"]")
 //	private List<String> visitResult;
 
-	@NotNull(message="拜访结果ID不能为空")
 	@ApiModelProperty(value = "")
 	private List<Long> visitResultId;
 

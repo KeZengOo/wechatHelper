@@ -5,11 +5,14 @@ import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
 import com.nuoxin.virtual.rep.api.common.util.mem.SessionMemUtils;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
+import com.nuoxin.virtual.rep.api.enums.OnOffLineEnum;
+import com.nuoxin.virtual.rep.api.enums.SaleUserTypeEnum;
 import com.nuoxin.virtual.rep.api.service.*;
 import com.nuoxin.virtual.rep.api.web.controller.request.LoginRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.UpdatePwdRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserCallDetaiBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.LoginResponseBean;
+import com.sun.org.apache.bcel.internal.generic.SALOAD;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -168,6 +171,15 @@ public class LoginController extends BaseController {
 		loginBean.setRoleId(drugUser.getRoleId());
 		loginBean.setRoleName(drugUser.getRoleName());
 		loginBean.setVirtualDrugUserId(drugUser.getId());
+		Integer saleType = drugUser.getSaleType();
+		if (OnOffLineEnum.ONLINE.getUserType().equals(saleType)){
+			loginBean.setSaleTypeName(OnOffLineEnum.ONLINE.getUserTypeName());
+		}else if (OnOffLineEnum.OFFLINE.getUserType().equals(saleType)){
+			loginBean.setSaleTypeName(OnOffLineEnum.OFFLINE.getUserTypeName());
+		}else {
+			loginBean.setSaleTypeName(OnOffLineEnum.OTHER.getUserTypeName());
+		}
+
 		loginBean.setSaleType(drugUser.getSaleType());
 		loginBean.setCallBean(JSON.parseObject(drugUser.getCallInfo(), DrugUserCallDetaiBean.class));
 
