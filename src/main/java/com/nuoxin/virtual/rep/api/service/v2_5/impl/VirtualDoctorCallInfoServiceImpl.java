@@ -19,6 +19,7 @@ import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.CallRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.VisitHistoryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.*;
+import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.PurposeRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.product.ProductResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VisitCountResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VisitResultResponseBean;
@@ -85,6 +86,10 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	public boolean saveConnectedCallInfo(SaveCallInfoRequest saveRequest) {
 		this.configSaveCallInfoRequestValue(saveRequest);
 
+		// 填充上拜访结果ID字段
+		this.fillVisitResultIdList(saveRequest);
+
+
 		// 电话拜访主键值
 		Long callId = saveRequest.getCallInfoId();
 		if (callId != null && callId > 0) {
@@ -105,11 +110,36 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 
 
 		// 保存电话拜访的目的
-		List<String> purposeList = saveRequest.getPurposeList();
-		if (CollectionsUtil.isNotEmptyList(purposeList)){
-			callInfoMapper.addCallPurpose(callId, purposeList);
-		}
+		List<PurposeRequest> purposeRequestList = saveRequest.getPurposeRequestList();
+
+		callInfoMapper.addCallPurpose(purposeRequestList);
+
 		return false;
+	}
+
+	/**
+	 * 填充上拜访ID
+	 * @param saveRequest
+	 */
+	private void fillVisitResultIdList(SaveCallInfoRequest saveRequest) {
+
+		Long callId = saveRequest.getCallInfoId();
+		List<PurposeRequest> purposeRequestList = saveRequest.getPurposeRequestList();
+		if (CollectionsUtil.isEmptyList(purposeRequestList)){
+			throw new BusinessException(ErrorEnum.ERROR, "拜访目的不能为空！");
+		}
+
+		List<Long> visitResultIdList = new ArrayList<>();
+		purposeRequestList.forEach(p->{
+			p.setCallId(callId);
+			List<Long> resultIdList = p.getResultIdList();
+			visitResultIdList.addAll(resultIdList);
+		});
+
+		List<Long> resultIdList = visitResultIdList.stream().distinct().collect(Collectors.toList());
+		saveRequest.setVisitResultId(resultIdList);
+
+
 	}
 
 	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)

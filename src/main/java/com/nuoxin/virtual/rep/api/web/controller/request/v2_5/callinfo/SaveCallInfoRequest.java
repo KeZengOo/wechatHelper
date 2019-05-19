@@ -7,6 +7,7 @@ import javax.validation.constraints.NotNull;
 
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.questionnaire.VirtualQuestionRequestBean;
 
+import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.PurposeRequest;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -62,8 +63,12 @@ public class SaveCallInfoRequest  extends BaseCallInfoRequest{
 	@ApiModelProperty(value = "作答结果")
 	
 	@NotNull(message="questions is null")
-	List<VirtualQuestionRequestBean> questions = new ArrayList<>();
+	private List<VirtualQuestionRequestBean> questions = new ArrayList<>();
 
-	@ApiModelProperty(value = "拜访目的")
-	List<String> purposeList = new ArrayList<>();
+//	@ApiModelProperty(value = "拜访目的")
+//	List<String> purposeList = new ArrayList<>();
+
+	@ApiModelProperty(value = "拜访目的请求参数，和拜访结果相关联")
+	@NotNull(message = "拜访结果不能为空")
+	private List<PurposeRequest> purposeRequestList;
 }

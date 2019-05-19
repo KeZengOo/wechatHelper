@@ -10,6 +10,7 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.VisitCoun
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.statistics.DailyStatisticsRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.DrugUserDoctorCallDetailRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.DrugUserDoctorCallRequest;
+import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.PurposeRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.CallTelephoneReponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VisitCountResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DrugUserDoctorCallDetailResponse;
@@ -244,10 +245,9 @@ public interface VirtualDoctorCallInfoMapper {
 
 	/**
 	 * 新增拜访的目的
-	 * @param callId
-	 * @param purposeList
+	 * @param purposeRequestList
 	 */
-	void addCallPurpose(@Param(value = "callId") Long callId,@Param(value = "purposeList") List<String> purposeList);
+	void addCallPurpose(List<PurposeRequest> purposeRequestList);
 
 
 	/**
