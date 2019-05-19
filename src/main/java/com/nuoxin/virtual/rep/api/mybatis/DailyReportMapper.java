@@ -132,6 +132,14 @@ public interface DailyReportMapper {
 
 
     /**
+     * 微信回复医生人数，分日期
+     * @param reportRequest
+     * @return
+     */
+    List<VisitDoctorStatisticsResponse> getVisitDateWechatReplyDoctorNum(DailyReportRequest reportRequest);
+
+
+    /**
      * 微信回复医生人次
      * @param reportRequest
      * @return
@@ -177,7 +185,7 @@ public interface DailyReportMapper {
 
 
     /**
-     * 拜访医生数：
+     * 拜访医生数，分日期
      * 所有打电话的医生+拜访登记的医生+参会医生+微信聊过天的医生（无论医生是否回复）+ 短信分享文章 + 小程序阅读
      * @param reportRequest
      * @return
@@ -187,7 +195,7 @@ public interface DailyReportMapper {
 
 
     /**
-     * 拜访医院数：
+     * 拜访医院数，分日期
      * 所有打电话的医生+拜访登记的医生+参会医生+微信聊过天的医生（无论医生是否回复）+ 短信分享文章 + 小程序阅读
      * @param reportRequest
      * @return
@@ -270,7 +278,7 @@ public interface DailyReportMapper {
      * @param visitChannel
      * @return
      */
-    List<VisitCountStatisticsResponse> visitDateCallDoctorNum(DailyReportRequest reportRequest,@Param(value = "visitChannel") Integer visitChannel);
+    List<VisitDoctorStatisticsResponse> visitDateCallDoctorNum(@Param(value = "request") DailyReportRequest reportRequest,@Param(value = "visitChannel") Integer visitChannel);
 
 
 
@@ -278,11 +286,20 @@ public interface DailyReportMapper {
 
 
     /**
-     * 电话接通数,分日期
+     * 电话接通次数数,分日期
      * @param reportRequest
      * @return
      */
     List<VisitCountStatisticsResponse> visitDateCallConnectCount(DailyReportRequest reportRequest);
+
+
+    /**
+     * 电话接通医生数,分日期
+     * @param reportRequest
+     * @return
+     */
+    List<VisitDoctorStatisticsResponse> visitDateCallConnectDoctorNum(DailyReportRequest reportRequest);
+
 
     /**
      * 参会医生数
@@ -297,7 +314,7 @@ public interface DailyReportMapper {
      * @param reportRequest
      * @return
      */
-    List<VisitCountStatisticsResponse> visitDateAttendMeetingDoctorNum(DailyReportRequest reportRequest);
+    List<VisitDoctorStatisticsResponse> visitDateAttendMeetingDoctorNum(DailyReportRequest reportRequest);
 
 
     /**
@@ -314,6 +331,6 @@ public interface DailyReportMapper {
      * @param reportRequest
      * @return
      */
-    List<VisitCountStatisticsResponse> visitDateReadDoctorNum(DailyReportRequest reportRequest);
+    List<VisitDoctorStatisticsResponse> visitDateReadDoctorNum(DailyReportRequest reportRequest);
 
 }

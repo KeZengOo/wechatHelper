@@ -200,6 +200,40 @@ public final class DateUtil {
 
 
     /**
+     * 获取两个日期之间的日期集合， yyyy-MM-dd格式
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    public static List<String> getDays(Date startTime, Date endTime) {
+
+        // 返回的日期集合
+        List<String> days = new ArrayList<>();
+
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+
+            Calendar tempStart = Calendar.getInstance();
+            tempStart.setTime(startTime);
+
+            Calendar tempEnd = Calendar.getInstance();
+            tempEnd.setTime(endTime);
+            tempEnd.add(Calendar.DATE, +1);// 日期加1(包含结束)
+            while (tempStart.before(tempEnd)) {
+                days.add(dateFormat.format(tempStart.getTime()));
+                tempStart.add(Calendar.DAY_OF_YEAR, 1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return days;
+    }
+
+
+
+    /**
      * 获取两个日期之间的日期天数
      * @param startTime
      * @param endTime

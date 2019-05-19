@@ -716,6 +716,51 @@
 
 
 
+    <!-- 微信回复人数，分日期 -->
+    <select id="getVisitDateWechatReplyDoctorNum" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.VisitDoctorStatisticsResponse">
+
+        SELECT
+        DATE_FORMAT(vm.message_time, '%Y-%m-%d') visitDate,
+        IFNULL(COUNT( DISTINCT vm.user_id ), 0) doctorNum
+        FROM
+        virtual_message vm
+        INNER JOIN doctor d ON vm.doctor_id = d.id
+        INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+        INNER JOIN drug_user du ON dud.drug_user_id = du.id
+        WHERE
+        dud.is_available = 1
+        AND vm.user_type =2
+        AND vm.wechat_message_type !='撤回提醒'
+        AND vm.wechat_message_type !='系统消息'
+
+        <if test="productIdList !=null and productIdList.size > 0">
+            AND dud.prod_id IN
+            <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+                #{productId}
+            </foreach>
+        </if>
+
+
+        <if test="drugUserIdList !=null and drugUserIdList.size > 0">
+            AND dud.drug_user_id IN
+            <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+                #{drugUserId}
+            </foreach>
+        </if>
+
+
+        <if test="startTime !=null and endTime !=null">
+            AND vm.message_time BETWEEN #{startTime}  AND #{endTime}
+        </if>
+
+        GROUP BY DATE_FORMAT(vm.message_time, '%Y-%m-%d')
+
+
+    </select>
+
+
+
+
     <!-- 微信回复人次 -->
     <select id="getWechatReplyDoctorCount" resultType="java.lang.Integer">
 
@@ -961,7 +1006,7 @@
             WHERE 1=1
 
                  <if test="drugUserIdList !=null and drugUserIdList.size > 0">
-                    v.virtual_drug_user_id IN
+                    AND v.virtual_drug_user_id IN
                     <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
                         #{drugUserId}
                     </foreach>
@@ -1133,7 +1178,7 @@
         WHERE 1=1
 
         <if test="drugUserIdList !=null and drugUserIdList.size > 0">
-            v.virtual_drug_user_id IN
+            AND v.virtual_drug_user_id IN
             <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
                 #{drugUserId}
             </foreach>
@@ -1788,7 +1833,7 @@
 
 
         <if test="productIdList !=null and productIdList.size > 0">
-            AND v.content_id IN ( SELECT content_id FROM t_content_product WHERE product_id IN
+            AND v.product_id IN ( SELECT content_id FROM t_content_product WHERE product_id IN
             <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
                 #{productId}
             </foreach>
@@ -1806,7 +1851,7 @@
 
 
     <!-- 不同拜访渠道的医生统计结果，分日期-->
-    <select id="visitDateCallDoctorNum" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.VisitCountStatisticsResponse">
+    <select id="visitDateCallDoctorNum" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.VisitDoctorStatisticsResponse">
 
         SELECT
         COUNT(DISTINCT d.id) visitCount,
@@ -1816,9 +1861,9 @@
         ON v.virtual_doctor_id=d.id
         WHERE v.visit_channel=#{visitChannel}
 
-        <if test="drugUserIdList !=null and drugUserIdList.size > 0">
+        <if test="request.drugUserIdList !=null and request.drugUserIdList.size > 0">
             AND v.virtual_drug_user_id IN
-            <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+            <foreach collection="request.drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
                 #{drugUserId}
             </foreach>
         </if>
@@ -1826,9 +1871,9 @@
 
 
 
-        <if test="productIdList !=null and productIdList.size > 0">
-            AND v.content_id IN ( SELECT content_id FROM t_content_product WHERE product_id IN
-            <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+        <if test="request.productIdList !=null and request.productIdList.size > 0">
+            AND v.product_id IN ( SELECT content_id FROM t_content_product WHERE product_id IN
+            <foreach collection="request.productIdList" item="productId" open="(" close=")" separator=",">
                 #{productId}
             </foreach>
 
@@ -1836,8 +1881,8 @@
 
         </if>
 
-        <if test="startTime !=null and endTime !=null">
-            AND v.create_time BETWEEN #{startTime}  AND #{endTime}
+        <if test="request.startTime !=null and request.endTime !=null">
+            AND v.create_time BETWEEN #{request.startTime}  AND #{request.endTime}
         </if>
 
         GROUP BY DATE_FORMAT(v.create_time, '%Y-%m-%d')
@@ -1940,6 +1985,41 @@
     </select>
 
 
+    <!-- 电话接通医生数数,分日期 -->
+    <select id="visitDateCallConnectDoctorNum" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.VisitDoctorStatisticsResponse">
+
+        SELECT IFNULL(COUNT(DISTINCT d.id), 0) doctorNum,
+        DATE_FORMAT(v.create_time, '%Y-%m-%d') visitDate
+        FROM virtual_doctor_call_info v
+        INNER JOIN doctor d
+        ON v.virtual_doctor_id=d.id
+        WHERE v.visit_channel=1
+        AND v.status_name='answer'
+        <if test="drugUserIdList !=null and drugUserIdList.size > 0">
+            AND v.virtual_drug_user_id IN
+            <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+                #{drugUserId}
+            </foreach>
+        </if>
+
+        <if test="productIdList !=null and productIdList.size > 0">
+            AND v.product_id IN
+            <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+                #{productId}
+            </foreach>
+
+        </if>
+
+
+        <if test="startTime !=null and endTime !=null">
+            AND v.create_time BETWEEN #{startTime}  AND #{endTime}
+        </if>
+
+        GROUP BY DATE_FORMAT(create_time, '%Y-%m-%d')
+
+    </select>
+
+
 
 
     <!-- 参会医生人数 -->
@@ -1985,10 +2065,10 @@
 
 
     <!-- 参会医生人数, 分日期 -->
-    <select id="visitDateAttendMeetingDoctorNum" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.VisitCountStatisticsResponse">
+    <select id="visitDateAttendMeetingDoctorNum" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.VisitDoctorStatisticsResponse">
 
         SELECT
-        IFNULL(COUNT(DISTINCT d.id), 0) visitCount,
+        IFNULL(COUNT(DISTINCT d.id), 0) doctorNum,
         DATE_FORMAT(tmad.attend_start_time, '%Y-%m-%d') visitDate
         FROM
         t_meeting_attend_details tmad
@@ -2113,11 +2193,12 @@
 
 
     <!-- 阅读医生数, 分日期-->
-    <select id="visitDateReadDoctorNum" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.VisitCountStatisticsResponse">
+    <select id="visitDateReadDoctorNum" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.VisitDoctorStatisticsResponse">
 
-        SELECT IFNULL(COUNT(*), 0) FROM (
+        SELECT IFNULL(COUNT(DISTINCT t.doctorId), 0) doctorNum,
+        t.visitDate FROM (
         SELECT
-        DISTINCT d.id
+        DISTINCT d.id doctorId, DATE_FORMAT(ar.create_time, '%Y-%m-%d') visitDate
         FROM
         activity_read ar
         INNER JOIN doctor d
@@ -2153,7 +2234,7 @@
         UNION
 
         SELECT DISTINCT
-        d.id
+        d.id doctorId, DATE_FORMAT(wur.create_time, '%Y-%m-%d') visitDate
         FROM
         wx_users wu
         INNER JOIN doctor d ON wu.doctor_id = d.id
@@ -2187,8 +2268,9 @@
         <if test="startTime !=null and endTime !=null">
             AND wur.create_time BETWEEN #{startTime} AND #{endTime}
         </if>
-
         ) t
+        GROUP BY t.visitDate
+
     </select>
 
 </mapper>

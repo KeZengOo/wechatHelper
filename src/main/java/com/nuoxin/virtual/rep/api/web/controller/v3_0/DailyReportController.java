@@ -1,8 +1,12 @@
 package com.nuoxin.virtual.rep.api.web.controller.v3_0;
 
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
+import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
+import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.v3_0.DailyReportService;
+import com.nuoxin.virtual.rep.api.utils.DateUtil;
+import com.nuoxin.virtual.rep.api.utils.StringUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.DailyReportRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DailyReportResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.*;
@@ -14,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -153,12 +158,41 @@ public class DailyReportController extends NewBaseController {
     }
 
 
-
+    /**
+     * 得到导出请求参数
+     * @param request
+     * @return
+     */
     private DailyReportRequest getExportParmas(HttpServletRequest request) {
+        String productIdStr = request.getParameter("productIdStr");
+        String drugUserIdStr = request.getParameter("drugUserIdStr");
+        String startTimeStr = request.getParameter("startTime");
+        String endTimeStr = request.getParameter("endTime");
+        List<Long> productIdList;
+        List<Long> drugUserIdList;
 
+        try {
+            productIdList = StringUtil.getIdList(productIdStr);
+        }catch (Exception e){
+            throw new BusinessException(ErrorEnum.ERROR, "产品ID输入不合法，多个以逗号分开");
+        }
 
+        try {
+            drugUserIdList = StringUtil.getIdList(drugUserIdStr);
+        }catch (Exception e){
+            throw new BusinessException(ErrorEnum.ERROR, "代表ID输入不合法，多个以逗号分开");
+        }
 
-        return null;
+        Date startTime = DateUtil.stringToDate(startTimeStr, DateUtil.DATE_FORMAT_YMD);
+        Date endTime = DateUtil.stringToDate(endTimeStr, DateUtil.DATE_FORMAT_YMD);
+
+        DailyReportRequest dailyReportRequest = new DailyReportRequest();
+        dailyReportRequest.setDrugUserIdList(drugUserIdList);
+        dailyReportRequest.setProductIdList(productIdList);
+        dailyReportRequest.setStartTime(startTime);
+        dailyReportRequest.setEndTime(endTime);
+
+        return dailyReportRequest;
     }
 
 
