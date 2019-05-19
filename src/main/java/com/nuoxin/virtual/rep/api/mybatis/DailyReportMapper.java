@@ -269,7 +269,7 @@ public interface DailyReportMapper {
      * @param visitChannel
      * @return
      */
-    Integer callDoctorNum(DailyReportRequest reportRequest,@Param(value = "visitChannel") Integer visitChannel);
+    Integer callDoctorNum(@Param(value = "request") DailyReportRequest reportRequest,@Param(value = "visitChannel") Integer visitChannel);
 
 
     /**

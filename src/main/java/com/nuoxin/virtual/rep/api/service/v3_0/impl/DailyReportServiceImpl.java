@@ -353,9 +353,41 @@ public class DailyReportServiceImpl implements DailyReportService {
     @Override
     public List<VisitChannelDoctorNumResponse> getVisitChannelDoctorNumList(DailyReportRequest request) {
 
-        List<VisitChannelDoctorNumResponse> visitChannelDoctorNumList = dailyReportMapper.getVisitChannelDoctorNumList(request);
 
-        return visitChannelDoctorNumList;
+        List<VisitChannelDoctorNumResponse> list = new ArrayList<>();
+        // 不能合起来用一个SQL查询
+        Integer wechatDoctorNum = dailyReportMapper.callDoctorNum(request, VisitChannelEnum.WECHAT.getVisitChannel());
+        VisitChannelDoctorNumResponse wechatVisit = new VisitChannelDoctorNumResponse();
+        wechatVisit.setVisitChannel(VisitChannelEnum.WECHAT.getVisitChannel());
+        wechatVisit.setVisitChannelStr(VisitChannelEnum.WECHAT.getVisitChannelStr());
+        wechatVisit.setDoctorNum(wechatDoctorNum);
+        list.add(wechatVisit);
+
+
+        Integer interviewDoctorNum = dailyReportMapper.callDoctorNum(request, VisitChannelEnum.INTERVIEW.getVisitChannel());
+        VisitChannelDoctorNumResponse interviewVisit = new VisitChannelDoctorNumResponse();
+        interviewVisit.setVisitChannel(VisitChannelEnum.INTERVIEW.getVisitChannel());
+        interviewVisit.setVisitChannelStr(VisitChannelEnum.INTERVIEW.getVisitChannelStr());
+        interviewVisit.setDoctorNum(interviewDoctorNum);
+        list.add(interviewVisit);
+
+
+        Integer smsDoctorNum = dailyReportMapper.callDoctorNum(request, VisitChannelEnum.MESSAGE.getVisitChannel());
+        VisitChannelDoctorNumResponse smsVisit = new VisitChannelDoctorNumResponse();
+        smsVisit.setVisitChannel(VisitChannelEnum.MESSAGE.getVisitChannel());
+        smsVisit.setVisitChannelStr(VisitChannelEnum.MESSAGE.getVisitChannelStr());
+        smsVisit.setDoctorNum(smsDoctorNum);
+        list.add(smsVisit);
+
+
+        Integer emailDoctorNum = dailyReportMapper.callDoctorNum(request, VisitChannelEnum.EMAIL.getVisitChannel());
+        VisitChannelDoctorNumResponse emailVisit = new VisitChannelDoctorNumResponse();
+        emailVisit.setVisitChannel(VisitChannelEnum.EMAIL.getVisitChannel());
+        emailVisit.setVisitChannelStr(VisitChannelEnum.EMAIL.getVisitChannelStr());
+        emailVisit.setDoctorNum(emailDoctorNum);
+        list.add(emailVisit);
+
+        return list;
     }
 
     @Override
@@ -474,7 +506,7 @@ public class DailyReportServiceImpl implements DailyReportService {
     public HospitalRecruitResponse getHospitalRecruit(DailyReportRequest request) {
         ProductTargetResponseBean productTarget = productTargetMapper.getProductTarget(request.getProductIdList().get(0));
         Integer targetHospital = 0;
-        if (targetHospital != null){
+        if (productTarget != null){
             targetHospital = productTarget.getTargetDoctor();
             if (targetHospital == null || targetHospital < 0){
                 targetHospital = 0;
