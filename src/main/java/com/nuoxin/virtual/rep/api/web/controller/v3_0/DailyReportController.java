@@ -109,6 +109,15 @@ public class DailyReportController extends NewBaseController {
     }
 
 
+    @ApiOperation(value = "医生其他维度统计")
+    @PostMapping(value = "/doctor/visit")
+    public DefaultResponseBean<DoctorVisitResponse> getDoctorVisit(@RequestBody DailyReportRequest request){
+        DoctorVisitResponse doctorVisit = dailyReportService.getDoctorVisit(request);
+        DefaultResponseBean<DoctorVisitResponse> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(doctorVisit);
+        return responseBean;
+    }
+
 
 
     @ApiOperation(value = "导出")

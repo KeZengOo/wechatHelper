@@ -355,6 +355,30 @@ public class DailyReportServiceImpl implements DailyReportService {
         return hospitalRecruit;
     }
 
+    @Override
+    public DoctorVisitResponse getDoctorVisit(DailyReportRequest request) {
+        Integer wechatReplyDoctorNum = dailyReportMapper.getWechatReplyDoctorNum(request);
+        Integer wechatReplyDoctorCount = dailyReportMapper.getWechatReplyDoctorCount(request);
+        Integer hasWechatDoctorNum = dailyReportMapper.hasWechatDoctorNum(request);
+        Integer addWechatDoctorNum = dailyReportMapper.addWechatDoctorNum(request);
+        Integer hasAeDoctorNum = dailyReportMapper.hasAeDoctorNum(request);
+        Integer hasDemandDoctorNum = dailyReportMapper.hasDemandDoctorNum(request);
+        Integer quitDoctorNum = dailyReportMapper.quitDoctorNum(request);
+
+
+        DoctorVisitResponse doctorVisit = new DoctorVisitResponse();
+        doctorVisit.setDoctorReplyDoctorNum(wechatReplyDoctorNum);
+        doctorVisit.setDoctorReplyDoctorCount(wechatReplyDoctorCount);
+        doctorVisit.setHasWechatDoctorNum(hasWechatDoctorNum);
+        doctorVisit.setAddWechatDoctorNum(addWechatDoctorNum);
+        doctorVisit.setHasAeDoctorNum(hasAeDoctorNum);
+        doctorVisit.setHasDemandDoctorNum(hasDemandDoctorNum);
+        doctorVisit.setQuitDoctorNum(quitDoctorNum);
+
+        return doctorVisit;
+
+    }
+
 
     /**
      * 导出的Excel数据

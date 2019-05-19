@@ -90,4 +90,11 @@ public interface DailyReportService {
     HospitalRecruitResponse getHospitalRecruit(DailyReportRequest request);
 
 
+    /**
+     * 医生拜访的指标统计
+     * @param request
+     * @return
+     */
+    DoctorVisitResponse getDoctorVisit(DailyReportRequest request);
+
 }
