@@ -89,6 +89,29 @@ public class DailyReportController extends NewBaseController {
     }
 
 
+
+    @ApiOperation(value = "不同拜访结果类型医生人数统计")
+    @PostMapping(value = "/visit/result/type/doctor/num")
+    public DefaultResponseBean<List<VisitTypeDoctorNumStatisticsResponse>> getVisitTypeDoctorNum(@RequestBody DailyReportRequest request){
+        List<VisitTypeDoctorNumStatisticsResponse> visitTypeDoctorNum = dailyReportService.getVisitTypeDoctorNum(request);
+        DefaultResponseBean<List<VisitTypeDoctorNumStatisticsResponse>> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(visitTypeDoctorNum);
+        return responseBean;
+    }
+
+
+    @ApiOperation(value = "不同拜访结果类型医院人数统计")
+    @PostMapping(value = "/visit/result/type/hospital/num")
+    public DefaultResponseBean<List<VisitTypeHospitalNumStatisticsResponse>> getVisitTypeHospitalNum(@RequestBody DailyReportRequest request){
+        List<VisitTypeHospitalNumStatisticsResponse> visitTypeHospitalNum = dailyReportService.getVisitTypeHospitalNum(request);
+        DefaultResponseBean<List<VisitTypeHospitalNumStatisticsResponse>> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(visitTypeHospitalNum);
+        return responseBean;
+    }
+
+
+
+
     @ApiOperation(value = "招募医生统计")
     @PostMapping(value = "/doctor/recruit")
     public DefaultResponseBean<DoctorRecruitResponse> getDoctorRecruit(@RequestBody DailyReportRequest request){
