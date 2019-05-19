@@ -15,8 +15,8 @@ import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.DailyReportRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.statistics.ProductTargetResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DailyReportResponse;
-import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.VisitResultDoctorNumStatisticsResponse;
-import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.VisitResultHospitalNumStatisticsResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.VisitResultDoctorNumStatisticsResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.VisitResultHospitalNumStatisticsResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.CallVisitStatisticsResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.MyAchievementResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.VisitChannelDoctorNumResponse;
@@ -277,6 +277,21 @@ public class DailyReportServiceImpl implements DailyReportService {
         List<VisitChannelDoctorNumResponse> visitChannelDoctorNumList = dailyReportMapper.getVisitChannelDoctorNumList(request);
 
         return visitChannelDoctorNumList;
+    }
+
+    @Override
+    public List<VisitResultDoctorNumStatisticsResponse> getVisitResultDoctorNum(DailyReportRequest request) {
+        List<VisitResultDoctorNumStatisticsResponse> visitResultDoctorNumList = dailyReportMapper.getVisitResultDoctorNumList(request);
+        return visitResultDoctorNumList;
+    }
+
+    @Override
+    public List<VisitResultHospitalNumStatisticsResponse> getVisitResultHospitalNum(DailyReportRequest request) {
+
+        List<VisitResultHospitalNumStatisticsResponse> visitResultHospitalNumList = dailyReportMapper.getVisitResultHospitalNumList(request);
+
+        return visitResultHospitalNumList;
+
     }
 
 

@@ -576,10 +576,10 @@
 
 
     <!-- 统计产品设置的各个拜访结果下的医生数量 -->
-    <select id="getVisitResultDoctorNumList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.VisitResultDoctorNumStatisticsResponse">
+    <select id="getVisitResultDoctorNumList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.VisitResultDoctorNumStatisticsResponse">
 
         SELECT
-            CONCAT(r.visit_result, '招募医生数') visitResult,
+            r.visit_result visitResult,
             r.id,
             IFNULL(COUNT( DISTINCT d.id ), 0) doctorNum
         FROM
@@ -627,10 +627,10 @@
 
 
     <!-- 统计产品设置的各个拜访结果下的医生数量 -->
-    <select id="getVisitResultHospitalNumList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.VisitResultHospitalNumStatisticsResponse">
+    <select id="getVisitResultHospitalNumList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.VisitResultHospitalNumStatisticsResponse">
 
         SELECT
-        CONCAT(r.visit_result, '招募医院数') visitResult,
+        r.visit_result visitResult,
         r.id,
         IFNULL(COUNT( DISTINCT d.hospital_id ), 0) hospitalNum
         FROM

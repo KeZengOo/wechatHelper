@@ -1,4 +1,4 @@
-package com.nuoxin.virtual.rep.api.web.controller.response.v3_0;
+package com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

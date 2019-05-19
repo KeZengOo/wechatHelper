@@ -4,6 +4,8 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.DailyReportRequest
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.*;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.CallVisitStatisticsResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.VisitChannelDoctorNumResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.VisitResultDoctorNumStatisticsResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.VisitResultHospitalNumStatisticsResponse;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -104,8 +106,6 @@ public interface DailyReportMapper {
      * @return
      */
     List<VisitChannelDoctorNumResponse> getVisitChannelDoctorNumList(DailyReportRequest reportRequest);
-
-
 
 
     /**

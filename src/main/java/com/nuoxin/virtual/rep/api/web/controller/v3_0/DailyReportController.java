@@ -5,10 +5,8 @@ import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.v3_0.DailyReportService;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.DailyReportRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DailyReportResponse;
-import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.CallVisitStatisticsResponse;
-import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.VisitChannelDoctorNumResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.*;
 import com.nuoxin.virtual.rep.api.web.controller.v2_5.NewBaseController;
-import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.MyAchievementResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
@@ -67,6 +65,26 @@ public class DailyReportController extends NewBaseController {
         List<VisitChannelDoctorNumResponse> visitChannelDoctorNumList = dailyReportService.getVisitChannelDoctorNumList(request);
         DefaultResponseBean<List<VisitChannelDoctorNumResponse>> responseBean = new DefaultResponseBean<>();
         responseBean.setData(visitChannelDoctorNumList);
+        return responseBean;
+    }
+
+
+    @ApiOperation(value = "不同拜访结果医生人数统计")
+    @PostMapping(value = "/visit/result/doctor/num")
+    public DefaultResponseBean<List<VisitResultDoctorNumStatisticsResponse>> getVisitResultDoctorNum(@RequestBody DailyReportRequest request){
+        List<VisitResultDoctorNumStatisticsResponse> visitResultDoctorNum = dailyReportService.getVisitResultDoctorNum(request);
+        DefaultResponseBean<List<VisitResultDoctorNumStatisticsResponse>> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(visitResultDoctorNum);
+        return responseBean;
+    }
+
+
+    @ApiOperation(value = "不同拜访结果医院人数统计")
+    @PostMapping(value = "/visit/result/hospital/num")
+    public DefaultResponseBean<List<VisitResultHospitalNumStatisticsResponse>> getVisitResultHospitalNum(@RequestBody DailyReportRequest request){
+        List<VisitResultHospitalNumStatisticsResponse> visitResultHospitalNum = dailyReportService.getVisitResultHospitalNum(request);
+        DefaultResponseBean<List<VisitResultHospitalNumStatisticsResponse>> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(visitResultHospitalNum);
         return responseBean;
     }
 
