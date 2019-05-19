@@ -48,6 +48,9 @@ public class DrugUser extends IdEntity {
     @Transient
     private Long roleId;
 
+    @Transient
+    private String roleName;
+
     public String getName() {
         return name;
     }
@@ -158,5 +161,14 @@ public class DrugUser extends IdEntity {
 
     public void setSaleType(Integer saleType) {
         this.saleType = saleType;
+    }
+
+
+    public String getRoleName() {
+        return roleName;
+    }
+
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
     }
 }

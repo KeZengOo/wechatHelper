@@ -3,10 +3,15 @@ package com.nuoxin.virtual.rep.api.service;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.common.util.PasswordEncoder;
+import com.nuoxin.virtual.rep.api.dao.RoleRepository;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
+import com.nuoxin.virtual.rep.api.entity.Role;
+import com.nuoxin.virtual.rep.api.mybatis.DrugUserMapper;
 import com.nuoxin.virtual.rep.api.web.controller.request.LoginRequestBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
 
 /**
  * Created by fenggang on 9/11/17.
@@ -20,6 +25,10 @@ public class LoginService {
     @Autowired
     private RoleUserService roleUserService;
 
+    @Resource
+    private DrugUserMapper drugUserMapper;
+
+
 	public DrugUser login(LoginRequestBean bean) {
 		DrugUser drugUser = drugUserService.findByEmail(bean.getUserName());
 		if (drugUser == null) {
@@ -31,8 +40,11 @@ public class LoginService {
 		}
 		
 		drugUser.setLeaderPath(drugUser.getLeaderPath() + "%");
-		drugUser.setRoleId(roleUserService.checkVirtualRole(drugUser.getId()));
-		
+		Long roleId = roleUserService.checkVirtualRole(drugUser.getId());
+		drugUser.setRoleId(roleId);
+		String roleName = drugUserMapper.getRoleNameById(roleId);
+		drugUser.setRoleName(roleName);
+
 		return drugUser;
 	}
 }

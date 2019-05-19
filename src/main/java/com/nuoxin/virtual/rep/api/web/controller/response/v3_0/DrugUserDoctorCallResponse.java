@@ -33,6 +33,9 @@ public class DrugUserDoctorCallResponse  implements Serializable{
     @ApiModelProperty(value = "代表姓名")
     private String drugUserName;
 
+    @ApiModelProperty(value = "代表角色")
+    private String drugUserRole;
+
     @ApiModelProperty(value = "线上或者线下")
     private String drugUserVisitType;
 

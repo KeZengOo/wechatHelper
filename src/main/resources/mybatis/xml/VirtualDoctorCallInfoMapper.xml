@@ -1554,6 +1554,7 @@
 			pl.prod_name productName,
 			du.id drugUserId,
 			du.NAME drugUserName,
+		    GROUP_CONCAT(DISTINCT ro.role_name) drugUserRole,
 			(
 			CASE
 
@@ -1636,6 +1637,10 @@
 				FROM
 					virtual_doctor_call_info v
 					INNER JOIN drug_user du ON v.virtual_drug_user_id = du.id
+					LEFT JOIN role_user ru
+					ON du.id=ru.user_id AND ru.role_id > 100
+					LEFT JOIN role ro
+					ON ru.role_id=ro.id
 					INNER JOIN doctor d ON v.virtual_doctor_id = d.id
 					INNER JOIN product_doctor_quate q ON v.product_id = q.product_id
 					AND v.virtual_doctor_id = q.doctor_id

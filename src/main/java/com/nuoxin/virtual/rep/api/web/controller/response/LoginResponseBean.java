@@ -19,8 +19,12 @@ public class LoginResponseBean implements Serializable {
     private String name;
     @ApiModelProperty(value = "邮箱")
     private String email;
-    @ApiModelProperty(value = "角色（101-普通虚拟代表，102-虚拟代表管理员）")
+    @ApiModelProperty(value = "角色 101-普通虚拟代表，102-虚拟代表管理员, 103 项目管理员，104 招募，105 覆盖")
     private Long roleId;
+
+    @ApiModelProperty(value = "给前端前端展示用")
+    private String roleName;
+
     @ApiModelProperty(value = "虚拟代表ID")
     private Long virtualDrugUserId;
     @ApiModelProperty(value = "销售类型，0是没有类型为经理的，1是线上销售，2是线下销售")

@@ -166,6 +166,7 @@ public class LoginController extends BaseController {
 		loginBean.setName(drugUser.getName());
 		loginBean.setEmail(drugUser.getEmail());
 		loginBean.setRoleId(drugUser.getRoleId());
+		loginBean.setRoleName(drugUser.getRoleName());
 		loginBean.setVirtualDrugUserId(drugUser.getId());
 		loginBean.setSaleType(drugUser.getSaleType());
 		loginBean.setCallBean(JSON.parseObject(drugUser.getCallInfo(), DrugUserCallDetaiBean.class));

@@ -157,4 +157,11 @@ public interface DrugUserMapper extends MyMapper<DrugUser> {
                                                     @Param(value = "productId") Long productId,
                                                     @Param(value = "roleId") Long roleId);
 
+    /**
+     * 根据角色ID查询名称
+     * @param roleId
+     * @return
+     */
+    String getRoleNameById(@Param(value = "roleId") Long roleId);
+
 }

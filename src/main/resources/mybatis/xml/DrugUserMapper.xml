@@ -321,5 +321,10 @@
             AND ru.role_id =#{roleId}
     </select>
 
+
+    <select id="getRoleNameById" resultType="java.lang.String">
+        SELECT role_name FROM role WHERE id=#{roleId}
+    </select>
+
     
 </mapper>

@@ -1,11 +1,13 @@
 package com.nuoxin.virtual.rep.api.service;
 
+import com.nuoxin.virtual.rep.api.dao.RoleRepository;
 import com.nuoxin.virtual.rep.api.dao.RoleUserRepository;
 import com.nuoxin.virtual.rep.api.entity.RoleUser;
 import com.nuoxin.virtual.rep.api.enums.RoleTypeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -16,6 +18,8 @@ public class RoleUserService {
 
     @Autowired
     private RoleUserRepository roleUserRepository;
+
+
 
     /**
      * 获取企业用户权限
