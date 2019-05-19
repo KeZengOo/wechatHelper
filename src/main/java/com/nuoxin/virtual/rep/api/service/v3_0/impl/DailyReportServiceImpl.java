@@ -15,11 +15,7 @@ import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.DailyReportRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.statistics.ProductTargetResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DailyReportResponse;
-import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.VisitResultDoctorNumStatisticsResponse;
-import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.VisitResultHospitalNumStatisticsResponse;
-import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.CallVisitStatisticsResponse;
-import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.MyAchievementResponse;
-import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.VisitChannelDoctorNumResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.*;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -292,6 +288,71 @@ public class DailyReportServiceImpl implements DailyReportService {
 
         return visitResultHospitalNumList;
 
+    }
+
+    @Override
+    public DoctorRecruitResponse getDoctorRecruit(DailyReportRequest request) {
+        ProductTargetResponseBean productTarget = productTargetMapper.getProductTarget(request.getProductIdList().get(0));
+        Integer targetDoctor = 0;
+        if (productTarget != null){
+            targetDoctor = productTarget.getTargetDoctor();
+            if (targetDoctor == null || targetDoctor < 0){
+                targetDoctor = 0;
+            }
+        }
+
+
+        Integer recruitDoctorNum = dailyReportMapper.recruitDoctorNum(request);
+        Integer noRecruitDoctorNum = targetDoctor - recruitDoctorNum;
+        if (noRecruitDoctorNum == null || noRecruitDoctorNum < 0){
+            noRecruitDoctorNum = 0;
+        }
+
+
+        String recruitRate = CalculateUtil.getPercentage(recruitDoctorNum, targetDoctor, 2);
+
+
+        DoctorRecruitResponse doctorRecruit = new DoctorRecruitResponse();
+
+        doctorRecruit.setRecruitDoctorNum(recruitDoctorNum);
+        doctorRecruit.setNoRecruitDoctorNum(noRecruitDoctorNum);
+        doctorRecruit.setTargetDoctor(targetDoctor);
+        doctorRecruit.setRecruitRate(recruitRate);
+
+
+        return doctorRecruit;
+
+    }
+
+    @Override
+    public HospitalRecruitResponse getHospitalRecruit(DailyReportRequest request) {
+        ProductTargetResponseBean productTarget = productTargetMapper.getProductTarget(request.getProductIdList().get(0));
+        Integer targetHospital = 0;
+        if (targetHospital != null){
+            targetHospital = productTarget.getTargetDoctor();
+            if (targetHospital == null || targetHospital < 0){
+                targetHospital = 0;
+            }
+        }
+
+
+        Integer recruitHospitalNum = dailyReportMapper.recruitHospitalNum(request);
+        Integer noRecruitHospitallNum = targetHospital - recruitHospitalNum;
+        if (noRecruitHospitallNum == null || noRecruitHospitallNum < 0){
+            noRecruitHospitallNum = 0;
+        }
+
+        String recruitRate = CalculateUtil.getPercentage(recruitHospitalNum, targetHospital, 2);
+
+        HospitalRecruitResponse hospitalRecruit = new HospitalRecruitResponse();
+
+        hospitalRecruit.setRecruitHospitalNum(recruitHospitalNum);
+        hospitalRecruit.setNoRecruitHospitalNum(noRecruitHospitallNum);
+        hospitalRecruit.setTargetHospital(targetHospital);
+        hospitalRecruit.setRecruitRate(recruitRate);
+
+
+        return hospitalRecruit;
     }
 
 

@@ -89,6 +89,26 @@ public class DailyReportController extends NewBaseController {
     }
 
 
+    @ApiOperation(value = "招募医生统计")
+    @PostMapping(value = "/doctor/recruit")
+    public DefaultResponseBean<DoctorRecruitResponse> getDoctorRecruit(@RequestBody DailyReportRequest request){
+        DoctorRecruitResponse doctorRecruit = dailyReportService.getDoctorRecruit(request);
+        DefaultResponseBean<DoctorRecruitResponse> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(doctorRecruit);
+        return responseBean;
+    }
+
+
+    @ApiOperation(value = "招募医院统计")
+    @PostMapping(value = "/hospital/recruit")
+    public DefaultResponseBean<HospitalRecruitResponse> getHospitalRecruit(@RequestBody DailyReportRequest request){
+        HospitalRecruitResponse hospitalRecruit = dailyReportService.getHospitalRecruit(request);
+        DefaultResponseBean<HospitalRecruitResponse> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(hospitalRecruit);
+        return responseBean;
+    }
+
+
 
 
     @ApiOperation(value = "导出")

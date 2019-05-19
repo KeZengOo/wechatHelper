@@ -73,4 +73,21 @@ public interface DailyReportService {
      */
     List<VisitResultHospitalNumStatisticsResponse> getVisitResultHospitalNum(DailyReportRequest request);
 
+
+    /**
+     * 招募医生统计
+     * @param request
+     * @return
+     */
+    DoctorRecruitResponse getDoctorRecruit(DailyReportRequest request);
+
+
+    /**
+     * 招募医院统计
+     * @param request
+     * @return
+     */
+    HospitalRecruitResponse getHospitalRecruit(DailyReportRequest request);
+
+
 }
