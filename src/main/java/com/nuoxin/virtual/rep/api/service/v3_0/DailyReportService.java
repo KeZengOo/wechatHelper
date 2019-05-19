@@ -3,7 +3,8 @@ package com.nuoxin.virtual.rep.api.service.v3_0;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.DailyReportRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DailyReportResponse;
-import com.nuoxin.virtual.rep.api.web.controller.v3_0.daily.MyAchievementResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.CallVisitStatisticsResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.MyAchievementResponse;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -40,6 +41,13 @@ public interface DailyReportService {
      */
     MyAchievementResponse getMyAchievement(DailyReportRequest request);
 
+
+    /**
+     * 电话拜访统计，次数，时长
+     * @param request
+     * @return
+     */
+    CallVisitStatisticsResponse getCallVisitStatistics(DailyReportRequest request);
 
 
 

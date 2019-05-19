@@ -1,18 +1,13 @@
 package com.nuoxin.virtual.rep.api.web.controller.v3_0;
 
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
-import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
-import com.nuoxin.virtual.rep.api.entity.v3_0.params.ContentSharingParams;
-import com.nuoxin.virtual.rep.api.entity.v3_0.request.ContentSharingRequest;
 import com.nuoxin.virtual.rep.api.service.v3_0.DailyReportService;
-import com.nuoxin.virtual.rep.api.service.v3_0.MyDoctorService;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.DailyReportRequest;
-import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.MyDoctorRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DailyReportResponse;
-import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.MyDoctorResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.CallVisitStatisticsResponse;
 import com.nuoxin.virtual.rep.api.web.controller.v2_5.NewBaseController;
-import com.nuoxin.virtual.rep.api.web.controller.v3_0.daily.MyAchievementResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.MyAchievementResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
@@ -20,9 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 我的客户相关接口
@@ -55,6 +47,17 @@ public class DailyReportController extends NewBaseController {
         responseBean.setData(myAchievement);
         return responseBean;
     }
+
+
+    @ApiOperation(value = "电话拜访统计")
+    @PostMapping(value = "/call/statistics")
+    public DefaultResponseBean<CallVisitStatisticsResponse> getCallVisitStatistics(@RequestBody DailyReportRequest request){
+        CallVisitStatisticsResponse callVisitStatistics = dailyReportService.getCallVisitStatistics(request);
+        DefaultResponseBean<CallVisitStatisticsResponse> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(callVisitStatistics);
+        return responseBean;
+    }
+
 
 
 

@@ -8,6 +8,7 @@ import com.nuoxin.virtual.rep.api.enums.RoleTypeEnum;
 import com.nuoxin.virtual.rep.api.mybatis.DailyReportMapper;
 import com.nuoxin.virtual.rep.api.mybatis.ProductTargetMapper;
 import com.nuoxin.virtual.rep.api.mybatis.VirtualProductVisitResultMapper;
+import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v3_0.DailyReportService;
 import com.nuoxin.virtual.rep.api.utils.CalculateUtil;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
@@ -16,7 +17,8 @@ import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.statistics.Produc
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DailyReportResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.VisitResultDoctorNumStatisticsResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.VisitResultHospitalNumStatisticsResponse;
-import com.nuoxin.virtual.rep.api.web.controller.v3_0.daily.MyAchievementResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.CallVisitStatisticsResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.MyAchievementResponse;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -41,6 +43,9 @@ public class DailyReportServiceImpl implements DailyReportService {
 
     @Resource
     private VirtualProductVisitResultMapper virtualProductVisitResultMapper;
+
+    @Resource
+    private CommonService commonService;
 
 
     @Override
@@ -243,6 +248,25 @@ public class DailyReportServiceImpl implements DailyReportService {
         myAchievement.setMulChannelDoctorNum(mulChannelDoctorNum);
 
         return myAchievement;
+
+    }
+
+    @Override
+    public CallVisitStatisticsResponse getCallVisitStatistics(DailyReportRequest request) {
+        CallVisitStatisticsResponse callVisitStatistics = dailyReportMapper.getCallVisitStatistics(request);
+        if (callVisitStatistics == null){
+            callVisitStatistics = new CallVisitStatisticsResponse();
+        }
+
+        Integer callConnectCount = dailyReportMapper.callConnectCount(request);
+        Integer callUnConnectCount = dailyReportMapper.callUnConnectCount(request);
+
+        callVisitStatistics.setConnectCallCount(callConnectCount);
+        callVisitStatistics.setUnConnectCallCount(callUnConnectCount);
+        callVisitStatistics.setTotalCallTime(commonService.alterCallTimeContent(callVisitStatistics.getTotalCallSecond()));
+
+
+        return callVisitStatistics;
 
     }
 

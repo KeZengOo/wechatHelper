@@ -2,6 +2,7 @@ package com.nuoxin.virtual.rep.api.mybatis;
 
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.DailyReportRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.*;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.CallVisitStatisticsResponse;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -69,6 +70,32 @@ public interface DailyReportMapper {
      * @return
      */
     Integer mulChannelDoctorNum(DailyReportRequest reportRequest);
+
+
+    /**
+     * 电话拜访统计，次数，时长
+     * @param reportRequest
+     * @return
+     */
+    CallVisitStatisticsResponse getCallVisitStatistics(DailyReportRequest reportRequest);
+
+
+
+    /**
+     * 电话接通次数
+     * @param reportRequest
+     * @return
+     */
+    Integer callConnectCount(DailyReportRequest reportRequest);
+
+
+    /**
+     * 电话接通未次数
+     * @param reportRequest
+     * @return
+     */
+    Integer callUnConnectCount(DailyReportRequest reportRequest);
+
 
 
     /**
@@ -235,12 +262,7 @@ public interface DailyReportMapper {
     List<VisitCountStatisticsResponse> visitDateCallDoctorNum(DailyReportRequest reportRequest,@Param(value = "visitChannel") Integer visitChannel);
 
 
-    /**
-     * 电话接通数
-     * @param reportRequest
-     * @return
-     */
-    Integer callConnectCount(DailyReportRequest reportRequest);
+
 
 
 
