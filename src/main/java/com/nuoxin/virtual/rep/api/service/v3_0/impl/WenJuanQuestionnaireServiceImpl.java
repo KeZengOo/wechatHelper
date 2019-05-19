@@ -363,10 +363,20 @@ public class WenJuanQuestionnaireServiceImpl implements WenJuanQuestionnaireServ
     public PageResponseBean<List<WenJuanProject>> getWenJuanProjectListPage(WenJuanProjectRequest wenJuanProjectRequest) {
         //问卷列表
         List<WenJuanProject> wenJuanProjectList = wenJuanQuestionnaireMapper.getWenJuanProjectListPage(wenJuanProjectRequest);
+        List<WenJuanProject> wenJuanProjectListNew = new ArrayList<WenJuanProject>();
+
+        wenJuanProjectList.forEach(n->{
+            WenJuanProject w = new WenJuanProject();
+            w = n;
+            w.setCreateTime(n.getCreateTime().substring(0,n.getCreateTime().indexOf(".")));
+            w.setUpdateTime(n.getUpdateTime().substring(0,n.getUpdateTime().indexOf(".")));
+            wenJuanProjectListNew.add(w);
+        });
+
         //问卷count
         Integer count = wenJuanQuestionnaireMapper.getWenJuanProjectCount(wenJuanProjectRequest);
 
-        return new PageResponseBean(wenJuanProjectRequest, count, wenJuanProjectList);
+        return new PageResponseBean(wenJuanProjectRequest, count, wenJuanProjectListNew);
     }
 
     @Override
