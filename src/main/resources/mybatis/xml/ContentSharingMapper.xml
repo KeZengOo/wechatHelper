@@ -271,7 +271,7 @@
         title
     </select>
 
-    <!-- 内容分享列表 -->
+    <!-- 内容分享列表导出 -->
     <select id="getContentSharingCSVList" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.ContentSharingParams">
         SELECT
         m.id,
