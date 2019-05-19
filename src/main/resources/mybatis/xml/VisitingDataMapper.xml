@@ -60,7 +60,7 @@
 			GROUP BY
 				pl.prod_id,
 				du.id
-		LIMIT #{k.currentSize}, #{key.pageSize}
+		LIMIT #{key.currentSize}, #{key.pageSize}
 	</select>
 
 	<!-- 参加问卷的医生数量 -->
@@ -88,7 +88,7 @@
 		SELECT DISTINCT dud.drug_user_id userId, tmad.doctor_id doctorId
 		FROM t_meeting_attend_details tmad
 		INNER JOIN t_meeting_data tmd ON tmad.meeting_id = tmd.id
-		INNER JOIN drug_user_doctor dud ON tmad.product_id = dud.prod_id ON tmad.id = dud.doctor_id
+		INNER JOIN drug_user_doctor dud ON tmd.product_id = dud.prod_id AND tmad.id = dud.doctor_id
 		WHERE dud.prod_id = #{key.proId} AND dud.is_available = 1
 		AND tmad.attend_start_time BETWEEN #{key.startTime} AND #{key.endTime}
 		AND dud.drug_user_id IN
@@ -113,7 +113,7 @@
 		SELECT r.drug_user_id userId, r.read_person_id doctorId FROM
 		t_content_product a INNER JOIN activity_read r ON r.data_id = a.content_id
 		LEFT JOIN activity_read_ip i ON i.read_token = r.read_token
-		WHERE a.product_id = #{key.proId} AND r.read_person_id > 0 AND r.drug_user_id IN
+		WHERE a.product_id = #{key.proId} AND r.read_person_id &gt; 0 AND r.drug_user_id IN
 		<foreach collection="key.list" item="id" open="(" separator="," close=")">
 			#{id}
 		</foreach>
@@ -127,7 +127,7 @@
 		WHERE c.is_available = 1 AND c.prod_id = #{key.proId} AND b.create_time BETWEEN #{key.startTime} AND
 		#{key.endTime}
 		AND c.drug_user_id IN
-		<foreach collection="list" item="id" open="(" separator="," close=")">
+		<foreach collection="key.list" item="id" open="(" separator="," close=")">
 			#{id}
 		</foreach>
 		GROUP BY c.drug_user_id, c.doctor_id
@@ -138,7 +138,7 @@
 	<select id="getContactAndSuccessHcpCount" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.VisitDataPart">
 		SELECT a.drug_user_id userId, COUNT(DISTINCT a.doctor_id) total  FROM `drug_user_doctor_quate` a
 		JOIN drug_user_doctor_quate_result b ON a.id = b.quate_id
-		JOIN virtual_product_visit_result c ON b.result_id = c.id ON c.product_id = a.product_id
+		JOIN virtual_product_visit_result c ON b.result_id = c.id AND c.product_id = a.product_id
 		WHERE a.product_id = #{key.proId} AND a.create_time BETWEEN #{key.startTime} AND #{key.endTime}
 		AND c.visit_type LIKE '%{type}%'
 		AND a.drug_user_id IN
@@ -236,7 +236,7 @@
 		JOIN t_meeting_attend_details b ON a.id = b.meeting_id
 		WHERE a.product_id = #{key.proId} AND b.attend_start_time BETWEEN #{key.startTime} AND #{key.endTime}
 		) a
-		JOIN drug_user_doctor c ON a.product_id = c.prod_id ON a.doctor_id = c.doctor_id
+		JOIN drug_user_doctor c ON a.doctor_id = c.doctor_id
 		WHERE c.prod_id = #{key.proId} AND c.is_available = 1
 		AND c.drug_user_id IN
 		<foreach collection="key.list" item="id" open="(" separator="," close=")">
@@ -281,7 +281,7 @@
 			resultType="com.nuoxin.virtual.rep.api.entity.v3_0.VisitDataPart">
 		SELECT a.drug_user_id userId, COUNT(DISTINCT b.doctor_id) total FROM drug_user_doctor a
 		JOIN `virtual_message` b ON a.doctor_id = b.doctor_id
-		WHERE a.is_available = 1 AND b.doctor_id > 0 AND a.prod_id = #{key.proId}
+		WHERE a.is_available = 1 AND b.doctor_id &gt; 0 AND a.prod_id = #{key.proId}
 		AND b.message_time BETWEEN #{key.startTime} AND #{key.endTime} AND b.user_type = 1
 		AND b.wechat_message_status = '发送' AND b.wechat_message_type NOT IN ('系统消息','撤回提醒')
 		AND a.drug_user_id IN
@@ -330,7 +330,7 @@
 		SELECT r.drug_user_id userId, r.read_person_id doctorId, SUM(r.read_time) total FROM
 		t_content_product a	INNER JOIN activity_read r ON r.data_id = a.content_id
 		LEFT JOIN activity_read_ip i ON i.read_token = r.read_token
-		WHERE a.product_id = #{key.proId} AND r.read_person_id > 0 AND r.drug_user_id IN
+		WHERE a.product_id = #{key.proId} AND r.read_person_id &gt; 0 AND r.drug_user_id IN
 		<foreach collection="key.list" item="id" open="(" separator="," close=")">
 			#{id}
 		</foreach>
@@ -344,13 +344,13 @@
 		INNER JOIN drug_user_doctor c ON c.doctor_id = a.doctor_id
 		WHERE c.is_available = 1 AND c.prod_id = #{key.proId} AND b.create_time BETWEEN #{key.startTime} AND #{key.endTime}
 		AND c.drug_user_id IN
-		<foreach collection="list" item="id" open="(" separator="," close=")">
+		<foreach collection="key.list" item="id" open="(" separator="," close=")">
 			#{id}
 		</foreach>
 		GROUP BY c.drug_user_id, c.doctor_id
 	</select>
 
-	<!-- 内容分享统计—— >50s医生数 -->
+	<!-- 内容分享统计—— >=50s医生数 -->
 	<select id="getContentPartMoreThen50s" parameterType="com.nuoxin.virtual.rep.api.entity.v3_0.request.VisitDataParam"
 			resultType="com.nuoxin.virtual.rep.api.entity.v3_0.VisitDataPart">
 		SELECT a.drug_user_id userId, COUNT(a.read_person_id) total FROM
@@ -359,7 +359,7 @@
 		t_content_product a
 		INNER JOIN activity_read r ON r.data_id = a.content_id
 		LEFT JOIN activity_read_ip i ON i.read_token = r.read_token
-		WHERE a.product_id = #{key.proId} AND r.read_person_id > 0 AND r.read_time > 50
+		WHERE a.product_id = #{key.proId} AND r.read_person_id &gt; 0 AND r.read_time &gt;= 50
 		AND r.create_time BETWEEN #{key.startTime} AND #{key.endTime}
 		AND (i.isp != '阿里云' OR i.isp IS NULL)
 		AND r.drug_user_id IN
@@ -373,7 +373,7 @@
 		SELECT c.drug_user_id, c.doctor_id FROM
 		wx_users a INNER JOIN wx_user_read b ON a.id = b.user_id
 		INNER JOIN drug_user_doctor c ON c.doctor_id = a.doctor_id
-		WHERE c.is_available = 1 AND c.prod_id = #{key.proId} AND b.read_time > 50 AND b.create_time BETWEEN #{key.startTime} AND #{key.endTime}
+		WHERE c.is_available = 1 AND c.prod_id = #{key.proId} AND b.read_time &gt;= 50 AND b.create_time BETWEEN #{key.startTime} AND #{key.endTime}
 		AND c.drug_user_id IN
 		<foreach collection="key.list" item="id" open="(" separator="," close=")">
 			#{id}

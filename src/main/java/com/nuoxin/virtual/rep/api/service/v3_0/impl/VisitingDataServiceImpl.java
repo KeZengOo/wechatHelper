@@ -32,16 +32,19 @@ public class VisitingDataServiceImpl implements VisitingDataService, Serializabl
     private VisitingDataMapper visitingDataMapper;
 
     @Override
-    public PageResponseBean<List<VisitDataResponse>> getVisitDataByPage(String leaderPath, VisitDataRequest request) {
+    public PageResponseBean<VisitDataResponse> getVisitDataByPage(String leaderPath, VisitDataRequest request) {
 
         int total = visitingDataMapper.getVisitDataCount(leaderPath, request);
 
-        PageResponseBean<List<VisitDataResponse>> result = null;
+        PageResponseBean<VisitDataResponse> result = null;
 
         if(total > 0) {
             List<VisitDataBase> list = visitingDataMapper.getVisitDataBaseInfo(leaderPath, request);
             // 产品对应的销售代表
             List<Long> userIds = list.stream().map(b -> b.getUserId()).collect(Collectors.toList());
+            if(!CollectionUtils.isEmpty(request.getDrugUserIdList())) {
+                userIds = request.getDrugUserIdList();
+            }
             VisitDataParam param = new VisitDataParam();
             param.setProId(list.get(0).getProId());
             param.setStartTime(request.getStartTime());
@@ -128,7 +131,7 @@ public class VisitingDataServiceImpl implements VisitingDataService, Serializabl
             if(!CollectionUtils.isEmpty(weChatData)) {
                 weChatDataMap = weChatData.stream().collect(Collectors.toMap(k -> k.getUserId(), k -> k.getTotal(), (k1, k2) -> k2));
             }
-            // 发送次数
+            // 阅读人数&总时长
             List<VisitDataPart> partTimeData = visitingDataMapper.getContentPartTimeAndCount(param);
             Map<Long, String> partTimeDataMap = new HashMap<>(1);
             Map<Long, Integer> partCountDataMap = new HashMap<>(1);

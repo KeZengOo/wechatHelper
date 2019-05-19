@@ -21,6 +21,6 @@ public interface VisitingDataService {
      * @param request 请求对象 含分页参数和查询参数
      * @return page
      */
-    PageResponseBean<List<VisitDataResponse>> getVisitDataByPage(String leaderPath, VisitDataRequest request);
+    PageResponseBean<VisitDataResponse> getVisitDataByPage(String leaderPath, VisitDataRequest request);
 
 }
