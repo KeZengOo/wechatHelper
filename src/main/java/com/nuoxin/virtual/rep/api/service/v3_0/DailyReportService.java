@@ -66,12 +66,29 @@ public interface DailyReportService {
     List<VisitResultDoctorNumStatisticsResponse> getVisitResultDoctorNum(DailyReportRequest request);
 
 
+
     /**
      * 不同的拜访结果的医院人数统计
      * @param request
      * @return
      */
     List<VisitResultHospitalNumStatisticsResponse> getVisitResultHospitalNum(DailyReportRequest request);
+
+
+    /**
+     * 不同的拜访类型的医生人数统计
+     * @param request
+     * @return
+     */
+    List<VisitTypeDoctorNumStatisticsResponse> getVisitTypeDoctorNum(DailyReportRequest request);
+
+
+    /**
+     * 不同的拜访类型的医院数统计
+     * @param request
+     * @return
+     */
+    List<VisitTypeHospitalNumStatisticsResponse> getVisitTypeHospitalNum(DailyReportRequest request);
 
 
     /**

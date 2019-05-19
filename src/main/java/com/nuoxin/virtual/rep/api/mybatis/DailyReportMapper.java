@@ -195,12 +195,12 @@ public interface DailyReportMapper {
     List<VisitHospitalStatisticsResponse> visitDateHospitalNum(DailyReportRequest reportRequest);
 
     /**
-     * 不同的拜访结果的医生数统计
+     * 不同的拜访结果类型的医生数统计
      * @param reportRequest
      * @param visitType
      * @return
      */
-    Integer visitResultDoctorNum(DailyReportRequest reportRequest,@Param(value = "visitType") Integer visitType);
+    Integer visitResultTypeDoctorNum(@Param(value = "request") DailyReportRequest reportRequest,@Param(value = "visitType") Integer visitType);
 
 
     /**
@@ -209,7 +209,8 @@ public interface DailyReportMapper {
      * @param visitType
      * @return
      */
-    List<VisitDoctorStatisticsResponse> visitDateVisitResultDoctorNum(DailyReportRequest reportRequest,@Param(value = "visitType") Integer visitType);
+
+    List<VisitDoctorStatisticsResponse> visitDateVisitResultDoctorNum(@Param(value = "request") DailyReportRequest reportRequest,@Param(value = "visitType") Integer visitType);
 
 
     /**
@@ -218,7 +219,7 @@ public interface DailyReportMapper {
      * @param visitType
      * @return
      */
-    Integer visitResultHospitalNum(DailyReportRequest reportRequest,@Param(value = "visitType") Integer visitType);
+    Integer visitResultTypeHospitalNum(@Param(value = "request") DailyReportRequest reportRequest,@Param(value = "visitType") Integer visitType);
 
 
     /**
@@ -227,7 +228,7 @@ public interface DailyReportMapper {
      * @param visitType
      * @return
      */
-    List<VisitHospitalStatisticsResponse> visitDateVisitResultHospitalNum(DailyReportRequest reportRequest,@Param(value = "visitType") Integer visitType);
+    List<VisitHospitalStatisticsResponse> visitDateVisitResultHospitalNum(@Param(value = "request") DailyReportRequest reportRequest,@Param(value = "visitType") Integer visitType);
 
 
 

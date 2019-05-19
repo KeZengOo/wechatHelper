@@ -1292,10 +1292,10 @@
     </select>
 
     <!-- 不同拜访结果拜访医生数统计 -->
-    <select id="visitResultDoctorNum" resultType="java.lang.Integer">
+    <select id="visitResultTypeDoctorNum" resultType="java.lang.Integer">
 
         SELECT
-            IFNULL(COUNT( DISTINCT d.id ))
+            IFNULL(COUNT( DISTINCT d.id ), 0)
         FROM
             virtual_doctor_call_info_mend m
             INNER JOIN doctor d ON m.virtual_doctor_id = d.id
@@ -1304,29 +1304,29 @@
         WHERE
             r.visit_type LIKE CONCAT('%', #{visitType}, '%')
 
-            <if test="drugUserIdList !=null and drugUserIdList.size > 0">
+            <if test="request.drugUserIdList !=null and request.drugUserIdList.size > 0">
                 AND m.virtual_drug_user_id IN
-                <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+                <foreach collection="request.drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
                     #{drugUserId}
                 </foreach>
             </if>
 
 
-            <if test="productIdList !=null and productIdList.size > 0">
+            <if test="request.productIdList !=null and request.productIdList.size > 0">
                 AND m.product_id IN
-                <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+                <foreach collection="request.productIdList" item="productId" open="(" close=")" separator=",">
                     #{productId}
                 </foreach>
 
                 AND r.product_id IN
-                <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+                <foreach collection="request.productIdList" item="productId" open="(" close=")" separator=",">
                     #{productId}
                 </foreach>
             </if>
 
 
-            <if test="startTime !=null and endTime !=null">
-                AND m.create_time BETWEEN #{startTime}  AND #{endTime}
+            <if test="request.startTime !=null and request.endTime !=null">
+                AND m.create_time BETWEEN #{request.startTime}  AND #{request.endTime}
             </if>
 
 
@@ -1338,7 +1338,7 @@
     <select id="visitDateVisitResultDoctorNum" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.VisitDoctorStatisticsResponse">
 
         SELECT
-        IFNULL(COUNT( DISTINCT d.id )) doctorNum, DATE_FORMAT(m.create_time, '%Y-%m-%d') visitDate
+        IFNULL(COUNT( DISTINCT d.id ), 0) doctorNum, DATE_FORMAT(m.create_time, '%Y-%m-%d') visitDate
         FROM
         virtual_doctor_call_info_mend m
         INNER JOIN doctor d ON m.virtual_doctor_id = d.id
@@ -1347,29 +1347,29 @@
         WHERE
         r.visit_type LIKE CONCAT('%', #{visitType}, '%')
 
-        <if test="drugUserIdList !=null and drugUserIdList.size > 0">
+        <if test="request.drugUserIdList !=null and request.drugUserIdList.size > 0">
             AND m.virtual_drug_user_id IN
-            <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+            <foreach collection="request.drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
                 #{drugUserId}
             </foreach>
         </if>
 
 
-        <if test="productIdList !=null and productIdList.size > 0">
+        <if test="request.productIdList !=null and request.productIdList.size > 0">
             AND m.product_id IN
-            <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+            <foreach collection="request.productIdList" item="productId" open="(" close=")" separator=",">
                 #{productId}
             </foreach>
 
             AND r.product_id IN
-            <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+            <foreach collection="request.productIdList" item="productId" open="(" close=")" separator=",">
                 #{productId}
             </foreach>
         </if>
 
 
-        <if test="startTime !=null and endTime !=null">
-            AND m.create_time BETWEEN #{startTime}  AND #{endTime}
+        <if test="request.startTime !=null and request.endTime !=null">
+            AND m.create_time BETWEEN #{request.startTime}  AND #{request.endTime}
         </if>
 
         GROUP BY DATE_FORMAT(m.create_time, '%Y-%m-%d')
@@ -1379,10 +1379,10 @@
 
 
     <!-- 不同拜访结果拜访医院数统计 -->
-    <select id="visitResultHospitalNum" resultType="java.lang.Integer">
+    <select id="visitResultTypeHospitalNum" resultType="java.lang.Integer">
 
         SELECT
-        IFNULL(COUNT( DISTINCT h.hospital_id ))
+        IFNULL(COUNT( DISTINCT d.hospital_id ), 0)
         FROM
         virtual_doctor_call_info_mend m
         INNER JOIN doctor d ON m.virtual_doctor_id = d.id
@@ -1391,29 +1391,29 @@
         WHERE
         r.visit_type LIKE CONCAT('%', #{visitType}, '%')
 
-        <if test="drugUserIdList !=null and drugUserIdList.size > 0">
+        <if test="request.drugUserIdList !=null and request.drugUserIdList.size > 0">
             AND m.virtual_drug_user_id IN
-            <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+            <foreach collection="request.drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
                 #{drugUserId}
             </foreach>
         </if>
 
 
-        <if test="productIdList !=null and productIdList.size > 0">
+        <if test="request.productIdList !=null and request.productIdList.size > 0">
             AND m.product_id IN
-            <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+            <foreach collection="request.productIdList" item="productId" open="(" close=")" separator=",">
                 #{productId}
             </foreach>
 
             AND r.product_id IN
-            <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+            <foreach collection="request.productIdList" item="productId" open="(" close=")" separator=",">
                 #{productId}
             </foreach>
         </if>
 
 
-        <if test="startTime !=null and endTime !=null">
-            AND m.create_time BETWEEN #{startTime}  AND #{endTime}
+        <if test="request.startTime !=null and request.endTime !=null">
+            AND m.create_time BETWEEN #{request.startTime}  AND #{request.endTime}
         </if>
 
 
@@ -1424,7 +1424,7 @@
     <select id="visitDateVisitResultHospitalNum" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.VisitHospitalStatisticsResponse">
 
         SELECT
-        IFNULL(COUNT( DISTINCT h.hospital_id )) hospitalNum,
+        IFNULL(COUNT( DISTINCT d.hospital_id ), 0) hospitalNum,
         DATE_FORMAT(m.create_time, '%Y-%m-%d') visitDate
         FROM
         virtual_doctor_call_info_mend m
@@ -1434,29 +1434,29 @@
         WHERE
         r.visit_type LIKE CONCAT('%', #{visitType}, '%')
 
-        <if test="drugUserIdList !=null and drugUserIdList.size > 0">
+        <if test="request.drugUserIdList !=null and request.drugUserIdList.size > 0">
             AND m.virtual_drug_user_id IN
-            <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+            <foreach collection="request.drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
                 #{drugUserId}
             </foreach>
         </if>
 
 
-        <if test="productIdList !=null and productIdList.size > 0">
+        <if test="request.productIdList !=null and request.productIdList.size > 0">
             AND m.product_id IN
-            <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+            <foreach collection="request.productIdList" item="productId" open="(" close=")" separator=",">
                 #{productId}
             </foreach>
 
             AND r.product_id IN
-            <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+            <foreach collection="request.productIdList" item="productId" open="(" close=")" separator=",">
                 #{productId}
             </foreach>
         </if>
 
 
-        <if test="startTime !=null and endTime !=null">
-            AND m.create_time BETWEEN #{startTime}  AND #{endTime}
+        <if test="request.startTime !=null and request.endTime !=null">
+            AND m.create_time BETWEEN #{request.startTime}  AND #{request.endTime}
         </if>
 
         GROUP BY DATE_FORMAT(m.create_time, '%Y-%m-%d')

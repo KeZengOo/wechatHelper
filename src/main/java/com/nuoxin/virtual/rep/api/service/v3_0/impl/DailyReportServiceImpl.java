@@ -5,6 +5,7 @@ import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.v2_5.ProductVisitResultResponse;
 import com.nuoxin.virtual.rep.api.enums.RoleTypeEnum;
+import com.nuoxin.virtual.rep.api.enums.VisitResultTypeEnum;
 import com.nuoxin.virtual.rep.api.mybatis.DailyReportMapper;
 import com.nuoxin.virtual.rep.api.mybatis.ProductTargetMapper;
 import com.nuoxin.virtual.rep.api.mybatis.VirtualProductVisitResultMapper;
@@ -47,6 +48,20 @@ public class DailyReportServiceImpl implements DailyReportService {
 
     @Override
     public void exportDailyReport(HttpServletResponse response, DailyReportRequest request, DrugUser drugUser) {
+        this.checkoutDailyReportRequest(request);
+        Long productId = request.getProductIdList().get(0);
+        Map<String, String> dailyReportTitle = this.getExportDailyReportTitle(productId);
+        List<LinkedHashMap<String, Object>> dailyReportExportData = this.getAllDailyReportExportData(request, drugUser);
+
+
+    }
+
+    /**
+     * 检查请求参数
+     * @param request
+     */
+    private void checkoutDailyReportRequest(DailyReportRequest request){
+
         List<Long> productIdList = request.getProductIdList();
         if (CollectionsUtil.isEmptyList(productIdList) || productIdList.size() > 1){
             throw new BusinessException(ErrorEnum.ERROR, "只能选择一个产品！");
@@ -55,18 +70,6 @@ public class DailyReportServiceImpl implements DailyReportService {
         if (CollectionsUtil.isEmptyList(request.getDrugUserIdList())){
             throw new BusinessException(ErrorEnum.ERROR, "代表不能为空！");
         }
-
-
-
-        // 拜访的明细，按照天
-
-
-
-        Long productId = productIdList.get(0);
-        Map<String, String> dailyReportTitle = this.getExportDailyReportTitle(productId);
-        List<LinkedHashMap<String, Object>> dailyReportExportData = this.getAllDailyReportExportData(request, drugUser);
-
-
     }
 
     /**
@@ -291,6 +294,69 @@ public class DailyReportServiceImpl implements DailyReportService {
     }
 
     @Override
+    public List<VisitTypeDoctorNumStatisticsResponse> getVisitTypeDoctorNum(DailyReportRequest request) {
+
+        Integer contactDoctor = dailyReportMapper.visitResultTypeDoctorNum(request, VisitResultTypeEnum.CONTACT.getType());
+
+        VisitTypeDoctorNumStatisticsResponse contact = new VisitTypeDoctorNumStatisticsResponse();
+        contact.setVisitType(VisitResultTypeEnum.CONTACT.getType());
+        contact.setVisitTypeStr(VisitResultTypeEnum.CONTACT.getName());
+        contact.setDoctorNum(contactDoctor);
+
+        Integer successDoctor = dailyReportMapper.visitResultTypeDoctorNum(request, VisitResultTypeEnum.SUCCESS.getType());
+        VisitTypeDoctorNumStatisticsResponse success = new VisitTypeDoctorNumStatisticsResponse();
+        success.setVisitType(VisitResultTypeEnum.SUCCESS.getType());
+        success.setVisitTypeStr(VisitResultTypeEnum.SUCCESS.getName());
+        success.setDoctorNum(successDoctor);
+
+        Integer coverDoctor = dailyReportMapper.visitResultTypeDoctorNum(request, VisitResultTypeEnum.COVER.getType());
+        VisitTypeDoctorNumStatisticsResponse cover = new VisitTypeDoctorNumStatisticsResponse();
+        cover.setVisitType(VisitResultTypeEnum.CONTACT.getType());
+        cover.setVisitTypeStr(VisitResultTypeEnum.CONTACT.getName());
+        cover.setDoctorNum(coverDoctor);
+
+
+
+        List<VisitTypeDoctorNumStatisticsResponse> list = new ArrayList<>();
+        list.add(contact);
+        list.add(success);
+        list.add(cover);
+
+        return list;
+    }
+
+    @Override
+    public List<VisitTypeHospitalNumStatisticsResponse> getVisitTypeHospitalNum(DailyReportRequest request) {
+        Integer contactHospital = dailyReportMapper.visitResultTypeHospitalNum(request, VisitResultTypeEnum.CONTACT.getType());
+
+        VisitTypeHospitalNumStatisticsResponse contact = new VisitTypeHospitalNumStatisticsResponse();
+        contact.setVisitType(VisitResultTypeEnum.CONTACT.getType());
+        contact.setVisitTypeStr(VisitResultTypeEnum.CONTACT.getName());
+        contact.setHospitalNum(contactHospital);
+
+        Integer successHospital = dailyReportMapper.visitResultTypeHospitalNum(request, VisitResultTypeEnum.SUCCESS.getType());
+        VisitTypeHospitalNumStatisticsResponse success = new VisitTypeHospitalNumStatisticsResponse();
+        success.setVisitType(VisitResultTypeEnum.SUCCESS.getType());
+        success.setVisitTypeStr(VisitResultTypeEnum.SUCCESS.getName());
+        success.setHospitalNum(successHospital);
+
+        Integer coverHospital = dailyReportMapper.visitResultTypeHospitalNum(request, VisitResultTypeEnum.COVER.getType());
+        VisitTypeHospitalNumStatisticsResponse cover = new VisitTypeHospitalNumStatisticsResponse();
+        cover.setVisitType(VisitResultTypeEnum.CONTACT.getType());
+        cover.setVisitTypeStr(VisitResultTypeEnum.CONTACT.getName());
+        cover.setHospitalNum(coverHospital);
+
+
+
+        List<VisitTypeHospitalNumStatisticsResponse> list = new ArrayList<>();
+        list.add(contact);
+        list.add(success);
+        list.add(cover);
+
+        return list;
+    }
+
+    @Override
     public DoctorRecruitResponse getDoctorRecruit(DailyReportRequest request) {
         ProductTargetResponseBean productTarget = productTargetMapper.getProductTarget(request.getProductIdList().get(0));
         Integer targetDoctor = 0;
@@ -462,12 +528,22 @@ public class DailyReportServiceImpl implements DailyReportService {
         titleMap.put("activeCoverDoctorNum", "活跃覆盖医生数");
         titleMap.put("mulChannelDoctorNum", "多渠道覆盖医生数");
 
+        titleMap.put("callCount", "外呼次数");
+        titleMap.put("connectCallCount", "外呼接通次数");
+        titleMap.put("unConnectCallCount", "外呼未接通次数");
+        titleMap.put("callTime", "通话时长");
+        titleMap.put("wechatVisit", "微信拜访");
+        titleMap.put("smsVisit", "短信拜访");
+        titleMap.put("emailVisit", "邮件拜访");
+        titleMap.put("interviewVisit", "面谈拜访");
+
+
         List<ProductVisitResultResponse> recruitDoctorVisitResultList = virtualProductVisitResultMapper.selectVisitResultList(productId);
         if (CollectionsUtil.isNotEmptyList(recruitDoctorVisitResultList)){
             recruitDoctorVisitResultList.forEach(r->{
                 String visitResult = r.getVisitResult();
                 Long id = r.getId();
-                titleMap.put("d_" + id, visitResult.concat("招募医生数"));
+                titleMap.put("d_" + id, visitResult.concat("_招募医生数"));
             });
         }
 
@@ -475,6 +551,8 @@ public class DailyReportServiceImpl implements DailyReportService {
         titleMap.put("targetDoctor", "目标招募医生数");
         titleMap.put("noRecruitDoctorNum", "未招募医生数");
         titleMap.put("recruitDoctorRate", "医生招募率");
+
+
         titleMap.put("wechatReplyDoctorNum", "微信回复人数");
         titleMap.put("wechatReplyDoctorCount", "微信回复人次");
         titleMap.put("hasWechatDoctorNum", "有微信医生人数");
@@ -482,7 +560,7 @@ public class DailyReportServiceImpl implements DailyReportService {
         titleMap.put("hasDemandDoctorNum", "有需求医生数");
         titleMap.put("hasAeDoctorNum", "有AE医生数");
         titleMap.put("quitDoctorNum", "退出项目医生数");
-        titleMap.put("targetHospital", "目标医院数");
+        titleMap.put("targetHospital", "目标招募医院数");
         titleMap.put("recruitHospital", "招募医院数");
         titleMap.put("recruitHospitalRate", "医院招募率");
 
@@ -490,7 +568,7 @@ public class DailyReportServiceImpl implements DailyReportService {
             recruitDoctorVisitResultList.forEach(r->{
                 String visitResult = r.getVisitResult();
                 Long id = r.getId();
-                titleMap.put("h_" + id, visitResult.concat("招募医院数"));
+                titleMap.put("h_" + id, visitResult.concat("_招募医院数"));
             });
         }
 
