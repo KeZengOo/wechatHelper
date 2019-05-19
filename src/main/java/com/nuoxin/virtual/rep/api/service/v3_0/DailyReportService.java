@@ -5,8 +5,10 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.DailyReportRequest
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DailyReportResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.CallVisitStatisticsResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.MyAchievementResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.VisitChannelDoctorNumResponse;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * 日报相关业务接口
@@ -50,5 +52,11 @@ public interface DailyReportService {
     CallVisitStatisticsResponse getCallVisitStatistics(DailyReportRequest request);
 
 
+    /**
+     * 不同渠道拜访的医生统计
+     * @param request
+     * @return
+     */
+    List<VisitChannelDoctorNumResponse> getVisitChannelDoctorNumList(DailyReportRequest request);
 
 }

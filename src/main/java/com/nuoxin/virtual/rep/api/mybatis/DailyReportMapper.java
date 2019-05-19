@@ -3,6 +3,7 @@ package com.nuoxin.virtual.rep.api.mybatis;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.DailyReportRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.*;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.CallVisitStatisticsResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.VisitChannelDoctorNumResponse;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -95,6 +96,15 @@ public interface DailyReportMapper {
      * @return
      */
     Integer callUnConnectCount(DailyReportRequest reportRequest);
+
+
+    /**
+     * 不同渠道拜访医生人数
+     * @param reportRequest
+     * @return
+     */
+    List<VisitChannelDoctorNumResponse> getVisitChannelDoctorNumList(DailyReportRequest reportRequest);
+
 
 
 

@@ -6,6 +6,7 @@ import com.nuoxin.virtual.rep.api.service.v3_0.DailyReportService;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.DailyReportRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DailyReportResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.CallVisitStatisticsResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.VisitChannelDoctorNumResponse;
 import com.nuoxin.virtual.rep.api.web.controller.v2_5.NewBaseController;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.MyAchievementResponse;
 import io.swagger.annotations.Api;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * 我的客户相关接口
@@ -55,6 +57,16 @@ public class DailyReportController extends NewBaseController {
         CallVisitStatisticsResponse callVisitStatistics = dailyReportService.getCallVisitStatistics(request);
         DefaultResponseBean<CallVisitStatisticsResponse> responseBean = new DefaultResponseBean<>();
         responseBean.setData(callVisitStatistics);
+        return responseBean;
+    }
+
+
+    @ApiOperation(value = "不同渠道拜访医生人数统计")
+    @PostMapping(value = "/visit/channel/doctor/num")
+    public DefaultResponseBean<List<VisitChannelDoctorNumResponse>> getVisitChannelDoctorNum(@RequestBody DailyReportRequest request){
+        List<VisitChannelDoctorNumResponse> visitChannelDoctorNumList = dailyReportService.getVisitChannelDoctorNumList(request);
+        DefaultResponseBean<List<VisitChannelDoctorNumResponse>> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(visitChannelDoctorNumList);
         return responseBean;
     }
 

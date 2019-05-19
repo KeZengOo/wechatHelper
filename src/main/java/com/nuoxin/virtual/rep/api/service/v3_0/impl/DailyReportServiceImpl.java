@@ -19,6 +19,7 @@ import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.VisitResultDoctor
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.VisitResultHospitalNumStatisticsResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.CallVisitStatisticsResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.MyAchievementResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.VisitChannelDoctorNumResponse;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -268,6 +269,14 @@ public class DailyReportServiceImpl implements DailyReportService {
 
         return callVisitStatistics;
 
+    }
+
+    @Override
+    public List<VisitChannelDoctorNumResponse> getVisitChannelDoctorNumList(DailyReportRequest request) {
+
+        List<VisitChannelDoctorNumResponse> visitChannelDoctorNumList = dailyReportMapper.getVisitChannelDoctorNumList(request);
+
+        return visitChannelDoctorNumList;
     }
 
 
