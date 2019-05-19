@@ -15,9 +15,9 @@ import java.io.Serializable;
  */
 @ApiModel(value = "拜访数据汇总返回数据")
 @Data
-public class VisitDataResponse implements Serializable {
+public class VisitDataResponse {
 
-    private static final long serialVersionUID = 4042804124371545133L;
+//    private static final long serialVersionUID = 4042804124371545133L;
 
     /**
      * 销售代表id

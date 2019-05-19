@@ -29,13 +29,21 @@ public interface VisitingDataMapper {
     int getVisitDataCount(@Param("leaderPath") String leaderPath, @Param("key") VisitDataRequest request);
 
     /**
-     * 查询符合条件的拜访数据信息
+     * 分页查询符合条件的拜访数据信息
      * @Author dangjunhui
      * @param leaderPath 当前登录用户leaderPath
      * @param request 请求参数
      * @return list
      */
     List<VisitDataBase> getVisitDataBaseInfo(@Param("leaderPath") String leaderPath, @Param("key") VisitDataRequest request);
+
+    /**
+     * 查询符合条件的拜访数据信息
+     * @param leaderPath 当前登录用户leaderPath
+     * @param request 请求参数
+     * @return list
+     */
+    List<VisitDataBase> getVisitDataInfos(@Param("leaderPath") String leaderPath, @Param("key") VisitDataRequest request);
 
     /**
      * 根据产品id和销售代表id查询拜访医生数

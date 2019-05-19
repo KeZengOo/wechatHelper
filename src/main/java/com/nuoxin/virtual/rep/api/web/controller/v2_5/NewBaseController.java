@@ -2,6 +2,7 @@ package com.nuoxin.virtual.rep.api.web.controller.v2_5;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
@@ -35,6 +36,15 @@ public class NewBaseController {
 	 */
 	protected HttpServletRequest getRequest() {
 		return ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+	}
+
+	/**
+	 * 获取Response
+	 * @author dangjunhui
+	 * @return request
+	 */
+	protected HttpServletResponse getResponse() {
+		return ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
 	}
 
 	/**

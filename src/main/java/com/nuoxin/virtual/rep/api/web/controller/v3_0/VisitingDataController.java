@@ -5,6 +5,7 @@ import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.v3_0.VisitingDataService;
 import com.nuoxin.virtual.rep.api.utils.StringUtil;
+import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.DrugUserDoctorCallRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.VisitDataRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.VisitDataResponse;
 import com.nuoxin.virtual.rep.api.web.controller.v2_5.NewBaseController;
@@ -13,13 +14,13 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -59,6 +60,41 @@ public class VisitingDataController extends NewBaseController implements Seriali
         DefaultResponseBean<PageResponseBean<VisitDataResponse>> result = new DefaultResponseBean<>();
         result.setData(list);
         return result;
+    }
+
+    @ApiOperation(value = "拜访数据汇总查询列表导出")
+    @GetMapping(value = "/list/export")
+    public void getVisitDataSummaryList(HttpServletRequest request) throws Exception {
+        DrugUser drugUser = this.getDrugUser();
+        String leaderPath = drugUser.getLeaderPath();
+        String startTime = request.getParameter("startTime");
+        String endTime = request.getParameter("endTime");
+        if(StringUtils.isBlank(startTime) || StringUtils.isBlank(endTime)) {
+            throw new Exception("参数不合法!");
+        }
+        String pIds = request.getParameter("productIdList");
+        if(StringUtils.isBlank(pIds)) {
+            throw new Exception("参数不合法!");
+        }
+        String[] proIds = pIds.split(",");
+        List<Long> productIdList = new ArrayList<>(1);
+        for(String s : proIds) {
+            productIdList.add(Long.parseLong(s));
+        }
+        VisitDataRequest req = new VisitDataRequest();
+        req.setStartTime(startTime);
+        req.setEndTime(endTime);
+        req.setProductIdList(productIdList);
+        String drugIds = request.getParameter("drugUserIdList");
+        if(StringUtils.isNotBlank(drugIds)) {
+            List<Long> drugUserIdList = new ArrayList<>(1);
+            String[] str = drugIds.split(",");
+            for(String s : str) {
+                drugUserIdList.add(Long.parseLong(s));
+            }
+            req.setDrugUserIdList(drugUserIdList);
+        }
+        visitingDataService.exportVisitDataSummary(getResponse(), leaderPath, req);
     }
 
 }

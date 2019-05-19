@@ -63,6 +63,44 @@
 		LIMIT #{key.currentSize}, #{key.pageSize}
 	</select>
 
+	<select id="getVisitDataInfos" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.VisitDataBase">
+		SELECT
+		pl.prod_id proId,
+		pl.prod_name productName,
+		du.id userId,
+		du.`name` userName,
+		CASE sale_type
+		WHEN 1 THEN
+		'线上'
+		WHEN 2 THEN
+		'线下'
+		ELSE
+		''
+		END visitWay,
+		GROUP_CONCAT(r.role_name) saleType
+		FROM
+		product_line pl
+		JOIN product_user pu ON pu.prod_id = pl.prod_id
+		JOIN drug_user du ON pu.user_id = du.id
+		JOIN role_user ru ON ru.user_id = du.id
+		LEFT JOIN role r ON ru.role_id = r.id
+		WHERE
+		du.leader_path LIKE #{leaderPath} AND ru.role_id IN (104, 105)
+		AND pl.prod_id IN
+		<foreach collection="key.productIdList" item="pro" open="(" separator="," close=")">
+			#{pro}
+		</foreach>
+		<if test="key.drugUserIdList != null and key.drugUserIdList.size() > 0">
+			AND du.id IN
+			<foreach collection="key.drugUserIdList" item="uid" open="(" separator="," close=")">
+				#{uid}
+			</foreach>
+		</if>
+		GROUP BY
+		pl.prod_id,
+		du.id
+	</select>
+
 	<!-- 参加问卷的医生数量 -->
 	<select id="getQuestionHcpCount" parameterType="com.nuoxin.virtual.rep.api.entity.v3_0.request.VisitDataParam"
 			resultType="com.nuoxin.virtual.rep.api.entity.v3_0.VisitDataPart">
@@ -266,7 +304,7 @@
 	<!-- 外呼统计——总时长 -->
 	<select id="getOutboundTimeCount" parameterType="com.nuoxin.virtual.rep.api.entity.v3_0.request.VisitDataParam"
 			resultType="com.nuoxin.virtual.rep.api.entity.v3_0.VisitDataPart">
-		SELECT a.virtual_drug_user_id userId, SUM(call_time) total FROM `virtual_doctor_call_info` a
+		SELECT a.virtual_drug_user_id userId, IFNULL(SUM(call_time),0) total FROM `virtual_doctor_call_info` a
 		WHERE a.visit_channel = 1 AND a.product_id = #{key.proId}
 		AND a.create_time BETWEEN #{key.startTime} AND #{key.endTime}
 		AND a.virtual_drug_user_id IN
@@ -327,7 +365,7 @@
 	<!-- 内容分享统计——阅读人数 总时长-->
 	<select id="getContentPartTimeAndCount" parameterType="com.nuoxin.virtual.rep.api.entity.v3_0.request.VisitDataParam"
 			resultType="com.nuoxin.virtual.rep.api.entity.v3_0.VisitDataPart">
-		SELECT r.drug_user_id userId, r.read_person_id doctorId, SUM(r.read_time) total FROM
+		SELECT r.drug_user_id userId, r.read_person_id doctorId, IFNULL(SUM(r.read_time),0) total FROM
 		t_content_product a	INNER JOIN activity_read r ON r.data_id = a.content_id
 		LEFT JOIN activity_read_ip i ON i.read_token = r.read_token
 		WHERE a.product_id = #{key.proId} AND r.read_person_id &gt; 0 AND r.drug_user_id IN
@@ -339,7 +377,7 @@
 
 		UNION ALL
 
-		SELECT c.drug_user_id userId, c.doctor_id doctorId, SUM(b.read_time) total FROM
+		SELECT c.drug_user_id userId, c.doctor_id doctorId, IFNULL(SUM(b.read_time),0) total FROM
 		wx_users a INNER JOIN wx_user_read b ON a.id = b.user_id
 		INNER JOIN drug_user_doctor c ON c.doctor_id = a.doctor_id
 		WHERE c.is_available = 1 AND c.prod_id = #{key.proId} AND b.create_time BETWEEN #{key.startTime} AND #{key.endTime}

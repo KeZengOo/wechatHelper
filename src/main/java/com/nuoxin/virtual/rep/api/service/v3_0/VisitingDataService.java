@@ -4,6 +4,7 @@ import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.VisitDataRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.VisitDataResponse;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -22,5 +23,13 @@ public interface VisitingDataService {
      * @return page
      */
     PageResponseBean<VisitDataResponse> getVisitDataByPage(String leaderPath, VisitDataRequest request);
+
+    /**
+     * 导出拜访数据汇总记录
+     * @param response 相应内容
+     * @param leaderPath 当前用户的关联人员
+     * @param request 请求对象
+     */
+    void exportVisitDataSummary(HttpServletResponse response, String leaderPath, VisitDataRequest request);
 
 }
