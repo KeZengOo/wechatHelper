@@ -16,6 +16,7 @@ import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.statistics.Produc
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DailyReportResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.VisitResultDoctorNumStatisticsResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.VisitResultHospitalNumStatisticsResponse;
+import com.nuoxin.virtual.rep.api.web.controller.v3_0.daily.MyAchievementResponse;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -52,6 +53,11 @@ public class DailyReportServiceImpl implements DailyReportService {
         if (CollectionsUtil.isEmptyList(request.getDrugUserIdList())){
             throw new BusinessException(ErrorEnum.ERROR, "代表不能为空！");
         }
+
+
+
+        // 拜访的明细，按照天
+
 
 
         Long productId = productIdList.get(0);
@@ -100,8 +106,20 @@ public class DailyReportServiceImpl implements DailyReportService {
     @Override
     public DailyReportResponse getDailyReport(DailyReportRequest request) {
 
+
+        /*
+         * 我的业绩相关
+         */
         // 招募医生数
         Integer recruitDoctorNum = dailyReportMapper.recruitDoctorNum(request);
+
+        // 有收益的覆盖医生数
+        Integer activeCoverDoctorNum = dailyReportMapper.activeCoverDoctorNum(request);
+
+        // 多渠道覆盖医生数
+        Integer mulChannelDoctorNum = dailyReportMapper.mulChannelDoctorNum(request);
+
+
 
         // 覆盖医生数
         Integer coverDoctorNum = dailyReportMapper.coverDoctorNum(request);
@@ -113,11 +131,9 @@ public class DailyReportServiceImpl implements DailyReportService {
         // 未招募医生数
         Integer noRecruitDoctorNum = 0;
 
-        // 有收益的覆盖医生数
-        Integer activeCoverDoctorNum = dailyReportMapper.activeCoverDoctorNum(request);
 
-        // 多渠道覆盖医生数
-        Integer mulChannelDoctorNum = dailyReportMapper.mulChannelDoctorNum(request);
+
+
 
         // 产品设置的不同拜访结果医生数统计
         List<VisitResultDoctorNumStatisticsResponse> visitResultDoctorNumList = dailyReportMapper.getVisitResultDoctorNumList(request);
@@ -209,6 +225,27 @@ public class DailyReportServiceImpl implements DailyReportService {
 
     }
 
+    @Override
+    public MyAchievementResponse getMyAchievement(DailyReportRequest request) {
+
+        // 招募医生数
+        Integer recruitDoctorNum = dailyReportMapper.recruitDoctorNum(request);
+
+        // 有收益的覆盖医生数
+        Integer activeCoverDoctorNum = dailyReportMapper.activeCoverDoctorNum(request);
+
+        // 多渠道覆盖医生数
+        Integer mulChannelDoctorNum = dailyReportMapper.mulChannelDoctorNum(request);
+
+        MyAchievementResponse myAchievement = new MyAchievementResponse();
+        myAchievement.setRecruitDoctorNum(recruitDoctorNum);
+        myAchievement.setActiveCoverDoctorNum(activeCoverDoctorNum);
+        myAchievement.setMulChannelDoctorNum(mulChannelDoctorNum);
+
+        return myAchievement;
+
+    }
+
 
     /**
      * 导出的Excel数据
@@ -264,7 +301,7 @@ public class DailyReportServiceImpl implements DailyReportService {
         dataMap.put("quitDoctorNum", quitDoctorNum);
         dataMap.put("targetHospital", targetHospital);
         dataMap.put("recruitHospital", recruitHospitalNum);
-        dataMap.put("recuritHospitalRate", recruitHospitalRate);
+        dataMap.put("recruitHospitalRate", recruitHospitalRate);
 
         if (CollectionsUtil.isNotEmptyList(visitResultHospitalNumList)){
             visitResultHospitalNumList.forEach(h->{
@@ -314,7 +351,7 @@ public class DailyReportServiceImpl implements DailyReportService {
         titleMap.put("quitDoctorNum", "退出项目医生数");
         titleMap.put("targetHospital", "目标医院数");
         titleMap.put("recruitHospital", "招募医院数");
-        titleMap.put("recuritHospitalRate", "医院招募率");
+        titleMap.put("recruitHospitalRate", "医院招募率");
 
         if (CollectionsUtil.isNotEmptyList(recruitDoctorVisitResultList)){
             recruitDoctorVisitResultList.forEach(r->{

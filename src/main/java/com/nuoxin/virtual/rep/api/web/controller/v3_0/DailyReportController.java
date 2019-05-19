@@ -12,6 +12,7 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.MyDoctorRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DailyReportResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.MyDoctorResponse;
 import com.nuoxin.virtual.rep.api.web.controller.v2_5.NewBaseController;
+import com.nuoxin.virtual.rep.api.web.controller.v3_0.daily.MyAchievementResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
@@ -44,6 +45,17 @@ public class DailyReportController extends NewBaseController {
         responseBean.setData(dailyReport);
         return responseBean;
     }
+
+
+    @ApiOperation(value = "我的业绩")
+    @PostMapping(value = "/my/achievement")
+    public DefaultResponseBean<MyAchievementResponse> getMyAchievement(@RequestBody DailyReportRequest request){
+        MyAchievementResponse myAchievement = dailyReportService.getMyAchievement(request);
+        DefaultResponseBean<MyAchievementResponse> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(myAchievement);
+        return responseBean;
+    }
+
 
 
     @ApiOperation(value = "导出")

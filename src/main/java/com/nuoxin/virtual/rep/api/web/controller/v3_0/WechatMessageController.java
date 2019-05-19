@@ -92,6 +92,8 @@ public class WechatMessageController {
         String productIdStr = request.getParameter("productIdStr");
         String drugUserIdStr = request.getParameter("drugUserIdStr");
 
+
+
         List<Long> productIdList;
         List<Long> drugUserIdList;
 

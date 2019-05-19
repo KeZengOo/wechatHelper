@@ -1,8 +1,8 @@
 package com.nuoxin.virtual.rep.api.mybatis;
 
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.DailyReportRequest;
-import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.VisitResultDoctorNumStatisticsResponse;
-import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.VisitResultHospitalNumStatisticsResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.*;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -20,7 +20,6 @@ public interface DailyReportMapper {
      * @return
      */
     Integer recruitDoctorNum(DailyReportRequest reportRequest);
-
 
 
     /**
@@ -138,5 +137,150 @@ public interface DailyReportMapper {
      * @return
      */
     Integer quitDoctorNum(DailyReportRequest reportRequest);
+
+
+    /**
+     * 拜访医生数：
+     * 所有打电话的医生+拜访登记的医生+参会医生+微信聊过天的医生（无论医生是否回复）+ 短信分享文章 + 小程序阅读
+     * @param reportRequest
+     * @return
+     */
+    List<VisitDoctorStatisticsResponse> visitDateDoctorNum(DailyReportRequest reportRequest);
+
+
+
+    /**
+     * 拜访医院数：
+     * 所有打电话的医生+拜访登记的医生+参会医生+微信聊过天的医生（无论医生是否回复）+ 短信分享文章 + 小程序阅读
+     * @param reportRequest
+     * @return
+     */
+    List<VisitHospitalStatisticsResponse> visitDateHospitalNum(DailyReportRequest reportRequest);
+
+    /**
+     * 不同的拜访结果的医生数统计
+     * @param reportRequest
+     * @param visitType
+     * @return
+     */
+    Integer visitResultDoctorNum(DailyReportRequest reportRequest,@Param(value = "visitType") Integer visitType);
+
+
+    /**
+     * 不同的拜访结果的医生数统计
+     * @param reportRequest
+     * @param visitType
+     * @return
+     */
+    List<VisitDoctorStatisticsResponse> visitDateVisitResultDoctorNum(DailyReportRequest reportRequest,@Param(value = "visitType") Integer visitType);
+
+
+    /**
+     * 不同的拜访结果的医院数统计
+     * @param reportRequest
+     * @param visitType
+     * @return
+     */
+    Integer visitResultHospitalNum(DailyReportRequest reportRequest,@Param(value = "visitType") Integer visitType);
+
+
+    /**
+     * 不同的拜访结果的医院数统计
+     * @param reportRequest
+     * @param visitType
+     * @return
+     */
+    List<VisitHospitalStatisticsResponse> visitDateVisitResultHospitalNum(DailyReportRequest reportRequest,@Param(value = "visitType") Integer visitType);
+
+
+
+
+    /**
+     * 拜访次数
+     * 算法：拜访登记+参会+内容(APP+小程序)
+     *
+     * @param reportRequest
+     * @return
+     */
+    Integer visitCount(DailyReportRequest reportRequest);
+
+
+
+    /**
+     * 拜访次数, 分日期
+     * 算法：拜访登记+参会+内容(APP+小程序)
+     *
+     * @param reportRequest
+     * @return
+     */
+    List<VisitCountStatisticsResponse> visitDateVisitCount(DailyReportRequest reportRequest);
+
+
+
+    /**
+     * 不同的拜访渠道的医生人数统计结果
+     * @param reportRequest
+     * @param visitChannel
+     * @return
+     */
+    Integer callDoctorNum(DailyReportRequest reportRequest,@Param(value = "visitChannel") Integer visitChannel);
+
+
+    /**
+     * 不同的拜访渠道的医生人数统计结果,分日期
+     * @param reportRequest
+     * @param visitChannel
+     * @return
+     */
+    List<VisitCountStatisticsResponse> visitDateCallDoctorNum(DailyReportRequest reportRequest,@Param(value = "visitChannel") Integer visitChannel);
+
+
+    /**
+     * 电话接通数
+     * @param reportRequest
+     * @return
+     */
+    Integer callConnectCount(DailyReportRequest reportRequest);
+
+
+
+    /**
+     * 电话接通数,分日期
+     * @param reportRequest
+     * @return
+     */
+    List<VisitCountStatisticsResponse> visitDateCallConnectCount(DailyReportRequest reportRequest);
+
+    /**
+     * 参会医生数
+     * @param reportRequest
+     * @return
+     */
+    Integer attendMeetingDoctorNum(DailyReportRequest reportRequest);
+
+
+    /**
+     * 参会医生数,分日期
+     * @param reportRequest
+     * @return
+     */
+    List<VisitCountStatisticsResponse> visitDateAttendMeetingDoctorNum(DailyReportRequest reportRequest);
+
+
+    /**
+     * 阅读医生数
+     * @param reportRequest
+     * @return
+     */
+    Integer readDoctorNum(DailyReportRequest reportRequest);
+
+
+
+    /**
+     * 阅读医生数，分日期
+     * @param reportRequest
+     * @return
+     */
+    List<VisitCountStatisticsResponse> visitDateReadDoctorNum(DailyReportRequest reportRequest);
 
 }

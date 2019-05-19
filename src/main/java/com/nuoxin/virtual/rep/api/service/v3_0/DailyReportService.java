@@ -3,6 +3,7 @@ package com.nuoxin.virtual.rep.api.service.v3_0;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.DailyReportRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DailyReportResponse;
+import com.nuoxin.virtual.rep.api.web.controller.v3_0.daily.MyAchievementResponse;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -30,6 +31,16 @@ public interface DailyReportService {
      * @return
      */
     DailyReportResponse getDailyReport(DailyReportRequest request);
+
+
+    /**
+     * 我的业绩
+     * @param request
+     * @return
+     */
+    MyAchievementResponse getMyAchievement(DailyReportRequest request);
+
+
 
 
 }
