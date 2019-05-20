@@ -84,7 +84,7 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
             {
                 m.setAttendanceRate("0%");
             }
-            m.setDoctorCount(doctorIdCountByProductId);
+            m.setDoctorCount(doctorIds.size());
             m.setStartTime(m.getStartTime().substring(0,m.getStartTime().indexOf(".")));
             m.setEndTime(m.getEndTime().substring(0,m.getEndTime().indexOf(".")));
             m.setSubjectNum(subjectCount);
@@ -300,11 +300,11 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
                     if(null != h.getDoctorTel() && null != h.getAttendStartTime() && null != h.getAttendEndTime())
                     {
                         //根据会议ID获取会议项目ID
-                        MeetingParticipantsParams meetingParticipants = meetingRecordMapper.getMeetingItemIdByMeetingId(meetingId);
+//                        MeetingParticipantsParams meetingParticipants = meetingRecordMapper.getMeetingItemIdByMeetingId(meetingId);
                         //根据医生电话号获取医生信息
                         MeetingParticipantsParams meetingParticipantsDoctorInfo = meetingRecordMapper.getDoctorInfoByDoctorTel(h.getDoctorTel());
 
-                        if(null != meetingParticipants.getItemId() && null != meetingParticipantsDoctorInfo.getDoctorId() && null != meetingParticipantsDoctorInfo.getName()){
+                        if(null != meetingParticipantsDoctorInfo.getDoctorId() && null != meetingParticipantsDoctorInfo.getName()){
                             meetingParticipantsExcel.setDoctorId(meetingParticipantsDoctorInfo.getDoctorId().toString());
                             meetingParticipantsExcel.setDoctorName(meetingParticipantsDoctorInfo.getName());
                             meetingParticipantsExcel.setMeetingId(meetingId);
@@ -320,14 +320,14 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
 
                             meetingParticipantsExcel.setAttendSumTime(minutes+"");
                             meetingParticipantsExcel.setType("1");
-                            meetingParticipantsExcel.setItemId(meetingParticipants.getItemId().toString());
+//                            meetingParticipantsExcel.setItemId(meetingParticipants.getItemId().toString());
                             meetingParticipantsExcel.setDoctorTel(h.getDoctorTel());
                             meetingParticipantsTemps.add(meetingParticipantsExcel);
                         }
                         else
                         {
                             map.put("flag",false);
-                            map.put("message","上传数据存在空值");
+                            map.put("message","医生ID、医生姓名数据存在空值");
                             return map;
                         }
 
