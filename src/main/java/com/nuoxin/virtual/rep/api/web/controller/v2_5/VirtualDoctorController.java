@@ -174,7 +174,7 @@ public class VirtualDoctorController extends NewBaseController {
 			return super.getLoginErrorResponse();
 		}
 
-		List<HospitalProvinceBean> list = virtualDoctorService.getHospitals(hospitalName);
+		List<HospitalProvinceBean> list = virtualDoctorService.getHospitals(user.getId(), hospitalName);
 		DefaultResponseBean<List<HospitalProvinceBean>> responseBean = new DefaultResponseBean<List<HospitalProvinceBean>>();
 		responseBean.setData(list);
 		

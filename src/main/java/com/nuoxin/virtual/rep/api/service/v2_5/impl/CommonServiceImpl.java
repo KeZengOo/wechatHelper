@@ -763,6 +763,10 @@ public class CommonServiceImpl implements CommonService {
 
 			// 先查询是否有目标的医院
 			List<HospitalResponse> productHospitalList = productHospitalMapper.getHospitalListByPoductId(product.getId());
+			if (CollectionsUtil.isEmptyList(productHospitalList)){
+				throw new BusinessException(ErrorEnum.ERROR, product.getName() + " 还没有添加目标医院！");
+			}
+
 
 			for (int i = 0; i < doctorVos.size(); i++) {
 				DoctorVo doctorVo = doctorVos.get(i);

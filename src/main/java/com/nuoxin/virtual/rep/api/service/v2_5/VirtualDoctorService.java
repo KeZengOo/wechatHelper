@@ -68,10 +68,11 @@ public interface VirtualDoctorService {
 	
 	/**
 	 * 根据医院名模糊匹配
+	 * @param drugUserId
 	 * @param hospitalName
 	 * @return
 	 */
-	List<HospitalProvinceBean> getHospitals(String hospitalName);
+	List<HospitalProvinceBean> getHospitals(Long drugUserId, String hospitalName);
 
 
 	/**

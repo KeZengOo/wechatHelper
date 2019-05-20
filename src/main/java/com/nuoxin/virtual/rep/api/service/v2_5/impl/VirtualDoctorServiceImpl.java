@@ -407,8 +407,11 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
     }
 
     @Override
-    public List<HospitalProvinceBean> getHospitals(String hospitalName) {
-        return hospitalMapper.getHospitals(hospitalName);
+    public List<HospitalProvinceBean> getHospitals(Long drugUserId, String hospitalName) {
+//        return hospitalMapper.getHospitals(hospitalName);
+
+
+        return hospitalMapper.getHospitalsByDrugUserId(drugUserId, hospitalName);
     }
 
     @Override
