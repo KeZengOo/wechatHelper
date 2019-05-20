@@ -783,9 +783,6 @@ public class CommonServiceImpl implements CommonService {
 				String telephone = doctorVo.getTelephone();
 				List<String> telephoneList = new ArrayList<>();
 				int row = i + 2;
-				if (telephone.contains("，")){
-					telephone = telephone.replace("，", ",");
-				}
 
 				String drugUserEmail = doctorVo.getDrugUserEmail();
 				if (StringUtil.isEmpty(province)){
@@ -865,6 +862,11 @@ public class CommonServiceImpl implements CommonService {
 					detailList.add(doctorImportErrorDetail);
 					failNum ++;
 					continue;
+				}
+
+
+				if (telephone.contains("，")){
+					telephone = telephone.replace("，", ",");
 				}
 
 				if (telephone.contains(",")){
