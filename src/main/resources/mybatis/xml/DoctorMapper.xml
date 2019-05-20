@@ -2253,12 +2253,26 @@
 			</foreach>
 		</if>
 
+
 		<if test="productIdList !=null and productIdList.size > 0">
 			AND dud.prod_id IN
 			<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
 				#{productId}
 			</foreach>
+
+			AND q.product_id IN
+			<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+				#{productId}
+			</foreach>
+
+			AND re.product_id IN
+			<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+				#{productId}
+			</foreach>
+
 		</if>
+
+
 
 		<if test="recruit !=null">
 			AND q.is_recruit=#{recruit}
