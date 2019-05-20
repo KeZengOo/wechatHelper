@@ -27,7 +27,6 @@ public class ExportExcelWrapper<T> extends ExportExcelUtil<T> {
      */
     public  void exportExcel(String fileName, String title, String[] headers, Collection<T> dataset, HttpServletResponse response,String version) {
         try {
-//
             if(StringUtils.isBlank(version) || EXCEL_FILE_2003.equals(version.trim())){
                 response.setContentType("application/vnd.ms-excel");
                 response.addHeader("Content-Disposition", "attachment;filename="+ URLEncoder.encode(fileName, "UTF-8") + ".xls");

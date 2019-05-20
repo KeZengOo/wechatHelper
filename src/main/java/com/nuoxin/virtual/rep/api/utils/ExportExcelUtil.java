@@ -5,9 +5,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Iterator;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -176,11 +174,17 @@ public class ExportExcelUtil<T>{
             t = (T) it.next();
             // 利用反射，根据JavaBean属性的先后顺序，动态调用getXxx()方法得到属性值
             fields = t.getClass().getDeclaredFields();
-            for (int i = 0; i < fields.length; i++) {
+            List<String> fieldList = new ArrayList<>();
+            for(Field f : fields) {
+                fieldList.add(f.getName());
+            }
+            fieldList.remove("serialVersionUID");
+//            for (int i = 0; i < fields.length; i++) {
+            for (int i = 0; i < fieldList.size(); i++) {
                 cell = row.createCell(i);
                 cell.setCellStyle(style2);
-                field = fields[i];
-                fieldName = field.getName();
+//                field = fields[i];
+                fieldName = fieldList.get(i);
                 getMethodName = "get" + fieldName.substring(0, 1).toUpperCase()
                         + fieldName.substring(1);
                 try {
