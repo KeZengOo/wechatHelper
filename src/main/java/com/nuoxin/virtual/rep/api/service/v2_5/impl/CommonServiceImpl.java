@@ -774,6 +774,9 @@ public class CommonServiceImpl implements CommonService {
 				String city = doctorVo.getCity();
 				String hospitalName = doctorVo.getHospitalName();
 				String hospitalLevel = doctorVo.getHospitalLevel();
+				if (StringUtil.isEmpty(hospitalLevel)){
+					hospitalLevel = "0";
+				}
 				String drugHospitalId = doctorVo.getDrugHospitalId();
 				String depart = doctorVo.getDepart();
 				String address = doctorVo.getAddress();
@@ -1164,6 +1167,11 @@ public class CommonServiceImpl implements CommonService {
 				String city = doctorVo.getCity();
 				String hospitalName = doctorVo.getHospitalName();
 				String hospitalLevel = doctorVo.getHospitalLevel();
+
+				if (StringUtil.isEmpty(hospitalLevel)){
+					hospitalLevel = "0";
+				}
+
 				String drugHospitalId = doctorVo.getDrugHospitalId();
 				String depart = doctorVo.getDepart();
 				String address = doctorVo.getAddress();
