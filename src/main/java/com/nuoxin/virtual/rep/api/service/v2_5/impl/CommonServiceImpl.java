@@ -877,6 +877,7 @@ public class CommonServiceImpl implements CommonService {
 						doctorImportErrorDetail.setError("医生手机号为空！");
 						doctorImportErrorDetail.setRowNum(row);
 						detailList.add(doctorImportErrorDetail);
+						failNum ++;
 						continue;
 					}
 
@@ -1256,6 +1257,7 @@ public class CommonServiceImpl implements CommonService {
 						doctorImportErrorDetail.setError("医生手机号为空！");
 						doctorImportErrorDetail.setRowNum(row);
 						detailList.add(doctorImportErrorDetail);
+						failNum ++;
 						continue;
 					}
 
