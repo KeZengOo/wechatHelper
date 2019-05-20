@@ -899,6 +899,7 @@ public class CommonServiceImpl implements CommonService {
 						doctorImportErrorDetail.setError("医生手机号 "+ telephone +" 输入不合法!");
 						doctorImportErrorDetail.setRowNum(row);
 						detailList.add(doctorImportErrorDetail);
+						failNum ++;
 						continue;
 					}
 
