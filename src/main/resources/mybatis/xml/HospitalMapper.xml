@@ -17,8 +17,8 @@
 	</select>
 
 	<select id="getHospitalsByDrugUserId" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.HospitalProvinceBean">
-		SELECT
-			id, name, province, city, level
+		SELECT DISTINCT
+			h.id, h.name, h.province, h.city, h.level
 		FROM hospital h
 		INNER JOIN product_hospital p
 		ON h.name=p.hospital_name
