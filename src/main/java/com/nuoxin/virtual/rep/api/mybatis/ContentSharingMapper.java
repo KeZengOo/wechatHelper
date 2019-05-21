@@ -36,16 +36,18 @@ public interface ContentSharingMapper {
     /**
      * 内容阅读记录列表
      * @param contentReadLogsRequest
+     * @param drugUserIds
      * @return list
      */
-    List<ContentReadLogsParams> getContentReadLogsListPage(@Param("contentReadLogsRequest") ContentReadLogsRequest contentReadLogsRequest);
+    List<ContentReadLogsParams> getContentReadLogsListPage(@Param("contentReadLogsRequest") ContentReadLogsRequest contentReadLogsRequest, @Param("drugUserIds") List<Long> drugUserIds);
 
     /**
      * 内容阅读记录列表Count
      * @param contentReadLogsRequest
+     * @param drugUserIds
      * @return int
      */
-    Integer getContentReadLogsListCount(@Param("contentReadLogsRequest") ContentReadLogsRequest contentReadLogsRequest);
+    Integer getContentReadLogsListCount(@Param("contentReadLogsRequest") ContentReadLogsRequest contentReadLogsRequest, @Param("drugUserIds") List<Long> drugUserIds);
 
     /**
      * 根据内容ID和医生ID查询阅读时间数组和阅读时长数组

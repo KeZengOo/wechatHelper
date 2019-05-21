@@ -66,7 +66,12 @@ public class ContentSharingServiceImpl implements ContentSharingService {
     @Override
     public PageResponseBean<List<ContentReadLogsParams>> getContentReadLogsListPage(ContentReadLogsRequest contentReadLogsRequest) {
 
-        List<ContentReadLogsParams> list = contentSharingMapper.getContentReadLogsListPage(contentReadLogsRequest);
+        List<Long> drugUserIds = new ArrayList<Long>();
+        if(contentReadLogsRequest.getDrugUserId()!= null){
+            drugUserIds = Arrays.asList(contentReadLogsRequest.getDrugUserId());
+        }
+
+        List<ContentReadLogsParams> list = contentSharingMapper.getContentReadLogsListPage(contentReadLogsRequest,drugUserIds);
 
         List<ContentReadLogsParams> newList = new ArrayList<ContentReadLogsParams>();
 
@@ -100,7 +105,7 @@ public class ContentSharingServiceImpl implements ContentSharingService {
             newList.add(c);
         }
 
-        Integer contentReadLogsCount = contentSharingMapper.getContentReadLogsListCount(contentReadLogsRequest);
+        Integer contentReadLogsCount = contentSharingMapper.getContentReadLogsListCount(contentReadLogsRequest,drugUserIds);
 
         return new PageResponseBean(contentReadLogsRequest, contentReadLogsCount, newList);
     }
@@ -229,10 +234,10 @@ public class ContentSharingServiceImpl implements ContentSharingService {
                 contentSharingExcelParams.setSaleType("没有类型为经理");
             }
             else if(list.get(i).getSaleType().equals(1)){
-                contentSharingExcelParams.setSaleType("是线上销售");
+                contentSharingExcelParams.setSaleType("线上");
             }
             else if(list.get(i).getSaleType().equals(2)){
-                contentSharingExcelParams.setSaleType("是线下销售");
+                contentSharingExcelParams.setSaleType("线下");
             }
 
             if(list.get(i).getShareType().equals(1)){
