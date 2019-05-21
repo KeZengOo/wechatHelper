@@ -69,7 +69,7 @@
                 <if test="contentSharingRequest.title != '' and contentSharingRequest.title != null">
                     AND t.title LIKE "%"#{contentSharingRequest.title}"%"
                 </if>
-
+                AND r.read_person_id != ''
                 GROUP BY
                 r.read_person_id,
                 t.id
@@ -124,7 +124,7 @@
                 <if test="contentSharingRequest.title != '' and contentSharingRequest.title != null">
                     AND t.title LIKE "%"#{contentSharingRequest.title}"%"
                 </if>
-
+                AND r.read_person_id != ''
                 GROUP BY
                 r.read_person_id,
                 t.id
@@ -155,6 +155,13 @@
             OR ip.isp != '阿里云'
         )
         AND t.data_id = #{contentReadLogsRequest.dataId}
+        AND t.read_person_id != ''
+        <if test="drugUserIds.size() > 0 and drugUserIds != null">
+            AND t.drug_user_id in
+            <foreach collection="drugUserIds" item="drugUserIds" separator="," open="(" close=")">
+                #{drugUserIds}
+            </foreach>
+        </if>
         GROUP BY t.data_id,d.id
         LIMIT #{contentReadLogsRequest.currentSize},#{contentReadLogsRequest.pageSize}
     </select>
@@ -178,6 +185,13 @@
                     OR ip.isp != '阿里云'
                 )
                 AND t.data_id = #{contentReadLogsRequest.dataId}
+                AND t.read_person_id != ''
+                <if test="drugUserIds.size() > 0 and drugUserIds != null">
+                    AND t.drug_user_id in
+                    <foreach collection="drugUserIds" item="drugUserIds" separator="," open="(" close=")">
+                        #{drugUserIds}
+                    </foreach>
+                </if>
                 GROUP BY
                     t.data_id,
                     d.id
@@ -345,5 +359,19 @@
         ) m
         GROUP BY
         m.title
+    </select>
+
+    <!-- 查询文章列表的代表类型 -->
+    <select id="getContentSharingRoleNameByDrugUserId" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.ContentSharingParams">
+        SELECT
+            t.id,
+            t.`name` AS drugUserName,
+            r.role_name AS roleName
+        FROM
+            drug_user t
+        LEFT JOIN role_user u ON t.id = u.user_id
+        JOIN role r ON r.id = u.role_id
+        WHERE
+            t.id = #{drugUserId}
     </select>
 </mapper>

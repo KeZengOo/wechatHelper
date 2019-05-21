@@ -15,4 +15,6 @@ import lombok.Data;
 public class ContentReadLogsRequest extends PageRequestBean {
     @ApiModelProperty("内容Id")
     private Long dataId;
+    @ApiModelProperty("代表ID")
+    private Long[] drugUserId;
 }
