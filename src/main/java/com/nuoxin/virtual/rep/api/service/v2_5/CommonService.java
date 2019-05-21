@@ -127,4 +127,9 @@ public interface CommonService {
 	 */
 	Map<Long, String> getProductIdNameMap();
 
+
+	/**
+	 * 删除掉重复记录
+	 */
+	void deleteRepeatDrugUserDoctorRecord();
 }

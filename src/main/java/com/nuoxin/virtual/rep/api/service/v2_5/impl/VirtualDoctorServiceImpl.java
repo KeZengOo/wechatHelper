@@ -235,6 +235,8 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
             }
         }
 
+        // 删除重复
+        commonService.deleteRepeatDrugUserDoctorRecord();
 
         return virtualDoctorId;
     }

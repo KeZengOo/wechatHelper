@@ -1592,6 +1592,7 @@ public class CommonServiceImpl implements CommonService {
 	 * 删除掉重复的记录
 	 */
 	@Async
+	@Override
 	public void deleteRepeatDrugUserDoctorRecord(){
 
 		List<Long> availableDeleteIdList = drugUserDoctorMapper.getAvailableDeleteIdList(1);
