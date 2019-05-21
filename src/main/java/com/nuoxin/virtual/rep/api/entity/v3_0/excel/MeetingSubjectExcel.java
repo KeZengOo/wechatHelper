@@ -13,8 +13,14 @@ import java.util.Date;
  * @date 20190506
  */
 public class MeetingSubjectExcel {
+    @Excel(name = "产品ID", width = 50)
+    private String productId;
+    @Excel(name = "产品名称", width = 50)
+    private String productName;
     @Excel(name = "会议名称", width = 50)
     private String meetingName;
+    @Excel(name = "会议Id", width = 50)
+    private String meetingId;
     @Excel(name = "主题名称", width = 50)
     private String subjectName;
     @Excel(name = "演讲人", width = 50)
@@ -23,6 +29,26 @@ public class MeetingSubjectExcel {
     private Date startTime;
     @Excel(name = "主题结束时间", width = 100)
     private Date endTime;
+
+    public String getProductId() {
+        return productId;
+    }
+    public void setProductId(String productId) {
+        this.productId = productId;
+    }
+    public String getMeetingId() {
+        return meetingId;
+    }
+    public void setMeetingId(String meetingId) {
+        this.meetingId = meetingId;
+    }
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
 
     public String getMeetingName() {
         return meetingName;

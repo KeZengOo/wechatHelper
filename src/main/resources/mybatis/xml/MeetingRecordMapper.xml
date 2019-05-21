@@ -190,11 +190,21 @@ FROM
             subject_name,
             speaker,
             start_time,
-            end_time
+            end_time,
+            meeting_id
         )
         VALUES
         <foreach collection="list" item="list" separator=",">
-            (#{list.meetingName}, #{list.subjectName},#{list.speaker},#{list.startTime},#{list.endTime})
+            (#{list.meetingName}, #{list.subjectName},#{list.speaker},#{list.startTime},#{list.endTime},#{list.meetingId})
+        </foreach>
+    </insert>
+
+    <!-- 导入会议 -->
+    <insert id="saveMeetingExcel">
+        INSERT INTO t_meeting_data (title,start_time,end_time,product_name,product_id)
+        VALUES
+        <foreach collection="list" item="list" separator=",">
+            (#{list.meetingName}, #{list.startTime},#{list.endTime},#{list.productName},#{list.productId})
         </foreach>
     </insert>
 
@@ -264,5 +274,22 @@ FROM
           <foreach collection="list" item="list" separator="," open="(" close=")">
               #{list.doctorId}
           </foreach>
+    </select>
+
+    <!-- 根据产品名称获取产品ID -->
+    <select id="getProductIdByProductName" resultType="java.lang.Integer">
+        SELECT t.prod_id FROM product_line t WHERE t.prod_name = #{productName}
+    </select>
+
+    <!-- 根据会议名称和开始结束时间，查找该会议的id -->
+    <select id="getMeetingIdByTitleAndStartTimeAndEndTime" resultType="java.lang.Integer">
+        SELECT
+          t.id
+        FROM
+          t_meeting_data t
+        WHERE
+          t.title = #{title}
+        AND t.start_time &gt;= #{startTime}
+        AND t.end_time &lt;= #{endTime};
     </select>
 </mapper>

@@ -205,21 +205,22 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
             }
         }
 
-        List<MeetingSubjectExcel> meetingTemps = new ArrayList<MeetingSubjectExcel>();
+        List<MeetingSubjectExcel> meetingSubjectTemps = new ArrayList<MeetingSubjectExcel>();
 
         for (MeetingSubjectExcel h : meetingSubjectExcels) {
             MeetingSubjectExcel meetingSubjectExcel = new MeetingSubjectExcel();
 
             if (h != null) {
                 try {
-                    if(null != h.getMeetingName() && null != h.getSubjectName() && null != h.getSpeaker() && null != h.getStartTime() && null != h.getEndTime())
+                    if(null != h.getProductName() && null != h.getMeetingName() && null != h.getSubjectName() && null != h.getSpeaker() && null != h.getStartTime() && null != h.getEndTime())
                     {
+                        meetingSubjectExcel.setProductName(h.getProductName());
                         meetingSubjectExcel.setMeetingName(h.getMeetingName());
                         meetingSubjectExcel.setSubjectName(h.getSubjectName());
                         meetingSubjectExcel.setSpeaker(h.getSpeaker());
                         meetingSubjectExcel.setStartTime(h.getStartTime());
                         meetingSubjectExcel.setEndTime(h.getEndTime());
-                        meetingTemps.add(meetingSubjectExcel);
+                        meetingSubjectTemps.add(meetingSubjectExcel);
                     }
                     else
                     {
@@ -235,21 +236,82 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
 
         //把list存到mysql
         boolean result = false;
+        boolean meetingResult = false;
         try {
-            result = meetingRecordMapper.saveExcel(meetingTemps);
-            flag = result;
-            map.put("flag",flag);
+            Map<String,String> meetingNameMap = new HashMap<String,String>();
+            //保存会议
+            List<MeetingSubjectExcel> meetingList = new ArrayList<MeetingSubjectExcel>();
+
+            //获取Excel中的会议名称，并放入Map去重
+            meetingSubjectTemps.forEach(n->{
+                meetingNameMap.put(n.getMeetingName(),n.getProductName());
+            });
+
+            //通过会议名称遍历，查出每个会议的所有主题的开始和结束时间
+            for(String key:meetingNameMap.keySet()){
+                List<Date> meetingDateList = new ArrayList<Date>();
+                //根据会议名称匹配Excel中匹配的数据会议时间，放入list排序
+                for (int i = 0; i < meetingSubjectTemps.size(); i++){
+                    if(meetingSubjectTemps.get(i).getMeetingName().equals(key)){
+                        meetingDateList.add(meetingSubjectTemps.get(i).getStartTime());
+                        meetingDateList.add(meetingSubjectTemps.get(i).getEndTime());
+                    }
+                }
+                //对时间进行排序
+                meetingDateList.sort(Date::compareTo);
+                MeetingSubjectExcel m = new MeetingSubjectExcel();
+                Integer productId = meetingRecordMapper.getProductIdByProductName(meetingNameMap.get(key));
+                m.setMeetingName(key);
+                m.setStartTime(meetingDateList.get(0));
+                m.setEndTime(meetingDateList.get(meetingDateList.size()-1));
+                m.setProductName(meetingNameMap.get(key));
+                m.setProductId(String.valueOf(productId));
+                meetingList.add(m);
+             }
+
+            //导入会议
+            meetingResult = meetingRecordMapper.saveMeetingExcel(meetingList);
+
+            if(!meetingResult)
+            {
+                map.put("flag",meetingResult);
+                map.put("message","上传会议失败");
+                return map;
+            }
+
+            //会议列表-会议名称与主题列表-会议名称匹配，如果匹配，便把会议列表的会议id放入主题列表中
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            meetingList.forEach(n->{
+                Integer meetingId = meetingRecordMapper.getMeetingIdByTitleAndStartTimeAndEndTime(n.getMeetingName(),sdf.format(n.getStartTime()),sdf.format(n.getEndTime()));
+
+                for (int i = 0; i < meetingSubjectTemps.size(); i++)
+                {
+                    if (n.getMeetingName().equals(meetingSubjectTemps.get(i).getMeetingName()))
+                    {
+                        meetingSubjectTemps.get(i).setMeetingId(String.valueOf(meetingId));
+                    }
+                }
+            });
+
+            result = meetingRecordMapper.saveExcel(meetingSubjectTemps);
+            if(!result)
+            {
+                map.put("flag",result);
+                map.put("message","上传主题失败");
+                return map;
+            }
+            map.put("flag",true);
             map.put("message","上传会议成功");
         } catch (Exception e) {
             log.error("IOException", e);
-            map.put("flag",flag);
+            map.put("flag",false);
             map.put("message","上传会议失败");
         }
+//        //预计导入条数
+//        map.put("estimatedNumber",meetingSubjectExcels.size());
+//        //预计导入条数
+//        map.put("actualNumber",meetingTemps.size());
 
-        //预计导入条数
-        map.put("estimatedNumber",meetingSubjectExcels.size());
-        //预计导入条数
-        map.put("actualNumber",meetingTemps.size());
         return map;
     }
 

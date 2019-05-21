@@ -136,4 +136,27 @@ public interface MeetingRecordMapper {
      * @return int
      */
     Integer getDoctorIdsCountByProductId(@Param("productId")Integer productId, @Param("list") List<MeetingAttendDetailsParams> list);
+
+    /**
+     * 导入会议
+     * @param list
+     * @return
+     */
+    boolean saveMeetingExcel(@Param("list")List<MeetingSubjectExcel> list);
+
+    /**
+     *根据产品名称获取产品ID
+     * @param productName
+     * @return
+     */
+    Integer getProductIdByProductName(@Param("productName")String productName);
+
+    /**
+     * 根据会议名称和开始结束时间，查找该会议的id
+     * @param title
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    Integer getMeetingIdByTitleAndStartTimeAndEndTime(@Param("title")String title,@Param("startTime")String startTime,@Param("endTime")String endTime);
 }
