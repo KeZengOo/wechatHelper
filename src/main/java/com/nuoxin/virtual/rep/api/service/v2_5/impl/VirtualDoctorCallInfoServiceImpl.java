@@ -84,7 +84,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 	@Override
 	public boolean saveConnectedCallInfo(SaveCallInfoRequest saveRequest) {
-		this.configSaveCallInfoRequestValue(saveRequest);
+//		this.configSaveCallInfoRequestValue(saveRequest);
 
 		// 填充上拜访结果ID字段
 		this.fillVisitResultIdList(saveRequest);
