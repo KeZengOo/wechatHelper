@@ -36,4 +36,6 @@ public class ContentSharingParams {
     private String prodName;
     @ApiModelProperty("销售类型，0是没有类型为经理的，1是线上销售，2是线下销售")
     private Integer saleType;
+    @ApiModelProperty("代表类型")
+    private String roleName;
 }

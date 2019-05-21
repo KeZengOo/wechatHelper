@@ -75,4 +75,11 @@ public interface ContentSharingMapper {
      * @return list
      */
     List<ContentSharingParams> getContentSharingCSVList(@Param("productId")Integer productId, @Param("drugUserIds") List<Long> drugUserIds, @Param("startTimeAfter")String startTimeAfter, @Param("startTimeBefore")String startTimeBefore, @Param("shareType") Integer shareType, @Param("title") String title);
+
+    /**
+     * 查询文章列表的代表类型
+     * @param drugUserId
+     * @return
+     */
+    List<ContentSharingParams> getContentSharingRoleNameByDrugUserId(@Param("drugUserId") Long drugUserId);
 }

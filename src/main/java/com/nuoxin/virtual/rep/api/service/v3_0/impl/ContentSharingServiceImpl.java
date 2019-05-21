@@ -51,9 +51,17 @@ public class ContentSharingServiceImpl implements ContentSharingService {
         List<ContentSharingParams> newList = new ArrayList<ContentSharingParams>();
 
         list.forEach(n->{
+            List<ContentSharingParams> roleNames =  contentSharingMapper.getContentSharingRoleNameByDrugUserId(n.getDrugUserId());
+            String roleNamesString = "";
+            for (int i=0; i<roleNames.size(); i++)
+            {
+                roleNamesString += roleNames.get(i).getRoleName()+",";
+            }
+
             ContentSharingParams c = new ContentSharingParams();
             c = n;
             c.setTime(n.getTime().substring(0,n.getTime().indexOf(".")));
+            c.setRoleName(roleNamesString.substring(0,roleNamesString.length()-1));
             c.setTotalDuration(ParseTimeSecondsUtils.secondToTime(Long.parseLong(n.getTotalDuration())));
             newList.add(c);
         });

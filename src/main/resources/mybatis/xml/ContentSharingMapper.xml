@@ -360,4 +360,18 @@
         GROUP BY
         m.title
     </select>
+
+    <!-- 查询文章列表的代表类型 -->
+    <select id="getContentSharingRoleNameByDrugUserId" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.ContentSharingParams">
+        SELECT
+            t.id,
+            t.`name` AS drugUserName,
+            r.role_name AS roleName
+        FROM
+            drug_user t
+        LEFT JOIN role_user u ON t.id = u.user_id
+        JOIN role r ON r.id = u.role_id
+        WHERE
+            t.id = #{drugUserId}
+    </select>
 </mapper>
