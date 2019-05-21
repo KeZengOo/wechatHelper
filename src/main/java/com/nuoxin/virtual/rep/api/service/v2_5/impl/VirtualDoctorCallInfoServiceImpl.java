@@ -519,7 +519,8 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		if (request instanceof SaveCallInfoRequest) {
 			SaveCallInfoRequest saveRequest = (SaveCallInfoRequest)request;
 			
-			relationShipParams.setIsRecruit(saveRequest.getIsRecruit()); // 是否有药
+			relationShipParams.setIsRecruit(saveRequest.getIsRecruit()); // 是否招募
+			relationShipParams.setIsCover(saveRequest.getIsCover());
 			relationShipParams.setIsHasDrug(saveRequest.getIsHasDrug()); // 是否有药
 			relationShipParams.setIsTarget(saveRequest.getIsTarget()); // 是否目标客户
 			relationShipParams.setIsHasAe(saveRequest.getIsHasAe()); //是否AE

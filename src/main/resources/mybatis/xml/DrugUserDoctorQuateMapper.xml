@@ -21,7 +21,7 @@
 		REPLACE INTO drug_user_doctor_quate 
 		(drug_user_id,doctor_id,product_id, is_has_drug,is_target,is_recruit,is_cover,
 		is_has_ae, is_break_off, hcp_potential, attitude)
-		VALUE (#{virtualDrugUserId}, #{doctorId}, #{productLineId}, #{isHasDrug}, #{isTarget}, #{isRecruit},#{isCover}
+		VALUE (#{virtualDrugUserId}, #{doctorId}, #{productLineId}, #{isHasDrug}, #{isTarget}, #{isRecruit},#{isCover},
 		#{isHasAe}, #{isBreakOff}, #{hcpPotential}, #{attitude})
 	</insert>
 
@@ -33,7 +33,7 @@
 		REPLACE INTO product_doctor_quate
 		(doctor_id,product_id, is_has_drug,is_target,is_recruit,is_cover,
 		is_has_ae, is_break_off, hcp_potential, attitude)
-		VALUE (#{doctorId}, #{productLineId}, #{isHasDrug}, #{isTarget}, #{isRecruit},#{isCover}
+		VALUE (#{doctorId}, #{productLineId}, #{isHasDrug}, #{isTarget}, #{isRecruit},#{isCover},
 		#{isHasAe}, #{isBreakOff}, #{hcpPotential}, #{attitude})
 	</insert>
 

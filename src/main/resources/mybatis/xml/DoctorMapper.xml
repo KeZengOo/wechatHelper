@@ -2462,7 +2462,47 @@
 		doctor d
 		LEFT JOIN hospital h
 		ON d.hospital_id=h.id
-		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+
+		<!--
+		INNER JOIN drug_user_doctor dud
+		-->
+
+		INNER JOIN (
+		SELECT drug_user_id, doctor_id, prod_id, is_available FROM drug_user_doctor WHERE is_available=1
+
+		<if test="drugUserIdList !=null and drugUserIdList.size > 0">
+			AND drug_user_id IN
+			<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+				#{drugUserId}
+			</foreach>
+		</if>
+
+		<if test="productIdList !=null and productIdList.size > 0">
+			AND prod_id IN
+			<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+				#{productId}
+			</foreach>
+		</if>
+
+		GROUP BY drug_user_id, doctor_id, prod_id
+
+		UNION
+
+		SELECT drug_user_id, doctor_id, prod_id, is_available FROM drug_user_doctor WHERE is_available=0
+
+		<if test="productIdList !=null and productIdList.size > 0">
+			AND prod_id IN
+			<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+				#{productId}
+			</foreach>
+		</if>
+
+		GROUP BY  doctor_id, prod_id
+
+		) dud
+
+
+		ON d.id = dud.doctor_id
 		INNER JOIN drug_user du ON dud.drug_user_id = du.id
 		INNER JOIN product_line pl ON dud.prod_id = pl.prod_id
 		LEFT JOIN
@@ -2570,7 +2610,48 @@
 		dud.prod_id
 		FROM
 		doctor d
-		INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+
+		<!--
+		INNER JOIN drug_user_doctor dud
+		-->
+
+		INNER JOIN (
+		SELECT drug_user_id, doctor_id, prod_id, is_available FROM drug_user_doctor WHERE is_available=1
+
+		<if test="drugUserIdList !=null and drugUserIdList.size > 0">
+			AND drug_user_id IN
+			<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+				#{drugUserId}
+			</foreach>
+		</if>
+
+		<if test="productIdList !=null and productIdList.size > 0">
+			AND prod_id IN
+			<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+				#{productId}
+			</foreach>
+		</if>
+
+		GROUP BY drug_user_id, doctor_id, prod_id
+
+		UNION
+
+		SELECT drug_user_id, doctor_id, prod_id, is_available FROM drug_user_doctor WHERE is_available=0
+
+		<if test="productIdList !=null and productIdList.size > 0">
+			AND prod_id IN
+			<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+				#{productId}
+			</foreach>
+		</if>
+
+		GROUP BY  doctor_id, prod_id
+
+		) dud
+
+
+
+		ON d.id = dud.doctor_id
 		INNER JOIN drug_user du ON dud.drug_user_id = du.id
 		INNER JOIN product_line pl ON dud.prod_id = pl.prod_id
 		LEFT JOIN
