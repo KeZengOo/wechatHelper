@@ -7,10 +7,11 @@ import lombok.Data;
 import java.util.Date;
 
 /**
- * 会议详情导入
+ * 会议详情导入，废弃，使用V3.0的
  * Create by tiancun on 2017/10/11
  */
 @Data
+@Deprecated
 public class MeetingDetailVo {
 
     @Excel(name = "医生手机号")

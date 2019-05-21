@@ -44,6 +44,7 @@ public interface MeetingRecordService {
      * @param file
      * @return map
      */
+    @Deprecated
     Map<String, Object> meetingImport(MultipartFile file);
 
     /**
@@ -52,6 +53,7 @@ public interface MeetingRecordService {
      * @param meetId
      * @return map
      */
+    @Deprecated
     Map<String, Object> meetingParticipantsImport(MultipartFile file, String meetId);
 
     /**
@@ -62,5 +64,13 @@ public interface MeetingRecordService {
      * @return boolean
      */
     boolean updateMeetingSubjectProductIdByMeetingName(String meetingName, Integer productId, String productName, Integer id);
+
+
+
+
+
+
+
+
 
 }

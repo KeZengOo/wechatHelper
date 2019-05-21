@@ -5,9 +5,10 @@ import com.nuoxin.virtual.rep.api.common.annotations.Excel;
 import java.util.Date;
 
 /**
- * 会议导入
+ * 会议导入,使用 V3.0 的
  * Create by tiancun on 2017/10/11
  */
+@Deprecated
 public class MeetingVo {
 
 

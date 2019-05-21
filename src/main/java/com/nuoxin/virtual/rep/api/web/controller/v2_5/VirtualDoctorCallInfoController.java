@@ -67,7 +67,7 @@ public class VirtualDoctorCallInfoController extends NewBaseController{
 
 	@SuppressWarnings("unchecked")
 	@ApiOperation(value = "保存电话接通拜访信息", notes = "保存电话接通拜访信息")
-	@RequestMapping(value = "  /connected/save", method = { RequestMethod.POST })
+	@RequestMapping(value = "/connected/save", method = { RequestMethod.POST })
 	public DefaultResponseBean<Boolean> connectedSave(HttpServletRequest request, 
 			                                                             @RequestBody @Valid  SaveCallInfoRequest saveRequest, 
 			                                                             BindingResult bindingResult) {
