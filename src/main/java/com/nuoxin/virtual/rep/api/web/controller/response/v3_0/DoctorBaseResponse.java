@@ -46,7 +46,10 @@ public class DoctorBaseResponse implements Serializable {
     private String city;
 
     @ApiModelProperty(value = "医院等级")
-    private String hospitalLevel;
+    private Integer hospitalLevel;
+
+    @ApiModelProperty(value = "医院等级，供前端展示用")
+    private String hospitalLevelStr;
 
     @ApiModelProperty(value = "科室")
     private String depart;

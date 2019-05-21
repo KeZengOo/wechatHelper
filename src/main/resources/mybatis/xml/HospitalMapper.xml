@@ -15,6 +15,21 @@
 		FROM hospital 
 		WHERE name LIKE "%"#{name}"%" LIMIT 20
 	</select>
+
+	<select id="getHospitalsByDrugUserId" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.HospitalProvinceBean">
+		SELECT DISTINCT
+			h.id, h.name, h.province, h.city, h.level
+		FROM hospital h
+		INNER JOIN product_hospital p
+		ON h.name=p.hospital_name
+		WHERE h.name LIKE CONCAT('%', #{name}, '%')
+		AND p.product_id IN
+		(
+		SELECT DISTINCT prod_id FROM product_user WHERE user_id=#{drugUserId}
+		)
+		LIMIT 20
+	</select>
+
 	
 	<insert id="saveHospital" keyProperty="id" useGeneratedKeys="true">
 		INSERT INTO hospital 

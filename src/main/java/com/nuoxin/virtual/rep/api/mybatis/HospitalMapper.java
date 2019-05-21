@@ -3,6 +3,7 @@ package com.nuoxin.virtual.rep.api.mybatis;
 import java.util.List;
 
 import com.nuoxin.virtual.rep.api.entity.v2_5.HospitalProvinceBean;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 客户医生 Mapper
@@ -23,6 +24,16 @@ public interface HospitalMapper {
 	 * @return
 	 */
 	List<HospitalProvinceBean> getHospitals(String name);
+
+
+	/**
+	 * 根据医院名获取医院信息(模糊匹配)
+	 * @param drugUserId
+	 * @param name
+	 * @return
+	 */
+	List<HospitalProvinceBean> getHospitalsByDrugUserId(@Param(value = "drugUserId") Long drugUserId,@Param(value = "name") String name);
+
 	
 	/**
 	 * 保存医院信息

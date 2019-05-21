@@ -10,6 +10,7 @@ import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v3_0.MyDoctorService;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.utils.ExcelUtils;
+import com.nuoxin.virtual.rep.api.utils.HospitalLevelUtil;
 import com.nuoxin.virtual.rep.api.utils.RegularUtils;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.MyDoctorRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.vo.DoctorVo;
@@ -104,6 +105,8 @@ public class MyDoctorServiceImpl implements MyDoctorService {
             }
 
             for (MyDoctorResponse doctor : myDoctorList) {
+
+                doctor.setHospitalLevelStr(HospitalLevelUtil.getLevelNameByLevelCode("" +doctor.getHospitalLevel()));
                 Long doctorId = doctor.getDoctorId();
                 List<DoctorTelephoneResponse> doctorTelephones = doctorTelephoneMap.get(doctorId);
                 // 去掉无效的手机号

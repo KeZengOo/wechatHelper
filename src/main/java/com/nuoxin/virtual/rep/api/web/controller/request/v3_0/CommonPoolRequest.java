@@ -19,6 +19,9 @@ public class CommonPoolRequest extends DoctorBaseRequest implements Serializable
     @ApiModelProperty(value = "是否关联代表，1是关联，0是未关联，其他展示全部")
     private Integer relationDrugUser;
 
+    @ApiModelProperty(value = "上次拜访时间排序，up 是时间升序，down 是时间降序, 默认是降序")
+    private String lastVisitTimeOrder = "down";
+
     @ApiModelProperty(value = "是否是可分页的,0和null 可以分页的，其他是可以分页的")
     private Integer paginable;
 

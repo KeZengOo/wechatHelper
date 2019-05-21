@@ -763,6 +763,10 @@ public class CommonServiceImpl implements CommonService {
 
 			// 先查询是否有目标的医院
 			List<HospitalResponse> productHospitalList = productHospitalMapper.getHospitalListByPoductId(product.getId());
+			if (CollectionsUtil.isEmptyList(productHospitalList)){
+				throw new BusinessException(ErrorEnum.ERROR, product.getName() + " 还没有添加目标医院！");
+			}
+
 
 			for (int i = 0; i < doctorVos.size(); i++) {
 				DoctorVo doctorVo = doctorVos.get(i);
@@ -770,6 +774,9 @@ public class CommonServiceImpl implements CommonService {
 				String city = doctorVo.getCity();
 				String hospitalName = doctorVo.getHospitalName();
 				String hospitalLevel = doctorVo.getHospitalLevel();
+				if (StringUtil.isEmpty(hospitalLevel)){
+					hospitalLevel = "0";
+				}
 				String drugHospitalId = doctorVo.getDrugHospitalId();
 				String depart = doctorVo.getDepart();
 				String address = doctorVo.getAddress();
@@ -779,9 +786,6 @@ public class CommonServiceImpl implements CommonService {
 				String telephone = doctorVo.getTelephone();
 				List<String> telephoneList = new ArrayList<>();
 				int row = i + 2;
-				if (telephone.contains("，")){
-					telephone = telephone.replace("，", ",");
-				}
 
 				String drugUserEmail = doctorVo.getDrugUserEmail();
 				if (StringUtil.isEmpty(province)){
@@ -863,6 +867,11 @@ public class CommonServiceImpl implements CommonService {
 					continue;
 				}
 
+
+				if (telephone.contains("，")){
+					telephone = telephone.replace("，", ",");
+				}
+
 				if (telephone.contains(",")){
 					String[] telephoneArray = telephone.split(",");
 					if (CollectionsUtil.isEmptyArray(telephoneArray)){
@@ -871,6 +880,7 @@ public class CommonServiceImpl implements CommonService {
 						doctorImportErrorDetail.setError("医生手机号为空！");
 						doctorImportErrorDetail.setRowNum(row);
 						detailList.add(doctorImportErrorDetail);
+						failNum ++;
 						continue;
 					}
 
@@ -893,6 +903,7 @@ public class CommonServiceImpl implements CommonService {
 						doctorImportErrorDetail.setError("医生手机号 "+ telephone +" 输入不合法!");
 						doctorImportErrorDetail.setRowNum(row);
 						detailList.add(doctorImportErrorDetail);
+						failNum ++;
 						continue;
 					}
 
@@ -1156,6 +1167,11 @@ public class CommonServiceImpl implements CommonService {
 				String city = doctorVo.getCity();
 				String hospitalName = doctorVo.getHospitalName();
 				String hospitalLevel = doctorVo.getHospitalLevel();
+
+				if (StringUtil.isEmpty(hospitalLevel)){
+					hospitalLevel = "0";
+				}
+
 				String drugHospitalId = doctorVo.getDrugHospitalId();
 				String depart = doctorVo.getDepart();
 				String address = doctorVo.getAddress();
@@ -1249,6 +1265,7 @@ public class CommonServiceImpl implements CommonService {
 						doctorImportErrorDetail.setError("医生手机号为空！");
 						doctorImportErrorDetail.setRowNum(row);
 						detailList.add(doctorImportErrorDetail);
+						failNum ++;
 						continue;
 					}
 
@@ -1575,6 +1592,7 @@ public class CommonServiceImpl implements CommonService {
 	 * 删除掉重复的记录
 	 */
 	@Async
+	@Override
 	public void deleteRepeatDrugUserDoctorRecord(){
 
 		List<Long> availableDeleteIdList = drugUserDoctorMapper.getAvailableDeleteIdList(1);

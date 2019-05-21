@@ -114,11 +114,16 @@
     </resultMap>
 
     <select id="relationDrugUser" resultMap="drugUserResponseBean">
-      select du.id,du.name
+      select
+       DISTINCT du.id,du.name
       from product_user pu
       join drug_user du
       on pu.user_id=du.id
-      where pu.prod_id = #{productId}
+      where 1=1
+       <if test="productId !=null and productId !=0">
+           AND pu.prod_id = #{productId}
+       </if>
+
       <if test="leaderPath !=null and leaderPath!=''">
          AND du.leader_path like #{leaderPath,jdbcType=VARCHAR}
       </if>

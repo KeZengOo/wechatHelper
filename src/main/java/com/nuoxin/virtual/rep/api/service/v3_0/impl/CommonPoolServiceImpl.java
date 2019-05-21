@@ -101,6 +101,9 @@ public class CommonPoolServiceImpl implements CommonPoolService {
             }
 
             for (CommonPoolDoctorResponse commonPoolDoctor : commonPoolDoctorList) {
+
+                commonPoolDoctor.setHospitalLevelStr(HospitalLevelUtil.getLevelNameByLevelCode("" + commonPoolDoctor.getHospitalLevel()));
+
                 Long doctorId = commonPoolDoctor.getDoctorId();
                 List<DoctorTelephoneResponse> doctorTelephones = doctorTelephoneMap.get(doctorId);
                 // 去掉无效的手机号
@@ -224,7 +227,7 @@ public class CommonPoolServiceImpl implements CommonPoolService {
             String hospitalName = m.getHospitalName();
             String province = m.getProvince();
             String city = m.getCity();
-            String hospitalLevel = HospitalLevelUtil.getLevelNameByLevelCode(m.getHospitalLevel());
+            String hospitalLevel = HospitalLevelUtil.getLevelNameByLevelCode("" + m.getHospitalLevel());
             Long productId = m.getProductId();
             String productName = m.getProductName();
             String hasDrug = m.getHasDrug();

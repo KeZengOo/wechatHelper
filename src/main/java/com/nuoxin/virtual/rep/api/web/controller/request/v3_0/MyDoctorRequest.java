@@ -19,5 +19,8 @@ public class MyDoctorRequest extends DoctorBaseRequest implements Serializable {
     @ApiModelProperty(value = "搜索的标签, 1、需要会议回访，2、新转入医生，3、超过10天未拜访，4、阅读文章但为拜访")
     private Integer tag;
 
+    @ApiModelProperty(value = "上次拜访时间排序，up 是时间升序，down 是时间降序, 默认是降序")
+    private String lastVisitTimeOrder = "down";
+
 
 }
