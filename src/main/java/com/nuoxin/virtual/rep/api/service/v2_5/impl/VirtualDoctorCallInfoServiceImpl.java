@@ -114,6 +114,14 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 
 		callInfoMapper.addCallPurpose(purposeRequestList);
 
+
+		// 是否丢入公共池
+		Integer commonPool = saveRequest.getCommonPool();
+		if (commonPool !=null && commonPool == 1){
+			this.updateDrugUserDoctorAvailable(saveRequest.getVirtualDrugUserId(), saveRequest.getVirtualDoctorId(), Long.valueOf(saveRequest.getProductId()));
+			commonService.deleteRepeatDrugUserDoctorRecord();
+		}
+
 		return false;
 	}
 
