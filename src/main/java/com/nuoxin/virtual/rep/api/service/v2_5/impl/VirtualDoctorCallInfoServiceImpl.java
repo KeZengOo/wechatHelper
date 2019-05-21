@@ -547,7 +547,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 
 		// 变更产品和医生的关系
 		drugUserDoctorQuateMapper.replaceProductDoctorRelationShipInfo(relationShipParams);
-		this.saveProductDoctorQuateResult(relationShipParams.getId(), visitResultId);
+		this.saveProductDoctorQuateResult(relationShipParams.getQuateId(), visitResultId);
 
 	}
 
@@ -573,7 +573,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	private void saveProductDoctorQuateResult(Long id, List<Long> visitResultId) {
 
 		if (id !=null && id > 0 && CollectionsUtil.isNotEmptyList(visitResultId)){
-			drugUserDoctorQuateResultMapper.batchInsert(id, visitResultId);
+			drugUserDoctorQuateResultMapper.batchInsertProductDoctor(id, visitResultId);
 		}
 	}
 

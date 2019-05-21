@@ -28,7 +28,7 @@
 
 
 	<!-- 使用 MYSQL 私有语法, 通过  doctor_id, product_id 创建唯一约束 -->
-	<insert id="replaceProductDoctorRelationShipInfo" keyProperty="id" useGeneratedKeys="true"
+	<insert id="replaceProductDoctorRelationShipInfo" keyProperty="quateId" useGeneratedKeys="true"
 			parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorQuateParams">
 		REPLACE INTO product_doctor_quate
 		(doctor_id,product_id, is_has_drug,is_target,is_recruit,is_cover,
