@@ -2080,7 +2080,16 @@
 		  HAVING (TO_DAYS(NOW())-TO_DAYS(MAX(v.create_time))) > 10
 		</if>
 
-		ORDER BY max(v.id) DESC
+
+		<if test="lastVisitTimeOrder !=null and lastVisitTimeOrder='down'">
+			ORDER BY max(v.id) DESC
+		</if>
+
+		<if test="lastVisitTimeOrder !=null and lastVisitTimeOrder='up'">
+			ORDER BY max(v.id)
+		</if>
+
+
 		LIMIT #{currentSize}, #{pageSize}
 
 	</select>
@@ -2535,7 +2544,15 @@
 		dud.doctor_id,
 		dud.prod_id
 
-		ORDER BY max(v.id) DESC
+		<if test="lastVisitTimeOrder !=null and lastVisitTimeOrder='down'">
+			ORDER BY max(v.id) DESC
+		</if>
+
+		<if test="lastVisitTimeOrder !=null and lastVisitTimeOrder='up'">
+			ORDER BY max(v.id)
+		</if>
+
+
 
 		<if test="paginable == null or paginable == 0">
 			LIMIT #{currentSize}, #{pageSize}
