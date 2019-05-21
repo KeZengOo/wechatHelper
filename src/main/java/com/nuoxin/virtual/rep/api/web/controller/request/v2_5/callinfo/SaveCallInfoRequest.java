@@ -71,4 +71,10 @@ public class SaveCallInfoRequest  extends BaseCallInfoRequest{
 	@ApiModelProperty(value = "拜访目的请求参数，和拜访结果相关联")
 	@NotNull(message = "拜访结果不能为空")
 	private List<PurposeRequest> purposeRequestList;
+
+
+	@ApiModelProperty(value = "是否放入公共池，1是放入，其他不放入")
+	private Integer commonPool;
+
+
 }

@@ -15,6 +15,7 @@ public class DrugUserDoctorQuateParams {
 	private Integer isHasAe;
 	private Integer isTarget;
 	private Integer isRecruit;
+	private Integer isCover;
 	private Integer isBreakOff;
 	private Integer hcpPotential;
 	private Integer attitude;

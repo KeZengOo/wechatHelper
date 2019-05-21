@@ -84,7 +84,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 	@Override
 	public boolean saveConnectedCallInfo(SaveCallInfoRequest saveRequest) {
-		this.configSaveCallInfoRequestValue(saveRequest);
+//		this.configSaveCallInfoRequestValue(saveRequest);
 
 		// 填充上拜访结果ID字段
 		this.fillVisitResultIdList(saveRequest);
@@ -113,6 +113,14 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		List<PurposeRequest> purposeRequestList = saveRequest.getPurposeRequestList();
 
 		callInfoMapper.addCallPurpose(purposeRequestList);
+
+
+		// 是否丢入公共池
+		Integer commonPool = saveRequest.getCommonPool();
+		if (commonPool !=null && commonPool == 1){
+			this.updateDrugUserDoctorAvailable(saveRequest.getVirtualDrugUserId(), saveRequest.getVirtualDoctorId(), Long.valueOf(saveRequest.getProductId()));
+			commonService.deleteRepeatDrugUserDoctorRecord();
+		}
 
 		return false;
 	}
@@ -511,7 +519,8 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		if (request instanceof SaveCallInfoRequest) {
 			SaveCallInfoRequest saveRequest = (SaveCallInfoRequest)request;
 			
-			relationShipParams.setIsRecruit(saveRequest.getIsRecruit()); // 是否有药
+			relationShipParams.setIsRecruit(saveRequest.getIsRecruit()); // 是否招募
+			relationShipParams.setIsCover(saveRequest.getIsCover());
 			relationShipParams.setIsHasDrug(saveRequest.getIsHasDrug()); // 是否有药
 			relationShipParams.setIsTarget(saveRequest.getIsTarget()); // 是否目标客户
 			relationShipParams.setIsHasAe(saveRequest.getIsHasAe()); //是否AE
