@@ -46,10 +46,12 @@
         FROM product_line pl 
         JOIN product_user pu 
             ON pu.prod_id=pl.prod_id 
-            AND pu.user_id IN 
-            <foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
- 				#{virtualDrugUserId}
-			</foreach>
+
+        WHERE pl.show_place=1
+        AND pu.user_id IN
+        <foreach collection="virtualDrugUserIds" item="virtualDrugUserId" open="(" close=")" separator=",">
+            #{virtualDrugUserId}
+        </foreach>
             
     </select>
 
