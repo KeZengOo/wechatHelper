@@ -307,11 +307,6 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
             map.put("flag",false);
             map.put("message","上传会议失败");
         }
-//        //预计导入条数
-//        map.put("estimatedNumber",meetingSubjectExcels.size());
-//        //预计导入条数
-//        map.put("actualNumber",meetingTemps.size());
-
         return map;
     }
 
