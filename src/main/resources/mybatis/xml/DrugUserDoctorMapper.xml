@@ -117,10 +117,20 @@
 			drug_user_doctor dud
 		WHERE
 			dud.is_available = #{available}
-		GROUP BY
+
+		<if test="available !=null and available == 1">
+			GROUP BY
 			dud.drug_user_id,
 			dud.doctor_id,
 			dud.prod_id
+		</if>
+
+		<if test="available !=null and available == 0">
+			GROUP BY
+			dud.doctor_id,
+			dud.prod_id
+		</if>
+
 		HAVING
 			COUNT(*) > 1
 	</select>
@@ -130,8 +140,8 @@
 		SELECT DISTINCT
 			b.id
 		FROM
-			( SELECT id, dud.doctor_id, dud.drug_user_id, dud.prod_id, is_available FROM drug_user_doctor dud WHERE dud.is_available = 1 ) a
-			INNER JOIN ( SELECT id, dud.doctor_id, dud.prod_id, is_available FROM drug_user_doctor dud WHERE dud.is_available = 0 ) b ON
+			( SELECT id, dud.doctor_id, dud.drug_user_id, dud.prod_id FROM drug_user_doctor dud WHERE dud.is_available = 1 ) a
+			INNER JOIN ( SELECT id, dud.doctor_id, dud.prod_id FROM drug_user_doctor dud WHERE dud.is_available = 0 ) b ON
 			a.doctor_id = b.doctor_id
 			AND a.prod_id = b.prod_id
 	</select>

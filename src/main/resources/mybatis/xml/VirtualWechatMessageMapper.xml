@@ -121,6 +121,7 @@
             GROUP BY dud.drug_user_id, dud.doctor_id, dud.prod_id
 
             UNION ALL
+
             SELECT du.id drugUserId,
             du.name drugUserName,
             pl.prod_id productId,
@@ -146,7 +147,7 @@
             '' depart,
             '' is_recruit,
             '' is_cover,
-            '' totalDialogCount,
+            COUNT(DISTINCT c.id) totalDialogCount,
             '' drugUserDialogCount,
             '' doctorDialogCount,
             (
