@@ -61,7 +61,7 @@ public class ContentSharingServiceImpl implements ContentSharingService {
             ContentSharingParams c = new ContentSharingParams();
             c = n;
             c.setTime(n.getTime().substring(0,n.getTime().indexOf(".")));
-            c.setRoleName(roleNamesString.substring(0,roleNamesString.length()-1));
+            c.setRoleName(roleNamesString.substring(0,roleNamesString.length()));
             c.setTotalDuration(ParseTimeSecondsUtils.secondToTime(Long.parseLong(n.getTotalDuration())));
             newList.add(c);
         });
