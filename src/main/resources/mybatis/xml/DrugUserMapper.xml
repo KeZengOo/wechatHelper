@@ -119,6 +119,8 @@
       from product_user pu
       join drug_user du
       on pu.user_id=du.id
+      INNER JOIN role_user ru
+        ON du.id=ru.user_id AND ru.role_id > 100
       where 1=1
        <if test="productId !=null and productId !=0">
            AND pu.prod_id = #{productId}
@@ -127,6 +129,10 @@
       <if test="leaderPath !=null and leaderPath!=''">
          AND du.leader_path like #{leaderPath,jdbcType=VARCHAR}
       </if>
+
+      AND du.status=1
+      AND ru.role_id IN (101, 104, 105)
+
 
       group by du.id
 
