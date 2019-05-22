@@ -766,7 +766,7 @@ public class DailyReportServiceImpl implements DailyReportService {
         Integer recruitHospitalNum = dailyReportMapper.recruitHospitalNum(request);
         Integer noRecruitHospitalNum = 0;
         noRecruitHospitalNum = targetHospital - recruitHospitalNum;
-        if (noRecruitDoctorNum < 0){
+        if (noRecruitHospitalNum < 0){
             noRecruitHospitalNum = 0;
         }
 
