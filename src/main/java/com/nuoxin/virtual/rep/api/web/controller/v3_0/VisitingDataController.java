@@ -13,6 +13,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -46,13 +48,13 @@ public class VisitingDataController extends NewBaseController implements Seriali
     public DefaultResponseBean<PageResponseBean<VisitDataResponse>> visitDataSummaryList(@RequestBody VisitDataRequest request) throws Exception {
         DrugUser drugUser = this.getDrugUser();
         String leaderPath = drugUser.getLeaderPath();
-        String startTime = request.getStartTime();
-        String endTime = request.getEndTime();
+        Date startTime = request.getStartTime();
+        Date endTime = request.getEndTime();
         List<Long> proIds = request.getProductIdList();
         if(CollectionUtils.isEmpty(proIds)) {
             throw new Exception("参数不合法!");
         }
-        if(StringUtils.isBlank(startTime) || StringUtils.isBlank(endTime)) {
+        if(startTime == null || endTime == null) {
             throw new Exception("参数不合法!");
         }
 
@@ -69,8 +71,19 @@ public class VisitingDataController extends NewBaseController implements Seriali
         String leaderPath = drugUser.getLeaderPath();
         String startTime = request.getParameter("startTime");
         String endTime = request.getParameter("endTime");
+        Date startDate;
+        Date endDate;
         if(StringUtils.isBlank(startTime) || StringUtils.isBlank(endTime)) {
             throw new Exception("参数不合法!");
+        } else {
+            try {
+                startDate = DateUtils.parseDate(startTime, "yyyy-MM-dd");
+                endDate = DateUtils.parseDate(endTime, "yyyy-MM-dd");
+                // TODO 增加日期范围验证
+
+            } catch (Exception e) {
+                throw new Exception("参数不合法!");
+            }
         }
         String pIds = request.getParameter("productIdList");
         if(StringUtils.isBlank(pIds)) {
@@ -82,8 +95,8 @@ public class VisitingDataController extends NewBaseController implements Seriali
             productIdList.add(Long.parseLong(s));
         }
         VisitDataRequest req = new VisitDataRequest();
-        req.setStartTime(startTime);
-        req.setEndTime(endTime);
+        req.setStartTime(startDate);
+        req.setEndTime(endDate);
         req.setProductIdList(productIdList);
         String drugIds = request.getParameter("drugUserIdList");
         if(StringUtils.isNotBlank(drugIds)) {
