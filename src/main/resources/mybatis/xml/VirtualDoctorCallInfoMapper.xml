@@ -1819,7 +1819,8 @@
 			IFNULL( GROUP_CONCAT( DISTINCT p.item ), '' ) purpose,
 			IFNULL( GROUP_CONCAT( DISTINCT r.visit_result ), '' ) visitResult,
 			IFNULL( v.call_url, '' ) callUrl,
-			IFNULL( t.call_text, '' ) callText
+			IFNULL( t.call_text, '' ) callText,
+			v.visit_channel visitChannel
 		FROM
 			virtual_doctor_call_info v
 			LEFT JOIN virtual_doctor_call_text t ON v.sin_token = t.sin_token
