@@ -3,6 +3,7 @@ package com.nuoxin.virtual.rep.api.web.controller.request.v3_0;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @ClassName VisitDataRequest
@@ -19,25 +20,11 @@ public class VisitDataRequest extends CommonRequest implements Serializable {
     /**
      * 开始时间
      */
-    private String startTime;
+    private Date startTime;
 
     /**
      * 结束时间
      */
-    private String endTime;
-
-//    private boolean userFlag;
-
-//    private boolean proFlag;
-
-
-//    public void hasFilter() {
-//        if(super.drugUserIdList != null && super.drugUserIdList.size() > 0) {
-//            userFlag = true;
-//        }
-//        if(super.productIdList != null && super.productIdList.size() > 0) {
-//            proFlag = true;
-//        }
-//    }
+    private Date endTime;
 
 }

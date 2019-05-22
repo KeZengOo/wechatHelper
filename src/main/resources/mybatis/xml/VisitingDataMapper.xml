@@ -116,6 +116,7 @@
 		SELECT virtual_drug_user_id userId, a.virtual_doctor_id doctorId
 		FROM virtual_doctor_call_info a INNER JOIN doctor d ON a.virtual_doctor_id = d.id
 		WHERE a.product_id = #{key.proId} AND a.create_time BETWEEN #{key.startTime} AND #{key.endTime}
+		AND a.visit_channel = 1
 		AND a.virtual_drug_user_id IN
 		<foreach collection="key.list" item="id" open="(" separator="," close=")">
 			#{id}

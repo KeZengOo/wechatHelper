@@ -10,8 +10,8 @@ import com.nuoxin.virtual.rep.api.utils.ExportExcelUtil;
 import com.nuoxin.virtual.rep.api.utils.ExportExcelWrapper;
 import com.nuoxin.virtual.rep.api.utils.v3_0.TimeUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.VisitDataRequest;
-import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.ExportDrugUserDoctorCallResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.VisitDataResponse;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -57,8 +57,8 @@ public class VisitingDataServiceImpl implements VisitingDataService, Serializabl
             }
             VisitDataParam param = new VisitDataParam();
             param.setProId(list.get(0).getProId());
-            param.setStartTime(request.getStartTime());
-            param.setEndTime(request.getEndTime());
+            param.setStartTime(DateFormatUtils.format(request.getStartTime(), "yyyy-MM-dd").concat(" 00:00:00"));
+            param.setEndTime(DateFormatUtils.format(request.getEndTime(), "yyyy-MM-dd").concat(" 23:59:59"));
             param.setList(userIds);
             result = new PageResponseBean(request, total, this.buildResultList(list, param));
         }
@@ -78,8 +78,8 @@ public class VisitingDataServiceImpl implements VisitingDataService, Serializabl
             }
             VisitDataParam param = new VisitDataParam();
             param.setProId(list.get(0).getProId());
-            param.setStartTime(request.getStartTime());
-            param.setEndTime(request.getEndTime());
+            param.setStartTime(DateFormatUtils.format(request.getStartTime(), "yyyy-MM-dd").concat(" 00:00:00"));
+            param.setEndTime(DateFormatUtils.format(request.getEndTime(), "yyyy-MM-dd").concat(" 23:59:59"));
             param.setList(userIds);
             rlist = this.buildResultList(list, param);
         }
