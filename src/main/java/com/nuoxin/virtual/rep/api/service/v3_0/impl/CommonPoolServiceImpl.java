@@ -7,6 +7,7 @@ import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.mybatis.DoctorMapper;
 import com.nuoxin.virtual.rep.api.mybatis.DrugUserMapper;
 import com.nuoxin.virtual.rep.api.mybatis.DynamicFieldMapper;
+import com.nuoxin.virtual.rep.api.mybatis.ProductLineMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v3_0.CommonPoolService;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
@@ -14,6 +15,7 @@ import com.nuoxin.virtual.rep.api.utils.ExportExcel;
 import com.nuoxin.virtual.rep.api.utils.ExportExcelTitle;
 import com.nuoxin.virtual.rep.api.utils.HospitalLevelUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.CommonPoolRequest;
+import com.nuoxin.virtual.rep.api.web.controller.response.product.ProductResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.*;
 import org.apache.commons.collections4.map.LinkedMap;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -42,6 +44,11 @@ public class CommonPoolServiceImpl implements CommonPoolService {
 
     @Resource
     private DynamicFieldMapper dynamicFieldMapper;
+
+
+    @Resource
+    private ProductLineMapper productLineMapper;
+
 
     @Resource
     private CommonService commonService;
@@ -185,6 +192,14 @@ public class CommonPoolServiceImpl implements CommonPoolService {
             }
         }
 
+    }
+
+    @Override
+    public List<ProductResponseBean> getProductList() {
+
+        List<ProductResponseBean> commonPoolProductList = productLineMapper.getCommonPoolProductList();
+
+        return commonPoolProductList;
     }
 
     /**

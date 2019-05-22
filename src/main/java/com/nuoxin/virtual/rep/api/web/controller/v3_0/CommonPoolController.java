@@ -9,6 +9,7 @@ import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v3_0.CommonPoolService;
 import com.nuoxin.virtual.rep.api.utils.StringUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.CommonPoolRequest;
+import com.nuoxin.virtual.rep.api.web.controller.response.product.ProductResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.CommonPoolDoctorResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DoctorImportErrorResponse;
 import com.nuoxin.virtual.rep.api.web.controller.v2_5.NewBaseController;
@@ -39,6 +40,18 @@ public class CommonPoolController extends NewBaseController {
 
     @Resource
     private CommonService commonService;
+
+
+    @ApiOperation(value = "产品列表", notes = "产品列表")
+    @GetMapping(value = "/product/list")
+    public DefaultResponseBean<List<ProductResponseBean>> getProductList() {
+        List<ProductResponseBean> productList = commonPoolService.getProductList();
+        DefaultResponseBean<List<ProductResponseBean>> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(productList);
+        return responseBean;
+    }
+
+
 
     @ApiOperation(value = "列表", notes = "列表")
     @PostMapping(value = "/doctor/list")

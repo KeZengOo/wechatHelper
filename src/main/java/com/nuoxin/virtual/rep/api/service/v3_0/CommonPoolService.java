@@ -3,9 +3,11 @@ package com.nuoxin.virtual.rep.api.service.v3_0;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.CommonPoolRequest;
+import com.nuoxin.virtual.rep.api.web.controller.response.product.ProductResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.CommonPoolDoctorResponse;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * 公共池相关业务接口
@@ -29,5 +31,12 @@ public interface CommonPoolService {
      * @param request
      */
     void exportDoctorList(HttpServletResponse response, CommonPoolRequest request);
+
+
+    /**
+     * 公共池展示的医生
+     * @return
+     */
+    List<ProductResponseBean> getProductList();
 
 }

@@ -44,6 +44,14 @@ public interface ProductLineMapper extends MyMapper<ProductLine> {
 	List<ProductResponseBean> getListByDrugUserId(@Param(value = "virtualDrugUserIds") List<Long> virtualDrugUserIds);
 
     /**
+     * 公共池的产品列表
+     * @return
+     */
+    List<ProductResponseBean> getCommonPoolProductList();
+
+
+
+    /**
      * 在客户聊天记录中，当前代表在过去N天内是否与医生有微信聊天记录
      * @param drugUserId
      * @param doctorId

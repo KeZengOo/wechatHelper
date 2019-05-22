@@ -53,6 +53,16 @@
             
     </select>
 
+    <!-- 公共池产品列表 -->
+    <select id="getCommonPoolProductList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.product.ProductResponseBean">
+        SELECT
+        DISTINCT  pl.prod_id productId, pl.prod_name productName
+        FROM product_line pl
+        WHERE pl.show_place=1
+
+    </select>
+
+
     <!-- 在客户聊天记录中，当前代表在过去N天内是否与医生有微信聊天记录  -->
     <select id="wechatChatRecordIsExist" resultType="java.lang.Integer">
         SELECT
