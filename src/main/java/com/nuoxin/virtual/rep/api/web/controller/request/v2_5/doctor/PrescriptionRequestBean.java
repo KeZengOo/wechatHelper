@@ -37,11 +37,17 @@ public class PrescriptionRequestBean implements Serializable {
     @ApiModelProperty(value = "是否招募:1是,0否,-1未知")
     private Integer recruit;
 
+    @ApiModelProperty(value = "是否覆盖:0是未开始,1 覆盖中, 2是退出项目")
+    private Integer cover;
+
     @ApiModelProperty(value = "是否脱落:1是,0否,-1未知")
     private Integer breakOff;
 
     @ApiModelProperty(value = "是否有Ae")
     private Integer isHasAe;
+
+
+
 
 
 }

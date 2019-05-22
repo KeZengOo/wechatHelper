@@ -64,6 +64,13 @@ public interface VirtualDoctorMapper {
 	 */
 	void updateDoctorProductFixField(PrescriptionRequestBean bean);
 
+
+	/**
+	 * 修改医生产品的固定字段(比如：处方信息)
+	 * @param bean
+	 */
+	void updateDoctorProductFixFieldQuate(PrescriptionRequestBean bean);
+
 	
 	/**
 	 * 批量添加客户医生扩展信息

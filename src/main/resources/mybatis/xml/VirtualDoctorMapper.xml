@@ -164,6 +164,21 @@
 		SET is_has_drug=#{hasDrug},
 		is_target=#{target},
 		is_recruit=#{recruit},
+		is_cover=#{cover},
+		is_break_off=#{breakOff},
+		hcp_potential=#{potential},
+		is_has_ae=#{isHasAe}
+		WHERE doctor_id=#{doctorId}
+		AND product_id=#{productId}
+	</update>
+
+	<!-- 修改医生产品固定字段 -->
+	<update id="updateDoctorProductFixFieldQuate">
+		UPDATE product_doctor_quate
+		SET is_has_drug=#{hasDrug},
+		is_target=#{target},
+		is_recruit=#{recruit},
+		is_cover=#{cover},
 		is_break_off=#{breakOff},
 		hcp_potential=#{potential},
 		is_has_ae=#{isHasAe}
