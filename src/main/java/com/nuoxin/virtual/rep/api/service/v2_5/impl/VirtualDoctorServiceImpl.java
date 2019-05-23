@@ -111,7 +111,7 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
             }
 
 
-            doctorDetail = doctorMapper.getDoctorListByName(bean.getDrugUserId(), bean.getDoctorName(), bean.getHospitalName()).get(0);
+            doctorDetail = doctorMapper.getDoctorListByName(null, bean.getDoctorName(), bean.getHospitalName()).get(0);
 
         }else {
             // 去掉座机号
@@ -129,7 +129,7 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
                 throw new BusinessException(ErrorEnum.ERROR, "联系方式属于多个医生！");
             }
 
-            doctorDetail = doctorMapper.getDoctorListByTelephones(bean.getTelephones(), bean.getDrugUserId()).get(0);
+            doctorDetail = doctorMapper.getDoctorListByTelephones(bean.getTelephones(), null).get(0);
         }
 
 

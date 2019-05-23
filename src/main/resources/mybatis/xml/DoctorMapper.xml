@@ -1459,24 +1459,18 @@
 	</select>
 
 	<select id="selectDoctorByMobiles" resultType="com.nuoxin.virtual.rep.api.entity.Doctor">
-		select DISTINCT t.id,t.email,t.name,t.hospital_id hospitalId,t.hospital_name hospitalName,
+		select t.id,t.email,t.name,t.hospital_id hospitalId,t.hospital_name hospitalName,
 		t.provice,t.city,t.depart department,t.telephone mobile,t.positions doctorLevel,
 		t.create_time createTime,t.status,t.master_data_id masterDataId
 		FROM doctor t
+		LEFT JOIN doctor_telephone dt
+		ON t.id=dt.doctor_id
 		WHERE
-		t.telephone IN
+		dt.telephone IN
 		<foreach collection="mobiles" item="mobile" open="(" close=")" separator=",">
 			#{mobile}
 		</foreach>
-
-		OR t.id IN
-		(
-		SELECT DISTINCT doctor_id FROM doctor_telephone
-		WHERE telephone IN
-		<foreach collection="mobiles" item="mobile" open="(" close=")" separator=",">
-			#{mobile}
-		</foreach>
-		)
+		GROUP BY t.id
 
 	</select>
 
@@ -1619,6 +1613,8 @@
 
 	<!-- 根据多个联系方式获取详情 -->
 	<select id="getDoctorListByTelephones" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorDetailsResponseBean">
+
+		<!--
 		SELECT DISTINCT
 			d.id doctorId,
 			d.`name` doctorName,
@@ -1664,6 +1660,45 @@
 							#{telephone}
 						</foreach>
 			)
+        -->
+
+
+
+
+
+		SELECT
+		d.id doctorId,
+		d.`name` doctorName,
+		d.sex,
+		dm.wechat,
+		dm.address,
+		d.email,
+		h.id hospitalId,
+		d.hospital_name hospitalName,
+		h.`level` hospitalLevel,
+		h.province,
+		h.city,
+		d.depart department,
+		d.positions
+		FROM
+		doctor d
+		LEFT JOIN hospital h ON d.hospital_id = h.id
+		LEFT JOIN doctor_mend dm
+		ON d.id=dm.virtual_doctor_id
+		LEFT JOIN doctor_telephone dt
+		ON d.id=dt.doctor_id
+		WHERE
+		dt.telephone IN
+
+		<foreach collection="telephones" item="telephone" open="(" close=")" separator=",">
+			#{telephone}
+		</foreach>
+
+		GROUP BY d.id
+
+
+
+
 	</select>
 
 
@@ -1682,18 +1717,15 @@
 				h.province,
 				h.city,
 				d.depart department,
-				d.positions,
-				IFNULL(dudoto.is_add_wechat, 0) addWechat
+				d.positions
 			FROM
 				doctor d
 			LEFT JOIN hospital h ON d.hospital_id = h.id
 			LEFT JOIN doctor_mend dm
 			ON d.id=dm.virtual_doctor_id
-			LEFT JOIN drug_user_doctor_one_to_one dudoto
-			ON  dudoto.doctor_id=d.id
-			AND dudoto.drug_user_id=#{drugUserId}
 			WHERE d.hospital_name=#{hospitalName}
 			AND d.name=#{doctorName}
+			GROUP BY d.id
 	</select>
 
 	<select id="getDoctorList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.DoctorDetailsResponseBean">
