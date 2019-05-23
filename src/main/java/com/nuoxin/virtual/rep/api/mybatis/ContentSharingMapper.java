@@ -51,9 +51,11 @@ public interface ContentSharingMapper {
      * 根据内容ID和医生ID查询阅读时间数组和阅读时长数组
      * @param dataId
      * @param doctorId
+     * @param shareType
+     * @param drugUserId
      * @return list
      */
-    List<ContentReadLogsTimeParams> getReadTimeAndReadDurationByDataIdAndDoctorId(@Param("dataId")Long dataId, @Param("doctorId")Long doctorId, @Param("shareType") Integer shareType);
+    List<ContentReadLogsTimeParams> getReadTimeAndReadDurationByDataIdAndDoctorId(@Param("dataId")Long dataId, @Param("doctorId")Long doctorId, @Param("shareType") Integer shareType, @Param("drugUserId") Long drugUserId);
 
     /**
      * 内容分享列表

@@ -92,7 +92,7 @@ public class ContentSharingServiceImpl implements ContentSharingService {
             ContentReadLogsParams c = new ContentReadLogsParams();
             c = list.get(i);
             //获取同一名医生多长阅读的时间和时长
-            List<ContentReadLogsTimeParams> logsTimeParams = contentSharingMapper.getReadTimeAndReadDurationByDataIdAndDoctorId(list.get(i).getDataId(),list.get(i).getDoctorId(), contentReadLogsRequest.getShareType());
+            List<ContentReadLogsTimeParams> logsTimeParams = contentSharingMapper.getReadTimeAndReadDurationByDataIdAndDoctorId(list.get(i).getDataId(),list.get(i).getDoctorId(), contentReadLogsRequest.getShareType(), contentReadLogsRequest.getDrugUserId());
             String[] createTimeArray = new String[logsTimeParams.size()];
             String[] readTimeArray = new String[logsTimeParams.size()];
             String[] readTimeStringArray = new String[logsTimeParams.size()];

@@ -70,6 +70,7 @@
                     AND t.title LIKE "%"#{contentSharingRequest.title}"%"
                 </if>
                 AND r.read_person_id != ''
+                AND l.show_place = 1
                 GROUP BY
                 r.read_person_id,
                 t.id
@@ -141,6 +142,7 @@
                     AND t.title LIKE "%"#{contentSharingRequest.title}"%"
                 </if>
                 AND r.read_person_id != ''
+                AND l.show_place = 1
                 GROUP BY
                 r.read_person_id,
                 t.id
@@ -311,7 +313,7 @@
     <select id="getReadTimeAndReadDurationByDataIdAndDoctorId" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.ContentReadLogsTimeParams">
         SELECT
             m.time AS createTime,
-            m.readTime AS readTime
+            m.readTime
         FROM
             (
                 SELECT
@@ -332,7 +334,8 @@
                     OR ip.isp != '阿里云'
                 )
                 AND r.read_person_id != ''
-                AND u.id = #{doctorId}
+                AND u.id = #{drugUserId}
+                AND r.read_person_id = #{doctorId}
                 AND t.id = #{dataId}
                 AND r.share_type = #{shareType}
                 GROUP BY
@@ -349,8 +352,9 @@
                     LEFT JOIN drug_user_doctor dd ON xu.doctor_id = dd.doctor_id
                     WHERE
                         1 = 1
-                    AND dd.drug_user_id = #{doctorId}
+                    AND dd.drug_user_id = #{drugUserId}
                     AND wr.content_id = #{dataId}
+                    AND xu.doctor_id = #{doctorId}
                     AND wr.share_type = #{shareType}
             ) m
     </select>
@@ -499,6 +503,7 @@
             AND t.title LIKE "%"#{title}"%"
         </if>
         AND r.read_person_id != ''
+        AND l.show_place = 1
         GROUP BY
         r.read_person_id,
         t.id
