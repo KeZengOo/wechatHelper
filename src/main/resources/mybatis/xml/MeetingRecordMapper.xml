@@ -12,10 +12,11 @@
             str_to_date(t.start_time, '%Y-%m-%d %H:%i:%s') AS startTime,
             str_to_date(t.end_time, '%Y-%m-%d %H:%i:%s') AS endTime
         FROM
-            t_meeting_data t
+            t_meeting_data t LEFT JOIN product_line l ON t.product_id = l.prod_id
         WHERE
             1 = 1
         AND t.product_id != ''
+        AND l.show_place = 1
 
         <if test="meetingRecordRequest.productId != 0 and meetingRecordRequest.productId != null">
             AND t.product_id = #{meetingRecordRequest.productId}
@@ -43,10 +44,11 @@
         SELECT
             COUNT(1)
         FROM
-            t_meeting_data t
+            t_meeting_data t LEFT JOIN product_line l ON t.product_id = l.prod_id
         WHERE
             1 = 1
         AND t.product_id != ''
+        AND l.show_place = 1
         <if test="meetingRecordRequest.productId != 0 and meetingRecordRequest.productId != null">
             AND t.product_id = #{meetingRecordRequest.productId}
         </if>
