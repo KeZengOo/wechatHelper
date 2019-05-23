@@ -13,14 +13,14 @@ import java.util.List;
  * @date 20190505
  */
 @Data
-@ApiModel("内容分享列表查询Request")
+@ApiModel("内容分享列表查询请求参数")
 public class ContentSharingRequest extends PageRequestBean {
 
     @ApiModelProperty(value = "产品ID")
     private Integer productId;
-    @ApiModelProperty("分享渠道1微信，2短信，3邮件")
+    @ApiModelProperty(value = "分享渠道1微信，2短信，3邮件")
     private Integer shareType;
-    @ApiModelProperty("代表ID")
+    @ApiModelProperty(value = "代表ID")
     private Long[] drugUserId;
     @ApiModelProperty(value = "第一个开始时间")
     private String startTimeBefore;
