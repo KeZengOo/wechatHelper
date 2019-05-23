@@ -37,12 +37,16 @@ public class DrugUserDoctorCallRequest extends DoctorBaseRequest implements Seri
      * @param startTime
      */
     public void setStartTime(Date startTime) {
+        if (startTime !=null){
+            String dateString = DateUtil.getDateString(startTime);
+            String dateTimeString = dateString.concat(" 00:00:00");
+            Date date = DateUtil.stringToDate(dateTimeString, DateUtil.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS);
 
-        String dateString = DateUtil.getDateString(startTime);
-        String dateTimeString = dateString.concat(" 00:00:00");
-        Date date = DateUtil.stringToDate(dateTimeString, DateUtil.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS);
+            this.startTime = date;
+        }else {
+            this.startTime = startTime;
+        }
 
-        this.startTime = date;
     }
 
     public Date getEndTime() {
@@ -51,11 +55,17 @@ public class DrugUserDoctorCallRequest extends DoctorBaseRequest implements Seri
 
     public void setEndTime(Date endTime) {
 
-        String dateString = DateUtil.getDateString(endTime);
-        String dateTimeString = dateString.concat(" 00:00:00");
-        Date date = DateUtil.stringToDate(dateTimeString, DateUtil.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS);
 
-        this.endTime = date;
+
+        if (endTime !=null){
+            String dateString = DateUtil.getDateString(endTime);
+            String dateTimeString = dateString.concat(" 00:00:00");
+            Date date = DateUtil.stringToDate(dateTimeString, DateUtil.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS);
+            this.endTime = date;
+        }else {
+            this.endTime = endTime;
+        }
+
     }
 
     public Integer getPaginable() {

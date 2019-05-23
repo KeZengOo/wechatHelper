@@ -83,11 +83,16 @@ public class DrugUserDoctorCallDetailRequest extends PageRequestBean implements 
      */
     public void setStartTime(Date startTime) {
 
-        String dateString = DateUtil.getDateString(startTime);
-        String dateTimeString = dateString.concat(" 00:00:00");
-        Date date = DateUtil.stringToDate(dateTimeString, DateUtil.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS);
+        if (startTime !=null){
+            String dateString = DateUtil.getDateString(startTime);
+            String dateTimeString = dateString.concat(" 00:00:00");
+            Date date = DateUtil.stringToDate(dateTimeString, DateUtil.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS);
+            this.startTime = date;
+        }else{
+            this.startTime = startTime;
+        }
 
-        this.startTime = date;
+
     }
 
     public Date getEndTime() {
@@ -96,10 +101,15 @@ public class DrugUserDoctorCallDetailRequest extends PageRequestBean implements 
 
     public void setEndTime(Date endTime) {
 
-        String dateString = DateUtil.getDateString(endTime);
-        String dateTimeString = dateString.concat(" 00:00:00");
-        Date date = DateUtil.stringToDate(dateTimeString, DateUtil.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS);
+        if (endTime != null){
+            String dateString = DateUtil.getDateString(endTime);
+            String dateTimeString = dateString.concat(" 00:00:00");
+            Date date = DateUtil.stringToDate(dateTimeString, DateUtil.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS);
+            this.endTime = date;
+        }else{
+            this.endTime = endTime;
 
-        this.endTime = date;
+        }
+
     }
 }

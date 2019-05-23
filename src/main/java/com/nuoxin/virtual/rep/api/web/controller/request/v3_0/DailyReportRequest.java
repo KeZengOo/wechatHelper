@@ -56,12 +56,15 @@ public class DailyReportRequest implements Serializable {
      * @param startTime
      */
     public void setStartTime(Date startTime) {
+        if (startTime != null){
+            String dateString = DateUtil.getDateString(startTime);
+            String dateTimeString = dateString.concat(" 00:00:00");
+            Date date = DateUtil.stringToDate(dateTimeString, DateUtil.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS);
+            this.startTime = date;
+        }else {
+            this.startTime = startTime;
+        }
 
-        String dateString = DateUtil.getDateString(startTime);
-        String dateTimeString = dateString.concat(" 00:00:00");
-        Date date = DateUtil.stringToDate(dateTimeString, DateUtil.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS);
-
-        this.startTime = date;
     }
 
     public Date getEndTime() {
@@ -70,11 +73,15 @@ public class DailyReportRequest implements Serializable {
 
     public void setEndTime(Date endTime) {
 
-        String dateString = DateUtil.getDateString(endTime);
-        String dateTimeString = dateString.concat(" 59:59:59");
-        Date date = DateUtil.stringToDate(dateTimeString, DateUtil.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS);
+        if (endTime != null){
+            String dateString = DateUtil.getDateString(endTime);
+            String dateTimeString = dateString.concat(" 59:59:59");
+            Date date = DateUtil.stringToDate(dateTimeString, DateUtil.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS);
+            this.endTime = date;
+        }else{
+            this.endTime = endTime;
+        }
 
 
-        this.endTime = date;
     }
 }
