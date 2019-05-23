@@ -2008,7 +2008,7 @@
 			</if>
 
 			<if test="recruit!=1 and recruit != 0">
-				AND (q.is_recruit IS NULL OR q.is_recruit=#{recruit})
+				AND (q.is_recruit IS NULL OR q.is_recruit=#{recruit} OR q.is_recruit=2)
 			</if>
 
 		</if>
@@ -2259,7 +2259,7 @@
 			</if>
 
 			<if test="recruit!=1 and recruit != 0">
-				AND (q.is_recruit IS NULL OR q.is_recruit=#{recruit})
+				AND (q.is_recruit IS NULL OR q.is_recruit=#{recruit} OR q.is_recruit=2)
 			</if>
 
 		</if>
@@ -2508,7 +2508,7 @@
 			</if>
 
 			<if test="recruit!=1 and recruit != 0">
-				AND (q.is_recruit IS NULL OR q.is_recruit=#{recruit})
+				AND (q.is_recruit IS NULL OR q.is_recruit=#{recruit} OR q.is_recruit=2)
 			</if>
 
 		</if>
@@ -2649,7 +2649,7 @@
 			</if>
 
 			<if test="recruit!=1 and recruit != 0">
-				AND (q.is_recruit IS NULL OR q.is_recruit=#{recruit})
+				AND (q.is_recruit IS NULL OR q.is_recruit=#{recruit} OR q.is_recruit=2)
 			</if>
 
 		</if>
