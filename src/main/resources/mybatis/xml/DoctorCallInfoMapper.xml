@@ -129,13 +129,13 @@
 
     <!-- 根据sinToken查询电话记录信息 -->
     <select id="getCallInfoBySinToken" resultType="com.nuoxin.virtual.rep.api.web.controller.response.call.CallInfoResponseBean">
-        SELECT id, call_url callUrl, call_time callTime, status_name statusName  FROM virtual_doctor_call_info WHERE sin_token = #{sinToken}
+        SELECT id, call_url callUrl, unpressed_call_url unpressedCallUrl, unpressed_call_url_in unpressedCallUrlIn, unpressed_call_url_out unpressedCallUrlOut, call_time callTime, status_name statusName  FROM virtual_doctor_call_info WHERE sin_token = #{sinToken}
     </select>
 
     <!-- 新增重试的电话记录 -->
     <insert id="addRetryCallInfo">
-        INSERT INTO virtual_doctor_call_info(sin_token, is_retry, mobile,status, status_name, call_time, call_url, create_time, type)
-        VALUES (#{sinToken}, #{retry}, #{mobile},#{status}, #{statusName}, #{callTime}, #{callUrl}, #{createTime}, #{type})
+        INSERT INTO virtual_doctor_call_info(sin_token, is_retry, mobile,status, status_name, call_time, call_url, unpressed_call_url, unpressed_call_url_in, unpressed_call_url_out, create_time, type)
+        VALUES (#{sinToken}, #{retry}, #{mobile},#{status}, #{statusName}, #{callTime}, #{callUrl}, #{unpressedCallUrl}, #{unpressedCallUrlIn}, #{unpressedCallUrlOut}, #{createTime}, #{type})
     </insert>
 
 
@@ -143,6 +143,13 @@
         update virtual_doctor_call_info set is_retry=1, call_url = #{callUrl}, call_time=#{callTime}, status_name='answer'
         where sin_token = #{sinToken}
     </update>
+
+
+    <update id="updateCallUrlBySigTokenRefactor">
+        update virtual_doctor_call_info set is_retry=1, call_url = #{callUrl}, unpressed_call_url =#{unpressedCallUrl}, unpressed_call_url_in=#{unpressedCallUrlIn}, unpressed_call_url_out=#{unpressedCallUrlOut}, call_time=#{callTime}, status_name='answer'
+        where sin_token = #{sinToken}
+    </update>
+
 
     <select id="getDoctorVisitDetailList" resultType="java.util.LinkedHashMap">
 
@@ -1103,7 +1110,10 @@
     <select id="getIdentifyCallUrl" resultType="com.nuoxin.virtual.rep.api.web.controller.response.call.CallInfoResponseBean">
         SELECT
             a.sin_token sinToken,
-            a.call_url callUrl
+            a.call_url callUrl,
+            a.unpressed_call_url unpressedCallUrl,
+            a.unpressed_call_url_in unpressedCallUrlIn,
+            a.unpressed_call_url_out unpressedCallUrlOut
         FROM
             virtual_doctor_call_info a
         LEFT JOIN virtual_doctor_call_text b ON a.sin_token = b.sin_token

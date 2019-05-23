@@ -120,6 +120,21 @@ public interface VirtualDoctorCallInfoMapper {
 	 */
 	void updateCallUrlText(@Param(value = "sinToken") String sinToken,@Param(value = "callText") String callText);
 
+
+	/**
+	 * 更新录音文本，包含未压缩的url识别
+	 * @param sinToken
+	 * @param callText
+	 * @param unpressedCallInText
+	 * @param unpressedCallOutText
+	 * @param unpressedCallText
+	 */
+	void updateCallUrlTextRefactor(@Param(value = "sinToken") String sinToken,
+								   @Param(value = "callText") String callText,
+								   @Param(value = "unpressedCallText") String unpressedCallText,
+								   @Param(value = "unpressedCallInText") String unpressedCallInText,
+								   @Param(value = "unpressedCallOutText") String unpressedCallOutText);
+
 	/**
 	 * 临时功能，导入森福罗历史拜访记录
 	 * @return

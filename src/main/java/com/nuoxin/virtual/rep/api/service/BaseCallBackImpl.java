@@ -57,8 +57,21 @@ public abstract class BaseCallBackImpl implements CallBackService{
 	protected void processCallBack(ConvertResult result) {
 		String sinToken = result.getSinToken();
 		String audioFileDownloadUrl = result.getMonitorFilenameUrl();
+
+		String unpressedCallUrl = result.getUnpressedCallUrl();
+		String unpressedCallUrlIn = result.getUnpressedCallUrlIn();
+		String unpressedCallUrlOut = result.getUnpressedCallUrlOut();
+
 		String callOssUrl = this.processFile(audioFileDownloadUrl, sinToken);
-		logger.info("callOssUrl={}, processCallBack方法中获取的地址："+ callOssUrl);
+		String unpressedOssCallUrl = this.processWavFile(unpressedCallUrl, sinToken, "-tmp");
+		String unpressedOssCallUrlIn = this.processWavFile(unpressedCallUrlIn, sinToken, "-in");
+		String unpressedOssCallUrlOut = this.processWavFile(unpressedCallUrlOut, sinToken, "-out");
+
+
+		logger.info("callOssUrl={}, 压缩后的 processCallBack方法中获取的地址："+ callOssUrl);
+		logger.info("unpressedOssCallUrl={}, 未压缩的 processCallBack方法中获取的地址："+ unpressedOssCallUrl);
+		logger.info("unpressedOssCallUrlIn={}, 未压缩的 processCallBack方法中获取的地址："+ unpressedOssCallUrlIn);
+		logger.info("unpressedOssCallUrlOut={}, 未压缩的 processCallBack方法中获取的地址："+ unpressedOssCallUrlOut);
 
 		//异步（分割录音文件并上传阿里云，返回左右声道的阿里云地址 并且 根据左右声道的阿里云地址进行语音识别，进行入库）
 		new Thread(new Runnable(){
@@ -82,6 +95,9 @@ public abstract class BaseCallBackImpl implements CallBackService{
 //		boolean result_is_save = saveSpeechRecognitionResultCallInfo(pathMap, sinToken,0);
 
 		result.setMonitorFilenameUrl(callOssUrl);
+		result.setUnpressedCallUrl(unpressedOssCallUrl);
+		result.setUnpressedCallUrlIn(unpressedOssCallUrlIn);
+		result.setUnpressedCallUrlOut(unpressedOssCallUrlOut);
 
 		DoctorCallInfo info = this.getDoctorCallInfoBySinToken(sinToken);
 		if (info == null) {
@@ -96,11 +112,11 @@ public abstract class BaseCallBackImpl implements CallBackService{
 				result.setStatusName(statusName);
 			}
 
-			this.updateUrl(callOssUrl, result.getStatus(), result.getStatusName(), callId, result.getCallTime());
+			this.updateUrl(callOssUrl,unpressedOssCallUrl,unpressedOssCallUrlIn, unpressedOssCallUrlOut, result.getStatus(), result.getStatusName(), callId, result.getCallTime());
 		}
 
 		// 语音识别
-		this.updateCallUrlText(sinToken, callOssUrl);
+		this.updateCallUrlText(sinToken, callOssUrl, unpressedCallUrl, unpressedCallUrlIn, unpressedCallUrlOut);
 
 		// 语音拆分
 		logger.warn("回调执行成功! sinToken:{}, status:{}, statusName:{}, downloadUrl:{}", 
@@ -113,13 +129,19 @@ public abstract class BaseCallBackImpl implements CallBackService{
 	 * @param callOssUrl
 	 */
 	@Async
-	protected void updateCallUrlText(String sinToken, String callOssUrl) {
+	protected void updateCallUrlText(String sinToken, String callOssUrl, String unpressedCallUrl, String unpressedCallUrlIn, String unpressedCallUrlOut) {
 		if (StringUtil.isNotEmpty(sinToken) && StringUtil.isNotEmpty(callOssUrl)){
 			try {
 				String callText = SpeechRecognitionUtil.getSpeechRecognitionResult(callOssUrl);
-				callInfoMapper.updateCallUrlText(sinToken, callText);
+				String unpressedCallText = SpeechRecognitionUtil.getSpeechRecognitionResult(unpressedCallUrl);
+				String unpressedCallInText = SpeechRecognitionUtil.getSpeechRecognitionResult(unpressedCallUrlIn);
+				String unpressedCallOutText = SpeechRecognitionUtil.getSpeechRecognitionResult(unpressedCallUrlOut);
+//				callInfoMapper.updateCallUrlText(sinToken, callText);
+				callInfoMapper.updateCallUrlTextRefactor(sinToken, callText, unpressedCallText, unpressedCallUrlIn, unpressedCallOutText);
+
 			}catch (Exception e){
-				logger.error("BaseCallBackImpl updateCallUrlText(String sinToken, String callOssUrl) error !!! sinToken={}, callOssUrl={}", sinToken, callOssUrl, e);
+				logger.error("BaseCallBackImpl updateCallUrlText(String sinToken, String callOssUrl, String unpressedCallUrl, " +
+						"String unpressedCallUrlIn, String unpressedCallUrlOut) error !!! sinToken={}, callOssUrl={}, unpressedCallUrl={}, unpressedCallUrlIn={},unpressedCallUrlOut={} ", sinToken, callOssUrl,unpressedCallUrl, unpressedCallUrlIn, unpressedCallUrlOut, e);
 			}
 
 		}
@@ -166,6 +188,42 @@ public abstract class BaseCallBackImpl implements CallBackService{
 		
 		return ossUrl;
 	}
+
+
+
+	/**
+	 * 文件处理(保存至本地及上传至阿里OSS)
+	 * @param audioFileUrl 供应商提供的录音文件下载 URL
+	 * @param sinToken 通讯唯一标识
+	 * @param suffix 需要拼接的后缀
+	 * @return 返回 OSS URL
+	 */
+	protected String processWavFile(String audioFileUrl, String sinToken, String suffix) {
+		String fileName = sinToken.concat(suffix).concat(FileConstant.WAV_SUFFIX);
+		fileService.processLocalFile(audioFileUrl, fileName, path);
+
+		String fullFileName = path.concat(fileName);
+		logger.info("文件处理方法的文件名：",fullFileName);
+		String ossUrl = ossService.uploadFile(new File(fullFileName));
+		logger.info("文件处理处理方法中的ossUrl！ossUrl={}", ossUrl);
+
+		// 这里走了补偿机制.即:当上传至阿里失败时写入回调时供应商传递过来的文件下载链接
+		if (StringUtils.isBlank(ossUrl)) {
+			ossUrl = audioFileUrl;
+		}
+
+		if (StringUtil.isNotEmpty(ossUrl)){
+			if (ossUrl.contains("\\")){
+				ossUrl = ossUrl.replaceAll("\\\\","/");
+			}
+		}
+
+
+		return ossUrl;
+	}
+
+
+
 	
 	/**
 	 * 当 statusName 关机,拒接,空号,忙音,停机,无人接听时,不使用回调状态值 TODO 和前端确认 statusName 的值 @谢开宇
@@ -194,6 +252,12 @@ public abstract class BaseCallBackImpl implements CallBackService{
 		params.setType(result.getType());
 		params.setMobile(result.getCalledNo());
 		params.setCallUrl(result.getMonitorFilenameUrl());
+
+		params.setUnpressedCallUrl(result.getUnpressedCallUrl());
+		params.setUnpressedCallUrlIn(result.getUnpressedCallUrlIn());
+		params.setUnpressedCallUrlOut(result.getUnpressedCallUrlOut());
+
+
 		params.setStatus(result.getStatus());
 		params.setStatusName(result.getStatusName());
 		if (StringUtils.isBlank(result.getVisitTime())) {
@@ -214,9 +278,9 @@ public abstract class BaseCallBackImpl implements CallBackService{
 	 * @param callId 打电话记录主键
 	 * @param callTime 通话时长
 	 */
-	private void updateUrl(String callOssUrl, Integer status, String statusName, Long callId, Long callTime) {
-		logger.info("callUrl:{},status:{}, statusName:{},id:{}", callOssUrl, status, statusName, callId);
-		callInfoDao.updateUrlRefactor(callOssUrl, status, statusName, callId, callTime);
+	private void updateUrl(String callOssUrl, String unpressedCallUrl, String unpressedCallUrlIn, String unpressedCallUrlOut, Integer status, String statusName, Long callId, Long callTime) {
+		logger.info("callUrl:{}, unpressedCallUrl={},unpressedCallUrlIn={},unpressedCallUrlOut={},  status:{}, statusName:{},id:{}", callOssUrl, status, statusName, callId);
+		callInfoDao.updateUrlRefactor(callOssUrl,unpressedCallUrl, unpressedCallUrlIn, unpressedCallUrlOut, status, statusName, callId, callTime);
 	}
 
 	/**

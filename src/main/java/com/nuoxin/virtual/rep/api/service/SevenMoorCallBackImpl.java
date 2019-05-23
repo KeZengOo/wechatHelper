@@ -136,7 +136,7 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 			Date date=new Date();
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTime(date);
-			calendar.add(Calendar.DAY_OF_MONTH, -3);
+			calendar.add(Calendar.DAY_OF_MONTH, -1);
 			date = calendar.getTime();
 			bean.setBeginTime(DateUtil.getDateTimeString(date));
 		}
@@ -174,7 +174,7 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 		}
 
 		for (CallInfoResponseBean callInfo : identifyCallUrlList) {
-			super.updateCallUrlText(callInfo.getSinToken(), callInfo.getCallUrl());
+			super.updateCallUrlText(callInfo.getSinToken(), callInfo.getCallUrl(), callInfo.getUnpressedCallUrl(), callInfo.getUnpressedCallUrlIn(), callInfo.getUnpressedCallUrlOut());
 			//异步（分割录音文件并上传阿里云，返回左右声道的阿里云地址 并且 根据左右声道的阿里云地址进行语音识别，进行入库）
 			if(!callInfo.getCallUrl().isEmpty()){
 				new Thread(new Runnable(){
@@ -276,6 +276,7 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 	}
 
 	/**
+	 * TODO 重构
 	 * 新增或者更新电话记录
 	 * @param dealingList
 	 */
@@ -287,16 +288,37 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 			CallInfoResponseBean callInfo = doctorCallInfoMapper.getCallInfoBySinToken(call_sheet_id);
 			if (callInfo != null){
 				String callUrl = callInfo.getCallUrl();
-				if (StringUtils.isEmpty(callUrl) || callInfo.getCallTime()==null || callInfo.getCallTime() == 0 || (!"answer".equals(callInfo.getStatusName()))){
+				String unpressedCallUrl = callInfo.getUnpressedCallUrl();
+				String unpressedCallUrlIn = callInfo.getUnpressedCallUrlIn();
+				String unpressedCallUrlOut = callInfo.getUnpressedCallUrlOut();
+				if (StringUtils.isEmpty(callUrl) || StringUtils.isEmpty(unpressedCallUrl)
+					|| StringUtils.isEmpty(unpressedCallUrlIn)
+					|| StringUtils.isEmpty(unpressedCallUrlOut) ||
+						callInfo.getCallTime()==null ||
+						callInfo.getCallTime() == 0 || (!"answer".equals(callInfo.getStatusName()))){
 					String ossFilePath = null;
-					if (StringUtil.isNotEmpty(callUrl)){
+					String ossTmpFilePath = null;
+					String ossInFilePath = null;
+					String ossOutFilePath = null;
+
+					if (StringUtil.isNotEmpty(callUrl) && StringUtil.isNotEmpty(ossTmpFilePath) && StringUtil.isNotEmpty(ossInFilePath) && StringUtil.isNotEmpty(ossOutFilePath)){
 						ossFilePath = callUrl;
+						ossTmpFilePath = unpressedCallUrl;
+						ossInFilePath = unpressedCallUrlIn;
+						ossOutFilePath = unpressedCallUrlOut;
 					}else{
 						String record_file_name = call7mmorResponseBean.getRECORD_FILE_NAME();
 						String file_server = call7mmorResponseBean.getFILE_SERVER();
 						String originFilePath = file_server +"/" +  record_file_name;
+						String originTmpFilePath = originFilePath.replace("monitor", "inOutTempOfWav").replace(".mp3", "-tmp.wav");
+						String originInFilePath = originFilePath.replace("monitor", "inOutTempOfWav").replace(".mp3", "-in.wav");
+						String originOutFilePath = originFilePath.replace("monitor", "inOutTempOfWav").replace(".mp3", "-out.wav");
+
 						try {
 							ossFilePath = super.processFile(originFilePath, call_sheet_id);
+							ossTmpFilePath= super.processWavFile(originTmpFilePath, call_sheet_id, "-tmp");
+							ossInFilePath= super.processWavFile(originInFilePath, call_sheet_id, "-in");
+							ossOutFilePath= super.processWavFile(originOutFilePath, call_sheet_id, "-out");
 						}catch (Exception e){
 							logger.error("sinToken={} 文件上传失败", call_sheet_id, e);
 						}
@@ -308,9 +330,9 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 						String beginTime = call7mmorResponseBean.getBEGIN_TIME();
 						String endTime = call7mmorResponseBean.getEND_TIME();
 						int callTime = DateUtil.calLastedTime(beginTime, endTime);
-						doctorCallInfoMapper.updateCallUrlBySigToken(ossFilePath, call_sheet_id, callTime);
+						doctorCallInfoMapper.updateCallUrlBySigTokenRefactor(ossFilePath,ossTmpFilePath, ossInFilePath,ossOutFilePath, call_sheet_id, callTime);
 
-						super.updateCallUrlText(call_sheet_id, ossFilePath);
+						super.updateCallUrlText(call_sheet_id, ossFilePath, ossTmpFilePath, ossInFilePath, ossOutFilePath);
 						logger.info("sinToken={} 的电话记录，没有call_url，更新成功！", call_sheet_id);
 					}
 				}else {
@@ -321,9 +343,24 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 				String record_file_name = call7mmorResponseBean.getRECORD_FILE_NAME();
 				String file_server = call7mmorResponseBean.getFILE_SERVER();
 				String originFilePath = file_server +"/" +  record_file_name;
+
+				String originTmpFilePath = originFilePath.replace("monitor", "inOutTempOfWav").replace(".mp3", "-tmp.wav");
+				String originInFilePath = originFilePath.replace("monitor", "inOutTempOfWav").replace(".mp3", "-in.wav");
+				String originOutFilePath = originFilePath.replace("monitor", "inOutTempOfWav").replace(".mp3", "-out.wav");
+
+
 				String ossFilePath = null;
+				String ossTmpFilePath = null;
+				String ossInFilePath = null;
+				String ossOutFilePath = null;
+
 				try {
 					ossFilePath = super.processFile(originFilePath, call_sheet_id);
+
+					ossTmpFilePath= super.processWavFile(originTmpFilePath, call_sheet_id, "-tmp");
+					ossInFilePath= super.processWavFile(originInFilePath, call_sheet_id, "-in");
+					ossOutFilePath= super.processWavFile(originOutFilePath, call_sheet_id, "-out");
+
 				}catch (Exception e){
 					logger.error("sinToken={} 文件上传失败", call_sheet_id, e);
 				}
@@ -349,10 +386,13 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 				retryCallInfoRequestBean.setStatusName("answer");
 				retryCallInfoRequestBean.setCallTime(DateUtil.calLastedTime(beginTime, endTime));
 				retryCallInfoRequestBean.setCallUrl(ossFilePath);
+				retryCallInfoRequestBean.setUnpressedCallUrl(ossTmpFilePath);
+				retryCallInfoRequestBean.setUnpressedCallUrlIn(ossInFilePath);
+				retryCallInfoRequestBean.setUnpressedCallUrlOut(ossOutFilePath);
 				retryCallInfoRequestBean.setCreateTime(beginTime);
 				retryCallInfoRequestBean.setType(type);
 				doctorCallInfoMapper.addRetryCallInfo(retryCallInfoRequestBean);
-				super.updateCallUrlText(call_sheet_id, ossFilePath);
+				super.updateCallUrlText(call_sheet_id, ossFilePath, ossTmpFilePath, ossInFilePath, ossOutFilePath);
 				logger.info("sinToken={} 的电话记录，库里不存在，新增成功！", call_sheet_id);
 			}
 		}
@@ -429,6 +469,22 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 		convertResult.setSinToken(sinToken);
 		convertResult.setCalledNo(calledNo);
 		convertResult.setMonitorFilenameUrl(monitorFilenameUrl);
+
+		try {
+
+			//规则：将未压缩后的url 中的 monitor 替换成  inOutTempOfWav，后缀换成 -tmp.wav, 如果是单声道文件后缀为 -in.wav 或者 -out.wav
+			String unpressedCallUrl = monitorFilenameUrl.replace("monitor", "inOutTempOfWav").replace(".mp3", "-tmp.wav");
+			String unpressedCallUrlIn =  monitorFilenameUrl.replace("monitor", "inOutTempOfWav").replace(".mp3", "-in.wav");
+			String unpressedCallUrlOut =  monitorFilenameUrl.replace("monitor", "inOutTempOfWav").replace(".mp3", "-out.wav");
+
+			convertResult.setUnpressedCallUrl(unpressedCallUrl);
+			convertResult.setUnpressedCallUrlIn(unpressedCallUrlIn);
+			convertResult.setUnpressedCallUrlOut(unpressedCallUrlOut);
+
+		}catch (Exception e){
+			logger.error("根据压缩后的录音url,获取未压缩后的录音url失败, 压缩后的录音url={}", monitorFilenameUrl, e);
+		}
+
 		convertResult.setVisitTime(begin); // 打电话开始时间即为拜访时间
 		
 		statusName = ConvertStatusUtil.convertStatusName(callType, statusName);
@@ -461,7 +517,15 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 class ConvertResult{
 	private String sinToken; // 通话唯一标识
 	private String statusName; // 状态名
-	private String monitorFilenameUrl; // 录音文件地址
+	private String monitorFilenameUrl; // 录音文件地址 压缩过的
+
+	private String unpressedCallUrl; // 未压缩的的录音地址
+
+	private String unpressedCallUrlIn; // 单声道，暂未确定是左右中的哪个声道
+
+	private String unpressedCallUrlOut; // 单声道，暂未确定是左右中的哪个声道
+
+
 	private long callTime; // 通话时长
 	private Integer type; // 呼叫方式 
 	private String calledNo; // 被叫号码

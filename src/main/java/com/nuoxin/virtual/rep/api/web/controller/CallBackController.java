@@ -134,7 +134,7 @@ public class CallBackController extends BaseController {
 	 * @param paramsMap
 	 */
 	@Async
-	private void processCallBack(ConcurrentMap<String, String> paramsMap) {
+	public void processCallBack(ConcurrentMap<String, String> paramsMap) {
 		String callSheetId = paramsMap.get("CallSheetID");
 		try {
 			callBackService.callBack(paramsMap);

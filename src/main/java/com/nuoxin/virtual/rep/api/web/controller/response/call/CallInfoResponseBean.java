@@ -20,6 +20,14 @@ public class CallInfoResponseBean implements Serializable {
 
     private String callUrl;
 
+
+    private String unpressedCallUrl;
+
+    private String unpressedCallUrlIn;
+
+    private String unpressedCallUrlOut;
+
+
     private Integer callTime;
 
     private String statusName;

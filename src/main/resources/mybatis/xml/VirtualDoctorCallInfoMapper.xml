@@ -100,9 +100,9 @@
 	<insert id="saveVirtualDoctorCallInfo" keyProperty="callId" useGeneratedKeys="true"
 		parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoParams">
 		INSERT INTO virtual_doctor_call_info
-		(sin_token, virtual_doctor_id, mobile, type, status, status_name, create_time, call_url, call_time)
+		(sin_token, virtual_doctor_id, mobile, type, status, status_name, create_time, call_url, unpressed_call_url, unpressed_call_url_in, unpressed_call_url_out, call_time)
 		VALUES
-		(#{sinToken}, #{virtualDoctorId}, #{mobile}, #{type}, #{status}, #{statusName}, #{visitTime}, #{callUrl}, #{callTime})
+		(#{sinToken}, #{virtualDoctorId}, #{mobile}, #{type}, #{status}, #{statusName}, #{visitTime}, #{callUrl}, #{unpressedCallUrl}, #{unpressedCallUrlIn}, #{unpressedCallUrlOut},  #{callTime})
 	</insert>
 	
 	<update id="updateVirtualDoctorCallInfo" parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorCallInfoParams">
@@ -383,6 +383,12 @@
 	<!-- 更新录音文本 -->
 	<insert id="updateCallUrlText">
 		REPLACE INTO virtual_doctor_call_text(sin_token, call_text) VALUES(#{sinToken}, #{callText})
+	</insert>
+
+
+	<!-- 更新录音文本重构版本 -->
+	<insert id="updateCallUrlTextRefactor">
+		REPLACE INTO virtual_doctor_call_text(sin_token, call_text, unpressed_call_text, unpressed_call_in_text, unpressed_call_out_text) VALUES(#{sinToken}, #{callText}, #{unpressedCallText}, #{unpressedCallInText}, #{unpressedCallOutText})
 	</insert>
 
 
@@ -1511,7 +1517,9 @@
 
     <!-- 根据sin_token获取virtual_doctor_call_info表中的id-->
     <select id="getCallInfoBySinToken" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualSplitSpeechCallInfoParams">
-      SELECT t.id,t.sin_token sinToken,t.virtual_drug_user_id virtualDrugUserId FROM virtual_doctor_call_info t WHERE t.sin_token = #{sinToken}
+      SELECT t.id,t.sin_token sinToken,t.virtual_drug_user_id virtualDrugUserId
+
+      FROM virtual_doctor_call_info t WHERE t.sin_token = #{sinToken}
     </select>
 
     <!-- 根据id获取virtual_doctor_call_info表中的sin_token-->

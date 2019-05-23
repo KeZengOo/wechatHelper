@@ -27,6 +27,18 @@ public class DoctorCallInfo extends IdEntity {
     private Long callTime;
     @Column(name = "call_url")
     private String callUrl;
+
+    @Column(name = "unpressed_call_url")
+    private String unpressedCallUrl;
+
+    @Column(name = "unpressed_call_url_in")
+    private String unpressedCallUrlIn;
+
+
+    @Column(name = "unpressed_call_url_out")
+    private String unpressedCallUrlOut;
+
+
     @Column(name = "doctor_questionnaire_id")
     private Long questionnaireId;
     @Column(name = "remark")
@@ -200,5 +212,30 @@ public class DoctorCallInfo extends IdEntity {
 
     public void setDrugUser(DrugUser drugUser) {
         this.drugUser = drugUser;
+    }
+
+
+    public String getUnpressedCallUrl() {
+        return unpressedCallUrl;
+    }
+
+    public void setUnpressedCallUrl(String unpressedCallUrl) {
+        this.unpressedCallUrl = unpressedCallUrl;
+    }
+
+    public String getUnpressedCallUrlIn() {
+        return unpressedCallUrlIn;
+    }
+
+    public void setUnpressedCallUrlIn(String unpressedCallUrlIn) {
+        this.unpressedCallUrlIn = unpressedCallUrlIn;
+    }
+
+    public String getUnpressedCallUrlOut() {
+        return unpressedCallUrlOut;
+    }
+
+    public void setUnpressedCallUrlOut(String unpressedCallUrlOut) {
+        this.unpressedCallUrlOut = unpressedCallUrlOut;
     }
 }
