@@ -31,23 +31,21 @@ public interface ContentSharingMapper {
      * @param drugUserIds
      * @return int
      */
-    List<ContentSharingParams> getContentSharingListCount(@Param("contentSharingRequest") ContentSharingRequest contentSharingRequest, @Param("drugUserIds") List<Long> drugUserIds);
+    Integer getContentSharingListCount(@Param("contentSharingRequest") ContentSharingRequest contentSharingRequest, @Param("drugUserIds") List<Long> drugUserIds);
 
     /**
      * 内容阅读记录列表
      * @param contentReadLogsRequest
-     * @param drugUserIds
      * @return list
      */
-    List<ContentReadLogsParams> getContentReadLogsListPage(@Param("contentReadLogsRequest") ContentReadLogsRequest contentReadLogsRequest, @Param("drugUserIds") List<Long> drugUserIds);
+    List<ContentReadLogsParams> getContentReadLogsListPage(@Param("contentReadLogsRequest") ContentReadLogsRequest contentReadLogsRequest);
 
     /**
      * 内容阅读记录列表Count
      * @param contentReadLogsRequest
-     * @param drugUserIds
      * @return int
      */
-    Integer getContentReadLogsListCount(@Param("contentReadLogsRequest") ContentReadLogsRequest contentReadLogsRequest, @Param("drugUserIds") List<Long> drugUserIds);
+    Integer getContentReadLogsListCount(@Param("contentReadLogsRequest") ContentReadLogsRequest contentReadLogsRequest);
 
     /**
      * 根据内容ID和医生ID查询阅读时间数组和阅读时长数组
@@ -55,7 +53,7 @@ public interface ContentSharingMapper {
      * @param doctorId
      * @return list
      */
-    List<ContentReadLogsTimeParams> getReadTimeAndReadDurationByDataIdAndDoctorId(@Param("dataId")Long dataId, @Param("doctorId")Long doctorId);
+    List<ContentReadLogsTimeParams> getReadTimeAndReadDurationByDataIdAndDoctorId(@Param("dataId")Long dataId, @Param("doctorId")Long doctorId, @Param("shareType") Integer shareType);
 
     /**
      * 内容分享列表
@@ -82,4 +80,13 @@ public interface ContentSharingMapper {
      * @return
      */
     List<ContentSharingParams> getContentSharingRoleNameByDrugUserId(@Param("drugUserId") Long drugUserId);
+
+    /**
+     * 该代表的文章的医生阅读数
+     * @param titleId
+     * @param drugUserId
+     * @param shareType
+     * @return int
+     */
+    Integer getReadCountByDrugUserAndTitle(@Param("titleId") Long titleId,@Param("drugUserId") Long drugUserId, @Param("shareType") Integer shareType);
 }

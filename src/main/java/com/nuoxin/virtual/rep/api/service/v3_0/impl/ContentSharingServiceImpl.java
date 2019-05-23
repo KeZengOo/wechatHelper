@@ -58,17 +58,21 @@ public class ContentSharingServiceImpl implements ContentSharingService {
                 roleNamesString += roleNames.get(i).getRoleName()+",";
             }
 
+            //该代表的文章的医生阅读数
+            Integer readCount = contentSharingMapper.getReadCountByDrugUserAndTitle(n.getId(),n.getDrugUserId(),n.getShareType());
+            logger.info("titleID:"+ n.getId()+"readCount:"+readCount);
             ContentSharingParams c = new ContentSharingParams();
             c = n;
             c.setTime(n.getTime().substring(0,n.getTime().indexOf(".")));
+            c.setPeopleNumber(readCount);
             c.setRoleName(roleNamesString.substring(0,roleNamesString.length()));
             c.setTotalDuration(ParseTimeSecondsUtils.secondToTime(Long.parseLong(n.getTotalDuration())));
             newList.add(c);
         });
 
-        List<ContentSharingParams> contentSharingCount = contentSharingMapper.getContentSharingListCount(contentSharingRequest,drugUserIds);
+        Integer contentSharingCount = contentSharingMapper.getContentSharingListCount(contentSharingRequest,drugUserIds);
 
-        return new PageResponseBean(contentSharingRequest, contentSharingCount.size(), newList);
+        return new PageResponseBean(contentSharingRequest, contentSharingCount, newList);
     }
 
     @Override
@@ -79,7 +83,7 @@ public class ContentSharingServiceImpl implements ContentSharingService {
             drugUserIds = Arrays.asList(contentReadLogsRequest.getDrugUserId());
         }
 
-        List<ContentReadLogsParams> list = contentSharingMapper.getContentReadLogsListPage(contentReadLogsRequest,drugUserIds);
+        List<ContentReadLogsParams> list = contentSharingMapper.getContentReadLogsListPage(contentReadLogsRequest);
 
         List<ContentReadLogsParams> newList = new ArrayList<ContentReadLogsParams>();
 
@@ -88,7 +92,7 @@ public class ContentSharingServiceImpl implements ContentSharingService {
             ContentReadLogsParams c = new ContentReadLogsParams();
             c = list.get(i);
             //获取同一名医生多长阅读的时间和时长
-            List<ContentReadLogsTimeParams> logsTimeParams = contentSharingMapper.getReadTimeAndReadDurationByDataIdAndDoctorId(list.get(i).getDataId(),list.get(i).getDoctorId());
+            List<ContentReadLogsTimeParams> logsTimeParams = contentSharingMapper.getReadTimeAndReadDurationByDataIdAndDoctorId(list.get(i).getDataId(),list.get(i).getDoctorId(), contentReadLogsRequest.getShareType());
             String[] createTimeArray = new String[logsTimeParams.size()];
             String[] readTimeArray = new String[logsTimeParams.size()];
             String[] readTimeStringArray = new String[logsTimeParams.size()];
@@ -99,13 +103,16 @@ public class ContentSharingServiceImpl implements ContentSharingService {
                 readTimeStringArray[j] = ParseTimeSecondsUtils.secondToTime(Long.parseLong(logsTimeParams.get(j).getReadTime()));
             }
             //定义最大值为该数组的第一个数
-            int maxIndex = Integer.parseInt(readTimeArray[0]);
-            //遍历循环数组
-            for (int j = 0; j < readTimeArray.length; j++) {
-                if(maxIndex < Integer.parseInt(readTimeArray[j])){
-                    maxIndex = Integer.parseInt(readTimeArray[j]);
+            int maxIndex = 0;
+                if(readTimeArray.length > 0){
+                    maxIndex = Integer.parseInt(readTimeArray[0]);
+                    //遍历循环数组
+                    for (int j = 0; j < readTimeArray.length; j++) {
+                        if(maxIndex < Integer.parseInt(readTimeArray[j])){
+                            maxIndex = Integer.parseInt(readTimeArray[j]);
+                        }
+                    }
                 }
-            }
 
             c.setCreateTime(createTimeArray);
             c.setReadTime(readTimeStringArray);
@@ -113,7 +120,7 @@ public class ContentSharingServiceImpl implements ContentSharingService {
             newList.add(c);
         }
 
-        Integer contentReadLogsCount = contentSharingMapper.getContentReadLogsListCount(contentReadLogsRequest,drugUserIds);
+        Integer contentReadLogsCount = contentSharingMapper.getContentReadLogsListCount(contentReadLogsRequest);
 
         return new PageResponseBean(contentReadLogsRequest, contentReadLogsCount, newList);
     }
@@ -212,7 +219,9 @@ public class ContentSharingServiceImpl implements ContentSharingService {
     public void contentSharingExportFile(Integer productId, Long[] drugUserId, String startTimeAfter, String startTimeBefore, Integer shareType, String title, HttpServletResponse response) {
         //代表数组转list
         List<Long> drugUserIds = new ArrayList<Long>();
-        drugUserIds = Arrays.asList(drugUserId);
+        if(null != drugUserId && drugUserId.length > 0){
+            drugUserIds = Arrays.asList(drugUserId);
+        }
         List<ContentSharingParams> list = contentSharingMapper.getContentSharingCSVList(productId, drugUserIds, startTimeAfter, startTimeBefore, shareType, title);
         List<ContentSharingExcelParams> newList = new ArrayList<ContentSharingExcelParams>();
         //时间格式转字符串
@@ -256,6 +265,9 @@ public class ContentSharingServiceImpl implements ContentSharingService {
             }
             else if(list.get(i).getShareType().equals(3)){
                 contentSharingExcelParams.setShareType("邮件");
+            }
+            else if(list.get(i).getShareType().equals(4)){
+                contentSharingExcelParams.setShareType("小程序");
             }
             newList.add(contentSharingExcelParams);
         }
