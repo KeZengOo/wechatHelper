@@ -118,6 +118,8 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
         list.forEach(n -> {
             MeetingSubjectParams m = new MeetingSubjectParams();
             m=n;
+            m.setStartTime(n.getStartTime().substring(0,n.getStartTime().indexOf(".")));
+            m.setEndTime(n.getEndTime().substring(0,n.getEndTime().indexOf(".")));
             m.setDuration(hours+"小时");
             newList.add(m);
         });
