@@ -208,31 +208,35 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
         }
 
         List<MeetingSubjectExcel> meetingSubjectTemps = new ArrayList<MeetingSubjectExcel>();
-
+        int existNum = 0;
         for (MeetingSubjectExcel h : meetingSubjectExcels) {
-            MeetingSubjectExcel meetingSubjectExcel = new MeetingSubjectExcel();
-
-            if (h != null) {
-                try {
-                    if(null != h.getProductName() && null != h.getMeetingName() && null != h.getSubjectName() && null != h.getSpeaker() && null != h.getStartTime() && null != h.getEndTime())
-                    {
-                        meetingSubjectExcel.setProductName(h.getProductName());
-                        meetingSubjectExcel.setMeetingName(h.getMeetingName());
-                        meetingSubjectExcel.setSubjectName(h.getSubjectName());
-                        meetingSubjectExcel.setSpeaker(h.getSpeaker());
-                        meetingSubjectExcel.setStartTime(h.getStartTime());
-                        meetingSubjectExcel.setEndTime(h.getEndTime());
-                        meetingSubjectTemps.add(meetingSubjectExcel);
+            //判断会议名称是否存在，存在不让导入
+            Integer titleCount = meetingRecordMapper.getTitleCountExist(h.getMeetingName());
+            if(titleCount == 0) {
+                MeetingSubjectExcel meetingSubjectExcel = new MeetingSubjectExcel();
+                if (h != null) {
+                    try {
+                        if (null != h.getProductName() && null != h.getMeetingName() && null != h.getSubjectName() && null != h.getSpeaker() && null != h.getStartTime() && null != h.getEndTime()) {
+                            meetingSubjectExcel.setProductName(h.getProductName());
+                            meetingSubjectExcel.setMeetingName(h.getMeetingName());
+                            meetingSubjectExcel.setSubjectName(h.getSubjectName());
+                            meetingSubjectExcel.setSpeaker(h.getSpeaker());
+                            meetingSubjectExcel.setStartTime(h.getStartTime());
+                            meetingSubjectExcel.setEndTime(h.getEndTime());
+                            meetingSubjectTemps.add(meetingSubjectExcel);
+                        } else {
+                            map.put("flag", false);
+                            map.put("message", "上传数据存在空值");
+                            return map;
+                        }
+                    } catch (Exception e) {
+                        log.error("IOException", e);
                     }
-                    else
-                    {
-                        map.put("flag",false);
-                        map.put("message","上传数据存在空值");
-                        return map;
-                    }
-                } catch (Exception e) {
-                    log.error("IOException", e);
                 }
+            }
+            else
+            {
+                existNum = 1;
             }
         }
 
@@ -302,8 +306,17 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
                 map.put("message","上传主题失败");
                 return map;
             }
-            map.put("flag",true);
-            map.put("message","上传会议成功");
+            if (existNum == 0)
+            {
+                map.put("flag",true);
+                map.put("message","上传会议成功");
+            }
+            else
+            {
+                map.put("flag",true);
+                map.put("message","上传的会议有已存在会议");
+            }
+
         } catch (Exception e) {
             log.error("IOException", e);
             map.put("flag",false);

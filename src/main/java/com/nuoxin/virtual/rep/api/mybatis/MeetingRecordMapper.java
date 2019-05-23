@@ -159,4 +159,11 @@ public interface MeetingRecordMapper {
      * @return
      */
     Integer getMeetingIdByTitleAndStartTimeAndEndTime(@Param("title")String title,@Param("startTime")String startTime,@Param("endTime")String endTime);
+
+    /**
+     * 判断会议名称是否存在，存在不让导入
+     * @param meetingName
+     * @return int
+     */
+    Integer getTitleCountExist(@Param("meetingName") String meetingName);
 }

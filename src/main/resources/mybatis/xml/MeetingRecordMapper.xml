@@ -293,4 +293,9 @@ FROM
         AND t.start_time &gt;= #{startTime}
         AND t.end_time &lt;= #{endTime};
     </select>
+
+    <!-- 判断会议名称是否存在，存在不让导入 -->
+    <select id="getTitleCountExist" resultType="java.lang.Integer">
+        SELECT count(1) FROM t_meeting_data t WHERE t.title = #{meetingName}
+    </select>
 </mapper>

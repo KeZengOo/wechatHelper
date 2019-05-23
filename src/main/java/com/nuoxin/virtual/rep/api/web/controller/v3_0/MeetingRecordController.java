@@ -69,7 +69,7 @@ public class MeetingRecordController {
         Map<String, Object> result = meetingRecordService.meetingImport(file);
         DefaultResponseBean<Map<String, Object>> responseBean = new DefaultResponseBean<>();
         responseBean.setData(result);
-        responseBean.setMessage("");
+        responseBean.setMessage(result.get("message").toString());
         return responseBean;
     }
 
