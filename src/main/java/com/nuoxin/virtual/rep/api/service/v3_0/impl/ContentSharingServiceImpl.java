@@ -260,7 +260,7 @@ public class ContentSharingServiceImpl implements ContentSharingService {
             contentSharingExcelParams.setDrugUserName(list.get(i).getDrugUserName());
             contentSharingExcelParams.setProdName(list.get(i).getProdName());
             contentSharingExcelParams.setPeopleNumber(readCount.toString());
-            contentSharingExcelParams.setTotalDuration(list.get(i).getTotalDuration());
+            contentSharingExcelParams.setTotalDuration(ParseTimeSecondsUtils.secondToTime(Long.parseLong(list.get(i).getTotalDuration())));
 
             if(list.get(i).getSaleType().equals(0)){
                 contentSharingExcelParams.setSaleType("没有类型为经理");
