@@ -90,7 +90,6 @@
     <select id="getMeetingSubjectListByProductIdAndMeetingName" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingSubjectParams">
         SELECT
             t.id,
-            t.product_id AS productId,
             t.meeting_name AS meetingName,
             t.subject_name AS subjectName,
             t.speaker,
