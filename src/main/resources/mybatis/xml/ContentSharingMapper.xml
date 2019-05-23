@@ -80,25 +80,41 @@
     </select>
 
     <!-- 内容分享列表总数 -->
-    <select id="getContentSharingListCount" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.ContentSharingParams">
+    <select id="getContentSharingListCount" resultType="java.lang.Integer">
         SELECT
-            m.title
+        COUNT(t.title)
         FROM
-            (
-                SELECT
-                  t.title
-                FROM
-                activity_info t
-                JOIN activity_read r ON t.id = r.data_id
-                JOIN activity_read_ip ip ON r.read_token = ip.read_token
-                JOIN t_content_product p ON p.content_id = t.id
-                JOIN product_line l ON p.product_id = l.prod_id
-                JOIN drug_user u ON u.id = r.drug_user_id
-                WHERE
-                1 = 1
-                <if test="drugUserIds.size() > 0 and drugUserIds != null">
-                    AND r.drug_user_id in
-                    <foreach collection="drugUserIds" item="drugUserIds" separator="," open="(" close=")">
+        (
+        SELECT
+        m.title
+        FROM
+        (
+        SELECT
+        t.id,
+        t.title,
+        t.time,
+        r.share_type,
+        r.data_id,
+        r.drug_user_id,
+        r.drug_user_name,
+        r.read_person_id,
+        r.read_person_name,
+        r.read_time,
+        p.product_id,
+        l.prod_name,
+        u.sale_type
+        FROM
+        activity_info t
+        JOIN activity_read r ON t.id = r.data_id
+        JOIN activity_read_ip ip ON r.read_token = ip.read_token
+        JOIN t_content_product p ON p.content_id = t.id
+        JOIN product_line l ON p.product_id = l.prod_id
+        JOIN drug_user u ON u.id = r.drug_user_id
+        WHERE
+        1 = 1
+        <if test="drugUserIds.size() > 0 and drugUserIds != null">AND r.drug_user_id in
+            <foreach
+                    collection="drugUserIds" item="drugUserIds" separator="," open="(" close=")">
                         #{drugUserIds}
                     </foreach>
                 </if>
@@ -131,82 +147,212 @@
             ) m
         GROUP BY
         m.title
+        ) t
     </select>
 
     <!-- 内容阅读记录列表 -->
     <select id="getContentReadLogsListPage" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.ContentReadLogsParams">
         SELECT
-            t.id,
-            t.data_id AS dataId,
-            d.id AS doctorId,
-            d.`name` AS doctorName,
-            d.hospital_name AS hospitalName,
-            d.depart,
-            t.create_time AS createTime,
-            t.read_time AS readTime
+            m.id,
+            m.title,
+            m.time AS createTime,
+            m.dataId,
+            m.drugUserId,
+            m.drugUserName,
+            m.doctorId,
+            m.doctorName,
+            m.readTime,
+            m.shareType,
+            m.hospitalName,
+            m.depart
         FROM
-            activity_read t
-        JOIN activity_read_ip ip ON t.read_token = ip.read_token
-        JOIN doctor d ON t.read_person_id = d.id
-        WHERE
-            1 = 1
-        AND (
-            ip.isp IS NULL
-            OR ip.isp != '阿里云'
-        )
-        AND t.data_id = #{contentReadLogsRequest.dataId}
-        AND t.read_person_id != ''
-        <if test="drugUserIds.size() > 0 and drugUserIds != null">
-            AND t.drug_user_id in
-            <foreach collection="drugUserIds" item="drugUserIds" separator="," open="(" close=")">
-                #{drugUserIds}
-            </foreach>
-        </if>
-        GROUP BY t.data_id,d.id
-        LIMIT #{contentReadLogsRequest.currentSize},#{contentReadLogsRequest.pageSize}
+            (
+                SELECT
+			d.id,
+            t.title,
+            t.time,
+            r.data_id AS dataId,
+            r.drug_user_id AS drugUserId,
+            r.drug_user_name AS drugUserName,
+            r.read_person_id AS doctorId,
+            r.read_person_name AS doctorName,
+            r.read_time AS readTime,
+            r.share_type AS shareType,
+            d.hospital_name AS hospitalName,
+            d.depart
+                FROM
+            activity_info t
+            JOIN activity_read r ON t.id = r.data_id
+            JOIN activity_read_ip ip ON r.read_token = ip.read_token
+            JOIN t_content_product p ON p.content_id = t.id
+            JOIN product_line l ON p.product_id = l.prod_id
+            JOIN drug_user u ON u.id = r.drug_user_id
+            JOIN doctor d ON r.read_person_id = d.id
+                WHERE
+                    1 = 1
+                    AND r.data_id = t.id
+                    AND (
+                    ip.isp IS NULL
+                    OR ip.isp != '阿里云'
+                    )
+                    AND r.read_person_id != ''
+                    AND u.id = #{contentReadLogsRequest.drugUserId}
+                    AND t.id = #{contentReadLogsRequest.dataId}
+                    AND r.share_type = #{contentReadLogsRequest.shareType}
+                    GROUP BY
+                    r.read_person_id,
+                    t.id
+            UNION ALL
+                SELECT
+                    d.id,
+                    i.title,
+                    wr.create_time time,
+                    wr.content_id AS dataId,
+                    dd.drug_user_id AS drugUserId,
+                    dd.drug_user_name AS drugUserName,
+                    wr.user_id AS doctorId,
+                    wr.user_name AS doctorName,
+                    wr.read_time AS readTime,
+                    wr.share_type AS shareType,
+                    d.hospital_name AS hospitalName,
+                    d.depart
+                FROM
+                wx_user_read wr
+                LEFT JOIN wx_users xu ON wr.user_id = xu.id
+                LEFT JOIN activity_info i ON wr.content_id = i.id
+                LEFT JOIN drug_user_doctor dd ON xu.doctor_id = dd.doctor_id
+                LEFT JOIN doctor d ON dd.doctor_id = d.id
+                    WHERE
+                    1 = 1
+                    AND wr.content_id = #{contentReadLogsRequest.dataId}
+                    AND dd.drug_user_id = #{contentReadLogsRequest.drugUserId}
+                    AND wr.share_type = #{contentReadLogsRequest.shareType}
+                ) m
+                GROUP BY
+                    m.doctorId
+                LIMIT #{contentReadLogsRequest.currentSize},#{contentReadLogsRequest.pageSize}
     </select>
 
     <!-- 内容阅读记录列表Count -->
     <select id="getContentReadLogsListCount" resultType="java.lang.Integer">
         SELECT
-            COUNT(m.id)
+            COUNT(t.doctorId)
         FROM
             (
-                SELECT
-                    t.id
+		SELECT
+			m.doctorId
+        FROM
+            (
+            SELECT
+            t.title,
+            t.time,
+            r.data_id AS dataId,
+            r.drug_user_id AS drugUserId,
+            r.drug_user_name AS drugUserName,
+            r.read_person_id AS doctorId,
+            r.read_person_name AS doctorName,
+            r.read_time AS readTime,
+            r.share_type AS shareType,
+            d.hospital_name AS hospitalName,
+            d.depart
                 FROM
-                    activity_read t
-                JOIN activity_read_ip ip ON t.read_token = ip.read_token
-                JOIN doctor d ON t.read_person_id = d.id
+            activity_info t
+            JOIN activity_read r ON t.id = r.data_id
+            JOIN activity_read_ip ip ON r.read_token = ip.read_token
+            JOIN t_content_product p ON p.content_id = t.id
+            JOIN product_line l ON p.product_id = l.prod_id
+            JOIN drug_user u ON u.id = r.drug_user_id
+            JOIN doctor d ON r.read_person_id = d.id
                 WHERE
                     1 = 1
-                AND (
+                    AND r.data_id = t.id
+                    AND (
                     ip.isp IS NULL
                     OR ip.isp != '阿里云'
-                )
-                AND t.data_id = #{contentReadLogsRequest.dataId}
-                AND t.read_person_id != ''
-                <if test="drugUserIds.size() > 0 and drugUserIds != null">
-                    AND t.drug_user_id in
-                    <foreach collection="drugUserIds" item="drugUserIds" separator="," open="(" close=")">
-                        #{drugUserIds}
-                    </foreach>
-                </if>
+                    )
+                    AND r.read_person_id != ''
+                    AND r.share_type = #{contentReadLogsRequest.shareType}
+                    AND u.id = #{contentReadLogsRequest.drugUserId}
+                    AND t.id = #{contentReadLogsRequest.dataId}
+                    GROUP BY
+                    r.read_person_id,
+                    t.id
+            UNION ALL
+                SELECT
+                    i.title,
+                    wr.create_time time,
+                    wr.content_id AS dataId,
+                    dd.drug_user_id AS drugUserId,
+                    dd.drug_user_name AS drugUserName,
+                    wr.user_id AS doctorId,
+                    wr.user_name AS doctorName,
+                    wr.read_time AS readTime,
+                    wr.share_type AS shareType,
+                    d.hospital_name AS hospitalName,
+                    d.depart
+                FROM
+                wx_user_read wr
+                LEFT JOIN wx_users xu ON wr.user_id = xu.id
+                LEFT JOIN activity_info i ON wr.content_id = i.id
+                LEFT JOIN drug_user_doctor dd ON xu.doctor_id = dd.doctor_id
+                LEFT JOIN doctor d ON dd.doctor_id = d.id
+                    WHERE
+                    1 = 1
+                    AND wr.content_id = #{contentReadLogsRequest.dataId}
+                    AND dd.drug_user_id = #{contentReadLogsRequest.drugUserId}
+                    AND wr.share_type = #{contentReadLogsRequest.shareType}
+                ) m
                 GROUP BY
-                    t.data_id,
-                    d.id
-            ) m
+                m.doctorId
+                ) t
     </select>
 
     <!-- 根据内容ID和医生ID查询阅读时间数组和阅读时长数组 -->
     <select id="getReadTimeAndReadDurationByDataIdAndDoctorId" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.ContentReadLogsTimeParams">
         SELECT
-            t.create_time AS createTime,t.read_time AS readTime
+            m.time AS createTime,
+            m.readTime AS readTime
         FROM
-            activity_read t
-        WHERE
-            t.read_person_id = #{doctorId}
-        AND t.data_id = #{dataId}
+            (
+                SELECT
+                    t.time,
+                    r.read_time AS readTime
+                FROM
+                    activity_info t
+                JOIN activity_read r ON t.id = r.data_id
+                JOIN activity_read_ip ip ON r.read_token = ip.read_token
+                JOIN t_content_product p ON p.content_id = t.id
+                JOIN product_line l ON p.product_id = l.prod_id
+                JOIN drug_user u ON u.id = r.drug_user_id
+                WHERE
+                    1 = 1
+                AND r.data_id = t.id
+                AND (
+                    ip.isp IS NULL
+                    OR ip.isp != '阿里云'
+                )
+                AND r.read_person_id != ''
+                AND u.id = #{doctorId}
+                AND t.id = #{dataId}
+                AND r.share_type = #{shareType}
+                GROUP BY
+                    r.read_person_id,
+                    t.id
+                UNION ALL
+                    SELECT
+                        wr.create_time time,
+                        wr.read_time AS readTime
+                    FROM
+                        wx_user_read wr
+                    LEFT JOIN wx_users xu ON wr.user_id = xu.id
+                    LEFT JOIN activity_info i ON wr.content_id = i.id
+                    LEFT JOIN drug_user_doctor dd ON xu.doctor_id = dd.doctor_id
+                    WHERE
+                        1 = 1
+                    AND dd.drug_user_id = #{doctorId}
+                    AND wr.content_id = #{dataId}
+                    AND wr.share_type = #{shareType}
+            ) m
     </select>
 
     <!-- 内容分享列表 -->
@@ -301,64 +447,64 @@
         m.sale_type AS saleType
         FROM
         (
-            SELECT
-            t.id,
-            t.title,
-            t.time,
-            r.share_type,
-            r.data_id,
-            r.drug_user_id,
-            r.drug_user_name,
-            r.read_person_id,
-            r.read_person_name,
-            r.read_time,
-            p.product_id,
-            l.prod_name,
-            u.sale_type
-            FROM
-            activity_info t
-            JOIN activity_read r ON t.id = r.data_id
-            JOIN activity_read_ip ip ON r.read_token = ip.read_token
-            JOIN t_content_product p ON p.content_id = t.id
-            JOIN product_line l ON p.product_id = l.prod_id
-            JOIN drug_user u ON u.id = r.drug_user_id
-            WHERE
-            1 = 1
-            <if test="drugUserIds.size() > 0 and drugUserIds != null">
-                AND r.drug_user_id in
-                <foreach collection="drugUserIds" item="drugUserIds" separator="," open="(" close=")">
-                    #{drugUserIds}
-                </foreach>
-            </if>
-            AND r.data_id = t.id
-            <if test="shareType != 0 and shareType != null">
-                AND r.share_type = #{shareType}
-            </if>
-            AND (
-            ip.isp IS NULL
-            OR ip.isp != '阿里云'
-            )
-            <if test="productId != 0 and productId != null">
-                AND l.prod_id = #{productId}
-            </if>
-            <if test="startTimeBefore != '' and startTimeBefore != null">
-                AND t.time &gt;= #{startTimeBefore}
-            </if>
+        SELECT
+        t.id,
+        t.title,
+        t.time,
+        r.share_type,
+        r.data_id,
+        r.drug_user_id,
+        r.drug_user_name,
+        r.read_person_id,
+        r.read_person_name,
+        r.read_time,
+        p.product_id,
+        l.prod_name,
+        u.sale_type
+        FROM
+        activity_info t
+        JOIN activity_read r ON t.id = r.data_id
+        JOIN activity_read_ip ip ON r.read_token = ip.read_token
+        JOIN t_content_product p ON p.content_id = t.id
+        JOIN product_line l ON p.product_id = l.prod_id
+        JOIN drug_user u ON u.id = r.drug_user_id
+        WHERE
+        1 = 1
+        <if test="drugUserIds.size() > 0 and drugUserIds != null">
+            AND r.drug_user_id in
+            <foreach collection="drugUserIds" item="drugUserIds" separator="," open="(" close=")">
+                #{drugUserIds}
+            </foreach>
+        </if>
+        AND r.data_id = t.id
+        <if test="shareType != 0 and shareType != null">
+            AND r.share_type = #{shareType}
+        </if>
+        AND (
+        ip.isp IS NULL
+        OR ip.isp != '阿里云'
+        )
+        <if test="productId != 0 and productId != null">
+            AND l.prod_id = #{productId}
+        </if>
+        <if test="startTimeBefore != '' and startTimeBefore != null">
+            AND t.time &gt;= #{startTimeBefore}
+        </if>
 
-            <if test="startTimeAfter != '' and startTimeAfter != null">
-                AND t.time &lt;= #{startTimeAfter}
-            </if>
+        <if test="startTimeAfter != '' and startTimeAfter != null">
+            AND t.time &lt;= #{startTimeAfter}
+        </if>
 
-            <if test="title != '' and title != null">
-                AND t.title LIKE "%"#{title}"%"
-            </if>
-
-            GROUP BY
-            r.read_person_id,
-            t.id
+        <if test="title != '' and title != null">
+            AND t.title LIKE "%"#{title}"%"
+        </if>
+        AND r.read_person_id != ''
+        GROUP BY
+        r.read_person_id,
+        t.id
         ) m
         GROUP BY
-        m.title
+        title
     </select>
 
     <!-- 查询文章列表的代表类型 -->
@@ -373,5 +519,78 @@
         JOIN role r ON r.id = u.role_id
         WHERE
             t.id = #{drugUserId}
+    </select>
+
+    <!-- 该代表的文章的医生阅读数 -->
+    <select id="getReadCountByDrugUserAndTitle" resultType="java.lang.Integer">
+        SELECT count(t.doctorId) FROM (
+            SELECT
+                m.title,
+                m.time,
+                m.dataId,
+                m.drugUserId,
+                m.drugUserName,
+                m.doctorId,
+                m.doctorName,
+                m.readTime,
+                m.shareType
+            FROM
+                (
+                    SELECT
+                        t.title,
+                        t.time,
+                        r.data_id AS dataId,
+                        r.drug_user_id AS drugUserId,
+                        r.drug_user_name AS drugUserName,
+                        r.read_person_id AS doctorId,
+                        r.read_person_name AS doctorName,
+                        r.read_time AS readTime,
+                        r.share_type AS shareType
+                    FROM
+                        activity_info t
+                    JOIN activity_read r ON t.id = r.data_id
+                    JOIN activity_read_ip ip ON r.read_token = ip.read_token
+                    JOIN t_content_product p ON p.content_id = t.id
+                    JOIN product_line l ON p.product_id = l.prod_id
+                    JOIN drug_user u ON u.id = r.drug_user_id
+                    WHERE
+                        1 = 1
+                    AND r.data_id = t.id
+                    AND u.id = #{drugUserId}
+                    AND (
+                        ip.isp IS NULL
+                        OR ip.isp != '阿里云'
+                    )
+                    AND r.read_person_id != ''
+                    AND t.id = #{titleId}
+                    AND r.share_type = #{shareType}
+                    GROUP BY
+                        r.read_person_id,
+                        t.id
+                    UNION ALL
+                        SELECT
+                            i.title,
+                            wr.create_time time,
+                            wr.content_id AS dataId,
+                            dd.drug_user_id AS drugUserId,
+                            dd.drug_user_name AS drugUserName,
+                            wr.user_id AS doctorId,
+                            wr.user_name AS doctorName,
+                            wr.read_time AS readTime,
+                            wr.share_type AS shareType
+                        FROM
+                            wx_user_read wr
+                        LEFT JOIN wx_users xu ON wr.user_id = xu.id
+                        LEFT JOIN activity_info i ON wr.content_id = i.id
+                        LEFT JOIN drug_user_doctor dd ON xu.doctor_id = dd.doctor_id
+                        WHERE
+                          1=1 AND
+                            wr.content_id = #{titleId}
+                        AND dd.drug_user_id = #{drugUserId}
+                        AND wr.share_type = #{shareType}
+                ) m
+
+            GROUP BY m.doctorId
+            ) t
     </select>
 </mapper>

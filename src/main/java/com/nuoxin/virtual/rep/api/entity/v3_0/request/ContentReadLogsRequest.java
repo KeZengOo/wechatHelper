@@ -16,5 +16,7 @@ public class ContentReadLogsRequest extends PageRequestBean {
     @ApiModelProperty("内容Id")
     private Long dataId;
     @ApiModelProperty("代表ID")
-    private Long[] drugUserId;
+    private Long drugUserId;
+    @ApiModelProperty("分享渠道")
+    private Integer shareType;
 }
