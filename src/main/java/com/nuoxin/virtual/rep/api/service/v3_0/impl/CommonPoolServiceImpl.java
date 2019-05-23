@@ -157,11 +157,6 @@ public class CommonPoolServiceImpl implements CommonPoolService {
         if (CollectionsUtil.isEmptyList(productIdList)){
             throw new BusinessException(ErrorEnum.ERROR, "请选择产品！");
         }
-
-        if (productIdList.size() > 1){
-            throw new BusinessException(ErrorEnum.ERROR, "只能选择一个产品！");
-        }
-
         // 设置成不可分页的
         request.setPaginable(1);
 

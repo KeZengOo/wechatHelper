@@ -1,5 +1,6 @@
 package com.nuoxin.virtual.rep.api.web.controller.request.v3_0;
 
+import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -13,7 +14,6 @@ import java.util.List;
  * @author tiancun
  * @date 2019-05-09
  */
-@Data
 @ApiModel(value = "V3.0日报请求参数")
 public class DailyReportRequest implements Serializable {
     private static final long serialVersionUID = -8473359742664477431L;
@@ -31,5 +31,50 @@ public class DailyReportRequest implements Serializable {
     private Date endTime;
 
 
+    public List<Long> getProductIdList() {
+        return productIdList;
+    }
 
+    public void setProductIdList(List<Long> productIdList) {
+        this.productIdList = productIdList;
+    }
+
+    public List<Long> getDrugUserIdList() {
+        return drugUserIdList;
+    }
+
+    public void setDrugUserIdList(List<Long> drugUserIdList) {
+        this.drugUserIdList = drugUserIdList;
+    }
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    /**
+     * 前端传的YYYY-MM-DD 需要转换
+     * @param startTime
+     */
+    public void setStartTime(Date startTime) {
+
+        String dateString = DateUtil.getDateString(startTime);
+        String dateTimeString = dateString.concat(" 00:00:00");
+        Date date = DateUtil.stringToDate(dateTimeString, DateUtil.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS);
+
+        this.startTime = date;
+    }
+
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+
+        String dateString = DateUtil.getDateString(endTime);
+        String dateTimeString = dateString.concat(" 59:59:59");
+        Date date = DateUtil.stringToDate(dateTimeString, DateUtil.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS);
+
+
+        this.endTime = date;
+    }
 }

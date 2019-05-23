@@ -1,6 +1,7 @@
 package com.nuoxin.virtual.rep.api.web.controller.request.v3_0;
 
 import com.nuoxin.virtual.rep.api.common.bean.PageRequestBean;
+import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -13,7 +14,6 @@ import java.util.Date;
  * @author tiancun
  * @date 2019-05-13
  */
-@Data
 @ApiModel
 public class DrugUserDoctorCallDetailRequest extends PageRequestBean implements Serializable {
     private static final long serialVersionUID = -7638207011746085656L;
@@ -37,5 +37,69 @@ public class DrugUserDoctorCallDetailRequest extends PageRequestBean implements 
     private Date endTime;
 
 
+    public Long getProductId() {
+        return productId;
+    }
 
+    public void setProductId(Long productId) {
+        this.productId = productId;
+    }
+
+    public Long getDrugUserId() {
+        return drugUserId;
+    }
+
+    public void setDrugUserId(Long drugUserId) {
+        this.drugUserId = drugUserId;
+    }
+
+    public Long getDoctorId() {
+        return doctorId;
+    }
+
+    public void setDoctorId(Long doctorId) {
+        this.doctorId = doctorId;
+    }
+
+    public Integer getVisitChannel() {
+        return visitChannel;
+    }
+
+    public void setVisitChannel(Integer visitChannel) {
+        this.visitChannel = visitChannel;
+    }
+
+
+
+
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    /**
+     * 前端传的YYYY-MM-DD 需要转换
+     * @param startTime
+     */
+    public void setStartTime(Date startTime) {
+
+        String dateString = DateUtil.getDateString(startTime);
+        String dateTimeString = dateString.concat(" 00:00:00");
+        Date date = DateUtil.stringToDate(dateTimeString, DateUtil.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS);
+
+        this.startTime = date;
+    }
+
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+
+        String dateString = DateUtil.getDateString(endTime);
+        String dateTimeString = dateString.concat(" 00:00:00");
+        Date date = DateUtil.stringToDate(dateTimeString, DateUtil.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS);
+
+        this.endTime = date;
+    }
 }

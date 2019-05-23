@@ -156,31 +156,51 @@ public class DailyReportServiceImpl implements DailyReportService {
     private List<LinkedHashMap<String, Object>> getAllDailyReportExportData(DailyReportRequest request, DrugUser drugUser) {
 
         List<LinkedHashMap<String, Object>> list = new ArrayList<>();
-        Long roleId = drugUser.getRoleId();
-        if (RoleTypeEnum.MANAGER.getType().equals(roleId) || RoleTypeEnum.PROJECT_MANAGER.getType().equals(roleId)){
 
-            List<Long> drugUserIdList = request.getDrugUserIdList();
-            for (Long drugUserId : drugUserIdList) {
-                List<Long> selectDrugUserIdList = new ArrayList<>();
-                selectDrugUserIdList.add(drugUserId);
-                request.setDrugUserIdList(selectDrugUserIdList);
-                LinkedHashMap<String, Object> exportDailyReportData = this.getExportDailyReportData(request);
+        // drugUser暂时废弃，不适用，看看需求更倾向那个
 
-                DrugUser findDrugUser = drugUserRepository.findFirstById(drugUserId);
-                exportDailyReportData.put("drugUserId", findDrugUser.getId());
-                exportDailyReportData.put("drugUserName", findDrugUser.getName());
+//        Long roleId = drugUser.getRoleId();
+//        if (RoleTypeEnum.MANAGER.getType().equals(roleId) || RoleTypeEnum.PROJECT_MANAGER.getType().equals(roleId)){
+//
+//            List<Long> drugUserIdList = request.getDrugUserIdList();
+//            for (Long drugUserId : drugUserIdList) {
+//                List<Long> selectDrugUserIdList = new ArrayList<>();
+//                selectDrugUserIdList.add(drugUserId);
+//                request.setDrugUserIdList(selectDrugUserIdList);
+//                LinkedHashMap<String, Object> exportDailyReportData = this.getExportDailyReportData(request);
+//
+//                DrugUser findDrugUser = drugUserRepository.findFirstById(drugUserId);
+//                exportDailyReportData.put("drugUserId", findDrugUser.getId());
+//                exportDailyReportData.put("drugUserName", findDrugUser.getName());
+//
+//                list.add(exportDailyReportData);
+//            }
+//
+//        }else{
+//
+//            List<Long> drugUserIdList = new ArrayList<>();
+//            drugUserIdList.add(drugUser.getId());
+//            request.setDrugUserIdList(drugUserIdList);
+//            LinkedHashMap<String, Object> exportDailyReportData = this.getExportDailyReportData(request);
+//            exportDailyReportData.put("drugUserId", drugUser.getId());
+//            exportDailyReportData.put("drugUserName", drugUser.getName());
+//            list.add(exportDailyReportData);
+//        }
 
-                list.add(exportDailyReportData);
-            }
 
-        }else{
 
-            List<Long> drugUserIdList = new ArrayList<>();
-            drugUserIdList.add(drugUser.getId());
-            request.setDrugUserIdList(drugUserIdList);
+
+        List<Long> drugUserIdList = request.getDrugUserIdList();
+        for (Long drugUserId : drugUserIdList) {
+            List<Long> selectDrugUserIdList = new ArrayList<>();
+            selectDrugUserIdList.add(drugUserId);
+            request.setDrugUserIdList(selectDrugUserIdList);
             LinkedHashMap<String, Object> exportDailyReportData = this.getExportDailyReportData(request);
-            exportDailyReportData.put("drugUserId", drugUser.getId());
-            exportDailyReportData.put("drugUserName", drugUser.getName());
+
+            DrugUser findDrugUser = drugUserRepository.findFirstById(drugUserId);
+            exportDailyReportData.put("drugUserId", findDrugUser.getId());
+            exportDailyReportData.put("drugUserName", findDrugUser.getName());
+
             list.add(exportDailyReportData);
         }
 
@@ -597,7 +617,6 @@ public class DailyReportServiceImpl implements DailyReportService {
         Integer mulChannelDoctorNum = dailyReportMapper.mulChannelDoctorNum(request);
 
 
-
         Integer callCount = 0;
         Integer connectCallCount = 0;
         Integer unConnectCallCount = 0;
@@ -624,21 +643,21 @@ public class DailyReportServiceImpl implements DailyReportService {
             }
 
 
-            Optional<VisitChannelDoctorNumResponse> smsFirst = visitChannelDoctorNumList.stream().filter(v -> (VisitChannelEnum.WECHAT.getVisitChannel().equals(v.getVisitChannel()))).findFirst();
+            Optional<VisitChannelDoctorNumResponse> smsFirst = visitChannelDoctorNumList.stream().filter(v -> (VisitChannelEnum.MESSAGE.getVisitChannel().equals(v.getVisitChannel()))).findFirst();
             if (smsFirst.isPresent()){
                 VisitChannelDoctorNumResponse visitChannelDoctorNumResponse = smsFirst.get();
                 smsVisit = visitChannelDoctorNumResponse.getDoctorNum();
             }
 
 
-            Optional<VisitChannelDoctorNumResponse> emailFirst = visitChannelDoctorNumList.stream().filter(v -> (VisitChannelEnum.WECHAT.getVisitChannel().equals(v.getVisitChannel()))).findFirst();
+            Optional<VisitChannelDoctorNumResponse> emailFirst = visitChannelDoctorNumList.stream().filter(v -> (VisitChannelEnum.EMAIL.getVisitChannel().equals(v.getVisitChannel()))).findFirst();
             if (emailFirst.isPresent()){
                 VisitChannelDoctorNumResponse visitChannelDoctorNumResponse = emailFirst.get();
                 emailVisit = visitChannelDoctorNumResponse.getDoctorNum();
             }
 
 
-            Optional<VisitChannelDoctorNumResponse> interviewFirst = visitChannelDoctorNumList.stream().filter(v -> (VisitChannelEnum.WECHAT.getVisitChannel().equals(v.getVisitChannel()))).findFirst();
+            Optional<VisitChannelDoctorNumResponse> interviewFirst = visitChannelDoctorNumList.stream().filter(v -> (VisitChannelEnum.INTERVIEW.getVisitChannel().equals(v.getVisitChannel()))).findFirst();
             if (interviewFirst.isPresent()){
                 VisitChannelDoctorNumResponse visitChannelDoctorNumResponse = interviewFirst.get();
                 interviewVisit = visitChannelDoctorNumResponse.getDoctorNum();

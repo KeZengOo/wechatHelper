@@ -524,33 +524,34 @@
 
     <!-- 不同的渠道拜访医生人数统计 -->
     <select id="getVisitChannelDoctorNumList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.VisitChannelDoctorNumResponse">
-        SELECT visit_channel visitChannel,
+        SELECT v.visit_channel visitChannel,
             (
-            CASE WHEN visit_channel IS NULL
+            CASE WHEN v.visit_channel IS NULL
             THEN '未知'
-            WHEN visit_channel=1
+            WHEN v.visit_channel=1
             THEN '线上电话'
-            WHEN visit_channel=2
+            WHEN v.visit_channel=2
             THEN '微信'
-            WHEN visit_channel=3
+            WHEN v.visit_channel=3
             THEN '短信'
-            WHEN visit_channel=4
+            WHEN v.visit_channel=4
             THEN '邮件'
-            WHEN visit_channel=5
+            WHEN v.visit_channel=5
             THEN '面谈'
-            WHEN visit_channel=6
+            WHEN v.visit_channel=6
             THEN '内容分享'
-            WHEN visit_channel=7
+            WHEN v.visit_channel=7
             THEN '线下电话'
             END
             ) AS visitChannelStr,
-            COUNT(DISTINCT virtual_doctor_id) doctorNum
+            COUNT(DISTINCT d.id) doctorNum
 
-            FROM virtual_doctor_call_info
+            FROM virtual_doctor_call_info v INNER JOIN doctor d
+            ON v.virtual_doctor_id=d.id
             WHERE 1=1
 
             <if test="drugUserIdList !=null and drugUserIdList.size > 0">
-                AND virtual_drug_user_id IN
+                AND v.virtual_drug_user_id IN
                 <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
                     #{drugUserId}
                 </foreach>
@@ -558,7 +559,7 @@
 
 
             <if test="productIdList !=null and productIdList.size > 0">
-                AND product_id IN
+                AND v.product_id IN
                 <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
                     #{productId}
                 </foreach>
@@ -566,11 +567,11 @@
 
 
             <if test="startTime !=null and endTime !=null">
-                AND create_time BETWEEN #{startTime}  AND #{endTime}
+                AND v.create_time BETWEEN #{startTime}  AND #{endTime}
             </if>
 
 
-          GROUP BY visit_channel
+          GROUP BY v.visit_channel
     </select>
 
 
