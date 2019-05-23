@@ -160,14 +160,21 @@ public class ContentSharingServiceImpl implements ContentSharingService {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
             for(int i = 0; i < list.size(); i++){
+                Long titleId = Long.parseLong(list.get(i).get("id").toString());
+                Long drugUserId = Long.parseLong(list.get(i).get("drugUserId").toString());
+                Integer shareType = Integer.parseInt(list.get(i).get("shareType").toString());
+                //该代表的文章的医生阅读数
+                Integer readCount = contentSharingMapper.getReadCountByDrugUserAndTitle(titleId,drugUserId,shareType);
+                logger.info("titleID:"+ titleId+"readCount:"+readCount);
+
                 if(list.get(i).get("saleType").equals(0)){
                     list.get(i).replace("saleType",0,"没有类型为经理");
                 }
                 else if(list.get(i).get("saleType").equals(1)){
-                    list.get(i).replace("saleType",1,"是线上销售");
+                    list.get(i).replace("saleType",1,"线上");
                 }
                 else if(list.get(i).get("saleType").equals(2)){
-                    list.get(i).replace("saleType",2,"是线下销售");
+                    list.get(i).replace("saleType",2,"线下");
                 }
 
                 if(list.get(i).get("shareType").equals(1)){
@@ -238,13 +245,21 @@ public class ContentSharingServiceImpl implements ContentSharingService {
         String fileds[] = new String[] { "id", "title", "time", "shareType", "drugUserName", "prodName", "saleType", "peopleNumber", "totalDuration"};
 
         for(int i = 0; i < list.size(); i++){
+
+            Long titleId = Long.parseLong(list.get(i).getId().toString());
+            Long drugUserIdParam = Long.parseLong(list.get(i).getDrugUserId().toString());
+            Integer shareTypeParam = Integer.parseInt(list.get(i).getShareType().toString());
+            //该代表的文章的医生阅读数
+            Integer readCount = contentSharingMapper.getReadCountByDrugUserAndTitle(titleId,drugUserIdParam,shareTypeParam);
+            logger.info("titleID:"+ titleId+"readCount:"+readCount);
+
             ContentSharingExcelParams contentSharingExcelParams = new ContentSharingExcelParams();
             contentSharingExcelParams.setId(list.get(i).getId());
             contentSharingExcelParams.setTitle(list.get(i).getTitle());
             contentSharingExcelParams.setTime(list.get(i).getTime().substring(0,list.get(i).getTime().indexOf(".")));
             contentSharingExcelParams.setDrugUserName(list.get(i).getDrugUserName());
             contentSharingExcelParams.setProdName(list.get(i).getProdName());
-            contentSharingExcelParams.setPeopleNumber(list.get(i).getPeopleNumber().toString());
+            contentSharingExcelParams.setPeopleNumber(readCount.toString());
             contentSharingExcelParams.setTotalDuration(list.get(i).getTotalDuration());
 
             if(list.get(i).getSaleType().equals(0)){
