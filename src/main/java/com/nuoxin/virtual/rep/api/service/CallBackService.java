@@ -67,4 +67,10 @@ public interface CallBackService {
 	 * @return Integer
 	 */
 	Integer manualRefreshRecordingSegmentation();
+
+	/**
+	 * 根据url和token手动刷新电话录音分割-语音转文字
+	 * @return Integer
+	 */
+	Integer saveRecordingByUrlAndToken(String url, String token);
 }

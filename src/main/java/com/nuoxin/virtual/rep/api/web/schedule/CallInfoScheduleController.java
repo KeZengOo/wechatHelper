@@ -122,4 +122,17 @@ public class CallInfoScheduleController {
         responseBean.setData(resultNum);
         return responseBean;
     }
+
+    /**
+     * 根据url和token手动刷新电话录音分割-语音转文字
+     * @return Integer
+     */
+    @ApiOperation(value = "根据url和token手动刷新电话录音分割-语音转文字", notes = "根据url和token手动刷新电话录音分割-语音转文字")
+    @GetMapping(value = "/save/refresh/by/url/and/token")
+    public DefaultResponseBean<Integer> saveRecordingByUrlAndToken(@RequestParam(value = "url") String url, @RequestParam(value = "token") String token){
+        Integer resultNum = callBackService.saveRecordingByUrlAndToken(url,token);
+        DefaultResponseBean<Integer> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(resultNum);
+        return responseBean;
+    }
 }

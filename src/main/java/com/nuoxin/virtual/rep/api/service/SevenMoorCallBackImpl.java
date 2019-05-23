@@ -259,6 +259,22 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 		return num;
 	}
 
+	@Override
+	public Integer saveRecordingByUrlAndToken(String url, String token) {
+		int n = 0;
+		logger.info("callUrl={}, callInfo中获取的地址：", url);
+		//分割录音文件并上传阿里云，返回左右声道的阿里云地址
+		Map<String,String> pathMap = splitSpeechAliyunUrlUpdate(url);
+		logger.info("pathMap={}, 分割录音文件并上传阿里云，返回左右声道的阿里云地址", pathMap);
+		if(pathMap.size() > 0){
+			//根据左右声道的阿里云地址进行语音识别，进行入库
+			boolean result_is_save = saveSpeechRecognitionResultCallInfo(pathMap, token);
+			logger.info("result_is_save={}, 根据左右声道的阿里云地址进行语音识别，进行入库是否成功！", result_is_save);
+			n = 1;
+		}
+		return n;
+	}
+
 	/**
 	 * 新增或者更新电话记录
 	 * @param dealingList
