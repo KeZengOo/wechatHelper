@@ -1833,12 +1833,10 @@
 
 
         <if test="request.productIdList !=null and request.productIdList.size > 0">
-            AND v.product_id IN ( SELECT content_id FROM t_content_product WHERE product_id IN
+            AND v.product_id IN
             <foreach collection="request.productIdList" item="productId" open="(" close=")" separator=",">
                 #{productId}
             </foreach>
-
-            )
 
         </if>
 
