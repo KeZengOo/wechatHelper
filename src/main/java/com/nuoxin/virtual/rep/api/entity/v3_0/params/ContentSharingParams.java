@@ -20,7 +20,7 @@ public class ContentSharingParams {
     private String title;
     @ApiModelProperty("内容创建时间")
     private String time;
-    @ApiModelProperty("分享渠道1微信，2短信，3邮件")
+    @ApiModelProperty("分享渠道1微信，2短信，3邮件，4小程序")
     private Integer shareType;
     @ApiModelProperty("代表ID")
     private Long drugUserId;
