@@ -27,6 +27,13 @@ public class VirtualDoctorCallInfoParams{
 	private String statusName;
 	private Long callTime;
 	private String callUrl;
+
+	private String unpressedCallUrl;
+
+	private String unpressedCallUrlIn;
+
+	private String unpressedCallUrlOut;
+
 	@ApiModelProperty(value = "医生潜力 3高,2中,1低,-1未知")
 	private Integer hcpPotential;
 	@ApiModelProperty(value = "是否有药 1.有,0.无,-1未知")

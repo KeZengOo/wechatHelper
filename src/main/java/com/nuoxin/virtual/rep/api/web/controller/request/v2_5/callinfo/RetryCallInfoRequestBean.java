@@ -49,6 +49,16 @@ public class RetryCallInfoRequestBean implements Serializable {
     private String callUrl;
 
     /**
+     * 未压缩的
+     */
+    private String unpressedCallUrl;
+
+    private String unpressedCallUrlIn;
+
+    private String unpressedCallUrlOut;
+
+
+    /**
      * 打电话时间
      */
     private String createTime;

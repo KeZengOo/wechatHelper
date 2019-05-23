@@ -40,6 +40,7 @@ public class CallInfoSchedule {
     }
 
 
+
     @ApiOperation(value = "录音识别", notes = "录音识别")
     @PostMapping(value = "/url/identify")
     @Scheduled(cron = "0 0 23 * * ?") // 每天23点执行

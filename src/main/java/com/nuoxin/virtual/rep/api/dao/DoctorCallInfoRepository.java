@@ -99,4 +99,24 @@ public interface DoctorCallInfoRepository extends JpaRepository<DoctorCallInfo,L
     		                             @Param("id") Long id, 
     		                             @Param("callTime")Long callTime);
 
+
+
+
+    /**
+     * 修改电话记录录音文件地址及通话状态
+     * @param url
+     * @param statusName
+     * @param id
+     */
+    @Modifying
+    @Query("UPDATE DoctorCallInfo d SET d.callUrl=:url, d.unpressedCallUrl=:unpressedCallUrl,d.unpressedCallUrlIn=:unpressedCallUrlIn,d.unpressedCallUrlOut=:unpressedCallUrlOut, d.status=:status, d.statusName=:statusName,callTime=:callTime WHERE d.id=:id")
+    void updateUrlRefactor(@Param("url") String url,
+                           @Param("unpressedCallUrl") String unpressedCallUrl,
+                           @Param("unpressedCallUrlIn") String unpressedCallUrlIn,
+                           @Param("unpressedCallUrlOut") String unpressedCallUrlOut,
+                           @Param("status") Integer status,
+                           @Param("statusName")String statusName,
+                           @Param("id") Long id,
+                           @Param("callTime")Long callTime);
+
 }
