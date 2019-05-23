@@ -147,7 +147,7 @@ public class DailyStatisticsController  extends NewBaseController {
 
 
     @ApiOperation(value = "医生目标修改", notes = "医生目标修改")
-    @PostMapping(value = "/doctor/target/{productId}/{targetDoctor}")
+    @GetMapping(value = "/doctor/target/{productId}/{targetDoctor}")
     @ResponseBody
     public DefaultResponseBean<Boolean> updateTargetDoctor(HttpServletRequest request, @PathVariable(value = "productId") Long productId,@PathVariable(value = "targetDoctor") Integer targetDoctor) {
 

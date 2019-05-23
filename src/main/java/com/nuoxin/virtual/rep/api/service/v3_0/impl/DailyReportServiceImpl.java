@@ -507,7 +507,7 @@ public class DailyReportServiceImpl implements DailyReportService {
         ProductTargetResponseBean productTarget = productTargetMapper.getProductTarget(request.getProductIdList().get(0));
         Integer targetHospital = 0;
         if (productTarget != null){
-            targetHospital = productTarget.getTargetDoctor();
+            targetHospital = productTarget.getTargetHospital();
             if (targetHospital == null || targetHospital < 0){
                 targetHospital = 0;
             }
