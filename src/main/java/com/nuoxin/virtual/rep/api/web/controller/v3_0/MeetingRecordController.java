@@ -75,11 +75,11 @@ public class MeetingRecordController {
 
     @ApiOperation(value = "导入参会列表")
     @RequestMapping(value = "/meetingParticipantsImport", method = {RequestMethod.POST})
-    public DefaultResponseBean<Map<String, Object>> meetingParticipantsImport(@RequestParam("file") @ApiParam("参会列表文件") MultipartFile file, @RequestParam("meetingId") String meetingId) {
+    public DefaultResponseBean<String> meetingParticipantsImport(@RequestParam("file") @ApiParam("参会列表文件") MultipartFile file, @RequestParam("meetingId") String meetingId) {
         Map<String, Object> result = meetingRecordService.meetingParticipantsImport(file,meetingId);
-        DefaultResponseBean<Map<String, Object>> responseBean = new DefaultResponseBean<>();
-        responseBean.setData(result);
-        responseBean.setMessage("");
+        DefaultResponseBean<String> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(result.get("flag").toString());
+        responseBean.setMessage(result.get("message").toString());
         return responseBean;
     }
 
