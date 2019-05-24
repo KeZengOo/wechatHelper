@@ -138,7 +138,7 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
 
         List<MeetingAttendDetailsParams> newList = new ArrayList<MeetingAttendDetailsParams>();
 
-        SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-mm-dd  HH:mm:ss");
+        SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd  HH:mm:ss");
 
         //把每小段时长放在一个数组里
         meetingAttendDetailsParamsList.forEach(n ->{

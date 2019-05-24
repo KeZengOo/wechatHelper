@@ -76,7 +76,8 @@
                 SELECT
                     t.doctor_id
                 FROM
-                    product_doctor_quate t
+                  drug_user_doctor d
+		        LEFT JOIN product_doctor_quate t ON t.doctor_id = d.doctor_id
                 WHERE
                     t.product_id = #{productId}
                 AND t.is_recruit = 1
