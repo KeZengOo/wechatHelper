@@ -275,8 +275,17 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
                 meetingList.add(m);
              }
 
-            //导入会议
-            meetingResult = meetingRecordMapper.saveMeetingExcel(meetingList);
+             if(meetingList.size() > 0){
+                 //导入会议
+                 meetingResult = meetingRecordMapper.saveMeetingExcel(meetingList);
+             }
+             else
+             {
+                 map.put("flag",false);
+                 map.put("message","上传会议已存在，上传失败！");
+                 return map;
+             }
+
 
             if(!meetingResult)
             {
