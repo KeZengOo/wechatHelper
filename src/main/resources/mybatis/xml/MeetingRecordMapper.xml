@@ -183,6 +183,7 @@ FROM
         AND t.doctor_id = #{doctorId}
         AND t.meeting_id = #{meetingId}
         AND t.type = 1
+        GROUP BY t.doctor_id,t.attend_start_time,t.attend_end_time,t.attend_sum_time
     </select>
 
     <!-- 导入Excel -->
