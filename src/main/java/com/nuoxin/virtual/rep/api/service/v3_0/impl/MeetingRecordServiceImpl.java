@@ -275,8 +275,17 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
                 meetingList.add(m);
              }
 
-            //导入会议
-            meetingResult = meetingRecordMapper.saveMeetingExcel(meetingList);
+             if(meetingList.size() > 0){
+                 //导入会议
+                 meetingResult = meetingRecordMapper.saveMeetingExcel(meetingList);
+             }
+             else
+             {
+                 map.put("flag",false);
+                 map.put("message","上传会议已存在，上传失败！");
+                 return map;
+             }
+
 
             if(!meetingResult)
             {
@@ -330,7 +339,9 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
     public Map<String, Object> meetingParticipantsImport(MultipartFile file, String meetingId) {
 
         Map<String, Object> map =new HashMap<String, Object>(4);
-
+        int doctorNum = 0;
+        //医生表中医生的id和姓名是否存在空值
+        int doctorIsExist = 0;
         boolean flag = false;
         String originalFilename = file.getOriginalFilename();
         if (!originalFilename.endsWith(RegularUtils.EXTENSION_XLS) && !originalFilename.endsWith(RegularUtils.EXTENSION_XLSX)) {
@@ -375,34 +386,43 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
 //                        MeetingParticipantsParams meetingParticipants = meetingRecordMapper.getMeetingItemIdByMeetingId(meetingId);
                         //根据医生电话号获取医生信息
                         MeetingParticipantsParams meetingParticipantsDoctorInfo = meetingRecordMapper.getDoctorInfoByDoctorTel(h.getDoctorTel());
+                        if(null != meetingParticipantsDoctorInfo)
+                        {
+                            if(null != meetingParticipantsDoctorInfo.getDoctorId()){
+                                meetingParticipantsExcel.setDoctorId("0");
+                            }
+                            else
+                            {
 
-                        if(null != meetingParticipantsDoctorInfo.getDoctorId() && null != meetingParticipantsDoctorInfo.getName()){
-                            meetingParticipantsExcel.setDoctorId(meetingParticipantsDoctorInfo.getDoctorId().toString());
-                            meetingParticipantsExcel.setDoctorName(meetingParticipantsDoctorInfo.getName());
-                            meetingParticipantsExcel.setMeetingId(meetingId);
-                            meetingParticipantsExcel.setAttendStartTime(h.getAttendStartTime());
-                            meetingParticipantsExcel.setAttendEndTime(h.getAttendEndTime());
+                            }
+                            if(null != meetingParticipantsDoctorInfo.getName()) {
+                                meetingParticipantsExcel.setDoctorName(meetingParticipantsDoctorInfo.getName());
+                            }
+                            else
+                            {
+                                meetingParticipantsExcel.setDoctorName("");
+                            }
+                                meetingParticipantsExcel.setMeetingId(meetingId);
+                                meetingParticipantsExcel.setAttendStartTime(h.getAttendStartTime());
+                                meetingParticipantsExcel.setAttendEndTime(h.getAttendEndTime());
 
-                            //计算参会分钟差
-                            Date date1 = df.parse(h.getAttendEndTime());
-                            Date date2 = df.parse(h.getAttendStartTime());
-                            long diff = date1.getTime() - date2.getTime();
-                            //计算两个时间之间差了多少分钟
-                            long minutes = diff / (1000 * 60);
+                                //计算参会分钟差
+                                Date date1 = df.parse(h.getAttendEndTime());
+                                Date date2 = df.parse(h.getAttendStartTime());
+                                long diff = date1.getTime() - date2.getTime();
+                                //计算两个时间之间差了多少分钟
+                                long minutes = diff / (1000 * 60);
 
-                            meetingParticipantsExcel.setAttendSumTime(minutes+"");
-                            meetingParticipantsExcel.setType("1");
-//                            meetingParticipantsExcel.setItemId(meetingParticipants.getItemId().toString());
-                            meetingParticipantsExcel.setDoctorTel(h.getDoctorTel());
-                            meetingParticipantsTemps.add(meetingParticipantsExcel);
+                                meetingParticipantsExcel.setAttendSumTime(minutes+"");
+                                meetingParticipantsExcel.setType("1");
+    //                            meetingParticipantsExcel.setItemId(meetingParticipants.getItemId().toString());
+                                meetingParticipantsExcel.setDoctorTel(h.getDoctorTel());
+                                meetingParticipantsTemps.add(meetingParticipantsExcel);
                         }
                         else
                         {
-                            map.put("flag",false);
-                            map.put("message","医生ID、医生姓名数据存在空值");
-                            return map;
+                            doctorNum +=1;
                         }
-
                     }
                     else
                     {
@@ -419,20 +439,38 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
         //把list存到mysql
         boolean result = false;
         try {
-            result = meetingRecordMapper.saveMeetingParticipantsExcel(meetingParticipantsTemps);
-            flag = result;
-            map.put("flag",flag);
-            map.put("message","上传会议成功");
+            if(meetingParticipantsTemps.size() > 0)
+            {
+                result = meetingRecordMapper.saveMeetingParticipantsExcel(meetingParticipantsTemps);
+                if(doctorNum > 0){
+                    flag = result;
+                    map.put("flag",flag);
+                    map.put("message","上传参会数据中有不存在的医生手机号");
+                }
+                else
+                {
+                    flag = result;
+                    map.put("flag",flag);
+                    map.put("message","上传参会数据成功");
+                }
+
+            }
+            else
+            {
+                map.put("flag",false);
+                map.put("message","上传参会人员手机号不存在，上传数据失败");
+                return map;
+            }
         } catch (Exception e) {
             log.error("IOException", e);
             map.put("flag",flag);
-            map.put("message","上传会议失败");
+            map.put("message","上传参会数据失败");
         }
 
         //预计导入条数
-        map.put("estimatedNumber",meetingParticipantsExcels.size());
+//        map.put("estimatedNumber",meetingParticipantsExcels.size());
         //预计导入条数
-        map.put("actualNumber",meetingParticipantsTemps.size());
+//        map.put("actualNumber",meetingParticipantsTemps.size());
 
         return map;
     }
