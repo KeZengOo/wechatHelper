@@ -94,6 +94,19 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		Long callId = saveRequest.getCallInfoId();
 		if (callId != null && callId > 0) {
 			this.saveCallInfo(saveRequest);
+
+			Integer productId = saveRequest.getProductId();
+			callInfoMapper.updateCallProduct(callId, productId.longValue());
+			// 保存电话拜访的目的
+			List<PurposeRequest> purposeRequestList = saveRequest.getPurposeRequestList();
+			callInfoMapper.addCallPurpose(purposeRequestList);
+			// 是否丢入公共池
+			Integer commonPool = saveRequest.getCommonPool();
+			if (commonPool !=null && commonPool == 1){
+				this.updateDrugUserDoctorAvailable(saveRequest.getVirtualDrugUserId(), saveRequest.getVirtualDoctorId(), Long.valueOf(saveRequest.getProductId()));
+				commonService.deleteRepeatDrugUserDoctorRecord();
+			}
+
 			
 			Integer virtualQuestionaireId = saveRequest.getVirtualQuestionaireId();
 			if (virtualQuestionaireId != null && virtualQuestionaireId > 0){
@@ -104,23 +117,7 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 			return true;
 		}
 
-		Integer productId = saveRequest.getProductId();
 
-		callInfoMapper.updateCallProduct(callId, productId.longValue());
-
-
-		// 保存电话拜访的目的
-		List<PurposeRequest> purposeRequestList = saveRequest.getPurposeRequestList();
-
-		callInfoMapper.addCallPurpose(purposeRequestList);
-
-
-		// 是否丢入公共池
-		Integer commonPool = saveRequest.getCommonPool();
-		if (commonPool !=null && commonPool == 1){
-			this.updateDrugUserDoctorAvailable(saveRequest.getVirtualDrugUserId(), saveRequest.getVirtualDoctorId(), Long.valueOf(saveRequest.getProductId()));
-			commonService.deleteRepeatDrugUserDoctorRecord();
-		}
 
 		return false;
 	}

@@ -1551,7 +1551,7 @@
 			<foreach collection="p.resultIdList" item="resultId" separator=",">
 				(
 				#{p.callId},
-				#{p.item},
+				#{p.purpose},
 				#{resultId}
 				)
 			</foreach>
