@@ -58,7 +58,7 @@ public class DailyReportServiceImpl implements DailyReportService {
 
     @Override
     public void exportDailyReport(HttpServletResponse response, DailyReportRequest request, DrugUser drugUser) {
-        this.checkoutDailyReportRequest(request);
+        this.checkoutExportDailyReportRequest(request);
         Long productId = request.getProductIdList().get(0);
 
         // 明细
@@ -131,11 +131,24 @@ public class DailyReportServiceImpl implements DailyReportService {
 
 
 
+
     /**
      * 检查请求参数
      * @param request
      */
     private void checkoutDailyReportRequest(DailyReportRequest request){
+
+        if (CollectionsUtil.isEmptyList(request.getDrugUserIdList())){
+            throw new BusinessException(ErrorEnum.ERROR, "代表不能为空！");
+        }
+    }
+
+
+    /**
+     * 检查请求参数
+     * @param request
+     */
+    private void checkoutExportDailyReportRequest(DailyReportRequest request){
 
         List<Long> productIdList = request.getProductIdList();
         if (CollectionsUtil.isEmptyList(productIdList) || productIdList.size() > 1){
@@ -333,6 +346,8 @@ public class DailyReportServiceImpl implements DailyReportService {
     @Override
     public MyAchievementResponse getMyAchievement(DailyReportRequest request) {
 
+        this.checkoutDailyReportRequest(request);
+
         // 招募医生数
         Integer recruitDoctorNum = dailyReportMapper.recruitDoctorNum(request);
 
@@ -353,6 +368,9 @@ public class DailyReportServiceImpl implements DailyReportService {
 
     @Override
     public CallVisitStatisticsResponse getCallVisitStatistics(DailyReportRequest request) {
+
+        this.checkoutDailyReportRequest(request);
+
         CallVisitStatisticsResponse callVisitStatistics = dailyReportMapper.getCallVisitStatistics(request);
         if (callVisitStatistics == null){
             callVisitStatistics = new CallVisitStatisticsResponse();
@@ -372,7 +390,7 @@ public class DailyReportServiceImpl implements DailyReportService {
 
     @Override
     public List<VisitChannelDoctorNumResponse> getVisitChannelDoctorNumList(DailyReportRequest request) {
-
+        this.checkoutDailyReportRequest(request);
 
         List<VisitChannelDoctorNumResponse> list = new ArrayList<>();
         // 不能合起来用一个SQL查询
@@ -412,6 +430,7 @@ public class DailyReportServiceImpl implements DailyReportService {
 
     @Override
     public List<VisitResultDoctorNumStatisticsResponse> getVisitResultDoctorNum(DailyReportRequest request) {
+        this.checkoutDailyReportRequest(request);
         List<VisitResultDoctorNumStatisticsResponse> visitResultDoctorNumList = dailyReportMapper.getVisitResultDoctorNumList(request);
         return visitResultDoctorNumList;
     }
@@ -419,14 +438,17 @@ public class DailyReportServiceImpl implements DailyReportService {
     @Override
     public List<VisitResultHospitalNumStatisticsResponse> getVisitResultHospitalNum(DailyReportRequest request) {
 
-        List<VisitResultHospitalNumStatisticsResponse> visitResultHospitalNumList = dailyReportMapper.getVisitResultHospitalNumList(request);
+        this.checkoutDailyReportRequest(request);
 
+        List<VisitResultHospitalNumStatisticsResponse> visitResultHospitalNumList = dailyReportMapper.getVisitResultHospitalNumList(request);
         return visitResultHospitalNumList;
 
     }
 
     @Override
     public List<VisitTypeDoctorNumStatisticsResponse> getVisitTypeDoctorNum(DailyReportRequest request) {
+
+        this.checkoutDailyReportRequest(request);
 
         Integer contactDoctor = dailyReportMapper.visitResultTypeDoctorNum(request, VisitResultTypeEnum.CONTACT.getType());
 
@@ -459,6 +481,8 @@ public class DailyReportServiceImpl implements DailyReportService {
 
     @Override
     public List<VisitTypeHospitalNumStatisticsResponse> getVisitTypeHospitalNum(DailyReportRequest request) {
+        this.checkoutDailyReportRequest(request);
+
         Integer contactHospital = dailyReportMapper.visitResultTypeHospitalNum(request, VisitResultTypeEnum.CONTACT.getType());
 
         VisitTypeHospitalNumStatisticsResponse contact = new VisitTypeHospitalNumStatisticsResponse();
@@ -490,6 +514,9 @@ public class DailyReportServiceImpl implements DailyReportService {
 
     @Override
     public DoctorRecruitResponse getDoctorRecruit(DailyReportRequest request) {
+
+        this.checkoutDailyReportRequest(request);
+
         ProductTargetResponseBean productTarget = productTargetMapper.getProductTarget(request.getProductIdList().get(0));
         Integer targetDoctor = 0;
         if (productTarget != null){
@@ -524,6 +551,9 @@ public class DailyReportServiceImpl implements DailyReportService {
 
     @Override
     public HospitalRecruitResponse getHospitalRecruit(DailyReportRequest request) {
+
+        this.checkoutDailyReportRequest(request);
+
         ProductTargetResponseBean productTarget = productTargetMapper.getProductTarget(request.getProductIdList().get(0));
         Integer targetHospital = 0;
         if (productTarget != null){
@@ -555,6 +585,8 @@ public class DailyReportServiceImpl implements DailyReportService {
 
     @Override
     public DoctorVisitResponse getDoctorVisit(DailyReportRequest request) {
+        this.checkoutDailyReportRequest(request);
+
         Integer wechatReplyDoctorNum = dailyReportMapper.getWechatReplyDoctorNum(request);
         Integer wechatReplyDoctorCount = dailyReportMapper.getWechatReplyDoctorCount(request);
         Integer hasWechatDoctorNum = dailyReportMapper.hasWechatDoctorNum(request);
@@ -1007,7 +1039,7 @@ public class DailyReportServiceImpl implements DailyReportService {
     private List<ExportDetailResponse> getExportDetailList(DailyReportRequest request) {
         Date startTime = request.getStartTime();
         Date endTime = request.getEndTime();
-        List<String> days = DateUtil.getDays(startTime, endTime);
+        List<String> days = DateUtil.getDays(DateUtil.getDateString(startTime), DateUtil.getDateString(endTime));
         if (CollectionsUtil.isEmptyList(days)){
             throw new BusinessException(ErrorEnum.ERROR, "请选择日期！");
         }

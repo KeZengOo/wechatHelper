@@ -6,10 +6,8 @@ import com.nuoxin.virtual.rep.api.common.exception.FileFormatException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.time.LocalDate;
+import java.util.*;
 
 /**
  * 对时间做处理的工具类
@@ -207,6 +205,8 @@ public final class DateUtil {
      */
     public static List<String> getDays(Date startTime, Date endTime) {
 
+
+
         // 返回的日期集合
         List<String> days = new ArrayList<>();
 
@@ -301,15 +301,23 @@ public final class DateUtil {
 
 
     public static void main(String[] args) {
-        List<String> holiday = new ArrayList<>();
-        holiday.add("2019-01-10");
-        holiday.add("2019-01-11");
-        holiday.add("2019-01-12");
-        holiday.add("2019-01-13");
-        int daysRemoveWeekend = DateUtil.getDaysWeekend("2018-11-28", DateUtil.gettDateStrFromSpecialDate(new Date(), DateUtil.DATE_FORMAT_YYYY_MM_DD), holiday);
-        int dayCount = DateUtil.getDayCount("2019-01-13", "2019-01-14");
-        System.out.println(daysRemoveWeekend);
-        System.out.println(dayCount);
+
+
+
+
+
+
+
+        Calendar calendar = new GregorianCalendar();
+        Date startTime = new Date();
+        calendar.setTime(startTime);
+        //calendar.add(Calendar.DATE,1);
+        Date endTime = calendar.getTime();
+
+
+        List<String> days = DateUtil.getDays(startTime, endTime);
+
+        System.out.println(days);
     }
 
 

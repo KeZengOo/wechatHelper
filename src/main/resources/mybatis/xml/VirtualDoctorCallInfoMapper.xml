@@ -1839,7 +1839,7 @@
 	<select id="getDrugUserDoctorCallDetailList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DrugUserDoctorCallDetailResponse">
 		SELECT
 			v.id,
-			DATE_FORMAT( v.create_time, '%Y-%m-%d %H:%i:%s' ) create_time,
+			DATE_FORMAT( v.create_time, '%Y-%m-%d %H:%i:%s' ) createTime,
 			IFNULL( v.call_time, 0 ) callSecond,
 			IFNULL( GROUP_CONCAT( DISTINCT p.item ), '' ) purpose,
 			IFNULL( GROUP_CONCAT( DISTINCT r.visit_result ), '' ) visitResult,

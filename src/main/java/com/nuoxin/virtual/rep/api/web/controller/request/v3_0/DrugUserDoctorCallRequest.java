@@ -59,7 +59,7 @@ public class DrugUserDoctorCallRequest extends DoctorBaseRequest implements Seri
 
         if (endTime !=null){
             String dateString = DateUtil.getDateString(endTime);
-            String dateTimeString = dateString.concat(" 00:00:00");
+            String dateTimeString = dateString.concat(" 23:59:59");
             Date date = DateUtil.stringToDate(dateTimeString, DateUtil.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS);
             this.endTime = date;
         }else {
