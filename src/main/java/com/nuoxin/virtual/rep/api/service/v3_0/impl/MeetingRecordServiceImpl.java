@@ -389,11 +389,11 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
                         if(null != meetingParticipantsDoctorInfo)
                         {
                             if(null != meetingParticipantsDoctorInfo.getDoctorId()){
-                                meetingParticipantsExcel.setDoctorId("0");
+                                meetingParticipantsExcel.setDoctorId(meetingParticipantsDoctorInfo.getDoctorId().toString());
                             }
                             else
                             {
-
+                                meetingParticipantsExcel.setDoctorId("0");
                             }
                             if(null != meetingParticipantsDoctorInfo.getName()) {
                                 meetingParticipantsExcel.setDoctorName(meetingParticipantsDoctorInfo.getName());
