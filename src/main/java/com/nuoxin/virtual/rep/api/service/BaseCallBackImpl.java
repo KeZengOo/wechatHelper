@@ -137,7 +137,7 @@ public abstract class BaseCallBackImpl implements CallBackService{
 				String unpressedCallInText = SpeechRecognitionUtil.getSpeechRecognitionResult(unpressedCallUrlIn);
 				String unpressedCallOutText = SpeechRecognitionUtil.getSpeechRecognitionResult(unpressedCallUrlOut);
 //				callInfoMapper.updateCallUrlText(sinToken, callText);
-				callInfoMapper.updateCallUrlTextRefactor(sinToken, callText, unpressedCallText, unpressedCallUrlIn, unpressedCallOutText);
+				callInfoMapper.updateCallUrlTextRefactor(sinToken, callText, unpressedCallText, unpressedCallInText, unpressedCallOutText);
 
 			}catch (Exception e){
 				logger.error("BaseCallBackImpl updateCallUrlText(String sinToken, String callOssUrl, String unpressedCallUrl, " +
