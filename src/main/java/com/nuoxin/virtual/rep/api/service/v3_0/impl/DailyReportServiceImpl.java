@@ -617,27 +617,6 @@ public class DailyReportServiceImpl implements DailyReportService {
      */
     private LinkedHashMap<String, Object> getExportDailyReportData(DailyReportRequest request){
 
-//        DailyReportResponse dailyReport = this.getDailyReport(request);
-//        Integer recruitDoctorNum = dailyReport.getRecruitDoctorNum();
-//        Integer activeCoverDoctorNum = dailyReport.getActiveCoverDoctorNum();
-//        Integer mulChannelDoctorNum = dailyReport.getMulChannelDoctorNum();
-//        List<VisitResultDoctorNumStatisticsResponse> visitResultDoctorNumList = dailyReport.getVisitResultDoctorNumList();
-//        Integer targetDoctor = dailyReport.getTargetDoctor();
-//        Integer noRecruitDoctorNum = dailyReport.getNoRecruitDoctorNum();
-//        String recruitDoctorRate = dailyReport.getRecruitDoctorRate();
-//        Integer wechatReplyDoctorNum = dailyReport.getWechatReplyDoctorNum();
-//        Integer wechatReplyDoctorCount = dailyReport.getWechatReplyDoctorCount();
-//        Integer hasWechatDoctorNum = dailyReport.getHasWechatDoctorNum();
-//        Integer addWechatDoctorNum = dailyReport.getAddWechatDoctorNum();
-//        Integer hasDemandDoctorNum = dailyReport.getHasDemandDoctorNum();
-//        Integer hasAeDoctorNum = dailyReport.getHasAeDoctorNum();
-//        Integer quitDoctorNum = dailyReport.getQuitDoctorNum();
-//        Integer targetHospital = dailyReport.getTargetHospital();
-//        Integer recruitHospitalNum = dailyReport.getRecruitHospitalNum();
-//        String recruitHospitalRate = dailyReport.getRecruitHospitalRate();
-//        List<VisitResultHospitalNumStatisticsResponse> visitResultHospitalNumList = dailyReport.getVisitResultHospitalNumList();
-
-
 
         // 招募医生数
         Integer recruitDoctorNum = dailyReportMapper.recruitDoctorNum(request);
@@ -653,7 +632,7 @@ public class DailyReportServiceImpl implements DailyReportService {
         Integer connectCallCount = 0;
         Integer unConnectCallCount = 0;
         String totalCallTime = "";
-        CallVisitStatisticsResponse callVisitStatistics = dailyReportMapper.getCallVisitStatistics(request);
+        CallVisitStatisticsResponse callVisitStatistics = this.getCallVisitStatistics(request);
         if (callVisitStatistics != null){
             callCount = callVisitStatistics.getCallCount();
             connectCallCount = callVisitStatistics.getConnectCallCount();

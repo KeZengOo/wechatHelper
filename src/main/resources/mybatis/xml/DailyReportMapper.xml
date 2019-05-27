@@ -1853,7 +1853,7 @@
     <select id="visitDateCallDoctorNum" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.VisitDoctorStatisticsResponse">
 
         SELECT
-        COUNT(DISTINCT d.id) visitCount,
+        COUNT(DISTINCT d.id) doctorNum,
         DATE_FORMAT(v.create_time, '%Y-%m-%d') visitDate
         FROM virtual_doctor_call_info v
         INNER JOIN doctor d
@@ -1871,12 +1871,10 @@
 
 
         <if test="request.productIdList !=null and request.productIdList.size > 0">
-            AND v.product_id IN ( SELECT content_id FROM t_content_product WHERE product_id IN
+            AND v.product_id IN
             <foreach collection="request.productIdList" item="productId" open="(" close=")" separator=",">
                 #{productId}
             </foreach>
-
-            )
 
         </if>
 
