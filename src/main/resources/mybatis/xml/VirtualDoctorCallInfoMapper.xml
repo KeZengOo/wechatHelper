@@ -1620,7 +1620,7 @@
 					AND visit_channel = 1
 					AND status_name = 'answer'
 					<if test="startTime !=null and endTime !=null">
-						AND v.create_time BETWEEN #{startTime} AND  #{endTime}
+						AND create_time BETWEEN #{startTime} AND  #{endTime}
 					</if>
 
 					) totalCallSecond,
@@ -1637,7 +1637,7 @@
 						AND visit_channel = 1
 						AND status_name = 'answer'
 						<if test="startTime !=null and endTime !=null">
-						AND v.create_time BETWEEN #{startTime} AND  #{endTime}
+						AND create_time BETWEEN #{startTime} AND  #{endTime}
 						</if>
 
 					) connectCallCount,
@@ -1653,7 +1653,7 @@
 						AND product_id = v.product_id
 						AND visit_channel = 1
 						<if test="startTime !=null and endTime !=null">
-						AND v.create_time BETWEEN #{startTime} AND  #{endTime}
+						AND create_time BETWEEN #{startTime} AND  #{endTime}
 						</if>
 
 					ORDER BY
