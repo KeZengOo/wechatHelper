@@ -285,7 +285,7 @@ public class CommonServiceImpl implements CommonService {
 	private DoctorImportErrorResponse saveOrUpdateDrugUserDoctorTransfer(Map<String, List<DrugUserDoctorTransferVo>> doctorListMap) {
 
 		Map<String, DoctorImportErrorResponse> errorMap = new HashMap<>();
-		Map<String, Long> productNameIdMap = getProductNameIdMap();
+		Map<String, Long> productNameIdMap = this.getProductNameIdMap();
 		DoctorImportErrorResponse doctorImportError = new DoctorImportErrorResponse();
 		List<DoctorImportErrorDetailResponse> detailList = new ArrayList<>();
 
@@ -476,9 +476,11 @@ public class CommonServiceImpl implements CommonService {
 					v1.forEach(d->{
 						Long drugUserId = d.getDrugUserId();
 						Integer prodId = d.getProdId();
+						Long doctorId = d.getDoctorId();
 						DrugUserDoctorParams drugUserDoctorParams = new DrugUserDoctorParams();
 						drugUserDoctorParams.setDrugUserId(drugUserId);
 						drugUserDoctorParams.setProdId(prodId);
+						drugUserDoctorParams.setDoctorId(doctorId);
 						deleteDrugUserDoctorParamsList.add(drugUserDoctorParams);
 					});
 				});
@@ -688,9 +690,11 @@ public class CommonServiceImpl implements CommonService {
 					v1.forEach(d->{
 						Long drugUserId = d.getDrugUserId();
 						Integer prodId = d.getProdId();
+						Long doctorId = d.getDoctorId();
 						DrugUserDoctorParams drugUserDoctorParams = new DrugUserDoctorParams();
 						drugUserDoctorParams.setDrugUserId(drugUserId);
 						drugUserDoctorParams.setProdId(prodId);
+						drugUserDoctorParams.setDoctorId(doctorId);
 						deleteDrugUserDoctorParamsList.add(drugUserDoctorParams);
 					});
 				});
@@ -719,7 +723,8 @@ public class CommonServiceImpl implements CommonService {
 			for (DrugUserDoctorParams drugUserDoctorParams : deleteDrugUserDoctorParamsList) {
 				Integer prodId = drugUserDoctorParams.getProdId();
 				Long drugUserId = drugUserDoctorParams.getDrugUserId();
-				drugUserDoctorMapper.updateDrugUserDoctorAvailable(drugUserId, null, Long.valueOf(prodId));
+				Long doctorId = drugUserDoctorParams.getDoctorId();
+				drugUserDoctorMapper.updateDrugUserDoctorAvailable(drugUserId, doctorId, Long.valueOf(prodId));
 			}
 		}
 
