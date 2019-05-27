@@ -341,6 +341,7 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 
         this.checkPrescriptionRequest(bean);
         virtualDoctorMapper.updateDoctorProductFixField(bean);
+        virtualDoctorMapper.updateDoctorProductFixFieldQuate(bean);
     }
 
     /**
