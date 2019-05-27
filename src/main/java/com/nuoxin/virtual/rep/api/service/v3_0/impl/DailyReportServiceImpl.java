@@ -465,8 +465,8 @@ public class DailyReportServiceImpl implements DailyReportService {
 
         Integer coverDoctor = dailyReportMapper.visitResultTypeDoctorNum(request, VisitResultTypeEnum.COVER.getType());
         VisitTypeDoctorNumStatisticsResponse cover = new VisitTypeDoctorNumStatisticsResponse();
-        cover.setVisitType(VisitResultTypeEnum.CONTACT.getType());
-        cover.setVisitTypeStr(VisitResultTypeEnum.CONTACT.getName());
+        cover.setVisitType(VisitResultTypeEnum.COVER.getType());
+        cover.setVisitTypeStr(VisitResultTypeEnum.COVER.getName());
         cover.setDoctorNum(coverDoctor);
 
 
