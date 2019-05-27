@@ -98,9 +98,22 @@ public class CustomerSetServiceImpl implements CustomerSetService {
 
     @Override
     public Long insertDoctorDynamicField(DoctorDynamicFieldRequestBean bean) {
-
+        this.checkDoctorDynamicField(bean);
         dynamicFieldMapper.insertDoctorDynamicField(bean);
         return bean.getId();
+    }
+
+    /**
+     * 检查
+     * @param bean
+     */
+    private void checkDoctorDynamicField(DoctorDynamicFieldRequestBean bean) {
+
+        Integer count = dynamicFieldMapper.checkDoctorDynamicField(bean);
+        if (count !=null && count > 0){
+            throw new BusinessException(ErrorEnum.ERROR, "字段已经存在！");
+        }
+
     }
 
     @Override

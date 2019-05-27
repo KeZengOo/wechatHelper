@@ -125,6 +125,13 @@ public interface DynamicFieldMapper {
      */
     void insertDoctorDynamicField(DoctorDynamicFieldRequestBean bean);
 
+    /**
+     * 获取数量，判断字段是否存在
+     * @param bean
+     * @return
+     */
+    Integer checkDoctorDynamicField(DoctorDynamicFieldRequestBean bean);
+
 
     /**
      * 得到医生基本信息动态字段填充的值

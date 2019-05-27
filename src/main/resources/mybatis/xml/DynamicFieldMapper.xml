@@ -207,6 +207,16 @@
         SELECT id FROM virtual_doctor_dynamic_field WHERE product_id=#{productId} AND extend_type=#{extendType}
     </select>
 
+    <!-- 获取数量，判断字段是否存在 -->
+    <select id="checkDoctorDynamicField" resultType="java.lang.Integer">
+
+        SELECT COUNT(*)
+        FROM virtual_doctor_dynamic_field
+        WHERE field_name=#{name}
+        AND product_id=#{productId}
+
+    </select>
+
 
     <insert id="insertDoctorDynamicField" parameterType="com.nuoxin.virtual.rep.api.web.controller.request.v2_5.set.DoctorDynamicFieldRequestBean" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         insert into virtual_doctor_dynamic_field(serial_number, field_name, type, extend_type, field_value, classification, required, product_id, creator_id, creator_name, mender_id, mender_name)
