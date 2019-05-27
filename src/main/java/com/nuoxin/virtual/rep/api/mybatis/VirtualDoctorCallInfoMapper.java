@@ -3,6 +3,7 @@ package com.nuoxin.virtual.rep.api.mybatis;
 import java.util.List;
 
 import com.nuoxin.virtual.rep.api.entity.v2_5.*;
+import com.nuoxin.virtual.rep.api.entity.v3_0.params.PurposeParams;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.CallRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.VisitHistoryRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.CallInfoListRequest;
@@ -260,9 +261,9 @@ public interface VirtualDoctorCallInfoMapper {
 
 	/**
 	 * 新增拜访的目的
-	 * @param purposeRequestList
+	 * @param purposeParamsList
 	 */
-	void addCallPurpose(List<PurposeRequest> purposeRequestList);
+	void addCallPurpose(List<PurposeParams> purposeParamsList);
 
 
 	/**

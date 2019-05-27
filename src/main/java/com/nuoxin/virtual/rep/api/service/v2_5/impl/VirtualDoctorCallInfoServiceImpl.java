@@ -11,6 +11,7 @@ import javax.annotation.Resource;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
+import com.nuoxin.virtual.rep.api.entity.v3_0.params.PurposeParams;
 import com.nuoxin.virtual.rep.api.enums.RecruitEnum;
 import com.nuoxin.virtual.rep.api.enums.RoleTypeEnum;
 
@@ -99,7 +100,11 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 			callInfoMapper.updateCallProduct(callId, productId.longValue());
 			// 保存电话拜访的目的
 			List<PurposeRequest> purposeRequestList = saveRequest.getPurposeRequestList();
-			callInfoMapper.addCallPurpose(purposeRequestList);
+			List<PurposeParams> purposeParamsList = this.getPurposeParamsList(purposeRequestList);
+			if (CollectionsUtil.isNotEmptyList(purposeParamsList)){
+				callInfoMapper.addCallPurpose(purposeParamsList);
+			}
+
 			// 是否丢入公共池
 			Integer commonPool = saveRequest.getCommonPool();
 			if (commonPool !=null && commonPool == 1){
@@ -120,6 +125,33 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 
 
 		return false;
+	}
+
+	/**
+	 * 处理拜访目的参数
+	 * @param purposeRequestList
+	 * @return
+	 */
+	private List<PurposeParams> getPurposeParamsList(List<PurposeRequest> purposeRequestList) {
+		if (CollectionsUtil.isEmptyList(purposeRequestList)){
+			return null;
+		}
+
+		List<PurposeParams> list = new ArrayList<>();
+		purposeRequestList.forEach(p->{
+			Long callId = p.getCallId();
+			String purpose = p.getPurpose();
+			List<Long> resultIdList = p.getResultIdList();
+			resultIdList.forEach(r->{
+				PurposeParams purposeParams = new PurposeParams();
+				purposeParams.setCallId(callId);
+				purposeParams.setPurpose(purpose);
+				purposeParams.setResultId(r);
+				list.add(purposeParams);
+			});
+		});
+
+		return list;
 	}
 
 	/**

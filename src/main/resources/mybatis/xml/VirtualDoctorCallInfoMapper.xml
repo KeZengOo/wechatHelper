@@ -1545,18 +1545,12 @@
 	<insert id="addCallPurpose">
 		INSERT INTO virtual_doctor_call_purpose(call_id, item, result_id)
 		VALUES
-		<foreach collection="list" item="p">
-
-
-			<foreach collection="p.resultIdList" item="resultId" separator=",">
-				(
-				#{p.callId},
-				#{p.purpose},
-				#{resultId}
-				)
-			</foreach>
-
-
+		<foreach collection="list" item="p" separator=",">
+			(
+			#{p.callId},
+			#{p.purpose},
+			#{p.resultId}
+			)
 		</foreach>
 
 	</insert>
