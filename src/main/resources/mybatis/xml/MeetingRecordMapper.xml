@@ -76,7 +76,8 @@
                 SELECT
                     t.doctor_id
                 FROM
-                    product_doctor_quate t
+                  drug_user_doctor d
+		        LEFT JOIN product_doctor_quate t ON t.doctor_id = d.doctor_id
                 WHERE
                     t.product_id = #{productId}
                 AND t.is_recruit = 1
@@ -182,6 +183,7 @@ FROM
         AND t.doctor_id = #{doctorId}
         AND t.meeting_id = #{meetingId}
         AND t.type = 1
+        GROUP BY t.doctor_id,t.attend_start_time,t.attend_end_time,t.attend_sum_time
     </select>
 
     <!-- 导入Excel -->
