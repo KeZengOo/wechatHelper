@@ -1893,15 +1893,18 @@
 
 		<!-- 需要会议回访 -->
 		<if test="tag !=null and tag==1">
-			RIGHT JOIN (
+			INNER JOIN (
 			SELECT DISTINCT
 			tmad.doctor_id
 			FROM
 			t_meeting_data tmd
 			INNER JOIN t_meeting_attend_details tmad ON tmd.id = tmad.meeting_id
 			INNER JOIN drug_user_doctor dud ON tmad.doctor_id = dud.doctor_id
+			LEFT JOIN virtual_doctor_call_info v1
+			ON v1.virtual_doctor_id=dud.doctor_id AND v1.virtual_drug_user_id=dud.drug_user_id AND v1.product_id=dud.prod_id
 			WHERE
 			dud.is_available = 1
+			AND v1.id IS NULL
 
 			<if test="drugUserIdList !=null and drugUserIdList.size > 0">
 				AND dud.drug_user_id IN
@@ -1939,21 +1942,25 @@
 			)
 			)
 			) meeting_dud
-			ON v.virtual_doctor_id=meeting_dud.doctor_id
+			ON d.id=meeting_dud.doctor_id
 		</if>
 
 
 		<!-- 阅读过文章但未拜访 -->
 		<if test="tag !=null and tag ==4">
-			RIGHT JOIN (
+			INNER JOIN (
 			SELECT DISTINCT
 			read_person_id
 			FROM
 			drug_user_doctor dud
 			INNER JOIN activity_read ar ON dud.doctor_id = ar.read_person_id
 			AND dud.drug_user_id = ar.drug_user_id
+			LEFT JOIN virtual_doctor_call_info v1
+			ON v1.virtual_drug_user_id=dud.drug_user_id AND v1.virtual_doctor_id=dud.doctor_id AND v1.product_id=dud.prod_id
+
 			WHERE
 			dud.is_available = 1
+			AND v1.id IS NULL
 
 			<if test="productIdList !=null and productIdList.size > 0">
 				AND dud.prod_id IN
@@ -1979,7 +1986,7 @@
 
 			)
 			) content_dud
-			ON v.virtual_doctor_id=content_dud.read_person_id
+			ON d.id=content_dud.read_person_id
 		</if>
 
 
@@ -2079,9 +2086,11 @@
 		</if>
 
 		<!-- 阅读过文章但未拜访 -->
+		<!--
 		<if test="tag !=null and tag==4">
 			AND v.id IS NULL
 		</if>
+		-->
 
 
 		GROUP BY
@@ -2139,15 +2148,18 @@
 
 		<!-- 需要会议回访 -->
 		<if test="tag !=null and tag==1">
-			RIGHT JOIN (
+			INNER JOIN (
 			SELECT DISTINCT
 			tmad.doctor_id
 			FROM
 			t_meeting_data tmd
 			INNER JOIN t_meeting_attend_details tmad ON tmd.id = tmad.meeting_id
 			INNER JOIN drug_user_doctor dud ON tmad.doctor_id = dud.doctor_id
+			LEFT JOIN virtual_doctor_call_info v1
+			ON v1.virtual_doctor_id=dud.doctor_id AND v1.virtual_drug_user_id=dud.drug_user_id AND v1.product_id=dud.prod_id
 			WHERE
 			dud.is_available = 1
+			AND v1.id IS NULL
 
 			<if test="drugUserIdList !=null and drugUserIdList.size > 0">
 				AND dud.drug_user_id IN
@@ -2185,22 +2197,26 @@
 			)
 			)
 			) meeting_dud
-			ON v.virtual_doctor_id=meeting_dud.doctor_id
+			ON d.id=meeting_dud.doctor_id
 		</if>
 
 
 		<!-- 阅读过文章但未拜访 -->
 		<if test="tag !=null and tag ==4">
-			RIGHT JOIN (
+			INNER JOIN (
 			SELECT DISTINCT
 			read_person_id
 			FROM
 			drug_user_doctor dud
 			INNER JOIN activity_read ar ON dud.doctor_id = ar.read_person_id
 			AND dud.drug_user_id = ar.drug_user_id
+			LEFT JOIN virtual_doctor_call_info v1
+			ON v1.virtual_drug_user_id=dud.drug_user_id AND v1.virtual_doctor_id=dud.doctor_id AND v1.product_id=dud.prod_id
+
+
 			WHERE
 			dud.is_available = 1
-
+			AND v1.id IS NULL
 			<if test="productIdList !=null and productIdList.size > 0">
 				AND dud.prod_id IN
 				<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
@@ -2225,7 +2241,7 @@
 
 			)
 			) content_dud
-			ON v.virtual_doctor_id=content_dud.read_person_id
+			ON d.id=content_dud.read_person_id
 		</if>
 
 
@@ -2332,9 +2348,12 @@
 		</if>
 
 		<!-- 阅读过文章但未拜访 -->
+
+		<!--
 		<if test="tag !=null and tag==4">
 			AND v.id IS NULL
 		</if>
+		-->
 
 
 		GROUP BY
