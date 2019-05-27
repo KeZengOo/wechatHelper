@@ -165,7 +165,7 @@
             ON du.id=ru.user_id
             LEFT JOIN role r
             ON ru.role_id=r.id
-
+            WHERE 1=1
             <if test="drugUserIdList !=null and drugUserIdList.size > 0">
                 AND du.id IN
                 <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
@@ -269,6 +269,8 @@
         ON du.id=ru.user_id
         LEFT JOIN role r
         ON ru.role_id=r.id
+
+        WHERE 1=1
 
         <if test="drugUserIdList !=null and drugUserIdList.size > 0">
             AND du.id IN
