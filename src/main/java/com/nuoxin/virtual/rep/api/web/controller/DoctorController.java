@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.nuoxin.virtual.rep.api.entity.v2_5.DoctorExcelBean;
+import com.nuoxin.virtual.rep.api.enums.RoleTypeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -309,6 +310,21 @@ public class DoctorController extends BaseController {
             responseBean.setMessage("登录失效");
             return responseBean;
         }
+
+        Long roleId = user.getRoleId();
+        if (RoleTypeEnum.SALE.getType().equals(roleId)
+                || RoleTypeEnum.RECRUIT_SALE.getType().equals(roleId)
+                || RoleTypeEnum.COVER_SALE.getType().equals(roleId)){
+            DrugUserResponseBean drugUserResponseBean = new DrugUserResponseBean();
+            drugUserResponseBean.setId(user.getId());
+            drugUserResponseBean.setName(user.getName());
+            List<DrugUserResponseBean> list = new ArrayList<>();
+            list.add(drugUserResponseBean);
+            responseBean.setData(list);
+            return responseBean;
+        }
+
+
         responseBean.setData(drugUserService.relationDrugUser(user.getLeaderPath(),productId));
         return responseBean;
     }
