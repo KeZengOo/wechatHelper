@@ -176,29 +176,30 @@
 
 	<!-- type 1 接触医生数 2 成功医生数 -->
 	<select id="getContactAndSuccessHcpCount" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.VisitDataPart">
-		SELECT a.drug_user_id userId, COUNT(DISTINCT a.doctor_id) total  FROM `drug_user_doctor_quate` a
-		JOIN drug_user_doctor_quate_result b ON a.id = b.quate_id
+		SELECT a.virtual_drug_user_id userId, COUNT(DISTINCT a.virtual_doctor_id) total  FROM `virtual_doctor_call_info_mend` a
+		JOIN virtual_doctor_call_info_result b ON a.id = b.mend_id
 		JOIN virtual_product_visit_result c ON b.result_id = c.id AND c.product_id = a.product_id
 		WHERE a.product_id = #{key.proId} AND a.create_time BETWEEN #{key.startTime} AND #{key.endTime}
 		AND c.visit_type LIKE '%{type}%'
-		AND a.drug_user_id IN
+		AND a.virtual_drug_user_id IN
 		<foreach collection="key.list" item="id" open="(" separator="," close=")">
 			#{id}
 		</foreach>
-		GROUP BY a.drug_user_id
+		GROUP BY a.virtual_drug_user_id
 	</select>
 
 	<!-- 招募医生数 -->
 	<select id="getRecruitHcpCount" parameterType="com.nuoxin.virtual.rep.api.entity.v3_0.request.VisitDataParam"
 			resultType="com.nuoxin.virtual.rep.api.entity.v3_0.VisitDataPart">
-		SELECT a.drug_user_id userId, COUNT(DISTINCT a.doctor_id) total  FROM `drug_user_doctor_quate` a
+		SELECT b.drug_user_id userId, COUNT(DISTINCT a.doctor_id) total  FROM `product_doctor_quate` a
+		JOIN drug_user_doctor b on a.doctor_id = b.doctor_id and a.product_id = b.prod_id
 		WHERE a.is_available = 1 AND a.is_recruit = 1 AND a.product_id = #{key.proId}
 		AND a.create_time BETWEEN #{key.startTime} AND #{key.endTime}
-		AND a.drug_user_id IN
+		AND b.drug_user_id IN
 		<foreach collection="key.list" item="id" open="(" separator="," close=")">
 			#{id}
 		</foreach>
-		GROUP BY a.drug_user_id
+		GROUP BY b.drug_user_id
 	</select>
 
 	<!-- 覆盖医生 -->

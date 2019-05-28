@@ -284,7 +284,7 @@ public class VisitingDataServiceImpl implements VisitingDataService, Serializabl
             bean.setMeetingCoverage(meetingDataMap.get(userId) == null ? 0 : meetingDataMap.get(userId));
             bean.setQuestionCoverage(0);
             bean.setOutGoingTimes(outDataMap.get(userId) == null ? 0 : outDataMap.get(userId));
-            bean.setContactedHcpNum(contactedDataMap.get(userId) == null ? 0 : contactedDataMap.get(userId));
+            bean.setConnectionNum(contactedDataMap.get(userId) == null ? 0 : contactedDataMap.get(userId));
             bean.setTotalDuration(totalTimeDataMap.get(userId) == null ? "" : totalTimeDataMap.get(userId));
             bean.setSendingNum(sendDataMap.get(userId) == null ? 0 : sendDataMap.get(userId));
             bean.setHcpReplyNum(replyDataMap.get(userId) == null ? 0 : replyDataMap.get(userId));
