@@ -12,7 +12,6 @@
 		JOIN drug_user du ON pu.user_id = du.id
 		JOIN role_user ru ON ru.user_id = du.id
 		WHERE
--- 		du.leader_path LIKE #{leaderPath} AND
 		pl.show_place = 1 AND ru.role_id IN (101, 104, 105)
 		AND pl.prod_id IN
 		<foreach collection="key.productIdList" item="pro" open="(" separator="," close=")">
@@ -48,7 +47,6 @@
 			JOIN role_user ru ON ru.user_id = du.id
 			LEFT JOIN role r ON ru.role_id = r.id
 			WHERE
--- 				du.leader_path LIKE #{leaderPath} AND
 			pl.show_place = 1 AND ru.role_id IN (101, 104, 105)
 			AND pl.prod_id IN
 			<foreach collection="key.productIdList" item="pro" open="(" separator="," close=")">
@@ -88,7 +86,6 @@
 		JOIN role_user ru ON ru.user_id = du.id
 		LEFT JOIN role r ON ru.role_id = r.id
 		WHERE
--- 		du.leader_path LIKE #{leaderPath} AND
 		pl.show_place = 1 AND ru.role_id IN (101, 104, 105)
 		AND pl.prod_id IN
 		<foreach collection="key.productIdList" item="pro" open="(" separator="," close=")">
