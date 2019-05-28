@@ -455,6 +455,7 @@
 
 
         SELECT
+        DISTINCT
         vm.id,
         vm.user_id userId,
         vm.user_type userType,
@@ -543,7 +544,7 @@
         -->
 
         SELECT
-        COUNT(*)
+        COUNT(DISTINCT vm.id)
         FROM
         virtual_message vm
         WHERE

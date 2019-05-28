@@ -1842,13 +1842,13 @@
 		CASE
 
 		WHEN q.is_cover IS NULL THEN
-		'未知'
+		'其他'
 		WHEN q.is_cover = 0 THEN
 		'未开始'
 		WHEN q.is_cover = 1 THEN
 		'覆盖中'
 		WHEN q.is_cover = 2 THEN
-		'退出项目' ELSE '未知'
+		'退出项目' ELSE '其他'
 		END
 		) AS cover ,
 
