@@ -1806,9 +1806,9 @@
 		WHEN q.is_recruit IS NULL THEN
 		'暂未招募'
 		WHEN q.is_recruit = 0 THEN
-		'否'
+		'招募失败'
 		WHEN q.is_recruit = 1 THEN
-		'是' ELSE '暂未招募'
+		'成功招募' ELSE '暂未招募'
 		END
 		) AS recruit,
 		(
@@ -2413,9 +2413,9 @@
 		WHEN q.is_recruit IS NULL THEN
 		'暂未招募'
 		WHEN q.is_recruit = 0 THEN
-		'否'
+		'招募失败'
 		WHEN q.is_recruit = 1 THEN
-		'是' ELSE '暂未招募'
+		'成功招募' ELSE '暂未招募'
 		END
 		) AS recruit,
 		(
