@@ -1855,6 +1855,11 @@
 				AND v.visit_channel=#{visitChannel}
 			</if>
 
+
+			<if test="startTime !=null and endTime !=null">
+				AND v.create_time BETWEEN #{startTime} AND #{ endTime}
+			</if>
+
 		GROUP BY
 			v.id
 		ORDER BY
@@ -1882,6 +1887,11 @@
 				<if test="visitChannel !=null and visitChannel !=0">
 					AND v.visit_channel=#{visitChannel}
 				</if>
+
+				<if test="startTime !=null and endTime !=null">
+					AND v.create_time BETWEEN #{startTime} AND #{ endTime}
+				</if>
+
 			GROUP BY
 				v.id
 		) t
