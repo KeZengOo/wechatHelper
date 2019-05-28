@@ -138,6 +138,8 @@ public class CustomerSetServiceImpl implements CustomerSetService {
             }
         }
 
+        this.checkDoctorDynamicField(bean);
+
         dynamicFieldMapper.insertDoctorDynamicField(bean);
         return bean.getId();
     }
