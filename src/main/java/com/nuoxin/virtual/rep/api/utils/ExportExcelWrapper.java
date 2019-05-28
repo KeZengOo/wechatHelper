@@ -38,7 +38,6 @@ public class ExportExcelWrapper<T> extends ExportExcelUtil<T> {
                 response.addHeader("Content-Disposition", "attachment;filename="+ URLEncoder.encode(fileName, "UTF-8") + ".xlsx");
                 exportExcel2007(title, headers, dataset, response.getOutputStream(), "yyyy-MM-dd hh:mm:ss");
             }
-            response.addHeader("Content-Length", String.valueOf(response.getBufferSize()));
         } catch (Exception e) {
             e.printStackTrace();
         }
