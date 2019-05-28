@@ -3,8 +3,10 @@ package com.nuoxin.virtual.rep.api.web.controller.v3_0;
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
+import com.nuoxin.virtual.rep.api.enums.RoleTypeEnum;
 import com.nuoxin.virtual.rep.api.service.v3_0.VisitingDataService;
 import com.nuoxin.virtual.rep.api.utils.StringUtil;
+import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.CommonRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.DrugUserDoctorCallRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.VisitDataRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.VisitDataResponse;
@@ -22,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -48,6 +51,7 @@ public class VisitingDataController extends NewBaseController implements Seriali
     public DefaultResponseBean<PageResponseBean<VisitDataResponse>> visitDataSummaryList(@RequestBody VisitDataRequest request) throws Exception {
         DrugUser drugUser = this.getDrugUser();
         String leaderPath = drugUser.getLeaderPath();
+        this.fillDrugUserIdListByRoleId(drugUser, request);
         Date startTime = request.getStartTime();
         Date endTime = request.getEndTime();
         List<Long> proIds = request.getProductIdList();
@@ -107,7 +111,25 @@ public class VisitingDataController extends NewBaseController implements Seriali
             }
             req.setDrugUserIdList(drugUserIdList);
         }
+        Long userId = this.fillDrugUserIdByRoleId(drugUser);
+        if(userId.intValue() > 0) {
+            req.setDrugUserIdList(Arrays.asList(userId));
+        }
         visitingDataService.exportVisitDataSummary(getResponse(), leaderPath, req);
+    }
+
+    /**
+     * 根据角色补充代表查询条件
+     * @param drugUser
+     * @return
+     */
+    private Long fillDrugUserIdByRoleId(DrugUser drugUser){
+        Long userId = 0L;
+        Long roleId = drugUser.getRoleId();
+        if (RoleTypeEnum.SALE.getType().equals(roleId) || RoleTypeEnum.RECRUIT_SALE.getType().equals(roleId) || RoleTypeEnum.COVER_SALE.getType().equals(roleId)){
+            userId = drugUser.getId();
+        }
+        return userId;
     }
 
 }
