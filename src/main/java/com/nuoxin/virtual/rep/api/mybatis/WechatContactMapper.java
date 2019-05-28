@@ -59,4 +59,8 @@ public interface WechatContactMapper {
      * @return
      */
     String getNickNameByUseName(@Param(value = "userName") String userName);
+
+
+
+
 }

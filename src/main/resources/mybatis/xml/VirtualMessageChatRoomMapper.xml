@@ -74,4 +74,25 @@
             chatroom_id = #{chatRoomId}
     </select>
 
+    <!-- 查询历史的群聊消息 -->
+    <select id="getReHandleWechatChatRoomMessageList" resultType="com.nuoxin.virtual.rep.api.web.controller.request.v2_5.wechat.WechatChatRoomMessageRequestBean">
+        SELECT
+            wechat_number chatRoomId,
+            doctor_id doctorId,
+            drug_user_id drugUserId,
+            '' memberId,
+            '' memberName,
+            '' telephone,
+            wechat_message_status wechatMessageStatus,
+            wechat_message_type wechatMessageType,
+            message wechatMessage,
+            img_path filePath,
+            DATE_FORMAT(message_time, '%Y-%m-%d %H:%i:%s') messageTime
+        FROM
+            virtual_message
+        WHERE
+            wechat_number LIKE '%@chatroom%'
+    </select>
+
+
 </mapper>

@@ -6,7 +6,7 @@
     <select id="getWechatAndroidContactList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.wechat.WechatAndroidContactResponseBean">
 
       SELECT drug_user_id drugUserId, upload_time uploadTime,
-      user_name userName,nickname,alias,con_remark conRemark
+      user_name userName,nickname,alias,IF(con_remark IS NULL OR con_remark='', nickname, con_remark) conRemark
       FROM virtual_wechat_contact
       WHERE user_name IN
         <foreach collection="userNameList" item="userName" open="(" close=")" separator=",">

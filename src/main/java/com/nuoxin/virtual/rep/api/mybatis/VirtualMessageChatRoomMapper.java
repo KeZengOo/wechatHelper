@@ -49,4 +49,11 @@ public interface VirtualMessageChatRoomMapper {
      */
     Integer getWechatChatRoomMessageListCount(WechatChatRoomMessageRequest request);
 
+
+    /**
+     * 查询历史的群聊消息
+     * @return
+     */
+    List<WechatChatRoomMessageRequestBean> getReHandleWechatChatRoomMessageList();
+
 }

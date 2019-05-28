@@ -37,10 +37,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -167,6 +164,87 @@ public class WechatServiceImpl implements WechatService {
 
 
         this.reUpdateMessage();
+    }
+
+
+    @Override
+    public void reHandleWechatChatRoomMessage() {
+
+
+        List<WechatChatRoomMessageRequestBean> wechatChatRoomMessageList = virtualMessageChatRoomMapper.getReHandleWechatChatRoomMessageList();
+        if (CollectionsUtil.isEmptyList(wechatChatRoomMessageList)){
+            return;
+        }
+
+        List<WechatChatRoomMessageRequestBean> addList = new ArrayList<>();
+        for (WechatChatRoomMessageRequestBean wechatChatRoomMessage : wechatChatRoomMessageList) {
+
+            String chatRoomId = wechatChatRoomMessage.getChatRoomId();
+            Long drugUserId = wechatChatRoomMessage.getDrugUserId();
+
+            String wechatMessageStatus = wechatChatRoomMessage.getWechatMessageStatus();
+            String wechatMessage = wechatChatRoomMessage.getWechatMessage();
+
+            String memberId = "";
+            String memberName = "";
+
+            List<WechatChatRoomMemberResponseBean> wechatChatRoomMemberList = wechatChatRoomContactMapper.getWechatChatRoomMemberList(chatRoomId);
+            if (StringUtil.isNotEmpty(wechatMessageStatus) && "发送".equals(wechatMessageStatus)){
+
+                List<String> drugUserWechat = drugUserWechatMapper.getDrugUserWechat(drugUserId);
+                if (CollectionsUtil.isEmptyList(drugUserWechat)){
+                    throw new BusinessException(ErrorEnum.ERROR, "代表还没有绑定微信号！");
+                }
+                DrugUser drugUser = drugUserRepository.findFirstById(drugUserId);
+                memberId = drugUserWechat.get(0);
+                memberName = drugUser.getName();
+            }
+
+            if (StringUtil.isNotEmpty(wechatMessageStatus) && "接收".equals(wechatMessageStatus)){
+                if (CollectionsUtil.isNotEmptyList(wechatChatRoomMemberList)){
+                    final String memberIdStr = wechatMessage.split(":")[0];
+                    memberId = wechatChatRoomMessage.getMemberId();
+                    Optional<String> first = wechatChatRoomMemberList.stream().filter(m -> (memberIdStr.equals(m.getMemberId()))).map(WechatChatRoomMemberResponseBean::getMemberName).findFirst();
+                    if (first.isPresent()){
+                        memberName = first.get();
+                    }
+                }
+                wechatMessage = wechatMessage.substring(wechatMessage.indexOf(":") +1);
+                wechatChatRoomMessage.setWechatMessage(wechatMessage);
+
+            }
+
+            Integer messageCount = virtualMessageChatRoomMapper.getMessageCount(chatRoomId, memberId, wechatMessage, wechatChatRoomMessage.getMessageTime());
+            if (messageCount !=null && messageCount > 0){
+                continue;
+            }
+
+            wechatChatRoomMessage.setMemberId(memberId);
+            wechatChatRoomMessage.setMemberName(memberName);
+
+            addList.add(wechatChatRoomMessage);
+        }
+
+
+        if (CollectionsUtil.isNotEmptyList(addList)){
+            int size = addList.size();
+            int totalPage = PageUtil.getTotalPage(size, BATCH_INSERT_SIZE);
+            List<WechatChatRoomMessageRequestBean> subWechatChatRoomMessageRequestBean = null;
+            for (int i = 0; i < totalPage; i++) {
+                if (i == (totalPage - 1)) {
+
+                    subWechatChatRoomMessageRequestBean = addList.subList(i * BATCH_INSERT_SIZE, i * BATCH_INSERT_SIZE + (size - i * BATCH_INSERT_SIZE));
+                } else {
+                    subWechatChatRoomMessageRequestBean = addList.subList(i * BATCH_INSERT_SIZE, i * BATCH_INSERT_SIZE + BATCH_INSERT_SIZE);
+                }
+
+                List<WechatChatRoomMessageRequestBean> addWechatMessageList = new ArrayList<>(subWechatChatRoomMessageRequestBean);
+                virtualMessageChatRoomMapper.batchInsert(addWechatMessageList);
+
+            }
+        }
+
+
     }
 
     /**
@@ -735,17 +813,31 @@ public class WechatServiceImpl implements WechatService {
             String displayNameListStr = csvRecord.get("displayname");
             String roomOwnerId = csvRecord.get("roomowner");
             String selfDisplayName = csvRecord.get("selfDisplayName");
+
+
+
             
             // 群成员ID以 ; 分割，名字以 、 分割，两个数量如果不一致给出错误提示
             String[] memberIdList = this.checkMemberIdListStr(memberIdListStr);
-            String[] displayNameList = this.checkDisplayNameListStr(displayNameListStr);
-            if (memberIdList.length !=displayNameList.length){
-                throw new BusinessException(ErrorEnum.ERROR, "群成员昵称和备注中不能包含符号、");
+
+            List<WechatAndroidContactResponseBean> wechatAndroidContactList = wechatContactMapper.getWechatAndroidContactList(Arrays.asList(memberIdList));
+            if (CollectionsUtil.isEmptyList(wechatAndroidContactList)){
+                throw new BusinessException(ErrorEnum.ERROR, "群联系人还未导入！");
             }
+
+            // 群聊的昵称和群成员的昵称不在群里面获取，因为有的群备注获取不到，统一到联系人里面去获取
+//            String[] displayNameList = this.checkDisplayNameListStr(displayNameListStr);
+//            if (memberIdList.length !=displayNameList.length){
+//                throw new BusinessException(ErrorEnum.ERROR, "群成员昵称和备注中不能包含符号、");
+//            }
 
             for (int i = 0; i < memberIdList.length; i++) {
                 String memberId = memberIdList[i];
-                String displayName = displayNameList[i];
+                String displayName = "";
+                Optional<String> first = wechatAndroidContactList.stream().filter(w -> (memberId.equals(w.getUserName()))).map(WechatAndroidContactResponseBean::getConRemark).findFirst();
+                if (first.isPresent()){
+                    displayName = first.get();
+                }
                 WechatAndroidChatroomContactRequestBean chatRoomConcat = new WechatAndroidChatroomContactRequestBean();
                 chatRoomConcat.setChatroomId(chatRoomId);
                 chatRoomConcat.setChatroomName(chatRoomName);

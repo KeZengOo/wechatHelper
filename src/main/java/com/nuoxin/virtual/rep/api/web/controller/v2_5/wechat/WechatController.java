@@ -33,6 +33,20 @@ public class WechatController extends NewBaseController {
     private WechatService wechatService;
 
 
+    @ApiOperation(value = "重新处理历史的群聊消息", notes = "重新处理历史的群聊消息")
+    @GetMapping("/re/handle/wechat/chat/room/message")
+    @ResponseBody
+    public DefaultResponseBean<Boolean> reHandleWechatChatRoomMessage(){
+
+        wechatService.reHandleWechatChatRoomMessage();
+
+        DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(true);
+
+        return responseBean;
+    }
+
+
     @ApiOperation(value = "安卓手机微信联系人导入接口", notes = "安卓手机微信联系人导入接口")
     @PostMapping("/contact/import")
     @ResponseBody

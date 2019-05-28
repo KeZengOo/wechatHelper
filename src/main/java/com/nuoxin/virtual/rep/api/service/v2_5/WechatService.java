@@ -3,6 +3,7 @@ package com.nuoxin.virtual.rep.api.service.v2_5;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.wechat.WechatAndroidMessageRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.wechat.WechatChatRoomMessageRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.WechatChatRoomMessageRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.wechat.WechatAndroidUploadTimeResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.WechatChatRoomMessageResponse;
@@ -37,6 +38,14 @@ public interface WechatService {
      * @param bean
      */
     void handleWechatMessageFile(MultipartFile file, WechatAndroidMessageRequestBean bean);
+
+
+    /**
+     * 重新处理微信聊天记录，用于处理历史的微信聊天记录
+     */
+    void reHandleWechatChatRoomMessage();
+
+
 
 
     WechatAndroidUploadTimeResponseBean getWechatAndroidUploadTime(String wechatNumber);
