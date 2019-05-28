@@ -4,6 +4,7 @@ import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
+import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.v2_5.WechatService;
 import com.nuoxin.virtual.rep.api.service.v3_0.WechatMessageService;
 import com.nuoxin.virtual.rep.api.utils.StringUtil;
@@ -12,6 +13,7 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.WechatMessageReque
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.WechatChatRoomMessageResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.WechatChatRoomResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.WechatMessageSummaryResponse;
+import com.nuoxin.virtual.rep.api.web.controller.v2_5.NewBaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +31,7 @@ import java.util.List;
 @RestController
 @Api(value = "V3.0.1微信聊天消息查询相关")
 @RequestMapping(value = "/wechat")
-public class WechatMessageController {
+public class WechatMessageController extends NewBaseController {
 
     @Resource
     private WechatService wechatService;
@@ -40,9 +42,11 @@ public class WechatMessageController {
 
     @ApiOperation(value = "概要列表", notes = "概要列表")
     @PostMapping(value = "/message/summary/list")
-    public DefaultResponseBean<PageResponseBean<WechatMessageSummaryResponse>> wechatMessageSummaryPage(@RequestBody WechatMessageRequest request) {
+    public DefaultResponseBean<PageResponseBean<WechatMessageSummaryResponse>> wechatMessageSummaryPage(HttpServletRequest request, @RequestBody WechatMessageRequest bean) {
+        DrugUser drugUser = this.getDrugUser(request);
+        this.fillDrugUserIdListByRoleId(drugUser, bean);
 
-        PageResponseBean<WechatMessageSummaryResponse> wechatMessageSummaryPage = wechatMessageService.getWechatMessageSummaryPage(request);
+        PageResponseBean<WechatMessageSummaryResponse> wechatMessageSummaryPage = wechatMessageService.getWechatMessageSummaryPage(bean);
         DefaultResponseBean<PageResponseBean<WechatMessageSummaryResponse>> responseBean = new DefaultResponseBean<>();
         responseBean.setData(wechatMessageSummaryPage);
         return responseBean;
@@ -55,6 +59,9 @@ public class WechatMessageController {
     public void wechatMessageSummaryPage(HttpServletResponse response, HttpServletRequest request) {
 
         WechatMessageRequest bean = this.getExportParams(request);
+        DrugUser drugUser = this.getDrugUser(request);
+        this.fillDrugUserIdListByRoleId(drugUser, bean);
+
         wechatMessageService.exportWechatMessageSummaryList(response, bean);
     }
 
@@ -72,9 +79,9 @@ public class WechatMessageController {
 
     @ApiOperation(value = "微信群消息", notes = "微信群消息")
     @PostMapping(value = "/chat/room/message")
-    public DefaultResponseBean<PageResponseBean<WechatChatRoomMessageResponse>> getWechatChatRoomMessagePage(@RequestBody WechatChatRoomMessageRequest request) {
+    public DefaultResponseBean<PageResponseBean<WechatChatRoomMessageResponse>> getWechatChatRoomMessagePage(HttpServletRequest request, @RequestBody WechatChatRoomMessageRequest bean) {
 
-        PageResponseBean<WechatChatRoomMessageResponse> wechatChatRoomMessagePage = wechatService.getWechatChatRoomMessagePage(request);
+        PageResponseBean<WechatChatRoomMessageResponse> wechatChatRoomMessagePage = wechatService.getWechatChatRoomMessagePage(bean);
         DefaultResponseBean<PageResponseBean<WechatChatRoomMessageResponse>> responseBean = new DefaultResponseBean<>();
         responseBean.setData(wechatChatRoomMessagePage);
         return responseBean;

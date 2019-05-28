@@ -4,6 +4,7 @@ import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
+import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.service.v3_0.DrugUserDoctorCallService;
 import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.utils.StringUtil;
@@ -12,6 +13,7 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.DrugUserDoctorCall
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.DrugUserDoctorCallRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DrugUserDoctorCallDetailResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DrugUserDoctorCallResponse;
+import com.nuoxin.virtual.rep.api.web.controller.v2_5.NewBaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
@@ -30,16 +32,17 @@ import java.util.List;
 @RestController
 @Api(value = "V3.0.1电话拜访记录查询相关")
 @RequestMapping(value = "/drug/user/doctor")
-public class DrugUserDoctorCallController {
+public class DrugUserDoctorCallController extends NewBaseController {
 
     @Resource
     private DrugUserDoctorCallService drugUserDoctorCallService;
 
     @ApiOperation(value = "电话拜访记录查询列表")
     @PostMapping(value = "/call/list")
-    public DefaultResponseBean<PageResponseBean<DrugUserDoctorCallResponse>> getDrugUserDoctorCallPage(@RequestBody DrugUserDoctorCallRequest request){
-
-        PageResponseBean<DrugUserDoctorCallResponse> drugUserDoctorCallPage = drugUserDoctorCallService.getDrugUserDoctorCallPage(request);
+    public DefaultResponseBean<PageResponseBean<DrugUserDoctorCallResponse>> getDrugUserDoctorCallPage(HttpServletRequest request, @RequestBody DrugUserDoctorCallRequest bean){
+        DrugUser drugUser = this.getDrugUser(request);
+        this.fillDrugUserIdListByRoleId(drugUser, bean);
+        PageResponseBean<DrugUserDoctorCallResponse> drugUserDoctorCallPage = drugUserDoctorCallService.getDrugUserDoctorCallPage(bean);
         DefaultResponseBean<PageResponseBean<DrugUserDoctorCallResponse>> responseBean = new DefaultResponseBean<>();
         responseBean.setData(drugUserDoctorCallPage);
         return responseBean;
@@ -63,6 +66,8 @@ public class DrugUserDoctorCallController {
     public void getDrugUserDoctorCallPage(HttpServletResponse response, HttpServletRequest request){
 
         DrugUserDoctorCallRequest bean = this.getExportParams(request);
+        DrugUser drugUser = this.getDrugUser(request);
+        this.fillDrugUserIdListByRoleId(drugUser, bean);
         drugUserDoctorCallService.exportDrugUserDoctorCallList(response, bean);
 
     }

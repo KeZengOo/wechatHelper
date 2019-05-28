@@ -7,9 +7,15 @@ import javax.servlet.http.HttpServletResponse;
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
+import com.nuoxin.virtual.rep.api.entity.Role;
+import com.nuoxin.virtual.rep.api.enums.RoleTypeEnum;
 import com.nuoxin.virtual.rep.api.service.SecurityService;
+import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.CommonRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 新的 BaseController
@@ -83,5 +89,21 @@ public class NewBaseController {
 		responseBean.setDescription(msg);
 		return responseBean;
 	}
-	
+
+
+	/**
+	 * 根据角色补充代表查询条件
+	 * @param drugUser
+	 * @param bean
+	 * @return
+	 */
+	protected void fillDrugUserIdListByRoleId(DrugUser drugUser, CommonRequest bean){
+		Long roleId = drugUser.getRoleId();
+		if (RoleTypeEnum.SALE.getType().equals(roleId) || RoleTypeEnum.RECRUIT_SALE.getType().equals(roleId) || RoleTypeEnum.COVER_SALE.getType().equals(roleId)){
+			List<Long> drugUserIdList = new ArrayList<>();
+			drugUserIdList.add(drugUser.getId());
+			bean.setDrugUserIdList(drugUserIdList);
+		}
+
+	}
 }

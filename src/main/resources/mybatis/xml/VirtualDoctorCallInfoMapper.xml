@@ -1619,9 +1619,24 @@
 					AND product_id = v.product_id
 					AND visit_channel = 1
 					AND status_name = 'answer'
+
+					<!---
 					<if test="startTime !=null and endTime !=null">
 						AND create_time BETWEEN #{startTime} AND  #{endTime}
 					</if>
+					-->
+
+
+					<if test="startTime !=null">
+						AND create_time &gt;= DATE_FORMAT(#{startTime}, '%Y-%m-%d %H:%i:%s')
+					</if>
+
+
+					<if test="endTime !=null">
+						AND create_time &lt;= DATE_FORMAT(#{endTime}, '%Y-%m-%d %H:%i:%s')
+					</if>
+
+
 
 					) totalCallSecond,
 
@@ -1636,9 +1651,22 @@
 						AND product_id = v.product_id
 						AND visit_channel = 1
 						AND status_name = 'answer'
+
+						<!--
 						<if test="startTime !=null and endTime !=null">
 						AND create_time BETWEEN #{startTime} AND  #{endTime}
 						</if>
+						-->
+
+						<if test="startTime !=null">
+							AND create_time &gt;= DATE_FORMAT(#{startTime}, '%Y-%m-%d %H:%i:%s')
+						</if>
+
+
+						<if test="endTime !=null">
+							AND create_time &lt;= DATE_FORMAT(#{endTime}, '%Y-%m-%d %H:%i:%s')
+						</if>
+
 
 					) connectCallCount,
 					MAX( v.create_time ) lastVisitDate,
@@ -1652,9 +1680,22 @@
 						AND virtual_doctor_id = v.virtual_doctor_id
 						AND product_id = v.product_id
 						AND visit_channel = 1
+
+						<!--
 						<if test="startTime !=null and endTime !=null">
 						AND create_time BETWEEN #{startTime} AND  #{endTime}
 						</if>
+						-->
+
+						<if test="startTime !=null">
+							AND create_time &gt;= DATE_FORMAT(#{startTime}, '%Y-%m-%d %H:%i:%s')
+						</if>
+
+
+						<if test="endTime !=null">
+							AND create_time &lt;= DATE_FORMAT(#{endTime}, '%Y-%m-%d %H:%i:%s')
+						</if>
+
 
 					ORDER BY
 						v.create_time DESC
@@ -1673,9 +1714,23 @@
 					INNER JOIN product_line pl ON v.product_id = pl.prod_id
 				WHERE
 					v.visit_channel = 1
+
+					<!--
 					<if test="startTime !=null and endTime !=null">
 						AND v.create_time BETWEEN #{startTime} AND  #{endTime}
 					</if>
+					-->
+
+
+					<if test="startTime !=null">
+						AND v.create_time &gt;= DATE_FORMAT(#{startTime}, '%Y-%m-%d %H:%i:%s')
+					</if>
+
+
+					<if test="endTime !=null">
+						AND v.create_time &lt;= DATE_FORMAT(#{endTime}, '%Y-%m-%d %H:%i:%s')
+					</if>
+
 
 
 					<if test="drugUserIdList !=null and drugUserIdList.size > 0">
@@ -1759,8 +1814,21 @@
 		INNER JOIN product_line pl ON v.product_id = pl.prod_id
 		WHERE
 		v.visit_channel = 1
+
+		<!--
 		<if test="startTime !=null and endTime !=null">
-			AND v.create_time BETWEEN #{startTime} AND #{ endTime}
+			AND v.create_time BETWEEN #{startTime} AND  #{endTime}
+		</if>
+		-->
+
+
+		<if test="startTime !=null">
+			AND v.create_time &gt;= DATE_FORMAT(#{startTime}, '%Y-%m-%d %H:%i:%s')
+		</if>
+
+
+		<if test="endTime !=null">
+			AND v.create_time &lt;= DATE_FORMAT(#{endTime}, '%Y-%m-%d %H:%i:%s')
 		</if>
 
 
@@ -1856,9 +1924,24 @@
 			</if>
 
 
+
+
+				<!--
 			<if test="startTime !=null and endTime !=null">
-				AND v.create_time BETWEEN #{startTime} AND #{ endTime}
+				AND v.create_time BETWEEN #{startTime} AND  #{endTime}
 			</if>
+			-->
+
+
+		<if test="startTime !=null">
+			AND v.create_time &gt;= DATE_FORMAT(#{startTime}, '%Y-%m-%d %H:%i:%s')
+		</if>
+
+
+		<if test="endTime !=null">
+			AND v.create_time &lt;= DATE_FORMAT(#{endTime}, '%Y-%m-%d %H:%i:%s')
+		</if>
+
 
 		GROUP BY
 			v.id
@@ -1888,9 +1971,25 @@
 					AND v.visit_channel=#{visitChannel}
 				</if>
 
+
+
+					<!--
 				<if test="startTime !=null and endTime !=null">
-					AND v.create_time BETWEEN #{startTime} AND #{ endTime}
+					AND v.create_time BETWEEN #{startTime} AND  #{endTime}
 				</if>
+				-->
+
+
+					<if test="startTime !=null">
+						AND v.create_time &gt;= DATE_FORMAT(#{startTime}, '%Y-%m-%d %H:%i:%s')
+					</if>
+
+
+					<if test="endTime !=null">
+						AND v.create_time &lt;= DATE_FORMAT(#{endTime}, '%Y-%m-%d %H:%i:%s')
+					</if>
+
+
 
 			GROUP BY
 				v.id

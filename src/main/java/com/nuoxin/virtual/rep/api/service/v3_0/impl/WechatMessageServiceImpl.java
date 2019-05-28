@@ -57,7 +57,7 @@ public class WechatMessageServiceImpl implements WechatMessageService {
 
         ExportExcelWrapper<WechatMessageSummaryResponse> exportExcelWrapper = new ExportExcelWrapper();
         exportExcelWrapper.exportExcel("微信消息概要查询", "微信消息概要查询",
-                new String[]{"代表ID", "代表姓名", "角色名称", "拜访方式", "1是和医生聊天，2是群聊", "医生ID", "群聊ID", "医生姓名或者群名称",
+                new String[]{"代表ID", "代表姓名","产品ID", "产品名称",  "角色名称", "拜访方式", "1是和医生聊天，2是群聊", "医生ID", "群聊ID", "医生姓名或者群名称",
                 "医院ID", "医院名称", "医生科室", "招募状态", "覆盖状态", "总对话数", "代表对话数量", "医生对话数量", "上一次微信导入时间"},
                 messageSummaryList, response, ExportExcelUtil.EXCEl_FILE_2007);
 
