@@ -265,7 +265,7 @@
             m.drugUserName,
             m.doctorId,
             m.doctorName,
-            m.readTime,
+            SUM(m.readTime) readTime,
             m.shareType,
             m.hospitalName,
             m.depart
@@ -314,7 +314,7 @@
                     wr.content_id AS dataId,
                     dd.drug_user_id AS drugUserId,
                     dd.drug_user_name AS drugUserName,
-                    wr.user_id AS doctorId,
+                    xu.doctor_id AS doctorId,
                     wr.user_name AS doctorName,
                     wr.read_time AS readTime,
                     wr.share_type AS shareType,
@@ -442,7 +442,9 @@
                 AND r.share_type = #{shareType}
                 GROUP BY
                     r.read_person_id,
-                    t.id
+                    t.id,
+                    t.time,
+                    r.read_time
                 UNION ALL
                     SELECT
                         wr.create_time time,
