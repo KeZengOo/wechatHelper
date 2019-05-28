@@ -79,7 +79,7 @@
             INNER JOIN product_line pl
             ON dud.prod_id=pl.prod_id
             LEFT JOIN product_doctor_quate q
-            ON dud.doctor_id=q.product_id AND dud.prod_id=q.product_id
+            ON dud.doctor_id=q.doctor_id AND dud.prod_id=q.product_id
             WHERE dud.is_available=1
 
             <if test="drugUserIdList !=null and drugUserIdList.size > 0">
@@ -215,7 +215,7 @@
         INNER JOIN product_line pl
         ON dud.prod_id=pl.prod_id
         LEFT JOIN product_doctor_quate q
-        ON dud.doctor_id=q.product_id AND dud.prod_id=q.product_id
+        ON dud.doctor_id=q.doctor_id AND dud.prod_id=q.product_id
         WHERE dud.is_available=1
 
         <if test="drugUserIdList !=null and drugUserIdList.size > 0">
