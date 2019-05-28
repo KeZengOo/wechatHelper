@@ -1804,11 +1804,11 @@
 		CASE
 
 		WHEN q.is_recruit IS NULL THEN
-		'未知'
+		'暂未招募'
 		WHEN q.is_recruit = 0 THEN
 		'否'
 		WHEN q.is_recruit = 1 THEN
-		'是' ELSE '未知'
+		'是' ELSE '暂未招募'
 		END
 		) AS recruit,
 		(
@@ -2411,11 +2411,11 @@
 		CASE
 
 		WHEN q.is_recruit IS NULL THEN
-		'未知'
+		'暂未招募'
 		WHEN q.is_recruit = 0 THEN
 		'否'
 		WHEN q.is_recruit = 1 THEN
-		'是' ELSE '未知'
+		'是' ELSE '暂未招募'
 		END
 		) AS recruit,
 		(
