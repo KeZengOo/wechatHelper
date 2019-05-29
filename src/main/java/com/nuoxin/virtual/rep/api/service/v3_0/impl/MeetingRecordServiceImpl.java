@@ -427,7 +427,22 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
                         }
                         else
                         {
-                            doctorNum +=1;
+                            meetingParticipantsExcel.setDoctorName(h.getDoctorTel());
+                            meetingParticipantsExcel.setMeetingId(meetingId);
+                            meetingParticipantsExcel.setAttendStartTime(h.getAttendStartTime());
+                            meetingParticipantsExcel.setAttendEndTime(h.getAttendEndTime());
+
+                            //计算参会分钟差
+                            Date date1 = df.parse(h.getAttendEndTime());
+                            Date date2 = df.parse(h.getAttendStartTime());
+                            long diff = date1.getTime() - date2.getTime();
+                            //计算两个时间之间差了多少分钟
+                            long minutes = diff / (1000 * 60);
+
+                            meetingParticipantsExcel.setAttendSumTime(minutes+"");
+                            meetingParticipantsExcel.setType("1");
+                            meetingParticipantsExcel.setDoctorTel(h.getDoctorTel());
+                            meetingParticipantsTemps.add(meetingParticipantsExcel);
                         }
                     }
                     else
@@ -448,25 +463,11 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
             if(meetingParticipantsTemps.size() > 0)
             {
                 result = meetingRecordMapper.saveMeetingParticipantsExcel(meetingParticipantsTemps);
-                if(doctorNum > 0){
-                    flag = result;
-                    map.put("flag",flag);
-                    map.put("message","上传参会数据中有不存在的医生手机号");
-                }
-                else
-                {
-                    flag = result;
-                    map.put("flag",flag);
-                    map.put("message","上传参会数据成功");
-                }
+                 flag = result;
+                 map.put("flag",flag);
+                 map.put("message","上传参会数据成功");
+            }
 
-            }
-            else
-            {
-                map.put("flag",false);
-                map.put("message","上传参会人员手机号不存在，上传数据失败");
-                return map;
-            }
         } catch (Exception e) {
             log.error("IOException", e);
             map.put("flag",flag);

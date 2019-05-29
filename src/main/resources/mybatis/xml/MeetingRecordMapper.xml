@@ -144,32 +144,40 @@
         LEFT JOIN doctor d ON t.doctor_id = d.id
         WHERE
             1 = 1
-        AND t.doctor_id != ''
         AND t.meeting_id = #{meetingAttendDetailsRequest.meetingId}
         AND t.type = 1
-        GROUP BY t.doctor_id
+        GROUP BY t.doctor_name,t.doctor_id
         LIMIT #{meetingAttendDetailsRequest.currentSize},#{meetingAttendDetailsRequest.pageSize}
     </select>
 
     <!-- 参会总数 -->
     <select id="getMeetingAttendDetailsCountByMeetingId" resultType="java.lang.Integer">
-SELECT
-	COUNT(m.doctor_id)
-FROM
-	(
-		SELECT
-			t.doctor_id
-		FROM
-			t_meeting_attend_details t
-		LEFT JOIN doctor d ON t.doctor_id = d.id
-		WHERE
-			1 = 1
-		AND t.doctor_id != ''
-		AND t.meeting_id = #{meetingId}
-		AND t.type = 1
-		GROUP BY
-			t.doctor_id
-	) m
+    SELECT
+        COUNT(m.id)
+    FROM
+        (
+            SELECT
+                t.id,
+                t.doctor_id AS doctorId,
+                t.doctor_name AS doctorName,
+                d.hospital_id AS hospitalId,
+                d.hospital_name AS hospitalName,
+                d.depart,
+                str_to_date(t.attend_start_time, '%Y-%m-%d %H:%i:%s') AS attendStartTime,
+                str_to_date(t.attend_end_time, '%Y-%m-%d %H:%i:%s') AS attendEndTime,
+                t.attend_sum_time AS attendSumTime,
+                t.meeting_id AS meetingId,
+                t.type
+            FROM
+                t_meeting_attend_details t
+            LEFT JOIN doctor d ON t.doctor_id = d.id
+            WHERE
+                1 = 1
+            AND t.meeting_id = #{meetingId}
+            AND t.type = 1
+            GROUP BY
+                t.doctor_name,t.doctor_id
+        ) m
     </select>
 
     <!-- 根据医生ID和会议ID查询该医生的所有参会时间 -->
@@ -275,7 +283,7 @@ FROM
 
     <!-- 根据会议id查询参会人员总数及人员idList -->
     <select id="getMeetingAttendDetailsParamsListByMeetingId" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingAttendDetailsParams">
-        SELECT DISTINCT t.doctor_id doctorId FROM t_meeting_attend_details t WHERE t.meeting_id = #{meetingId} AND t.doctor_id != ''
+        SELECT t.doctor_id doctorId FROM t_meeting_attend_details t WHERE t.meeting_id = #{meetingId} GROUP BY t.doctor_id , t.doctor_name
     </select>
 
     <!-- 根据产品Id筛选医生IDlist -->
