@@ -28,10 +28,11 @@ public class VirtualDoctorMeetingServiceImpl implements VirtualDoctorMeetingServ
 	public PageResponseBean<List<MeetingBean>> getMeetingList(MeetingListRequestBean request) {
 		PageResponseBean pageResponse = null;
 		Long virtualDoctorId = request.getVirtualDoctorId();
-		String leaderPath = request.getLeaderPath();
-		int count = meetingAttendMapper.getMeetingAttendCount(virtualDoctorId, leaderPath);
+		//String leaderPath = request.getLeaderPath();
+		List<Long> productIdList = request.getProductIdList();
+		int count = meetingAttendMapper.getProductMeetingAttendCount(virtualDoctorId, productIdList);
 		if(count > 0) {
-			List<MeetingBean> list = meetingAttendMapper.getMeetingAttendList(virtualDoctorId, leaderPath, request.getCurrentSize(),
+			List<MeetingBean> list = meetingAttendMapper.getProductMeetingAttendList(virtualDoctorId, productIdList, request.getCurrentSize(),
 					request.getPageSize());
 			pageResponse = new PageResponseBean(request, count, list);
 		}

@@ -28,5 +28,26 @@ public interface MeetingAttendMapper {
 	 */
 	List<MeetingBean> getMeetingAttendList(@Param(value = "virtualDoctorId") Long virtualDoctorId, @Param(value = "leaderPath") String leaderPath,
 			@Param(value = "currentSize") Integer currentSize, @Param(value = "pageSize") Integer pageSize);
+
+
+
+
+	/**
+	 * 根据客户医生ID 获取记录条数
+	 * @param virtualDoctorId
+	 * @return
+	 */
+	int getProductMeetingAttendCount(@Param(value = "virtualDoctorId") Long virtualDoctorId,@Param(value = "productIdList") List<Long> productIdList);
+
+	/**
+	 * 根据客户医生ID 获取列表
+	 * @param virtualDoctorId
+	 * @param currentSize
+	 * @param pageSize
+	 * @return
+	 */
+	List<MeetingBean> getProductMeetingAttendList(@Param(value = "virtualDoctorId") Long virtualDoctorId, @Param(value = "productIdList") List<Long> productIdList,
+										   @Param(value = "currentSize") Integer currentSize, @Param(value = "pageSize") Integer pageSize);
+
 }
 

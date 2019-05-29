@@ -30,4 +30,8 @@ public class ShareRequestBean extends PageRequestBean implements Serializable {
     @ApiModelProperty(value = "选择的互动代表ID")
     private List<Long> drugUserIdList;
 
+
+    @ApiModelProperty(value = "产品ID列表")
+    private List<Long> productIdList;
+
 }

@@ -50,5 +50,50 @@
 		LIMIT #{currentSize}, #{pageSize}
 	</select>
 
+
+	<select id="getProductMeetingAttendCount" resultType="java.lang.Integer">
+		SELECT
+		count(*)
+		FROM t_meeting_attend_details a
+		JOIN t_meeting_data m
+		ON a.meeting_id = m.id
+		WHERE
+		doctor_id = #{virtualDoctorId}
+		<!-- 加上产品 -->
+
+		<if test="productIdList !=null and productIdList.size > 0">
+			AND m.product_id IN
+			<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+				#{productId}
+			</foreach>
+		</if>
+
+
+	</select>
+
+	<select id="getProductMeetingAttendList" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.MeetingBean">
+		SELECT
+		m.title, m.speaker, m.s_hospital AS speakerHospital,
+		DATE_FORMAT(m.start_time,'%Y-%m-%d %H:%i:%s') AS startTime,
+		DATE_FORMAT(m.end_time,'%Y-%m-%d %H:%i:%s') AS endTime,
+		DATE_FORMAT(a.attend_start_time,'%Y-%m-%d %H:%i:%s') AS attendStartTime,
+		DATE_FORMAT(a.attend_end_time,'%Y-%m-%d %H:%i:%s') AS attendEndTime,
+		type, attend_type AS attendType, download
+		FROM t_meeting_attend_details a
+		JOIN t_meeting_data m
+		ON a.meeting_id = m.id
+		WHERE
+		doctor_id = #{virtualDoctorId}
+		<!-- 加上产品 -->
+		<if test="productIdList !=null and productIdList.size > 0">
+			AND m.product_id IN
+			<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+				#{productId}
+			</foreach>
+		</if>
+
+		LIMIT #{currentSize}, #{pageSize}
+	</select>
+
 </mapper>
 

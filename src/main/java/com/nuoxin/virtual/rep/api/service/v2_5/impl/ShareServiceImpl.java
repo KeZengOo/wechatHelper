@@ -6,6 +6,7 @@ import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.enums.ShareStatusEnum;
 import com.nuoxin.virtual.rep.api.mybatis.ActivityShareMapper;
+import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v2_5.ShareService;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.share.QuestionnaireRequestBean;
@@ -33,6 +34,9 @@ public class ShareServiceImpl implements ShareService{
     @Resource
     private ActivityShareMapper activityShareMapper;
 
+    @Resource
+    private CommonService commonService;
+
     @Override
     public PageResponseBean<ContentShareResponseBean> getContentShareList(DrugUser user,  ShareRequestBean bean) {
         bean.setLeaderPath(user.getLeaderPath());
@@ -40,6 +44,8 @@ public class ShareServiceImpl implements ShareService{
         Integer pageSize = bean.getPageSize();
         bean.setCurrentSize(page  * pageSize);
 
+        List<Long> productIdList = commonService.getProductIdListByDrugUserId(user.getId());
+        bean.setProductIdList(productIdList);
         Integer contentShareListCount = activityShareMapper.getContentShareListCount(bean);
         if (contentShareListCount == null){
             contentShareListCount = 0;

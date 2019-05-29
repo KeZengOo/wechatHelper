@@ -8,6 +8,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.List;
+
 @EqualsAndHashCode(callSuper=false)
 @Data
 public class MeetingListRequestBean extends PageRequestBean {
@@ -20,4 +22,8 @@ public class MeetingListRequestBean extends PageRequestBean {
 
 	@ApiModelProperty(value = "前端不用传")
 	private String leaderPath;
+
+
+	@ApiModelProperty(value = "产品ID")
+	private List<Long> productIdList;
 }

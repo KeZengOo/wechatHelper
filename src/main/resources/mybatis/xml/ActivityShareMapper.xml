@@ -690,6 +690,8 @@
 			</foreach>
 		</if>
 
+		<!--
+
 			AND a.data_id IN (
 				SELECT DISTINCT
 					content_id
@@ -700,6 +702,25 @@
 				WHERE
 					du.leader_path LIKE #{leaderPath}
 			)
+
+			-->
+
+		<if test="productIdList !=null and productIdList.size > 0">
+			AND a.data_id IN
+			(
+			SELECT DISTINCT content_id FROM t_content_product
+			WHERE product_id IN
+
+			<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+				#{productId}
+			</foreach>
+			)
+		</if>
+
+
+
+
+
 			ORDER BY
 				a.create_time DESC
 			LIMIT #{currentSize}, #{pageSize}
@@ -735,6 +756,9 @@
 			</foreach>
 		</if>
 
+
+		<!--
+
 		AND a.data_id IN (
 			SELECT DISTINCT
 				content_id
@@ -745,6 +769,21 @@
 			WHERE
 				du.leader_path LIKE #{leaderPath}
 		)
+
+		-->
+
+		<if test="productIdList !=null and productIdList.size > 0">
+			AND a.data_id IN
+			(
+			SELECT DISTINCT content_id FROM t_content_product
+			WHERE product_id IN
+
+			<foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+				#{productId}
+			</foreach>
+			)
+		</if>
+
 
 	</select>
 
