@@ -361,8 +361,15 @@ public class WenJuanQuestionnaireServiceImpl implements WenJuanQuestionnaireServ
 
     @Override
     public PageResponseBean<List<WenJuanProject>> getWenJuanProjectListPage(WenJuanProjectRequest wenJuanProjectRequest) {
+
+        //代表数组转list
+        List<Long> productIds = new ArrayList<Long>();
+        if(wenJuanProjectRequest.getProductId()!= null){
+            productIds = Arrays.asList(wenJuanProjectRequest.getProductId());
+        }
+
         //问卷列表
-        List<WenJuanProject> wenJuanProjectList = wenJuanQuestionnaireMapper.getWenJuanProjectListPage(wenJuanProjectRequest);
+        List<WenJuanProject> wenJuanProjectList = wenJuanQuestionnaireMapper.getWenJuanProjectListPage(wenJuanProjectRequest,productIds);
         List<WenJuanProject> wenJuanProjectListNew = new ArrayList<WenJuanProject>();
 
         wenJuanProjectList.forEach(n->{
@@ -374,7 +381,7 @@ public class WenJuanQuestionnaireServiceImpl implements WenJuanQuestionnaireServ
         });
 
         //问卷count
-        Integer count = wenJuanQuestionnaireMapper.getWenJuanProjectCount(wenJuanProjectRequest);
+        Integer count = wenJuanQuestionnaireMapper.getWenJuanProjectCount(wenJuanProjectRequest,productIds);
 
         return new PageResponseBean(wenJuanProjectRequest, count, wenJuanProjectListNew);
     }
