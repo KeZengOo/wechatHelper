@@ -39,6 +39,14 @@ public interface DrugUserDoctorQuateMapper {
 	 */
 	int saveDrugUserDoctorQuates (List<DrugUserDoctorQuateParams> list);
 
+
+	/**
+	 * 指保存至 product_doctor_quate 表
+	 * @param list
+	 * @return
+	 */
+	int saveProductDoctorQuates (List<DrugUserDoctorQuateParams> list);
+
 	/**
 	 * 删除关系
 	 * @param drugUserId
@@ -46,7 +54,15 @@ public interface DrugUserDoctorQuateMapper {
 	 * @param productId
 	 */
 	void deleteDrugUserDoctorQuates(@Param(value = "drugUserId") Long drugUserId,@Param(value = "doctorId") Long doctorId,@Param(value = "productId") Long productId);
-	
+
+	/**
+	 * 删除关系
+	 * @param doctorId
+	 * @param productId
+	 */
+	void deleteProductDoctorQuates(@Param(value = "doctorId") Long doctorId,@Param(value = "productId") Long productId);
+
+
 	/**
 	 * 备虚拟代表关联的医生关系信息:是否有药,是否是目标客户,是否有AE
 	 * @param params
@@ -97,6 +113,16 @@ public interface DrugUserDoctorQuateMapper {
 	 * @return
 	 */
 	Integer getQuateCount(@Param(value = "drugUserId") Long drugUserId,@Param(value = "doctorId") Long doctorId,@Param(value = "productId") Long productId);
+
+
+
+	/**
+	 * 查询总数，校验记录是否存在
+	 * @param doctorId
+	 * @param productId
+	 * @return
+	 */
+	Integer getProductQuateCount(@Param(value = "doctorId") Long doctorId,@Param(value = "productId") Long productId);
 
 
 	/**

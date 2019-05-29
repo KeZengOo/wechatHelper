@@ -1018,6 +1018,23 @@ public class DoctorService extends BaseService {
             drugUserDoctorQuateMapper.saveDrugUserDoctorQuates(list);
 
         }
+
+
+
+        Integer productQuateCount = drugUserDoctorQuateMapper.getProductQuateCount(doctorId, productId);
+
+        if (productQuateCount == null || productQuateCount == 0){
+            List<DrugUserDoctorQuateParams> list = new ArrayList<>();
+            DrugUserDoctorQuateParams drugUserDoctorQuateParam = new DrugUserDoctorQuateParams();
+            drugUserDoctorQuateParam.setProductLineId(productId.intValue());
+            drugUserDoctorQuateParam.setVirtualDrugUserId(drugUserId);
+            drugUserDoctorQuateParam.setDoctorId(doctorId);
+            list.add(drugUserDoctorQuateParam);
+
+            drugUserDoctorQuateMapper.saveProductDoctorQuates(list);
+        }
+
+
     }
 
     /**

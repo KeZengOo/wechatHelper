@@ -1061,6 +1061,8 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
         if (CollectionsUtil.isNotEmptyList(collectDrugUserDoctorQuateParams)) {
             this.deleteDrugUserDoctorQuates(collectDrugUserDoctorQuateParams);
             drugUserDoctorQuateMapper.saveDrugUserDoctorQuates(collectDrugUserDoctorQuateParams);
+
+            drugUserDoctorQuateMapper.saveProductDoctorQuates(collectDrugUserDoctorQuateParams);
         }
 
     }
@@ -1080,6 +1082,8 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
             Long doctorId = collectDrugUserDoctorQuateParam.getDoctorId();
             Long productLineId = collectDrugUserDoctorQuateParam.getProductLineId().longValue();
             drugUserDoctorQuateMapper.deleteDrugUserDoctorQuates(virtualDrugUserId, doctorId, productLineId);
+
+            drugUserDoctorQuateMapper.deleteProductDoctorQuates(doctorId, productLineId);
         }
     }
 

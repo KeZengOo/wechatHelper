@@ -41,13 +41,27 @@
 	<insert id="saveDrugUserDoctorQuates" parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorQuateParams">
 		INSERT INTO drug_user_doctor_quate 
 		(drug_user_id,doctor_id,product_id, is_has_drug,
-		 is_target,is_has_ae, is_recruit, hcp_potential)
+		 is_target,is_has_ae, is_recruit,is_cover, hcp_potential, attitude)
 		VALUES
 		<foreach collection ="list" item="index" separator =",">
 			 (#{index.virtualDrugUserId}, #{index.doctorId}, #{index.productLineId}, #{index.isHasDrug}, 
-			 #{index.isTarget}, #{index.isHasAe}, #{index.isRecruit}, #{index.hcpPotential})
+			 #{index.isTarget}, #{index.isHasAe}, #{index.isRecruit},#{index.isCover}, #{index.hcpPotential}, #{index.attitude})
 		</foreach>
 	</insert>
+
+
+	<insert id="saveProductDoctorQuates" parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorQuateParams">
+		INSERT INTO product_doctor_quate
+		(doctor_id,product_id, is_has_drug,
+		is_target,is_has_ae, is_recruit,is_cover, hcp_potential, attitude)
+		VALUES
+		<foreach collection ="list" item="index" separator =",">
+			(#{index.doctorId}, #{index.productLineId}, #{index.isHasDrug},
+			#{index.isTarget}, #{index.isHasAe}, #{index.isRecruit},#{index.isCover}, #{index.hcpPotential}, #{index.attitude})
+		</foreach>
+	</insert>
+
+
 
 	<delete id="deleteDrugUserDoctorQuates">
 		DELETE FROM drug_user_doctor_quate
@@ -55,6 +69,15 @@
 		AND doctor_id=#{doctorId}
 		AND product_id=#{productId}
 	</delete>
+
+
+	<delete id="deleteProductDoctorQuates">
+		DELETE FROM product_doctor_quate
+		WHERE
+		doctor_id=#{doctorId}
+		AND product_id=#{productId}
+	</delete>
+
 
 	<select id="getPotentialDoctorCount" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.StatisticsDrugNumResponse">
 		<!-- 2018-09-29 重构前
@@ -320,6 +343,14 @@
 		AND product_id=#{productId}
 		AND is_available=1
 	</select>
+
+
+
+	<select id="getProductQuateCount" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM product_doctor_quate WHERE doctor_id=#{doctorId}
+		AND product_id=#{productId}
+	</select>
+
 
 	<!-- 根据产品ID得到招募结果 -->
 	<select id="getProductRecruit" resultType="java.lang.Integer">
