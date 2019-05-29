@@ -3,6 +3,7 @@ package com.nuoxin.virtual.rep.api.web.controller.v3_0;
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.controller.BaseController;
+import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.v3_0.params.ContentReadLogsParams;
 import com.nuoxin.virtual.rep.api.entity.v3_0.params.ContentSharingParams;
 import com.nuoxin.virtual.rep.api.entity.v3_0.params.FilePathParams;
@@ -14,6 +15,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.List;
@@ -33,7 +35,19 @@ public class ContentSharingController extends BaseController {
 
     @ApiOperation(value = "内容分享记录查询查询列表")
     @RequestMapping(value = "/getContentSharingListPage", method = {RequestMethod.POST})
-    public DefaultResponseBean<PageResponseBean<List<ContentSharingParams>>> getContentSharingListPage(@RequestBody @Valid ContentSharingRequest contentSharingRequest) {
+    public DefaultResponseBean<PageResponseBean<List<ContentSharingParams>>> getContentSharingListPage(@RequestBody @Valid ContentSharingRequest contentSharingRequest, HttpServletRequest request) {
+        Long[] drugUserIdArray = new Long[1];
+        DrugUser user = this.getLoginUser(request);
+        if(user == null) {
+            return super.getLoginErrorResponse();
+        }
+        // 101 虚拟代表 104 招募 105 覆盖
+        if(user.getRoleId() == 101 || user.getRoleId() == 104 || user.getRoleId() == 105)
+        {
+            drugUserIdArray[0] = user.getId();
+            contentSharingRequest.setDrugUserId(drugUserIdArray);
+        }
+
         PageResponseBean<List<ContentSharingParams>> list = contentSharingService.getContentSharingListPage(contentSharingRequest);
         DefaultResponseBean<PageResponseBean<List<ContentSharingParams>>> responseBean = new DefaultResponseBean<PageResponseBean<List<ContentSharingParams>>>();
         responseBean.setData(list);
