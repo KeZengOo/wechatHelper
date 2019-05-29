@@ -257,8 +257,9 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
     @Override
     public List<ProductDynamicFieldQuestionnaireResponseBean> getDoctorProductDynamicFieldValue(Long doctorId, Long drugUserId) {
         List<ProductDynamicFieldQuestionnaireResponseBean> list = new ArrayList<>();
-        String leaderPath = commonService.getLeaderPathById(drugUserId);
-        List<ProductDO> productList = drugUserMapper.getSetDynamicFieldProductListByDoctorId(leaderPath, doctorId);
+        //String leaderPath = commonService.getLeaderPathById(drugUserId);
+        List<Long> findProductIdList = commonService.getProductIdListByDrugUserId(drugUserId);
+        List<ProductDO> productList = drugUserMapper.getSetDynamicFieldProductListByProduct(findProductIdList, doctorId);
         if (CollectionsUtil.isEmptyList(productList)){
             return list;
         }

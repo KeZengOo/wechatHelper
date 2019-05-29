@@ -83,6 +83,15 @@ public interface DrugUserMapper extends MyMapper<DrugUser> {
 
     /**
      * 查询销售名下某个医生所有设置动态字段的产品
+     * @param productIdList
+     * @param doctorId
+     * @return
+     */
+    List<ProductDO> getSetDynamicFieldProductListByProduct(@Param(value = "productIdList") List<Long> productIdList,@Param(value = "doctorId") Long doctorId);
+
+
+    /**
+     * 查询销售名下某个医生所有设置动态字段的产品
      * @param leaderPath
      * @param doctorIdList
      * @return

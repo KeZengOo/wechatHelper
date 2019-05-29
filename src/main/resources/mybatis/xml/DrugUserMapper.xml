@@ -210,6 +210,31 @@
 
 
     <!-- 查询销售名下某个医生所有设置动态字段的产品 -->
+    <select id="getSetDynamicFieldProductListByProduct" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.ProductDO">
+
+        SELECT
+        DISTINCT pl.prod_id productId, pl.prod_name productName
+        FROM product_line pl
+        INNER JOIN drug_user_doctor dud
+        ON pl.prod_id=dud.prod_id
+        INNER JOIN doctor d
+        ON dud.doctor_id=d.id
+        INNER JOIN virtual_doctor_dynamic_field vddf
+        ON pl.prod_id=vddf.product_id
+        WHERE
+        d.id=#{doctorId}
+        <if test="productIdList !=null and productIdList.size > 0">
+            AND dud.prod_id IN
+            <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+                #{productId}
+            </foreach>
+        </if>
+
+    </select>
+
+
+
+    <!-- 查询销售名下某个医生所有设置动态字段的产品 -->
     <select id="getProductListByDoctorId" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DoctorProductResponse">
 
         SELECT
