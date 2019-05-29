@@ -1994,6 +1994,10 @@
 			v.virtual_doctor_id = #{doctorId}
 			AND v.virtual_drug_user_id = #{drugUserId}
 			AND v.product_id = #{productId}
+			<if test="id !=null and id!=0">
+				AND v.id=#{id}
+			</if>
+
 			<if test="visitChannel !=null and visitChannel !=0">
 				AND v.visit_channel=#{visitChannel}
 			</if>
@@ -2042,6 +2046,11 @@
 				v.virtual_doctor_id = #{doctorId}
 				AND v.virtual_drug_user_id = #{drugUserId}
 				AND v.product_id = #{productId}
+
+				<if test="id !=null and id!=0">
+					AND v.id=#{id}
+				</if>
+
 				<if test="visitChannel !=null and visitChannel !=0">
 					AND v.visit_channel=#{visitChannel}
 				</if>

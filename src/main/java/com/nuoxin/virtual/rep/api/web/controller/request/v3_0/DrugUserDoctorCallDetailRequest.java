@@ -18,6 +18,9 @@ import java.util.Date;
 public class DrugUserDoctorCallDetailRequest extends PageRequestBean implements Serializable {
     private static final long serialVersionUID = -7638207011746085656L;
 
+    @ApiModelProperty(value = "编号")
+    private Long id;
+
     @ApiModelProperty(value = "产品ID")
     private Long productId;
 
