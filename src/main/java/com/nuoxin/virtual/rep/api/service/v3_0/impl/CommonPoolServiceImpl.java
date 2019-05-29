@@ -91,7 +91,8 @@ public class CommonPoolServiceImpl implements CommonPoolService {
 
 
             // 填充医生的多个产品
-            List<DoctorProductResponse> productList = drugUserMapper.getProductListByDoctorId(drugUser.getLeaderPath(), doctorIdList);
+            List<Long> productId = commonService.getProductIdListByDrugUserId(drugUser.getId());
+            List<DoctorProductResponse> productList = drugUserMapper.getProductListByDoctorIdAndProduct(null, productId, doctorIdList);
             if (CollectionsUtil.isEmptyList(productList)){
                 productList = new ArrayList<>();
             }

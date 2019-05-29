@@ -88,7 +88,8 @@ public class MyDoctorServiceImpl implements MyDoctorService {
 
 
             // 填充医生的多个产品
-            List<DoctorProductResponse> productList = drugUserMapper.getProductListByDoctorId(drugUser.getLeaderPath(), doctorIdList);
+            List<Long> productId = commonService.getProductIdListByDrugUserId(drugUser.getId());
+            List<DoctorProductResponse> productList = drugUserMapper.getProductListByDoctorIdAndProduct(1, productId, doctorIdList);
             if (CollectionsUtil.isEmptyList(productList)){
                 productList = new ArrayList<>();
             }

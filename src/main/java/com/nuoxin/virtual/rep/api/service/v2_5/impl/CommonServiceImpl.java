@@ -1618,6 +1618,17 @@ public class CommonServiceImpl implements CommonService {
 		}
 	}
 
+	@Override
+	public List<Long> getProductIdListByDrugUserId(Long drugUserId) {
+		List<ProductLine> productLineList = productLineMapper.findByDrugUserId(drugUserId);
+		if (CollectionsUtil.isNotEmptyList(productLineList)){
+			List<Long> productIdList = productLineList.stream().map(ProductLine::getId).distinct().collect(Collectors.toList());
+			return productIdList;
+		}
+
+		return null;
+
+	}
 
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////

@@ -90,6 +90,17 @@ public interface DrugUserMapper extends MyMapper<DrugUser> {
     List<DoctorProductResponse> getProductListByDoctorId(@Param(value = "leaderPath") String leaderPath, @Param(value = "doctorIdList") List<Long> doctorIdList);
 
 
+    /**
+     * 查询销售名下某个医生所有设置动态字段的产品
+     * @param type 1 是代表我的医生的，
+     *             其他代表是公共池的
+     * @param productIdList
+     * @param doctorIdList
+     * @return
+     */
+    List<DoctorProductResponse> getProductListByDoctorIdAndProduct(@Param(value = "type") Integer type, @Param(value = "productIdList") List<Long> productIdList, @Param(value = "doctorIdList") List<Long> doctorIdList);
+
+
 
     /**
      * 根据ID获得已经拼上%的leaderPath

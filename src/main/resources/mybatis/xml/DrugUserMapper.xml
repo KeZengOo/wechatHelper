@@ -238,6 +238,45 @@
 
 
 
+    <!-- 查询销售名下某个医生所有设置动态字段的产品 -->
+    <select id="getProductListByDoctorIdAndProduct" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DoctorProductResponse">
+
+        SELECT
+        DISTINCT pl.prod_id productId, pl.prod_name productName, d.id doctorId
+        FROM product_line pl
+        INNER JOIN drug_user_doctor dud
+        ON pl.prod_id=dud.prod_id
+        INNER JOIN drug_user du
+        ON dud.drug_user_id=du.id
+        INNER JOIN doctor d
+        ON dud.doctor_id=d.id
+        INNER JOIN virtual_doctor_dynamic_field vddf
+        ON pl.prod_id=vddf.product_id
+        WHERE 1=1
+
+
+
+        <if test="type !=null and type==1">
+            AND dud.is_available=1
+        </if>
+
+        AND
+        d.id IN
+        <foreach collection="doctorIdList" item="doctorId" open="(" close=")" separator=",">
+            #{doctorId}
+        </foreach>
+
+        <if test="productIdList !=null and productIdList.size > 0">
+            AND dud.prod_id IN
+            <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+                #{productId}
+            </foreach>
+        </if>
+
+    </select>
+
+
+
     <!-- 根据ID获得已经拼上%的leaderPath -->
     <select id="getLeaderPathById" resultType="java.lang.String">
         SELECT concat(du.leader_path, '%')

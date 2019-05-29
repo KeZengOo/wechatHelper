@@ -132,4 +132,13 @@ public interface CommonService {
 	 * 删除掉重复记录
 	 */
 	void deleteRepeatDrugUserDoctorRecord();
+
+
+	/**
+	 * 得到代表下的产品ID
+	 * @param drugUserId
+	 * @return
+	 */
+	List<Long> getProductIdListByDrugUserId(Long drugUserId);
+
 }
