@@ -73,8 +73,13 @@ public class DrugUserDoctorCallDetailRequest extends PageRequestBean implements 
     }
 
 
+    public Long getId() {
+        return id;
+    }
 
-
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public Date getStartTime() {
         return startTime;
