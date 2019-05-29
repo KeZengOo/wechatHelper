@@ -18,16 +18,19 @@
         AND t.product_id != ''
         AND l.show_place = 1
 
-        <if test="meetingRecordRequest.productId != 0 and meetingRecordRequest.productId != null">
-            AND t.product_id = #{meetingRecordRequest.productId}
+        <if test="productIds.size() > 0 and productIds != null">
+            AND t.product_id in
+            <foreach collection="productIds" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
         </if>
 
         <if test="meetingRecordRequest.startTimeBefore != '' and meetingRecordRequest.startTimeBefore != null">
-            AND t.start_time &gt;= #{meetingRecordRequest.startTimeBefore}
+            AND t.start_time &gt;= CONCAT(#{meetingRecordRequest.startTimeBefore},' 00:00:00')
         </if>
 
         <if test="meetingRecordRequest.startTimeAfter != '' and meetingRecordRequest.startTimeAfter != null">
-            AND t.start_time &lt;= #{meetingRecordRequest.startTimeAfter}
+            AND t.start_time &lt;= CONCAT(#{meetingRecordRequest.startTimeAfter},' 23:59:59')
         </if>
 
         <if test="meetingRecordRequest.title != '' and meetingRecordRequest.title != null">
@@ -49,16 +52,20 @@
             1 = 1
         AND t.product_id != ''
         AND l.show_place = 1
-        <if test="meetingRecordRequest.productId != 0 and meetingRecordRequest.productId != null">
-            AND t.product_id = #{meetingRecordRequest.productId}
+
+        <if test="productIds.size() > 0 and productIds != null">
+            AND t.product_id in
+            <foreach collection="productIds" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
         </if>
 
         <if test="meetingRecordRequest.startTimeBefore != '' and meetingRecordRequest.startTimeBefore != null">
-            AND t.start_time &gt;= #{meetingRecordRequest.startTimeBefore}
+            AND t.start_time &gt;= CONCAT(#{meetingRecordRequest.startTimeBefore},' 00:00:00')
         </if>
 
         <if test="meetingRecordRequest.startTimeAfter != '' and meetingRecordRequest.startTimeAfter != null">
-            AND t.start_time &lt;= #{meetingRecordRequest.startTimeAfter}
+            AND t.start_time &lt;= CONCAT(#{meetingRecordRequest.startTimeAfter},' 23:59:59')
         </if>
 
         <if test="meetingRecordRequest.title != '' and meetingRecordRequest.title != null">

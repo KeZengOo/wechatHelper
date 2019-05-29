@@ -58,5 +58,5 @@ public interface ContentSharingService {
      * @param title
      * @param response
      */
-    void contentSharingExportFile(Integer productId, Long[] drugUserId, String startTimeAfter, String startTimeBefore,Integer shareType, String title, HttpServletResponse response);
+    void contentSharingExportFile(Long[] productId, Long[] drugUserId, String startTimeAfter, String startTimeBefore,Integer shareType, String title, HttpServletResponse response);
 }

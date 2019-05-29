@@ -47,8 +47,14 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
     @Override
     public PageResponseBean<List<MeetingRecordParams>> getMeetingRecordList(MeetingRecordRequest meetingRecordRequest) {
 
-        List<MeetingRecordParams> list = meetingRecordMapper.getMeetingRecordList(meetingRecordRequest);
-        Integer getMeetingRecordListCount = meetingRecordMapper.getMeetingRecordListCount(meetingRecordRequest);
+        //代表数组转list
+        List<Long> productIds = new ArrayList<Long>();
+        if(meetingRecordRequest.getProductId()!= null){
+            productIds = Arrays.asList(meetingRecordRequest.getProductId());
+        }
+
+        List<MeetingRecordParams> list = meetingRecordMapper.getMeetingRecordList(meetingRecordRequest,productIds);
+        Integer getMeetingRecordListCount = meetingRecordMapper.getMeetingRecordListCount(meetingRecordRequest,productIds);
         List<MeetingRecordParams> newList = new ArrayList<MeetingRecordParams>();
         // 创建一个数值格式化对象
         NumberFormat numberFormat = NumberFormat.getInstance();

@@ -24,14 +24,14 @@ public interface MeetingRecordMapper {
      * @param meetingRecordRequest
      * @return list
      */
-    List<MeetingRecordParams> getMeetingRecordList(@Param("meetingRecordRequest") MeetingRecordRequest meetingRecordRequest);
+    List<MeetingRecordParams> getMeetingRecordList(@Param("meetingRecordRequest") MeetingRecordRequest meetingRecordRequest, @Param("productIds") List<Long> productIds);
 
     /**
      * 会议记录查询列表总数
      * @param meetingRecordRequest
      * @return int
      */
-    Integer getMeetingRecordListCount(@Param("meetingRecordRequest") MeetingRecordRequest meetingRecordRequest);
+    Integer getMeetingRecordListCount(@Param("meetingRecordRequest") MeetingRecordRequest meetingRecordRequest, @Param("productIds") List<Long> productIds);
 
     /**
      * 获取产品下的所有招募医生
