@@ -278,7 +278,8 @@ public class WechatServiceImpl implements WechatService {
         wechatChatRoomContactMapper.deleteByChatRoomIdList(chatRoomIdList);
         wechatChatRoomContactMapper.batchInsert(chatroomConcatList);
 
-
+        // 更新群名称
+        wechatChatRoomContactMapper.updateAllChatRoomName();
     }
 
 

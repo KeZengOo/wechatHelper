@@ -56,4 +56,14 @@
         </if>
 
     </select>
+
+    <!-- 更新所有群的名称 -->
+    <update id="updateAllChatRoomName">
+        UPDATE
+        virtual_wechat_contact c
+        INNER JOIN virtual_wechat_chatroom_contact cc
+        ON c.user_name=cc.chatroom_id
+        SET cc.chatroom_name=c.con_remark
+    </update>
+
 </mapper>

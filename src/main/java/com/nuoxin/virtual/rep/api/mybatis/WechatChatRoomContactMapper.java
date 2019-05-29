@@ -47,4 +47,9 @@ public interface WechatChatRoomContactMapper {
      */
     List<WechatChatRoomResponse> getWechatChatRoomList(@Param(value = "drugUserId") Long drugUserId,@Param(value = "doctorId") Long doctorId);
 
+    /**
+     * 更新群的名称
+     */
+    void updateAllChatRoomName();
+
 }

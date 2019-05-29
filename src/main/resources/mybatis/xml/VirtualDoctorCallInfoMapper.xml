@@ -1773,7 +1773,7 @@
 
 
 					ORDER BY
-						v.create_time DESC
+						create_time DESC
 						LIMIT 1
 					) lastCallSecond
 				FROM
