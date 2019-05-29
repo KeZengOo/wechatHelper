@@ -16,7 +16,9 @@ import java.util.Date;
  */
 @ApiModel
 public class DrugUserDoctorCallDetailRequest extends PageRequestBean implements Serializable {
-    private static final long serialVersionUID = -7638207011746085656L;
+
+
+    private static final long serialVersionUID = 6299926110069901212L;
 
     @ApiModelProperty(value = "编号")
     private Long id;
@@ -38,6 +40,15 @@ public class DrugUserDoctorCallDetailRequest extends PageRequestBean implements 
 
     @ApiModelProperty(value = "结束时间")
     private Date endTime;
+
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
 
     public Long getProductId() {
@@ -73,13 +84,7 @@ public class DrugUserDoctorCallDetailRequest extends PageRequestBean implements 
     }
 
 
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public Date getStartTime() {
         return startTime;
