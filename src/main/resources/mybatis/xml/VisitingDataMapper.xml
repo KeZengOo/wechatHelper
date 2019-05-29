@@ -179,8 +179,9 @@
 		SELECT a.virtual_drug_user_id userId, COUNT(DISTINCT a.virtual_doctor_id) total  FROM `virtual_doctor_call_info_mend` a
 		JOIN virtual_doctor_call_info_result b ON a.id = b.mend_id
 		JOIN virtual_product_visit_result c ON b.result_id = c.id AND c.product_id = a.product_id
+		JOIN virtual_doctor_call_info d ON d.id = a.call_id and d.visit_channel != 5
 		WHERE a.product_id = #{key.proId} AND a.create_time BETWEEN #{key.startTime} AND #{key.endTime}
-		AND c.visit_type LIKE '%{type}%'
+		AND c.visit_type LIKE '%${type}%'
 		AND a.virtual_drug_user_id IN
 		<foreach collection="key.list" item="id" open="(" separator="," close=")">
 			#{id}
