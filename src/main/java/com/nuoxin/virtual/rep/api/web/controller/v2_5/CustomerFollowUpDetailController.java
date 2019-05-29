@@ -85,6 +85,9 @@ public class CustomerFollowUpDetailController extends NewBaseController {
 		
 		String leaderPath = user.getLeaderPath();
 		listRequest.setLeaderPath(leaderPath);
+		List<Long> productIdList = this.getProductIdByDrugUserId(user.getId());
+		listRequest.setProductIdList(productIdList);
+
 		PageResponseBean<List<CallVisitBean>> result = callInfoService.getCallVisitList(listRequest);
 		DefaultResponseBean<PageResponseBean<List<CallVisitBean>>> responseBean = new DefaultResponseBean<PageResponseBean<List<CallVisitBean>>>();
 		responseBean.setData(result);

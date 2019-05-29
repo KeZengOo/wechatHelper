@@ -7,15 +7,20 @@ import javax.servlet.http.HttpServletResponse;
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
+import com.nuoxin.virtual.rep.api.entity.ProductLine;
 import com.nuoxin.virtual.rep.api.entity.Role;
 import com.nuoxin.virtual.rep.api.enums.RoleTypeEnum;
+import com.nuoxin.virtual.rep.api.mybatis.DrugUserMapper;
+import com.nuoxin.virtual.rep.api.mybatis.ProductLineMapper;
 import com.nuoxin.virtual.rep.api.service.SecurityService;
+import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.CommonRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 新的 BaseController
@@ -25,6 +30,9 @@ public class NewBaseController {
 	
 	@Resource
 	private SecurityService sercurityService;
+
+	@Resource
+	private ProductLineMapper productLineMapper;
 	
 	/**
 	 * 根据 request 从会话变量中获取 DrugUser 信息 
@@ -106,4 +114,37 @@ public class NewBaseController {
 		}
 
 	}
+
+
+	/**
+	 * 获得代表下的产品
+	 * @param drugUserId
+	 * @return
+	 */
+	protected List<ProductLine> getProductLineByDrugUserId(Long drugUserId){
+		List<ProductLine> productLineList = productLineMapper.findByDrugUserId(drugUserId);
+
+		return productLineList;
+
+	}
+
+
+
+
+	/**
+	 * 获得代表下的产品ID
+	 * @param drugUserId
+	 * @return
+	 */
+	protected List<Long> getProductIdByDrugUserId(Long drugUserId){
+		List<ProductLine> productLineList = productLineMapper.findByDrugUserId(drugUserId);
+		if (CollectionsUtil.isNotEmptyList(productLineList)){
+			List<Long> productIdList = productLineList.stream().map(ProductLine::getId).distinct().collect(Collectors.toList());
+			return productIdList;
+		}
+
+		return null;
+	}
+
+
 }

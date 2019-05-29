@@ -25,6 +25,14 @@ public interface ProductLineMapper extends MyMapper<ProductLine> {
      */
     List<ProductLine> findByLeaderPath(String leaderPath);
 
+
+    /**
+     * 根据代表ID获取产品列表
+     * @param drugUserId
+     * @return
+     */
+    List<ProductLine> findByDrugUserId(Long drugUserId);
+
     /**
      * 根据leaderpath获取产品id集合
      * @param leaderPath

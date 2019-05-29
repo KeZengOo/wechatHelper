@@ -2393,7 +2393,7 @@
 		h.city,
 		h.level hospitalLevel,
 		IF(dud.is_available=1, du.id, 0) drugUserId,
-		IF(dud.is_available=1, du.NAME, '') drugUserName,
+		IF(dud.is_available=1, du.NAME, '无') drugUserName,
 		pl.prod_id productId,
 		pl.prod_name productName,
 		(

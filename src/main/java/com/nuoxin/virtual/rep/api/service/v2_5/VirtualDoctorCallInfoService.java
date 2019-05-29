@@ -22,7 +22,7 @@ import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VisitCountRespons
 public interface VirtualDoctorCallInfoService {
 	
 	/**
-	 * 根据 leaderPath 获取电话拜访列表
+	 * 获取电话拜访列表
 	 * @param listRequest
 	 * @return
 	 */
