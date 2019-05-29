@@ -74,6 +74,10 @@
                 </if>
                 AND r.read_person_id != ''
                 AND l.show_place = 1
+                GROUP BY
+                drugUserId,
+                id,
+                sharetype
 
                 UNION ALL
 
@@ -130,10 +134,16 @@
                     AND i.title LIKE "%"#{contentSharingRequest.title}"%"
                 </if>
                     AND l.show_place = 1
+
+                GROUP BY
+                drugUserId,
+                id,
+                sharetype
             ) m
             GROUP BY
             m.drugUserId,
-            m.id
+            m.id,
+            m.sharetype
         LIMIT #{contentSharingRequest.currentSize},#{contentSharingRequest.pageSize}
     </select>
 
@@ -203,6 +213,10 @@
             </if>
             AND r.read_person_id != ''
             AND l.show_place = 1
+            GROUP BY
+            drugUserId,
+            id,
+            sharetype
 
             UNION ALL
 
@@ -259,10 +273,17 @@
                 AND i.title LIKE "%"#{contentSharingRequest.title}"%"
             </if>
             AND l.show_place = 1
+
+            GROUP BY
+            drugUserId,
+            id,
+            sharetype
+
             ) m
             GROUP BY
             m.drugUserId,
-            m.id
+            m.id,
+            m.sharetype
         ) t
     </select>
 
@@ -547,7 +568,10 @@
         </if>
         AND r.read_person_id != ''
         AND l.show_place = 1
-
+        GROUP BY
+        drugUserId,
+        id,
+        sharetype
         UNION ALL
 
         SELECT
@@ -603,10 +627,15 @@
             AND i.title LIKE "%"#{contentSharingRequest.title}"%"
         </if>
         AND l.show_place = 1
+        GROUP BY
+        drugUserId,
+        id,
+        sharetype
         ) m
         GROUP BY
         m.drugUserId,
-        m.id
+        m.id,
+        m.sharetype
     </select>
 
     <!-- 内容分享列表导出 -->
@@ -689,7 +718,10 @@
         </if>
         AND r.read_person_id != ''
         AND l.show_place = 1
-
+        GROUP BY
+        drugUserId,
+        id,
+        sharetype
         UNION ALL
 
         SELECT
@@ -745,10 +777,15 @@
             AND i.title LIKE "%"#{title}"%"
         </if>
         AND l.show_place = 1
+        GROUP BY
+        drugUserId,
+        id,
+        sharetype
         ) m
         GROUP BY
         m.drugUserId,
-        m.id
+        m.id,
+        m.sharetype
     </select>
 
     <!-- 查询文章列表的代表类型 -->
