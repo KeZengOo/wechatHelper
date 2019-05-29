@@ -194,7 +194,7 @@
 			resultType="com.nuoxin.virtual.rep.api.entity.v3_0.VisitDataPart">
 		SELECT a.drug_user_id userId, COUNT(DISTINCT a.doctor_id) total  FROM `drug_user_doctor_quate` a
 		WHERE a.is_available = 1 AND a.is_recruit = 1 AND a.product_id = #{key.proId}
-		AND a.create_time BETWEEN #{key.startTime} AND #{key.endTime}
+		AND a.update_time BETWEEN #{key.startTime} AND #{key.endTime}
 		AND a.drug_user_id IN
 		<foreach collection="key.list" item="id" open="(" separator="," close=")">
 			#{id}
@@ -247,9 +247,9 @@
 		JOIN t_meeting_attend_details b ON t.product_id = #{key.proId} AND t.id = b.meeting_id
 		WHERE b.attend_start_time BETWEEN #{key.startTime} AND #{key.endTime}
 		) a
-		JOIN drug_user_doctor c ON c.prod_id = #{key.proId}
+		JOIN drug_user_doctor c ON a.doctor_id = c.doctor_id
 		JOIN product_doctor_quate d on c.prod_id = d.product_id and c.doctor_id = d.doctor_id
-		WHERE d.is_recruit = 1 AND c.is_available = 1 AND
+		WHERE d.is_recruit = 1 AND c.prod_id = #{key.proId} AND c.is_available = 1 AND
 		c.drug_user_id IN
 		<foreach collection="key.list" item="id" open="(" separator="," close=")">
 			#{id}
