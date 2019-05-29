@@ -59,16 +59,18 @@ public interface WenJuanQuestionnaireMapper {
     /**
      * 问卷列表
      * @param wenJuanProjectRequest
+     * @param productIds
      * @return list
      */
-    List<WenJuanProject> getWenJuanProjectListPage(@Param(value = "wenJuanProjectRequest") WenJuanProjectRequest wenJuanProjectRequest);
+    List<WenJuanProject> getWenJuanProjectListPage(@Param(value = "wenJuanProjectRequest") WenJuanProjectRequest wenJuanProjectRequest, @Param(value = "productIds") List<Long> productIds);
 
     /**
      * 问卷Count
      * @param wenJuanProjectRequest
+     * @param productIds
      * @return int
      */
-    Integer getWenJuanProjectCount(@Param(value = "wenJuanProjectRequest") WenJuanProjectRequest wenJuanProjectRequest);
+    Integer getWenJuanProjectCount(@Param(value = "wenJuanProjectRequest") WenJuanProjectRequest wenJuanProjectRequest, @Param(value = "productIds") List<Long> productIds);
 
     /**
      * 编辑问卷所属产品

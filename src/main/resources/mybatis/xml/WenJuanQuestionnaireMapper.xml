@@ -118,8 +118,11 @@
             wj_project t LEFT JOIN product_line l ON t.product_id = l.prod_id
         WHERE 1=1
             AND l.show_place = 1
-        <if test="wenJuanProjectRequest.productId != 0 and wenJuanProjectRequest.productId != null">
-            AND t.`product_id` = #{wenJuanProjectRequest.productId}
+        <if test="productIds.size() > 0 and productIds != null">
+            AND t.product_id in
+            <foreach collection="productIds" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
         </if>
         <if test="wenJuanProjectRequest.startTimeBefore != '' and wenJuanProjectRequest.startTimeBefore != null">
             AND t.`create_time` &gt;= #{wenJuanProjectRequest.startTimeBefore}
@@ -143,8 +146,11 @@
             wj_project t LEFT JOIN product_line l ON t.product_id = l.prod_id
         WHERE 1=1
             AND l.show_place = 1
-        <if test="wenJuanProjectRequest.productId != 0 and wenJuanProjectRequest.productId != null">
-            AND t.`product_id` = #{wenJuanProjectRequest.productId}
+        <if test="productIds.size() > 0 and productIds != null">
+            AND t.product_id in
+            <foreach collection="productIds" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
         </if>
         <if test="wenJuanProjectRequest.startTimeBefore != '' and wenJuanProjectRequest.startTimeBefore != null">
             AND t.`create_time` &gt;= #{wenJuanProjectRequest.startTimeBefore}
