@@ -15,7 +15,7 @@
     <insert id="batchInsert">
         INSERT INTO virtual_wechat_chatroom_contact
         (chatroom_id, chatroom_name, member_id, member_name,
-        room_owner_id, rom_drug_user_name, drug_user_id,
+        room_owner_id, room_drug_user_name, drug_user_id,
         drug_user_name, doctor_id, doctor_name, telephone
         )
         VALUES

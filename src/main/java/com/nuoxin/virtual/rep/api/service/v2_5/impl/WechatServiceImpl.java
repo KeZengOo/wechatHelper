@@ -814,6 +814,17 @@ public class WechatServiceImpl implements WechatService {
             String displayNameListStr = csvRecord.get("displayname");
             String roomOwnerId = csvRecord.get("roomowner");
             String selfDisplayName = csvRecord.get("selfDisplayName");
+            if (StringUtil.isNotEmpty(chatRoomName) && EmojiUtil.containsEmoji(chatRoomName)){
+                chatRoomName = EmojiUtil.filterEmoji(chatRoomName);
+            }
+
+
+            if (StringUtil.isNotEmpty(selfDisplayName) && EmojiUtil.containsEmoji(selfDisplayName)){
+                selfDisplayName = EmojiUtil.filterEmoji(selfDisplayName);
+            }
+
+
+
 
 
 

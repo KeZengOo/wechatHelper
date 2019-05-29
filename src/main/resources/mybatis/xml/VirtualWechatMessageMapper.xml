@@ -141,7 +141,7 @@
             ) AS saleType,
             '' doctorId,
             c.chatroom_id chatRoomId,
-            '' doctorName,
+            c.chatroom_name doctorName,
             '' hospitalId,
             '' hospitalName,
             '' depart,
@@ -155,7 +155,7 @@
             FROM virtual_message WHERE wechat_number=c.chatroom_id
             ) lastSyncTime,
             2 messageType
-            FROM virtual_message_chatroom c INNER JOIN drug_user du
+            FROM virtual_wechat_chatroom_contact c INNER JOIN drug_user du
             ON c.drug_user_id=du.id
             INNER JOIN product_user pu
             ON du.id=pu.user_id
