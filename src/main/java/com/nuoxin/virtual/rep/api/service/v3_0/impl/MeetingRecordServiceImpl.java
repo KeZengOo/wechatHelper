@@ -149,7 +149,7 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
         //把每小段时长放在一个数组里
         meetingAttendDetailsParamsList.forEach(n ->{
             MeetingAttendDetailsParams m = new MeetingAttendDetailsParams();
-            List<MeetingAttendDetailsParams> list = meetingRecordMapper.getMeetingTimeByDoctorIdAndMeetingID(n.getDoctorId(),n.getMeetingId());
+            List<MeetingAttendDetailsParams> list = meetingRecordMapper.getMeetingTimeByDoctorIdAndMeetingID(n.getDoctorName(),n.getMeetingId());
             //开始时间和结束时间数组
             String[] times = new String[list.size()];
             //每个会议时段的时长数组

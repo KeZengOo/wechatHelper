@@ -72,10 +72,10 @@ public interface MeetingRecordMapper {
     /**
      * 根据医生ID和会议ID查询该医生的所有参会时间
      * @param meetingId
-     * @param doctorId
+     * @param doctorName
      * @return list
      */
-    List<MeetingAttendDetailsParams> getMeetingTimeByDoctorIdAndMeetingID(@Param("doctorId") Long doctorId, @Param("meetingId") Long meetingId);
+    List<MeetingAttendDetailsParams> getMeetingTimeByDoctorIdAndMeetingID(@Param("doctorName") String doctorName, @Param("meetingId") Long meetingId);
 
 
     /**
