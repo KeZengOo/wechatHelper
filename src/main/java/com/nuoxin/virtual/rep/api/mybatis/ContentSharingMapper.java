@@ -23,7 +23,7 @@ public interface ContentSharingMapper {
      * @param drugUserIds
      * @return list
      */
-    List<ContentSharingParams> getContentSharingListPage(@Param("contentSharingRequest") ContentSharingRequest contentSharingRequest, @Param("drugUserIds") List<Long> drugUserIds);
+    List<ContentSharingParams> getContentSharingListPage(@Param("contentSharingRequest") ContentSharingRequest contentSharingRequest, @Param("drugUserIds") List<Long> drugUserIds, @Param("productIds") List<Long> productIds);
 
     /**
      * 内容分享列表Count
@@ -31,7 +31,7 @@ public interface ContentSharingMapper {
      * @param drugUserIds
      * @return int
      */
-    Integer getContentSharingListCount(@Param("contentSharingRequest") ContentSharingRequest contentSharingRequest, @Param("drugUserIds") List<Long> drugUserIds);
+    Integer getContentSharingListCount(@Param("contentSharingRequest") ContentSharingRequest contentSharingRequest, @Param("drugUserIds") List<Long> drugUserIds, @Param("productIds") List<Long> productIds);
 
     /**
      * 内容阅读记录列表
@@ -67,14 +67,14 @@ public interface ContentSharingMapper {
 
     /**
      * 内容分享列表
-     * @param productId
+     * @param productIds
      * @param drugUserIds
      * @param startTimeAfter
      * @param startTimeBefore
      * @param title
      * @return list
      */
-    List<ContentSharingParams> getContentSharingCSVList(@Param("productId")Integer productId, @Param("drugUserIds") List<Long> drugUserIds, @Param("startTimeAfter")String startTimeAfter, @Param("startTimeBefore")String startTimeBefore, @Param("shareType") Integer shareType, @Param("title") String title);
+    List<ContentSharingParams> getContentSharingCSVList(@Param("productIds")List<Long> productIds, @Param("drugUserIds") List<Long> drugUserIds, @Param("startTimeAfter")String startTimeAfter, @Param("startTimeBefore")String startTimeBefore, @Param("shareType") Integer shareType, @Param("title") String title);
 
     /**
      * 查询文章列表的代表类型

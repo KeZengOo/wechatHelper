@@ -17,7 +17,7 @@ import java.util.List;
 public class ContentSharingRequest extends PageRequestBean {
 
     @ApiModelProperty(value = "产品ID")
-    private Integer productId;
+    private Long[] productId;
     @ApiModelProperty(value = "分享渠道1微信，2短信，3邮件")
     private Integer shareType;
     @ApiModelProperty(value = "代表ID")

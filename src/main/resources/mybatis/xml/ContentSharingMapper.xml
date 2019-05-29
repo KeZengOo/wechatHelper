@@ -55,15 +55,18 @@
                 ip.isp IS NULL
                 OR ip.isp != '阿里云'
                 )
-                <if test="contentSharingRequest.productId != 0 and contentSharingRequest.productId != null">
-                    AND l.prod_id = #{contentSharingRequest.productId}
+                <if test="productIds.size() > 0 and productIds != null">
+                    AND l.prod_id in
+                    <foreach collection="productIds" item="item" separator="," open="(" close=")">
+                        #{item}
+                    </foreach>
                 </if>
                 <if test="contentSharingRequest.startTimeBefore != '' and contentSharingRequest.startTimeBefore != null">
-                    AND t.time &gt;= #{contentSharingRequest.startTimeBefore}
+                    AND t.time &gt;= CONCAT(#{contentSharingRequest.startTimeBefore}, ' 00:00:00')
                 </if>
 
                 <if test="contentSharingRequest.startTimeAfter != '' and contentSharingRequest.startTimeAfter != null">
-                    AND t.time &lt;= #{contentSharingRequest.startTimeAfter}
+                    AND t.time &lt;= CONCAT(#{contentSharingRequest.startTimeAfter}, ' 23:59:59')
                 </if>
 
                 <if test="contentSharingRequest.title != '' and contentSharingRequest.title != null">
@@ -109,15 +112,18 @@
                     AND wr.share_type = #{contentSharingRequest.shareType}
                 </if>
 
-                <if test="contentSharingRequest.productId != 0 and contentSharingRequest.productId != null">
-                    AND l.prod_id = #{contentSharingRequest.productId}
+                <if test="productIds.size() > 0 and productIds != null">
+                    AND l.prod_id in
+                    <foreach collection="productIds" item="item" separator="," open="(" close=")">
+                        #{item}
+                    </foreach>
                 </if>
                 <if test="contentSharingRequest.startTimeBefore != '' and contentSharingRequest.startTimeBefore != null">
-                    AND i.time &gt;= #{contentSharingRequest.startTimeBefore}
+                    AND i.time &gt;= CONCAT(#{contentSharingRequest.startTimeBefore}, ' 00:00:00')
                 </if>
 
                 <if test="contentSharingRequest.startTimeAfter != '' and contentSharingRequest.startTimeAfter != null">
-                    AND i.time &lt;= #{contentSharingRequest.startTimeAfter}
+                    AND i.time &lt;= CONCAT(#{contentSharingRequest.startTimeAfter}, ' 23:59:59')
                 </if>
 
                 <if test="contentSharingRequest.title != '' and contentSharingRequest.title != null">
@@ -178,15 +184,18 @@
             ip.isp IS NULL
             OR ip.isp != '阿里云'
             )
-            <if test="contentSharingRequest.productId != 0 and contentSharingRequest.productId != null">
-                AND l.prod_id = #{contentSharingRequest.productId}
+            <if test="productIds.size() > 0 and productIds != null">
+                AND l.prod_id in
+                <foreach collection="productIds" item="item" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
             </if>
             <if test="contentSharingRequest.startTimeBefore != '' and contentSharingRequest.startTimeBefore != null">
-                AND t.time &gt;= #{contentSharingRequest.startTimeBefore}
+                AND t.time &gt;= CONCAT(#{contentSharingRequest.startTimeBefore}, ' 00:00:00')
             </if>
 
             <if test="contentSharingRequest.startTimeAfter != '' and contentSharingRequest.startTimeAfter != null">
-                AND t.time &lt;= #{contentSharingRequest.startTimeAfter}
+                AND t.time &lt;= CONCAT(#{contentSharingRequest.startTimeAfter}, ' 23:59:59')
             </if>
 
             <if test="contentSharingRequest.title != '' and contentSharingRequest.title != null">
@@ -232,15 +241,18 @@
                 AND wr.share_type = #{contentSharingRequest.shareType}
             </if>
 
-            <if test="contentSharingRequest.productId != 0 and contentSharingRequest.productId != null">
-                AND l.prod_id = #{contentSharingRequest.productId}
+            <if test="productIds.size() > 0 and productIds != null">
+                AND l.prod_id in
+                <foreach collection="productIds" item="item" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
             </if>
             <if test="contentSharingRequest.startTimeBefore != '' and contentSharingRequest.startTimeBefore != null">
-                AND i.time &gt;= #{contentSharingRequest.startTimeBefore}
+                AND i.time &gt;= CONCAT(#{contentSharingRequest.startTimeBefore},' 00:00:00')
             </if>
 
             <if test="contentSharingRequest.startTimeAfter != '' and contentSharingRequest.startTimeAfter != null">
-                AND i.time &lt;= #{contentSharingRequest.startTimeAfter}
+                AND i.time &lt;= CONCAT(#{contentSharingRequest.startTimeAfter}, ' 23:59:59')
             </if>
 
             <if test="contentSharingRequest.title != '' and contentSharingRequest.title != null">
@@ -516,15 +528,18 @@
         ip.isp IS NULL
         OR ip.isp != '阿里云'
         )
-        <if test="contentSharingRequest.productId != 0 and contentSharingRequest.productId != null">
-            AND l.prod_id = #{contentSharingRequest.productId}
+        <if test="productIds.size() > 0 and productIds != null">
+            AND l.prod_id in
+            <foreach collection="productIds" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
         </if>
         <if test="contentSharingRequest.startTimeBefore != '' and contentSharingRequest.startTimeBefore != null">
-            AND t.time &gt;= #{contentSharingRequest.startTimeBefore}
+            AND t.time &gt;= CONCAT(#{contentSharingRequest.startTimeBefore}, ' 00:00:00')
         </if>
 
         <if test="contentSharingRequest.startTimeAfter != '' and contentSharingRequest.startTimeAfter != null">
-            AND t.time &lt;= #{contentSharingRequest.startTimeAfter}
+            AND t.time &lt;= CONCAT(#{contentSharingRequest.startTimeAfter}, ' 23:59:59')
         </if>
 
         <if test="contentSharingRequest.title != '' and contentSharingRequest.title != null">
@@ -570,15 +585,18 @@
             AND wr.share_type = #{contentSharingRequest.shareType}
         </if>
 
-        <if test="contentSharingRequest.productId != 0 and contentSharingRequest.productId != null">
-            AND l.prod_id = #{contentSharingRequest.productId}
+        <if test="productIds.size() > 0 and productIds != null">
+            AND l.prod_id in
+            <foreach collection="productIds" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
         </if>
         <if test="contentSharingRequest.startTimeBefore != '' and contentSharingRequest.startTimeBefore != null">
-            AND i.time &gt;= #{contentSharingRequest.startTimeBefore}
+            AND i.time &gt;= CONCAT(#{contentSharingRequest.startTimeBefore},' 00:00:00')
         </if>
 
         <if test="contentSharingRequest.startTimeAfter != '' and contentSharingRequest.startTimeAfter != null">
-            AND i.time &lt;= #{contentSharingRequest.startTimeAfter}
+            AND i.time &lt;= CONCAT(#{contentSharingRequest.startTimeAfter},' 23:59:59')
         </if>
 
         <if test="contentSharingRequest.title != '' and contentSharingRequest.title != null">
@@ -637,6 +655,14 @@
                 #{item}
             </foreach>
         </if>
+
+        <if test="drugUserIds.size() > 0 and drugUserIds != null">
+            AND r.drug_user_id in
+            <foreach collection="drugUserIds" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+
         <if test="shareType != 0 and shareType != null">
             AND r.share_type = #{shareType}
         </if>
@@ -644,15 +670,18 @@
         ip.isp IS NULL
         OR ip.isp != '阿里云'
         )
-        <if test="productId != 0 and productId != null">
-            AND l.prod_id = #{productId}
+        <if test="productIds.size() > 0 and productIds != null">
+            AND l.prod_id in
+            <foreach collection="productIds" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
         </if>
         <if test="startTimeBefore != '' and startTimeBefore != null">
-            AND t.time &gt;= #{startTimeBefore}
+            AND t.time &gt;= CONCAT(#{startTimeBefore}, ' 00:00:00')
         </if>
 
         <if test="startTimeAfter != '' and startTimeAfter != null">
-            AND t.time &lt;= #{startTimeAfter}
+            AND t.time &lt;= CONCAT(#{startTimeAfter}, ' 23:59:59')
         </if>
 
         <if test="title != '' and title != null">
@@ -698,15 +727,18 @@
             AND wr.share_type = #{shareType}
         </if>
 
-        <if test="productId != 0 and productId != null">
-            AND l.prod_id = #{productId}
+        <if test="productIds.size() > 0 and productIds != null">
+            AND l.prod_id in
+            <foreach collection="productIds" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
         </if>
         <if test="startTimeBefore != '' and startTimeBefore != null">
-            AND i.time &gt;= #{startTimeBefore}
+            AND i.time &gt;= CONCAT(#{startTimeBefore}, ' 00:00:00')
         </if>
 
         <if test="startTimeAfter != '' and startTimeAfter != null">
-            AND i.time &lt;= #{startTimeAfter}
+            AND i.time &lt;= CONCAT(#{startTimeAfter}, ' 23:59:59')
         </if>
 
         <if test="title != '' and title != null">

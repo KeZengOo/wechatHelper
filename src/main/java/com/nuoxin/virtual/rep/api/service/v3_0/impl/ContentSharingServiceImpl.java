@@ -47,7 +47,13 @@ public class ContentSharingServiceImpl implements ContentSharingService {
             drugUserIds = Arrays.asList(contentSharingRequest.getDrugUserId());
         }
 
-        List<ContentSharingParams> list = contentSharingMapper.getContentSharingListPage(contentSharingRequest,drugUserIds);
+        //代表数组转list
+        List<Long> productIds = new ArrayList<Long>();
+        if(contentSharingRequest.getProductId()!= null){
+            productIds = Arrays.asList(contentSharingRequest.getProductId());
+        }
+
+        List<ContentSharingParams> list = contentSharingMapper.getContentSharingListPage(contentSharingRequest,drugUserIds,productIds);
         List<ContentSharingParams> newList = new ArrayList<ContentSharingParams>();
 
         list.forEach(n->{
@@ -70,7 +76,7 @@ public class ContentSharingServiceImpl implements ContentSharingService {
             newList.add(c);
         });
 
-        Integer contentSharingCount = contentSharingMapper.getContentSharingListCount(contentSharingRequest,drugUserIds);
+        Integer contentSharingCount = contentSharingMapper.getContentSharingListCount(contentSharingRequest,drugUserIds,productIds);
 
         return new PageResponseBean(contentSharingRequest, contentSharingCount, newList);
     }
@@ -223,13 +229,20 @@ public class ContentSharingServiceImpl implements ContentSharingService {
     }
 
     @Override
-    public void contentSharingExportFile(Integer productId, Long[] drugUserId, String startTimeAfter, String startTimeBefore, Integer shareType, String title, HttpServletResponse response) {
+    public void contentSharingExportFile(Long[] productId, Long[] drugUserId, String startTimeAfter, String startTimeBefore, Integer shareType, String title, HttpServletResponse response) {
         //代表数组转list
         List<Long> drugUserIds = new ArrayList<Long>();
         if(null != drugUserId && drugUserId.length > 0){
             drugUserIds = Arrays.asList(drugUserId);
         }
-        List<ContentSharingParams> list = contentSharingMapper.getContentSharingCSVList(productId, drugUserIds, startTimeAfter, startTimeBefore, shareType, title);
+
+        //代表数组转list
+        List<Long> productIds = new ArrayList<Long>();
+        if(null != productId && productId.length > 0){
+            productIds = Arrays.asList(productId);
+        }
+
+        List<ContentSharingParams> list = contentSharingMapper.getContentSharingCSVList(productIds, drugUserIds, startTimeAfter, startTimeBefore, shareType, title);
         List<ContentSharingExcelParams> newList = new ArrayList<ContentSharingExcelParams>();
         //时间格式转字符串
         HashMap map = new LinkedHashMap();
