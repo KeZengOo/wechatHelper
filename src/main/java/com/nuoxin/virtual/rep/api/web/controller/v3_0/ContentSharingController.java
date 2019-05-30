@@ -78,7 +78,18 @@ public class ContentSharingController extends BaseController {
 
     @ApiOperation(value = "内容分享记录导出文件下載一体")
     @RequestMapping(value = "/exportCSVFile", method = {RequestMethod.GET})
-    public void exportCSVFile(@RequestParam(value = "productId", required = false) Long[] productId, @RequestParam(value = "drugUserId", required = false)Long[] drugUserId, @RequestParam(value = "startTimeAfter", required = false)String startTimeAfter, @RequestParam(value = "startTimeBefore", required = false)String startTimeBefore, @RequestParam(value = "shareType", required = false) Integer shareType, @RequestParam(value = "title", required = false) String title, HttpServletResponse response) {
+    public void exportCSVFile(@RequestParam(value = "productId", required = false) Long[] productId, @RequestParam(value = "drugUserId", required = false)Long[] drugUserId, @RequestParam(value = "startTimeAfter", required = false)String startTimeAfter, @RequestParam(value = "startTimeBefore", required = false)String startTimeBefore, @RequestParam(value = "shareType", required = false) Integer shareType, @RequestParam(value = "title", required = false) String title, HttpServletResponse response, HttpServletRequest request) {
+
+        DrugUser user = this.getLoginUser(request);
+        if(user != null) {
+            // 101 虚拟代表 104 招募 105 覆盖
+            if(user.getRoleId() == 101 || user.getRoleId() == 104 || user.getRoleId() == 105)
+            {
+                Long[] drugUserIdArray = new Long[1];
+                drugUserIdArray[0] = user.getId();
+                drugUserId = drugUserIdArray;
+            }
+        }
         contentSharingService.contentSharingExportFile(productId, drugUserId, startTimeAfter, startTimeBefore, shareType, title, response);
     }
 

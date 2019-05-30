@@ -101,12 +101,15 @@ public class ContentSharingServiceImpl implements ContentSharingService {
 
         List<ContentReadLogsParams> newList = new ArrayList<ContentReadLogsParams>();
 
+
         for (int i=0; i<list.size(); i++)
         {
+            int readTimeNum = 0;
             ContentReadLogsParams c = new ContentReadLogsParams();
             c = list.get(i);
             //获取同一名医生多长阅读的时间和时长
             List<ContentReadLogsTimeParams> logsTimeParams = contentSharingMapper.getReadTimeAndReadDurationByDataIdAndDoctorId(list.get(i).getDataId(),list.get(i).getDoctorId(), contentReadLogsRequest.getShareType(), contentReadLogsRequest.getDrugUserId());
+
             String[] createTimeArray = new String[logsTimeParams.size()];
             String[] readTimeArray = new String[logsTimeParams.size()];
             String[] readTimeStringArray = new String[logsTimeParams.size()];
@@ -114,8 +117,10 @@ public class ContentSharingServiceImpl implements ContentSharingService {
             for (int j = 0; j<logsTimeParams.size(); j++){
                 createTimeArray[j] = logsTimeParams.get(j).getCreateTime().substring(0,logsTimeParams.get(j).getCreateTime().indexOf("."));
                 readTimeArray[j] = logsTimeParams.get(j).getReadTime();
-                readTimeStringArray[j] = ParseTimeSecondsUtils.secondToTime(Long.parseLong(logsTimeParams.get(j).getReadTime()));
+                readTimeStringArray[j] = logsTimeParams.get(j).getReadTime()+"秒";
+                readTimeNum += Integer.parseInt(readTimeArray[j]);
             }
+            System.out.println("readTimeNum:"+readTimeNum);
             //定义最大值为该数组的第一个数
             int maxIndex = 0;
                 if(readTimeArray.length > 0){
