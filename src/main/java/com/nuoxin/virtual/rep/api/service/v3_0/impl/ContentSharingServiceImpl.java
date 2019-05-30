@@ -117,7 +117,7 @@ public class ContentSharingServiceImpl implements ContentSharingService {
             for (int j = 0; j<logsTimeParams.size(); j++){
                 createTimeArray[j] = logsTimeParams.get(j).getCreateTime().substring(0,logsTimeParams.get(j).getCreateTime().indexOf("."));
                 readTimeArray[j] = logsTimeParams.get(j).getReadTime();
-                readTimeStringArray[j] = logsTimeParams.get(j).getReadTime()+"秒";
+                readTimeStringArray[j] = ParseTimeSecondsUtils.secondToTime(Long.parseLong(logsTimeParams.get(j).getReadTime()));
                 readTimeNum += Integer.parseInt(readTimeArray[j]);
             }
             System.out.println("readTimeNum:"+readTimeNum);
