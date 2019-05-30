@@ -288,7 +288,7 @@
 
     <!-- 根据产品Id筛选医生IDlist -->
     <select id="getDoctorIdsCountByProductId" resultType="java.lang.Integer">
-        SELECT count(1) FROM product_doctor_quate q WHERE 1=1 AND q.product_id = #{productId} AND q.doctor_id in
+        SELECT count(1) FROM drug_user_doctor q WHERE 1=1 AND q.prod_id = #{productId} AND q.doctor_id in
           <foreach collection="list" item="list" separator="," open="(" close=")">
               #{list.doctorId}
           </foreach>

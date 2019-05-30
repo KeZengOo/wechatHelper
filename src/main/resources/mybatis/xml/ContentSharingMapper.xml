@@ -848,10 +848,7 @@
                     AND r.read_person_id != ''
                     AND t.id = #{titleId}
                     AND r.share_type = #{shareType}
-                    GROUP BY
-					t.id,
-					r.read_time,
-					r.share_type
+
                     UNION ALL
                         SELECT
                             i.title,
