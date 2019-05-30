@@ -1674,11 +1674,11 @@
 				CASE
 
 						WHEN q.is_recruit IS NULL THEN
-						'未知'
+						'暂未招募'
 						WHEN q.is_recruit = 0 THEN
-						'未招募'
+						'招募失败'
 						WHEN q.is_recruit = 1 THEN
-						'已招募' ELSE '未知'
+						'成功招募' ELSE '暂未招募'
 					END
 					) AS recruitStatus,
 					IFNULL(COUNT(DISTINCT v.id), 0) callCount,
@@ -1823,6 +1823,7 @@
 					</if>
 
 
+					<!--
 					<if test="recruit !=null">
 						AND q.is_recruit=#{recruit}
 					</if>
@@ -1838,6 +1839,53 @@
 					<if test="hasDrug!=null">
 						AND q.is_has_drug=#{hasDrug}
 					</if>
+					-->
+
+
+					<if test="recruit !=null">
+						<if test="recruit==1 or recruit == 0">
+							AND q.is_recruit=#{recruit}
+						</if>
+
+						<if test="recruit!=1 and recruit != 0">
+							AND (q.is_recruit IS NULL OR q.is_recruit=#{recruit} OR q.is_recruit=2)
+						</if>
+
+					</if>
+
+					<if test="cover !=null">
+						<if test="cover == 0 or cover == 1 or cover==2">
+							AND q.is_cover=#{cover}
+						</if>
+
+						<if test="cover != 0 and cover != 1 and cover!=2">
+							AND (q.is_cover IS NULL OR q.is_cover=#{cover})
+						</if>
+					</if>
+
+					<if test="target !=null">
+
+						<if test="target==0 or target ==1">
+							AND q.is_target =#{target}
+						</if>
+
+						<if test="target!=0 and target !=1">
+							AND (q.is_target IS NULL OR q.is_target =#{target})
+						</if>
+
+
+					</if>
+
+					<if test="hasDrug!=null">
+						<if test="hasDrug == 0 or hasDrug==1 or hasDrug==2">
+							AND q.is_has_drug=#{hasDrug}
+						</if>
+
+						<if test="hasDrug != 0 and hasDrug!=1 and hasDrug!=2">
+							AND (q.is_has_drug IS NULL OR q.is_has_drug=#{hasDrug})
+						</if>
+					</if>
+
 
 					<if test="searchKeyword !=null and searchKeyword !=''">
 						AND d.id IN
@@ -1922,6 +1970,7 @@
 		</if>
 
 
+		<!--
 		<if test="recruit !=null">
 			AND q.is_recruit=#{recruit}
 		</if>
@@ -1937,7 +1986,52 @@
 			<if test="hasDrug!=null">
 				AND q.is_has_drug=#{hasDrug}
 			</if>
+		-->
 
+
+		<if test="recruit !=null">
+			<if test="recruit==1 or recruit == 0">
+				AND q.is_recruit=#{recruit}
+			</if>
+
+			<if test="recruit!=1 and recruit != 0">
+				AND (q.is_recruit IS NULL OR q.is_recruit=#{recruit} OR q.is_recruit=2)
+			</if>
+
+		</if>
+
+		<if test="cover !=null">
+			<if test="cover == 0 or cover == 1 or cover==2">
+				AND q.is_cover=#{cover}
+			</if>
+
+			<if test="cover != 0 and cover != 1 and cover!=2">
+				AND (q.is_cover IS NULL OR q.is_cover=#{cover})
+			</if>
+		</if>
+
+		<if test="target !=null">
+
+			<if test="target==0 or target ==1">
+				AND q.is_target =#{target}
+			</if>
+
+			<if test="target!=0 and target !=1">
+				AND (q.is_target IS NULL OR q.is_target =#{target})
+			</if>
+
+
+		</if>
+
+		<if test="hasDrug!=null">
+			<if test="hasDrug == 0 or hasDrug==1 or hasDrug==2">
+				AND q.is_has_drug=#{hasDrug}
+			</if>
+
+			<if test="hasDrug != 0 and hasDrug!=1 and hasDrug!=2">
+				AND (q.is_has_drug IS NULL OR q.is_has_drug=#{hasDrug})
+			</if>
+		</if>
 
 
 			<if test="searchKeyword !=null and searchKeyword !=''">
