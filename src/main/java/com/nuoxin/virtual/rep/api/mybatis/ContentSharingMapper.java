@@ -91,4 +91,12 @@ public interface ContentSharingMapper {
      * @return int
      */
     Integer getReadCountByDrugUserAndTitle(@Param("titleId") Long titleId,@Param("drugUserId") Long drugUserId, @Param("shareType") Integer shareType);
+
+    /**
+     * 根据会议id和分享渠道计算阅读总时长
+     * @param dataId
+     * @param shareType
+     * @return
+     */
+    Long getActivityReadReadTimeByActivityIdAndShareType(@Param("dataId") Long dataId, @Param("shareType") Integer shareType, @Param("drugUserId") Long drugUserId);
 }

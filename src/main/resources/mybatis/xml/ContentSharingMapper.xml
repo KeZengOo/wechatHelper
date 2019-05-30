@@ -301,7 +301,8 @@
             SUM(m.readTime) readTime,
             m.shareType,
             m.hospitalName,
-            m.depart
+            m.depart,
+            m.readId
         FROM
             (
                 SELECT
@@ -316,7 +317,8 @@
             r.read_time AS readTime,
             r.share_type AS shareType,
             d.hospital_name AS hospitalName,
-            d.depart
+            d.depart,
+            r.id readId
                 FROM
             activity_info t
             JOIN activity_read r ON t.id = r.data_id
@@ -352,7 +354,8 @@
                     wr.read_time AS readTime,
                     wr.share_type AS shareType,
                     d.hospital_name AS hospitalName,
-                    d.depart
+                    d.depart,
+                    wr.id readId
                 FROM
                 wx_user_read wr
                 LEFT JOIN wx_users xu ON wr.user_id = xu.id
@@ -470,14 +473,14 @@
                 )
                 AND r.read_person_id != ''
                 AND u.id = #{drugUserId}
-                AND r.read_person_id = #{doctorId}
                 AND t.id = #{dataId}
                 AND r.share_type = #{shareType}
+                AND r.read_person_id = #{doctorId}
                 GROUP BY
-                    r.read_person_id,
                     t.id,
                     t.time,
-                    r.read_time
+                    r.read_time,
+                    r.id
                 UNION ALL
                     SELECT
                         wr.create_time time,
@@ -491,8 +494,8 @@
                         1 = 1
                     AND dd.drug_user_id = #{drugUserId}
                     AND wr.content_id = #{dataId}
-                    AND xu.doctor_id = #{doctorId}
                     AND wr.share_type = #{shareType}
+                    AND xu.doctor_id = #{doctorId}
             ) m
     </select>
 
@@ -846,8 +849,9 @@
                     AND t.id = #{titleId}
                     AND r.share_type = #{shareType}
                     GROUP BY
-                        r.read_person_id,
-                        t.id
+					t.id,
+					r.read_time,
+					r.share_type
                     UNION ALL
                         SELECT
                             i.title,
@@ -873,5 +877,41 @@
 
             GROUP BY m.doctorId
             ) t
+    </select>
+
+    <!-- 根据会议id和分享渠道计算阅读总时长 -->
+    <select id="getActivityReadReadTimeByActivityIdAndShareType" resultType="java.lang.Long">
+            SELECT
+                SUM(m.read_time)
+            FROM
+                (
+                    SELECT
+                        t.read_time
+                    FROM
+                        activity_read t
+                    JOIN activity_read_ip ip ON t.read_token = ip.read_token
+                    WHERE
+                        1 = 1
+                    AND (
+                        ip.isp IS NULL
+                        OR ip.isp != '阿里云'
+                    )
+                    AND t.read_person_id != ''
+                    AND t.data_id = #{dataId}
+                    AND t.share_type = #{shareType}
+                    AND t.drug_user_id = #{drugUserId}
+                    UNION ALL
+                        SELECT
+                            r.read_time
+                        FROM
+                            wx_user_read r
+                        JOIN wx_users u ON r.user_id = u.id
+                        JOIN drug_user_doctor dd ON u.doctor_id = dd.doctor_id
+                        WHERE
+                            1 = 1
+                        AND r.content_id = #{dataId}
+                        AND r.share_type = #{shareType}
+                        AND dd.drug_user_id = #{drugUserId}
+                ) m
     </select>
 </mapper>

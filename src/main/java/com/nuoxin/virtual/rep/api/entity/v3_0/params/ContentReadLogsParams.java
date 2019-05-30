@@ -30,4 +30,6 @@ public class ContentReadLogsParams {
     private String[] readTime;
     @ApiModelProperty("单次最多阅读时长")
     private String maxReadTime;
+    @ApiModelProperty("阅读ID")
+    private Long readId;
 }
