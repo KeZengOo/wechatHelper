@@ -64,6 +64,9 @@ public class ContentSharingServiceImpl implements ContentSharingService {
                 roleNamesString += roleNames.get(i).getRoleName()+",";
             }
 
+            //根据会议id和分享渠道计算阅读总时长
+            Long readTimeCount = contentSharingMapper.getActivityReadReadTimeByActivityIdAndShareType(n.getId(),n.getShareType(),n.getDrugUserId());
+
             //该代表的文章的医生阅读数
             Integer readCount = contentSharingMapper.getReadCountByDrugUserAndTitle(n.getId(),n.getDrugUserId(),n.getShareType());
             logger.info("titleID:"+ n.getId()+"readCount:"+readCount);
@@ -72,7 +75,12 @@ public class ContentSharingServiceImpl implements ContentSharingService {
             c.setTime(n.getTime().substring(0,n.getTime().indexOf(".")));
             c.setPeopleNumber(readCount);
             c.setRoleName(roleNamesString.substring(0,roleNamesString.length()));
-            c.setTotalDuration(ParseTimeSecondsUtils.secondToTime(Long.parseLong(n.getTotalDuration())));
+            if(readTimeCount != null){
+                c.setTotalDuration(ParseTimeSecondsUtils.secondToTime(readTimeCount));
+            }else
+            {
+                c.setTotalDuration(ParseTimeSecondsUtils.secondToTime(0));
+            }
             newList.add(c);
         });
 
