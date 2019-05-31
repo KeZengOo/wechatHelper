@@ -359,11 +359,9 @@
 		SELECT	dud.drug_user_id userId, COUNT(DISTINCT vm.doctor_id) total
 		FROM virtual_message vm
 		INNER JOIN drug_user_doctor dud ON vm.doctor_id = dud.doctor_id
-		INNER JOIN drug_user du ON dud.drug_user_id = du.id
+		inner join (select min(message_time) time, doctor_id from virtual_message GROUP BY doctor_id) a on a.doctor_id = dud.doctor_id
 		WHERE dud.is_available = 1 AND dud.prod_id = #{key.proId}
-		AND vm.message_time BETWEEN #{key.startTime} AND #{key.endTime}
-		AND vm.message LIKE '你已添加了%，现在可以开始聊天了。'
-		AND vm.wechat_message_type = '系统消息'
+		AND a.time BETWEEN #{key.startTime} AND #{key.endTime}
 		AND dud.drug_user_id IN
 		<foreach collection="key.list" item="id" open="(" separator="," close=")">
 			#{id}
