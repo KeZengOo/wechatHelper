@@ -165,9 +165,9 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
      * baseUrl
      */
     //测试
-     String baseUrl = "http://123.56.95.29:7083/android/wechat/";
+//     String baseUrl = "http://123.56.95.29:7083/android/wechat/";
     //正式
-//   String baseUrl = "http://47.93.121.23:10001/android/wechat/";
+   String baseUrl = "http://47.93.121.23:10001/android/wechat/";
     //sql 语句
      String contactSql = "select * from rcontact where verifyFlag = 0 and  type != 2 and type != 0 and type != 33 and nickname != ''and nickname != '文件传输助手'";
      String messageSql = "select * from message where  createTime >";
@@ -876,7 +876,6 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
                         Log.e("query上传文件失败的返回错误", e.toString());
                     }
                     //上传失败
-
                     switch (type) {
                         case 1:
                             getUploadTimeError("联系人上传失败请联系开发人员");
@@ -915,7 +914,6 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
                         e.printStackTrace();
                     }
                     if (isDebug) {
-
                         switch (type) {
                             case 1:
                                 Log.e("query上传联系人文件的返回值", string);

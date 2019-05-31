@@ -127,10 +127,8 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
         loadingView.setVisibility(View.VISIBLE);
         iv_success.setVisibility(View.INVISIBLE);
         iv_fail.setVisibility(View.INVISIBLE);
-
         //异步执行文件拷贝和数据查询操作,防止 dialog 不显示
         new MyTask().execute();
-
 
     }
 
