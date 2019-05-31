@@ -182,5 +182,19 @@ public interface DrugUserDoctorQuateMapper {
 	Integer breakOffDoctor(DailyStatisticsRequestBean bean);
 
 
+	/**
+	 * 新导入的医生初始化
+	 */
+	void importDoctorQuateInsert();
+
+
+	/**
+	 * 新导入的医生初始化
+	 */
+	void importDoctorProductQuateInsert();
+
+
+
+
 }
 

@@ -602,4 +602,37 @@
 	</select>
 
 
+
+	<insert id="importDoctorQuateInsert">
+		INSERT INTO drug_user_doctor(drug_user_id, doctor_id, product_id)
+		SELECT
+			dud.drug_user_id, dud.doctor_id, dud.prod_id
+		FROM
+			drug_user_doctor dud
+			INNER JOIN product_line pl ON dud.prod_id = pl.prod_id
+			LEFT JOIN drug_user_doctor_quate q ON dud.drug_user_id = q.drug_user_id
+			AND dud.doctor_id = q.doctor_id
+			AND dud.prod_id = q.product_id
+		WHERE
+			dud.is_available = 1
+			AND pl.show_place = 1
+			AND q.id IS NULL
+	</insert>
+
+	<insert id="importDoctorProductQuateInsert">
+		INSERT INTO product_doctor_quate(doctor_id, product_id)
+		SELECT
+			dud.doctor_id, dud.prod_id
+		FROM
+			drug_user_doctor dud
+			INNER JOIN product_line pl ON dud.prod_id = pl.prod_id
+			LEFT JOIN product_doctor_quate q ON
+			dud.doctor_id = q.doctor_id
+			AND dud.prod_id = q.product_id
+		WHERE
+			dud.is_available = 1
+			AND pl.show_place = 1
+			AND q.id IS NULL
+	</insert>
+
 </mapper>

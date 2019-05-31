@@ -66,6 +66,10 @@ public class CommonServiceImpl implements CommonService {
 	private DrugUserDoctorMapper drugUserDoctorMapper;
 
 	@Resource
+	private DrugUserDoctorQuateMapper drugUserDoctorQuateMapper;
+
+
+	@Resource
 	private ProductHospitalMapper productHospitalMapper;
 
 	@Resource
@@ -1590,6 +1594,11 @@ public class CommonServiceImpl implements CommonService {
 
 		// 删除掉重复的
 		this.deleteRepeatDrugUserDoctorRecord();
+
+		// 新添加的医生初始化 drug_user_doctor_quate 和 doctor_product_quate 表
+		drugUserDoctorQuateMapper.importDoctorQuateInsert();
+		drugUserDoctorQuateMapper.importDoctorProductQuateInsert();
+
 	}
 
 
