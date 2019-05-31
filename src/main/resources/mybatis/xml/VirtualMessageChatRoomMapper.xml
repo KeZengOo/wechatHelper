@@ -59,7 +59,7 @@
             virtual_message_chatroom
         WHERE
             chatroom_id = #{chatRoomId}
-            ORDER BY message_time
+            ORDER BY message_time DESC
 
 	        LIMIT #{currentSize}, #{pageSize}
     </select>
