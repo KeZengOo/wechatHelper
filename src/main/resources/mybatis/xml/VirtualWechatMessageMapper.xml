@@ -209,7 +209,8 @@
     <select id="getWechatMessageSummaryListCount" resultType="java.lang.Integer">
             SELECT COUNT(*) FROM (
             SELECT
-            d.id doctorId
+            d.id doctorId,
+            1 messageType
             FROM drug_user du
             LEFT JOIN role_user ru
             ON du.id=ru.user_id AND ru.role_id>100
@@ -248,7 +249,8 @@
             UNION ALL
 
             SELECT
-            0 doctorId
+            0 doctorId,
+            2 messageType
             FROM virtual_message_chatroom c
             INNER JOIN virtual_wechat_chatroom_contact cc
             ON c.chatroom_id=cc.chatroom_id
