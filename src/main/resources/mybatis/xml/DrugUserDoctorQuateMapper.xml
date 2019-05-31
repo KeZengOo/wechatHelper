@@ -604,7 +604,7 @@
 
 
 	<insert id="importDoctorQuateInsert">
-		INSERT INTO drug_user_doctor(drug_user_id, doctor_id, product_id)
+		INSERT INTO drug_user_doctor_quate(drug_user_id, doctor_id, product_id)
 		SELECT
 			dud.drug_user_id, dud.doctor_id, dud.prod_id
 		FROM

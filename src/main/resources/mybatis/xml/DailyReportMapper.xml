@@ -814,8 +814,10 @@
             INNER JOIN drug_user du ON dud.drug_user_id = du.id
         WHERE
             dud.is_available = 1
+            <!--
             AND vm.message LIKE '你已添加了%，现在可以开始聊天了。'
             AND wechat_message_type = '系统消息'
+            -->
 
             <if test="productIdList !=null and productIdList.size > 0">
                 AND dud.prod_id IN
@@ -833,9 +835,14 @@
             </if>
 
 
+            <!--
             <if test="startTime !=null and endTime !=null">
                 AND vm.message_time BETWEEN #{startTime}  AND #{endTime}
             </if>
+            -->
+
+            GROUP BY vm.doctor_id
+            HAVING MIN(message_time) BETWEEN #{startTime}  AND #{endTime}
 
     </select>
 
