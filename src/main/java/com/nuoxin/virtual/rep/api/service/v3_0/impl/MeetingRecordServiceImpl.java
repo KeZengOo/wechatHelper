@@ -282,8 +282,14 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
              }
 
              if(meetingList.size() > 0){
-                 //导入会议
-                 meetingResult = meetingRecordMapper.saveMeetingExcel(meetingList);
+                 try {
+                     //导入会议
+                     meetingResult = meetingRecordMapper.saveMeetingExcel(meetingList);
+                 }
+                 catch (Exception e)
+                 {
+                     e.printStackTrace();
+                 }
              }
              else
              {
