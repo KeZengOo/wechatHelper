@@ -605,7 +605,7 @@
 
 	<insert id="importDoctorQuateInsert">
 		INSERT INTO drug_user_doctor_quate(drug_user_id, doctor_id, product_id)
-		SELECT
+		SELECT DISTINCT
 			dud.drug_user_id, dud.doctor_id, dud.prod_id
 		FROM
 			drug_user_doctor dud
@@ -622,7 +622,7 @@
 	<insert id="importDoctorProductQuateInsert">
 		INSERT INTO product_doctor_quate(doctor_id, product_id)
 		SELECT
-			dud.doctor_id, dud.prod_id
+			DISTINCT dud.doctor_id, dud.prod_id
 		FROM
 			drug_user_doctor dud
 			INNER JOIN product_line pl ON dud.prod_id = pl.prod_id
