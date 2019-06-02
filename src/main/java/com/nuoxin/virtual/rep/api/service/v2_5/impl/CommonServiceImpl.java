@@ -500,6 +500,10 @@ public class CommonServiceImpl implements CommonService {
 		doctorImportError.setSuccessNum(addDrugUserDoctorParamsList.size());
 		doctorImportError.setTotalNum(totalNum);
 
+
+		// 初始化 drug_user_doctor_quate 表
+		drugUserDoctorQuateMapper.importDoctorQuateInsert();
+
 		return doctorImportError;
 
 	}
