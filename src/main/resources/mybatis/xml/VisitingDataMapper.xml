@@ -194,7 +194,15 @@
 			resultType="com.nuoxin.virtual.rep.api.entity.v3_0.VisitDataPart">
 		SELECT a.drug_user_id userId, COUNT(DISTINCT a.doctor_id) total  FROM `drug_user_doctor_quate` a
 		WHERE a.is_available = 1 AND a.is_recruit = 1 AND a.product_id = #{key.proId}
+
+		<!-- 2019-06-02修改 不能查更新时间，修改别的字段，update_time 也会发生变化 -->
+		<!--
 		AND a.update_time BETWEEN #{key.startTime} AND #{key.endTime}
+		-->
+
+		AND a.create_time BETWEEN #{key.startTime} AND #{key.endTime}
+
+
 		AND a.drug_user_id IN
 		<foreach collection="key.list" item="id" open="(" separator="," close=")">
 			#{id}
