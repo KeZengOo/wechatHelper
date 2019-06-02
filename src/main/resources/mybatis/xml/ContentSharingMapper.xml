@@ -455,7 +455,7 @@
         FROM
             (
                 SELECT
-                    t.time,
+                    r.create_time `time`,
                     r.read_time AS readTime
                 FROM
                     activity_info t
