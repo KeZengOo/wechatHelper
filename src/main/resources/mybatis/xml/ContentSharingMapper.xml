@@ -308,7 +308,7 @@
                 SELECT
 			d.id,
             t.title,
-            t.time,
+            r.create_time `time`,
             r.data_id AS dataId,
             r.drug_user_id AS drugUserId,
             r.drug_user_name AS drugUserName,
@@ -345,7 +345,7 @@
                 SELECT
                     d.id,
                     i.title,
-                    wr.create_time time,
+                    wr.create_time `time`,
                     wr.content_id AS dataId,
                     dd.drug_user_id AS drugUserId,
                     dd.drug_user_name AS drugUserName,
@@ -385,7 +385,7 @@
             (
             SELECT
             t.title,
-            t.time,
+            r.create_time `time`,
             r.data_id AS dataId,
             r.drug_user_id AS drugUserId,
             r.drug_user_name AS drugUserName,
@@ -420,7 +420,7 @@
             UNION ALL
                 SELECT
                     i.title,
-                    wr.create_time time,
+                    wr.create_time `time`,
                     wr.content_id AS dataId,
                     dd.drug_user_id AS drugUserId,
                     dd.drug_user_name AS drugUserName,
