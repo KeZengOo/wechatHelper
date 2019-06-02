@@ -805,19 +805,20 @@
 
     <!-- 添加微信的人数，根据微信聊天消息判断 -->
     <select id="addWechatDoctorNum" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM (
         SELECT
-            IFNULL(COUNT( DISTINCT vm.doctor_id ), 0)
+        vm.doctor_id
         FROM
-            virtual_message vm
-            INNER JOIN doctor d ON vm.doctor_id = d.id
-            INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
-            INNER JOIN drug_user du ON dud.drug_user_id = du.id
+        virtual_message vm
+        INNER JOIN doctor d ON vm.doctor_id = d.id
+        INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
+        INNER JOIN drug_user du ON dud.drug_user_id = du.id
         WHERE
-            dud.is_available = 1
-            <!--
-            AND vm.message LIKE '你已添加了%，现在可以开始聊天了。'
-            AND wechat_message_type = '系统消息'
-            -->
+        dud.is_available = 1
+        <!--
+        AND vm.message LIKE '你已添加了%，现在可以开始聊天了。'
+        AND wechat_message_type = '系统消息'
+        -->
 
             <if test="productIdList !=null and productIdList.size > 0">
                 AND dud.prod_id IN
@@ -843,6 +844,7 @@
 
             GROUP BY vm.doctor_id
             HAVING MIN(message_time) BETWEEN #{startTime}  AND #{endTime}
+        ) t
 
     </select>
 
