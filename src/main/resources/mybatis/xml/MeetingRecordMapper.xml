@@ -76,6 +76,8 @@
 
     <!-- 获取产品下的所有招募医生 -->
     <select id="getRecruitHcpAllCountByProduct" resultType="java.lang.Integer">
+
+        <!--
         SELECT
             count(t.doctor_id)
         FROM
@@ -92,6 +94,14 @@
                 GROUP BY
                     t.doctor_id
             ) t
+
+            -->
+
+        <!-- 2019-06-02 修改 -->
+        SELECT COUNT(DISTINCT doctor_id)  FROM product_doctor_quate q
+        WHERE q.product_id=#{productId} AND q.is_recruit=1
+
+
     </select>
 
     <!-- 查询每个会议的主题列表 -->
@@ -283,12 +293,13 @@
 
     <!-- 根据会议id查询参会人员总数及人员idList -->
     <select id="getMeetingAttendDetailsParamsListByMeetingId" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.params.MeetingAttendDetailsParams">
-        SELECT t.doctor_id doctorId FROM t_meeting_attend_details t WHERE t.meeting_id = #{meetingId} GROUP BY t.doctor_id , t.doctor_name
+        SELECT t.doctor_id doctorId FROM t_meeting_attend_details t WHERE t.meeting_id = #{meetingId} GROUP BY t.doctor_id
     </select>
 
     <!-- 根据产品Id筛选医生IDlist -->
     <select id="getDoctorIdsCountByProductId" resultType="java.lang.Integer">
-        SELECT count(1) FROM drug_user_doctor q WHERE 1=1 AND q.prod_id = #{productId} AND q.doctor_id in
+        <!-- 2019-06-02 修改，以后  drug_user_doctor 表记得添加 is_available=1  -->
+        SELECT count(DISTINCT q.doctor_id) FROM drug_user_doctor q WHERE is_available=1 AND q.prod_id = #{productId} AND q.doctor_id in
           <foreach collection="list" item="list" separator="," open="(" close=")">
               #{list.doctorId}
           </foreach>
