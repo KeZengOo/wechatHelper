@@ -2,6 +2,8 @@ package com.nuoxin.virtual.rep.api.entity.v3_0.excel;
 
 import com.nuoxin.virtual.rep.api.common.annotations.Excel;
 
+import java.util.Date;
+
 /**
  * 参会导入
  * @author wujiang
@@ -19,11 +21,11 @@ public class MeetingParticipantsExcel {
     @Excel(name = "参会时长", width = 50)
     private String attendSumTime;
     @Excel(name = "进入直播时间", width = 100)
-    private String attendStartTime;
+    private Date attendStartTime;
     @Excel(name = "类型，用于区分是否回看(1--参会，2--回看)", width = 50)
     private String type;
     @Excel(name = "退出直播时间", width = 100)
-    private String attendEndTime;
+    private Date attendEndTime;
     @Excel(name = "会议项目ID", width = 50)
     private String itemId;
 
@@ -67,11 +69,11 @@ public class MeetingParticipantsExcel {
         this.attendSumTime = attendSumTime;
     }
 
-    public String getAttendStartTime() {
+    public Date getAttendStartTime() {
         return attendStartTime;
     }
 
-    public void setAttendStartTime(String attendStartTime) {
+    public void setAttendStartTime(Date attendStartTime) {
         this.attendStartTime = attendStartTime;
     }
 
@@ -83,11 +85,11 @@ public class MeetingParticipantsExcel {
         this.type = type;
     }
 
-    public String getAttendEndTime() {
+    public Date getAttendEndTime() {
         return attendEndTime;
     }
 
-    public void setAttendEndTime(String attendEndTime) {
+    public void setAttendEndTime(Date attendEndTime) {
         this.attendEndTime = attendEndTime;
     }
 

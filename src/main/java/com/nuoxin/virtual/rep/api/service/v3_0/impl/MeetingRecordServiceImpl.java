@@ -419,8 +419,8 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
                                 meetingParticipantsExcel.setAttendEndTime(h.getAttendEndTime());
 
                                 //计算参会分钟差
-                                Date date1 = df.parse(h.getAttendEndTime());
-                                Date date2 = df.parse(h.getAttendStartTime());
+                                Date date1 = h.getAttendEndTime();
+                                Date date2 = h.getAttendStartTime();
                                 long diff = date1.getTime() - date2.getTime();
                                 //计算两个时间之间差了多少分钟
                                 long minutes = diff / (1000 * 60);
@@ -439,8 +439,8 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
                             meetingParticipantsExcel.setAttendEndTime(h.getAttendEndTime());
 
                             //计算参会分钟差
-                            Date date1 = df.parse(h.getAttendEndTime());
-                            Date date2 = df.parse(h.getAttendStartTime());
+                            Date date1 = h.getAttendEndTime();
+                            Date date2 = h.getAttendStartTime();
                             long diff = date1.getTime() - date2.getTime();
                             //计算两个时间之间差了多少分钟
                             long minutes = diff / (1000 * 60);
