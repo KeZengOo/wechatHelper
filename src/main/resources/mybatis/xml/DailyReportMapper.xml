@@ -4,8 +4,10 @@
 
     <!-- 招募的医生数 -->
     <select id="recruitDoctorNum" resultType="java.lang.Integer">
+
+        SELECT IFNULL(COUNT(*), 0) FROM (
         SELECT
-        IFNULL(COUNT(DISTINCT d.id), 0)
+        d.id
         FROM
         virtual_doctor_call_info_mend m
         INNER JOIN doctor d
@@ -27,10 +29,17 @@
             </foreach>
         </if>
 
+
+        GROUP BY d.id
+        <if test="startTime !=null and endTime !=null">HAVING MIN(m.create_time) BETWEEN #{startTime} AND #{ endTime}
+        </if>
+
+        <!--
         <if test="startTime !=null and endTime !=null">
             AND m.create_time BETWEEN #{startTime}  AND #{endTime}
         </if>
-
+        -->
+        ) t
 
 
     </select>
