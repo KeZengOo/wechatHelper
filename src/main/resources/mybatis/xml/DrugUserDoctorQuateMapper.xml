@@ -354,11 +354,13 @@
 
 	<!-- 根据产品ID得到招募结果 -->
 	<select id="getProductRecruit" resultType="java.lang.Integer">
-		SELECT is_recruit FROM drug_user_doctor_quate
+		SELECT is_recruit FROM product_doctor_quate
 		WHERE product_id=#{productId}
 		AND doctor_id=#{doctorId}
 		AND is_available=1
+		<!--
 		ORDER BY create_time DESC LIMIT 1
+		-->
 	</select>
 
 	<!-- 得到成功招募的医生ID列表 -->
