@@ -15,6 +15,7 @@ import com.nuoxin.virtual.rep.api.utils.MD5Util;
 import com.nuoxin.virtual.rep.api.utils.csv.PublicGlobalCSVExprot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -99,7 +100,7 @@ public class WenJuanQuestionnaireServiceImpl implements WenJuanQuestionnaireServ
      * 保存项目列表
      * @return ScheduleResult
      */
-//    @Scheduled(cron = "0 47 12 * * ?")
+    @Scheduled(cron = "0 0 0/1 * * ? ")
     @Override
     public ScheduleResult saveWenJuanProject() {
         boolean tag = false;
@@ -236,7 +237,7 @@ public class WenJuanQuestionnaireServiceImpl implements WenJuanQuestionnaireServ
      * 获取答卷详情列表
      * @return ScheduleResult
      */
-    //    @Scheduled(cron = "0 47 12 * * ?")
+    @Scheduled(cron = "0 2 0/1 * * ? ")
     @Override
     public ScheduleResult saveWenJuanAnswerSheetInfo() {
         //登录问卷网API
@@ -361,7 +362,6 @@ public class WenJuanQuestionnaireServiceImpl implements WenJuanQuestionnaireServ
 
     @Override
     public PageResponseBean<List<WenJuanProject>> getWenJuanProjectListPage(WenJuanProjectRequest wenJuanProjectRequest) {
-
         //代表数组转list
         List<Long> productIds = new ArrayList<Long>();
         if(wenJuanProjectRequest.getProductId()!= null){
