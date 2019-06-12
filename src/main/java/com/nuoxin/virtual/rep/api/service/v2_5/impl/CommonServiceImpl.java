@@ -801,25 +801,25 @@ public class CommonServiceImpl implements CommonService {
 				int row = i + 2;
 
 				String drugUserEmail = doctorVo.getDrugUserEmail();
-				if (StringUtil.isEmpty(province)){
-					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
-					doctorImportErrorDetail.setSheetName(productName);
-					doctorImportErrorDetail.setError("医院所在省为空！");
-					doctorImportErrorDetail.setRowNum(row);
-					detailList.add(doctorImportErrorDetail);
-					failNum ++;
-					continue;
-				}
+//				if (StringUtil.isEmpty(province)){
+//					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
+//					doctorImportErrorDetail.setSheetName(productName);
+//					doctorImportErrorDetail.setError("医院所在省为空！");
+//					doctorImportErrorDetail.setRowNum(row);
+//					detailList.add(doctorImportErrorDetail);
+//					failNum ++;
+//					continue;
+//				}
 
-				if (StringUtil.isEmpty(city)){
-					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
-					doctorImportErrorDetail.setSheetName(productName);
-					doctorImportErrorDetail.setError("医院所在市为空！");
-					doctorImportErrorDetail.setRowNum(row);
-					detailList.add(doctorImportErrorDetail);
-					failNum ++;
-					continue;
-				}
+//				if (StringUtil.isEmpty(city)){
+//					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
+//					doctorImportErrorDetail.setSheetName(productName);
+//					doctorImportErrorDetail.setError("医院所在市为空！");
+//					doctorImportErrorDetail.setRowNum(row);
+//					detailList.add(doctorImportErrorDetail);
+//					failNum ++;
+//					continue;
+//				}
 
 				if (StringUtil.isEmpty(hospitalName)){
 					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();

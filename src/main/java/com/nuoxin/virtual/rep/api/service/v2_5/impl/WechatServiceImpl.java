@@ -345,8 +345,17 @@ public class WechatServiceImpl implements WechatService {
                         continue;
                     }
 
+                    String[] split = content.split(":");
+                    if (CollectionsUtil.isEmptyArray(split) || split.length == 0 ){
+                        continue;
+                    }
+
                     final String memberIdStr = content.split(":")[0];
                     memberId = content.split(":")[0];
+                    if (memberId.length() > 50){
+                        continue;
+                    }
+
                     Optional<String> first = wechatChatRoomMemberList.stream().filter(w -> w.getMemberId().equals(memberIdStr)).map(WechatChatRoomMemberResponseBean::getMemberName).findFirst();
                     if (first.isPresent()){
                         memberName = first.get();

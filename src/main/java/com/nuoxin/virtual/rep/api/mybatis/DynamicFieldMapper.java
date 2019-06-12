@@ -207,9 +207,10 @@ public interface DynamicFieldMapper {
     /**
      * 删除医生动态字段填充的值
      * @param doctorId 医生id
+     * @param productId
      * @param classification 分类：目前1基本信息，2医生的处方信息，3之前拜访记录，4分析，5是医院信息
      */
-    void deleteDoctorDynamicFieldValue(@Param(value="doctorId") Long doctorId,@Param(value="classification") Integer classification);
+    void deleteDoctorDynamicFieldValue(@Param(value="doctorId") Long doctorId,@Param(value = "productId") Long productId, @Param(value="classification") Integer classification);
 
     /**
      * 删除医生动态字段填充的值，关联每次拜访的的callId
