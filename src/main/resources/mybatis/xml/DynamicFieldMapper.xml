@@ -409,6 +409,7 @@
                 virtual_doctor_dynamic_field
             WHERE
                 classification = #{classification}
+                AND product_id=#{productId}
         )
     </delete>
 

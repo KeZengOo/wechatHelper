@@ -49,9 +49,10 @@ public interface DoctorDynamicFieldService {
     /**
      * 删除医生动态字段填充的值
      * @param doctorId
+     * @param productId
      * @param classification
      */
-    void deleteDoctorDynamicFieldValue(Long doctorId, Integer classification);
+    void deleteDoctorDynamicFieldValue(Long doctorId, Long productId, Integer classification);
 
 
     /**

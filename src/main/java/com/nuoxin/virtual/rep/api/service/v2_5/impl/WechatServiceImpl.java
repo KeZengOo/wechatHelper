@@ -155,6 +155,8 @@ public class WechatServiceImpl implements WechatService {
                 List<WechatChatRoomMessageRequestBean> wechatChatRoomMessageList = this.getWechatChatRoomMessageList(drugUserId, drugUserWechat, chatRoomMessage);
                 if (CollectionsUtil.isNotEmptyList(wechatChatRoomMessageList)){
                     virtualMessageChatRoomMapper.batchInsert(wechatChatRoomMessageList);
+                    // 修改群消息中的全成员
+                    virtualMessageChatRoomMapper.updateWechatChatroomMember();
                 }
             }
         }
@@ -338,8 +340,22 @@ public class WechatServiceImpl implements WechatService {
             if (StringUtil.isNotEmpty(isSend) && "0".equals(isSend)){
                 wechatMessageStatus = "接收";
                 if (CollectionsUtil.isNotEmptyList(wechatChatRoomMemberList)){
+                    if (!content.contains(":")){
+                        // 没有 ":" 的都是无效的消息
+                        continue;
+                    }
+
+                    String[] split = content.split(":");
+                    if (CollectionsUtil.isEmptyArray(split) || split.length == 0 ){
+                        continue;
+                    }
+
                     final String memberIdStr = content.split(":")[0];
                     memberId = content.split(":")[0];
+                    if (memberId.length() > 50){
+                        continue;
+                    }
+
                     Optional<String> first = wechatChatRoomMemberList.stream().filter(w -> w.getMemberId().equals(memberIdStr)).map(WechatChatRoomMemberResponseBean::getMemberName).findFirst();
                     if (first.isPresent()){
                         memberName = first.get();

@@ -45,6 +45,16 @@
         </foreach>
     </insert>
 
+
+    <update id="updateWechatChatroomMember">
+        UPDATE
+        virtual_message_chatroom c
+        INNER JOIN virtual_wechat_chatroom_contact co
+        ON c.member_id=co.member_id
+        SET c.doctor_id=co.doctor_id,c.member_name=co.doctor_name
+        WHERE co.doctor_id > 0
+    </update>
+
     <!-- 群消息 -->
     <select id="getWechatChatRoomMessageList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.WechatChatRoomMessageResponse">
         SELECT

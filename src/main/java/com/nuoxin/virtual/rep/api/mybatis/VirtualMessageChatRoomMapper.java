@@ -35,6 +35,11 @@ public interface VirtualMessageChatRoomMapper {
     void batchInsert(List<WechatChatRoomMessageRequestBean> list);
 
     /**
+     * 更新群消息中的群成员
+     */
+    void updateWechatChatroomMember();
+
+    /**
      * 群消息
      * @param request
      * @return

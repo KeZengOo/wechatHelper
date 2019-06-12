@@ -62,7 +62,7 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
             List<Integer> collectClassification = list.stream().map(DoctorDynamicFieldValueRequestBean::getClassification).distinct().collect(Collectors.toList());
             if (CollectionsUtil.isNotEmptyList(collectClassification)){
                 collectClassification.forEach(classification->{
-                    this.deleteDoctorDynamicFieldValue(doctorId, classification);
+                    this.deleteDoctorDynamicFieldValue(doctorId, productId, classification);
                 });
             }
 
@@ -208,8 +208,8 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
     }
 
     @Override
-    public void deleteDoctorDynamicFieldValue(Long doctorId, Integer classification) {
-        dynamicFieldMapper.deleteDoctorDynamicFieldValue(doctorId, classification);
+    public void deleteDoctorDynamicFieldValue(Long doctorId,Long productId, Integer classification) {
+        dynamicFieldMapper.deleteDoctorDynamicFieldValue(doctorId, productId, classification);
     }
 
     @Override

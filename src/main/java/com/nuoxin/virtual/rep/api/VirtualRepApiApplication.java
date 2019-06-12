@@ -27,7 +27,7 @@ import java.time.LocalDate;
 import static springfox.documentation.schema.AlternateTypeRules.newRule;
 
 @SpringBootApplication
-@EnableDiscoveryClient
+//@EnableDiscoveryClient
 @EnableSwagger2
 @EnableAsync
 @EnableScheduling
