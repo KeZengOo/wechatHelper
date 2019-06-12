@@ -239,7 +239,7 @@
 		</foreach>
 		UNION
 		SELECT DISTINCT a.drug_user_id userId, b.user_id doctorId FROM drug_user_doctor a
-		JOIN `virtual_message` b ON a.doctor_id = b.doctor_id
+		JOIN `virtual_message` b ON a.doctor_id = b.doctor_id AND a.doctor_id = c.doctor_id
 		JOIN product_doctor_quate c ON a.prod_id = c.product_id AND a.doctor_id = c.doctor_id
 		WHERE c.is_recruit = 1 AND a.is_available = 1 AND a.prod_id = #{key.proId}
 		AND b.message_time BETWEEN #{key.startTime} AND #{key.endTime} AND b.user_type = 2
