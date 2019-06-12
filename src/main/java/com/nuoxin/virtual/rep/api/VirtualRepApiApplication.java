@@ -9,7 +9,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -37,9 +36,8 @@ public class VirtualRepApiApplication {
 	
 	@Autowired
 	private TypeResolver typeResolver;
-	
-	@Bean
-	@LoadBalanced
+
+	@Bean(name="remoteRestTemplate")
 	public RestTemplate getRestTemplate(){
 		return new RestTemplate();
 	}
