@@ -57,4 +57,27 @@ public interface MonthlyRecruitMapper {
      * @return
      */
     Integer getRecruitDoctor(MonthlyCommonRequest request);
+
+
+    /**
+     * 成功招募的医生中，有手机号的医生
+     * @param request
+     * @return
+     */
+    Integer getHasMobileDoctor(MonthlyCommonRequest request);
+
+    /**
+     * 成功招募的医生中，有微信的医生
+     * @param request
+     * @return
+     */
+    Integer getHasWechatDoctor(MonthlyCommonRequest request);
+
+
+    /**
+     * 成功招募的医生中，添加微信的医生
+     * @param request
+     * @return
+     */
+    Integer getAddWechatDoctor(MonthlyCommonRequest request);
 }
