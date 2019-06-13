@@ -11,12 +11,14 @@
         INNER JOIN doctor d ON v.virtual_doctor_id = d.id
         WHERE
         v.product_id = #{productId}
+        AND v.visit_channel=1
+
         <if test="startDate !=null">
-            AND DATE_FORMAT( v.create_time, '%Y-%m' ) &gt;= DATE_FORMAT( v.create_time, #{startDate} )
+            AND DATE_FORMAT( v.create_time, '%Y-%m' ) &gt;= #{startDate}
         </if>
 
         <if test="endDate !=null">
-            AND DATE_FORMAT( v.create_time, '%Y-%m' ) &lt;  DATE_FORMAT( v.create_time, #{endDate} )
+            AND DATE_FORMAT( v.create_time, '%Y-%m' ) &lt;  #{endDate}
         </if>
 
     </select>
@@ -31,12 +33,13 @@
         INNER JOIN doctor d ON v.virtual_doctor_id = d.id
         WHERE
         v.product_id = #{productId}
+        AND v.visit_channel=1
         <if test="startDate !=null">
-            AND DATE_FORMAT( v.create_time, '%Y-%m' ) &gt;=  DATE_FORMAT( v.create_time, #{startDate} )
+            AND DATE_FORMAT( v.create_time, '%Y-%m' ) &gt;= #{startDate}
         </if>
 
         <if test="endDate !=null">
-            AND DATE_FORMAT( v.create_time, '%Y-%m' ) &lt;  DATE_FORMAT( v.create_time, #{endDate} )
+            AND DATE_FORMAT( v.create_time, '%Y-%m' ) &lt;  #{endDate}
         </if>
     </select>
 
@@ -51,14 +54,15 @@
         INNER JOIN doctor d ON v.virtual_doctor_id = d.id
         WHERE
         v.product_id = #{productId}
+        AND v.visit_channel=1
         AND v.status_name='answer'
 
         <if test="startDate !=null">
-            AND DATE_FORMAT( v.create_time, '%Y-%m' ) &gt;=  DATE_FORMAT( v.create_time, #{startDate} )
+            AND DATE_FORMAT( v.create_time, '%Y-%m' ) &gt;= #{startDate}
         </if>
 
         <if test="endDate !=null">
-            AND DATE_FORMAT( v.create_time, '%Y-%m' ) &lt;  DATE_FORMAT( v.create_time, #{endDate} )
+            AND DATE_FORMAT( v.create_time, '%Y-%m' ) &lt;  #{endDate}
         </if>
 
 
@@ -74,13 +78,15 @@
         INNER JOIN doctor d ON v.virtual_doctor_id = d.id
         WHERE
         v.product_id = #{productId}
+        AND v.visit_channel=1
         AND v.status_name='answer'
 
         <if test="startDate !=null">
-            AND DATE_FORMAT( v.create_time, '%Y-%m' ) &gt;=  DATE_FORMAT( v.create_time, #{startDate} )
+            AND DATE_FORMAT( v.create_time, '%Y-%m' ) &gt;= #{startDate}
         </if>
+
         <if test="endDate !=null">
-            AND DATE_FORMAT( v.create_time, '%Y-%m' ) &lt;  DATE_FORMAT( v.create_time, #{endDate} )
+            AND DATE_FORMAT( v.create_time, '%Y-%m' ) &lt;  #{endDate}
         </if>
     </select>
 
@@ -89,46 +95,55 @@
 
     <!-- 招募医院数量 -->
     <select id="getRecruitHospital" resultType="java.lang.Integer">
-        SELECT
-        COUNT( DISTINCT d.hospital_id )
-        FROM
-        virtual_doctor_call_info v
-        INNER JOIN doctor d ON v.virtual_doctor_id = d.id
-        INNER JOIN virtual_doctor_call_info_mend m
-        ON v.id=m.call_id
-        WHERE
-        v.product_id = #{productId}
-        AND m.is_recruit=1
-        <if test="startDate !=null">
-            AND DATE_FORMAT( v.create_time, '%Y-%m' ) &gt;=  DATE_FORMAT( v.create_time, #{startDate} )
-        </if>
+        SELECT COUNT(*) FROM (
+            SELECT
+            d.hospital_id
+            FROM
+            virtual_doctor_call_info v
+            INNER JOIN doctor d ON v.virtual_doctor_id = d.id
+            INNER JOIN virtual_doctor_call_info_mend m
+            ON v.id=m.call_id
+            WHERE
+            v.product_id = #{productId}
+            AND m.is_recruit=1
 
-        <if test="endDate !=null">
-            AND DATE_FORMAT( v.create_time, '%Y-%m' ) &lt;  DATE_FORMAT( v.create_time, #{endDate} )
-        </if>
+            GROUP BY d.hospital_id
+            HAVING 1=1
 
+            <if test="startDate !=null">
+                AND MIN(DATE_FORMAT( v.create_time, '%Y-%m' )) &gt;= #{startDate}
+            </if>
+            <if test="endDate !=null">
+                AND MIN(DATE_FORMAT( v.create_time, '%Y-%m' )) &lt; #{endDate}
+            </if>
+        ) t
 
     </select>
 
 
     <!-- 招募医生数量 -->
     <select id="getRecruitDoctor" resultType="java.lang.Integer">
-        SELECT
-        COUNT( DISTINCT d.id )
-        FROM
-        virtual_doctor_call_info v
-        INNER JOIN doctor d ON v.virtual_doctor_id = d.id
-        INNER JOIN virtual_doctor_call_info_mend m
-        ON v.id=m.call_id
-        WHERE
-        v.product_id = #{productId}
-        AND m.is_recruit=1
-        <if test="startDate !=null">
-            AND DATE_FORMAT( v.create_time, '%Y-%m' ) &gt;=  DATE_FORMAT( v.create_time, #{startDate} )
-        </if>
-        <if test="endDate !=null">
-            AND DATE_FORMAT( v.create_time, '%Y-%m' ) &lt;  DATE_FORMAT( v.create_time, #{endDate} )
-        </if>
+        SELECT COUNT(*) FROM (
+            SELECT
+            d.id
+            FROM
+            virtual_doctor_call_info v
+            INNER JOIN doctor d ON v.virtual_doctor_id = d.id
+            INNER JOIN virtual_doctor_call_info_mend m
+            ON v.id=m.call_id
+            WHERE
+            v.product_id = #{productId}
+            AND m.is_recruit=1
+
+            GROUP BY d.id
+            HAVING 1=1
+            <if test="startDate !=null">
+                AND MIN(DATE_FORMAT( v.create_time, '%Y-%m' )) &gt;= #{startDate}
+            </if>
+            <if test="endDate !=null">
+                AND MIN(DATE_FORMAT( v.create_time, '%Y-%m' )) &lt; #{endDate}
+            </if>
+        ) t
     </select>
 
 

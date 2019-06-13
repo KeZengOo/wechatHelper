@@ -4,11 +4,11 @@ import com.nuoxin.virtual.rep.api.mybatis.MonthlyRecruitMapper;
 import com.nuoxin.virtual.rep.api.mybatis.ProductTargetMapper;
 import com.nuoxin.virtual.rep.api.service.v3_0.MonthlyRecruitService;
 import com.nuoxin.virtual.rep.api.utils.CalculateUtil;
+import com.nuoxin.virtual.rep.api.utils.DateUtil;
 import com.nuoxin.virtual.rep.api.utils.ExportExcelUtil;
 import com.nuoxin.virtual.rep.api.utils.ExportExcelWrapper;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.MonthlyRecruitRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.statistics.ProductTargetResponseBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.ExportDrugUserDoctorCallResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyDoctorRecruitResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyHospitalRecruitResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyRecruitExportResponse;
@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -35,6 +36,8 @@ public class MonthlyRecruitServiceImpl implements MonthlyRecruitService {
 
     @Override
     public MonthlyHospitalRecruitResponse getMonthlyHospitalRecruit(MonthlyRecruitRequest request) {
+        this.checkDateParam(request);
+
 
         Long productId = request.getProductId();
         ProductTargetResponseBean productTarget = productTargetMapper.getProductTarget(productId);
@@ -49,8 +52,8 @@ public class MonthlyRecruitServiceImpl implements MonthlyRecruitService {
         Integer recruitHospital = monthlyRecruitMapper.getRecruitHospital(request);
 
         String contactHospitalRate = CalculateUtil.getPercentage(contactHospital, targetHospital, 2);
-        String touchHospitalRate = CalculateUtil.getPercentage(touchHospital, targetHospital, 2);
-        String recruitHospitalRate = CalculateUtil.getPercentage(recruitHospital, targetHospital, 2);
+        String touchHospitalRate = CalculateUtil.getPercentage(touchHospital, contactHospital, 2);
+        String recruitHospitalRate = CalculateUtil.getPercentage(recruitHospital, touchHospital, 2);
 
         MonthlyHospitalRecruitResponse monthlyHospitalRecruit = new MonthlyHospitalRecruitResponse();
         monthlyHospitalRecruit.setTargetHospital(targetHospital);
@@ -65,9 +68,11 @@ public class MonthlyRecruitServiceImpl implements MonthlyRecruitService {
         return monthlyHospitalRecruit;
     }
 
+
+
     @Override
     public MonthlyDoctorRecruitResponse getMonthlyDoctorRecruit(MonthlyRecruitRequest request) {
-
+        this.checkDateParam(request);
         Long productId = request.getProductId();
         ProductTargetResponseBean productTarget = productTargetMapper.getProductTarget(productId);
         Integer targetDoctor = 0;
@@ -80,8 +85,8 @@ public class MonthlyRecruitServiceImpl implements MonthlyRecruitService {
         Integer recruitDoctor = monthlyRecruitMapper.getRecruitDoctor(request);
 
         String contactDoctorRate = CalculateUtil.getPercentage(contactDoctor, targetDoctor, 2);
-        String touchDoctorRate = CalculateUtil.getPercentage(touchDoctor, targetDoctor, 2);
-        String recruitDoctorRate = CalculateUtil.getPercentage(recruitDoctor, targetDoctor, 2);
+        String touchDoctorRate = CalculateUtil.getPercentage(touchDoctor, contactDoctor, 2);
+        String recruitDoctorRate = CalculateUtil.getPercentage(recruitDoctor, touchDoctor, 2);
 
         MonthlyDoctorRecruitResponse monthlyDoctorRecruit = new MonthlyDoctorRecruitResponse();
         monthlyDoctorRecruit.setTargetDoctor(targetDoctor);
@@ -100,6 +105,7 @@ public class MonthlyRecruitServiceImpl implements MonthlyRecruitService {
 
     @Override
     public void exportMonthlyRecruit(MonthlyRecruitRequest request, HttpServletResponse response) {
+        this.checkDateParam(request);
         ExportExcelWrapper<MonthlyRecruitExportResponse> exportExcelWrapper = new ExportExcelWrapper();
         exportExcelWrapper.exportExcel("月报—招募转化漏斗".concat(request.getStartDate()).concat("~").concat(request.getEndDate()), "月报—招募转化漏斗",
                 new String[]{"阶段", "医院数量", "分阶段医院转化率", "医生数量", "分阶段医生转化率"},
@@ -153,6 +159,20 @@ public class MonthlyRecruitServiceImpl implements MonthlyRecruitService {
         list.add(monthlyRecruitExportResponse);
 
         return list;
+    }
+
+
+    /**
+     * 检查日期
+     * @param request
+     */
+    private void checkDateParam(MonthlyRecruitRequest request) {
+        String startDate = request.getStartDate();
+        String endDate = request.getEndDate();
+
+        DateUtil.stringToDate(startDate, DateUtil.DATE_FORMAT_YYYY_MM);
+        DateUtil.stringToDate(endDate, DateUtil.DATE_FORMAT_YYYY_MM);
+
     }
 
 
