@@ -346,6 +346,7 @@ public abstract class BaseCallBackImpl implements CallBackService{
 	 * @param filePath 本地文件路径
 	 * @return path
 	 */
+	@Override
 	public String getFileOSSPathByLocalFilePath(String filePath){
 		File file = new File(filePath);
 		String path = "";
