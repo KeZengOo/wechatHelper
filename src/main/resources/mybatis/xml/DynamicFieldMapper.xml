@@ -339,7 +339,7 @@
             IFNULL(t.dynamic_extend_value,'') dymaicExtendValue
         FROM virtual_doctor_dynamic_field_value t
         WHERE t.doctor_id=#{doctorId} AND t.dynamic_field_id=#{dynamicFieldId}
-
+        LIMIT 1
 
     </select>
 
