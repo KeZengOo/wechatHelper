@@ -132,12 +132,14 @@ public abstract class BaseCallBackImpl implements CallBackService{
 	protected void updateCallUrlText(String sinToken, String callOssUrl, String unpressedCallUrl, String unpressedCallUrlIn, String unpressedCallUrlOut) {
 		if (StringUtil.isNotEmpty(sinToken) && StringUtil.isNotEmpty(callOssUrl)){
 			try {
+
+				// 阿里的语音识别按照时间收费，左右声道和WAV格式先不转了
 				String callText = SpeechRecognitionUtil.getSpeechRecognitionResult(callOssUrl);
-				String unpressedCallText = SpeechRecognitionUtil.getSpeechRecognitionResult(unpressedCallUrl);
-				String unpressedCallInText = SpeechRecognitionUtil.getSpeechRecognitionResult(unpressedCallUrlIn);
-				String unpressedCallOutText = SpeechRecognitionUtil.getSpeechRecognitionResult(unpressedCallUrlOut);
-//				callInfoMapper.updateCallUrlText(sinToken, callText);
-				callInfoMapper.updateCallUrlTextRefactor(sinToken, callText, unpressedCallText, unpressedCallInText, unpressedCallOutText);
+//				String unpressedCallText = SpeechRecognitionUtil.getSpeechRecognitionResult(unpressedCallUrl);
+//				String unpressedCallInText = SpeechRecognitionUtil.getSpeechRecognitionResult(unpressedCallUrlIn);
+//				String unpressedCallOutText = SpeechRecognitionUtil.getSpeechRecognitionResult(unpressedCallUrlOut);
+				callInfoMapper.updateCallUrlText(sinToken, callText);
+//				callInfoMapper.updateCallUrlTextRefactor(sinToken, callText, unpressedCallText, unpressedCallInText, unpressedCallOutText);
 
 			}catch (Exception e){
 				logger.error("BaseCallBackImpl updateCallUrlText(String sinToken, String callOssUrl, String unpressedCallUrl, " +
