@@ -73,11 +73,4 @@ public interface CallBackService {
 	 * @return Integer
 	 */
 	Integer saveRecordingByUrlAndToken(String url, String token);
-
-	/**
-	 * 上传文件
-	 * @param ossFilePath
-	 * @return string
-	 */
-	String getFileOSSPathByLocalFilePath(String ossFilePath);
 }
