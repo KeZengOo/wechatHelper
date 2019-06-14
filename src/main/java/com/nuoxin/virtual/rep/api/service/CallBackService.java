@@ -60,7 +60,7 @@ public interface CallBackService {
 	 * @param sinToken
 	 * @return boolean
 	 */
-	boolean saveSpeechRecognitionResultCallInfo(Map<String,String> pathMaps, String sinToken);
+	boolean saveSpeechRecognitionResultCallInfo(Map<String, String> pathMaps, String sinToken);
 
 	/**
 	 * 手动刷新电话录音分割-语音转文字
@@ -73,4 +73,11 @@ public interface CallBackService {
 	 * @return Integer
 	 */
 	Integer saveRecordingByUrlAndToken(String url, String token);
+
+	/**
+	 * 上传文件
+	 * @param ossFilePath
+	 * @return string
+	 */
+	String getFileOSSPathByLocalFilePath(String ossFilePath);
 }

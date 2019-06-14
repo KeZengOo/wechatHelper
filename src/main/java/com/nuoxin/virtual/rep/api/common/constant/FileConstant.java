@@ -20,5 +20,5 @@ public interface FileConstant {
 	 * 服务器本地地址：/home/nuoxin/stagging/split_speech
 	 * 本机地址：D:/mp3
 	 */
-	String LOCAL_PATH = "E:/mp3";
+	String LOCAL_PATH = "/home/nuoxin/stagging/split_speech";
 }
