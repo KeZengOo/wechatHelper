@@ -679,12 +679,15 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
             p.setAddWechatTime(null);
         }else {
             VirtualDoctorMendParams virtualDoctorMendParams = doctorMendMapper.getVirtualDoctorMendParams(doctorId);
-            String addWechat = virtualDoctorMendParams.getWechat();
-            if (StringUtil.isEmpty(addWechat)){
-                p.setAddWechatTime(DateUtil.getDateTimeString(new Date()));
-            }else{
-                p.setAddWechatTime(virtualDoctorMendParams.getAddWechatTime());
+            if (virtualDoctorMendParams !=null){
+                String addWechat = virtualDoctorMendParams.getWechat();
+                if (StringUtil.isEmpty(addWechat)){
+                    p.setAddWechatTime(DateUtil.getDateTimeString(new Date()));
+                }else{
+                    p.setAddWechatTime(virtualDoctorMendParams.getAddWechatTime());
+                }
             }
+
         }
         p.setVirtualDoctorId(doctorId);
         p.setWechat(wechat);

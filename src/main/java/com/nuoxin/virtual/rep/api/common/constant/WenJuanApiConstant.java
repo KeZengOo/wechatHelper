@@ -7,15 +7,15 @@ package com.nuoxin.virtual.rep.api.common.constant;
  */
 public interface WenJuanApiConstant {
 
-    /**
-     * 问卷网API url 正式
-     */
-    String URL = "https://www.wenjuan.com/openapi/v3/";
-
 //    /**
-//     * 问卷网API url 测试
+//     * 问卷网API url 正式
 //     */
-//    String URL = "http://apitest.wenjuan.com/openapi/v3/";
+//    String URL = "https://www.wenjuan.com/openapi/v3/";
+
+    /**
+     * 问卷网API url 测试
+     */
+    String URL = "http://apitest.wenjuan.com/openapi/v3/";
 
     /**
      * 登录接口
@@ -80,7 +80,7 @@ public interface WenJuanApiConstant {
     /**
      * wj_appkey_value
      */
-    String WJ_APPKEY_VALUE = "wjhr78bave2gf6s46u";
+    String WJ_APPKEY_VALUE = "wjrk1gycdidtoip31u";
 
     /**
      * wj_user 用户code
@@ -110,7 +110,7 @@ public interface WenJuanApiConstant {
     /**
      * wj_appsecret_value
      */
-    String WJ_APPSECRET_VALUE = "05d842c841269f0ad2da630060f953c9";
+    String WJ_APPSECRET_VALUE = "06caaf5b6d9f8688081399e89b740274";
 
     /**
      * wj_signature 签名

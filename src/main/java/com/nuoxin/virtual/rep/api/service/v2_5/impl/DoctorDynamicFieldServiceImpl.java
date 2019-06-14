@@ -55,6 +55,7 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
 
         Long doctorId = bean.getDoctorId();
         Long productId = bean.getProductId();
+
         // 先暂时去掉医生分型
 //        List<Long> classificationIdList = bean.getClassificationIdList();
         List<DoctorDynamicFieldValueRequestBean> list = bean.getList();
@@ -209,6 +210,9 @@ public class DoctorDynamicFieldServiceImpl implements DoctorDynamicFieldService 
 
     @Override
     public void deleteDoctorDynamicFieldValue(Long doctorId,Long productId, Integer classification) {
+        if (productId == null){
+            productId = 0L;
+        }
         dynamicFieldMapper.deleteDoctorDynamicFieldValue(doctorId, productId, classification);
     }
 
