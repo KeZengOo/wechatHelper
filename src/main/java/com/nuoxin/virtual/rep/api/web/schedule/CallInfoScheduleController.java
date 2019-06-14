@@ -2,7 +2,6 @@ package com.nuoxin.virtual.rep.api.web.schedule;
 
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.service.CallBackService;
-import com.nuoxin.virtual.rep.api.utils.SpeechRecognitionUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.Call7mmorRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.IdentifyCallUrlRequestBean;
 import io.swagger.annotations.Api;
@@ -82,28 +81,26 @@ public class CallInfoScheduleController {
     }
 
     /**
-     * 手动分割本地录音文件并上传阿里云
      *  1.下载阿里云上的电话录音到本地
      * 	2.之后进行MP3转WAV
      * 	3.进行左右声道分割
      * 	4.分别进行语音识别转成文本
      * 	5.入库
      */
-    @ApiOperation(value = "手动分割本地录音文件并上传阿里云", notes = "手动分割本地录音文件并上传阿里云")
+    @ApiOperation(value = "分割录音文件并上传阿里云", notes = "分割录音文件并上传阿里云")
     @GetMapping(value = "/split/speech/aliyun/url/update")
-    public DefaultResponseBean<String> splitSpeechAliyunUrlUpdate(@RequestParam(value = "ossFilePath") String ossFilePath,@RequestParam(value = "sinToken") String sinToken) {
-        String aliUrl = callBackService.getFileOSSPathByLocalFilePath(ossFilePath);
-        Map<String,String> pathMap = callBackService.splitSpeechAliyunUrlUpdate(aliUrl);
-
+    public DefaultResponseBean<String> splitSpeechAliyunUrlUpdate(@RequestParam(value = "ossFilePath") String ossFilePath) {
+//        Map<String,String> pathMap = callBackService.splitSpeechAliyunUrlUpdate(ossFilePath);
+        String sinToken = "";
         Integer callId = 1;
 
-//        Map<String,String> pathMaps = new HashMap<String,String>(16);
-//        pathMaps.put("leftOSSPath","https://nuoxin-virtual-rep-storage.oss-cn-beijing.aliyuncs.com/virtual/2019051616/af668ce5-1e0c-40b3-ace6-57bec0681f37_left.wav");
-//        pathMaps.put("rightOSSPath","https://nuoxin-virtual-rep-storage.oss-cn-beijing.aliyuncs.com/virtual/2019051616/af668ce5-1e0c-40b3-ace6-57bec0681f37_right.wav");
+        Map<String,String> pathMaps = new HashMap<String,String>(16);
+        pathMaps.put("leftOSSPath","https://nuoxin-virtual-rep-storage.oss-cn-beijing.aliyuncs.com/virtual/2019051616/af668ce5-1e0c-40b3-ace6-57bec0681f37_left.wav");
+        pathMaps.put("rightOSSPath","https://nuoxin-virtual-rep-storage.oss-cn-beijing.aliyuncs.com/virtual/2019051616/af668ce5-1e0c-40b3-ace6-57bec0681f37_right.wav");
 
         //根据左右声道的阿里云地址进行语音识别，进行入库
 //        boolean result = callBackService.saveSpeechRecognitionResultCallInfo(pathMap);
-        boolean result = callBackService.saveSpeechRecognitionResultCallInfo(pathMap, sinToken);
+        boolean result = callBackService.saveSpeechRecognitionResultCallInfo(pathMaps, sinToken);
         String resultStr = "";
         if(result == true){
             resultStr = "分割录音文件并上传阿里云入库成功";
