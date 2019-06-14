@@ -15,7 +15,6 @@ import com.nuoxin.virtual.rep.api.utils.MD5Util;
 import com.nuoxin.virtual.rep.api.utils.csv.PublicGlobalCSVExprot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -35,9 +34,7 @@ public class WenJuanQuestionnaireServiceImpl implements WenJuanQuestionnaireServ
 
     @Resource
     private WenJuanQuestionnaireMapper wenJuanQuestionnaireMapper;
-
     @Resource
-    @Qualifier(value = "remoteRestTemplate")
     private RestTemplate restTemplate;
 
     private static final Logger logger = LoggerFactory.getLogger(WenJuanQuestionnaireServiceImpl.class);
@@ -303,13 +300,7 @@ public class WenJuanQuestionnaireServiceImpl implements WenJuanQuestionnaireServ
                                     JSONObject jsonObject2 = JSONObject.parseObject(q);
                                     String emoji = "";
                                     try {
-                                        if(null == jsonObject2.getString("answer")){
-                                            emoji = "";
-                                        }
-                                        else
-                                        {
-                                            emoji = EmojiUtil.emojiConvert(jsonObject2.getString("answer"));
-                                        }
+                                        emoji = EmojiUtil.emojiConvert(jsonObject2.getString("answer"));
                                     } catch (UnsupportedEncodingException e) {
                                         e.printStackTrace();
                                     }
