@@ -9,6 +9,7 @@
         FROM
         virtual_doctor_call_info v
         INNER JOIN doctor d ON v.virtual_doctor_id = d.id
+        INNER JOIN hospital h ON d.hospital_id=h.id
         WHERE
         v.product_id = #{productId}
         AND v.visit_channel=1
@@ -31,6 +32,7 @@
         FROM
         virtual_doctor_call_info v
         INNER JOIN doctor d ON v.virtual_doctor_id = d.id
+        INNER JOIN hospital h ON d.hospital_id=h.id
         WHERE
         v.product_id = #{productId}
         AND v.visit_channel=1
@@ -52,6 +54,7 @@
         FROM
         virtual_doctor_call_info v
         INNER JOIN doctor d ON v.virtual_doctor_id = d.id
+        INNER JOIN hospital h ON d.hospital_id=h.id
         WHERE
         v.product_id = #{productId}
         AND v.visit_channel=1
@@ -76,6 +79,7 @@
         FROM
         virtual_doctor_call_info v
         INNER JOIN doctor d ON v.virtual_doctor_id = d.id
+        INNER JOIN hospital h ON d.hospital_id=h.id
         WHERE
         v.product_id = #{productId}
         AND v.visit_channel=1
@@ -101,6 +105,7 @@
             FROM
             virtual_doctor_call_info v
             INNER JOIN doctor d ON v.virtual_doctor_id = d.id
+            INNER JOIN hospital h ON d.hospital_id=h.id
             INNER JOIN virtual_doctor_call_info_mend m
             ON v.id=m.call_id
             WHERE
@@ -129,6 +134,7 @@
             FROM
             virtual_doctor_call_info v
             INNER JOIN doctor d ON v.virtual_doctor_id = d.id
+            INNER JOIN hospital h ON d.hospital_id=h.id
             INNER JOIN virtual_doctor_call_info_mend m
             ON v.id=m.call_id
             WHERE
@@ -161,6 +167,7 @@
             FROM
             virtual_doctor_call_info v
             INNER JOIN doctor d ON v.virtual_doctor_id = d.id
+            INNER JOIN hospital h ON d.hospital_id=h.id
             INNER JOIN virtual_doctor_call_info_mend m
             ON v.id=m.call_id
             WHERE
@@ -194,6 +201,7 @@
         FROM
         virtual_doctor_call_info v
         INNER JOIN doctor d ON v.virtual_doctor_id = d.id
+        INNER JOIN hospital h ON d.hospital_id=h.id
         INNER JOIN virtual_doctor_call_info_mend m
         ON v.id=m.call_id
         WHERE
@@ -223,6 +231,7 @@
         FROM
         virtual_doctor_call_info v
         INNER JOIN doctor d ON v.virtual_doctor_id = d.id
+        INNER JOIN hospital h ON d.hospital_id=h.id
         INNER JOIN virtual_doctor_call_info_mend m
         ON v.id=m.call_id
         WHERE
