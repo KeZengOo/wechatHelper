@@ -11,6 +11,7 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.MonthlyRecruitRequ
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DrugUserDoctorCallResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyDoctorRecruitResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyHospitalRecruitResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyRecruitContactResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
@@ -63,6 +64,18 @@ public class MonthlyRecruitController {
         MonthlyRecruitRequest bean = this.getMonthlyRecruitExportParam(request);
         monthlyRecruitService.exportMonthlyRecruit(bean, response);
     }
+
+
+    @ApiOperation(value = "医生招募中联系方式统计")
+    @PostMapping(value = "/recruit/contact")
+    public DefaultResponseBean<MonthlyRecruitContactResponse> getMonthlyRecruitContact(@RequestBody MonthlyRecruitRequest request){
+
+        MonthlyRecruitContactResponse monthlyRecruitContact = monthlyRecruitService.getMonthlyRecruitContact(request);
+        DefaultResponseBean<MonthlyRecruitContactResponse> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(monthlyRecruitContact);
+        return responseBean;
+    }
+
 
     /**
      * 得到月报导出数据

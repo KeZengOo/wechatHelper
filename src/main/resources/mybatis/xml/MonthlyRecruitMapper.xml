@@ -111,10 +111,10 @@
             HAVING 1=1
 
             <if test="startDate !=null">
-                AND MIN(DATE_FORMAT( v.create_time, '%Y-%m' )) &gt;= #{startDate}
+                AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &gt;= #{startDate}
             </if>
             <if test="endDate !=null">
-                AND MIN(DATE_FORMAT( v.create_time, '%Y-%m' )) &lt; #{endDate}
+                AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &lt; #{endDate}
             </if>
         ) t
 
@@ -138,10 +138,10 @@
             GROUP BY d.id
             HAVING 1=1
             <if test="startDate !=null">
-                AND MIN(DATE_FORMAT( v.create_time, '%Y-%m' )) &gt;= #{startDate}
+                AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &gt;= #{startDate}
             </if>
             <if test="endDate !=null">
-                AND MIN(DATE_FORMAT( v.create_time, '%Y-%m' )) &lt; #{endDate}
+                AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &lt; #{endDate}
             </if>
         ) t
     </select>
@@ -170,10 +170,10 @@
             GROUP BY d.id
             HAVING 1=1
             <if test="startDate !=null">
-                AND MIN(DATE_FORMAT( v.create_time, '%Y-%m' )) &gt;= #{startDate}
+                AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &gt;= #{startDate}
             </if>
             <if test="endDate !=null">
-                AND MIN(DATE_FORMAT( v.create_time, '%Y-%m' )) &lt; #{endDate}
+                AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &lt; #{endDate}
             </if>
         )
 
@@ -203,10 +203,10 @@
         GROUP BY d.id
         HAVING 1=1
         <if test="startDate !=null">
-            AND MIN(DATE_FORMAT( v.create_time, '%Y-%m' )) &gt;= #{startDate}
+            AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &gt;= #{startDate}
         </if>
         <if test="endDate !=null">
-            AND MIN(DATE_FORMAT( v.create_time, '%Y-%m' )) &lt; #{endDate}
+            AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &lt; #{endDate}
         </if>
         )
     </select>
@@ -232,10 +232,10 @@
         GROUP BY d.id
         HAVING 1=1
         <if test="startDate !=null">
-            AND MIN(DATE_FORMAT( v.create_time, '%Y-%m' )) &gt;= #{startDate}
+            AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &gt;= #{startDate}
         </if>
         <if test="endDate !=null">
-            AND MIN(DATE_FORMAT( v.create_time, '%Y-%m' )) &lt; #{endDate}
+            AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &lt; #{endDate}
         </if>
         )
     </select>

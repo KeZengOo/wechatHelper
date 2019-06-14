@@ -11,6 +11,7 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.MonthlyRecruitRequ
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.statistics.ProductTargetResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyDoctorRecruitResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyHospitalRecruitResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyRecruitContactResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyRecruitExportResponse;
 import org.springframework.stereotype.Service;
 
@@ -110,6 +111,30 @@ public class MonthlyRecruitServiceImpl implements MonthlyRecruitService {
         exportExcelWrapper.exportExcel("月报—招募转化漏斗".concat(request.getStartDate()).concat("~").concat(request.getEndDate()), "月报—招募转化漏斗",
                 new String[]{"阶段", "医院数量", "分阶段医院转化率", "医生数量", "分阶段医生转化率"},
                 this.getMonthlyRecruitList(request), response, ExportExcelUtil.EXCEl_FILE_2007);
+    }
+
+    @Override
+    public MonthlyRecruitContactResponse getMonthlyRecruitContact(MonthlyRecruitRequest request) {
+        this.checkDateParam(request);
+        Integer recruitDoctor = monthlyRecruitMapper.getRecruitDoctor(request);
+        Integer hasMobileDoctor = monthlyRecruitMapper.getHasMobileDoctor(request);
+        Integer hasWechatDoctor = monthlyRecruitMapper.getHasWechatDoctor(request);
+        Integer addWechatDoctor = monthlyRecruitMapper.getAddWechatDoctor(request);
+
+        String hasMobileDoctorRate = CalculateUtil.getPercentage(hasMobileDoctor, recruitDoctor, 2);
+        String hasWechatDoctorRate = CalculateUtil.getPercentage(hasWechatDoctor, recruitDoctor, 2);
+        String addWechatDoctorRate = CalculateUtil.getPercentage(addWechatDoctor, hasWechatDoctor, 2);
+
+        MonthlyRecruitContactResponse monthlyRecruitContact = new MonthlyRecruitContactResponse();
+        monthlyRecruitContact.setRecruitDoctor(recruitDoctor);
+        monthlyRecruitContact.setHasMobileDoctor(hasMobileDoctor);
+        monthlyRecruitContact.setHasMobileDoctorRate(hasMobileDoctorRate);
+        monthlyRecruitContact.setHasWechatDoctor(hasWechatDoctor);
+        monthlyRecruitContact.setHasWechatDoctorRate(hasWechatDoctorRate);
+        monthlyRecruitContact.setAddWechatDoctor(addWechatDoctor);
+        monthlyRecruitContact.setAddWechatDoctorRate(addWechatDoctorRate);
+
+        return monthlyRecruitContact;
     }
 
     /**
