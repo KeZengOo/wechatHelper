@@ -19,7 +19,7 @@
         </if>
 
         <if test="endDate !=null">
-            AND DATE_FORMAT( v.create_time, '%Y-%m' ) &lt;  #{endDate}
+            AND DATE_FORMAT( v.create_time, '%Y-%m' ) &lt;=  #{endDate}
         </if>
 
     </select>
@@ -41,7 +41,7 @@
         </if>
 
         <if test="endDate !=null">
-            AND DATE_FORMAT( v.create_time, '%Y-%m' ) &lt;  #{endDate}
+            AND DATE_FORMAT( v.create_time, '%Y-%m' ) &lt;=  #{endDate}
         </if>
     </select>
 
@@ -65,7 +65,7 @@
         </if>
 
         <if test="endDate !=null">
-            AND DATE_FORMAT( v.create_time, '%Y-%m' ) &lt;  #{endDate}
+            AND DATE_FORMAT( v.create_time, '%Y-%m' ) &lt;=  #{endDate}
         </if>
 
 
@@ -90,7 +90,7 @@
         </if>
 
         <if test="endDate !=null">
-            AND DATE_FORMAT( v.create_time, '%Y-%m' ) &lt;  #{endDate}
+            AND DATE_FORMAT( v.create_time, '%Y-%m' ) &lt;=  #{endDate}
         </if>
     </select>
 
@@ -119,7 +119,7 @@
                 AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &gt;= #{startDate}
             </if>
             <if test="endDate !=null">
-                AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &lt; #{endDate}
+                AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &lt;= #{endDate}
             </if>
         ) t
 
@@ -147,10 +147,43 @@
                 AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &gt;= #{startDate}
             </if>
             <if test="endDate !=null">
-                AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &lt; #{endDate}
+                AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &lt;= #{endDate}
             </if>
         ) t
     </select>
+
+
+
+    <!-- 每月招募医生数量 -->
+    <select id="getMonthRecruitDoctorList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyRecruitDetailResponse">
+        SELECT t.m `month`, COUNT(DISTINCT t.doctor_id) recruitDoctor FROM (
+        SELECT
+        d.id doctor_id, MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) m
+        FROM
+        virtual_doctor_call_info v
+        INNER JOIN doctor d ON v.virtual_doctor_id = d.id
+        INNER JOIN hospital h ON d.hospital_id=h.id
+        INNER JOIN virtual_doctor_call_info_mend m
+        ON v.id=m.call_id
+        WHERE
+        v.product_id = #{productId}
+        AND m.is_recruit=1
+
+        GROUP BY d.id
+        HAVING 1=1
+        <if test="startDate !=null">
+            AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &gt;= #{startDate}
+        </if>
+        <if test="endDate !=null">
+            AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &lt;= #{endDate}
+        </if>
+        ) t
+        GROUP BY t.m
+
+    </select>
+
+
+
 
     <!-- 成功招募的医生中，有手机号的医生 -->
     <select id="getHasMobileDoctor" resultType="java.lang.Integer">
@@ -180,11 +213,48 @@
                 AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &gt;= #{startDate}
             </if>
             <if test="endDate !=null">
-                AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &lt; #{endDate}
+                AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &lt;= #{endDate}
             </if>
         )
 
     </select>
+
+
+
+    <!-- 每月成功招募的医生中，有手机号的医生 -->
+    <select id="getMonthHasMobileDoctorList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyRecruitMobileDetailResponse">
+
+        SELECT t.`month`, COUNT(DISTINCT t.doctor_id) hasMobileDoctor  FROM doctor_telephone dt INNER JOIN
+        (
+        SELECT
+        d.id doctor_id, MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) `month`
+        FROM
+        virtual_doctor_call_info v
+        INNER JOIN doctor d ON v.virtual_doctor_id = d.id
+        INNER JOIN hospital h ON d.hospital_id=h.id
+        INNER JOIN virtual_doctor_call_info_mend m
+        ON v.id=m.call_id
+        WHERE
+        v.product_id = #{productId}
+        AND m.is_recruit=1
+
+        GROUP BY d.id
+        HAVING 1=1
+        <if test="startDate !=null">
+            AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &gt;= #{startDate}
+        </if>
+        <if test="endDate !=null">
+            AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &lt;= #{endDate}
+        </if>
+        ) t
+        ON dt.doctor_id=t.doctor_id
+        WHERE LEFT(dt.telephone, 1)=1
+        AND CHAR_LENGTH(dt.telephone)=11
+        GROUP BY t.`month`
+
+    </select>
+
+
 
 
     <!-- 成功招募的医生中，有微信的医生 -->
@@ -214,10 +284,51 @@
             AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &gt;= #{startDate}
         </if>
         <if test="endDate !=null">
-            AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &lt; #{endDate}
+            AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &lt;= #{endDate}
         </if>
         )
     </select>
+
+
+
+
+    <!-- 每月成功招募的医生中，有微信的医生 -->
+    <select id="getMonthHasWechatDoctorList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyRecruitWechatDetailResponse">
+
+        SELECT t.`month`, COUNT(DISTINCT t.doctor_id) hasWechatDoctor
+        FROM doctor_mend dm INNER JOIN
+        (
+        SELECT
+        d.id doctor_id, MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) `month`
+        FROM
+        virtual_doctor_call_info v
+        INNER JOIN doctor d ON v.virtual_doctor_id = d.id
+        INNER JOIN hospital h ON d.hospital_id=h.id
+        INNER JOIN virtual_doctor_call_info_mend m
+        ON v.id=m.call_id
+        WHERE
+        v.product_id = #{productId}
+        AND m.is_recruit=1
+
+        GROUP BY d.id
+        HAVING 1=1
+        <if test="startDate !=null">
+            AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &gt;= #{startDate}
+        </if>
+        <if test="endDate !=null">
+            AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &lt;= #{endDate}
+        </if>
+        ) t
+        ON dm.virtual_doctor_id=t.doctor_id
+        WHERE dm.wechat IS NOT NULL
+        AND dm.wechat!=''
+        GROUP BY t.`month`
+
+
+    </select>
+
+
+
 
     <!-- 成功招募的医生中，有微信的医生 -->
     <select id="getAddWechatDoctor" resultType="java.lang.Integer">
@@ -244,8 +355,44 @@
             AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &gt;= #{startDate}
         </if>
         <if test="endDate !=null">
-            AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &lt; #{endDate}
+            AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &lt;= #{endDate}
         </if>
         )
     </select>
+
+
+
+
+    <!-- 每月成功招募的医生中，有微信的医生 -->
+    <select id="getMonthAddWechatDoctorList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyRecruitAddWechatDetailResponse">
+
+        SELECT t.`month`, COUNT(DISTINCT t.doctor_id) addWechatDoctor
+        FROM virtual_message vm  INNER JOIN
+        (
+        SELECT
+        d.id doctor_id, MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) `month`
+        FROM
+        virtual_doctor_call_info v
+        INNER JOIN doctor d ON v.virtual_doctor_id = d.id
+        INNER JOIN hospital h ON d.hospital_id=h.id
+        INNER JOIN virtual_doctor_call_info_mend m
+        ON v.id=m.call_id
+        WHERE
+        v.product_id = #{productId}
+        AND m.is_recruit=1
+
+        GROUP BY d.id
+        HAVING 1=1
+        <if test="startDate !=null">
+            AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &gt;= #{startDate}
+        </if>
+        <if test="endDate !=null">
+            AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &lt;= #{endDate}
+        </if>
+        ) t
+        ON vm.doctor_id=t.doctor_id
+        GROUP BY t.`month`
+    </select>
+
+
 </mapper>

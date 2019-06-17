@@ -77,6 +77,18 @@ public class MonthlyRecruitController {
     }
 
 
+
+
+    @ApiOperation(value = "医生招募中联系方式统计导出")
+    @GetMapping(value = "/recruit/contact/export")
+    public void getMonthlyRecruitExportParam(HttpServletRequest request, HttpServletResponse response){
+
+        MonthlyRecruitRequest bean = this.getMonthlyRecruitExportParam(request);
+        monthlyRecruitService.exportMonthlyRecruitContact(bean, response);
+    }
+
+
+
     /**
      * 得到月报导出数据
      * @param request

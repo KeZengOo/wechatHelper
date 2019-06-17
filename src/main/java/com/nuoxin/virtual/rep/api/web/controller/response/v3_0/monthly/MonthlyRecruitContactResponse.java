@@ -31,7 +31,6 @@ public class MonthlyRecruitContactResponse implements Serializable {
     @ApiModelProperty(value = "有微信医生比和招募医生率")
     private String hasWechatDoctorRate;
 
-
     @ApiModelProperty(value = "添加微信医生")
     private Integer addWechatDoctor;
 

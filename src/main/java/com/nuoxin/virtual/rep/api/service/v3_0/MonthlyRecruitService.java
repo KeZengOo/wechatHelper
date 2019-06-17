@@ -46,4 +46,11 @@ public interface MonthlyRecruitService {
      */
     MonthlyRecruitContactResponse getMonthlyRecruitContact(MonthlyRecruitRequest request);
 
+    /**
+     * 导出月报招募中有联系方式的医生统计
+     * @param request
+     * @param response
+     */
+    void exportMonthlyRecruitContact(MonthlyRecruitRequest request, HttpServletResponse response);
+
 }

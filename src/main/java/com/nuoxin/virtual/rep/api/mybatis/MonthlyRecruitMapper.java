@@ -1,6 +1,12 @@
 package com.nuoxin.virtual.rep.api.mybatis;
 
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.MonthlyCommonRequest;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyRecruitAddWechatDetailResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyRecruitDetailResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyRecruitMobileDetailResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyRecruitWechatDetailResponse;
+
+import java.util.List;
 
 /**
  * 月报招募相关
@@ -60,11 +66,26 @@ public interface MonthlyRecruitMapper {
 
 
     /**
+     * 每月招募医生数量
+     * @param request
+     * @return
+     */
+    List<MonthlyRecruitDetailResponse> getMonthRecruitDoctorList(MonthlyCommonRequest request);
+
+
+    /**
      * 成功招募的医生中，有手机号的医生
      * @param request
      * @return
      */
     Integer getHasMobileDoctor(MonthlyCommonRequest request);
+
+    /**
+     * 每月成功招募的医生中，有手机号的医生
+     * @param request
+     * @return
+     */
+    List<MonthlyRecruitMobileDetailResponse> getMonthHasMobileDoctorList(MonthlyCommonRequest request);
 
     /**
      * 成功招募的医生中，有微信的医生
@@ -75,9 +96,27 @@ public interface MonthlyRecruitMapper {
 
 
     /**
+     * 每月成功招募的医生中，有微信的医生
+     * @param request
+     * @return
+     */
+    List<MonthlyRecruitWechatDetailResponse> getMonthHasWechatDoctorList(MonthlyCommonRequest request);
+
+
+
+    /**
      * 成功招募的医生中，添加微信的医生
      * @param request
      * @return
      */
     Integer getAddWechatDoctor(MonthlyCommonRequest request);
+
+
+    /**
+     * 每月成功招募的医生中，添加微信的医生
+     * @param request
+     * @return
+     */
+    List<MonthlyRecruitAddWechatDetailResponse> getMonthAddWechatDoctorList(MonthlyCommonRequest request);
+
 }

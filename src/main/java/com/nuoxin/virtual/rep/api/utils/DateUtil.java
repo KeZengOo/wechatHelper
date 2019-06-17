@@ -1,6 +1,7 @@
 package com.nuoxin.virtual.rep.api.utils;
 
 import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
+import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.common.exception.FileFormatException;
 
 import java.text.DateFormat;
@@ -232,6 +233,50 @@ public final class DateUtil {
     }
 
 
+    /**
+     * 得到两个日期之间的月份数
+     * @param minDate
+     * @param maxDate
+     * @return
+     * @throws ParseException
+     */
+    public static List<String> getMonthBetween(String minDate, String maxDate){
+        List<String> result = new ArrayList<>();
+        //格式化为年月
+        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_YYYY_MM);
+
+        Calendar min = Calendar.getInstance();
+        Calendar max = Calendar.getInstance();
+
+        try {
+            min.setTime(sdf.parse(minDate));
+            min.set(min.get(Calendar.YEAR), min.get(Calendar.MONTH), 1);
+
+            max.setTime(sdf.parse(maxDate));
+            max.set(max.get(Calendar.YEAR), max.get(Calendar.MONTH), 2);
+
+            Calendar curr = min;
+            while (curr.before(max)) {
+                result.add(sdf.format(curr.getTime()));
+                curr.add(Calendar.MONTH, 1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new BusinessException(ErrorEnum.ERROR, "日期输入不合法");
+        }
+
+
+        return result;
+    }
+
+    public static void main(String[] args) throws ParseException {
+        List<String> monthBetween = DateUtil.getMonthBetween("2018-12-01", "2019-06-13");
+        System.out.println(monthBetween);
+    }
+
+
+
+
 
     /**
      * 获取两个日期之间的日期天数
@@ -300,25 +345,7 @@ public final class DateUtil {
     }
 
 
-    public static void main(String[] args) {
 
-
-
-
-
-
-
-        Calendar calendar = new GregorianCalendar();
-        Date startTime = new Date();
-        calendar.setTime(startTime);
-        //calendar.add(Calendar.DATE,1);
-        Date endTime = calendar.getTime();
-
-
-        List<String> days = DateUtil.getDays(startTime, endTime);
-
-        System.out.println(days);
-    }
 
 
     /**
