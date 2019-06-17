@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.CoverageReportMapper">
+
+	<!-- 根据产品id和时间段查询招募医生和医院数据 -->
+    <select id="findRecruitList" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.VisitDataPart">
+		SELECT
+		d.id doctorId,h.id userId,DATE_FORMAT(m.create_time,'%Y%m') total
+		FROM
+		virtual_doctor_call_info v
+		INNER JOIN doctor d ON v.virtual_doctor_id = d.id
+		INNER JOIN virtual_doctor_call_info_mend m ON v.id=m.call_id
+		INNER JOIN hospital h on h.id = d.hospital_id
+		WHERE
+		v.product_id = #{productId} AND m.is_recruit=1
+		GROUP BY d.id, m.create_time
+		HAVING DATE_FORMAT(min(m.create_time), '%Y-%m') &gt;= #{startTime}
+		AND DATE_FORMAT(min(m.create_time), '%Y-%m') &lt; #{endTime}
+    </select>
+
+	<!--  -->
+
+
+</mapper>
