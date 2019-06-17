@@ -149,9 +149,7 @@ public class WenJuanQuestionnaireServiceImpl implements WenJuanQuestionnaireServ
 
             if(shortIdList.size() > 0) {
                 //ListToArray
-                String[] shortIdArray = new String[list.size()];
-                shortIdList.toArray(shortIdArray);
-
+                String[] shortIdArray = shortIdList.toArray(new String[list.size()]);
                 //判断接口的项目数据数据库中是否存在
                 for (int j = 0; j < list.size(); j++) {
                     boolean result = arrayExistValue(shortIdArray, list.get(j).getShortId());
@@ -237,7 +235,7 @@ public class WenJuanQuestionnaireServiceImpl implements WenJuanQuestionnaireServ
      * 获取答卷详情列表
      * @return ScheduleResult
      */
-    @Scheduled(cron = "0 2 0/1 * * ? ")
+    @Scheduled(cron = "0 4 0/1 * * ? ")
     @Override
     public ScheduleResult saveWenJuanAnswerSheetInfo() {
         //登录问卷网API
@@ -259,63 +257,92 @@ public class WenJuanQuestionnaireServiceImpl implements WenJuanQuestionnaireServ
             logger.info("answerUrl："+answerUrl);
             String answerSheetInfoPageResult = restTemplate.getForObject(answerUrl,String.class);
             logger.info("answerSheetInfoPageResult："+answerSheetInfoPageResult);
-
             if(!answerSheetInfoPageResult.equals("[]")){
-                JSONObject jsonPageObject = JSONObject.parseObject(answerSheetInfoPageResult);
-                JSONArray jan = (JSONArray) jsonPageObject.get("rspd_list");
+                JSONObject jsonObject = JSONObject.parseObject(answerSheetInfoPageResult);
 
-                //接口中获取的项目放入列表对象中
-                if(jan!=null||jan.size()!=0){
-                    for(int j=0;j<jan.size();j++){
-                        WenJuanAnswerSheet wenJuanAnswerSheet = new WenJuanAnswerSheet();
-                        JSONObject jsonObject1 = (JSONObject) jan.get(j);
+                if (null != jsonObject.get("err_code"))
+                {
+                    if(jsonObject.get("err_code").equals("20008")){
+                        continue;
+                    }
+                }
 
-                        wenJuanAnswerSheet.setSeq(jsonObject1.getInteger("seq"));
-                        wenJuanAnswerSheet.setUser(projectList.get(i).getUser());
-                        wenJuanAnswerSheet.setShortId(projectList.get(i).getShortId());
-                        wenJuanAnswerSheet.setIp(jsonObject1.getString("ip"));
-                        wenJuanAnswerSheet.setScore(jsonObject1.getString("score"));
-                        wenJuanAnswerSheet.setSource(jsonObject1.getString("source"));
-                        wenJuanAnswerSheet.setTimeUsed(jsonObject1.getString("time_used"));
-                        wenJuanAnswerSheet.setFinish(jsonObject1.getString("finish"));
-                        wenJuanAnswerSheet.setRspdStatus(jsonObject1.getString("rspd_status"));
-                        wenJuanAnswerSheet.setStart(jsonObject1.getString("start"));
-                        wenJuanAnswerSheet.setWeixinAddr(jsonObject1.getString("weixin_addr"));
-                        wenJuanAnswerSheet.setWeixinNickname(jsonObject1.getString("weixin_nickname"));
-                        wenJuanAnswerSheet.setWeixinSex(jsonObject1.getString("weixin_sex"));
-                        list.add(wenJuanAnswerSheet);
-
-                        //数据库中的问卷详情列表与问卷网接口中获取的问卷详情数据相比较，如果数据库中已存在接口采集的数据，
-                        //则删除list中的该对象，最终不把数据库中已存在的数据再次保存到数据库中
-                        if(answerSheetList.contains(wenJuanAnswerSheet)){
-                            list.remove(wenJuanAnswerSheet);
+                Integer totalCount = 0;
+                if(null != jsonObject.get("total_count")){
+                    //获取项目总数
+                    totalCount = Integer.parseInt(jsonObject.get("total_count").toString());
+                }
+                logger.info("共"+totalCount+"条数据");
+                //根据总数求总页数
+                Integer pages = totalCount/WenJuanApiConstant.WJ_PAGESIZE_VALUE;
+                logger.info("共{}页，每页50条",pages);
+                for (int s = 1; s <= pages+1; s++){
+                    String sheetUrl = answerSheetInfoUrlString(s+"",WenJuanApiConstant.WJ_PAGESIZE_VALUE+"",projectList.get(i).getUser(),projectList.get(i).getShortId());
+                    String sheetInfoPageResult = restTemplate.getForObject(sheetUrl,String.class);
+                    if(!sheetInfoPageResult.equals("[]")){
+                        JSONObject jsonPageObject = JSONObject.parseObject(sheetInfoPageResult);
+                        JSONArray jan = (JSONArray) jsonPageObject.get("rspd_list");
+//                        JSONArray jan = null;
+                        //接口中获取的项目放入列表对象中
+                        if(null == jan){
+                            continue;
                         }
-                        else
-                        {
-                            //获取第n题答案
-                            for(int k = 1; k < WenJuanApiConstant.Q_VALUE; k++){
-                                WenJuanAnswer wjq = new WenJuanAnswer();
-                                String q = jsonObject1.getString("Q"+k);
-                                if(null != q){
-                                    JSONObject jsonObject2 = JSONObject.parseObject(q);
-                                    String emoji = "";
-                                    try {
-                                        emoji = EmojiUtil.emojiConvert(jsonObject2.getString("answer"));
-                                    } catch (UnsupportedEncodingException e) {
-                                        e.printStackTrace();
-                                    }
-                                    wjq.setAnswer(emoji);
-                                    wjq.setTypeDesc(jsonObject2.getString("type_desc"));
-                                    wjq.setTitle(jsonObject2.getString("title"));
-                                    wjq.setSeq(jsonObject1.getInteger("seq"));
-                                    wjq.setShortId(projectList.get(i).getShortId());
-                                    wjq.setUser(projectList.get(i).getUser());
-                                    wjq.setQTop(k);
-                                    wenJuanAnswerList.add(wjq);
+                        if(jan.size() != 0){
+                            for(int j=0;j<jan.size();j++){
+                                WenJuanAnswerSheet wenJuanAnswerSheet = new WenJuanAnswerSheet();
+                                JSONObject jsonObject1 = (JSONObject) jan.get(j);
+                                wenJuanAnswerSheet.setSeq(jsonObject1.getInteger("seq"));
+                                wenJuanAnswerSheet.setUser(projectList.get(i).getUser());
+                                wenJuanAnswerSheet.setShortId(projectList.get(i).getShortId());
+                                wenJuanAnswerSheet.setIp(jsonObject1.getString("ip"));
+                                wenJuanAnswerSheet.setScore(jsonObject1.getString("score"));
+                                wenJuanAnswerSheet.setSource(jsonObject1.getString("source"));
+                                wenJuanAnswerSheet.setTimeUsed(jsonObject1.getString("time_used"));
+                                wenJuanAnswerSheet.setFinish(jsonObject1.getString("finish"));
+                                wenJuanAnswerSheet.setRspdStatus(jsonObject1.getString("rspd_status"));
+                                wenJuanAnswerSheet.setStart(jsonObject1.getString("start"));
+                                wenJuanAnswerSheet.setWeixinAddr(jsonObject1.getString("weixin_addr"));
+                                wenJuanAnswerSheet.setWeixinNickname(jsonObject1.getString("weixin_nickname"));
+                                wenJuanAnswerSheet.setWeixinSex(jsonObject1.getString("weixin_sex"));
+                                list.add(wenJuanAnswerSheet);
+
+                                //数据库中的问卷详情列表与问卷网接口中获取的问卷详情数据相比较，如果数据库中已存在接口采集的数据，
+                                //则删除list中的该对象，最终不把数据库中已存在的数据再次保存到数据库中
+                                if(answerSheetList.contains(wenJuanAnswerSheet)){
+                                    list.remove(wenJuanAnswerSheet);
                                 }
                                 else
                                 {
-                                    break;
+                                    //获取第n题答案
+                                    for(int k = 1; k < WenJuanApiConstant.Q_VALUE; k++){
+                                        WenJuanAnswer wjq = new WenJuanAnswer();
+                                        String q = jsonObject1.getString("Q"+k);
+                                        if(null != q){
+                                            //去掉所有的html标记
+                                            q = q.replaceAll("\\<.*?>", " ");
+                                            JSONObject jsonObject2 = JSONObject.parseObject(q);
+                                            String emoji = "";
+                                            try {
+                                                if(jsonObject2.containsKey("answer")){
+                                                    emoji = EmojiUtil.emojiConvert(jsonObject2.getString("answer"));
+                                                }
+                                            } catch (UnsupportedEncodingException e) {
+                                                e.printStackTrace();
+                                            }
+                                            wjq.setAnswer(emoji);
+                                            wjq.setTypeDesc(jsonObject2.getString("type_desc"));
+                                            wjq.setTitle(jsonObject2.getString("title"));
+                                            wjq.setSeq(jsonObject1.getInteger("seq"));
+                                            wjq.setShortId(projectList.get(i).getShortId());
+                                            wjq.setUser(projectList.get(i).getUser());
+                                            wjq.setQTop(k);
+                                            wenJuanAnswerList.add(wjq);
+                                        }
+                                        else
+                                        {
+                                            break;
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -445,12 +472,12 @@ public class WenJuanQuestionnaireServiceImpl implements WenJuanQuestionnaireServ
         return projectUrl;
     }
 
+
     /**
      * 检查数组是否包含某个值
      */
     public static boolean arrayExistValue(String[] arr, String targetValue) {
         return Arrays.asList(arr).contains(targetValue);
     }
-
 
 }

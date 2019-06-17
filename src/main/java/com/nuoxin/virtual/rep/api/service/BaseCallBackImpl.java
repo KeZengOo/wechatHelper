@@ -307,6 +307,10 @@ public abstract class BaseCallBackImpl implements CallBackService{
 			String fileType = ossFilePath.substring(ossFilePath.length()-4,ossFilePath.length());
 			String sourceFileName = "";
 			String targeFileName = "";
+			String wavSourceFileName = "";
+			String leftTargeFileName = "";
+			String rightTargeFileName = "";
+
 			if(fileType.equals(FileConstant.MP3_SUFFIX)){
 				sourceFileName = local+ossFilePath.substring((ossFilePath.lastIndexOf("/")));
 				targeFileName = local+ossFilePath.substring((ossFilePath.lastIndexOf("/")));
@@ -315,12 +319,12 @@ public abstract class BaseCallBackImpl implements CallBackService{
 			}
 
 			//区分wav左右声道，并保存到本地
-			String wavSourceFileName = local+ossFilePath.substring((ossFilePath.lastIndexOf("/")));
-			wavSourceFileName = wavSourceFileName.substring(0,wavSourceFileName.length()-3)+"wav";
-			String leftTargeFileName = local+ossFilePath.substring((ossFilePath.lastIndexOf("/")));
-			leftTargeFileName = leftTargeFileName.substring(0,leftTargeFileName.length()-4)+"_left.wav";
-			String rightTargeFileName = local+ossFilePath.substring((ossFilePath.lastIndexOf("/")));
-			rightTargeFileName = rightTargeFileName.substring(0,rightTargeFileName.length()-4)+"_right.wav";
+			wavSourceFileName = local + ossFilePath.substring((ossFilePath.lastIndexOf("/")));
+			wavSourceFileName = wavSourceFileName.substring(0, wavSourceFileName.length() - 3) + "wav";
+			leftTargeFileName = local + ossFilePath.substring((ossFilePath.lastIndexOf("/")));
+			leftTargeFileName = leftTargeFileName.substring(0, leftTargeFileName.length() - 4) + "_left.wav";
+			rightTargeFileName = local + ossFilePath.substring((ossFilePath.lastIndexOf("/")));
+			rightTargeFileName = rightTargeFileName.substring(0, rightTargeFileName.length() - 4) + "_right.wav";
 
 			try {
 				AudioConvertUtil.steroToMono(wavSourceFileName,leftTargeFileName,rightTargeFileName);
