@@ -9,7 +9,6 @@ import com.nuoxin.virtual.rep.api.utils.ExportExcelUtil;
 import com.nuoxin.virtual.rep.api.utils.ExportExcelWrapper;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.CoverageCallResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.CoverageOverviewResponse;
-import mpg.Common;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -348,6 +347,36 @@ public class CoverageReportServiceImpl implements CoverageReportService {
                         rlist, response, ExportExcelUtil.EXCEl_FILE_2007);
             }
         }
+    }
+
+    @Override
+    public Map<String, Object> findWeChatListByProductIdAndTime(Long productId, String startTime, String endTime) {
+        return null;
+    }
+
+    @Override
+    public void exportWeChat(HttpServletResponse response, long proId, String startTime, String endTime) {
+
+    }
+
+    @Override
+    public Map<String, Object> findMeetingListByProductIdAndTime(Long productId, String startTime, String endTime) {
+        return null;
+    }
+
+    @Override
+    public void exportMeeting(HttpServletResponse response, long proId, String startTime, String endTime) {
+
+    }
+
+    @Override
+    public Map<String, Object> findContentListByProductIdAndTime(Long productId, String startTime, String endTime) {
+        return null;
+    }
+
+    @Override
+    public void exportContent(HttpServletResponse response, long proId, String startTime, String endTime) {
+
     }
 
 
