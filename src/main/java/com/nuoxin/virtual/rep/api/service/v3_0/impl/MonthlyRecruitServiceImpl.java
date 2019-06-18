@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * 月报招募相关
@@ -145,6 +146,207 @@ public class MonthlyRecruitServiceImpl implements MonthlyRecruitService {
                 new String[]{"月份", "成功招募医生数", "有手机号医生数", "有手机号医生数/成功招募医生数百分比", "有微信号医生数",
                         "有微信号医生数/成功招募医生数百分比", "已添加微信医生数", "已添加微信医生数/有微信号医生数百分比"},
                 this.getMonthlyRecruitContactDetailList(request), response, ExportExcelUtil.EXCEl_FILE_2007);
+    }
+
+
+    @Override
+    public MonthlyHistogramResponse getMonthlyProvinceRecruitList(MonthlyRecruitRequest request) {
+        MonthlyHistogramResponse monthlyHistogramResponse = new MonthlyHistogramResponse();
+        List<MonthlyProvinceRecruitResponse> monthlyProvinceRecruitList = monthlyRecruitMapper.getMonthlyProvinceRecruitList(request);
+        if (CollectionsUtil.isNotEmptyList(monthlyProvinceRecruitList)){
+            List<String> provinceList = monthlyProvinceRecruitList.stream().map(MonthlyProvinceRecruitResponse::getProvince).collect(Collectors.toList());
+            monthlyHistogramResponse.setAbscissa(provinceList);
+            List<Integer> recruitDoctorList = monthlyProvinceRecruitList.stream().map(MonthlyProvinceRecruitResponse::getRecruitDoctor).collect(Collectors.toList());
+            List<Integer> recruitHospitalList = monthlyProvinceRecruitList.stream().map(MonthlyProvinceRecruitResponse::getRecruitHospital).collect(Collectors.toList());
+            List<List<Integer>> list = new ArrayList<>();
+            list.add(recruitDoctorList);
+            list.add(recruitHospitalList);
+            monthlyHistogramResponse.setOrdinate(list);
+        }
+
+        return monthlyHistogramResponse;
+    }
+
+    @Override
+    public void exportMonthlyProvinceRecruit(MonthlyRecruitRequest request, HttpServletResponse response) {
+        List<MonthlyProvinceRecruitResponse> monthlyProvinceRecruitList = monthlyRecruitMapper.getMonthlyProvinceRecruitList(request);
+        if (CollectionsUtil.isEmptyList(monthlyProvinceRecruitList)){
+            monthlyProvinceRecruitList = new ArrayList<>();
+        }
+
+        ExportExcelWrapper<MonthlyProvinceRecruitResponse> exportExcelWrapper = new ExportExcelWrapper();
+        exportExcelWrapper.exportExcel("月报—各省招募情况汇总".concat(request.getStartDate()).concat("~").concat(request.getEndDate()), "月报—各省招募情况汇总",
+                new String[]{"省份", "成功招募医院数", "成功招募医生数"},
+                monthlyProvinceRecruitList, response, ExportExcelUtil.EXCEl_FILE_2007);
+
+    }
+
+    @Override
+    public MonthlyHistogramResponse getMonthlyHospitalLevelRecruitList(MonthlyRecruitRequest request) {
+        MonthlyHistogramResponse monthlyHistogramResponse = new MonthlyHistogramResponse();
+        List<MonthlyHospitalLevelRecruitResponse> list = this.getMonthlyHospitalLevelRecruitData(request);
+        if (CollectionsUtil.isNotEmptyList(list)){
+            List<String> hospitalLevelList = list.stream().map(MonthlyHospitalLevelRecruitResponse::getHospitalLevel).collect(Collectors.toList());
+            List<Integer> recruitDoctorList = list.stream().map(MonthlyHospitalLevelRecruitResponse::getRecruitDoctor).collect(Collectors.toList());
+            monthlyHistogramResponse.setAbscissa(hospitalLevelList);
+            List<List<Integer>> dList = new ArrayList<>();
+            dList.add(recruitDoctorList);
+            monthlyHistogramResponse.setOrdinate(dList);
+        }
+        return monthlyHistogramResponse;
+    }
+
+
+
+    @Override
+    public void exportMonthlyHospitalLevelRecruit(MonthlyRecruitRequest request, HttpServletResponse response) {
+        List<MonthlyHospitalLevelRecruitResponse> list = this.getMonthlyHospitalLevelRecruitData(request);
+        ExportExcelWrapper<MonthlyHospitalLevelRecruitResponse> exportExcelWrapper = new ExportExcelWrapper();
+        exportExcelWrapper.exportExcel("月报—医院级别招募情况汇总".concat(request.getStartDate()).concat("~").concat(request.getEndDate()), "月报—医院级别招募情况汇总",
+                new String[]{"医院级别", "成功招募医生数", "招募占比"},
+                list, response, ExportExcelUtil.EXCEl_FILE_2007);
+    }
+
+    @Override
+    public MonthlyHistogramResponse getMonthlyDepartRecruitList(MonthlyRecruitRequest request) {
+        MonthlyHistogramResponse monthlyHistogramResponse = new MonthlyHistogramResponse();
+        List<MonthlyDepartRecruitResponse> monthlyDepartRecruitList = monthlyRecruitMapper.getMonthlyDepartRecruitList(request);
+        if (CollectionsUtil.isNotEmptyList(monthlyDepartRecruitList)){
+            List<String> departList = monthlyDepartRecruitList.stream().map(MonthlyDepartRecruitResponse::getDepart).collect(Collectors.toList());
+            List<Integer> recruitDoctorList = monthlyDepartRecruitList.stream().map(MonthlyDepartRecruitResponse::getRecruitDoctor).collect(Collectors.toList());
+            monthlyHistogramResponse.setAbscissa(departList);
+            List<List<Integer>> list = new ArrayList<>();
+            list.add(recruitDoctorList);
+            monthlyHistogramResponse.setOrdinate(list);
+        }
+
+        return monthlyHistogramResponse;
+    }
+
+    @Override
+    public void exportMonthlyDepartRecruit(MonthlyRecruitRequest request, HttpServletResponse response) {
+        List<MonthlyDepartRecruitResponse> monthlyDepartRecruitList = monthlyRecruitMapper.getMonthlyDepartRecruitList(request);
+        Integer recruitDoctor = monthlyRecruitMapper.getRecruitDoctor(request);
+        if (CollectionsUtil.isNotEmptyList(monthlyDepartRecruitList)){
+            for (MonthlyDepartRecruitResponse monthlyDepartRecruitResponse : monthlyDepartRecruitList) {
+                Integer departRecruitDoctor = monthlyDepartRecruitResponse.getRecruitDoctor();
+                String recruitDoctorRate = CalculateUtil.getPercentage(departRecruitDoctor, recruitDoctor, 2);
+                monthlyDepartRecruitResponse.setRecruitDoctorRate(recruitDoctorRate);
+            }
+        }else {
+            monthlyDepartRecruitList = new ArrayList<>();
+        }
+
+        ExportExcelWrapper<MonthlyDepartRecruitResponse> exportExcelWrapper = new ExportExcelWrapper();
+        exportExcelWrapper.exportExcel("月报—科室招募情况汇总".concat(request.getStartDate()).concat("~").concat(request.getEndDate()), "月报—科室招募情况汇总",
+                new String[]{"科室", "成功招募医生数", "招募占比"},
+                monthlyDepartRecruitList, response, ExportExcelUtil.EXCEl_FILE_2007);
+
+
+    }
+
+    @Override
+    public MonthlyHistogramResponse getMonthlyDoctorLevelRecruitList(MonthlyRecruitRequest request) {
+        MonthlyHistogramResponse monthlyHistogramResponse = new MonthlyHistogramResponse();
+        List<MonthlyDoctorLevelRecruitResponse> doctorLevelRecruitList = this.getDoctorLevelRecruitList(request);
+        if (CollectionsUtil.isNotEmptyList(doctorLevelRecruitList)){
+            List<String> doctorLevelList = doctorLevelRecruitList.stream().map(MonthlyDoctorLevelRecruitResponse::getDoctorLevel).collect(Collectors.toList());
+            List<Integer> doctorLevelRecruit = doctorLevelRecruitList.stream().map(MonthlyDoctorLevelRecruitResponse::getRecruitDoctor).collect(Collectors.toList());
+            monthlyHistogramResponse.setAbscissa(doctorLevelList);
+            List<List<Integer>> list = new ArrayList<>();
+            list.add(doctorLevelRecruit);
+            monthlyHistogramResponse.setOrdinate(list);
+        }
+
+        return monthlyHistogramResponse;
+    }
+
+
+
+    @Override
+    public void exportMonthlyDoctorLevelRecruit(MonthlyRecruitRequest request, HttpServletResponse response) {
+        List<MonthlyDoctorLevelRecruitResponse> doctorLevelRecruitList = this.getDoctorLevelRecruitList(request);
+        if (CollectionsUtil.isEmptyList(doctorLevelRecruitList)){
+            doctorLevelRecruitList = new ArrayList<>();
+        }
+        ExportExcelWrapper<MonthlyDoctorLevelRecruitResponse> exportExcelWrapper = new ExportExcelWrapper();
+        exportExcelWrapper.exportExcel("月报—医生级别招募情况汇总".concat(request.getStartDate()).concat("~").concat(request.getEndDate()), "月报—医生级别招募情况汇总",
+                new String[]{"医生级别", "成功招募医生数", "招募占比"},
+                doctorLevelRecruitList, response, ExportExcelUtil.EXCEl_FILE_2007);
+    }
+
+
+    /**
+     * 得到月报医生级别招募的数据
+     * @param request
+     * @return
+     */
+    private List<MonthlyDoctorLevelRecruitResponse> getDoctorLevelRecruitList(MonthlyRecruitRequest request) {
+        List<MonthlyDoctorLevelRecruitResponse> monthlyDoctorLevelRecruitList = monthlyRecruitMapper.getMonthlyDoctorLevelRecruitList(request);
+        Integer recruitDoctor = monthlyRecruitMapper.getRecruitDoctor(request);
+        List<MonthlyDoctorLevelRecruitResponse> list = new ArrayList<>();
+        if (CollectionsUtil.isNotEmptyList(monthlyDoctorLevelRecruitList)){
+            String doctorDynamicLevelStr = monthlyRecruitMapper.getDoctorDynamicLevelStr();
+            if (StringUtil.isNotEmpty(doctorDynamicLevelStr)){
+                String[] doctorLevelArray = doctorDynamicLevelStr.split(",");
+                for (String doctorLevel : doctorLevelArray) {
+                    MonthlyDoctorLevelRecruitResponse monthlyDoctorLevelRecruitResponse = new MonthlyDoctorLevelRecruitResponse();
+                    Optional<MonthlyDoctorLevelRecruitResponse> first = monthlyDoctorLevelRecruitList.stream().filter(m -> (doctorLevel.equals(m.getDoctorLevel()))).findFirst();
+                    if (first.isPresent()){
+                        MonthlyDoctorLevelRecruitResponse monthlyDoctorLevelRecruit = first.get();
+                        Integer doctorLevelRecruit = monthlyDoctorLevelRecruit.getRecruitDoctor();
+                        String recruitDoctorRate = CalculateUtil.getPercentage(doctorLevelRecruit, recruitDoctor, 2);
+                        monthlyDoctorLevelRecruitResponse.setRecruitDoctor(doctorLevelRecruit);
+                        monthlyDoctorLevelRecruitResponse.setRecruitDoctorRate(recruitDoctorRate);
+                    }else {
+                        monthlyDoctorLevelRecruitResponse.setRecruitDoctor(0);
+                        monthlyDoctorLevelRecruitResponse.setRecruitDoctorRate("0%");
+                    }
+
+                    monthlyDoctorLevelRecruitResponse.setDoctorLevel(doctorLevel);
+                    list.add(monthlyDoctorLevelRecruitResponse);
+                }
+            }
+        }
+        return list;
+
+    }
+
+
+    /**
+     * 得到月报医院级别招募的数据
+     * @param request
+     * @return
+     */
+    private List<MonthlyHospitalLevelRecruitResponse> getMonthlyHospitalLevelRecruitData(MonthlyRecruitRequest request) {
+        List<MonthlyHospitalLevelRecruitResponse> monthlyHospitalLevelRecruitList = monthlyRecruitMapper.getMonthlyHospitalLevelRecruitList(request);
+        Integer recruitDoctor = monthlyRecruitMapper.getRecruitDoctor(request);
+        List<MonthlyHospitalLevelRecruitResponse> list = new ArrayList<>();
+        if (CollectionsUtil.isNotEmptyList(monthlyHospitalLevelRecruitList)){
+            // 所有的医院级别
+            // 11一级甲等，12一级乙等，13一级丙等，14一级特等，21二级甲等，22二级乙等，23二级丙等，
+            // 31三级甲等，32三级乙等，33三级丙等，40特级医院，50民营医院' 0 其他
+            String[] hospitalLevelArray = {"11", "12", "13", "14", "21", "22", "23", "31", "32", "33", "40", "50", "0"};
+            for (String hospitalLevelValue : hospitalLevelArray) {
+                MonthlyHospitalLevelRecruitResponse monthlyHospitalLevelRecruitResponse = new MonthlyHospitalLevelRecruitResponse();
+                Optional<MonthlyHospitalLevelRecruitResponse> first = monthlyHospitalLevelRecruitList.stream().filter(m -> (hospitalLevelValue.equals(m.getHospitalLevel()))).findFirst();
+                if (first.isPresent()){
+                    MonthlyHospitalLevelRecruitResponse monthlyHospitalLevelRecruit = first.get();
+                    Integer doctorLevelRecruitDoctor = monthlyHospitalLevelRecruit.getRecruitDoctor();
+                    String recruitDoctorRate = CalculateUtil.getPercentage(doctorLevelRecruitDoctor, recruitDoctor, 2);
+                    monthlyHospitalLevelRecruitResponse.setRecruitDoctor(doctorLevelRecruitDoctor);
+                    monthlyHospitalLevelRecruitResponse.setRecruitDoctorRate(recruitDoctorRate);
+                }else {
+                    monthlyHospitalLevelRecruitResponse.setRecruitDoctor(0);
+                    monthlyHospitalLevelRecruitResponse.setRecruitDoctorRate("0%");
+                }
+                monthlyHospitalLevelRecruitResponse.setHospitalLevel(HospitalLevelUtil.getLevelNameByLevelCode(hospitalLevelValue));
+                list.add(monthlyHospitalLevelRecruitResponse);
+            }
+
+        }
+
+        return list;
     }
 
     /**

@@ -74,7 +74,7 @@ public enum HospitalLevelEnum {
                 name = "民营医院";
                 break;
             default:
-                name = "未知";
+                name = "其他";
 
         }
 

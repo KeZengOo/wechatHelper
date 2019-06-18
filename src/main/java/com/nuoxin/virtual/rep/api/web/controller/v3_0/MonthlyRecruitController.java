@@ -10,6 +10,7 @@ import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.DrugUserDoctorCall
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.MonthlyRecruitRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DrugUserDoctorCallResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyDoctorRecruitResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyHistogramResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyHospitalRecruitResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyRecruitContactResponse;
 import io.swagger.annotations.Api;
@@ -87,7 +88,79 @@ public class MonthlyRecruitController {
         monthlyRecruitService.exportMonthlyRecruitContact(bean, response);
     }
 
+    @ApiOperation(value = "医生招募中省份统计")
+    @PostMapping(value = "/recruit/province")
+    public DefaultResponseBean<MonthlyHistogramResponse> getMonthlyProvinceRecruitList(@RequestBody MonthlyRecruitRequest request){
 
+        MonthlyHistogramResponse monthlyProvinceRecruitList = monthlyRecruitService.getMonthlyProvinceRecruitList(request);
+        DefaultResponseBean<MonthlyHistogramResponse> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(monthlyProvinceRecruitList);
+        return responseBean;
+    }
+
+    @ApiOperation(value = "医生招募中省份统计导出")
+    @GetMapping(value = "/recruit/province/export")
+    public void exportMonthlyProvinceRecruit(HttpServletRequest request, HttpServletResponse response){
+        MonthlyRecruitRequest bean = this.getMonthlyRecruitExportParam(request);
+        monthlyRecruitService.exportMonthlyProvinceRecruit(bean, response);
+    }
+
+
+
+    @ApiOperation(value = "医院级别招募情况汇总")
+    @PostMapping(value = "/recruit/hospital/level")
+    public DefaultResponseBean<MonthlyHistogramResponse> getMonthlyHospitalLevelRecruitList(@RequestBody MonthlyRecruitRequest request){
+
+        MonthlyHistogramResponse monthlyHospitalLevelRecruitList = monthlyRecruitService.getMonthlyHospitalLevelRecruitList(request);
+        DefaultResponseBean<MonthlyHistogramResponse> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(monthlyHospitalLevelRecruitList);
+        return responseBean;
+    }
+
+
+
+    @ApiOperation(value = "医院级别招募情况汇总导出")
+    @GetMapping(value = "/recruit/hospital/level/export")
+    public void exportMonthlyHospitalLevelRecruit(HttpServletRequest request, HttpServletResponse response){
+        MonthlyRecruitRequest bean = this.getMonthlyRecruitExportParam(request);
+        monthlyRecruitService.exportMonthlyHospitalLevelRecruit(bean, response);
+    }
+
+
+    @ApiOperation(value = "医生科室招募情况汇总")
+    @PostMapping(value = "/recruit/depart")
+    public DefaultResponseBean<MonthlyHistogramResponse> getMonthlyDepartRecruitList(@RequestBody MonthlyRecruitRequest request){
+        MonthlyHistogramResponse monthlyDepartRecruitList = monthlyRecruitService.getMonthlyDepartRecruitList(request);
+        DefaultResponseBean<MonthlyHistogramResponse> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(monthlyDepartRecruitList);
+        return responseBean;
+    }
+
+
+    @ApiOperation(value = "医生科室招募情况汇总导出")
+    @GetMapping(value = "/recruit/depart/export")
+    public void exportMonthlyDepartRecruit(HttpServletRequest request, HttpServletResponse response){
+        MonthlyRecruitRequest bean = this.getMonthlyRecruitExportParam(request);
+        monthlyRecruitService.exportMonthlyDepartRecruit(bean, response);
+    }
+
+
+    @ApiOperation(value = "医生级别招募情况汇总")
+    @PostMapping(value = "/recruit/doctor/level")
+    public DefaultResponseBean<MonthlyHistogramResponse> getMonthlyDoctorLevelRecruitList(@RequestBody MonthlyRecruitRequest request){
+        MonthlyHistogramResponse monthlyDoctorLevelRecruitList = monthlyRecruitService.getMonthlyDoctorLevelRecruitList(request);
+        DefaultResponseBean<MonthlyHistogramResponse> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(monthlyDoctorLevelRecruitList);
+        return responseBean;
+    }
+
+
+    @ApiOperation(value = "医生级别招募情况汇总导出")
+    @GetMapping(value = "/recruit/doctor/level/export")
+    public void exportMonthlyDoctorLevelRecruit(HttpServletRequest request, HttpServletResponse response){
+        MonthlyRecruitRequest bean = this.getMonthlyRecruitExportParam(request);
+        monthlyRecruitService.exportMonthlyDoctorLevelRecruit(bean, response);
+    }
 
     /**
      * 得到月报导出数据

@@ -1,10 +1,7 @@
 package com.nuoxin.virtual.rep.api.mybatis;
 
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.MonthlyCommonRequest;
-import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyRecruitAddWechatDetailResponse;
-import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyRecruitDetailResponse;
-import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyRecruitMobileDetailResponse;
-import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyRecruitWechatDetailResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.*;
 
 import java.util.List;
 
@@ -119,4 +116,41 @@ public interface MonthlyRecruitMapper {
      */
     List<MonthlyRecruitAddWechatDetailResponse> getMonthAddWechatDoctorList(MonthlyCommonRequest request);
 
+
+    /**
+     * 得到每个省份招募的医生数，医院数
+     * @param request
+     * @return
+     */
+    List<MonthlyProvinceRecruitResponse> getMonthlyProvinceRecruitList(MonthlyCommonRequest request);
+
+
+    /**
+     * 每个医院级别招募的医生数，对应的医院数
+     * @param request
+     * @return
+     */
+    List<MonthlyHospitalLevelRecruitResponse> getMonthlyHospitalLevelRecruitList(MonthlyCommonRequest request);
+
+
+    /**
+     * 每个科室医生招募数据
+     * @param request
+     * @return
+     */
+    List<MonthlyDepartRecruitResponse> getMonthlyDepartRecruitList(MonthlyCommonRequest request);
+
+
+    /**
+     * 每个医生级别招募医生数据
+     * @param request
+     * @return
+     */
+    List<MonthlyDoctorLevelRecruitResponse> getMonthlyDoctorLevelRecruitList(MonthlyCommonRequest request);
+
+    /**
+     * 得到医生动态添加的医生级别
+     * @return
+     */
+    String getDoctorDynamicLevelStr();
 }

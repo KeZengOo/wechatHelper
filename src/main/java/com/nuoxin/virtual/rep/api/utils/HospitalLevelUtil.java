@@ -9,7 +9,7 @@ import java.util.Map;
 public class HospitalLevelUtil {
     private static final Map<String, String> levelMap = new HashMap<String, String>();
     static{
-        levelMap.put("0", "未知");
+        levelMap.put("0", "其他");
         levelMap.put("10", "一级");
         levelMap.put("20", "二级");
         levelMap.put("30", "三级");
@@ -28,6 +28,6 @@ public class HospitalLevelUtil {
     }
 
     public static String getLevelNameByLevelCode(String levelCode){
-        return levelMap.containsKey(levelCode) ? levelMap.get(levelCode) : "未知";
+        return levelMap.containsKey(levelCode) ? levelMap.get(levelCode) : "其他";
     }
 }

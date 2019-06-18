@@ -395,4 +395,145 @@
     </select>
 
 
+    <!-- 得到每个省份招募的医生数，医院数 -->
+    <select id="getMonthlyProvinceRecruitList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyProvinceRecruitResponse">
+        SELECT
+        IF(h.province IS NULL OR h.province='', '其他', h.province) province,
+        COUNT( DISTINCT h.id ) recruitHospital,
+        COUNT( DISTINCT d.id ) recruitDoctor
+        FROM
+        doctor d
+        INNER JOIN hospital h ON d.hospital_id = h.id
+        WHERE
+        d.id IN (
+        SELECT
+        d.id
+        FROM
+        virtual_doctor_call_info_mend m
+        INNER JOIN doctor d ON m.virtual_doctor_id = d.id
+        WHERE
+        m.product_id = #{productId}
+        AND m.is_recruit = 1
+        GROUP BY
+        d.id
+        HAVING
+        1 = 1
+        <if test="startDate !=null">
+            AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &gt;= #{startDate}
+        </if>
+        <if test="endDate !=null">
+            AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &lt;= #{endDate}
+        </if>
+        )
+        GROUP BY
+        h.province
+        ORDER BY recruitHospital DESC
+    </select>
+
+
+    <!-- 每个医院级别招募的医生数 -->
+    <select id="getMonthlyHospitalLevelRecruitList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyHospitalLevelRecruitResponse">
+        SELECT
+        IFNULL(h.`level`, 0) hospitalLevel,
+        COUNT( DISTINCT d.id ) recruitDoctor
+        FROM
+        doctor d
+        INNER JOIN hospital h ON d.hospital_id = h.id
+        WHERE
+        d.id IN (
+        SELECT
+        d.id
+        FROM
+        virtual_doctor_call_info_mend m
+        INNER JOIN doctor d ON m.virtual_doctor_id = d.id
+        WHERE
+        m.product_id = #{productId}
+        AND m.is_recruit = 1
+        GROUP BY
+        d.id
+        HAVING
+        1 = 1
+
+        <if test="startDate !=null">
+            AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &gt;= #{startDate}
+        </if>
+        <if test="endDate !=null">
+            AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &lt;= #{endDate}
+        </if>
+
+        )
+        GROUP BY
+        h.`level`
+        ORDER BY h.`level` DESC
+    </select>
+
+    <!-- 每个科室医生招募数据 -->
+    <select id="getMonthlyDepartRecruitList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyDepartRecruitResponse">
+        SELECT
+        IF(dd.depart IS NULL OR dd.depart='', '其他', dd.depart) depart,
+        COUNT(DISTINCT dd.id) recruitDoctor FROM doctor dd WHERE dd.id IN
+        (
+        SELECT
+        d.id
+        FROM
+        virtual_doctor_call_info_mend m
+        INNER JOIN doctor d ON m.virtual_doctor_id = d.id
+        WHERE
+        m.product_id = #{productId}
+        AND m.is_recruit = 1
+        GROUP BY
+        d.id
+        HAVING
+        1 = 1
+
+        <if test="startDate !=null">
+            AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &gt;= #{startDate}
+        </if>
+        <if test="endDate !=null">
+            AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &lt;= #{endDate}
+        </if>
+        )
+        GROUP BY dd.depart
+        ORDER BY dd.depart
+        DESC
+    </select>
+
+    <!-- 每个医生级别招募医生数据 -->
+    <select id="getMonthlyDoctorLevelRecruitList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyDoctorLevelRecruitResponse">
+        SELECT v2.dynamic_field_value doctorLevel,
+        COUNT(DISTINCT v2.doctor_id) recruitDoctor FROM virtual_doctor_dynamic_field v
+        INNER JOIN virtual_doctor_dynamic_field_value v2
+        ON v.id=v2.dynamic_field_id
+        WHERE v.product_id=0
+        AND v.field_name='医生职称'
+        AND v2.doctor_id IN
+        (
+        SELECT
+        d.id
+        FROM
+        virtual_doctor_call_info_mend m
+        INNER JOIN doctor d ON m.virtual_doctor_id = d.id
+        WHERE
+        m.product_id = #{productId}
+        AND m.is_recruit = 1
+        GROUP BY
+        d.id
+        HAVING
+        1 = 1
+        <if test="startDate !=null">
+            AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &gt;= #{startDate}
+        </if>
+        <if test="endDate !=null">
+            AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &lt;= #{endDate}
+        </if>
+        )
+        GROUP BY v2.dynamic_field_value
+    </select>
+
+    <!-- 得到医生动态添加的医生级别 -->
+    <select id="getDoctorDynamicLevelStr" resultType="java.lang.String">
+        SELECT field_value FROM virtual_doctor_dynamic_field WHERE field_name='医生职称' AND product_id=0 LIMIT 1
+    </select>
+
+
 </mapper>
