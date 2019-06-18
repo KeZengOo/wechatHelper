@@ -1,19 +1,13 @@
 package com.nuoxin.virtual.rep.api.web.controller.v3_0;
 
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
-import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
-import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.v3_0.request.CoverageReportRequest;
 import com.nuoxin.virtual.rep.api.service.v3_0.CoverageReportService;
-import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.VisitDataRequest;
-import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.VisitDataResponse;
 import com.nuoxin.virtual.rep.api.web.controller.v2_5.NewBaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateUtils;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;

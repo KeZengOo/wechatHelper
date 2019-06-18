@@ -82,4 +82,27 @@
 		WHERE pd.is_recruit = 1 AND pd.virtual_doctor_id > 0
 	</sql>
 
+	<!-- 根据产品id和时间段查询招募医生 -->
+	<select id="findCoverageRecruitList" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.CoverageReportPart">
+		SELECT
+		d.id hcpId,DATE_FORMAT(m.create_time,'%Y-%m') timeStr
+		FROM
+		virtual_doctor_call_info v
+		INNER JOIN doctor d ON v.virtual_doctor_id = d.id
+		INNER JOIN virtual_doctor_call_info_mend m ON v.id=m.call_id
+		WHERE v.product_id = #{productId} AND m.is_recruit= 1
+		AND DATE_FORMAT(m.create_time, '%Y-%m') &lt;= #{endTime}
+		GROUP BY d.id, m.create_time
+	</select>
+
+	<!-- 电话覆盖 -->
+	<select id="findCoverageCallList" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.CoverageReportPart">
+		-- 电话覆盖
+		SELECT d.id hcpId, a.call_time hciId, DATE_FORMAT(b.create_time,'%Y-%m') timeStr FROM `virtual_doctor_call_info` a
+		INNER JOIN doctor d ON a.virtual_doctor_id = d.id
+		INNER JOIN virtual_doctor_call_info_mend b on a.id = b.call_id
+		WHERE b.is_recruit = 1 AND a.product_id = #{productId} AND a.status_name = 'answer' AND a.visit_channel = 1
+		AND DATE_FORMAT(a.create_time,'%Y-%m') &gt;= #{startTime} AND DATE_FORMAT(a.create_time,'%Y-%m') &lt;= #{endTime}
+	</select>
+
 </mapper>

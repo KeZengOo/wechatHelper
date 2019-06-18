@@ -26,7 +26,7 @@ public interface CoverageReportMapper {
     /**
      * 根据产品id和时间段查询招募医生和医院数据
      * @param productId 产品id
-     * @param startTime 开始时间 eg: 2019-01
+     * @param startTime 开始时间 eg: 2019-01 未使用
      * @param endTime 结束时间 eg: 2019-05
      * @return list
      */
@@ -41,6 +41,23 @@ public interface CoverageReportMapper {
      */
     List<CoverageReportPart> findCoverageList(@Param("productId") Long productId, @Param("startTime") String startTime, @Param("endTime") String endTime);
 
+    /**
+     * 根据产品id和时间段查询招募医生数据
+     * @param productId 产品id
+     * @param startTime 开始时间 eg: 2019-01 未使用
+     * @param endTime 结束时间 eg: 2019-05
+     * @return list
+     */
+    List<CoverageReportPart> findCoverageRecruitList(@Param("productId") Long productId, @Param("startTime") String startTime, @Param("endTime") String endTime);
+
+    /**
+     * 根据产品id和时间段查询电话覆盖医生数据
+     * @param productId 产品id
+     * @param startTime 开始时间 eg: 2019-01
+     * @param endTime 结束时间 eg: 2019-05
+     * @return list
+     */
+    List<CoverageReportPart> findCoverageCallList(@Param("productId") Long productId, @Param("startTime") String startTime, @Param("endTime") String endTime);
 
 
 }
