@@ -10,10 +10,7 @@ import com.nuoxin.virtual.rep.api.mybatis.DynamicFieldMapper;
 import com.nuoxin.virtual.rep.api.mybatis.ProductLineMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v3_0.CommonPoolService;
-import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
-import com.nuoxin.virtual.rep.api.utils.ExportExcel;
-import com.nuoxin.virtual.rep.api.utils.ExportExcelTitle;
-import com.nuoxin.virtual.rep.api.utils.HospitalLevelUtil;
+import com.nuoxin.virtual.rep.api.utils.*;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.CommonPoolRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.product.ProductResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.*;
@@ -55,6 +52,10 @@ public class CommonPoolServiceImpl implements CommonPoolService {
 
     @Override
     public PageResponseBean<CommonPoolDoctorResponse> getDoctorPage(DrugUser drugUser, CommonPoolRequest request) {
+        String searchKeyword = request.getSearchKeyword();
+        if (StringUtil.isNotEmpty(searchKeyword)){
+            request.setSearchKeyword(searchKeyword.trim());
+        }
 
         Integer count = doctorMapper.getCommonPoolDoctorListCount(request);
         if (count == null){

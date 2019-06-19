@@ -8,10 +8,7 @@ import com.nuoxin.virtual.rep.api.mybatis.DoctorMapper;
 import com.nuoxin.virtual.rep.api.mybatis.DrugUserMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v3_0.MyDoctorService;
-import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
-import com.nuoxin.virtual.rep.api.utils.ExcelUtils;
-import com.nuoxin.virtual.rep.api.utils.HospitalLevelUtil;
-import com.nuoxin.virtual.rep.api.utils.RegularUtils;
+import com.nuoxin.virtual.rep.api.utils.*;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.MyDoctorRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.vo.DoctorVo;
 import com.nuoxin.virtual.rep.api.web.controller.response.message.MessageResponseBean;
@@ -54,6 +51,11 @@ public class MyDoctorServiceImpl implements MyDoctorService {
     @Override
     public PageResponseBean<MyDoctorResponse> getDoctorPage(DrugUser drugUser, MyDoctorRequest request) {
 
+        String searchKeyword = request.getSearchKeyword();
+        if (StringUtil.isNotEmpty(searchKeyword)){
+            request.setSearchKeyword(searchKeyword.trim());
+        }
+
         Integer count = doctorMapper.getMyDoctorListCount(request);
         if (count == null){
             count = 0;
@@ -72,6 +74,7 @@ public class MyDoctorServiceImpl implements MyDoctorService {
         }
 
         List<Long> doctorIdList = myDoctorList.stream().map(MyDoctorResponse::getDoctorId).distinct().collect(Collectors.toList());
+
         List<Long> productIdList = myDoctorList.stream().map(MyDoctorResponse::getProductId).distinct().collect(Collectors.toList());
         if (CollectionsUtil.isNotEmptyList(doctorIdList)){
 
