@@ -4,9 +4,12 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import com.alibaba.fastjson.JSONObject;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.callinfo.VisitCountRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.product.ProductResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.VisitCountResponseBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +32,10 @@ import java.util.List;
 @RequestMapping(value = "/call_info")
 @RestController
 public class VirtualDoctorCallInfoController extends NewBaseController{
-	
+
+
+	private static final Logger logger = LoggerFactory.getLogger(VirtualDoctorCallInfoController.class);
+
 	@Resource
 	private VirtualDoctorCallInfoService callInfoService;
 
@@ -71,6 +77,9 @@ public class VirtualDoctorCallInfoController extends NewBaseController{
 	public DefaultResponseBean<Boolean> connectedSave(HttpServletRequest request, 
 			                                                             @RequestBody @Valid  SaveCallInfoRequest saveRequest, 
 			                                                             BindingResult bindingResult) {
+		logger.info("请求路径：{}", request.getServletPath());
+		logger.info("请求参数：{}", JSONObject.toJSONString(saveRequest));
+
 		DrugUser user = this.getDrugUser(request);
 		if(user == null) {
 			return super.getLoginErrorResponse();
@@ -93,6 +102,8 @@ public class VirtualDoctorCallInfoController extends NewBaseController{
 	public DefaultResponseBean<Boolean> unconnectedSave(HttpServletRequest request, 
 			                                                             @RequestBody @Valid  SaveCallInfoUnConnectedRequest saveRequest, 
 			                                                             BindingResult bindingResult) {
+		logger.info("请求路径：{}", request.getServletPath());
+		logger.info("请求参数：{}", JSONObject.toJSONString(saveRequest));
 		DrugUser user = this.getDrugUser(request);
 		if(user == null) {
 			return super.getLoginErrorResponse();
