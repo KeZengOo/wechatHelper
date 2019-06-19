@@ -308,6 +308,8 @@ public class MonthlyRecruitServiceImpl implements MonthlyRecruitService {
                 }
             }
         }
+
+
         return list;
 
     }
@@ -326,7 +328,7 @@ public class MonthlyRecruitServiceImpl implements MonthlyRecruitService {
             // 所有的医院级别
             // 11一级甲等，12一级乙等，13一级丙等，14一级特等，21二级甲等，22二级乙等，23二级丙等，
             // 31三级甲等，32三级乙等，33三级丙等，40特级医院，50民营医院' 0 其他
-            String[] hospitalLevelArray = {"11", "12", "13", "14", "21", "22", "23", "31", "32", "33", "40", "50", "0"};
+            String[] hospitalLevelArray = {"10", "11", "12", "13", "14", "20", "21", "22", "23", "30", "31", "32", "33", "40", "50", "0"};
             for (String hospitalLevelValue : hospitalLevelArray) {
                 MonthlyHospitalLevelRecruitResponse monthlyHospitalLevelRecruitResponse = new MonthlyHospitalLevelRecruitResponse();
                 Optional<MonthlyHospitalLevelRecruitResponse> first = monthlyHospitalLevelRecruitList.stream().filter(m -> (hospitalLevelValue.equals(m.getHospitalLevel()))).findFirst();

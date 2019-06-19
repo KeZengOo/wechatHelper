@@ -9,6 +9,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.alibaba.fastjson.JSONObject;
 import com.nuoxin.virtual.rep.api.utils.StringUtil;
 import com.nuoxin.virtual.rep.api.web.controller.response.call.CallDoctorResponseBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -198,9 +199,10 @@ public class DoctorCallController extends BaseController {
     @ApiOperation(value = "拨号保存电话记录", notes = "拨号保存电话记录")
     @PostMapping("/save")
 	public ResponseObj save(@RequestBody CallRequestBean bean, HttpServletRequest request, HttpServletResponse response) {
-        logger.info("{}接口请求数据{}", request.getServletPath(), JSON.toJSONString(bean));
+        long startTime = System.currentTimeMillis();
+        logger.info("请求路径：{}", request.getServletPath());
+        logger.info("请求参数：{}", JSON.toJSONString(bean));
         ResponseObj responseBean = new ResponseObj();
-
         DrugUser user = super.getLoginUser(request);
         if (user == null) {
             responseBean.setCode(300);
@@ -234,6 +236,11 @@ public class DoctorCallController extends BaseController {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
+
+            long endTime = System.currentTimeMillis();
+            logger.info("返回数据：{}", JSONObject.toJSONString(responseBean));
+            logger.info("spend time {}ms", (endTime - startTime));
+
             return responseBean;
         }
     }

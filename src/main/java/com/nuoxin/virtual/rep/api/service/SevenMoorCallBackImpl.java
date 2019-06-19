@@ -166,6 +166,40 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 	}
 
 	@Override
+	public void repeatSaveOrUpdateCallNoWav(Call7mmorRequestBean bean) {
+		String beginTime = bean.getBeginTime();
+		// 如果没有开始时间，取当前时间前天的时间
+		if (StringUtils.isEmpty(beginTime)){
+			Date date=new Date();
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(date);
+			calendar.add(Calendar.DAY_OF_MONTH, -1);
+			date = calendar.getTime();
+			bean.setBeginTime(DateUtil.getDateTimeString(date));
+		}
+
+		String endTime = bean.getEndTime();
+		// 如果没有结束时间，取当前时间
+		if (StringUtils.isEmpty(endTime)){
+			bean.setEndTime(DateUtil.getDateTimeString(new Date()));
+		}
+
+		List<Call7mmorResponseBean> callList = getCallList(bean);
+		if (CollectionsUtil.isEmptyList(callList)){
+			logger.warn("params= {} 没有要重新新增或者更新的录音文件", JSONObject.toJSONString(bean));
+			return;
+		}
+
+
+		// 获得接通的电话记录(status=dealing)
+		List<Call7mmorResponseBean> dealingList = callList.stream().filter(call -> call.getSTATUS().equals("dealing")).collect(Collectors.toList());
+		if (CollectionsUtil.isEmptyList(dealingList)){
+			logger.warn("params= {} 没有要重新新增或者更新 status=dealing 录音文件", JSONObject.toJSONString(bean));
+			return;
+		}
+	}
+
+	@Override
 	public void identifyCallUrl(IdentifyCallUrlRequestBean bean) {
 
 		List<CallInfoResponseBean> identifyCallUrlList = doctorCallInfoMapper.getIdentifyCallUrl(bean);

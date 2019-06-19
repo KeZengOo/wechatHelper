@@ -500,6 +500,7 @@
 
     <!-- 每个医生级别招募医生数据 -->
     <select id="getMonthlyDoctorLevelRecruitList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyDoctorLevelRecruitResponse">
+        <!--
         SELECT v2.dynamic_field_value doctorLevel,
         COUNT(DISTINCT v2.doctor_id) recruitDoctor FROM virtual_doctor_dynamic_field v
         INNER JOIN virtual_doctor_dynamic_field_value v2
@@ -528,6 +529,58 @@
         </if>
         )
         GROUP BY v2.dynamic_field_value
+
+
+        -->
+
+
+        <!-- 待优化 -->
+
+        SELECT
+        b.doctorLevel,
+        COUNT( DISTINCT b.doctor_id ) recruitDoctor
+        FROM
+        (
+        SELECT
+        t.doctor_id,
+        IFNULL( t2.dynamic_field_value, '未知' ) doctorLevel
+        FROM
+        (
+        SELECT DISTINCT
+        d.id doctor_id
+        FROM
+        virtual_doctor_call_info_mend m
+        INNER JOIN doctor d ON m.virtual_doctor_id = d.id
+        WHERE
+        m.product_id = #{productId}
+        AND m.is_recruit = 1
+        GROUP BY
+        d.id
+        HAVING 1=1
+        <if test="startDate !=null">
+            AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &gt;= #{startDate}
+        </if>
+        <if test="endDate !=null">
+            AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &lt;= #{endDate}
+        </if>
+        ) t
+        LEFT JOIN (
+        SELECT
+        v2.doctor_id,
+        v2.dynamic_field_value
+        FROM
+        virtual_doctor_dynamic_field_value v2
+        INNER JOIN virtual_doctor_dynamic_field v ON v2.dynamic_field_id = v.id
+        WHERE
+        v.product_id = 0
+        AND v.field_name = '医生职称'
+        GROUP BY
+        v2.doctor_id
+        ) t2 ON t.doctor_id = t2.doctor_id
+        ) b
+        GROUP BY
+        b.doctorLevel
+
     </select>
 
     <!-- 得到医生动态添加的医生级别 -->

@@ -38,6 +38,14 @@ public interface CallBackService {
 	 */
 	void repeatSaveOrUpdateCall(Call7mmorRequestBean bean);
 
+
+	/**
+	 * 重新更新或者添加没有回调的电话拜访记录,不包含wav文件
+	 * @param bean
+	 */
+	void repeatSaveOrUpdateCallNoWav(Call7mmorRequestBean bean);
+
+
 	/**
 	 * 录音识别
 	 * @param bean
