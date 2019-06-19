@@ -308,6 +308,8 @@ public class MonthlyRecruitServiceImpl implements MonthlyRecruitService {
                 }
             }
         }
+
+
         return list;
 
     }
