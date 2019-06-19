@@ -46,6 +46,22 @@ public class CallInfoScheduleController {
 
 
 
+    @ApiOperation(value = "没有回调的电话记录重试,不包含WAV文件", notes = "没有回调的电话记录重试,不包含WAV文件")
+    @PostMapping(value = "/retry/no/wav")
+    public DefaultResponseBean<String> repeatSaveOrUpdateCallNoWav(@RequestBody Call7mmorRequestBean bean) {
+        logger.info("CallInfoScheduleController repeatSaveOrUpdateCallNoWav start....");
+        long starTime = System.currentTimeMillis();
+        callBackService.repeatSaveOrUpdateCall(bean);
+        long endTime = System.currentTimeMillis();
+        logger.info("CallInfoScheduleController repeatSaveOrUpdateCallNoWav end , cost {}s", (endTime-starTime)/1000);
+
+        DefaultResponseBean<String> responseBean = new DefaultResponseBean<>();
+        responseBean.setData("success");
+        return responseBean;
+    }
+
+
+
     @ApiOperation(value = "识别录音文件", notes = "识别录音文件")
     @PostMapping(value = "/url/identify")
     public DefaultResponseBean<String> identifyCallUrl(@RequestBody IdentifyCallUrlRequestBean bean) {
