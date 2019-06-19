@@ -48,4 +48,57 @@ public interface CoverageReportService {
      */
     void exportCall(HttpServletResponse response, Long proId, String startTime, String endTime);
 
+    /**
+     * 根据产品id和时间查询微信覆盖数据
+     * @param productId 产品id
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     * @return map
+     */
+    Map<String,Object> findWeChatListByProductIdAndTime(Long productId, String startTime, String endTime);
+
+    /**
+     * 根据产品id导出微信覆盖数据
+     * @param response 输出流
+     * @param proId 产品id
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     */
+    void exportWeChat(HttpServletResponse response, long proId, String startTime, String endTime);
+
+    /**
+     * 根据产品id和时间查询会议覆盖数据
+     * @param productId 产品id
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     * @return map
+     */
+    Map<String,Object> findMeetingListByProductIdAndTime(Long productId, String startTime, String endTime);
+
+    /**
+     * 根据产品id导出会议覆盖数据
+     * @param response 输出流
+     * @param proId 产品id
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     */
+    void exportMeeting(HttpServletResponse response, long proId, String startTime, String endTime);
+
+    /**
+     * 根据产品id和时间查询内容覆盖数据
+     * @param productId 产品id
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     * @return map
+     */
+    Map<String,Object> findContentListByProductIdAndTime(Long productId, String startTime, String endTime);
+
+    /**
+     * 根据产品id导出内容覆盖数据
+     * @param response 输出流
+     * @param proId 产品id
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     */
+    void exportContent(HttpServletResponse response, long proId, String startTime, String endTime);
 }

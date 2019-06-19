@@ -1,19 +1,13 @@
 package com.nuoxin.virtual.rep.api.web.controller.v3_0;
 
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
-import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
-import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.v3_0.request.CoverageReportRequest;
 import com.nuoxin.virtual.rep.api.service.v3_0.CoverageReportService;
-import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.VisitDataRequest;
-import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.VisitDataResponse;
 import com.nuoxin.virtual.rep.api.web.controller.v2_5.NewBaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateUtils;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -127,6 +121,136 @@ public class CoverageReportController extends NewBaseController implements Seria
         coverageReportService.exportCall(getResponse(), Long.parseLong(productId), startTime, endTime);
     }
 
+    /**
+     * 微信覆盖分析
+     * @param request 请求对象
+     * @return DefaultResponseBean
+     * @throws Exception
+     */
+    @ApiOperation(value = "覆盖渠道-微信覆盖", notes = "覆盖渠道-微信覆盖")
+    @PostMapping("/wechat")
+    public DefaultResponseBean<Map<String, Object>> weChatData(@RequestBody CoverageReportRequest request) throws Exception {
+        String startTime = request.getStartTime();
+        String endTime = request.getEndTime();
+        Long productId = request.getProductId();
+        if(productId == null) {
+            throw new Exception("参数不合法!");
+        }
+        if(StringUtils.isBlank(startTime) || StringUtils.isBlank(endTime)) {
+            throw new Exception("参数不合法!");
+        }
+        Map<String, Object> map = coverageReportService.findWeChatListByProductIdAndTime(productId, startTime, endTime);
+        DefaultResponseBean<Map<String, Object>> result = new DefaultResponseBean<>();
+        result.setData(map);
+        return result;
+    }
 
+    /**
+     * 微信覆盖——报表数据导出
+     * @param request 请求参数
+     * @throws Exception
+     */
+    @ApiOperation(value = "拜访数据汇总-微信覆盖导出")
+    @GetMapping(value = "/wechat/export")
+    public void getWeChat(HttpServletRequest request) throws Exception {
+        String startTime = request.getParameter("startTime");
+        String endTime = request.getParameter("endTime");
+        if(StringUtils.isBlank(startTime) || StringUtils.isBlank(endTime)) {
+            throw new Exception("参数不合法!");
+        }
+        String productId = request.getParameter("productId");
+        if(StringUtils.isBlank(productId)) {
+            throw new Exception("参数不合法!");
+        }
+        coverageReportService.exportWeChat(getResponse(), Long.parseLong(productId), startTime, endTime);
+    }
+
+    /**
+     * 会议覆盖分析
+     * @param request 请求对象
+     * @return DefaultResponseBean
+     * @throws Exception
+     */
+    @ApiOperation(value = "覆盖渠道-会议覆盖", notes = "覆盖渠道-会议覆盖")
+    @PostMapping("/meeting")
+    public DefaultResponseBean<Map<String, Object>> meetingData(@RequestBody CoverageReportRequest request) throws Exception {
+        String startTime = request.getStartTime();
+        String endTime = request.getEndTime();
+        Long productId = request.getProductId();
+        if(productId == null) {
+            throw new Exception("参数不合法!");
+        }
+        if(StringUtils.isBlank(startTime) || StringUtils.isBlank(endTime)) {
+            throw new Exception("参数不合法!");
+        }
+        Map<String, Object> map = coverageReportService.findMeetingListByProductIdAndTime(productId, startTime, endTime);
+        DefaultResponseBean<Map<String, Object>> result = new DefaultResponseBean<>();
+        result.setData(map);
+        return result;
+    }
+
+    /**
+     * 会议覆盖——报表数据导出
+     * @param request 请求参数
+     * @throws Exception
+     */
+    @ApiOperation(value = "拜访数据汇总-会议覆盖导出")
+    @GetMapping(value = "/meeting/export")
+    public void getMeeting(HttpServletRequest request) throws Exception {
+        String startTime = request.getParameter("startTime");
+        String endTime = request.getParameter("endTime");
+        if(StringUtils.isBlank(startTime) || StringUtils.isBlank(endTime)) {
+            throw new Exception("参数不合法!");
+        }
+        String productId = request.getParameter("productId");
+        if(StringUtils.isBlank(productId)) {
+            throw new Exception("参数不合法!");
+        }
+        coverageReportService.exportMeeting(getResponse(), Long.parseLong(productId), startTime, endTime);
+    }
+
+    /**
+     * 内容覆盖分析
+     * @param request 请求对象
+     * @return DefaultResponseBean
+     * @throws Exception
+     */
+    @ApiOperation(value = "覆盖渠道-内容覆盖", notes = "覆盖渠道-内容覆盖")
+    @PostMapping("/content")
+    public DefaultResponseBean<Map<String, Object>> contentData(@RequestBody CoverageReportRequest request) throws Exception {
+        String startTime = request.getStartTime();
+        String endTime = request.getEndTime();
+        Long productId = request.getProductId();
+        if(productId == null) {
+            throw new Exception("参数不合法!");
+        }
+        if(StringUtils.isBlank(startTime) || StringUtils.isBlank(endTime)) {
+            throw new Exception("参数不合法!");
+        }
+        Map<String, Object> map = coverageReportService.findContentListByProductIdAndTime(productId, startTime, endTime);
+        DefaultResponseBean<Map<String, Object>> result = new DefaultResponseBean<>();
+        result.setData(map);
+        return result;
+    }
+
+    /**
+     * 内容覆盖——报表数据导出
+     * @param request 请求参数
+     * @throws Exception
+     */
+    @ApiOperation(value = "拜访数据汇总-内容覆盖导出")
+    @GetMapping(value = "/content/export")
+    public void getContent(HttpServletRequest request) throws Exception {
+        String startTime = request.getParameter("startTime");
+        String endTime = request.getParameter("endTime");
+        if(StringUtils.isBlank(startTime) || StringUtils.isBlank(endTime)) {
+            throw new Exception("参数不合法!");
+        }
+        String productId = request.getParameter("productId");
+        if(StringUtils.isBlank(productId)) {
+            throw new Exception("参数不合法!");
+        }
+        coverageReportService.exportContent(getResponse(), Long.parseLong(productId), startTime, endTime);
+    }
 
 }

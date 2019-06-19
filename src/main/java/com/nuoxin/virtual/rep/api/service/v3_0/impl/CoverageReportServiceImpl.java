@@ -2,10 +2,12 @@ package com.nuoxin.virtual.rep.api.service.v3_0.impl;
 
 import com.nuoxin.virtual.rep.api.entity.v3_0.CoverageReportPart;
 import com.nuoxin.virtual.rep.api.mybatis.CoverageReportMapper;
+import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v3_0.CoverageReportService;
 import com.nuoxin.virtual.rep.api.utils.ArithUtil;
 import com.nuoxin.virtual.rep.api.utils.ExportExcelUtil;
 import com.nuoxin.virtual.rep.api.utils.ExportExcelWrapper;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.CoverageCallResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.CoverageOverviewResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -29,8 +31,13 @@ public class CoverageReportServiceImpl implements CoverageReportService {
 
     private static final String[] OVERVIEW_DATA_TITLES = {"月份", "已招募医院数", "覆盖医院数", "医院覆盖率", "已招募医生数", "覆盖医生数", "医生覆盖率"};
 
+    private static final String[] CALL_DATA_TITLES = {"月份", "覆盖人数", "覆盖次数", "总时长"};
+
     @Resource
     private CoverageReportMapper coverageReportMapper;
+
+    @Resource
+    private CommonService commonService;
 
     @Override
     public Map<String, Object> findOverviewListByProductIdAndTime(Long proId, String startTime, String endTime) {
@@ -208,12 +215,167 @@ public class CoverageReportServiceImpl implements CoverageReportService {
 
     @Override
     public Map<String, Object> findCallListByProductIdAndTime(Long productId, String startTime, String endTime) {
+        // 招募医生部分
+        Map<String, Object> map = new HashMap<>(2);
+        List<String> yearAndMonth = this.buildYearAndMonth(startTime, endTime);
+        map.put("xAxisData", yearAndMonth);
+        List<Object> resultList = new ArrayList<>(6);
+        List<CoverageReportPart> recruitList = coverageReportMapper.findCoverageRecruitList(productId, startTime, endTime);
+        if(!CollectionUtils.isEmpty(recruitList)) {
+            // 每个时间段的招募医生数量
+            Map<String, Set<Long>> recruitListHcp = recruitList.stream().collect(Collectors.groupingBy(k -> k.getTimeStr(),
+                    Collectors.mapping(k -> k.getHcpId(), Collectors.toSet())));
+            Map<String, Set<Long>> newRecruitHcp = this.buildMap(recruitListHcp, yearAndMonth, startTime);
+            List<CoverageReportPart> recruitCallList = coverageReportMapper.findCoverageCallList(productId, startTime, endTime);
+            if(!CollectionUtils.isEmpty(recruitCallList)) {
+                // 每个时间段的覆盖医生数量
+                Map<String, Set<Long>> recruitCallListHcp = recruitCallList.stream().collect(Collectors.groupingBy(k -> k.getTimeStr(),
+                        Collectors.mapping(k -> k.getHcpId(), Collectors.toSet())));
+                // 每个时间段的覆盖次数
+                Map<String, List<Long>> coverageMap = recruitCallList.stream().collect(Collectors.groupingBy(k -> k.getTimeStr(),
+                        Collectors.mapping(k -> k.getHcpId(), Collectors.toList())));
+                List<Integer> hcpNumList = new ArrayList<>(yearAndMonth.size());
+                List<Integer> coverNumList = new ArrayList<>(yearAndMonth.size());
+                Set<Long> hcpSet = new HashSet<>();
+                List<Long> coverageList = new ArrayList<>();
+                yearAndMonth.forEach(k -> {
+                    Set<Long> recruitHcpSet = newRecruitHcp.get(k);
+                    if(CollectionUtils.isEmpty(recruitHcpSet)) {
+                        recruitHcpSet = Collections.emptySet();
+                    }
+                    Set<Long> callHcpSet = recruitCallListHcp.get(k);
+                    if(CollectionUtils.isEmpty(callHcpSet)) {
+                        callHcpSet = Collections.emptySet();
+                    }
+                    hcpSet.addAll(callHcpSet);
+                    hcpSet.retainAll(recruitHcpSet);
+                    int hcpNum = hcpSet.size();
+                    hcpNumList.add(hcpNum);
 
-        return null;
+                    List<Long> coverage = coverageMap.get(k);
+                    if(CollectionUtils.isEmpty(coverage)) {
+                        coverage = Collections.emptyList();
+                    }
+                    coverageList.addAll(coverage);
+                    coverageList.retainAll(recruitHcpSet);
+                    coverNumList.add(coverageList.size());
+                    hcpSet.clear();
+                    coverageList.clear();
+                });
+                resultList.add(hcpNumList);
+                resultList.add(coverNumList);
+            }
+        }
+        map.put("seriesData", resultList);
+        return map;
     }
 
     @Override
     public void exportCall(HttpServletResponse response, Long proId, String startTime, String endTime) {
+        // 招募医生部分
+        List<String> yearAndMonth = this.buildYearAndMonth(startTime, endTime);
+        List<CoverageReportPart> recruitList = coverageReportMapper.findCoverageRecruitList(proId, startTime, endTime);
+        if(!CollectionUtils.isEmpty(recruitList)) {
+            // 每个时间段的招募医生数量
+            Map<String, Set<Long>> recruitListHcp = recruitList.stream().collect(Collectors.groupingBy(k -> k.getTimeStr(),
+                    Collectors.mapping(k -> k.getHcpId(), Collectors.toSet())));
+            Map<String, Set<Long>> newRecruitHcp = this.buildMap(recruitListHcp, yearAndMonth, startTime);
+            List<CoverageReportPart> recruitCallList = coverageReportMapper.findCoverageCallList(proId, startTime, endTime);
+            if(!CollectionUtils.isEmpty(recruitCallList)) {
+                // 每个时间段的覆盖医生数量
+                Map<String, Set<Long>> recruitCallListHcp = recruitCallList.stream().collect(Collectors.groupingBy(k -> k.getTimeStr(),
+                        Collectors.mapping(k -> k.getHcpId(), Collectors.toSet())));
+                // 每个时间段的覆盖次数
+                Map<String, List<Long>> coverageMap = recruitCallList.stream().collect(Collectors.groupingBy(k -> k.getTimeStr(),
+                        Collectors.mapping(k -> k.getHcpId(), Collectors.toList())));
+                // 每个时间段的覆盖时长
+                Map<String, List<Long>> coverageTimeMap = recruitCallList.stream().collect(Collectors.groupingBy(k -> k.getTimeStr(),
+                        Collectors.mapping(k -> k.getHciId(), Collectors.toList())));
+                Set<Long> hcpSet = new HashSet<>();
+                List<Long> coverageList = new ArrayList<>();
+                List<CoverageCallResponse> rlist = new ArrayList<>();
+                yearAndMonth.forEach(k -> {
+                    CoverageCallResponse res = new CoverageCallResponse();
+                    res.setTimeStr(k);
+                    Set<Long> recruitHcpSet = newRecruitHcp.get(k);
+                    if(CollectionUtils.isEmpty(recruitHcpSet)) {
+                        recruitHcpSet = Collections.emptySet();
+                    }
+                    Set<Long> callHcpSet = recruitCallListHcp.get(k);
+                    if(CollectionUtils.isEmpty(callHcpSet)) {
+                        callHcpSet = Collections.emptySet();
+                    }
+                    hcpSet.addAll(callHcpSet);
+                    hcpSet.retainAll(recruitHcpSet);
+                    int hcpNum = hcpSet.size();
+                    res.setCoverageNum(hcpNum);
+                    List<Long> coverage = coverageMap.get(k);
+                    if(CollectionUtils.isEmpty(coverage)) {
+                        coverage = Collections.emptyList();
+                    }
+                    coverageList.addAll(coverage);
+                    coverageList.retainAll(recruitHcpSet);
+                    res.setCoverageCount(coverageList.size());
+                    List<Long> timeList = coverageTimeMap.get(k);
+                    if(!CollectionUtils.isEmpty(timeList)) {
+                        Long time = timeList.stream().mapToLong(Long::longValue).sum();
+                        String totalTime = commonService.alterCallTimeContent(time);
+                        res.setTotalTime(totalTime);
+                    }
+                    hcpSet.clear();
+                    coverageList.clear();
+                    rlist.add(res);
+                });
+
+                // 总计部分
+                CoverageCallResponse res = new CoverageCallResponse();
+                Set<Long> totalHcp = new HashSet<>();
+                Set<Long> recruitHcp = recruitList.stream().map(k -> k.getHcpId()).collect(Collectors.toSet());
+                Set<Long> coverageHcp = recruitCallList.stream().map(k -> k.getHcpId()).collect(Collectors.toSet());
+                totalHcp.addAll(coverageHcp);
+                totalHcp.retainAll(recruitHcp);
+                res.setTimeStr("总计");
+                res.setCoverageNum(totalHcp.size());
+                res.setCoverageCount(recruitCallList.size());
+                Long time = recruitCallList.stream().mapToLong(k -> k.getHciId()).sum();
+                String totalTime = commonService.alterCallTimeContent(time);
+                res.setTotalTime(totalTime);
+                rlist.add(res);
+                // 导出逻辑
+                ExportExcelWrapper<CoverageCallResponse> exportExcelWrapper = new ExportExcelWrapper();
+                exportExcelWrapper.exportExcel("月报—电话覆盖分析—".concat(startTime).concat("-").concat(endTime), "电话覆盖分析表", CALL_DATA_TITLES,
+                        rlist, response, ExportExcelUtil.EXCEl_FILE_2007);
+            }
+        }
+    }
+
+    @Override
+    public Map<String, Object> findWeChatListByProductIdAndTime(Long productId, String startTime, String endTime) {
+        return null;
+    }
+
+    @Override
+    public void exportWeChat(HttpServletResponse response, long proId, String startTime, String endTime) {
+
+    }
+
+    @Override
+    public Map<String, Object> findMeetingListByProductIdAndTime(Long productId, String startTime, String endTime) {
+        return null;
+    }
+
+    @Override
+    public void exportMeeting(HttpServletResponse response, long proId, String startTime, String endTime) {
+
+    }
+
+    @Override
+    public Map<String, Object> findContentListByProductIdAndTime(Long productId, String startTime, String endTime) {
+        return null;
+    }
+
+    @Override
+    public void exportContent(HttpServletResponse response, long proId, String startTime, String endTime) {
 
     }
 
