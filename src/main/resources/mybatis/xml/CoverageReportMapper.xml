@@ -133,7 +133,7 @@
 		)
 	</select>
 
-	<!-- 会议覆盖 -->
+	<!-- 会议覆盖 医生和次数 -->
 	<select id="findCoverageMeetingList" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.CoverageReportPart">
 		SELECT d.id hcpId, UNIX_TIMESTAMP(b.attend_end_time) - UNIX_TIMESTAMP(b.attend_start_time) hciId, DATE_FORMAT(b.attend_start_time,'%Y-%m') timeStr FROM
 		t_meeting_data a
@@ -153,6 +153,60 @@
 		WHERE a.product_id = #{productId}
 		AND DATE_FORMAT(a.start_time,'%Y-%m') &gt;= #{startTime} AND DATE_FORMAT(a.start_time,'%Y-%m') &lt;= #{endTime}
 		GROUP BY timeStr
+	</select>
+
+	<!-- 内容覆盖 阅读数据 -->
+	<select id="findCoverageReadList" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.CoverageReportPart">
+		SELECT DISTINCT d.id hcpId, DATE_FORMAT(r.create_time,'%Y-%m') timeStr FROM
+		t_content_product a
+		INNER JOIN activity_read r ON r.data_id = a.content_id
+		INNER JOIN doctor d ON r.read_person_id = d.id
+		LEFT JOIN activity_read_ip i ON i.read_token = r.read_token
+		WHERE a.product_id = #{productId}
+		AND DATE_FORMAT(r.create_time,'%Y-%m') &gt;= #{startTime} AND DATE_FORMAT(r.create_time,'%Y-%m') &lt;= #{endTime}
+		AND (i.isp != '阿里云' OR i.isp IS NULL) AND d.id IN (
+		<include refid="recruitHcp"/> AND pd.product_id = #{productId}
+		AND DATE_FORMAT(pd.create_time,'%Y-%m') &lt;= #{endTime}
+		)
+		UNION
+		select DISTINCT d.id hcpId, DATE_FORMAT(b.create_time,'%Y-%m') timeStr FROM
+		t_content_product a
+		INNER JOIN wx_user_read b ON b.content_id = a.content_id
+		INNER JOIN wx_users c on b.user_id = c.id
+		INNER JOIN doctor d ON c.doctor_id = d.id
+		WHERE a.product_id = #{productId}
+		AND DATE_FORMAT(b.create_time,'%Y-%m') &gt;= #{startTime} AND DATE_FORMAT(b.create_time,'%Y-%m') &lt;= #{endTime}
+		AND d.id IN (
+		<include refid="recruitHcp"/> AND pd.product_id = #{productId}
+		AND DATE_FORMAT(pd.create_time,'%Y-%m') &lt;= #{endTime}
+		)
+	</select>
+
+	<!-- 内容覆盖 发送数据 -->
+	<select id="findCoverageSendList" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.CoverageReportPart">
+		select DISTINCT d.id hcpId, DATE_FORMAT(b.create_time,'%Y-%m') timeStr from
+		t_content_product a
+		inner join activity_share b on a.content_id = b.data_id
+		inner join doctor d on b.share_person_id = d.id
+		WHERE
+		a.product_id = #{productId}
+		AND DATE_FORMAT(b.create_time,'%Y-%m') &gt;= #{startTime} AND DATE_FORMAT(b.create_time,'%Y-%m') &lt;= #{endTime}
+		AND d.id IN (
+		select distinct pd.virtual_doctor_id from virtual_doctor_call_info_mend pd where pd.product_id = #{productId}
+		and  DATE_FORMAT(pd.create_time,'%Y-%m') &lt;= #{endTime} and pd.virtual_doctor_id > 0 and pd.is_recruit = 1
+		)
+		union
+		select DISTINCT d.id hcpId, DATE_FORMAT(b.create_time,'%Y-%m') timeStr from
+		drug_user_doctor a
+		inner join virtual_message b on a.doctor_id = b.doctor_id
+		inner join doctor d on b.doctor_id = d.id
+		WHERE a.prod_id = #{productId} and a.is_available = 1 and b.user_type = 1 and (b.wechat_message_type
+		in ('链接/小程序/聊天记录', '网页') or (b.message like 'http%' and b.message like '%token=%'))
+		AND DATE_FORMAT(b.message_time,'%Y-%m') &gt;= #{startTime} AND DATE_FORMAT(b.message_time,'%Y-%m') &lt;= #{endTime}
+		AND d.id IN (
+		select distinct pd.virtual_doctor_id from virtual_doctor_call_info_mend pd where pd.product_id = #{productId}
+		and DATE_FORMAT(pd.create_time,'%Y-%m') &lt;= #{endTime} and pd.virtual_doctor_id > 0 and pd.is_recruit = 1
+		)
 	</select>
 
 </mapper>

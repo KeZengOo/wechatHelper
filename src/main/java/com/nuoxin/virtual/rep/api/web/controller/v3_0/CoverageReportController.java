@@ -253,4 +253,48 @@ public class CoverageReportController extends NewBaseController implements Seria
         coverageReportService.exportContent(getResponse(), Long.parseLong(productId), startTime, endTime);
     }
 
+    /**
+     * 内容覆盖分析
+     * @param request 请求对象
+     * @return DefaultResponseBean
+     * @throws Exception
+     */
+    @ApiOperation(value = "覆盖渠道-内容覆盖", notes = "覆盖渠道-内容覆盖")
+    @PostMapping("/patient")
+    public DefaultResponseBean<Map<String, Object>> patientVolumeData(@RequestBody CoverageReportRequest request) throws Exception {
+        String startTime = request.getStartTime();
+        String endTime = request.getEndTime();
+        Long productId = request.getProductId();
+        if(productId == null) {
+            throw new Exception("参数不合法!");
+        }
+        if(StringUtils.isBlank(startTime) || StringUtils.isBlank(endTime)) {
+            throw new Exception("参数不合法!");
+        }
+        Map<String, Object> map = coverageReportService.findPatientVolumeListByProductIdAndTime(productId, startTime, endTime);
+        DefaultResponseBean<Map<String, Object>> result = new DefaultResponseBean<>();
+        result.setData(map);
+        return result;
+    }
+
+    /**
+     * 患者量覆盖——报表数据导出
+     * @param request 请求参数
+     * @throws Exception
+     */
+    @ApiOperation(value = "拜访数据汇总-患者量覆盖导出")
+    @GetMapping(value = "/patient/export")
+    public void getPatientVolume(HttpServletRequest request) throws Exception {
+        String startTime = request.getParameter("startTime");
+        String endTime = request.getParameter("endTime");
+        if(StringUtils.isBlank(startTime) || StringUtils.isBlank(endTime)) {
+            throw new Exception("参数不合法!");
+        }
+        String productId = request.getParameter("productId");
+        if(StringUtils.isBlank(productId)) {
+            throw new Exception("参数不合法!");
+        }
+        coverageReportService.exportPatientVolume(getResponse(), Long.parseLong(productId), startTime, endTime);
+    }
+
 }

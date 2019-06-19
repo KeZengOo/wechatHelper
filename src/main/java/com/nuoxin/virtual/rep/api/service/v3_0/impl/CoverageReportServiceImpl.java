@@ -5,6 +5,7 @@ import com.nuoxin.virtual.rep.api.mybatis.CoverageReportMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v3_0.CoverageReportService;
 import com.nuoxin.virtual.rep.api.utils.ArithUtil;
+import com.nuoxin.virtual.rep.api.utils.CollectionUtil;
 import com.nuoxin.virtual.rep.api.utils.ExportExcelUtil;
 import com.nuoxin.virtual.rep.api.utils.ExportExcelWrapper;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.CoverageCallResponse;
@@ -32,6 +33,8 @@ public class CoverageReportServiceImpl implements CoverageReportService {
     private static final String[] MONTH_ARRAY = {"01","02","03","04","05","06","07","08","09","10","11","12"};
 
     private static final String[] OVERVIEW_DATA_TITLES = {"月份", "已招募医院数", "覆盖医院数", "医院覆盖率", "已招募医生数", "覆盖医生数", "医生覆盖率"};
+
+    private static final String[] PATIENT_VOLUME_DATA_TITLES = {"目标患者量/月", "成功招募医生数", "覆盖医生数", "覆盖次数", "覆盖率"};
 
     private static final String[] CALL_DATA_TITLES = {"月份", "覆盖人数", "覆盖次数", "总时长"};
 
@@ -697,15 +700,179 @@ public class CoverageReportServiceImpl implements CoverageReportService {
 
     @Override
     public Map<String, Object> findContentListByProductIdAndTime(Long productId, String startTime, String endTime) {
+        Map<String, Object> map = new HashMap<>(2);
+        List<String> yearAndMonth = this.buildYearAndMonth(startTime, endTime);
+        map.put("xAxisData", yearAndMonth);
+        List<Object> resultList = new ArrayList<>(6);
+        // 发送人数
+        List<Integer> sendCountList = new ArrayList<>(yearAndMonth.size());
+        // 阅读人数
+        List<Integer> readCount = new ArrayList<>(yearAndMonth.size());
+        // 阅读率
+        List<Double> readingRate = new ArrayList<>(yearAndMonth.size());
+        List<CoverageReportPart> recruitList = coverageReportMapper.findCoverageRecruitList(productId, startTime, endTime);
+        if(!CollectionUtils.isEmpty(recruitList)) {
+            // 每个时间段的招募医生数量
+            Map<String, Set<Long>> recruitListHcp = recruitList.stream().collect(Collectors.groupingBy(k -> k.getTimeStr(),
+                    Collectors.mapping(k -> k.getHcpId(), Collectors.toSet())));
+            Map<String, Set<Long>> newRecruitHcp = this.buildMap(recruitListHcp, yearAndMonth, startTime);
+
+            List<CoverageReportPart> sendList = coverageReportMapper.findCoverageSendList(productId, startTime, endTime);
+            if(!CollectionUtils.isEmpty(sendList)) {
+                List<CoverageReportPart> readList = coverageReportMapper.findCoverageReadList(productId, startTime, endTime);
+                // 发送医生时间map
+                Map<String, Set<Long>> sendMap = sendList.stream().collect(Collectors.groupingBy(k -> k.getTimeStr(),
+                        Collectors.mapping(k -> k.getHcpId(), Collectors.toSet())));
+                // 阅读医生时间map
+                Map<String, Set<Long>> readMap = readList.stream().collect(Collectors.groupingBy(k -> k.getTimeStr(),
+                        Collectors.mapping(k -> k.getHcpId(), Collectors.toSet())));
+                Set<Long> sSet = new HashSet<>();
+                Set<Long> rSet = new HashSet<>();
+                yearAndMonth.forEach(k -> {
+                    Set<Long> recruitHcpSet = newRecruitHcp.get(k);
+                    if(CollectionUtils.isEmpty(recruitHcpSet)) {
+                        recruitHcpSet = Collections.emptySet();
+                    }
+                    int sendNum = 0;
+                    Set<Long> kSend = sendMap.get(k);
+                    if(!CollectionUtils.isEmpty(kSend)) {
+                        sSet.addAll(kSend);
+                        sSet.retainAll(recruitHcpSet);
+                        sendNum = sSet.size();
+                    }
+                    sendCountList.add(sendNum);
+                    Set<Long> rSend = readMap.get(k);
+                    int readNum = 0;
+                    if(!CollectionUtils.isEmpty(rSend)) {
+                        rSet.addAll(rSend);
+                        rSet.retainAll(recruitHcpSet);
+                        readNum = rSet.size();
+                    }
+                    readCount.add(readNum);
+                    double d = 0.0d;
+                    if(sendNum > 0) {
+                        d = ArithUtil.mul(ArithUtil.div(readNum, sendNum, 4), 100);
+                    }
+                    readingRate.add(d);
+                    sSet.clear();
+                    rSet.clear();
+                });
+            } else {
+                yearAndMonth.forEach(k -> {
+                    sendCountList.add(0);
+                    readCount.add(0);
+                    readingRate.add(0.0d);
+                });
+            }
+        } else {
+            yearAndMonth.forEach(k -> {
+                sendCountList.add(0);
+                readCount.add(0);
+                readingRate.add(0.0d);
+            });
+        }
+        resultList.add(sendCountList);
+        resultList.add(readCount);
+        resultList.add(readingRate);
+        map.put("seriesData", resultList);
+        return map;
+    }
+
+    @Override
+    public void exportContent(HttpServletResponse response, long productId, String startTime, String endTime) {
+        List<String> yearAndMonth = this.buildYearAndMonth(startTime, endTime);
+        List<CoverageCallResponse> rlist = new ArrayList<>();
+        List<CoverageReportPart> recruitList = coverageReportMapper.findCoverageRecruitList(productId, startTime, endTime);
+        if(!CollectionUtils.isEmpty(recruitList)) {
+            // 每个时间段的招募医生数量
+            Map<String, Set<Long>> recruitListHcp = recruitList.stream().collect(Collectors.groupingBy(k -> k.getTimeStr(),
+                    Collectors.mapping(k -> k.getHcpId(), Collectors.toSet())));
+            Map<String, Set<Long>> newRecruitHcp = this.buildMap(recruitListHcp, yearAndMonth, startTime);
+
+            List<CoverageReportPart> sendList = coverageReportMapper.findCoverageSendList(productId, startTime, endTime);
+            if (!CollectionUtils.isEmpty(sendList)) {
+                List<CoverageReportPart> readList = coverageReportMapper.findCoverageReadList(productId, startTime, endTime);
+                // 发送医生时间map
+                Map<String, Set<Long>> sendMap = sendList.stream().collect(Collectors.groupingBy(k -> k.getTimeStr(),
+                        Collectors.mapping(k -> k.getHcpId(), Collectors.toSet())));
+                // 阅读医生时间map
+                Map<String, Set<Long>> readMap = readList.stream().collect(Collectors.groupingBy(k -> k.getTimeStr(),
+                        Collectors.mapping(k -> k.getHcpId(), Collectors.toSet())));
+                Set<Long> sSet = new HashSet<>();
+                Set<Long> rSet = new HashSet<>();
+                yearAndMonth.forEach(k -> {
+                    CoverageCallResponse res = new CoverageCallResponse();
+                    res.setTimeStr(k);
+                    Set<Long> recruitHcpSet = newRecruitHcp.get(k);
+                    if (CollectionUtils.isEmpty(recruitHcpSet)) {
+                        recruitHcpSet = Collections.emptySet();
+                    }
+                    int sendNum = 0;
+                    Set<Long> kSend = sendMap.get(k);
+                    if (!CollectionUtils.isEmpty(kSend)) {
+                        sSet.addAll(kSend);
+                        sSet.retainAll(recruitHcpSet);
+                        sendNum = sSet.size();
+                    }
+                    res.setCoverageNum(sendNum);
+                    Set<Long> rSend = readMap.get(k);
+                    int readNum = 0;
+                    if (!CollectionUtils.isEmpty(rSend)) {
+                        rSet.addAll(rSend);
+                        rSet.retainAll(recruitHcpSet);
+                        readNum = rSet.size();
+                    }
+                    res.setCoverageCount(readNum);
+                    double d = 0.0d;
+                    if (sendNum > 0) {
+                        d = ArithUtil.mul(ArithUtil.div(readNum, sendNum, 4), 100);
+                    }
+                    res.setTotalTime(d + "%");
+                    rlist.add(res);
+                    sSet.clear();
+                    rSet.clear();
+                });
+
+                // 总计部分
+                CoverageCallResponse res = new CoverageCallResponse();
+                Set<Long> totalHcp = new HashSet<>();
+                Set<Long> recruitHcp = recruitList.stream().map(k -> k.getHcpId()).collect(Collectors.toSet());
+                Set<Long> coverageHcp = sendList.stream().map(k -> k.getHcpId()).collect(Collectors.toSet());
+                totalHcp.addAll(coverageHcp);
+                totalHcp.retainAll(recruitHcp);
+                res.setTimeStr("总计");
+                int sendNum = totalHcp.size();
+                res.setCoverageNum(sendNum);
+                totalHcp.clear();
+                Set<Long> readHcp = readList.stream().map(k -> k.getHcpId()).collect(Collectors.toSet());
+                totalHcp.addAll(readHcp);
+                totalHcp.retainAll(recruitHcp);
+                int readNum = totalHcp.size();
+                res.setCoverageCount(readNum);
+                double d = 0.0d;
+                if(sendNum > 0) {
+                    d = ArithUtil.mul(ArithUtil.div(readNum, sendNum, 4), 100);
+                }
+                res.setTotalTime(d + "%");
+                rlist.add(res);
+            }
+        }
+        // 导出逻辑
+        ExportExcelWrapper<CoverageCallResponse> exportExcelWrapper = new ExportExcelWrapper();
+        exportExcelWrapper.exportExcel("月报—内容覆盖分析—".concat(startTime).concat("-").concat(endTime), "内容覆盖分析表", CONTENT_DATA_TITLES,
+                rlist, response, ExportExcelUtil.EXCEl_FILE_2007);
+    }
+
+    @Override
+    public Map<String, Object> findPatientVolumeListByProductIdAndTime(Long productId, String startTime, String endTime) {
 
         return null;
     }
 
     @Override
-    public void exportContent(HttpServletResponse response, long proId, String startTime, String endTime) {
+    public void exportPatientVolume(HttpServletResponse response, long proId, String startTime, String endTime) {
 
     }
-
 
     /**
      * 根据前端传递的参数构建所有x轴坐标

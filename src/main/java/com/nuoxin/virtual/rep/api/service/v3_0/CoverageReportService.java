@@ -101,4 +101,23 @@ public interface CoverageReportService {
      * @param endTime 结束时间
      */
     void exportContent(HttpServletResponse response, long proId, String startTime, String endTime);
+
+    /**
+     * 根据产品id和时间查询患者量覆盖数据
+     * @param productId 产品id
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     * @return map
+     */
+    Map<String,Object> findPatientVolumeListByProductIdAndTime(Long productId, String startTime, String endTime);
+
+    /**
+     * 根据产品id导出患者量覆盖数据
+     * @param response 输出流
+     * @param proId 产品id
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     */
+    void exportPatientVolume(HttpServletResponse response, long proId, String startTime, String endTime);
+
 }

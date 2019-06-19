@@ -95,6 +95,22 @@ public interface CoverageReportMapper {
      */
     List<CoverageReportPart> findCoverageMeetingList(@Param("productId") Long productId, @Param("startTime") String startTime, @Param("endTime") String endTime);
 
+    /**
+     * 根据产品id和时间段查询阅读数据
+     * @param productId 产品id
+     * @param startTime 开始时间 eg: 2019-01
+     * @param endTime 结束时间 eg: 2019-05
+     * @return list
+     */
+    List<CoverageReportPart> findCoverageReadList(@Param("productId") Long productId, @Param("startTime") String startTime, @Param("endTime") String endTime);
 
+    /**
+     * 根据产品id和时间段查询阅读数据
+     * @param productId 产品id
+     * @param startTime 开始时间 eg: 2019-01
+     * @param endTime 结束时间 eg: 2019-05
+     * @return list
+     */
+    List<CoverageReportPart> findCoverageSendList(@Param("productId") Long productId, @Param("startTime") String startTime, @Param("endTime") String endTime);
 
 }
