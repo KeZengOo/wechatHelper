@@ -59,5 +59,42 @@ public interface CoverageReportMapper {
      */
     List<CoverageReportPart> findCoverageCallList(@Param("productId") Long productId, @Param("startTime") String startTime, @Param("endTime") String endTime);
 
+    /**
+     * 根据产品id和时间段查询微信覆盖 回复数、覆盖医生人数
+     * @param productId 产品id
+     * @param startTime 开始时间 eg: 2019-01
+     * @param endTime 结束时间 eg: 2019-05
+     * @return list
+     */
+    List<CoverageReportPart> findCoverageWeChatList(@Param("productId") Long productId, @Param("startTime") String startTime, @Param("endTime") String endTime);
+
+    /**
+     * 根据产品id和时间段查询微信发送次数
+     * @param productId 产品id
+     * @param startTime 开始时间 eg: 2019-01
+     * @param endTime 结束时间 eg: 2019-05
+     * @return list
+     */
+    List<CoverageReportPart> findCoverageWeChatSend(@Param("productId") Long productId, @Param("startTime") String startTime, @Param("endTime") String endTime);
+
+    /**
+     * 根据产品id和时间段查询会议数量
+     * @param productId 产品id
+     * @param startTime 开始时间 eg: 2019-01
+     * @param endTime 结束时间 eg: 2019-05
+     * @return list
+     */
+    List<CoverageReportPart> findCoverageMeeting(@Param("productId") Long productId, @Param("startTime") String startTime, @Param("endTime") String endTime);
+
+    /**
+     * 根据产品id和时间段查询会议人数、人次、总时长
+     * @param productId 产品id
+     * @param startTime 开始时间 eg: 2019-01
+     * @param endTime 结束时间 eg: 2019-05
+     * @return list
+     */
+    List<CoverageReportPart> findCoverageMeetingList(@Param("productId") Long productId, @Param("startTime") String startTime, @Param("endTime") String endTime);
+
+
 
 }
