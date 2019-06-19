@@ -8,7 +8,9 @@ import com.nuoxin.virtual.rep.api.utils.ArithUtil;
 import com.nuoxin.virtual.rep.api.utils.ExportExcelUtil;
 import com.nuoxin.virtual.rep.api.utils.ExportExcelWrapper;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.CoverageCallResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.CoverageMeetingResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.CoverageOverviewResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.WeChatResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -33,6 +35,12 @@ public class CoverageReportServiceImpl implements CoverageReportService {
 
     private static final String[] CALL_DATA_TITLES = {"月份", "覆盖人数", "覆盖次数", "总时长"};
 
+    private static final String[] WECHAT_DATA_TITLES = {"月份", "发送条数", "回复条数", "覆盖人数"};
+
+    private static final String[] MEETING_DATA_TITLES = {"月份", "会议数量", "参会人次", "参会人数", "总时长"};
+
+    private static final String[] CONTENT_DATA_TITLES = {"月份", "发送人数", "阅读人数", "阅读率"};
+
     @Resource
     private CoverageReportMapper coverageReportMapper;
 
@@ -47,6 +55,12 @@ public class CoverageReportServiceImpl implements CoverageReportService {
         map.put("xAxisData", yearAndMonth);
         List<Object> resultList = new ArrayList<>(6);
         List<CoverageReportPart> recruitList = coverageReportMapper.findRecruitList(proId, startTime, endTime);
+        List<Integer> recruitHciList = new ArrayList<>(13);
+        List<Integer> coverageHciList = new ArrayList<>(13);
+        List<Double> lineHciList = new ArrayList<>(13);
+        List<Integer> recruitHcpList = new ArrayList<>(13);
+        List<Integer> coverageHcpList = new ArrayList<>(13);
+        List<Double> lineHcpList = new ArrayList<>(13);
         if(!CollectionUtils.isEmpty(recruitList)) {
             // 每个时间段的招募医院数量
             Map<String, Set<Long>> recruitListHci = recruitList.stream().collect(Collectors.groupingBy(k -> k.getTimeStr(),
@@ -65,17 +79,6 @@ public class CoverageReportServiceImpl implements CoverageReportService {
                 // 每个时间段的招募医生数量
                 Map<String, Set<Long>> coverageListHcp = coverageList.stream().collect(Collectors.groupingBy(k -> k.getTimeStr(),
                         Collectors.mapping(k -> k.getHcpId(), Collectors.toSet())));
-
-//                int hciTotalNum = newRecruitHci.get(yearAndMonth.get(yearAndMonth.size()-1)).size();
-//                int hcpTotalNum = newRecruitHcp.get(yearAndMonth.get(yearAndMonth.size()-1)).size();
-
-                List<Integer> recruitHciList = new ArrayList<>(13);
-                List<Integer> coverageHciList = new ArrayList<>(13);
-                List<Double> lineHciList = new ArrayList<>(13);
-                List<Integer> recruitHcpList = new ArrayList<>(13);
-                List<Integer> coverageHcpList = new ArrayList<>(13);
-                List<Double> lineHcpList = new ArrayList<>(13);
-
                 Set<Long> hciSet = new HashSet<>();
                 Set<Long> hcpSet = new HashSet<>();
                 yearAndMonth.forEach(k -> {
@@ -89,7 +92,9 @@ public class CoverageReportServiceImpl implements CoverageReportService {
                         hciSet.addAll(chciSet);
                         hciSet.retainAll(rhciSet);
                         hciNum = hciSet.size();
-                        hciPercent = ArithUtil.mul(ArithUtil.div(hciNum, rhciNum, 4), 100);
+                        if(rhciNum > 0) {
+                            hciPercent = ArithUtil.mul(ArithUtil.div(hciNum, rhciNum, 4), 100);
+                        }
                     }
                     coverageHciList.add(hciNum);
                     lineHciList.add(hciPercent);
@@ -103,23 +108,42 @@ public class CoverageReportServiceImpl implements CoverageReportService {
                         hcpSet.addAll(chcpSet);
                         hcpSet.retainAll(rhcpSet);
                         lineNum = hcpSet.size();
-                        hcpPercent = ArithUtil.mul(ArithUtil.div(lineNum, rhcpNum, 4), 100);
+                        if(rhcpNum > 0) {
+                            hcpPercent = ArithUtil.mul(ArithUtil.div(lineNum, rhcpNum, 4), 100);
+                        }
                     }
                     coverageHcpList.add(lineNum);
                     lineHcpList.add(hcpPercent);
                     hciSet.clear();
                     hcpSet.clear();
                 });
-
-                resultList.add(recruitHciList);
-                resultList.add(coverageHciList);
-                resultList.add(lineHciList);
-                resultList.add(recruitHcpList);
-                resultList.add(coverageHcpList);
-                resultList.add(lineHcpList);
+            } else {
+                yearAndMonth.forEach(k -> {
+                    recruitHciList.add(0);
+                    coverageHciList.add(0);
+                    lineHciList.add(0.0d);
+                    recruitHcpList.add(0);
+                    coverageHcpList.add(0);
+                    lineHcpList.add(0.0);
+                });
             }
-            map.put("seriesData", resultList);
+        } else {
+            yearAndMonth.forEach(k -> {
+                recruitHciList.add(0);
+                coverageHciList.add(0);
+                lineHciList.add(0.0d);
+                recruitHcpList.add(0);
+                coverageHcpList.add(0);
+                lineHcpList.add(0.0);
+            });
         }
+        resultList.add(recruitHciList);
+        resultList.add(coverageHciList);
+        resultList.add(lineHciList);
+        resultList.add(recruitHcpList);
+        resultList.add(coverageHcpList);
+        resultList.add(lineHcpList);
+        map.put("seriesData", resultList);
         return map;
     }
 
@@ -127,6 +151,7 @@ public class CoverageReportServiceImpl implements CoverageReportService {
     public void exportOverview(HttpServletResponse response, Long proId, String startTime, String endTime) {
         List<CoverageReportPart> recruitList = coverageReportMapper.findRecruitList(proId, startTime, endTime);
         List<String> yearAndMonth = this.buildYearAndMonth(startTime, endTime);
+        List<CoverageOverviewResponse> rlist = new ArrayList<>();
         if(!CollectionUtils.isEmpty(recruitList)) {
             // 每个时间段的招募医院数量
             Map<String, Set<Long>> recruitListHci = recruitList.stream().collect(Collectors.groupingBy(k -> k.getTimeStr(),
@@ -139,7 +164,6 @@ public class CoverageReportServiceImpl implements CoverageReportService {
             // 覆盖医生部分
             List<CoverageReportPart> coverageList = coverageReportMapper.findCoverageList(proId, startTime, endTime);
             if(!CollectionUtils.isEmpty(coverageList)) {
-                List<CoverageOverviewResponse> rlist = new ArrayList<>();
                 // 每个时间段的覆盖医院数量
                 Map<String, Set<Long>> coverageListHci = coverageList.stream().collect(Collectors.groupingBy(k -> k.getTimeStr(),
                         Collectors.mapping(k -> k.getHciId(), Collectors.toSet())));
@@ -162,7 +186,9 @@ public class CoverageReportServiceImpl implements CoverageReportService {
                         hciSet.addAll(chciSet);
                         hciSet.retainAll(rhciSet);
                         hciNum = hciSet.size();
-                        hciPercent = ArithUtil.mul(ArithUtil.div(hciNum, rhciNum, 4), 100);
+                        if(rhciNum > 0) {
+                            hciPercent = ArithUtil.mul(ArithUtil.div(hciNum, rhciNum, 4), 100);
+                        }
                     }
                     res.setCoverageHciNum(hciNum);
                     res.setHciPercent(hciPercent + "%");
@@ -176,7 +202,9 @@ public class CoverageReportServiceImpl implements CoverageReportService {
                         hcpSet.addAll(chcpSet);
                         hcpSet.retainAll(rhcpSet);
                         lineNum = hcpSet.size();
-                        hcpPercent = ArithUtil.mul(ArithUtil.div(lineNum, rhcpNum, 4), 100);
+                        if(rhcpNum > 0) {
+                            hcpPercent = ArithUtil.mul(ArithUtil.div(lineNum, rhcpNum, 4), 100);
+                        }
                     }
                     res.setCoverageHcpNum(lineNum);
                     res.setHcpPercent(hcpPercent + "%");
@@ -187,11 +215,9 @@ public class CoverageReportServiceImpl implements CoverageReportService {
                 CoverageOverviewResponse res = new CoverageOverviewResponse();
                 res.setTimeStr("总计");
                 // 总招募医院数
-//                Long recruitHciTotal = recruitList.stream().map(k -> k.getHciId()).distinct().count();
                 int hciTotalNum = newRecruitHci.get(yearAndMonth.get(yearAndMonth.size()-1)).size();
                 res.setRecruitHciNum(hciTotalNum);
                 // 总招募医生数
-//                Long recruitHcpTotal = recruitList.stream().map(k -> k.getHcpId()).distinct().count();
                 int hcpTotalNum = newRecruitHcp.get(yearAndMonth.get(yearAndMonth.size()-1)).size();
                 res.setRecruitHcpNum(hcpTotalNum);
                 // 总覆盖医院数
@@ -205,12 +231,12 @@ public class CoverageReportServiceImpl implements CoverageReportService {
                 Double hcpPercent = ArithUtil.mul(ArithUtil.div(res.getCoverageHcpNum(), res.getRecruitHcpNum(), 4), 100);
                 res.setHcpPercent(hcpPercent + "%");
                 rlist.add(res);
-                // 导出逻辑
-                ExportExcelWrapper<CoverageOverviewResponse> exportExcelWrapper = new ExportExcelWrapper();
-                exportExcelWrapper.exportExcel("月报—招覆盖情况总览—".concat(startTime).concat("-").concat(endTime), "覆盖情况总览表", OVERVIEW_DATA_TITLES,
-                        rlist, response, ExportExcelUtil.EXCEl_FILE_2007);
             }
         }
+        // 导出逻辑
+        ExportExcelWrapper<CoverageOverviewResponse> exportExcelWrapper = new ExportExcelWrapper();
+        exportExcelWrapper.exportExcel("月报—招覆盖情况总览—".concat(startTime).concat("-").concat(endTime), "覆盖情况总览表", OVERVIEW_DATA_TITLES,
+                rlist, response, ExportExcelUtil.EXCEl_FILE_2007);
     }
 
     @Override
@@ -219,6 +245,8 @@ public class CoverageReportServiceImpl implements CoverageReportService {
         Map<String, Object> map = new HashMap<>(2);
         List<String> yearAndMonth = this.buildYearAndMonth(startTime, endTime);
         map.put("xAxisData", yearAndMonth);
+        List<Integer> hcpNumList = new ArrayList<>(yearAndMonth.size());
+        List<Integer> coverNumList = new ArrayList<>(yearAndMonth.size());
         List<Object> resultList = new ArrayList<>(6);
         List<CoverageReportPart> recruitList = coverageReportMapper.findCoverageRecruitList(productId, startTime, endTime);
         if(!CollectionUtils.isEmpty(recruitList)) {
@@ -234,8 +262,7 @@ public class CoverageReportServiceImpl implements CoverageReportService {
                 // 每个时间段的覆盖次数
                 Map<String, List<Long>> coverageMap = recruitCallList.stream().collect(Collectors.groupingBy(k -> k.getTimeStr(),
                         Collectors.mapping(k -> k.getHcpId(), Collectors.toList())));
-                List<Integer> hcpNumList = new ArrayList<>(yearAndMonth.size());
-                List<Integer> coverNumList = new ArrayList<>(yearAndMonth.size());
+
                 Set<Long> hcpSet = new HashSet<>();
                 List<Long> coverageList = new ArrayList<>();
                 yearAndMonth.forEach(k -> {
@@ -262,10 +289,20 @@ public class CoverageReportServiceImpl implements CoverageReportService {
                     hcpSet.clear();
                     coverageList.clear();
                 });
-                resultList.add(hcpNumList);
-                resultList.add(coverNumList);
+            } else {
+                yearAndMonth.forEach(k -> {
+                    hcpNumList.add(0);
+                    coverNumList.add(0);
+                });
             }
+        } else {
+            yearAndMonth.forEach(k -> {
+                hcpNumList.add(0);
+                coverNumList.add(0);
+            });
         }
+        resultList.add(hcpNumList);
+        resultList.add(coverNumList);
         map.put("seriesData", resultList);
         return map;
     }
@@ -274,6 +311,7 @@ public class CoverageReportServiceImpl implements CoverageReportService {
     public void exportCall(HttpServletResponse response, Long proId, String startTime, String endTime) {
         // 招募医生部分
         List<String> yearAndMonth = this.buildYearAndMonth(startTime, endTime);
+        List<CoverageCallResponse> rlist = new ArrayList<>();
         List<CoverageReportPart> recruitList = coverageReportMapper.findCoverageRecruitList(proId, startTime, endTime);
         if(!CollectionUtils.isEmpty(recruitList)) {
             // 每个时间段的招募医生数量
@@ -293,7 +331,6 @@ public class CoverageReportServiceImpl implements CoverageReportService {
                         Collectors.mapping(k -> k.getHciId(), Collectors.toList())));
                 Set<Long> hcpSet = new HashSet<>();
                 List<Long> coverageList = new ArrayList<>();
-                List<CoverageCallResponse> rlist = new ArrayList<>();
                 yearAndMonth.forEach(k -> {
                     CoverageCallResponse res = new CoverageCallResponse();
                     res.setTimeStr(k);
@@ -341,36 +378,326 @@ public class CoverageReportServiceImpl implements CoverageReportService {
                 String totalTime = commonService.alterCallTimeContent(time);
                 res.setTotalTime(totalTime);
                 rlist.add(res);
-                // 导出逻辑
-                ExportExcelWrapper<CoverageCallResponse> exportExcelWrapper = new ExportExcelWrapper();
-                exportExcelWrapper.exportExcel("月报—电话覆盖分析—".concat(startTime).concat("-").concat(endTime), "电话覆盖分析表", CALL_DATA_TITLES,
-                        rlist, response, ExportExcelUtil.EXCEl_FILE_2007);
             }
         }
+        // 导出逻辑
+        ExportExcelWrapper<CoverageCallResponse> exportExcelWrapper = new ExportExcelWrapper();
+        exportExcelWrapper.exportExcel("月报—电话覆盖分析—".concat(startTime).concat("-").concat(endTime), "电话覆盖分析表", CALL_DATA_TITLES,
+                rlist, response, ExportExcelUtil.EXCEl_FILE_2007);
     }
 
     @Override
     public Map<String, Object> findWeChatListByProductIdAndTime(Long productId, String startTime, String endTime) {
-        return null;
+        // 招募医生部分
+        Map<String, Object> map = new HashMap<>(2);
+        List<String> yearAndMonth = this.buildYearAndMonth(startTime, endTime);
+        map.put("xAxisData", yearAndMonth);
+        List<Object> resultList = new ArrayList<>(6);
+        List<Integer> sendCountList = new ArrayList<>(yearAndMonth.size());
+        List<Integer> replyCountList = new ArrayList<>(yearAndMonth.size());
+        List<Integer> coverNumList = new ArrayList<>(yearAndMonth.size());
+        List<CoverageReportPart> recruitList = coverageReportMapper.findCoverageRecruitList(productId, startTime, endTime);
+        if(!CollectionUtils.isEmpty(recruitList)) {
+            // 每个时间段的招募医生数量
+            Map<String, Set<Long>> recruitListHcp = recruitList.stream().collect(Collectors.groupingBy(k -> k.getTimeStr(),
+                    Collectors.mapping(k -> k.getHcpId(), Collectors.toSet())));
+            Map<String, Set<Long>> newRecruitHcp = this.buildMap(recruitListHcp, yearAndMonth, startTime);
+            List<CoverageReportPart> coverageWeChatList = coverageReportMapper.findCoverageWeChatList(productId, startTime, endTime);
+            List<CoverageReportPart> sendList = coverageReportMapper.findCoverageWeChatSend(productId, startTime, endTime);
+            if(!CollectionUtils.isEmpty(coverageWeChatList)) {
+                // 每个时间段的覆盖次数
+                Map<String, List<Long>> coverageMap = coverageWeChatList.stream().collect(Collectors.groupingBy(k -> k.getTimeStr(),
+                        Collectors.mapping(k -> k.getHcpId(), Collectors.toList())));
+                // 每个时间段的发送次数
+                Map<String, List<Long>> sendMap = sendList.stream().collect(Collectors.groupingBy(k -> k.getTimeStr(),
+                        Collectors.mapping(k -> k.getHcpId(), Collectors.toList())));
+                List<Long> sendCount = new ArrayList<>();
+                List<Long> replyCount = new ArrayList<>();
+                Set<Long> coverageSet = new HashSet<>();
+                yearAndMonth.forEach(k -> {
+                    Set<Long> recruitHcpSet = newRecruitHcp.get(k);
+                    if(CollectionUtils.isEmpty(recruitHcpSet)) {
+                        recruitHcpSet = Collections.emptySet();
+                    }
+                    List<Long> sendWeChat = sendMap.get(k);
+                    if(CollectionUtils.isEmpty(sendWeChat)) {
+                        sendWeChat = Collections.emptyList();
+                    }
+                    sendCount.addAll(sendWeChat);
+                    sendCount.retainAll(recruitHcpSet);
+                    int sendNum = sendCount.size();
+                    sendCountList.add(sendNum);
+
+                    List<Long> weChatHcpSet = coverageMap.get(k);
+                    if(CollectionUtils.isEmpty(weChatHcpSet)) {
+                        weChatHcpSet = Collections.emptyList();
+                    }
+                    replyCount.addAll(weChatHcpSet);
+                    replyCount.retainAll(recruitHcpSet);
+                    int replyNum = replyCount.size();
+                    replyCountList.add(replyNum);
+
+                    coverageSet.addAll(weChatHcpSet);
+                    coverageSet.retainAll(recruitHcpSet);
+                    coverNumList.add(coverageSet.size());
+
+                    sendCount.clear();
+                    replyCount.clear();
+                    coverageSet.clear();
+                });
+            } else {
+                yearAndMonth.forEach(k -> {
+                    sendCountList.add(0);
+                    replyCountList.add(0);
+                    coverNumList.add(0);
+                });
+            }
+        } else {
+            yearAndMonth.forEach(k -> {
+                sendCountList.add(0);
+                replyCountList.add(0);
+                coverNumList.add(0);
+            });
+        }
+        resultList.add(sendCountList);
+        resultList.add(replyCountList);
+        resultList.add(coverNumList);
+        map.put("seriesData", resultList);
+        return map;
     }
 
     @Override
-    public void exportWeChat(HttpServletResponse response, long proId, String startTime, String endTime) {
+    public void exportWeChat(HttpServletResponse response, long productId, String startTime, String endTime) {
+        List<String> yearAndMonth = this.buildYearAndMonth(startTime, endTime);
+        List<CoverageReportPart> recruitList = coverageReportMapper.findCoverageRecruitList(productId, startTime, endTime);
+        List<WeChatResponse> rlist = new ArrayList<>();
+        List<Long> sendCount = new ArrayList<>();
+        List<Long> replyCount = new ArrayList<>();
+        Set<Long> coverageSet = new HashSet<>();
+        if(!CollectionUtils.isEmpty(recruitList)) {
+            // 每个时间段的招募医生数量
+            Map<String, Set<Long>> recruitListHcp = recruitList.stream().collect(Collectors.groupingBy(k -> k.getTimeStr(),
+                    Collectors.mapping(k -> k.getHcpId(), Collectors.toSet())));
+            Map<String, Set<Long>> newRecruitHcp = this.buildMap(recruitListHcp, yearAndMonth, startTime);
+            List<CoverageReportPart> coverageWeChatList = coverageReportMapper.findCoverageWeChatList(productId, startTime, endTime);
+            List<CoverageReportPart> sendList = coverageReportMapper.findCoverageWeChatSend(productId, startTime, endTime);
+            if(!CollectionUtils.isEmpty(coverageWeChatList)) {
+                // 每个时间段的覆盖次数
+                Map<String, List<Long>> coverageMap = coverageWeChatList.stream().collect(Collectors.groupingBy(k -> k.getTimeStr(),
+                        Collectors.mapping(k -> k.getHcpId(), Collectors.toList())));
+                // 每个时间段的发送次数
+                Map<String, List<Long>> sendMap = sendList.stream().collect(Collectors.groupingBy(k -> k.getTimeStr(),
+                        Collectors.mapping(k -> k.getHcpId(), Collectors.toList())));
+                yearAndMonth.forEach(k -> {
+                    WeChatResponse res = new WeChatResponse();
+                    res.setTimeStr(k);
+                    Set<Long> recruitHcpSet = newRecruitHcp.get(k);
+                    if(CollectionUtils.isEmpty(recruitHcpSet)) {
+                        recruitHcpSet = Collections.emptySet();
+                    }
+                    List<Long> sendWeChat = sendMap.get(k);
+                    if(CollectionUtils.isEmpty(sendWeChat)) {
+                        sendWeChat = Collections.emptyList();
+                    }
+                    sendCount.addAll(sendWeChat);
+                    sendCount.retainAll(recruitHcpSet);
+                    int sendNum = sendCount.size();
+                    res.setSendNum(sendNum);
 
+                    List<Long> weChatHcpSet = coverageMap.get(k);
+                    if(CollectionUtils.isEmpty(weChatHcpSet)) {
+                        weChatHcpSet = Collections.emptyList();
+                    }
+                    replyCount.addAll(weChatHcpSet);
+                    replyCount.retainAll(recruitHcpSet);
+                    int replyNum = replyCount.size();
+                    res.setReplyNum(replyNum);
+
+                    coverageSet.addAll(weChatHcpSet);
+                    coverageSet.retainAll(recruitHcpSet);
+                    res.setHcpNum(coverageSet.size());
+
+                    sendCount.clear();
+                    replyCount.clear();
+                    coverageSet.clear();
+                    rlist.add(res);
+                });
+                // 总计部分
+                WeChatResponse res = new WeChatResponse();
+                List<Long> total = new ArrayList<>();
+                Set<Long> recruitHcp = recruitList.stream().map(k -> k.getHcpId()).collect(Collectors.toSet());
+                List<Long> sendTotal = sendList.stream().map(k -> k.getHcpId()).collect(Collectors.toList());
+                total.addAll(sendTotal);
+                total.retainAll(recruitHcp);
+                res.setTimeStr("总计");
+                res.setSendNum(total.size());
+                total.clear();
+                List<Long> replyTotal = coverageWeChatList.stream().map(k -> k.getHcpId()).collect(Collectors.toList());
+                total.addAll(replyTotal);
+                total.retainAll(recruitHcp);
+                res.setReplyNum(total.size());
+                Long totalHcp = total.stream().distinct().count();
+                res.setHcpNum(totalHcp.intValue());
+                rlist.add(res);
+            }
+        }
+        // 导出逻辑
+        ExportExcelWrapper<WeChatResponse> exportExcelWrapper = new ExportExcelWrapper();
+        exportExcelWrapper.exportExcel("月报—微信覆盖分析—".concat(startTime).concat("-").concat(endTime), "微信覆盖分析表", WECHAT_DATA_TITLES,
+                rlist, response, ExportExcelUtil.EXCEl_FILE_2007);
     }
 
     @Override
     public Map<String, Object> findMeetingListByProductIdAndTime(Long productId, String startTime, String endTime) {
-        return null;
+        // 招募医生部分
+        Map<String, Object> map = new HashMap<>(2);
+        List<String> yearAndMonth = this.buildYearAndMonth(startTime, endTime);
+        map.put("xAxisData", yearAndMonth);
+        List<Object> resultList = new ArrayList<>(6);
+        // 会议数量
+        List<Integer> meetingCountList = new ArrayList<>(yearAndMonth.size());
+        // 参会人次
+        List<Integer> participantsCount = new ArrayList<>(yearAndMonth.size());
+        // 参会人数
+        List<Integer> participants = new ArrayList<>(yearAndMonth.size());
+        List<CoverageReportPart> recruitList = coverageReportMapper.findCoverageRecruitList(productId, startTime, endTime);
+        if(!CollectionUtils.isEmpty(recruitList)) {
+            // 每个时间段的招募医生数量
+            Map<String, Set<Long>> recruitListHcp = recruitList.stream().collect(Collectors.groupingBy(k -> k.getTimeStr(),
+                    Collectors.mapping(k -> k.getHcpId(), Collectors.toSet())));
+            Map<String, Set<Long>> newRecruitHcp = this.buildMap(recruitListHcp, yearAndMonth, startTime);
+
+            List<CoverageReportPart> meeting = coverageReportMapper.findCoverageMeeting(productId, startTime, endTime);
+            if(!CollectionUtils.isEmpty(meeting)) {
+                List<CoverageReportPart> meetingList = coverageReportMapper.findCoverageMeetingList(productId, startTime, endTime);
+                // 每个月份的会议数量
+                Map<String, Long> meetingMap = meeting.stream().collect(Collectors.toMap(k -> k.getTimeStr(), k -> k.getHciId(), (k1, k2) -> k2));
+                // 每个月份的参会医生
+                Map<String, List<Long>> hcpMeeting = meetingList.stream().collect(Collectors.groupingBy(k -> k.getTimeStr(),
+                        Collectors.mapping(k -> k.getHcpId(), Collectors.toList())));
+                List<Long> personTime = new ArrayList<>();
+                yearAndMonth.forEach(k -> {
+                    Set<Long> recruitHcpSet = newRecruitHcp.get(k);
+                    if(CollectionUtils.isEmpty(recruitHcpSet)) {
+                        recruitHcpSet = Collections.emptySet();
+                    }
+                    int meetingCount = meetingMap.get(k) != null ? meetingMap.get(k).intValue() : 0;
+                    meetingCountList.add(meetingCount);
+                    List<Long> person = hcpMeeting.get(k);
+                    if(!CollectionUtils.isEmpty(person)) {
+                        personTime.addAll(person);
+                        personTime.retainAll(recruitHcpSet);
+                        participantsCount.add(personTime.size());
+                        Long hcpNum = personTime.stream().distinct().count();
+                        participants.add(hcpNum.intValue());
+                    } else {
+                        participantsCount.add(0);
+                        participants.add(0);
+                    }
+                    personTime.clear();
+                });
+            } else {
+                yearAndMonth.forEach(k -> {
+                    meetingCountList.add(0);
+                    participantsCount.add(0);
+                    participants.add(0);
+                });
+            }
+        } else {
+            yearAndMonth.forEach(k -> {
+                meetingCountList.add(0);
+                participantsCount.add(0);
+                participants.add(0);
+            });
+        }
+        resultList.add(meetingCountList);
+        resultList.add(participantsCount);
+        resultList.add(participants);
+        map.put("seriesData", resultList);
+        return map;
     }
 
     @Override
-    public void exportMeeting(HttpServletResponse response, long proId, String startTime, String endTime) {
+    public void exportMeeting(HttpServletResponse response, long productId, String startTime, String endTime) {
+        List<String> yearAndMonth = this.buildYearAndMonth(startTime, endTime);
+        List<CoverageMeetingResponse> rlist = new ArrayList<>();
+        List<CoverageReportPart> recruitList = coverageReportMapper.findCoverageRecruitList(productId, startTime, endTime);
+        if(!CollectionUtils.isEmpty(recruitList)) {
+            // 每个时间段的招募医生数量
+            Map<String, Set<Long>> recruitListHcp = recruitList.stream().collect(Collectors.groupingBy(k -> k.getTimeStr(),
+                    Collectors.mapping(k -> k.getHcpId(), Collectors.toSet())));
+            Map<String, Set<Long>> newRecruitHcp = this.buildMap(recruitListHcp, yearAndMonth, startTime);
 
+            List<CoverageReportPart> meeting = coverageReportMapper.findCoverageMeeting(productId, startTime, endTime);
+            if(!CollectionUtils.isEmpty(meeting)) {
+                List<CoverageReportPart> meetingList = coverageReportMapper.findCoverageMeetingList(productId, startTime, endTime);
+                // 每个月份的会议数量
+                Map<String, Long> meetingMap = meeting.stream().collect(Collectors.toMap(k -> k.getTimeStr(), k -> k.getHciId(), (k1, k2) -> k2));
+                // 每个月份的参会医生
+                Map<String, List<Long>> hcpMeeting = meetingList.stream().collect(Collectors.groupingBy(k -> k.getTimeStr(),
+                        Collectors.mapping(k -> k.getHcpId(), Collectors.toList())));
+                // 每个月份的参会时长
+                Map<String, List<Long>> meetingTime = meetingList.stream().collect(Collectors.groupingBy(k -> k.getTimeStr(),
+                        Collectors.mapping(k -> k.getHciId(), Collectors.toList())));
+                List<Long> personTime = new ArrayList<>();
+                yearAndMonth.forEach(k -> {
+                    CoverageMeetingResponse res = new CoverageMeetingResponse();
+                    res.setTimeStr(k);
+                    int meetingCount = meetingMap.get(k) != null ? meetingMap.get(k).intValue() : 0;
+                    res.setMeetingNum(meetingCount);
+                    Set<Long> recruitHcpSet = newRecruitHcp.get(k);
+                    if(CollectionUtils.isEmpty(recruitHcpSet)) {
+                        recruitHcpSet = Collections.emptySet();
+                    }
+                    List<Long> person = hcpMeeting.get(k);
+                    if(!CollectionUtils.isEmpty(person)) {
+                        personTime.addAll(person);
+                        personTime.retainAll(recruitHcpSet);
+                        res.setHcpCount(personTime.size());
+                        Long hcpNum = personTime.stream().distinct().count();
+                        res.setHcpNum(hcpNum.intValue());
+                    } else {
+                        res.setHcpCount(0);
+                        res.setHcpNum(0);
+                    }
+                    List<Long> timeList = meetingTime.get(k);
+                    if(!CollectionUtils.isEmpty(timeList)) {
+                        Long time = timeList.stream().mapToLong(Long::longValue).sum();
+                        String totalTime = commonService.alterCallTimeContent(time);
+                        res.setTotalTime(totalTime);
+                    }
+                    personTime.clear();
+                    rlist.add(res);
+                });
+
+                // 总计部分
+                CoverageMeetingResponse res = new CoverageMeetingResponse();
+                List<Long> totalHcp = new ArrayList<>();
+                Set<Long> recruitHcp = recruitList.stream().map(k -> k.getHcpId()).collect(Collectors.toSet());
+                List<Long> coverageHcp = meetingList.stream().map(k -> k.getHcpId()).collect(Collectors.toList());
+                totalHcp.addAll(coverageHcp);
+                totalHcp.retainAll(recruitHcp);
+                res.setTimeStr("总计");
+                Long totalMeeting = meeting.stream().mapToLong(k -> k.getHciId()).sum();
+                res.setMeetingNum(totalMeeting.intValue());
+                res.setHcpCount(totalHcp.size());
+                Long hcpNum = totalHcp.stream().distinct().count();
+                res.setHcpNum(hcpNum.intValue());
+                Long time = meetingList.stream().mapToLong(k -> k.getHciId()).sum();
+                String totalTime = commonService.alterCallTimeContent(time);
+                res.setTotalTime(totalTime);
+                rlist.add(res);
+            }
+        }
+        // 导出逻辑
+        ExportExcelWrapper<CoverageMeetingResponse> exportExcelWrapper = new ExportExcelWrapper();
+        exportExcelWrapper.exportExcel("月报—会议覆盖分析—".concat(startTime).concat("-").concat(endTime), "会议覆盖分析表", MEETING_DATA_TITLES,
+                rlist, response, ExportExcelUtil.EXCEl_FILE_2007);
     }
 
     @Override
     public Map<String, Object> findContentListByProductIdAndTime(Long productId, String startTime, String endTime) {
+
         return null;
     }
 
