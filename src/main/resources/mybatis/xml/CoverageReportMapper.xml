@@ -51,11 +51,11 @@
 		)
 		UNION
 		-- 微信回复
-		SELECT DISTINCT d.id doctorId, h.id userId, DATE_FORMAT(b.message_time,'%Y-%m') total FROM drug_user_doctor a
-		JOIN `virtual_message` b ON a.doctor_id = b.doctor_id AND a.drug_user_id = b.drug_user_id
+		SELECT DISTINCT d.id doctorId, h.id userId, DATE_FORMAT(b.message_time,'%Y-%m') total FROM product_user a
+		JOIN `virtual_message` b ON a.user_id = b.drug_user_id
 		JOIN doctor d ON b.doctor_id = d.id
 		JOIN hospital h on h.id = d.hospital_id
-		WHERE a.is_available = 1 AND a.prod_id = #{productId} AND b.user_type = 2
+		WHERE a.prod_id = #{productId} AND b.user_type = 2
 		and DATE_FORMAT(b.message_time,'%Y-%m') &gt;= #{startTime} AND DATE_FORMAT(b.message_time,'%Y-%m') &lt;= #{endTime}
 		AND b.wechat_message_type NOT IN ('系统消息','撤回提醒') AND d.id IN (
 		<include refid="recruitHcp"/>
@@ -66,11 +66,10 @@
 		SELECT DISTINCT d.id doctorId, h.id userId, DATE_FORMAT(b.attend_start_time,'%Y-%m') total FROM
 		t_meeting_data a
 		INNER JOIN t_meeting_attend_details b ON a.id = b.meeting_id
-		INNER JOIN drug_user_doctor c ON b.doctor_id = c.doctor_id and a.product_id = c.prod_id
-		INNER JOIN virtual_doctor_call_info_mend pd on c.prod_id = pd.product_id and c.doctor_id = pd.virtual_doctor_id
+		INNER JOIN virtual_doctor_call_info_mend pd on a.product_id = pd.product_id and b.doctor_id = pd.virtual_doctor_id
 		INNER JOIN doctor d ON b.doctor_id = d.id
 		INNER JOIN hospital h on h.id = d.hospital_id
-		WHERE pd.is_recruit = 1 AND c.prod_id = #{productId} AND c.is_available = 1
+		WHERE pd.is_recruit = 1 AND a.product_id = #{productId}
 		AND DATE_FORMAT(b.attend_start_time,'%Y-%m') &gt;= #{startTime} AND DATE_FORMAT(b.attend_start_time,'%Y-%m') &lt;= #{endTime}
 	</select>
 
@@ -107,11 +106,10 @@
 
 	<!-- 微信覆盖 回复数、覆盖医生人数 -->
 	<select id="findCoverageWeChatList" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.CoverageReportPart">
-		SELECT d.id hcpId, DATE_FORMAT(b.message_time,'%Y-%m') timeStr FROM drug_user_doctor a
-		JOIN `virtual_message` b ON a.doctor_id = b.doctor_id AND a.drug_user_id = b.drug_user_id
+		SELECT d.id hcpId, DATE_FORMAT(b.message_time,'%Y-%m') timeStr FROM product_user a
+		JOIN `virtual_message` b ON a.user_id = b.drug_user_id
 		JOIN doctor d ON b.doctor_id = d.id
-		JOIN hospital h on h.id = d.hospital_id
-		WHERE a.is_available = 1 AND a.prod_id = #{productId} AND b.user_type = 2
+		WHERE a.prod_id = #{productId} AND b.user_type = 2
 		and DATE_FORMAT(b.message_time,'%Y-%m') &gt;= #{startTime} AND DATE_FORMAT(b.message_time,'%Y-%m') &lt;= #{endTime}
 		AND b.wechat_message_type NOT IN ('系统消息','撤回提醒') AND d.id IN (
 		<include refid="recruitHcp"/>
@@ -121,11 +119,10 @@
 
 	<!-- 微信覆盖 发送次数统计 -->
 	<select id="findCoverageWeChatSend" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.CoverageReportPart">
-		SELECT d.id hcpId, DATE_FORMAT(b.message_time,'%Y-%m') timeStr FROM drug_user_doctor a
-		JOIN `virtual_message` b ON a.doctor_id = b.doctor_id AND a.drug_user_id = b.drug_user_id
+		SELECT d.id hcpId, DATE_FORMAT(b.message_time,'%Y-%m') timeStr FROM product_user a
+		JOIN `virtual_message` b ON a.user_id = b.drug_user_id
 		JOIN doctor d ON b.doctor_id = d.id
-		JOIN hospital h on h.id = d.hospital_id
-		WHERE a.is_available = 1 AND a.prod_id = #{productId} AND b.user_type = 1
+		WHERE a.prod_id = #{productId} AND b.user_type = 1
 		and DATE_FORMAT(b.message_time,'%Y-%m') &gt;= #{startTime} AND DATE_FORMAT(b.message_time,'%Y-%m') &lt;= #{endTime}
 		AND b.wechat_message_type NOT IN ('系统消息','撤回提醒') AND d.id IN (
 		<include refid="recruitHcp"/>
@@ -138,10 +135,9 @@
 		SELECT d.id hcpId, UNIX_TIMESTAMP(b.attend_end_time) - UNIX_TIMESTAMP(b.attend_start_time) hciId, DATE_FORMAT(b.attend_start_time,'%Y-%m') timeStr FROM
 		t_meeting_data a
 		INNER JOIN t_meeting_attend_details b ON a.id = b.meeting_id
-		INNER JOIN drug_user_doctor c ON b.doctor_id = c.doctor_id and a.product_id = c.prod_id
-		INNER JOIN virtual_doctor_call_info_mend pd on c.prod_id = pd.product_id and c.doctor_id = pd.virtual_doctor_id
+		INNER JOIN virtual_doctor_call_info_mend pd on a.product_id = pd.product_id and b.doctor_id = pd.virtual_doctor_id
 		INNER JOIN doctor d ON b.doctor_id = d.id
-		WHERE pd.is_recruit = 1 AND c.prod_id = #{productId} AND c.is_available = 1
+		WHERE pd.is_recruit = 1 AND a.product_id = #{productId}
 		AND DATE_FORMAT(b.attend_start_time,'%Y-%m') &gt;= #{startTime} AND DATE_FORMAT(b.attend_start_time,'%Y-%m') &lt;= #{endTime}
 		GROUP BY d.id, b.id
 	</select>
@@ -197,10 +193,10 @@
 		)
 		union
 		select DISTINCT d.id hcpId, DATE_FORMAT(b.create_time,'%Y-%m') timeStr from
-		drug_user_doctor a
-		inner join virtual_message b on a.doctor_id = b.doctor_id
+		product_user a
+		inner join virtual_message b on a.user_id = b.drug_user_id
 		inner join doctor d on b.doctor_id = d.id
-		WHERE a.prod_id = #{productId} and a.is_available = 1 and b.user_type = 1 and (b.wechat_message_type
+		WHERE a.prod_id = #{productId} and b.user_type = 1 and (b.wechat_message_type
 		in ('链接/小程序/聊天记录', '网页') or (b.message like 'http%' and b.message like '%token=%'))
 		AND DATE_FORMAT(b.message_time,'%Y-%m') &gt;= #{startTime} AND DATE_FORMAT(b.message_time,'%Y-%m') &lt;= #{endTime}
 		AND d.id IN (

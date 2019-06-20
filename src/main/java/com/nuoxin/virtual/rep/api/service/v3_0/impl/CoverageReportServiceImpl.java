@@ -236,7 +236,7 @@ public class CoverageReportServiceImpl implements CoverageReportService {
         }
         // 导出逻辑
         ExportExcelWrapper<CoverageOverviewResponse> exportExcelWrapper = new ExportExcelWrapper();
-        exportExcelWrapper.exportExcel("月报—招覆盖情况总览—".concat(startTime).concat("-").concat(endTime), "覆盖情况总览表", OVERVIEW_DATA_TITLES,
+        exportExcelWrapper.exportExcel("月报—覆盖情况总览—".concat(startTime).concat("-").concat(endTime), "覆盖情况总览表", OVERVIEW_DATA_TITLES,
                 rlist, response, ExportExcelUtil.EXCEl_FILE_2007);
     }
 
@@ -909,7 +909,7 @@ public class CoverageReportServiceImpl implements CoverageReportService {
 
     @Override
     public void exportPatientVolume(HttpServletResponse response, long productId, String startTime, String endTime) {
-        List<CoverageCallResponse> rlist = new ArrayList<>();
+        List<CoverageMeetingResponse> rlist = new ArrayList<>();
         CoverageReportPart bean = coverageReportMapper.getFieldValueByProductId(productId);
         if(bean != null && StringUtils.isNotBlank(bean.getTimeStr())) {
             List<CoverageReportPart> recruitList = coverageReportMapper.findCoveragePatientRecruitList(productId, startTime, endTime);
@@ -920,14 +920,14 @@ public class CoverageReportServiceImpl implements CoverageReportService {
                 Map<String, Integer> coverageHcpMap = coverageList.stream().collect(Collectors.toMap(k -> k.getTimeStr(), k -> k.getHcpId().intValue(), (k1, k2) -> k2));
                 Map<String, Integer> coverageMap = coverageList.stream().collect(Collectors.toMap(k -> k.getTimeStr(), k -> k.getHciId().intValue(), (k1, k2) -> k2));
                 yearAndMonth.forEach(k -> {
-                    CoverageCallResponse res = new CoverageCallResponse();
+                    CoverageMeetingResponse res = new CoverageMeetingResponse();
                     res.setTimeStr(k);
                     Integer recruitNum = recruitMap.get(k);
-                    res.setRecruitNum(recruitNum);
+                    res.setMeetingNum(recruitNum);
                     Integer hcpNum = coverageHcpMap.get(k);
-                    res.setCoverageNum(hcpNum);
+                    res.setHcpCount(hcpNum);
                     Integer num = coverageMap.get(k);
-                    res.setCoverageCount(num);
+                    res.setHcpNum(num);
                     Double d = 0.0d;
                     if(recruitNum > 0) {
                         d = ArithUtil.mul(ArithUtil.div(hcpNum, recruitNum, 4), 100);
@@ -938,7 +938,7 @@ public class CoverageReportServiceImpl implements CoverageReportService {
             }
         }
         // 导出逻辑
-        ExportExcelWrapper<CoverageCallResponse> exportExcelWrapper = new ExportExcelWrapper();
+        ExportExcelWrapper<CoverageMeetingResponse> exportExcelWrapper = new ExportExcelWrapper();
         exportExcelWrapper.exportExcel("月报—不同患者量的医生覆盖分析覆盖分析—".concat(startTime).concat("-").concat(endTime), "不同患者量的医生覆盖分析覆盖分析表", PATIENT_VOLUME_DATA_TITLES,
                 rlist, response, ExportExcelUtil.EXCEl_FILE_2007);
     }
