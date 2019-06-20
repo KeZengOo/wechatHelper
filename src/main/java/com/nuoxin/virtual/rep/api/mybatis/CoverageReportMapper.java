@@ -113,4 +113,29 @@ public interface CoverageReportMapper {
      */
     List<CoverageReportPart> findCoverageSendList(@Param("productId") Long productId, @Param("startTime") String startTime, @Param("endTime") String endTime);
 
+    /**
+     * 根据产品id和时间段查询患者量招募数据
+     * @param productId 产品id
+     * @param startTime 开始时间 eg: 2019-01
+     * @param endTime 结束时间 eg: 2019-05
+     * @return list
+     */
+    List<CoverageReportPart> findCoveragePatientRecruitList(@Param("productId") Long productId, @Param("startTime") String startTime, @Param("endTime") String endTime);
+
+    /**
+     * 根据产品id和时间段查询患者量覆盖数据
+     * @param productId 产品id
+     * @param startTime 开始时间 eg: 2019-01
+     * @param endTime 结束时间 eg: 2019-05
+     * @return list
+     */
+    List<CoverageReportPart> findCoveragePatientList(@Param("productId") Long productId, @Param("startTime") String startTime, @Param("endTime") String endTime);
+
+    /**
+     * 根据产品id查询对应的value
+     * @param productId 产品id
+     * @return bean
+     */
+    CoverageReportPart getFieldValueByProductId(@Param("productId") Long productId);
+
 }

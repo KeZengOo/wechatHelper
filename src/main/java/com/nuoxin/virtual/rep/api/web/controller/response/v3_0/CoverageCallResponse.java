@@ -16,6 +16,8 @@ public class CoverageCallResponse implements Serializable {
 
     private String timeStr;
 
+    private Integer recruitNum;
+
     private Integer coverageNum;
 
     private Integer coverageCount;

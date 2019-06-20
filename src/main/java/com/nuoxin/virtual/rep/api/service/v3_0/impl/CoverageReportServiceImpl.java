@@ -4,14 +4,12 @@ import com.nuoxin.virtual.rep.api.entity.v3_0.CoverageReportPart;
 import com.nuoxin.virtual.rep.api.mybatis.CoverageReportMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v3_0.CoverageReportService;
-import com.nuoxin.virtual.rep.api.utils.ArithUtil;
-import com.nuoxin.virtual.rep.api.utils.CollectionUtil;
-import com.nuoxin.virtual.rep.api.utils.ExportExcelUtil;
-import com.nuoxin.virtual.rep.api.utils.ExportExcelWrapper;
+import com.nuoxin.virtual.rep.api.utils.*;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.CoverageCallResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.CoverageMeetingResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.CoverageOverviewResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.WeChatResponse;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -865,13 +863,84 @@ public class CoverageReportServiceImpl implements CoverageReportService {
 
     @Override
     public Map<String, Object> findPatientVolumeListByProductIdAndTime(Long productId, String startTime, String endTime) {
-
-        return null;
+        Map<String, Object> map = new HashMap<>(2);
+        List<Object> resultList = new ArrayList<>(6);
+        // 招募人数
+        List<Integer> recruitCount = new ArrayList<>();
+        // 覆盖人数
+        List<Integer> coverageCount = new ArrayList<>();
+        // 覆盖次数
+        List<Integer> coverageNum = new ArrayList<>();
+        CoverageReportPart bean = coverageReportMapper.getFieldValueByProductId(productId);
+        List<CoverageReportPart> recruitList = coverageReportMapper.findCoveragePatientRecruitList(productId, startTime, endTime);
+        if(bean != null && StringUtils.isNotBlank(bean.getTimeStr())) {
+            List<String> yearAndMonth = Arrays.asList(bean.getTimeStr().split(","));
+            map.put("xAxisData", yearAndMonth);
+            if(!CollectionUtils.isEmpty(recruitList)) {
+                Map<String, Integer> recruitMap = recruitList.stream().collect(Collectors.toMap(k -> k.getTimeStr(), k -> k.getHcpId().intValue(), (k1, k2) -> k2));
+                List<CoverageReportPart> coverageList = coverageReportMapper.findCoveragePatientList(productId, startTime, endTime);
+                Map<String, Integer> coverageHcpMap = coverageList.stream().collect(Collectors.toMap(k -> k.getTimeStr(), k -> k.getHcpId().intValue(), (k1, k2) -> k2));
+                Map<String, Integer> coverageMap = coverageList.stream().collect(Collectors.toMap(k -> k.getTimeStr(), k -> k.getHciId().intValue(), (k1, k2) -> k2));
+                yearAndMonth.forEach(k -> {
+                    Integer recruitNum = recruitMap.get(k);
+                    recruitCount.add(recruitNum == null ? 0 : recruitNum);
+                    Integer hcpNum = coverageHcpMap.get(k);
+                    coverageCount.add(hcpNum == null ? 0 : hcpNum);
+                    Integer num = coverageMap.get(k);
+                    coverageNum.add(num == null ? 0 : num);
+                });
+            } else {
+                yearAndMonth.forEach(k -> {
+                    recruitCount.add(0);
+                    coverageCount.add(0);
+                    coverageNum.add(0);
+                });
+            }
+            resultList.add(recruitCount);
+            resultList.add(coverageCount);
+            resultList.add(coverageNum);
+            map.put("seriesData", resultList);
+        } else {
+            map.put("xAxisData", null);
+            map.put("seriesData", null);
+        }
+        return map;
     }
 
     @Override
-    public void exportPatientVolume(HttpServletResponse response, long proId, String startTime, String endTime) {
-
+    public void exportPatientVolume(HttpServletResponse response, long productId, String startTime, String endTime) {
+        List<CoverageCallResponse> rlist = new ArrayList<>();
+        CoverageReportPart bean = coverageReportMapper.getFieldValueByProductId(productId);
+        if(bean != null && StringUtils.isNotBlank(bean.getTimeStr())) {
+            List<CoverageReportPart> recruitList = coverageReportMapper.findCoveragePatientRecruitList(productId, startTime, endTime);
+            if(!CollectionUtils.isEmpty(recruitList)) {
+                List<String> yearAndMonth = Arrays.asList(bean.getTimeStr().split(","));
+                Map<String, Integer> recruitMap = recruitList.stream().collect(Collectors.toMap(k -> k.getTimeStr(), k -> k.getHcpId().intValue(), (k1, k2) -> k2));
+                List<CoverageReportPart> coverageList = coverageReportMapper.findCoveragePatientList(productId, startTime, endTime);
+                Map<String, Integer> coverageHcpMap = coverageList.stream().collect(Collectors.toMap(k -> k.getTimeStr(), k -> k.getHcpId().intValue(), (k1, k2) -> k2));
+                Map<String, Integer> coverageMap = coverageList.stream().collect(Collectors.toMap(k -> k.getTimeStr(), k -> k.getHciId().intValue(), (k1, k2) -> k2));
+                yearAndMonth.forEach(k -> {
+                    CoverageCallResponse res = new CoverageCallResponse();
+                    res.setTimeStr(k);
+                    Integer recruitNum = recruitMap.get(k);
+                    res.setRecruitNum(recruitNum);
+                    Integer hcpNum = coverageHcpMap.get(k);
+                    res.setCoverageNum(hcpNum);
+                    Integer num = coverageMap.get(k);
+                    res.setCoverageCount(num);
+                    Double d = 0.0d;
+                    if(recruitNum > 0) {
+                        d = ArithUtil.mul(ArithUtil.div(hcpNum, recruitNum, 4), 100);
+                    }
+                    res.setTotalTime(d + "%");
+                    rlist.add(res);
+                });
+            }
+        }
+        // 导出逻辑
+        ExportExcelWrapper<CoverageCallResponse> exportExcelWrapper = new ExportExcelWrapper();
+        exportExcelWrapper.exportExcel("月报—不同患者量的医生覆盖分析覆盖分析—".concat(startTime).concat("-").concat(endTime), "不同患者量的医生覆盖分析覆盖分析表", PATIENT_VOLUME_DATA_TITLES,
+                rlist, response, ExportExcelUtil.EXCEl_FILE_2007);
     }
 
     /**
