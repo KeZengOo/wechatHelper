@@ -54,6 +54,32 @@ public class DailyReportController extends NewBaseController {
     }
 
 
+
+    @ApiOperation(value = "我的业绩,已招募医生导出")
+    @GetMapping(value = "/my/achievement/recruit/doctor/export")
+    public void exportMyAchievementRecruitDoctor(HttpServletRequest request, HttpServletResponse response){
+        DailyReportRequest bean = this.getExportParmas(request);
+        dailyReportService.exportMyAchievementRecruitDoctor(bean, response);
+    }
+
+
+    @ApiOperation(value = "我的业绩,活跃覆盖医生导出")
+    @GetMapping(value = "/my/achievement/activity/doctor/export")
+    public void exportMyAchievementActivityDoctor(HttpServletRequest request, HttpServletResponse response){
+        DailyReportRequest bean = this.getExportParmas(request);
+        dailyReportService.exportMyAchievementActivityDoctor(bean, response);
+    }
+
+
+    @ApiOperation(value = "我的业绩,多渠道覆盖医生导出")
+    @GetMapping(value = "/my/achievement/mul/channel/doctor/export")
+    public void exportMyAchievementMulChannelDoctor(HttpServletRequest request, HttpServletResponse response){
+        DailyReportRequest bean = this.getExportParmas(request);
+        dailyReportService.exportMyAchievementMulChannelDoctor(bean, response);
+    }
+
+
+
     @ApiOperation(value = "电话拜访统计")
     @PostMapping(value = "/call/statistics")
     public DefaultResponseBean<CallVisitStatisticsResponse> getCallVisitStatistics(@RequestBody DailyReportRequest request){

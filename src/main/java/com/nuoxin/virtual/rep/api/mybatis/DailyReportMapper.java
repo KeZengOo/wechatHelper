@@ -25,6 +25,13 @@ public interface DailyReportMapper {
      */
     Integer recruitDoctorNum(DailyReportRequest reportRequest);
 
+    /**
+     * 招募医生数ID
+     * @param reportRequest
+     * @return
+     */
+    List<CommonPoolDoctorResponse> recruitDoctorIdList(DailyReportRequest reportRequest);
+
 
     /**
      * 招募医院数
@@ -61,6 +68,14 @@ public interface DailyReportMapper {
      */
     Integer activeCoverDoctorNum(DailyReportRequest reportRequest);
 
+    /**
+     * 活跃覆盖医生(收益)ID
+     * @param reportRequest
+     * @return
+     */
+    List<CommonPoolDoctorResponse> activeCoverDoctorIdList(DailyReportRequest reportRequest);
+
+
 
     /**
      * 多渠道覆盖医生数，满足任意三项
@@ -73,6 +88,14 @@ public interface DailyReportMapper {
      * @return
      */
     Integer mulChannelDoctorNum(DailyReportRequest reportRequest);
+
+
+    /**
+     * 多渠道覆盖医生Id
+     * @param reportRequest
+     * @return
+     */
+    List<CommonPoolDoctorResponse> mulChannelDoctorIdList(DailyReportRequest reportRequest);
 
 
     /**

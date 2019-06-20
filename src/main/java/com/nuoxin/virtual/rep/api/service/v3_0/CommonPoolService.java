@@ -34,6 +34,15 @@ public interface CommonPoolService {
 
 
     /**
+     * 执行导出一身
+     * @param doctorList
+     * @param productIdList
+     * @param response
+     */
+    void handleExportDoctorList(List<CommonPoolDoctorResponse> doctorList, List<Long> productIdList, HttpServletResponse response);
+
+
+    /**
      * 公共池展示的医生
      * @return
      */

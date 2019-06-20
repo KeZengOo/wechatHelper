@@ -2652,6 +2652,14 @@
 			)
 		</if>
 
+
+		<if test="doctorIdList !=null and doctorIdList.size > 0">
+			AND d.id IN
+			<foreach collection="doctorIdList" item="doctorId" open="(" close=")" separator=",">
+				#{doctorId}
+			</foreach>
+		</if>
+
 		GROUP BY
 		dud.drug_user_id,
 		dud.doctor_id,
@@ -2796,6 +2804,15 @@
 			SELECT #{searchKeyword}
 			)
 		</if>
+
+
+		<if test="doctorIdList !=null and doctorIdList.size > 0">
+			AND d.id IN
+			<foreach collection="doctorIdList" item="doctorId" open="(" close=")" separator=",">
+				#{doctorId}
+			</foreach>
+		</if>
+
 
 		GROUP BY
 		dud.drug_user_id,

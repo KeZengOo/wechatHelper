@@ -43,6 +43,30 @@ public interface DailyReportService {
 
 
     /**
+     * 导出我的业绩已招募医生
+     * @param request
+     * @param response
+     */
+    void exportMyAchievementRecruitDoctor(DailyReportRequest request, HttpServletResponse response);
+
+
+    /**
+     * 导出我的业绩活跃覆盖的医生
+     * @param request
+     * @param response
+     */
+    void exportMyAchievementActivityDoctor(DailyReportRequest request, HttpServletResponse response);
+
+
+    /**
+     * 导出我的业绩多渠道覆盖医生
+     * @param request
+     * @param response
+     */
+    void exportMyAchievementMulChannelDoctor(DailyReportRequest request, HttpServletResponse response);
+
+
+    /**
      * 电话拜访统计，次数，时长
      * @param request
      * @return

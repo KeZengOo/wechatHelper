@@ -163,7 +163,14 @@ public class CommonPoolServiceImpl implements CommonPoolService {
         request.setPaginable(1);
 
         List<CommonPoolDoctorResponse> commonPoolDoctorList = doctorMapper.getCommonPoolDoctorList(request);
-        List<LinkedHashMap<String, Object>> dataMap = this.exportData(productIdList, commonPoolDoctorList);
+        this.handleExportDoctorList(commonPoolDoctorList, productIdList, response);
+
+    }
+
+    @Override
+    public void handleExportDoctorList(List<CommonPoolDoctorResponse> doctorList, List<Long> productIdList, HttpServletResponse response) {
+
+        List<LinkedHashMap<String, Object>> dataMap = this.exportData(productIdList, doctorList);
         /**
          * 得到导出的字段
          */
@@ -188,8 +195,8 @@ public class CommonPoolServiceImpl implements CommonPoolService {
                 e.printStackTrace();
             }
         }
-
     }
+
 
     @Override
     public List<ProductResponseBean> getProductList() {

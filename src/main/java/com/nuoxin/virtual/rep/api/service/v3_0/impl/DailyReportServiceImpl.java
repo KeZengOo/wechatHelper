@@ -12,16 +12,16 @@ import com.nuoxin.virtual.rep.api.mybatis.DailyReportMapper;
 import com.nuoxin.virtual.rep.api.mybatis.ProductTargetMapper;
 import com.nuoxin.virtual.rep.api.mybatis.VirtualProductVisitResultMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
+import com.nuoxin.virtual.rep.api.service.v3_0.CommonPoolService;
 import com.nuoxin.virtual.rep.api.service.v3_0.DailyReportService;
 import com.nuoxin.virtual.rep.api.utils.*;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.excel.SheetRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.CommonPoolRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.DailyReportRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.statistics.ProductTargetResponseBean;
-import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DailyReportResponse;
-import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.VisitCountStatisticsResponse;
-import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.VisitDoctorStatisticsResponse;
-import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.VisitHospitalStatisticsResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.*;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.*;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.daily.DoctorVisitResponse;
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.stereotype.Service;
@@ -52,6 +52,9 @@ public class DailyReportServiceImpl implements DailyReportService {
 
     @Resource
     private CommonService commonService;
+
+    @Resource
+    private CommonPoolService commonPoolService;
 
     @Resource
     private DrugUserRepository drugUserRepository;
@@ -364,6 +367,40 @@ public class DailyReportServiceImpl implements DailyReportService {
 
         return myAchievement;
 
+    }
+
+    @Override
+    public void exportMyAchievementRecruitDoctor(DailyReportRequest request, HttpServletResponse response) {
+
+        List<CommonPoolDoctorResponse> doctorList = dailyReportMapper.recruitDoctorIdList(request);
+        if (CollectionsUtil.isEmptyList(doctorList)){
+            throw new BusinessException(ErrorEnum.ERROR, "暂无数据！");
+        }
+
+        commonPoolService.handleExportDoctorList(doctorList, request.getProductIdList(), response);
+
+
+
+    }
+
+    @Override
+    public void exportMyAchievementActivityDoctor(DailyReportRequest request, HttpServletResponse response) {
+
+        List<CommonPoolDoctorResponse> doctorList = dailyReportMapper.activeCoverDoctorIdList(request);
+        if (CollectionsUtil.isEmptyList(doctorList)){
+            throw new BusinessException(ErrorEnum.ERROR, "暂无数据！");
+        }
+
+        commonPoolService.handleExportDoctorList(doctorList, request.getProductIdList(), response);
+    }
+
+    @Override
+    public void exportMyAchievementMulChannelDoctor(DailyReportRequest request, HttpServletResponse response) {
+        List<CommonPoolDoctorResponse> doctorList = dailyReportMapper.mulChannelDoctorIdList(request);
+        if (CollectionsUtil.isEmptyList(doctorList)){
+            throw new BusinessException(ErrorEnum.ERROR, "暂无数据！");
+        }
+        commonPoolService.handleExportDoctorList(doctorList, request.getProductIdList(), response);
     }
 
     @Override

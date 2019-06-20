@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 公共池请求参数
@@ -25,6 +26,7 @@ public class CommonPoolRequest extends DoctorBaseRequest implements Serializable
     @ApiModelProperty(value = "是否是可分页的,0和null 可以分页的，其他是可以分页的")
     private Integer paginable;
 
-
+    @ApiModelProperty(value = "医生ID列表")
+    private List<Long> doctorIdList;
 
 }
