@@ -913,7 +913,14 @@
     </select>
 
     <select id="getPushTimesByDrugUserAndTitle" resultType="java.lang.Integer">
-
+        SELECT
+            count(1)
+        FROM
+            activity_share
+        WHERE
+            data_id = #{contentId}
+            AND share_type = #{shareType}
+            AND drug_user_id = #{drugUserId}
     </select>
 
 </mapper>

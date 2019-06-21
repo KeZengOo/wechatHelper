@@ -107,6 +107,6 @@ public interface ContentSharingMapper {
      * @param shareType 分享类型
      * @return list
      */
-    Integer getPushTimesByDrugUserAndTitle(Long contentId, Long drugUserId, Integer shareType);
+    Integer getPushTimesByDrugUserAndTitle(@Param("contentId") Long contentId, @Param("drugUserId") Long drugUserId, @Param("shareType") Integer shareType);
 
 }

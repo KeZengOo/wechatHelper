@@ -85,6 +85,7 @@ public class ContentSharingServiceImpl implements ContentSharingService {
                 c.setTime(n.getTime().substring(0,n.getTime().indexOf(".")));
                 c.setPeopleNumber(readCount);
                 c.setRoleName(roleNamesString);
+                c.setPushTimes(pushTimes);
                 if(readTimeCount != null){
                     c.setTotalDuration(ParseTimeSecondsUtils.secondToTime(readTimeCount));
                 } else {
