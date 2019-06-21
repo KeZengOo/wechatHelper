@@ -996,7 +996,7 @@ public class CoverageReportServiceImpl implements CoverageReportService {
             String j = yearAndMonth.get(i+1);
             Set<Long> setJ = recruitMap.get(j);
             if(setJ == null) {
-                setJ = Collections.emptySet();
+                setJ = new HashSet<>();
             }
             setJ.addAll(setI);
             recruitMap.put(j, setJ);

@@ -53,38 +53,37 @@ public class ContentSharingServiceImpl implements ContentSharingService {
             productIds = Arrays.asList(contentSharingRequest.getProductId());
         }
 
-        List<ContentSharingParams> list = contentSharingMapper.getContentSharingListPage(contentSharingRequest,drugUserIds,productIds);
-        List<ContentSharingParams> newList = new ArrayList<ContentSharingParams>();
-
-        list.forEach(n->{
-            List<ContentSharingParams> roleNames =  contentSharingMapper.getContentSharingRoleNameByDrugUserId(n.getDrugUserId());
-            String roleNamesString = "";
-            for (int i=0; i<roleNames.size(); i++)
-            {
-                roleNamesString += roleNames.get(i).getRoleName()+",";
-            }
-
-            //根据会议id和分享渠道计算阅读总时长
-            Long readTimeCount = contentSharingMapper.getActivityReadReadTimeByActivityIdAndShareType(n.getId(),n.getShareType(),n.getDrugUserId());
-
-            //该代表的文章的医生阅读数
-            Integer readCount = contentSharingMapper.getReadCountByDrugUserAndTitle(n.getId(),n.getDrugUserId(),n.getShareType());
-            logger.info("titleID:"+ n.getId()+"readCount:"+readCount);
-            ContentSharingParams c = new ContentSharingParams();
-            c = n;
-            c.setTime(n.getTime().substring(0,n.getTime().indexOf(".")));
-            c.setPeopleNumber(readCount);
-            c.setRoleName(roleNamesString.substring(0,roleNamesString.length()));
-            if(readTimeCount != null){
-                c.setTotalDuration(ParseTimeSecondsUtils.secondToTime(readTimeCount));
-            }else
-            {
-                c.setTotalDuration(ParseTimeSecondsUtils.secondToTime(0));
-            }
-            newList.add(c);
-        });
-
         Integer contentSharingCount = contentSharingMapper.getContentSharingListCount(contentSharingRequest,drugUserIds,productIds);
+        List<ContentSharingParams> newList = new ArrayList<ContentSharingParams>();
+        if(contentSharingCount > 0) {
+            List<ContentSharingParams> list = contentSharingMapper.getContentSharingListPage(contentSharingRequest,drugUserIds,productIds);
+
+            list.forEach(n->{
+                List<ContentSharingParams> roleNames =  contentSharingMapper.getContentSharingRoleNameByDrugUserId(n.getDrugUserId());
+                String roleNamesString = "";
+                for (int i=0; i<roleNames.size(); i++)
+                {
+                    roleNamesString += roleNames.get(i).getRoleName()+",";
+                }
+
+                //根据会议id和分享渠道计算阅读总时长
+                Long readTimeCount = contentSharingMapper.getActivityReadReadTimeByActivityIdAndShareType(n.getId(),n.getShareType(),n.getDrugUserId());
+
+                //该代表的文章的医生阅读数
+                Integer readCount = contentSharingMapper.getReadCountByDrugUserAndTitle(n.getId(),n.getDrugUserId(),n.getShareType());
+                logger.info("titleID:"+ n.getId()+"readCount:"+readCount);
+                ContentSharingParams c = n;
+                c.setTime(n.getTime().substring(0,n.getTime().indexOf(".")));
+                c.setPeopleNumber(readCount);
+                c.setRoleName(roleNamesString.substring(0,roleNamesString.length()));
+                if(readTimeCount != null){
+                    c.setTotalDuration(ParseTimeSecondsUtils.secondToTime(readTimeCount));
+                } else {
+                    c.setTotalDuration(ParseTimeSecondsUtils.secondToTime(0));
+                }
+                newList.add(c);
+            });
+        }
 
         return new PageResponseBean(contentSharingRequest, contentSharingCount, newList);
     }
