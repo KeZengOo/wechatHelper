@@ -911,4 +911,9 @@
                         AND dd.drug_user_id = #{drugUserId}
                 ) m
     </select>
+
+    <select id="getPushTimesByDrugUserAndTitle" resultType="java.lang.Integer">
+
+    </select>
+
 </mapper>

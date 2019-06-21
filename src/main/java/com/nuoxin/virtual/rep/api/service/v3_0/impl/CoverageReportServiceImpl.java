@@ -922,11 +922,11 @@ public class CoverageReportServiceImpl implements CoverageReportService {
                 yearAndMonth.forEach(k -> {
                     CoverageMeetingResponse res = new CoverageMeetingResponse();
                     res.setTimeStr(k);
-                    Integer recruitNum = recruitMap.get(k);
+                    Integer recruitNum = recruitMap.get(k) == null ? 0 : recruitMap.get(k);
                     res.setMeetingNum(recruitNum);
-                    Integer hcpNum = coverageHcpMap.get(k);
+                    Integer hcpNum = coverageHcpMap.get(k) == null ? 0 : coverageHcpMap.get(k);
                     res.setHcpCount(hcpNum);
-                    Integer num = coverageMap.get(k);
+                    Integer num = coverageMap.get(k) == null ? 0 : coverageMap.get(k);
                     res.setHcpNum(num);
                     Double d = 0.0d;
                     if(recruitNum > 0) {

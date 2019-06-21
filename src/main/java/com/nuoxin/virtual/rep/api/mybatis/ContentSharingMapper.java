@@ -99,4 +99,14 @@ public interface ContentSharingMapper {
      * @return
      */
     Long getActivityReadReadTimeByActivityIdAndShareType(@Param("dataId") Long dataId, @Param("shareType") Integer shareType, @Param("drugUserId") Long drugUserId);
+
+    /**
+     * 根据文章id和虚拟代表查询推送次数
+     * @param contentId 文章id
+     * @param drugUserId 代表id
+     * @param shareType 分享类型
+     * @return list
+     */
+    Integer getPushTimesByDrugUserAndTitle(Long contentId, Long drugUserId, Integer shareType);
+
 }

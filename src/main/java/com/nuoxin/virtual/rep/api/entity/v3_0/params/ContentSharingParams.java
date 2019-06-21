@@ -28,6 +28,8 @@ public class ContentSharingParams {
     private String drugUserName;
     @ApiModelProperty("阅读人数")
     private Integer peopleNumber;
+    @ApiModelProperty("推送次数")
+    private Integer pushTimes;
     @ApiModelProperty("总阅读时长-秒")
     private String totalDuration;
     @ApiModelProperty("产品ID")
