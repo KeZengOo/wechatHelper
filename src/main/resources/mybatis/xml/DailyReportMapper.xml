@@ -5,6 +5,8 @@
     <!-- 招募的医生数 -->
     <select id="recruitDoctorNum" resultType="java.lang.Integer">
 
+        <!-- 修改前
+
         SELECT IFNULL(COUNT(*), 0) FROM (
         SELECT
         d.id
@@ -22,24 +24,57 @@
             </foreach>
         </if>
 
+
+
+        GROUP BY d.id
+
+
+        ) t
+        -->
+
+
+        <!-- 修改后 -->
+        SELECT
+        COUNT( DISTINCT d.id )
+        FROM
+        virtual_doctor_call_info_mend a
+        INNER JOIN doctor d
+        ON a.virtual_doctor_id=d.id
+        INNER JOIN hospital h
+        ON d.hospital_id=h.id
+        INNER JOIN (
+        SELECT
+        d.id doctor_id,
+        MIN( m.id ) minId
+        FROM
+        virtual_doctor_call_info_mend m
+        INNER JOIN doctor d ON m.virtual_doctor_id = d.id
+        WHERE 1=1
+
+
+        <if test="productIdList !=null and productIdList.size > 0">
+            AND m.product_id IN
+            <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+                #{productId}
+            </foreach>
+        </if>
+
+        AND m.is_recruit = 1
+        GROUP BY
+        d.id
+        ) b ON a.id = b.minId
+        WHERE 1=1
+
         <if test="drugUserIdList !=null and drugUserIdList.size > 0">
-            AND m.virtual_drug_user_id IN
+            AND a.virtual_drug_user_id IN
             <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
                 #{drugUserId}
             </foreach>
         </if>
 
-
-        GROUP BY d.id
-        <if test="startTime !=null and endTime !=null">HAVING MIN(m.create_time) BETWEEN #{startTime} AND #{ endTime}
-        </if>
-
-        <!--
         <if test="startTime !=null and endTime !=null">
-            AND m.create_time BETWEEN #{startTime}  AND #{endTime}
+            AND a.create_time BETWEEN #{startTime} AND #{ endTime}
         </if>
-        -->
-        ) t
 
 
     </select>
@@ -170,14 +205,24 @@
         LEFT JOIN product_line pl
         ON q.product_id=pl.prod_id
         INNER JOIN (
+
         SELECT
-        d.id doctor_id, m.virtual_drug_user_id
+        d.id doctor_id, a.virtual_drug_user drug_user_id
+        FROM
+        virtual_doctor_call_info_mend a
+        INNER JOIN doctor d
+        ON a.virtual_doctor_id=d.id
+        INNER JOIN hospital h
+        ON d.hospital_id=h.id
+        INNER JOIN (
+        SELECT
+        d.id doctor_id,
+        MIN( m.id ) minId
         FROM
         virtual_doctor_call_info_mend m
-        INNER JOIN doctor d
-        ON m.virtual_doctor_id=d.id
-        WHERE
-        m.is_recruit = 1
+        INNER JOIN doctor d ON m.virtual_doctor_id = d.id
+        WHERE 1=1
+
 
         <if test="productIdList !=null and productIdList.size > 0">
             AND m.product_id IN
@@ -186,17 +231,21 @@
             </foreach>
         </if>
 
+        AND m.is_recruit = 1
+        GROUP BY
+        d.id
+        ) b ON a.id = b.minId
+        WHERE 1=1
+
         <if test="drugUserIdList !=null and drugUserIdList.size > 0">
-            AND m.virtual_drug_user_id IN
+            AND a.virtual_drug_user_id IN
             <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
                 #{drugUserId}
             </foreach>
         </if>
 
-
-        GROUP BY d.id, m.virtual_drug_user_id
         <if test="startTime !=null and endTime !=null">
-            HAVING MIN(m.create_time) BETWEEN #{startTime} AND #{ endTime}
+            AND a.create_time BETWEEN #{startTime} AND #{ endTime}
         </if>
 
         ) t
@@ -212,6 +261,9 @@
 
     <!-- 招募的医院数 -->
     <select id="recruitHospitalNum" resultType="java.lang.Integer">
+        <!-- 修改前 -->
+
+        <!--
         SELECT
         IFNULL(COUNT(DISTINCT d.hospital_id), 0)
         FROM
@@ -238,6 +290,53 @@
         <if test="startTime !=null and endTime !=null">
             AND m.create_time BETWEEN #{startTime}  AND #{endTime}
         </if>
+        -->
+
+
+
+        SELECT
+        COUNT( DISTINCT h.id )
+        FROM
+        virtual_doctor_call_info_mend a
+        INNER JOIN doctor d
+        ON a.virtual_doctor_id=d.id
+        INNER JOIN hospital h
+        ON d.hospital_id=h.id
+        INNER JOIN (
+        SELECT
+        d.id doctor_id,
+        MIN( m.id ) minId
+        FROM
+        virtual_doctor_call_info_mend m
+        INNER JOIN doctor d ON m.virtual_doctor_id = d.id
+        WHERE 1=1
+
+
+        <if test="productIdList !=null and productIdList.size > 0">
+            AND m.product_id IN
+            <foreach collection="productIdList" item="productId" open="(" close=")" separator=",">
+                #{productId}
+            </foreach>
+        </if>
+
+        AND m.is_recruit = 1
+        GROUP BY
+        d.id
+        ) b ON a.id = b.minId
+        WHERE 1=1
+
+        <if test="drugUserIdList !=null and drugUserIdList.size > 0">
+            AND a.virtual_drug_user_id IN
+            <foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
+                #{drugUserId}
+            </foreach>
+        </if>
+
+        <if test="startTime !=null and endTime !=null">
+            AND a.create_time BETWEEN #{startTime} AND #{ endTime}
+        </if>
+
+
 
     </select>
 

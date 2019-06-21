@@ -99,6 +99,7 @@
 
     <!-- 招募医院数量 -->
     <select id="getRecruitHospital" resultType="java.lang.Integer">
+        <!-- 修改前
         SELECT IFNULL(COUNT(*), 0) FROM (
             SELECT
             d.hospital_id
@@ -123,11 +124,51 @@
             </if>
         ) t
 
+        -->
+
+
+
+
+        SELECT
+        COUNT( DISTINCT d.hospital_id )
+        FROM
+        virtual_doctor_call_info_mend a
+        INNER JOIN doctor d
+        ON a.virtual_doctor_id=d.id
+        INNER JOIN hospital h
+        ON d.hospital_id=h.id
+        INNER JOIN (
+        SELECT
+        d.id doctor_id,
+        MIN( m.id ) minId
+        FROM
+        virtual_doctor_call_info_mend m
+        INNER JOIN doctor d ON m.virtual_doctor_id = d.id
+        WHERE 1=1
+        AND m.product_id = #{productId}
+
+        AND m.is_recruit = 1
+        GROUP BY
+        d.id
+        ) b ON a.id = b.minId
+        WHERE 1=1
+
+
+        <if test="startDate !=null">
+            AND DATE_FORMAT( a.create_time, '%Y-%m' ) &gt;= #{startDate}
+        </if>
+        <if test="endDate !=null">
+            AND DATE_FORMAT( a.create_time, '%Y-%m' ) &lt;= #{endDate}
+        </if>
+
     </select>
 
 
     <!-- 招募医生数量 -->
     <select id="getRecruitDoctor" resultType="java.lang.Integer">
+
+        <!-- 修改前
+
         SELECT IFNULL(COUNT(*), 0) FROM (
             SELECT
             d.id
@@ -150,12 +191,52 @@
                 AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &lt;= #{endDate}
             </if>
         ) t
+        -->
+
+
+
+
+        SELECT
+        COUNT( DISTINCT d.id )
+        FROM
+        virtual_doctor_call_info_mend a
+        INNER JOIN doctor d
+        ON a.virtual_doctor_id=d.id
+        INNER JOIN hospital h
+        ON d.hospital_id=h.id
+        INNER JOIN (
+        SELECT
+        d.id doctor_id,
+        MIN( m.id ) minId
+        FROM
+        virtual_doctor_call_info_mend m
+        INNER JOIN doctor d ON m.virtual_doctor_id = d.id
+        WHERE 1=1
+        AND m.product_id = #{productId}
+
+        AND m.is_recruit = 1
+        GROUP BY
+        d.id
+        ) b ON a.id = b.minId
+        WHERE 1=1
+
+
+        <if test="startDate !=null">
+            AND DATE_FORMAT( a.create_time, '%Y-%m' ) &gt;= #{startDate}
+        </if>
+        <if test="endDate !=null">
+            AND DATE_FORMAT( a.create_time, '%Y-%m' ) &lt;= #{endDate}
+        </if>
+
+
     </select>
 
 
 
     <!-- 每月招募医生数量 -->
     <select id="getMonthRecruitDoctorList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyRecruitDetailResponse">
+        <!-- 修改前
+
         SELECT t.m `month`, COUNT(DISTINCT t.doctor_id) recruitDoctor FROM (
         SELECT
         d.id doctor_id, MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) m
@@ -180,6 +261,47 @@
         ) t
         GROUP BY t.m
 
+         -->
+
+
+
+        SELECT
+        DATE_FORMAT( a.create_time, '%Y-%m' ) `month`,
+        COUNT(DISTINCT d.id) recruitDoctor
+        FROM
+        virtual_doctor_call_info_mend a
+        INNER JOIN doctor d
+        ON a.virtual_doctor_id=d.id
+        INNER JOIN hospital h
+        ON d.hospital_id=h.id
+        INNER JOIN (
+        SELECT
+        d.id doctor_id,
+        MIN( m.id ) minId
+        FROM
+        virtual_doctor_call_info_mend m
+        INNER JOIN doctor d ON m.virtual_doctor_id = d.id
+        WHERE 1=1
+
+        AND m.product_id = #{productId}
+
+        AND m.is_recruit = 1
+        GROUP BY
+        d.id
+        ) b ON a.id = b.minId
+        WHERE 1=1
+
+        <if test="startDate !=null">
+            AND DATE_FORMAT( a.create_time, '%Y-%m' ) &gt;= #{startDate}
+        </if>
+        <if test="endDate !=null">
+            AND DATE_FORMAT( a.create_time, '%Y-%m' ) &lt;= #{endDate}
+        </if>
+
+        GROUP BY DATE_FORMAT( a.create_time, '%Y-%m' )
+
+
+
     </select>
 
 
@@ -195,6 +317,8 @@
         AND CHAR_LENGTH(dt.telephone)=11
         AND d.id IN
         (
+
+            <!--
             SELECT
             d.id
             FROM
@@ -215,6 +339,41 @@
             <if test="endDate !=null">
                 AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &lt;= #{endDate}
             </if>
+            -->
+
+                SELECT
+                DISTINCT d.id
+                FROM
+                virtual_doctor_call_info_mend a
+                INNER JOIN doctor d
+                ON a.virtual_doctor_id=d.id
+                INNER JOIN hospital h
+                ON d.hospital_id=h.id
+                INNER JOIN (
+                SELECT
+                d.id doctor_id,
+                MIN( m.id ) minId
+                FROM
+                virtual_doctor_call_info_mend m
+                INNER JOIN doctor d ON m.virtual_doctor_id = d.id
+                WHERE 1=1
+
+                AND m.product_id = #{productId}
+
+                AND m.is_recruit = 1
+                GROUP BY
+                d.id
+                ) b ON a.id = b.minId
+                WHERE 1=1
+
+                <if test="startDate !=null">
+                    AND DATE_FORMAT( a.create_time, '%Y-%m' ) &gt;= #{startDate}
+                </if>
+                <if test="endDate !=null">
+                    AND DATE_FORMAT( a.create_time, '%Y-%m' ) &lt;= #{endDate}
+                </if>
+
+
         )
 
     </select>
@@ -223,7 +382,7 @@
 
     <!-- 每月成功招募的医生中，有手机号的医生 -->
     <select id="getMonthHasMobileDoctorList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyRecruitMobileDetailResponse">
-
+        <!-- 修改前
         SELECT t.`month`, COUNT(DISTINCT t.doctor_id) hasMobileDoctor  FROM doctor_telephone dt INNER JOIN
         (
         SELECT
@@ -251,6 +410,57 @@
         WHERE LEFT(dt.telephone, 1)=1
         AND CHAR_LENGTH(dt.telephone)=11
         GROUP BY t.`month`
+        -->
+
+
+
+
+
+
+        SELECT
+        DATE_FORMAT( t.create_time, '%Y-%m' ) `month`,
+        COUNT(DISTINCT t.doctor_id) hasMobileDoctor
+        FROM doctor_telephone dt INNER JOIN (
+        SELECT
+        DISTINCT d.id doctor_id, a.create_time
+        FROM
+        virtual_doctor_call_info_mend a
+        INNER JOIN doctor d
+        ON a.virtual_doctor_id=d.id
+        INNER JOIN hospital h
+        ON d.hospital_id=h.id
+        INNER JOIN (
+        SELECT
+        d.id doctor_id,
+        MIN( m.id ) minId
+        FROM
+        virtual_doctor_call_info_mend m
+        INNER JOIN doctor d ON m.virtual_doctor_id = d.id
+        WHERE 1=1
+
+        AND m.product_id = #{productId}
+
+        AND m.is_recruit = 1
+        GROUP BY
+        d.id
+        ) b ON a.id = b.minId
+        WHERE 1=1
+
+
+        <if test="startDate !=null">
+            AND DATE_FORMAT( a.create_time, '%Y-%m' ) &gt;= #{startDate}
+        </if>
+        <if test="endDate !=null">
+            AND DATE_FORMAT( a.create_time, '%Y-%m' ) &lt;= #{endDate}
+        </if>
+
+        ) t
+        ON dt.doctor_id = t.doctor_id
+        WHERE LEFT(dt.telephone, 1)=1
+        AND CHAR_LENGTH(dt.telephone)=11
+        GROUP BY DATE_FORMAT( t.create_time, '%Y-%m' )
+
+
 
     </select>
 
@@ -267,24 +477,36 @@
         AND d.id IN
         (
         SELECT
-        d.id
+        DISTINCT d.id
         FROM
-        virtual_doctor_call_info v
-        INNER JOIN doctor d ON v.virtual_doctor_id = d.id
-        INNER JOIN hospital h ON d.hospital_id=h.id
-        INNER JOIN virtual_doctor_call_info_mend m
-        ON v.id=m.call_id
-        WHERE
-        v.product_id = #{productId}
-        AND m.is_recruit=1
+        virtual_doctor_call_info_mend a
+        INNER JOIN doctor d
+        ON a.virtual_doctor_id=d.id
+        INNER JOIN hospital h
+        ON d.hospital_id=h.id
+        INNER JOIN (
+        SELECT
+        d.id doctor_id,
+        MIN( m.id ) minId
+        FROM
+        virtual_doctor_call_info_mend m
+        INNER JOIN doctor d ON m.virtual_doctor_id = d.id
+        WHERE 1=1
 
-        GROUP BY d.id
-        HAVING 1=1
+        AND m.product_id = #{productId}
+
+        AND m.is_recruit = 1
+        GROUP BY
+        d.id
+        ) b ON a.id = b.minId
+        WHERE 1=1
+
+
         <if test="startDate !=null">
-            AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &gt;= #{startDate}
+            AND DATE_FORMAT( a.create_time, '%Y-%m' ) &gt;= #{startDate}
         </if>
         <if test="endDate !=null">
-            AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &lt;= #{endDate}
+            AND DATE_FORMAT( a.create_time, '%Y-%m' ) &lt;= #{endDate}
         </if>
         )
     </select>
@@ -295,6 +517,7 @@
     <!-- 每月成功招募的医生中，有微信的医生 -->
     <select id="getMonthHasWechatDoctorList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyRecruitWechatDetailResponse">
 
+        <!-- 修改前
         SELECT t.`month`, COUNT(DISTINCT t.doctor_id) hasWechatDoctor
         FROM doctor_mend dm INNER JOIN
         (
@@ -323,7 +546,57 @@
         WHERE dm.wechat IS NOT NULL
         AND dm.wechat!=''
         GROUP BY t.`month`
+        -->
 
+
+
+
+
+
+
+        SELECT
+        DATE_FORMAT( t.create_time, '%Y-%m' ) `month`,
+        COUNT(DISTINCT t.doctor_id) hasMobileDoctor
+        FROM doctor_mend dm INNER JOIN (
+        SELECT
+        DISTINCT d.id doctor_id, a.create_time
+        FROM
+        virtual_doctor_call_info_mend a
+        INNER JOIN doctor d
+        ON a.virtual_doctor_id=d.id
+        INNER JOIN hospital h
+        ON d.hospital_id=h.id
+        INNER JOIN (
+        SELECT
+        d.id doctor_id,
+        MIN( m.id ) minId
+        FROM
+        virtual_doctor_call_info_mend m
+        INNER JOIN doctor d ON m.virtual_doctor_id = d.id
+        WHERE 1=1
+
+        AND m.product_id = #{productId}
+
+        AND m.is_recruit = 1
+        GROUP BY
+        d.id
+        ) b ON a.id = b.minId
+        WHERE 1=1
+
+
+
+        <if test="startDate !=null">
+            AND DATE_FORMAT( a.create_time, '%Y-%m' ) &gt;= #{startDate}
+        </if>
+        <if test="endDate !=null">
+            AND DATE_FORMAT( a.create_time, '%Y-%m' ) &lt;= #{endDate}
+        </if>
+
+        ) t
+        ON dm.virtual_doctor_id = t.doctor_id
+        WHERE dm.wechat IS NOT NULL
+        AND dm.wechat!=''
+        GROUP BY DATE_FORMAT( t.create_time, '%Y-%m' )
 
     </select>
 
@@ -338,24 +611,38 @@
         WHERE d.id IN
         (
         SELECT
-        d.id
+        DISTINCT d.id
         FROM
-        virtual_doctor_call_info v
-        INNER JOIN doctor d ON v.virtual_doctor_id = d.id
-        INNER JOIN hospital h ON d.hospital_id=h.id
-        INNER JOIN virtual_doctor_call_info_mend m
-        ON v.id=m.call_id
-        WHERE
-        v.product_id = #{productId}
-        AND m.is_recruit=1
+        virtual_doctor_call_info_mend a
+        INNER JOIN doctor d
+        ON a.virtual_doctor_id=d.id
+        INNER JOIN hospital h
+        ON d.hospital_id=h.id
+        INNER JOIN (
+        SELECT
+        d.id doctor_id,
+        MIN( m.id ) minId
+        FROM
+        virtual_doctor_call_info_mend m
+        INNER JOIN doctor d ON m.virtual_doctor_id = d.id
+        WHERE 1=1
 
-        GROUP BY d.id
-        HAVING 1=1
+
+        AND m.product_id = #{productId}
+
+        AND m.is_recruit = 1
+        GROUP BY
+        d.id
+        ) b ON a.id = b.minId
+        WHERE 1=1
+
+
+
         <if test="startDate !=null">
-            AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &gt;= #{startDate}
+            AND DATE_FORMAT( a.create_time, '%Y-%m' ) &gt;= #{startDate}
         </if>
         <if test="endDate !=null">
-            AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &lt;= #{endDate}
+            AND DATE_FORMAT( a.create_time, '%Y-%m' ) &lt;= #{endDate}
         </if>
         )
     </select>
@@ -366,6 +653,7 @@
     <!-- 每月成功招募的医生中，有微信的医生 -->
     <select id="getMonthAddWechatDoctorList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyRecruitAddWechatDetailResponse">
 
+        <!-- 修改前
         SELECT t.`month`, COUNT(DISTINCT t.doctor_id) addWechatDoctor
         FROM virtual_message vm  INNER JOIN
         (
@@ -392,11 +680,62 @@
         ) t
         ON vm.doctor_id=t.doctor_id
         GROUP BY t.`month`
+        -->
+
+
+
+
+
+
+        SELECT
+        DATE_FORMAT( t.create_time, '%Y-%m' ) `month`,
+        COUNT(DISTINCT t.doctor_id) hasMobileDoctor
+        FROM virtual_message vm INNER JOIN (
+        SELECT
+        DISTINCT d.id doctor_id, a.create_time
+        FROM
+        virtual_doctor_call_info_mend a
+        INNER JOIN doctor d
+        ON a.virtual_doctor_id=d.id
+        INNER JOIN hospital h
+        ON d.hospital_id=h.id
+        INNER JOIN (
+        SELECT
+        d.id doctor_id,
+        MIN( m.id ) minId
+        FROM
+        virtual_doctor_call_info_mend m
+        INNER JOIN doctor d ON m.virtual_doctor_id = d.id
+        WHERE 1=1
+        AND m.product_id = #{productId}
+
+        AND m.is_recruit = 1
+        GROUP BY
+        d.id
+        ) b ON a.id = b.minId
+        WHERE 1=1
+
+
+
+        <if test="startDate !=null">
+            AND DATE_FORMAT( a.create_time, '%Y-%m' ) &gt;= #{startDate}
+        </if>
+        <if test="endDate !=null">
+            AND DATE_FORMAT( a.create_time, '%Y-%m' ) &lt;= #{endDate}
+        </if>
+
+        ) t
+        ON vm.doctor_id = t.doctor_id
+        GROUP BY DATE_FORMAT( t.create_time, '%Y-%m' )
+
+
     </select>
 
 
     <!-- 得到每个省份招募的医生数，医院数 -->
     <select id="getMonthlyProvinceRecruitList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyProvinceRecruitResponse">
+
+        <!--
         SELECT
         IF(h.province IS NULL OR h.province='', '其他', h.province) province,
         COUNT( DISTINCT h.id ) recruitHospital,
@@ -428,11 +767,54 @@
         GROUP BY
         h.province
         ORDER BY recruitHospital DESC
+        -->
+
+
+
+        SELECT
+        IF(h.province IS NULL OR h.province='', '其他', h.province) province,
+        COUNT( DISTINCT h.id ) recruitHospital,
+        COUNT( DISTINCT d.id ) recruitDoctor
+        FROM
+        virtual_doctor_call_info_mend a
+        INNER JOIN doctor d
+        ON a.virtual_doctor_id=d.id
+        INNER JOIN hospital h
+        ON d.hospital_id=h.id
+        INNER JOIN (
+        SELECT
+        d.id doctor_id,
+        MIN( m.id ) minId
+        FROM
+        virtual_doctor_call_info_mend m
+        INNER JOIN doctor d ON m.virtual_doctor_id = d.id
+        WHERE 1=1
+        AND m.product_id = #{productId}
+
+        AND m.is_recruit = 1
+        GROUP BY
+        d.id
+        ) b ON a.id = b.minId
+        WHERE 1=1
+
+
+
+        <if test="startDate !=null">
+            AND DATE_FORMAT( a.create_time, '%Y-%m' ) &gt;= #{startDate}
+        </if>
+        <if test="endDate !=null">
+            AND DATE_FORMAT( a.create_time, '%Y-%m' ) &lt;= #{endDate}
+        </if>
+        GROUP BY h.province
+        ORDER BY recruitHospital DESC
+
     </select>
 
 
     <!-- 每个医院级别招募的医生数 -->
     <select id="getMonthlyHospitalLevelRecruitList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyHospitalLevelRecruitResponse">
+
+        <!-- 修改前
         SELECT
         IFNULL(h.`level`, 0) hospitalLevel,
         COUNT( DISTINCT d.id ) recruitDoctor
@@ -465,10 +847,55 @@
         GROUP BY
         h.`level`
         ORDER BY h.`level` DESC
+
+         -->
+
+
+
+        SELECT
+        IFNULL(h.`level`, 0) hospitalLevel,
+        COUNT( DISTINCT d.id ) recruitDoctor
+        FROM
+        virtual_doctor_call_info_mend a
+        INNER JOIN doctor d
+        ON a.virtual_doctor_id=d.id
+        INNER JOIN hospital h
+        ON d.hospital_id=h.id
+        INNER JOIN (
+        SELECT
+        d.id doctor_id,
+        MIN( m.id ) minId
+        FROM
+        virtual_doctor_call_info_mend m
+        INNER JOIN doctor d ON m.virtual_doctor_id = d.id
+        WHERE 1=1
+
+        AND m.product_id = #{productId}
+
+        AND m.is_recruit = 1
+        GROUP BY
+        d.id
+        ) b ON a.id = b.minId
+        WHERE 1=1
+
+
+
+        <if test="startDate !=null">
+            AND DATE_FORMAT( a.create_time, '%Y-%m' ) &gt;= #{startDate}
+        </if>
+        <if test="endDate !=null">
+            AND DATE_FORMAT( a.create_time, '%Y-%m' ) &lt;= #{endDate}
+        </if>
+        GROUP BY h.`level`
+        ORDER BY h.`level` DESC
+
+
+
     </select>
 
     <!-- 每个科室医生招募数据 -->
     <select id="getMonthlyDepartRecruitList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyDepartRecruitResponse">
+        <!-- 修改前
         SELECT
         IF(dd.depart IS NULL OR dd.depart='', '其他', dd.depart) depart,
         COUNT(DISTINCT dd.id) recruitDoctor FROM doctor dd WHERE dd.id IN
@@ -496,46 +923,56 @@
         GROUP BY dd.depart
         ORDER BY dd.depart
         DESC
+        -->
+
+
+
+
+        SELECT
+        IF(d.depart IS NULL OR d.depart='', '其他', d.depart) depart,
+        COUNT(DISTINCT d.id) recruitDoctor
+        FROM
+        virtual_doctor_call_info_mend a
+        INNER JOIN doctor d
+        ON a.virtual_doctor_id=d.id
+        INNER JOIN hospital h
+        ON d.hospital_id=h.id
+        INNER JOIN (
+        SELECT
+        d.id doctor_id,
+        MIN( m.id ) minId
+        FROM
+        virtual_doctor_call_info_mend m
+        INNER JOIN doctor d ON m.virtual_doctor_id = d.id
+        WHERE 1=1
+
+        AND m.product_id = #{productId}
+
+        AND m.is_recruit = 1
+        GROUP BY
+        d.id
+        ) b ON a.id = b.minId
+        WHERE 1=1
+
+
+
+        <if test="startDate !=null">
+            AND DATE_FORMAT( a.create_time, '%Y-%m' ) &gt;= #{startDate}
+        </if>
+        <if test="endDate !=null">
+            AND DATE_FORMAT( a.create_time, '%Y-%m' ) &lt;= #{endDate}
+        </if>
+        GROUP BY d.depart
+        ORDER BY d.depart
+        DESC
     </select>
 
     <!-- 每个医生级别招募医生数据 -->
     <select id="getMonthlyDoctorLevelRecruitList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.monthly.MonthlyDoctorLevelRecruitResponse">
-        <!--
-        SELECT v2.dynamic_field_value doctorLevel,
-        COUNT(DISTINCT v2.doctor_id) recruitDoctor FROM virtual_doctor_dynamic_field v
-        INNER JOIN virtual_doctor_dynamic_field_value v2
-        ON v.id=v2.dynamic_field_id
-        WHERE v.product_id=0
-        AND v.field_name='医生职称'
-        AND v2.doctor_id IN
-        (
-        SELECT
-        d.id
-        FROM
-        virtual_doctor_call_info_mend m
-        INNER JOIN doctor d ON m.virtual_doctor_id = d.id
-        WHERE
-        m.product_id = #{productId}
-        AND m.is_recruit = 1
-        GROUP BY
-        d.id
-        HAVING
-        1 = 1
-        <if test="startDate !=null">
-            AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &gt;= #{startDate}
-        </if>
-        <if test="endDate !=null">
-            AND MIN(DATE_FORMAT( m.create_time, '%Y-%m' )) &lt;= #{endDate}
-        </if>
-        )
-        GROUP BY v2.dynamic_field_value
 
 
-        -->
 
-
-        <!-- 待优化 -->
-
+        <!-- 待优化， 修改前
         SELECT
         b.doctorLevel,
         COUNT( DISTINCT b.doctor_id ) recruitDoctor
@@ -580,6 +1017,73 @@
         ) b
         GROUP BY
         b.doctorLevel
+        -->
+
+
+
+
+
+        SELECT
+        cc.doctorLevel,
+        COUNT( DISTINCT cc.doctor_id ) recruitDoctor
+        FROM (
+            SELECT
+            aa.doctor_id,
+            IFNULL( bb.dynamic_field_value, '未知' ) doctorLevel
+            FROM (
+            SELECT
+            DISTINCT d.id doctor_id
+            FROM
+            virtual_doctor_call_info_mend a
+            INNER JOIN doctor d
+            ON a.virtual_doctor_id=d.id
+            INNER JOIN hospital h
+            ON d.hospital_id=h.id
+            INNER JOIN (
+            SELECT
+            d.id doctor_id,
+            MIN( m.id ) minId
+            FROM
+            virtual_doctor_call_info_mend m
+            INNER JOIN doctor d ON m.virtual_doctor_id = d.id
+            WHERE 1=1
+
+            AND m.product_id = #{productId}
+
+            AND m.is_recruit = 1
+            GROUP BY
+            d.id
+            ) b ON a.id = b.minId
+            WHERE 1=1
+
+            <if test="startDate !=null">
+                AND DATE_FORMAT( a.create_time, '%Y-%m' ) &gt;= #{startDate}
+            </if>
+            <if test="endDate !=null">
+                AND DATE_FORMAT( a.create_time, '%Y-%m' ) &lt;= #{endDate}
+            </if>
+            ) aa
+
+            LEFT JOIN
+            (
+
+            SELECT
+            v2.doctor_id,
+            v2.dynamic_field_value
+            FROM
+            virtual_doctor_dynamic_field_value v2
+            INNER JOIN virtual_doctor_dynamic_field v ON v2.dynamic_field_id = v.id
+            WHERE
+            v.product_id = 0
+            AND v.field_name = '医生职称'
+            GROUP BY
+            v2.doctor_id
+            ) bb
+            ON aa.doctor_id=bb.doctor_id
+        ) cc
+        GROUP BY
+        cc.doctorLevel
+
 
     </select>
 
