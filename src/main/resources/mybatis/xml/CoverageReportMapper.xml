@@ -225,7 +225,7 @@
 		timeStr
 	</select>
 
-	<!-- 患者量覆盖 招募医生 -->
+	<!-- 患者量覆盖 覆盖医生 -->
 	<select id="findCoveragePatientList" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.CoverageReportPart">
 		select a.timeStr, count(DISTINCT a.hcpId) hcpId, count(1) hciId from
 		(

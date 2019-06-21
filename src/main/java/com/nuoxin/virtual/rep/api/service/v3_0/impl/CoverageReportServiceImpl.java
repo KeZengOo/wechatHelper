@@ -982,6 +982,9 @@ public class CoverageReportServiceImpl implements CoverageReportService {
             start.addAll(sourceMap.get(recruitKey.get(i)));
         }
         recruitMap.put(startTime, start);
+        if(index == recruitKey.size() - 1) {
+            return recruitMap;
+        }
         if(index == -1) {
             index = 0;
         }
