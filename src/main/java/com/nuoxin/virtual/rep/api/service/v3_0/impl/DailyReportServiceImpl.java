@@ -110,21 +110,21 @@ public class DailyReportServiceImpl implements DailyReportService {
         HSSFWorkbook wb= ExportExcel.excelLinkedHashMapExport(sheetList);
 
 
-        OutputStream ouputStream = null;
+        OutputStream outputStream = null;
         try {
             response.setContentType("application/vnd.ms-excel");
             response.setHeader("Content-disposition", "attachment;filename=" + URLEncoder.encode("日报.xls","UTF-8"));
             response.setHeader("Pragma", "No-cache");
-            ouputStream = response.getOutputStream();
-            if(ouputStream!=null){
-                wb.write(ouputStream);
+            outputStream = response.getOutputStream();
+            if(outputStream!=null){
+                wb.write(outputStream);
             }
-            ouputStream.flush();
+            outputStream.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }finally {
             try {
-                ouputStream.close();
+                outputStream.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -367,6 +367,29 @@ public class DailyReportServiceImpl implements DailyReportService {
 
         return myAchievement;
 
+    }
+
+    @Override
+    public void exportMyAchievement(DailyReportRequest request, HttpServletResponse response) {
+
+        List<CommonPoolDoctorResponse> recruitDoctorIdList = dailyReportMapper.recruitDoctorIdList(request);
+        if (CollectionsUtil.isEmptyList(recruitDoctorIdList)){
+            recruitDoctorIdList = new ArrayList<>();
+        }
+
+        List<CommonPoolDoctorResponse> activeCoverDoctorIdList = dailyReportMapper.activeCoverDoctorIdList(request);
+        if (CollectionsUtil.isEmptyList(activeCoverDoctorIdList)){
+            activeCoverDoctorIdList = new ArrayList<>();
+        }
+
+
+        List<CommonPoolDoctorResponse> mulChannelDoctorIdList = dailyReportMapper.mulChannelDoctorIdList(request);
+        if (CollectionsUtil.isEmptyList(mulChannelDoctorIdList)){
+            mulChannelDoctorIdList = new ArrayList<>();
+        }
+
+        commonPoolService.handleExportMyAchievementMulSheet(recruitDoctorIdList, activeCoverDoctorIdList,
+                mulChannelDoctorIdList, request.getProductIdList(), response);
     }
 
     @Override

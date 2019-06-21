@@ -2010,6 +2010,12 @@
 			</foreach>
 		</if>
 
+		<if test="resultIdList !=null and resultIdList.size > 0">
+			AND re.id IN
+			<foreach collection="resultIdList" item="resultId" open="(" close=")" separator=",">
+				#{resultId}
+			</foreach>
+		</if>
 
 		<!-- 下次拜访时间为今天 -->
 		<if test="tag !=null and tag==5">
@@ -2295,6 +2301,13 @@
 
 		</if>
 
+		<if test="resultIdList !=null and resultIdList.size > 0">
+			AND re.id IN
+			<foreach collection="resultIdList" item="resultId" open="(" close=")" separator=",">
+				#{resultId}
+			</foreach>
+		</if>
+
 		<!-- 下次拜访时间为今天 -->
 		<if test="tag !=null and tag==5">
 			AND DATE_FORMAT(m.next_visit_time, '%Y-%m-%d')=CURRENT_DATE()
@@ -2576,6 +2589,12 @@
 			</foreach>
 		</if>
 
+		<if test="resultIdList !=null and resultIdList.size > 0">
+			AND re.id IN
+			<foreach collection="resultIdList" item="resultId" open="(" close=")" separator=",">
+				#{resultId}
+			</foreach>
+		</if>
 
 
 		<if test="recruit !=null">
@@ -2705,10 +2724,6 @@
 		ON r.quate_id=q.id
 		LEFT JOIN virtual_product_visit_result re
 		ON r.result_id=re.id
-
-
-
-
 		LEFT JOIN virtual_doctor_call_info v
 		ON v.virtual_doctor_id=dud.doctor_id
 		AND v.product_id=dud.prod_id
@@ -2728,6 +2743,12 @@
 			</foreach>
 		</if>
 
+		<if test="resultIdList !=null and resultIdList.size > 0">
+			AND re.id IN
+			<foreach collection="resultIdList" item="resultId" open="(" close=")" separator=",">
+				#{resultId}
+			</foreach>
+		</if>
 
 		<if test="recruit !=null">
 			<if test="recruit==1 or recruit == 0">

@@ -53,6 +53,12 @@ public class DailyReportController extends NewBaseController {
         return responseBean;
     }
 
+    @ApiOperation(value = "我的业绩导出")
+    @GetMapping(value = "/my/achievement/export")
+    public void exportMyAchievement(HttpServletRequest request, HttpServletResponse response){
+        DailyReportRequest bean = this.getExportParmas(request);
+        dailyReportService.exportMyAchievement(bean, response);
+    }
 
 
     @ApiOperation(value = "我的业绩,已招募医生导出")

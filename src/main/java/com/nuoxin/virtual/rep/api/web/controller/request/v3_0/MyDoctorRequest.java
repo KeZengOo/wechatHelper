@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 我的客户请求参数
@@ -22,6 +23,7 @@ public class MyDoctorRequest extends DoctorBaseRequest implements Serializable {
     @ApiModelProperty(value = "上次拜访时间排序，up 是时间升序，down 是时间降序, 默认是降序")
     private String lastVisitTimeOrder = "down";
 
-
+    @ApiModelProperty(value = "拜访结果ID")
+    private List<Long> resultIdList;
 
 }

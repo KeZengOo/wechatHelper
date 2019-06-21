@@ -11,6 +11,7 @@ import com.nuoxin.virtual.rep.api.mybatis.ProductLineMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v3_0.CommonPoolService;
 import com.nuoxin.virtual.rep.api.utils.*;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.excel.SheetRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.CommonPoolRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.product.ProductResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.*;
@@ -191,6 +192,64 @@ public class CommonPoolServiceImpl implements CommonPoolService {
         }finally {
             try {
                 ouputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void handleExportMyAchievementMulSheet(List<CommonPoolDoctorResponse> recruitDoctorList,
+                                               List<CommonPoolDoctorResponse> activityDoctorList,
+                                               List<CommonPoolDoctorResponse> mulChannelDoctorList,
+                                                  List<Long> productIdList,
+                                               HttpServletResponse response) {
+        /**
+         * 得到导出的标题
+         */
+        Map<String, String> titleMap = this.getExportDoctorTitle(productIdList);
+        List<LinkedHashMap<String, Object>> recruitDoctorMap = this.exportData(productIdList, recruitDoctorList);
+        List<LinkedHashMap<String, Object>> activityDoctorMap = this.exportData(productIdList, activityDoctorList);
+        List<LinkedHashMap<String, Object>> mulChannelDoctorMap = this.exportData(productIdList, mulChannelDoctorList);
+
+        List<SheetRequestBean> list = new ArrayList<>();
+
+        SheetRequestBean recruitSheet = new SheetRequestBean();
+        recruitSheet.setTitleMap(titleMap);
+        recruitSheet.setDataList(recruitDoctorMap);
+        recruitSheet.setSheetName("已招募医生");
+
+        SheetRequestBean activitySheet = new SheetRequestBean();
+        activitySheet.setTitleMap(titleMap);
+        activitySheet.setDataList(activityDoctorMap);
+        activitySheet.setSheetName("活跃覆盖医生");
+
+        SheetRequestBean mulChannelSheet = new SheetRequestBean();
+        mulChannelSheet.setTitleMap(titleMap);
+        mulChannelSheet.setDataList(mulChannelDoctorMap);
+        mulChannelSheet.setSheetName("多渠道覆盖医生");
+
+        list.add(recruitSheet);
+        list.add(activitySheet);
+        list.add(mulChannelSheet);
+
+
+        HSSFWorkbook wb= ExportExcel.excelLinkedHashMapExport(list);
+        OutputStream outputStream = null;
+        try {
+            response.setContentType("application/vnd.ms-excel");
+            response.setHeader("Content-disposition", "attachment;filename=" + URLEncoder.encode("医生名单.xls","UTF-8"));
+            response.setHeader("Pragma", "No-cache");
+            outputStream = response.getOutputStream();
+            if(outputStream!=null){
+                wb.write(outputStream);
+            }
+            outputStream.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally {
+            try {
+                outputStream.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }

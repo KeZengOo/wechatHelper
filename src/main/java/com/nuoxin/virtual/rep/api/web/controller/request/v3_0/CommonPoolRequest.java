@@ -29,4 +29,7 @@ public class CommonPoolRequest extends DoctorBaseRequest implements Serializable
     @ApiModelProperty(value = "医生ID列表")
     private List<Long> doctorIdList;
 
+    @ApiModelProperty(value = "拜访结果ID")
+    private List<Long> resultIdList;
+
 }

@@ -2,6 +2,7 @@ package com.nuoxin.virtual.rep.api.service.v3_0;
 
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
+import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.excel.SheetRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.CommonPoolRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.product.ProductResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.CommonPoolDoctorResponse;
@@ -34,12 +35,27 @@ public interface CommonPoolService {
 
 
     /**
-     * 执行导出一身
+     * 执行导出医生，单个sheet
      * @param doctorList
      * @param productIdList
      * @param response
      */
     void handleExportDoctorList(List<CommonPoolDoctorResponse> doctorList, List<Long> productIdList, HttpServletResponse response);
+
+
+    /**
+     * 执行导出我的业绩医生，多个sheet
+     * @param recruitDoctorList
+     * @param activityDoctorList
+     * @param mulChannelDoctorList
+     * @param productIdList
+     * @param response
+     */
+    void handleExportMyAchievementMulSheet(List<CommonPoolDoctorResponse> recruitDoctorList,
+                                           List<CommonPoolDoctorResponse> activityDoctorList,
+                                           List<CommonPoolDoctorResponse> mulChannelDoctorList,
+                                           List<Long> productIdList,
+                                           HttpServletResponse response);
 
 
     /**

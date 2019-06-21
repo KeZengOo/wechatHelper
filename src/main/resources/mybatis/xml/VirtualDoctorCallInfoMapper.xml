@@ -2097,6 +2097,12 @@
 			</if>
 
 
+				<if test="resultIdList !=null and resultIdList.size > 0">
+					AND r.id IN
+					<foreach collection="resultIdList" item="resultId" open="(" close=")" separator=",">
+						#{resultId}
+					</foreach>
+				</if>
 
 
 				<!--
@@ -2149,6 +2155,12 @@
 					AND v.visit_channel=#{visitChannel}
 				</if>
 
+				<if test="resultIdList !=null and resultIdList.size > 0">
+					AND r.id IN
+					<foreach collection="resultIdList" item="resultId" open="(" close=")" separator=",">
+						#{resultId}
+					</foreach>
+				</if>
 
 
 					<!--

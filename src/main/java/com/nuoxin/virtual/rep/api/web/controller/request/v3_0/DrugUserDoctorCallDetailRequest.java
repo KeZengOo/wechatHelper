@@ -8,6 +8,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 拜访详情请求参数
@@ -40,6 +41,10 @@ public class DrugUserDoctorCallDetailRequest extends PageRequestBean implements 
 
     @ApiModelProperty(value = "结束时间")
     private Date endTime;
+
+    @ApiModelProperty(value = "拜访结果ID")
+    private List<Long> resultIdList;
+
 
 
     public Long getId() {
@@ -124,5 +129,14 @@ public class DrugUserDoctorCallDetailRequest extends PageRequestBean implements 
 
         }
 
+    }
+
+
+    public List<Long> getResultIdList() {
+        return resultIdList;
+    }
+
+    public void setResultIdList(List<Long> resultIdList) {
+        this.resultIdList = resultIdList;
     }
 }

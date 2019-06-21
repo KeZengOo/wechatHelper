@@ -194,8 +194,9 @@
         </if>
 
 
-        GROUP BY d.id
-        <if test="startTime !=null and endTime !=null">HAVING MIN(m.create_time) BETWEEN #{startTime} AND #{ endTime}
+        GROUP BY d.id, m.virtual_drug_user_id
+        <if test="startTime !=null and endTime !=null">
+            HAVING MIN(m.create_time) BETWEEN #{startTime} AND #{ endTime}
         </if>
 
         ) t
@@ -560,7 +561,7 @@
 
         INNER JOIN (
         SELECT DISTINCT
-        d.id doctor_id, v.virtual_drug_user_id drug_user_id, v.product_id
+        d.id doctor_id, v.virtual_drug_user_id drug_user_id
         FROM
         virtual_doctor_call_info v
         INNER JOIN doctor d
@@ -592,7 +593,7 @@
         UNION
 
         SELECT DISTINCT
-        d.id doctor_id, du.id drug_user_id, dud.prod_id product_id
+        d.id doctor_id, du.id drug_user_id
         FROM
         virtual_message vm
         INNER JOIN doctor d ON vm.doctor_id = d.id
@@ -622,14 +623,14 @@
         </if>
 
         GROUP BY
-        d.id
+        d.id, du.id
         HAVING
         COUNT(*) >=3
 
 
         UNION
         SELECT DISTINCT
-        d.id doctor_id, du.id drug_user_id, dud.prod_id product_id
+        d.id doctor_id, du.id drug_user_id
         FROM
         doctor d
         INNER JOIN drug_user_doctor dud ON d.id = dud.doctor_id
@@ -665,7 +666,8 @@
             </foreach>
         </if>
 
-        GROUP BY tmad.doctor_id HAVING SUM(tmad.attend_sum_time) >= 10
+        GROUP BY tmad.doctor_id,du.id
+        HAVING SUM(tmad.attend_sum_time) >= 10
         ) t
         ON t.doctor_id=d.id
         INNER JOIN drug_user du
@@ -1264,7 +1266,7 @@
         ) t
         ) dud
         GROUP BY
-        dud.doctor_id
+        dud.doctor_id,dud.drug_user_id
         HAVING
         SUM( dud.channelNum ) >= 3
         ) tt

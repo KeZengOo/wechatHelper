@@ -43,6 +43,15 @@ public interface DailyReportService {
 
 
     /**
+     * 导出我的业绩
+     * @param request
+     * @param response
+     */
+    void exportMyAchievement(DailyReportRequest request, HttpServletResponse response);
+
+
+
+    /**
      * 导出我的业绩已招募医生
      * @param request
      * @param response
