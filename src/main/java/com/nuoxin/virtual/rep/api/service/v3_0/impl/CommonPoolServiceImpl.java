@@ -209,8 +209,17 @@ public class CommonPoolServiceImpl implements CommonPoolService {
          */
         Map<String, String> titleMap = this.getExportDoctorTitle(productIdList);
         List<LinkedHashMap<String, Object>> recruitDoctorMap = this.exportData(productIdList, recruitDoctorList);
+        if (CollectionsUtil.isEmptyList(recruitDoctorMap)){
+            recruitDoctorMap = new ArrayList<>();
+        }
         List<LinkedHashMap<String, Object>> activityDoctorMap = this.exportData(productIdList, activityDoctorList);
+        if (CollectionsUtil.isEmptyList(activityDoctorMap)){
+            activityDoctorMap = new ArrayList<>();
+        }
         List<LinkedHashMap<String, Object>> mulChannelDoctorMap = this.exportData(productIdList, mulChannelDoctorList);
+        if (CollectionsUtil.isEmptyList(mulChannelDoctorMap)){
+            mulChannelDoctorMap = new ArrayList<>();
+        }
 
         List<SheetRequestBean> list = new ArrayList<>();
 

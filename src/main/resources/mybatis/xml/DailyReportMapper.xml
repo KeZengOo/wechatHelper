@@ -251,7 +251,7 @@
         ) t
         ON d.id=t.doctor_id
         INNER JOIN drug_user du
-        ON t.virtual_drug_user_id=du.id
+        ON t.drug_user_id=du.id
         GROUP BY d.id, du.id, pl.prod_id
 
     </select>
