@@ -207,7 +207,7 @@
         INNER JOIN (
 
         SELECT
-        d.id doctor_id, a.virtual_drug_user drug_user_id
+        d.id doctor_id, a.virtual_drug_user_id drug_user_id
         FROM
         virtual_doctor_call_info_mend a
         INNER JOIN doctor d

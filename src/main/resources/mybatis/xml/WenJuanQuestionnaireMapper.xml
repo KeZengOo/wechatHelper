@@ -250,4 +250,18 @@
     <select id="getWenJuanAnswerListByShortIdAndSeq" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.WenJuanAnswer">
         SELECT #{telPhone} telPhone , t.title, t.answer FROM wj_answer t WHERE t.short_id = #{shortId} AND t.seq = #{seq}
     </select>
+
+
+    <!-- 根据时间得到问卷问题的答案 -->
+    <select id="getQuestionnaireAnswerList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.questionnaire.QuestionnaireAnswerResponse">
+        SELECT id, answer FROM wj_answer WHERE 1=1
+        <if test="startDate !=null">
+            AND update_time &gt;= DATE_FORMAT(#{startDate}, '%Y-%m-%d')
+        </if>
+
+        <if test="endDate !=null">
+            AND update_time &lt;= DATE_FORMAT(#{endDate}, '%Y-%m-%d')
+        </if>
+
+    </select>
 </mapper>

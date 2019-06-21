@@ -7,8 +7,10 @@ import com.nuoxin.virtual.rep.api.entity.v3_0.WenJuanProjectUserAndShortId;
 import com.nuoxin.virtual.rep.api.entity.v3_0.params.WenJuanInfoParams;
 import com.nuoxin.virtual.rep.api.entity.v3_0.request.WenJuanInfoRequest;
 import com.nuoxin.virtual.rep.api.entity.v3_0.request.WenJuanProjectRequest;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.questionnaire.QuestionnaireAnswerResponse;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -103,4 +105,12 @@ public interface WenJuanQuestionnaireMapper {
      * @return list
      */
     List<WenJuanAnswer> getWenJuanAnswerListByShortIdAndSeq(@Param(value = "telPhone") String telPhone, @Param(value = "shortId") String shortId, @Param(value = "seq") Integer seq);
+
+    /**
+     * 根据时间得到问卷问题的答案
+     * @param starDate
+     * @param endDate
+     * @return
+     */
+    List<QuestionnaireAnswerResponse> getQuestionnaireAnswerList(@Param(value = "startDate") Date starDate,@Param(value = "endDate") Date endDate);
 }

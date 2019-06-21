@@ -267,12 +267,11 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 
         } else {
             String name = request.getName();
-            String depart = request.getDepart();
             String hospital = request.getHospital();
             Integer hciLevel = request.getHciLevel();
             String province = request.getProvince();
             String city = request.getCity();
-            if (StringUtil.isNotEmpty(name) || StringUtil.isNotEmpty(depart)
+            if (StringUtil.isNotEmpty(name)
                     || StringUtil.isNotEmpty(hospital) || hciLevel != null || StringUtil.isNotEmpty(province) || StringUtil.isNotEmpty(city)) {
                 throw new BusinessException(ErrorEnum.ERROR, "销售代表不能修改姓名、科室、医院、医院等级、省份、城市字段");
             }

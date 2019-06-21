@@ -58,4 +58,25 @@ public class CallInfoSchedule {
     }
 
 
+
+
+
+
+    @ApiOperation(value = "问卷答案中更新医生的手机号", notes = "录音识别")
+    @PostMapping(value = "/wj/telephone/update")
+    @Scheduled(cron = "0 0 22 * * ?") // 每天22点执行
+    public void updateWjTelephone() {
+        logger.info("CallInfoSchedule updateWjTelephone start....");
+        long starTime = System.currentTimeMillis();
+
+
+
+        long endTime = System.currentTimeMillis();
+        logger.info("CallInfoSchedule updateWjTelephone end , cost {}s", (endTime-starTime)/1000);
+
+    }
+
+
+
+
 }
