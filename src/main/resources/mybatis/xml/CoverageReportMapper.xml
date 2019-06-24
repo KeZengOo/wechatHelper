@@ -73,14 +73,6 @@
 		AND DATE_FORMAT(b.attend_start_time,'%Y-%m') &gt;= #{startTime} AND DATE_FORMAT(b.attend_start_time,'%Y-%m') &lt;= #{endTime}
 	</select>
 
-	<sql id="recruitHcp">
-		SELECT DISTINCT
-		pd.virtual_doctor_id
-		FROM
-		virtual_doctor_call_info_mend pd
-		WHERE pd.is_recruit = 1 AND pd.virtual_doctor_id > 0
-	</sql>
-
 	<!-- 根据产品id和时间段查询招募医生 -->
 	<select id="findCoverageRecruitList" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.CoverageReportPart">
 		SELECT
@@ -188,8 +180,8 @@
 		a.product_id = #{productId}
 		AND DATE_FORMAT(b.create_time,'%Y-%m') &gt;= #{startTime} AND DATE_FORMAT(b.create_time,'%Y-%m') &lt;= #{endTime}
 		AND d.id IN (
-		select distinct pd.virtual_doctor_id from virtual_doctor_call_info_mend pd where pd.product_id = #{productId}
-		and  DATE_FORMAT(pd.create_time,'%Y-%m') &lt;= #{endTime} and pd.virtual_doctor_id > 0 and pd.is_recruit = 1
+		<include refid="recruitHcp"/>
+		AND pd.product_id = #{productId} AND date_format(pd.create_time, '%Y-%m') &lt;= #{endTime}
 		)
 		union
 		select DISTINCT d.id hcpId, DATE_FORMAT(b.create_time,'%Y-%m') timeStr from
@@ -200,8 +192,8 @@
 		in ('链接/小程序/聊天记录', '网页') or (b.message like 'http%' and b.message like '%token=%'))
 		AND DATE_FORMAT(b.message_time,'%Y-%m') &gt;= #{startTime} AND DATE_FORMAT(b.message_time,'%Y-%m') &lt;= #{endTime}
 		AND d.id IN (
-		select distinct pd.virtual_doctor_id from virtual_doctor_call_info_mend pd where pd.product_id = #{productId}
-		and DATE_FORMAT(pd.create_time,'%Y-%m') &lt;= #{endTime} and pd.virtual_doctor_id > 0 and pd.is_recruit = 1
+		<include refid="recruitHcp"/>
+		AND pd.product_id = #{productId} AND date_format(pd.create_time, '%Y-%m') &lt;= #{endTime}
 		)
 	</select>
 
@@ -249,13 +241,8 @@
 		WHERE va.product_id = #{productId} and va.field_name = '目标患者量/月'
 		AND DATE_FORMAT(r.create_time,'%Y-%m') &gt;= #{startTime} AND DATE_FORMAT(r.create_time,'%Y-%m') &lt;= #{endTime}
 		AND (i.isp != '阿里云' OR i.isp IS NULL) AND r.read_person_id IN (
-		SELECT DISTINCT
-		pd.virtual_doctor_id
-		FROM
-		virtual_doctor_call_info_mend pd
-		WHERE pd.is_recruit = 1 AND pd.virtual_doctor_id > 0
-		AND pd.product_id = #{productId}
-		and date_format(pd.create_time, '%Y-%m') &lt;= #{endTime}
+		<include refid="recruitHcp"/>
+		AND pd.product_id = #{productId} AND date_format(pd.create_time, '%Y-%m') &lt;= #{endTime}
 		)
 		GROUP BY r.id
 		UNION all
@@ -266,13 +253,8 @@
 		WHERE va.product_id = #{productId} AND b.user_type = 2 and va.field_name = '目标患者量/月'
 		and DATE_FORMAT(b.message_time,'%Y-%m') &gt;= #{startTime} AND DATE_FORMAT(b.message_time,'%Y-%m') &lt;= #{endTime}
 		AND b.wechat_message_type NOT IN ('系统消息','撤回提醒') AND b.doctor_id IN (
-		SELECT DISTINCT
-		pd.virtual_doctor_id
-		FROM
-		virtual_doctor_call_info_mend pd
-		WHERE pd.is_recruit = 1 AND pd.virtual_doctor_id > 0
-		AND pd.product_id = #{productId}
-		and date_format(pd.create_time, '%Y-%m') &lt;= #{endTime}
+		<include refid="recruitHcp"/>
+		AND pd.product_id = #{productId} AND date_format(pd.create_time, '%Y-%m') &lt;= #{endTime}
 		)
 		GROUP BY b.id
 		UNION all
@@ -284,13 +266,8 @@
 		WHERE va.product_id = #{productId} and va.field_name = '目标患者量/月'
 		AND DATE_FORMAT(b.attend_start_time,'%Y-%m') &gt;= #{startTime} AND DATE_FORMAT(b.attend_start_time,'%Y-%m') &lt;= #{endTime}
 		AND b.doctor_id IN (
-		SELECT DISTINCT
-		pd.virtual_doctor_id
-		FROM
-		virtual_doctor_call_info_mend pd
-		WHERE pd.is_recruit = 1 AND pd.virtual_doctor_id > 0
-		AND pd.product_id = #{productId}
-		and date_format(pd.create_time, '%Y-%m') &lt;= #{endTime}
+		<include refid="recruitHcp"/>
+		AND pd.product_id = #{productId} AND date_format(pd.create_time, '%Y-%m') &lt;= #{endTime}
 		)
 		GROUP BY b.id
 		) a GROUP BY a.timeStr
@@ -299,5 +276,13 @@
 	<select id="getFieldValueByProductId"  resultType="com.nuoxin.virtual.rep.api.entity.v3_0.CoverageReportPart">
 		select field_value timeStr from virtual_doctor_dynamic_field where product_id = #{productId} and field_name = '目标患者量/月'
 	</select>
+
+	<sql id="recruitHcp">
+		SELECT DISTINCT
+		pd.virtual_doctor_id
+		FROM
+		virtual_doctor_call_info_mend pd
+		WHERE pd.is_recruit = 1 AND pd.virtual_doctor_id > 0
+	</sql>
 
 </mapper>
