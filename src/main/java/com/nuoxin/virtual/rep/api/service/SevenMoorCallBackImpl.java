@@ -514,15 +514,17 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 		convertResult.setMonitorFilenameUrl(monitorFilenameUrl);
 
 		try {
+			if (StringUtil.isNotEmpty(monitorFilenameUrl)){
 
-			//规则：将未压缩后的url 中的 monitor 替换成  inOutTempOfWav，后缀换成 -tmp.wav, 如果是单声道文件后缀为 -in.wav 或者 -out.wav
-			String unpressedCallUrl = monitorFilenameUrl.replace("monitor", "inOutTempOfWav").replace(".mp3", "-tmp.wav");
-			String unpressedCallUrlIn =  monitorFilenameUrl.replace("monitor", "inOutTempOfWav").replace(".mp3", "-in.wav");
-			String unpressedCallUrlOut =  monitorFilenameUrl.replace("monitor", "inOutTempOfWav").replace(".mp3", "-out.wav");
+				//规则：将未压缩后的url 中的 monitor 替换成  inOutTempOfWav，后缀换成 -tmp.wav, 如果是单声道文件后缀为 -in.wav 或者 -out.wav
+				String unpressedCallUrl = monitorFilenameUrl.replace("monitor", "inOutTempOfWav").replace(".mp3", "-tmp.wav");
+				String unpressedCallUrlIn =  monitorFilenameUrl.replace("monitor", "inOutTempOfWav").replace(".mp3", "-in.wav");
+				String unpressedCallUrlOut =  monitorFilenameUrl.replace("monitor", "inOutTempOfWav").replace(".mp3", "-out.wav");
 
-			convertResult.setUnpressedCallUrl(unpressedCallUrl);
-			convertResult.setUnpressedCallUrlIn(unpressedCallUrlIn);
-			convertResult.setUnpressedCallUrlOut(unpressedCallUrlOut);
+				convertResult.setUnpressedCallUrl(unpressedCallUrl);
+				convertResult.setUnpressedCallUrlIn(unpressedCallUrlIn);
+				convertResult.setUnpressedCallUrlOut(unpressedCallUrlOut);
+			}
 
 		}catch (Exception e){
 			logger.error("根据压缩后的录音url,获取未压缩后的录音url失败, 压缩后的录音url={}", monitorFilenameUrl, e);
