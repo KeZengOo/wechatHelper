@@ -8,6 +8,7 @@ import com.nuoxin.virtual.rep.api.entity.v3_0.request.WenJuanInfoRequest;
 import com.nuoxin.virtual.rep.api.entity.v3_0.request.WenJuanProjectRequest;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -72,4 +73,14 @@ public interface WenJuanQuestionnaireService {
      * @param response
      */
     void wenJuanInfoExportFile(String telPhone, String shortId, Integer seq, HttpServletResponse response);
+
+
+    /**
+     * 跟新问卷答案手机号
+     * @param startDate
+     * @param endDate
+     */
+    void updateWjAnswerTelephone(Date startDate, Date endDate);
+
+
 }

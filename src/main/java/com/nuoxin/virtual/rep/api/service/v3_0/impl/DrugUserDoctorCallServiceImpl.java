@@ -7,10 +7,7 @@ import com.nuoxin.virtual.rep.api.enums.VisitChannelEnum;
 import com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorCallInfoMapper;
 import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v3_0.DrugUserDoctorCallService;
-import com.nuoxin.virtual.rep.api.utils.CalculateUtil;
-import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
-import com.nuoxin.virtual.rep.api.utils.ExportExcelUtil;
-import com.nuoxin.virtual.rep.api.utils.ExportExcelWrapper;
+import com.nuoxin.virtual.rep.api.utils.*;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.DrugUserDoctorCallDetailRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.DrugUserDoctorCallRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DrugUserDoctorCallDetailResponse;
@@ -42,6 +39,11 @@ public class DrugUserDoctorCallServiceImpl implements DrugUserDoctorCallService 
 
     @Override
     public PageResponseBean<DrugUserDoctorCallResponse> getDrugUserDoctorCallPage(DrugUserDoctorCallRequest request) {
+
+        String searchKeyword = request.getSearchKeyword();
+        if (StringUtil.isNotEmpty(searchKeyword)){
+            request.setSearchKeyword(searchKeyword.trim());
+        }
 
         Integer count = virtualDoctorCallInfoMapper.getDrugUserDoctorCallListCount(request);
         if (count == null){

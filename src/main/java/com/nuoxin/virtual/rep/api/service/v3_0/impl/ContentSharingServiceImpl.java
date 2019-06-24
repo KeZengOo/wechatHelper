@@ -7,6 +7,7 @@ import com.nuoxin.virtual.rep.api.entity.v3_0.request.ContentSharingRequest;
 import com.nuoxin.virtual.rep.api.mybatis.ContentSharingMapper;
 import com.nuoxin.virtual.rep.api.service.v3_0.ContentSharingService;
 import com.nuoxin.virtual.rep.api.utils.ParseTimeSecondsUtils;
+import com.nuoxin.virtual.rep.api.utils.StringUtil;
 import com.nuoxin.virtual.rep.api.utils.csv.CSVUtils;
 import com.nuoxin.virtual.rep.api.utils.csv.PublicGlobalCSVExprot;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +44,11 @@ public class ContentSharingServiceImpl implements ContentSharingService {
 
     @Override
     public PageResponseBean<List<ContentSharingParams>> getContentSharingListPage(ContentSharingRequest contentSharingRequest) {
+
+        String title = contentSharingRequest.getTitle();
+        if (StringUtil.isNotEmpty(title)){
+            contentSharingRequest.setTitle(title.trim());
+        }
 
         //代表数组转list
         List<Long> drugUserIds = new ArrayList<Long>();

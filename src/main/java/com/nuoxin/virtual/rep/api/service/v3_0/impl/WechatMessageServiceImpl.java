@@ -8,6 +8,7 @@ import com.nuoxin.virtual.rep.api.service.v3_0.WechatMessageService;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.utils.ExportExcelUtil;
 import com.nuoxin.virtual.rep.api.utils.ExportExcelWrapper;
+import com.nuoxin.virtual.rep.api.utils.StringUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.WechatMessageRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.ExportDrugUserDoctorCallResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.WechatMessageSummaryResponse;
@@ -30,6 +31,11 @@ public class WechatMessageServiceImpl implements WechatMessageService {
 
     @Override
     public PageResponseBean<WechatMessageSummaryResponse> getWechatMessageSummaryPage(WechatMessageRequest request) {
+
+        String searchKeyword = request.getSearchKeyword();
+        if (StringUtil.isNotEmpty(searchKeyword)){
+            request.setSearchKeyword(searchKeyword.trim());
+        }
 
         Integer count = virtualWechatMessageMapper.getWechatMessageSummaryListCount(request);
         if (count == null){

@@ -4,15 +4,17 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.common.constant.WenJuanApiConstant;
+import com.nuoxin.virtual.rep.api.entity.Doctor;
 import com.nuoxin.virtual.rep.api.entity.v3_0.*;
 import com.nuoxin.virtual.rep.api.entity.v3_0.params.WenJuanInfoParams;
 import com.nuoxin.virtual.rep.api.entity.v3_0.request.WenJuanInfoRequest;
 import com.nuoxin.virtual.rep.api.entity.v3_0.request.WenJuanProjectRequest;
+import com.nuoxin.virtual.rep.api.mybatis.DoctorMapper;
 import com.nuoxin.virtual.rep.api.mybatis.WenJuanQuestionnaireMapper;
 import com.nuoxin.virtual.rep.api.service.v3_0.WenJuanQuestionnaireService;
-import com.nuoxin.virtual.rep.api.utils.EmojiUtil;
-import com.nuoxin.virtual.rep.api.utils.MD5Util;
+import com.nuoxin.virtual.rep.api.utils.*;
 import com.nuoxin.virtual.rep.api.utils.csv.PublicGlobalCSVExprot;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.questionnaire.QuestionnaireAnswerResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -23,6 +25,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 
 /**
  * 问卷网
@@ -34,6 +38,10 @@ public class WenJuanQuestionnaireServiceImpl implements WenJuanQuestionnaireServ
 
     @Resource
     private WenJuanQuestionnaireMapper wenJuanQuestionnaireMapper;
+
+    @Resource
+    private DoctorMapper doctorMapper;
+
     @Resource
     private RestTemplate restTemplate;
 
@@ -366,6 +374,8 @@ public class WenJuanQuestionnaireServiceImpl implements WenJuanQuestionnaireServ
             scheduleResult.setAnswerResult(aResult);
         }
 
+
+
         return scheduleResult;
     }
 
@@ -389,6 +399,12 @@ public class WenJuanQuestionnaireServiceImpl implements WenJuanQuestionnaireServ
 
     @Override
     public PageResponseBean<List<WenJuanProject>> getWenJuanProjectListPage(WenJuanProjectRequest wenJuanProjectRequest) {
+
+        String title = wenJuanProjectRequest.getTitle();
+        if (StringUtil.isNotEmpty(title)){
+            wenJuanProjectRequest.setTitle(title.trim());
+        }
+
         //代表数组转list
         List<Long> productIds = new ArrayList<Long>();
         if(wenJuanProjectRequest.getProductId()!= null){
@@ -439,6 +455,45 @@ public class WenJuanQuestionnaireServiceImpl implements WenJuanQuestionnaireServ
 
         //调用导出CSV文件公共方法
         PublicGlobalCSVExprot.exportCSVFile(response,map,wenJuanAnswerList,fileds,"wenJuanInfo.csv");
+    }
+
+    @Override
+    public void updateWjAnswerTelephone(Date startDate, Date endDate) {
+
+        List<QuestionnaireAnswerResponse> questionnaireAnswerList = wenJuanQuestionnaireMapper.getQuestionnaireAnswerList(startDate, endDate);
+        if (CollectionsUtil.isEmptyList(questionnaireAnswerList)){
+            return;
+        }
+
+        questionnaireAnswerList.forEach(q->{
+            String answer = q.getAnswer();
+            Matcher matcher = com.nuoxin.virtual.rep.api.utils.RegularUtils.getMatcher(RegularUtils.MATCH_ELEVEN_NUM, answer);
+            if (matcher.find()) {
+                String telephone = matcher.group();
+                q.setTelephone(telephone);
+                Doctor doctor = doctorMapper.findTopByMobile(telephone);
+                if (doctor != null) {
+                    Long doctorId = doctor.getId();
+                    q.setDoctorId(doctorId);
+                }
+            }
+        });
+
+
+        List<QuestionnaireAnswerResponse> list = questionnaireAnswerList.stream().filter(q -> (StringUtil.isNotEmpty(q.getTelephone()))).collect(Collectors.toList());
+        if (CollectionsUtil.isEmptyList(list)){
+            return;
+        }
+
+
+        list.forEach(q->{
+            wenJuanQuestionnaireMapper.updateQuestionnaireAnswerTelephone(q);
+        });
+
+
+        wenJuanQuestionnaireMapper.updateQuestionnaireAnswerDoctorId();
+
+
     }
 
     /**

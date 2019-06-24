@@ -115,10 +115,10 @@
             t.`product_id` AS productId,
             t.`product_name` AS productName
         FROM
-            wj_project t LEFT JOIN product_line l ON t.product_id = l.prod_id
+            wj_project t LEFT JOIN product_line l ON t.product_id = l.prod_id AND l.show_place = 1
         WHERE 1=1
-            AND l.show_place = 1
-        <if test="productIds.size() > 0 and productIds != null">
+
+        <if test="productIds != null and productIds.size() > 0">
             AND t.product_id in
             <foreach collection="productIds" item="item" separator="," open="(" close=")">
                 #{item}
@@ -143,10 +143,10 @@
         SELECT
           count(1)
         FROM
-            wj_project t LEFT JOIN product_line l ON t.product_id = l.prod_id
+            wj_project t LEFT JOIN product_line l ON t.product_id = l.prod_id AND l.show_place = 1
         WHERE 1=1
-            AND l.show_place = 1
-        <if test="productIds.size() > 0 and productIds != null">
+
+        <if test="productIds != null and productIds.size() > 0">
             AND t.product_id in
             <foreach collection="productIds" item="item" separator="," open="(" close=")">
                 #{item}
@@ -264,4 +264,27 @@
         </if>
 
     </select>
+
+
+    <!-- 更新问卷答案中医生手机号 -->
+    <update id="updateQuestionnaireAnswerTelephone">
+        UPDATE wj_answer
+        SET doctor_id=#{doctorId}, telephone=#{telephone}
+        WHERE id =#{id}
+
+    </update>
+
+
+    <update id="updateQuestionnaireAnswerDoctorId">
+
+        UPDATE doctor_telephone dt
+        INNER JOIN wj_answer w ON dt.telephone = w.telephone
+        SET w.doctor_id = dt.doctor_id
+        WHERE
+            ( w.doctor_id IS NULL OR w.doctor_id = 0 )
+            AND w.telephone IS NOT NULL
+            AND w.telephone != ''
+
+    </update>
+
 </mapper>

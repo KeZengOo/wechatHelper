@@ -129,6 +129,8 @@ public class CommonPoolController extends NewBaseController {
         String productIdStr = request.getParameter("productIdStr");
         String drugUserIdStr = request.getParameter("drugUserIdStr");
         String relationDrugUserStr = request.getParameter("relationDrugUser");
+        String resultIdStr = request.getParameter("resultIdStr");
+
 
         Integer recruit = null;
         Integer cover = null;
@@ -137,6 +139,7 @@ public class CommonPoolController extends NewBaseController {
         Integer relationDrugUser = null;
         List<Long> productIdList;
         List<Long> drugUserIdList;
+        List<Long> resultIdList;
 
         if (StringUtil.isNotEmpty(recruitStr)){
             try {
@@ -189,6 +192,13 @@ public class CommonPoolController extends NewBaseController {
         }
 
         try {
+            resultIdList = StringUtil.getIdList(resultIdStr);
+        }catch (Exception e){
+            throw new BusinessException(ErrorEnum.ERROR, "代表ID输入不合法，多个以逗号分开");
+        }
+
+
+        try {
             drugUserIdList = StringUtil.getIdList(drugUserIdStr);
         }catch (Exception e){
             throw new BusinessException(ErrorEnum.ERROR, "代表ID输入不合法，多个以逗号分开");
@@ -204,6 +214,7 @@ public class CommonPoolController extends NewBaseController {
         commonPoolRequest.setRecruit(recruit);
         commonPoolRequest.setSearchKeyword(searchKeyword);
         commonPoolRequest.setTarget(target);
+        commonPoolRequest.setResultIdList(resultIdList);
 
         return commonPoolRequest;
 

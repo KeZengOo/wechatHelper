@@ -13,6 +13,7 @@ import com.nuoxin.virtual.rep.api.entity.v3_0.request.MeetingSubjectRequest;
 import com.nuoxin.virtual.rep.api.mybatis.MeetingRecordMapper;
 import com.nuoxin.virtual.rep.api.service.v3_0.MeetingRecordService;
 import com.nuoxin.virtual.rep.api.utils.ExcelUtils;
+import com.nuoxin.virtual.rep.api.utils.StringUtil;
 import com.nuoxin.virtual.rep.api.utils.excel.RegularUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -46,6 +47,11 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
 
     @Override
     public PageResponseBean<List<MeetingRecordParams>> getMeetingRecordList(MeetingRecordRequest meetingRecordRequest) {
+
+        String title = meetingRecordRequest.getTitle();
+        if (StringUtil.isNotEmpty(title)){
+            meetingRecordRequest.setTitle(title.trim());
+        }
 
         //代表数组转list
         List<Long> productIds = new ArrayList<Long>();

@@ -2,6 +2,7 @@ package com.nuoxin.virtual.rep.api.web.schedule;
 
 import com.nuoxin.virtual.rep.api.common.bean.DefaultResponseBean;
 import com.nuoxin.virtual.rep.api.service.CallBackService;
+import com.nuoxin.virtual.rep.api.service.v3_0.WenJuanQuestionnaireService;
 import com.nuoxin.virtual.rep.api.utils.SpeechRecognitionUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.Call7mmorRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.IdentifyCallUrlRequestBean;
@@ -9,9 +10,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,6 +33,10 @@ public class CallInfoScheduleController {
 
     @Resource
     private CallBackService callBackService;
+
+
+    @Resource
+    private WenJuanQuestionnaireService wenJuanQuestionnaireService;
 
     @ApiOperation(value = "没有回调的电话记录重试", notes = "没有回调的电话记录重试")
     @PostMapping(value = "/retry")
@@ -154,4 +162,30 @@ public class CallInfoScheduleController {
         responseBean.setData(resultNum);
         return responseBean;
     }
+
+
+
+
+
+
+    @ApiOperation(value = "手动调用问卷答案中更新医生的手机号", notes = "手动调用问卷答案中更新医生的手机号")
+    @PostMapping(value = "/manual/wj/telephone/update")
+    public void updateWjTelephone() {
+        logger.info("CallInfoScheduleController updateWjTelephone start....");
+        long starTime = System.currentTimeMillis();
+
+        Date today = new Date();
+        Calendar c = Calendar.getInstance();
+        c.setTime(today);
+        c.add(Calendar.DAY_OF_MONTH, -1);
+        Date yesterday = c.getTime();
+
+        //wenJuanQuestionnaireService.updateWjAnswerTelephone(yesterday, today);
+        wenJuanQuestionnaireService.updateWjAnswerTelephone(null, null);
+        long endTime = System.currentTimeMillis();
+        logger.info("CallInfoScheduleController updateWjTelephone end , cost {}s", (endTime-starTime)/1000);
+
+    }
+
+
 }

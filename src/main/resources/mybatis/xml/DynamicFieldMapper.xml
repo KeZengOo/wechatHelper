@@ -786,7 +786,7 @@
     <select id="getPrescription" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v2_5.PrescriptionResponseBean">
         SELECT hcp_potential potential, is_has_drug hasDrug, is_target target, is_recruit recruit, is_cover cover, is_break_off breakOff,
         is_has_ae isHasAe, attitude
-         FROM drug_user_doctor_quate
+         FROM product_doctor_quate
          WHERE product_id=#{productId}
          AND doctor_id=#{doctorId}
          ORDER BY create_time DESC LIMIT 1

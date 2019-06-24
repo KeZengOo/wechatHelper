@@ -1,6 +1,7 @@
 package com.nuoxin.virtual.rep.api.web.schedule;
 
 import com.nuoxin.virtual.rep.api.service.CallBackService;
+import com.nuoxin.virtual.rep.api.service.v3_0.WenJuanQuestionnaireService;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.Call7mmorRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.IdentifyCallUrlRequestBean;
 import io.swagger.annotations.Api;
@@ -11,6 +12,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * V2.5电话记录补偿,自动调用
@@ -26,6 +29,9 @@ public class CallInfoSchedule {
 
     @Resource
     private CallBackService callBackService;
+
+    @Resource
+    private WenJuanQuestionnaireService wenJuanQuestionnaireService;
 
     @ApiOperation(value = "没有回调的电话记录重试", notes = "没有回调的电话记录重试")
     @PostMapping(value = "/retry")
@@ -62,15 +68,20 @@ public class CallInfoSchedule {
 
 
 
-    @ApiOperation(value = "问卷答案中更新医生的手机号", notes = "录音识别")
+    @ApiOperation(value = "问卷答案中更新医生的手机号", notes = "问卷答案中更新医生的手机号")
     @PostMapping(value = "/wj/telephone/update")
     @Scheduled(cron = "0 0 22 * * ?") // 每天22点执行
     public void updateWjTelephone() {
         logger.info("CallInfoSchedule updateWjTelephone start....");
         long starTime = System.currentTimeMillis();
 
+        Date today = new Date();
+        Calendar c = Calendar.getInstance();
+        c.setTime(today);
+        c.add(Calendar.DAY_OF_MONTH, -1);
+        Date yesterday = c.getTime();
 
-
+        wenJuanQuestionnaireService.updateWjAnswerTelephone(yesterday, today);
         long endTime = System.currentTimeMillis();
         logger.info("CallInfoSchedule updateWjTelephone end , cost {}s", (endTime-starTime)/1000);
 

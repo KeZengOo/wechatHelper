@@ -113,4 +113,17 @@ public interface WenJuanQuestionnaireMapper {
      * @return
      */
     List<QuestionnaireAnswerResponse> getQuestionnaireAnswerList(@Param(value = "startDate") Date starDate,@Param(value = "endDate") Date endDate);
+
+
+    /**
+     * 更新问卷答案中医生手机号
+     * @param questionnaireAnswer
+     */
+    void updateQuestionnaireAnswerTelephone(QuestionnaireAnswerResponse questionnaireAnswer);
+
+    /**
+     * 更新医生问卷答案中的医生ID
+     */
+    void updateQuestionnaireAnswerDoctorId();
+
 }

@@ -2024,7 +2024,7 @@
 
 		<!-- 最近一次未接通 -->
 		<if test="tag !=null and tag==6">
-			AND v.id = (SELECT MAX(id) FROM virtual_doctor_call_info WHERE
+			AND v.id IN (SELECT MAX(id) FROM virtual_doctor_call_info WHERE
 			status_name IN ('poweroff','reject','emptynumber', 'busy', 'stop', 'noanswer' )
 
 			<if test="drugUserIdList !=null and drugUserIdList.size > 0">
@@ -2040,6 +2040,8 @@
 					#{productId}
 				</foreach>
 			</if>
+
+			GROUP BY virtual_doctor_id, virtual_drug_user_id
 
 			)
 		</if>
@@ -2316,7 +2318,7 @@
 
 		<!-- 最近一次未接通 -->
 		<if test="tag !=null and tag==6">
-			AND v.id = (SELECT MAX(id) FROM virtual_doctor_call_info WHERE
+			AND v.id IN (SELECT MAX(id) FROM virtual_doctor_call_info WHERE
 			status_name IN ('poweroff','reject','emptynumber', 'busy', 'stop', 'noanswer' )
 
 			<if test="drugUserIdList !=null and drugUserIdList.size > 0">
@@ -2332,6 +2334,8 @@
 					#{productId}
 				</foreach>
 			</if>
+
+			GROUP BY virtual_doctor_id, virtual_drug_user_id
 
 			)
 		</if>
