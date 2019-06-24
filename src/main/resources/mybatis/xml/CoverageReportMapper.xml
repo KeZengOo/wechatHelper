@@ -227,6 +227,7 @@
 		INNER JOIN virtual_doctor_call_info_mend b on a.id = b.call_id
 		inner join virtual_doctor_dynamic_field va on b.product_id = va.product_id
 		inner join virtual_doctor_dynamic_field_value vb on va.id = vb.dynamic_field_id and vb.doctor_id = b.virtual_doctor_id
+		INNER JOIN doctor d ON d.id = vb.doctor_id
 		WHERE b.is_recruit = 1 AND a.product_id = #{productId} AND (a.status_name = 'answer' or a.visit_channel != 1)
 		and va.field_name = '目标患者量/月'
 		AND DATE_FORMAT(a.create_time,'%Y-%m') &gt;= #{startTime} AND DATE_FORMAT(a.create_time,'%Y-%m') &lt;= #{endTime}
@@ -238,6 +239,7 @@
 		inner join virtual_doctor_dynamic_field_value vb on va.id = vb.dynamic_field_id
 		INNER JOIN activity_read r ON vb.doctor_id = r.read_person_id
 		LEFT JOIN activity_read_ip i ON i.read_token = r.read_token
+		INNER JOIN doctor d ON d.id = vb.doctor_id
 		WHERE va.product_id = #{productId} and va.field_name = '目标患者量/月'
 		AND DATE_FORMAT(r.create_time,'%Y-%m') &gt;= #{startTime} AND DATE_FORMAT(r.create_time,'%Y-%m') &lt;= #{endTime}
 		AND (i.isp != '阿里云' OR i.isp IS NULL) AND r.read_person_id IN (
@@ -250,6 +252,7 @@
 		SELECT b.doctor_id hcpId, vb.dynamic_field_value timeStr FROM virtual_doctor_dynamic_field va
 		inner join virtual_doctor_dynamic_field_value vb on va.id = vb.dynamic_field_id
 		inner JOIN `virtual_message` b ON vb.doctor_id = b.doctor_id
+		INNER JOIN doctor d ON d.id = vb.doctor_id
 		WHERE va.product_id = #{productId} AND b.user_type = 2 and va.field_name = '目标患者量/月'
 		and DATE_FORMAT(b.message_time,'%Y-%m') &gt;= #{startTime} AND DATE_FORMAT(b.message_time,'%Y-%m') &lt;= #{endTime}
 		AND b.wechat_message_type NOT IN ('系统消息','撤回提醒') AND b.doctor_id IN (
@@ -263,6 +266,7 @@
 		virtual_doctor_dynamic_field va
 		inner join virtual_doctor_dynamic_field_value vb on va.id = vb.dynamic_field_id
 		INNER JOIN t_meeting_attend_details b ON b.doctor_id = vb.doctor_id
+		INNER JOIN doctor d ON d.id = vb.doctor_id
 		WHERE va.product_id = #{productId} and va.field_name = '目标患者量/月'
 		AND DATE_FORMAT(b.attend_start_time,'%Y-%m') &gt;= #{startTime} AND DATE_FORMAT(b.attend_start_time,'%Y-%m') &lt;= #{endTime}
 		AND b.doctor_id IN (

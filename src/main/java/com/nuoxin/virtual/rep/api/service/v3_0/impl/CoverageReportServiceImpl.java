@@ -976,33 +976,22 @@ public class CoverageReportServiceImpl implements CoverageReportService {
     private Map<String, Set<Long>> buildMap(Map<String, Set<Long>> sourceMap, List<String> yearAndMonth, String startTime) {
         Map<String, Set<Long>> recruitMap = new HashMap<>(yearAndMonth.size());
         List<String> recruitKey = sourceMap.keySet().stream().sorted().collect(Collectors.toList());
-        Set<Long> start = new HashSet<>();
-        int index = recruitKey.indexOf(startTime);
-        for(int i=0; i<= index; i++) {
-            start.addAll(sourceMap.get(recruitKey.get(i)));
-        }
-        recruitMap.put(startTime, start);
-        if(index == recruitKey.size() - 1) {
-            return recruitMap;
-        }
-        if(index == -1) {
-            index = 0;
-        }
-        for(int i=index; i<recruitKey.size(); i++) {
-            recruitMap.put(recruitKey.get(i), sourceMap.get(recruitKey.get(i)));
-        }
-        for(int i=0; i<yearAndMonth.size()-1; i++) {
-            Set<Long> setI = recruitMap.get(yearAndMonth.get(i));
-            if(setI == null) {
-                setI = Collections.emptySet();
+        recruitKey.addAll(yearAndMonth);
+        List<String> result = recruitKey.stream().distinct().sorted().collect(Collectors.toList());
+        for(int i=0; i<result.size(); i++) {
+            String k = result.get(i);
+            if(!yearAndMonth.contains(k)) {
+                continue;
             }
-            String j = yearAndMonth.get(i+1);
-            Set<Long> setJ = recruitMap.get(j);
-            if(setJ == null) {
-                setJ = new HashSet<>();
+            Set<Long> setI = new HashSet<>();
+            for(int j=0; j<=i; j++) {
+                String key = result.get(j);
+                Set<Long> setJ = sourceMap.get(key);
+                if(setJ != null) {
+                    setI.addAll(setJ);
+                }
             }
-            setJ.addAll(setI);
-            recruitMap.put(j, setJ);
+            recruitMap.put(k, setI);
         }
         return recruitMap;
     }
