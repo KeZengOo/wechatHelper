@@ -16,6 +16,7 @@ import javax.annotation.Resource;
 import com.nuoxin.virtual.rep.api.web.controller.request.call.IdentifyCallUrlRequestBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
@@ -50,6 +51,11 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 	private RestTemplate restTemplate;
 	@Resource
 	private DoctorCallInfoMapper doctorCallInfoMapper;
+
+	@Value("${audio.transcription}")
+	private String audioTranscription;
+
+
 	
 	/**
 	 * 参考链接 https://developer.7moor.com/event/
@@ -208,7 +214,10 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 		}
 
 		for (CallInfoResponseBean callInfo : identifyCallUrlList) {
-			super.updateCallUrlText(callInfo.getSinToken(), callInfo.getCallUrl(), callInfo.getUnpressedCallUrl(), callInfo.getUnpressedCallUrlIn(), callInfo.getUnpressedCallUrlOut());
+			if (StringUtil.isNotEmpty(audioTranscription) && "on".equalsIgnoreCase(audioTranscription)){
+				super.updateCallUrlText(callInfo.getSinToken(), callInfo.getCallUrl(), callInfo.getUnpressedCallUrl(), callInfo.getUnpressedCallUrlIn(), callInfo.getUnpressedCallUrlOut());
+			}
+
 			//异步（分割录音文件并上传阿里云，返回左右声道的阿里云地址 并且 根据左右声道的阿里云地址进行语音识别，进行入库）
 			if(!callInfo.getCallUrl().isEmpty()){
 				new Thread(new Runnable(){

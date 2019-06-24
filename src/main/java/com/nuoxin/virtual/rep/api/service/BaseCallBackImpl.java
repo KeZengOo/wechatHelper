@@ -49,6 +49,8 @@ public abstract class BaseCallBackImpl implements CallBackService{
 	@Resource
 	private DoctorCallInfoRepository callInfoDao;
 
+	@Value("${audio.transcription}")
+	private String audioTranscription;
 
 	/**
 	 * 父类通用回调处理
@@ -138,6 +140,11 @@ public abstract class BaseCallBackImpl implements CallBackService{
 //				String unpressedCallText = SpeechRecognitionUtil.getSpeechRecognitionResult(unpressedCallUrl);
 //				String unpressedCallInText = SpeechRecognitionUtil.getSpeechRecognitionResult(unpressedCallUrlIn);
 //				String unpressedCallOutText = SpeechRecognitionUtil.getSpeechRecognitionResult(unpressedCallUrlOut);
+
+				if (StringUtil.isNotEmpty(audioTranscription) && "on".equalsIgnoreCase(audioTranscription)){
+					callInfoMapper.updateCallUrlText(sinToken, callText);
+				}
+
 				callInfoMapper.updateCallUrlText(sinToken, callText);
 //				callInfoMapper.updateCallUrlTextRefactor(sinToken, callText, unpressedCallText, unpressedCallInText, unpressedCallOutText);
 
