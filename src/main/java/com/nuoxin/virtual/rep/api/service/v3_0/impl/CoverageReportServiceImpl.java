@@ -73,7 +73,7 @@ public class CoverageReportServiceImpl implements CoverageReportService {
             Map<String, Set<Long>> newRecruitHcp = this.buildMap(recruitListHcp, yearAndMonth, startTime);
             // 覆盖医生部分
             List<CoverageReportPart> coverageList = coverageReportMapper.findCoverageList(proId, startTime, endTime);
-            if(!CollectionUtils.isEmpty(coverageList)) {
+//            if(!CollectionUtils.isEmpty(coverageList)) {
                 // 每个时间段的覆盖医院数量
                 Map<String, Set<Long>> coverageListHci = coverageList.stream().collect(Collectors.groupingBy(k -> k.getTimeStr(),
                         Collectors.mapping(k -> k.getHciId(), Collectors.toSet())));
@@ -118,16 +118,16 @@ public class CoverageReportServiceImpl implements CoverageReportService {
                     hciSet.clear();
                     hcpSet.clear();
                 });
-            } else {
-                yearAndMonth.forEach(k -> {
-                    recruitHciList.add(0);
-                    coverageHciList.add(0);
-                    lineHciList.add(0.0d);
-                    recruitHcpList.add(0);
-                    coverageHcpList.add(0);
-                    lineHcpList.add(0.0);
-                });
-            }
+//            } else {
+//                yearAndMonth.forEach(k -> {
+//                    recruitHciList.add(0);
+//                    coverageHciList.add(0);
+//                    lineHciList.add(0.0d);
+//                    recruitHcpList.add(0);
+//                    coverageHcpList.add(0);
+//                    lineHcpList.add(0.0);
+//                });
+//            }
         } else {
             yearAndMonth.forEach(k -> {
                 recruitHciList.add(0);
@@ -164,7 +164,7 @@ public class CoverageReportServiceImpl implements CoverageReportService {
             Map<String, Set<Long>> newRecruitHcp = this.buildMap(recruitListHcp, yearAndMonth, startTime);
             // 覆盖医生部分
             List<CoverageReportPart> coverageList = coverageReportMapper.findCoverageList(proId, startTime, endTime);
-            if(!CollectionUtils.isEmpty(coverageList)) {
+//            if(!CollectionUtils.isEmpty(coverageList)) {
                 // 每个时间段的覆盖医院数量
                 Map<String, Set<Long>> coverageListHci = coverageList.stream().collect(Collectors.groupingBy(k -> k.getTimeStr(),
                         Collectors.mapping(k -> k.getHciId(), Collectors.toSet())));
@@ -193,7 +193,7 @@ public class CoverageReportServiceImpl implements CoverageReportService {
                     }
                     res.setCoverageHciNum(hciNum);
                     res.setHciPercent(hciPercent + "%");
-                    Set<Long> rhcpSet = recruitListHcp.get(k);
+                    Set<Long> rhcpSet = newRecruitHcp.get(k);
                     int rhcpNum = rhcpSet != null ? rhcpSet.size() : 0;
                     res.setRecruitHcpNum(rhcpNum);
                     Set<Long> chcpSet = coverageListHcp.get(k);
@@ -232,7 +232,7 @@ public class CoverageReportServiceImpl implements CoverageReportService {
                 Double hcpPercent = ArithUtil.mul(ArithUtil.div(res.getCoverageHcpNum(), res.getRecruitHcpNum(), 4), 100);
                 res.setHcpPercent(hcpPercent + "%");
                 rlist.add(res);
-            }
+//            }
         }
         // 导出逻辑
         ExportExcelWrapper<CoverageOverviewResponse> exportExcelWrapper = new ExportExcelWrapper();
