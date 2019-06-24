@@ -200,7 +200,7 @@
 	<!-- 患者量覆盖 招募医生 -->
 	<select id="findCoveragePatientRecruitList" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.CoverageReportPart">
 		SELECT
-		IFNULL(vb.dynamic_field_value,'未知') timeStr, timeStr,
+		IFNULL(vb.dynamic_field_value,'未知') timeStr,
 		count( DISTINCT d.id ) hcpId
 		FROM
 		doctor d
