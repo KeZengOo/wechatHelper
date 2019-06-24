@@ -200,13 +200,13 @@
 	<!-- 患者量覆盖 招募医生 -->
 	<select id="findCoveragePatientRecruitList" resultType="com.nuoxin.virtual.rep.api.entity.v3_0.CoverageReportPart">
 		SELECT
-		vb.dynamic_field_value timeStr,
+		IFNULL(vb.dynamic_field_value,'未知') timeStr, timeStr,
 		count( DISTINCT d.id ) hcpId
 		FROM
 		doctor d
 		INNER JOIN virtual_doctor_call_info_mend b ON d.id = b.virtual_doctor_id
 		INNER JOIN virtual_doctor_dynamic_field va ON b.product_id = va.product_id
-		INNER JOIN virtual_doctor_dynamic_field_value vb ON va.id = vb.dynamic_field_id
+		LEFT JOIN virtual_doctor_dynamic_field_value vb ON va.id = vb.dynamic_field_id
 		AND vb.doctor_id = b.virtual_doctor_id
 		WHERE
 		b.is_recruit = 1
