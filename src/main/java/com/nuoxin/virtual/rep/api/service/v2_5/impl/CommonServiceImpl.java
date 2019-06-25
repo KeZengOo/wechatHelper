@@ -315,7 +315,10 @@ public class CommonServiceImpl implements CommonService {
 				DrugUserDoctorTransferVo drugUserDoctorTransferVo = drugUserDoctorTransferVos.get(i);
 				String drugUserEmail = drugUserDoctorTransferVo.getDrugUserEmail();
 				String productName = drugUserDoctorTransferVo.getProductName();
-				String telephone = drugUserDoctorTransferVo.getTelephone();
+//				String telephone = drugUserDoctorTransferVo.getTelephone();
+				String doctorIdStr = drugUserDoctorTransferVo.getDoctorIdStr();
+
+
 				String toDrugUserEmail = drugUserDoctorTransferVo.getToDrugUserEmail();
 				int row = i + 2;
 				if (StringUtil.isEmpty(drugUserEmail)){
@@ -338,10 +341,10 @@ public class CommonServiceImpl implements CommonService {
 					continue;
 				}
 
-				if (StringUtil.isEmpty(telephone)){
+				if (StringUtil.isEmpty(doctorIdStr)){
 					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
 					doctorImportErrorDetail.setSheetName(sheetName);
-					doctorImportErrorDetail.setError("医生手机号为空！");
+					doctorImportErrorDetail.setError("医生ID为空！");
 					doctorImportErrorDetail.setRowNum(row);
 					detailList.add(doctorImportErrorDetail);
 					failNum ++;
@@ -415,21 +418,46 @@ public class CommonServiceImpl implements CommonService {
 					continue;
 				}
 
-				if (!RegularUtils.isMatcher(RegularUtils.MATCH_ELEVEN_NUM, telephone)) {
+//				if (!RegularUtils.isMatcher(RegularUtils.MATCH_ELEVEN_NUM, telephone)) {
+//					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
+//					doctorImportErrorDetail.setSheetName(sheetName);
+//					doctorImportErrorDetail.setError("医生手机号：" + telephone + " 输入不合法！" );
+//					doctorImportErrorDetail.setRowNum(row);
+//					detailList.add(doctorImportErrorDetail);
+//					failNum ++;
+//					continue;
+//				}
+//
+//				Doctor doctor = doctorMapper.findTopByMobile(telephone);
+//				if (doctor == null){
+//					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
+//					doctorImportErrorDetail.setSheetName(sheetName);
+//					doctorImportErrorDetail.setError("医生手机号：" + telephone + " 对应医生不存在！" );
+//					doctorImportErrorDetail.setRowNum(row);
+//					detailList.add(doctorImportErrorDetail);
+//					failNum ++;
+//					continue;
+//				}
+
+				Long doctorId = 0L;
+				try {
+					doctorId = Long.valueOf(doctorIdStr);
+				}catch (Exception e){
 					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
 					doctorImportErrorDetail.setSheetName(sheetName);
-					doctorImportErrorDetail.setError("医生手机号：" + telephone + " 输入不合法！" );
+					doctorImportErrorDetail.setError("医生ID:" +  doctorIdStr + " 输入不合法！");
 					doctorImportErrorDetail.setRowNum(row);
 					detailList.add(doctorImportErrorDetail);
 					failNum ++;
 					continue;
 				}
 
-				Doctor doctor = doctorMapper.findTopByMobile(telephone);
+
+				Doctor doctor = doctorRepository.findFirstById(doctorId);
 				if (doctor == null){
 					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
 					doctorImportErrorDetail.setSheetName(sheetName);
-					doctorImportErrorDetail.setError("医生手机号：" + telephone + " 对应医生不存在！" );
+					doctorImportErrorDetail.setError("医生ID:" +  doctorIdStr + " 对应的医生不存在！");
 					doctorImportErrorDetail.setRowNum(row);
 					detailList.add(doctorImportErrorDetail);
 					failNum ++;

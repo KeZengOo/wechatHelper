@@ -17,8 +17,8 @@ public class DrugUserDoctorTransferVo {
     @Excel(name = "产品名称")
     private String productName;
 
-    @Excel(name = "医生手机号")
-    private String telephone;
+    @Excel(name = "医生ID")
+    private String doctorIdStr;
 
     @Excel(name = "转给代表的邮箱", width = 50)
     private String toDrugUserEmail;
