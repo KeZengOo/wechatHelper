@@ -139,7 +139,6 @@ public class MonthlyRecruitServiceImpl implements MonthlyRecruitService {
 
     @Override
     public void exportMonthlyRecruitContact(MonthlyRecruitRequest request, HttpServletResponse response) {
-        List<MonthlyRecruitContactDetailResponse> list = this.getMonthlyRecruitContactDetailList(request);
 
         ExportExcelWrapper<MonthlyRecruitContactDetailResponse> exportExcelWrapper = new ExportExcelWrapper();
         exportExcelWrapper.exportExcel("月报—联系方式收集统计".concat(request.getStartDate()).concat("~").concat(request.getEndDate()), "月报—联系方式收集统计",

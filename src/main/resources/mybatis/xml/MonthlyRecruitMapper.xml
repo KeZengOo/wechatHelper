@@ -556,7 +556,7 @@
 
         SELECT
         DATE_FORMAT( t.create_time, '%Y-%m' ) `month`,
-        COUNT(DISTINCT t.doctor_id) hasMobileDoctor
+        COUNT(DISTINCT t.doctor_id) hasWechatDoctor
         FROM doctor_mend dm INNER JOIN (
         SELECT
         DISTINCT d.id doctor_id, a.create_time
@@ -689,7 +689,7 @@
 
         SELECT
         DATE_FORMAT( t.create_time, '%Y-%m' ) `month`,
-        COUNT(DISTINCT t.doctor_id) hasMobileDoctor
+        COUNT(DISTINCT t.doctor_id) addWechatDoctor
         FROM virtual_message vm INNER JOIN (
         SELECT
         DISTINCT d.id doctor_id, a.create_time
