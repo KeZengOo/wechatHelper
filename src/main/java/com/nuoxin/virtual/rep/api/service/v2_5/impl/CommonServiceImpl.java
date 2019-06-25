@@ -465,7 +465,7 @@ public class CommonServiceImpl implements CommonService {
 				}
 
 
-				List<DrugUserDoctorTransferVo> collectList = drugUserDoctorTransferVos.stream().filter(dv -> (drugUserEmail.equals(dv.getDrugUserEmail()) && productName.equals(dv.getProductName()) && telephone.equals(dv.getTelephone()) && toDrugUserEmail.equals(dv.getToDrugUserEmail()))).collect(Collectors.toList());
+				List<DrugUserDoctorTransferVo> collectList = drugUserDoctorTransferVos.stream().filter(dv -> (drugUserEmail.equals(dv.getDrugUserEmail()) && productName.equals(dv.getProductName()) && doctorIdStr.equals(dv.getDoctorIdStr()) && toDrugUserEmail.equals(dv.getToDrugUserEmail()))).collect(Collectors.toList());
 				if (CollectionsUtil.isNotEmptyList(collectList) && collectList.size() > 1){
 					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
 					doctorImportErrorDetail.setSheetName(sheetName);
@@ -569,7 +569,8 @@ public class CommonServiceImpl implements CommonService {
 				DrugUserDoctorTransferVo drugUserDoctorTransferVo = drugUserDoctorTransferVos.get(i);
 				String drugUserEmail = drugUserDoctorTransferVo.getDrugUserEmail();
 				String productName = drugUserDoctorTransferVo.getProductName();
-				String telephone = drugUserDoctorTransferVo.getTelephone();
+//				String telephone = drugUserDoctorTransferVo.getTelephone();
+				String doctorIdStr = drugUserDoctorTransferVo.getDoctorIdStr();
 				String toDrugUserEmail = drugUserDoctorTransferVo.getToDrugUserEmail();
 				int row = i + 2;
 				if (StringUtil.isEmpty(drugUserEmail)){
@@ -590,14 +591,14 @@ public class CommonServiceImpl implements CommonService {
 					continue;
 				}
 
-				if (StringUtil.isEmpty(telephone)){
-					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
-					doctorImportErrorDetail.setError("医生手机号为空！");
-					doctorImportErrorDetail.setRowNum(row);
-					detailList.add(doctorImportErrorDetail);
-					failNum ++;
-					continue;
-				}
+//				if (StringUtil.isEmpty(telephone)){
+//					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
+//					doctorImportErrorDetail.setError("医生手机号为空！");
+//					doctorImportErrorDetail.setRowNum(row);
+//					detailList.add(doctorImportErrorDetail);
+//					failNum ++;
+//					continue;
+//				}
 
 				if (StringUtil.isEmpty(toDrugUserEmail)){
 					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
@@ -660,19 +661,56 @@ public class CommonServiceImpl implements CommonService {
 					continue;
 				}
 
-				if (!RegularUtils.isMatcher(RegularUtils.MATCH_ELEVEN_NUM, telephone)) {
+				if (drugUserEmail.equalsIgnoreCase(toDrugUserEmail)){
 					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
-					doctorImportErrorDetail.setError("医生手机号：" + telephone + " 输入不合法！" );
+					doctorImportErrorDetail.setError("当前代表邮箱：" + drugUserEmail + " 和转给代表的邮箱：" + toDrugUserEmail + " 不能相同！" );
 					doctorImportErrorDetail.setRowNum(row);
 					detailList.add(doctorImportErrorDetail);
 					failNum ++;
 					continue;
 				}
 
-				Doctor doctor = doctorMapper.findTopByMobile(telephone);
+
+
+//				if (!RegularUtils.isMatcher(RegularUtils.MATCH_ELEVEN_NUM, telephone)) {
+//					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
+//					doctorImportErrorDetail.setError("医生手机号：" + telephone + " 输入不合法！" );
+//					doctorImportErrorDetail.setRowNum(row);
+//					detailList.add(doctorImportErrorDetail);
+//					failNum ++;
+//					continue;
+//				}
+//
+//				Doctor doctor = doctorMapper.findTopByMobile(telephone);
+//				if (doctor == null){
+//					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
+//					doctorImportErrorDetail.setError("医生手机号：" + telephone + " 对应医生不存在！" );
+//					doctorImportErrorDetail.setRowNum(row);
+//					detailList.add(doctorImportErrorDetail);
+//					failNum ++;
+//					continue;
+//				}
+
+
+				Long doctorId = 0L;
+				try {
+					doctorId = Long.valueOf(doctorIdStr);
+				}catch (Exception e){
+					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
+					doctorImportErrorDetail.setSheetName(sheetName);
+					doctorImportErrorDetail.setError("医生ID:" +  doctorIdStr + " 输入不合法！");
+					doctorImportErrorDetail.setRowNum(row);
+					detailList.add(doctorImportErrorDetail);
+					failNum ++;
+					continue;
+				}
+
+
+				Doctor doctor = doctorRepository.findFirstById(doctorId);
 				if (doctor == null){
 					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
-					doctorImportErrorDetail.setError("医生手机号：" + telephone + " 对应医生不存在！" );
+					doctorImportErrorDetail.setSheetName(sheetName);
+					doctorImportErrorDetail.setError("医生ID:" +  doctorIdStr + " 对应的医生不存在！");
 					doctorImportErrorDetail.setRowNum(row);
 					detailList.add(doctorImportErrorDetail);
 					failNum ++;
@@ -680,7 +718,7 @@ public class CommonServiceImpl implements CommonService {
 				}
 
 
-				List<DrugUserDoctorTransferVo> collectList = drugUserDoctorTransferVos.stream().filter(dv -> (drugUserEmail.equals(dv.getDrugUserEmail()) && productName.equals(dv.getProductName()) && telephone.equals(dv.getTelephone()) && toDrugUserEmail.equals(dv.getToDrugUserEmail()))).collect(Collectors.toList());
+				List<DrugUserDoctorTransferVo> collectList = drugUserDoctorTransferVos.stream().filter(dv -> (drugUserEmail.equals(dv.getDrugUserEmail()) && productName.equals(dv.getProductName()) && doctorIdStr.equals(dv.getDoctorIdStr()) && toDrugUserEmail.equals(dv.getToDrugUserEmail()))).collect(Collectors.toList());
 				if (CollectionsUtil.isNotEmptyList(collectList) && collectList.size() > 1){
 					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
 					doctorImportErrorDetail.setError("数据重复！" );
