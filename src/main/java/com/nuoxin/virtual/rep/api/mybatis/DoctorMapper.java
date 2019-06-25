@@ -322,4 +322,18 @@ public interface DoctorMapper{
      */
     void saveTelephoneList(@Param(value = "doctorId") Long doctorId,@Param(value = "telephoneList") List<String> telephoneList);
 
+
+    /**
+     * 医生的所有职称，用于下拉列表
+     * @return
+     */
+    List<String> getDoctorTitleList();
+
+
+    /**
+     * 医生的
+     * @return
+     */
+    List<String> getDoctorPositionList();
+
 }

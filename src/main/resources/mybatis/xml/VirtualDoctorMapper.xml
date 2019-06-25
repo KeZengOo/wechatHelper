@@ -32,6 +32,8 @@
 			hospital_name AS hospitalName,
 			sex AS gender,
 			positions AS title,
+			doctor_title doctorTitle,
+			doctor_position doctorPosition,
 			depart,
 			email,
 			m.wechat,
@@ -90,11 +92,11 @@
 	<insert id="saveVirtualDoctors"  keyProperty="id" useGeneratedKeys="true">
 		INSERT INTO doctor
 		 (name, sex, telephone, email, depart, 
-		  positions, hospital_name, hospital_id, provice, city, create_time)
+		  positions,doctor_title, doctor_position, hospital_name, hospital_id, provice, city, create_time)
 		VALUES 
 		<foreach collection ="list" item="item" separator =",">
         	(#{item.name}, #{item.gender}, #{item.mobile}, #{item.email}, #{item.depart}, 
-        	#{item.title}, #{item.hospital}, #{item.hospitalId}, #{item.province}, #{item.city}, NOW())
+        	#{item.title}, #{item.doctorTitle},#{item.doctorPosition}, #{item.hospital}, #{item.hospitalId}, #{item.province}, #{item.city}, NOW())
     	</foreach >
 	</insert>
 
@@ -102,10 +104,10 @@
 			parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorParams">
 		INSERT INTO doctor
 		(name, sex, telephone, email, depart,
-		positions, hospital_name, hospital_id, provice, city, create_time)
+		positions, doctor_title, doctor_position, hospital_name, hospital_id, provice, city, create_time)
 		VALUES
 		(#{name}, #{gender}, #{mobile}, #{email}, #{depart},
-		#{title}, #{hospital}, #{hospitalId}, #{province}, #{city}, NOW())
+		#{title}, #{doctorTitle},#{doctorPosition}, #{hospital}, #{hospitalId}, #{province}, #{city}, NOW())
 
 	</insert>
 
@@ -134,6 +136,14 @@
 
 			<if test="title !=null and title !=''">
 				positions = #{title},
+			</if>
+
+			<if test="doctorTitle !=null and doctorTitle !=''">
+			  	doctor_title=#{doctorTitle},
+			</if>
+
+			<if test="doctorPosition !=null and doctorPosition!=''">
+				doctor_position=#{doctorPosition},
 			</if>
 
 			<if test="hospital !=null and hospital !=''">

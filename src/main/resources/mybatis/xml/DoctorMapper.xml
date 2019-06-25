@@ -1780,6 +1780,8 @@
 		) AS sex,
 		d.depart,
 		d.positions,
+		d.doctor_title doctorTitle,
+		d.doctor_position doctorPosition,
 		d.hospital_id hospitalId,
 		d.hospital_name hospitalName,
 		h.province,
@@ -2461,6 +2463,8 @@
 		) AS sex,
 		d.depart,
 		d.positions,
+		d.doctor_title doctorTitle,
+		d.doctor_position doctorPosition,
 		d.hospital_id hospitalId,
 		d.hospital_name hospitalName,
 		h.province,
@@ -2914,5 +2918,14 @@
 
 	</insert>
 
+	<!-- 查询医生的职称 -->
+	<select id="getDoctorTitleList" resultType="java.lang.String">
+		SELECT rsrc_name FROM resources WHERE rsrc_type='type_user_title'
+	</select>
+
+	<!-- 查询医生的职务 -->
+	<select id="getDoctorPositionList" resultType="java.lang.String">
+		SELECT rsrc_name FROM resources WHERE rsrc_type='type_user_position'
+	</select>
 
 </mapper>

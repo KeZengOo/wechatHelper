@@ -44,8 +44,20 @@ public class Doctor extends IdEntity {
     @Transient
     private List<String> telephoneList = new ArrayList<>();
 
+    /**
+     * 废弃使用新的
+     */
+    @Deprecated
     @Column(name = "positions")
     private String doctorLevel;
+
+    @Column(name = "doctor_title")
+    private String doctorTitle;
+
+    @Column(name = "doctor_position")
+    private String doctorPosition;
+
+
     @Column(name = "create_time")
     private Date createTime;
     @Column(name = "status")
@@ -191,4 +203,19 @@ public class Doctor extends IdEntity {
         this.telephoneList = telephoneList;
     }
 
+    public String getDoctorTitle() {
+        return doctorTitle;
+    }
+
+    public void setDoctorTitle(String doctorTitle) {
+        this.doctorTitle = doctorTitle;
+    }
+
+    public String getDoctorPosition() {
+        return doctorPosition;
+    }
+
+    public void setDoctorPosition(String doctorPosition) {
+        this.doctorPosition = doctorPosition;
+    }
 }

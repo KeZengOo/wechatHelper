@@ -19,8 +19,17 @@ public class VirtualDoctorDO {
 	private Integer gender;
 	@ApiModelProperty(value = "主手机号")
 	private List<String> mobiles = new ArrayList<>();
-	@ApiModelProperty(value = "头衔")
+
+	@Deprecated
+	@ApiModelProperty(value = "头衔,字段废弃，使用新的")
 	private String title;
+
+	@ApiModelProperty(value = "医生职称")
+	private String doctorTitle;
+
+	@ApiModelProperty(value = "医生职务")
+	private String doctorPosition;
+
 	@ApiModelProperty(value = "科室")
 	private String depart;
 	@ApiModelProperty(value = "电子邮件")

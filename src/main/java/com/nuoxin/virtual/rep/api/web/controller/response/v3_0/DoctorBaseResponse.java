@@ -27,8 +27,16 @@ public class DoctorBaseResponse implements Serializable {
     @ApiModelProperty(value = "性别")
     private String sex;
 
-    @ApiModelProperty(value = "职称")
+    @Deprecated
+    @ApiModelProperty(value = "职称。废弃这个字段，使用新的")
     private String positions;
+
+    @ApiModelProperty(value = "新的医生职称")
+    private String doctorTitle;
+
+    @ApiModelProperty(value = "新的医生职务")
+    private String doctorPosition;
+
 
     @ApiModelProperty(value = "医生联系方式")
     private List<String> telephoneList = new ArrayList<>();

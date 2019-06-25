@@ -849,19 +849,23 @@ public class CommonServiceImpl implements CommonService {
 
 			for (int i = 0; i < doctorVos.size(); i++) {
 				DoctorVo doctorVo = doctorVos.get(i);
-				String province = doctorVo.getProvince();
-				String city = doctorVo.getCity();
+//				String province = doctorVo.getProvince();
+//				String city = doctorVo.getCity();
 				String hospitalName = doctorVo.getHospitalName();
-				String hospitalLevel = doctorVo.getHospitalLevel();
-				if (StringUtil.isEmpty(hospitalLevel)){
-					hospitalLevel = "0";
-				}
-				String drugHospitalId = doctorVo.getDrugHospitalId();
+//				String hospitalLevel = doctorVo.getHospitalLevel();
+//				if (StringUtil.isEmpty(hospitalLevel)){
+//					hospitalLevel = "0";
+//				}
+//				String drugHospitalId = doctorVo.getDrugHospitalId();
 				String depart = doctorVo.getDepart();
-				String address = doctorVo.getAddress();
+//				String address = doctorVo.getAddress();
 				String doctorName = doctorVo.getDoctorName();
 				String sex = doctorVo.getSex();
-				String positions = doctorVo.getPositions();
+//				String positions = doctorVo.getPositions();
+
+				String doctorTitle = doctorVo.getDoctorTitle();
+				String doctorPosition = doctorVo.getDoctorPosition();
+
 				String telephone = doctorVo.getTelephone();
 				List<String> telephoneList = new ArrayList<>();
 				int row = i + 2;
@@ -913,16 +917,16 @@ public class CommonServiceImpl implements CommonService {
 				}
 
 
-				if (StringUtil.isNotEmpty(hospitalLevel) && (!"0".equals(hospitalLevel))
-						&& (HospitalLevelUtil.getLevelNameByLevelCode(hospitalLevel).equals("未知"))){
-					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
-					doctorImportErrorDetail.setSheetName(productName);
-					doctorImportErrorDetail.setError("医院级别:" + hospitalLevel +"输入不合法！");
-					doctorImportErrorDetail.setRowNum(row);
-					detailList.add(doctorImportErrorDetail);
-					failNum ++;
-					continue;
-				}
+//				if (StringUtil.isNotEmpty(hospitalLevel) && (!"0".equals(hospitalLevel))
+//						&& (HospitalLevelUtil.getLevelNameByLevelCode(hospitalLevel).equals("未知"))){
+//					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
+//					doctorImportErrorDetail.setSheetName(productName);
+//					doctorImportErrorDetail.setError("医院级别:" + hospitalLevel +"输入不合法！");
+//					doctorImportErrorDetail.setRowNum(row);
+//					detailList.add(doctorImportErrorDetail);
+//					failNum ++;
+//					continue;
+//				}
 
 
 				if (StringUtil.isEmpty(doctorName)){
@@ -1142,17 +1146,34 @@ public class CommonServiceImpl implements CommonService {
 
 				HospitalProvinceBean hospitalProvinceBean = new HospitalProvinceBean();
 				hospitalProvinceBean.setName(hospitalName);
-				hospitalProvinceBean.setProvince(province);
-				hospitalProvinceBean.setCity(city);
-				hospitalProvinceBean.setLevel(Integer.valueOf(hospitalLevel));
+//				hospitalProvinceBean.setProvince(province);
+//				hospitalProvinceBean.setCity(city);
+//				hospitalProvinceBean.setLevel(Integer.valueOf(hospitalLevel));
 				Long hospitalId = this.getHospitalId(hospitalProvinceBean);
 				doctor.setMobile(telephoneList.get(0));
 				doctor.setTelephoneList(telephoneList);
-				doctor.setSex(Integer.valueOf(sex));
+
+				if (StringUtil.isNotEmpty(sex)){
+					doctor.setSex(Integer.valueOf(sex));
+				}
 				doctor.setHospitalId(hospitalId);
 				doctor.setHospitalName(hospitalName);
-				doctor.setDepartment(depart);
-				doctor.setDoctorLevel(positions);
+				if (StringUtil.isNotEmpty(depart)){
+					doctor.setDepartment(depart);
+				}
+
+//				doctor.setDoctorLevel(positions);
+
+				if (StringUtil.isNotEmpty(doctorTitle)){
+					doctor.setDoctorTitle(doctorTitle);
+				}
+
+				if (StringUtil.isNotEmpty(doctorPosition)){
+					doctor.setDoctorPosition(doctorPosition);
+				}
+
+
+
 				doctor.setName(doctorName);
 				doctor.setStatus(1);
 
@@ -1242,21 +1263,25 @@ public class CommonServiceImpl implements CommonService {
 
 			for (int i = 0; i < doctorVos.size(); i++) {
 				DoctorVo doctorVo = doctorVos.get(i);
-				String province = doctorVo.getProvince();
-				String city = doctorVo.getCity();
+//				String province = doctorVo.getProvince();
+//				String city = doctorVo.getCity();
 				String hospitalName = doctorVo.getHospitalName();
-				String hospitalLevel = doctorVo.getHospitalLevel();
+//				String hospitalLevel = doctorVo.getHospitalLevel();
 
-				if (StringUtil.isEmpty(hospitalLevel)){
-					hospitalLevel = "0";
-				}
+//				if (StringUtil.isEmpty(hospitalLevel)){
+//					hospitalLevel = "0";
+//				}
 
-				String drugHospitalId = doctorVo.getDrugHospitalId();
+//				String drugHospitalId = doctorVo.getDrugHospitalId();
 				String depart = doctorVo.getDepart();
-				String address = doctorVo.getAddress();
+//				String address = doctorVo.getAddress();
 				String doctorName = doctorVo.getDoctorName();
 				String sex = doctorVo.getSex();
-				String positions = doctorVo.getPositions();
+//				String positions = doctorVo.getPositions();
+
+				String doctorTitle = doctorVo.getDoctorTitle();
+				String doctorPosition = doctorVo.getDoctorPosition();
+
 				String telephone = doctorVo.getTelephone();
 				List<String> telephoneList = new ArrayList<>();
 				int row = i + 2;
@@ -1265,23 +1290,23 @@ public class CommonServiceImpl implements CommonService {
 				}
 
 				String drugUserEmail = doctorVo.getDrugUserEmail();
-				if (StringUtil.isEmpty(province)){
-					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
-					doctorImportErrorDetail.setError("医院所在省为空！");
-					doctorImportErrorDetail.setRowNum(row);
-					detailList.add(doctorImportErrorDetail);
-					failNum ++;
-					continue;
-				}
-
-				if (StringUtil.isEmpty(city)){
-					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
-					doctorImportErrorDetail.setError("医院所在市为空！");
-					doctorImportErrorDetail.setRowNum(row);
-					detailList.add(doctorImportErrorDetail);
-					failNum ++;
-					continue;
-				}
+//				if (StringUtil.isEmpty(province)){
+//					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
+//					doctorImportErrorDetail.setError("医院所在省为空！");
+//					doctorImportErrorDetail.setRowNum(row);
+//					detailList.add(doctorImportErrorDetail);
+//					failNum ++;
+//					continue;
+//				}
+//
+//				if (StringUtil.isEmpty(city)){
+//					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
+//					doctorImportErrorDetail.setError("医院所在市为空！");
+//					doctorImportErrorDetail.setRowNum(row);
+//					detailList.add(doctorImportErrorDetail);
+//					failNum ++;
+//					continue;
+//				}
 
 				if (StringUtil.isEmpty(hospitalName)){
 					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
@@ -1307,15 +1332,15 @@ public class CommonServiceImpl implements CommonService {
 				}
 
 
-				if (StringUtil.isNotEmpty(hospitalLevel) && (!"0".equals(hospitalLevel))
-						&& (HospitalLevelUtil.getLevelNameByLevelCode(hospitalLevel).equals("未知"))){
-					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
-					doctorImportErrorDetail.setError("医院级别:" + hospitalLevel +"输入不合法！");
-					doctorImportErrorDetail.setRowNum(row);
-					detailList.add(doctorImportErrorDetail);
-					failNum ++;
-					continue;
-				}
+//				if (StringUtil.isNotEmpty(hospitalLevel) && (!"0".equals(hospitalLevel))
+//						&& (HospitalLevelUtil.getLevelNameByLevelCode(hospitalLevel).equals("未知"))){
+//					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
+//					doctorImportErrorDetail.setError("医院级别:" + hospitalLevel +"输入不合法！");
+//					doctorImportErrorDetail.setRowNum(row);
+//					detailList.add(doctorImportErrorDetail);
+//					failNum ++;
+//					continue;
+//				}
 
 
 				if (StringUtil.isEmpty(doctorName)){
@@ -1516,9 +1541,9 @@ public class CommonServiceImpl implements CommonService {
 
 				HospitalProvinceBean hospitalProvinceBean = new HospitalProvinceBean();
 				hospitalProvinceBean.setName(hospitalName);
-				hospitalProvinceBean.setProvince(province);
-				hospitalProvinceBean.setCity(city);
-				hospitalProvinceBean.setLevel(Integer.valueOf(hospitalLevel));
+//				hospitalProvinceBean.setProvince(province);
+//				hospitalProvinceBean.setCity(city);
+//				hospitalProvinceBean.setLevel(Integer.valueOf(hospitalLevel));
 				Long hospitalId = this.getHospitalId(hospitalProvinceBean);
 				doctor.setMobile(telephoneList.get(0));
 				doctor.setTelephoneList(telephoneList);
@@ -1526,7 +1551,7 @@ public class CommonServiceImpl implements CommonService {
 				doctor.setHospitalId(hospitalId);
 				doctor.setHospitalName(hospitalName);
 				doctor.setDepartment(depart);
-				doctor.setDoctorLevel(positions);
+//				doctor.setDoctorLevel(positions);
 				doctor.setName(doctorName);
 				doctor.setStatus(1);
 

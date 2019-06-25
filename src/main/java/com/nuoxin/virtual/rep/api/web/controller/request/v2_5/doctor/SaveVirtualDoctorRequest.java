@@ -40,8 +40,18 @@ public class SaveVirtualDoctorRequest{
 	private String address;
 	@ApiModelProperty(value = "科室")
 	private String depart;
-	@ApiModelProperty(value = "职称")
+
+
+	@Deprecated
+	@ApiModelProperty(value = "职称, 废弃，使用新的字段")
 	private String title;
+
+	@ApiModelProperty(value = "新的医生职称")
+	private String doctorTitle;
+
+	@ApiModelProperty(value = "新的医生职务")
+	private String doctorPosition;
+
 
 	@NotNull(message = "hospital is null")
 	@ApiModelProperty(value = "医院")

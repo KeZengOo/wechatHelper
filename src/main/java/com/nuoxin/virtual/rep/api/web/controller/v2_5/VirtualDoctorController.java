@@ -10,6 +10,7 @@ import com.nuoxin.virtual.rep.api.common.enums.ErrorEnum;
 import com.nuoxin.virtual.rep.api.common.exception.BusinessException;
 import com.nuoxin.virtual.rep.api.enums.OnOffLineEnum;
 import com.nuoxin.virtual.rep.api.enums.RoleTypeEnum;
+import com.nuoxin.virtual.rep.api.mybatis.DoctorMapper;
 import com.nuoxin.virtual.rep.api.mybatis.VirtualDoctorMapper;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.DoctorSingleAddEchoRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.doctor.PrescriptionRequestBean;
@@ -45,6 +46,10 @@ public class VirtualDoctorController extends NewBaseController {
 
 	@Resource
 	private VirtualDoctorMapper virtualDoctorMapper;
+
+
+	@Resource
+	private DoctorMapper doctorMapper;
 
 	@SuppressWarnings("unchecked")
 	@ApiOperation(value = "医生的互动数据用于推荐")
@@ -197,6 +202,27 @@ public class VirtualDoctorController extends NewBaseController {
 		DefaultResponseBean<List<DoctorDetailsResponseBean>> responseBean = new DefaultResponseBean<>();
 		responseBean.setData(doctorList);
 
+		return responseBean;
+	}
+
+
+	@ApiOperation(value = "新版医生职称列表")
+	@RequestMapping(value = "/title/list", method = { RequestMethod.GET })
+	public DefaultResponseBean<List<String>> getDoctorTitleList() {
+		List<String> doctorTitleList = doctorMapper.getDoctorTitleList();
+		DefaultResponseBean<List<String>> responseBean = new DefaultResponseBean<>();
+		responseBean.setData(doctorTitleList);
+		return responseBean;
+	}
+
+
+
+	@ApiOperation(value = "新版医生职务列表")
+	@RequestMapping(value = "/position/list", method = { RequestMethod.GET })
+	public DefaultResponseBean<List<String>> getDoctorPositionList() {
+		List<String> doctorPositionList = doctorMapper.getDoctorPositionList();
+		DefaultResponseBean<List<String>> responseBean = new DefaultResponseBean<>();
+		responseBean.setData(doctorPositionList);
 		return responseBean;
 	}
 
