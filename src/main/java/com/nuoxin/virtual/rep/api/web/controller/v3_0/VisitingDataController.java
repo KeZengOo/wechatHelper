@@ -5,9 +5,6 @@ import com.nuoxin.virtual.rep.api.common.bean.PageResponseBean;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.enums.RoleTypeEnum;
 import com.nuoxin.virtual.rep.api.service.v3_0.VisitingDataService;
-import com.nuoxin.virtual.rep.api.utils.StringUtil;
-import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.CommonRequest;
-import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.DrugUserDoctorCallRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.VisitDataRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.VisitDataResponse;
 import com.nuoxin.virtual.rep.api.web.controller.v2_5.NewBaseController;
@@ -21,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;

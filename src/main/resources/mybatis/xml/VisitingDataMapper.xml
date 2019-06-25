@@ -210,20 +210,6 @@
 		GROUP BY a.drug_user_id
 	</select>
 
-	<!-- 招募医生数 -->
-	<!--<select id="getRecruitHcpCount" parameterType="com.nuoxin.virtual.rep.api.entity.v3_0.request.VisitDataParam"
-			resultType="com.nuoxin.virtual.rep.api.entity.v3_0.VisitDataPart">
-		SELECT b.drug_user_id userId, COUNT(DISTINCT a.doctor_id) total  FROM `product_doctor_quate` a
-		JOIN drug_user_doctor b on a.doctor_id = b.doctor_id and a.product_id = b.prod_id
-		WHERE a.is_available = 1 AND a.is_recruit = 1 AND a.product_id = #{key.proId}
-		AND a.create_time BETWEEN #{key.startTime} AND #{key.endTime}
-		AND b.drug_user_id IN
-		<foreach collection="key.list" item="id" open="(" separator="," close=")">
-			#{id}
-		</foreach>
-		GROUP BY b.drug_user_id
-	</select>-->
-
 	<!-- 覆盖医生 -->
 	<select id="getCoverHcpCount" parameterType="com.nuoxin.virtual.rep.api.entity.v3_0.request.VisitDataParam"
 			resultType="com.nuoxin.virtual.rep.api.entity.v3_0.VisitDataPart">

@@ -73,7 +73,6 @@ public class CoverageReportServiceImpl implements CoverageReportService {
             Map<String, Set<Long>> newRecruitHcp = this.buildMap(recruitListHcp, yearAndMonth, startTime);
             // 覆盖医生部分
             List<CoverageReportPart> coverageList = coverageReportMapper.findCoverageList(proId, startTime, endTime);
-//            if(!CollectionUtils.isEmpty(coverageList)) {
                 // 每个时间段的覆盖医院数量
                 Map<String, Set<Long>> coverageListHci = coverageList.stream().collect(Collectors.groupingBy(k -> k.getTimeStr(),
                         Collectors.mapping(k -> k.getHciId(), Collectors.toSet())));
@@ -118,16 +117,6 @@ public class CoverageReportServiceImpl implements CoverageReportService {
                     hciSet.clear();
                     hcpSet.clear();
                 });
-//            } else {
-//                yearAndMonth.forEach(k -> {
-//                    recruitHciList.add(0);
-//                    coverageHciList.add(0);
-//                    lineHciList.add(0.0d);
-//                    recruitHcpList.add(0);
-//                    coverageHcpList.add(0);
-//                    lineHcpList.add(0.0);
-//                });
-//            }
         } else {
             yearAndMonth.forEach(k -> {
                 recruitHciList.add(0);
