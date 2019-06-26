@@ -46,8 +46,19 @@ public class DoctorAddResponseBean implements Serializable {
     @ApiModelProperty(value = "医生科室")
     private String depart;
 
-    @ApiModelProperty(value = "医生职称")
+    @Deprecated
+    @ApiModelProperty(value = "医生职称, 废弃使用新的")
     private String position;
+
+
+    @ApiModelProperty(value = "新的医生职称")
+    private String doctorTitle;
+
+
+    @ApiModelProperty(value = "新的医生职务")
+    private String doctorPosition;
+
+
 
     @ApiModelProperty(value = "医生基本信息动态字段填入的值")
     private List<DoctorBasicDynamicFieldValueResponseBean> basicDynamicList = new ArrayList<>();

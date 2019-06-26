@@ -827,6 +827,8 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
         param.setEmail(request.getEmail());
         param.setDepart(request.getDepart());
         param.setTitle(request.getTitle());
+        param.setDoctorTitle(request.getDoctorTitle());
+        param.setDoctorPosition(request.getDoctorPosition());
 
         param.setProvince(request.getProvince());
         param.setCity(request.getCity());

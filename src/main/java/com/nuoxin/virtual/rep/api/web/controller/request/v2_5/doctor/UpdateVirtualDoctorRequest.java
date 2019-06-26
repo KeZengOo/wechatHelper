@@ -40,8 +40,17 @@ public class UpdateVirtualDoctorRequest {
 	private String address;
 	@ApiModelProperty(value = "科室")
 	private String depart;
-	@ApiModelProperty(value = "职称")
+
+	@Deprecated
+	@ApiModelProperty(value = "职称,废弃，使用新的")
 	private String title;
+
+	@ApiModelProperty(value = "医生职称")
+	private String doctorTitle;
+
+	@ApiModelProperty(value = "医生职务")
+	private String doctorPosition;
+
 
 	@ApiModelProperty(value = "医院")
 	private String hospital;

@@ -1460,7 +1460,8 @@
 
 	<select id="selectDoctorByMobiles" resultType="com.nuoxin.virtual.rep.api.entity.Doctor">
 		select t.id,t.email,t.name,t.hospital_id hospitalId,t.hospital_name hospitalName,
-		t.provice,t.city,t.depart department,t.telephone mobile,t.positions doctorLevel,
+		t.provice,t.city,t.depart department,t.telephone mobile,t.positions doctorLevel, t.doctor_title doctorTitle,
+		t.doctor_position doctorPosition,
 		t.create_time createTime,t.status,t.master_data_id masterDataId
 		FROM doctor t
 		LEFT JOIN doctor_telephone dt
@@ -1717,7 +1718,9 @@
 				h.province,
 				h.city,
 				d.depart department,
-				d.positions
+				d.positions,
+				d.doctor_title doctorTitle,
+				d.doctor_position doctorPosition
 			FROM
 				doctor d
 			LEFT JOIN hospital h ON d.hospital_id = h.id

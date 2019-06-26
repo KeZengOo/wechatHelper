@@ -44,8 +44,16 @@ public class DoctorDetailsResponseBean implements Serializable {
     @ApiModelProperty(value = "科室")
     private String department;
 
-    @ApiModelProperty(value = "医生职称")
+    @Deprecated
+    @ApiModelProperty(value = "医生职称, 字段废弃，使用新的字段")
     private String positions;
+
+    @ApiModelProperty(value = "新的医生职称")
+    private String doctorTitle;
+
+    @ApiModelProperty(value = "新的医生职务")
+    private String doctorPosition;
+
 
     @ApiModelProperty(value = "是否添加微信，1是添加，0是未添加")
     private Integer addWechat;
