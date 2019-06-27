@@ -25,10 +25,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.DateFormat;
-import java.text.NumberFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.math.BigDecimal;
+import java.text.*;
 import java.util.*;
 
 /**
@@ -392,7 +390,6 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
         }
 
         List<MeetingParticipantsExcel> meetingParticipantsTemps = new ArrayList<MeetingParticipantsExcel>();
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         for (MeetingParticipantsExcel h : meetingParticipantsExcels) {
             MeetingParticipantsExcel meetingParticipantsExcel = new MeetingParticipantsExcel();
@@ -400,10 +397,14 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
                 try {
                     if(null != h.getDoctorTel() && null != h.getAttendStartTime() && null != h.getAttendEndTime())
                     {
+                        //要修改的值，需要string类型
+                        BigDecimal bd = new BigDecimal(h.getDoctorTel());
+                        String phoneNumber=bd.setScale(0,BigDecimal.ROUND_HALF_UP).toPlainString();
+
                         //根据会议ID获取会议项目ID
 //                        MeetingParticipantsParams meetingParticipants = meetingRecordMapper.getMeetingItemIdByMeetingId(meetingId);
                         //根据医生电话号获取医生信息
-                        MeetingParticipantsParams meetingParticipantsDoctorInfo = meetingRecordMapper.getDoctorInfoByDoctorTel(h.getDoctorTel());
+                        MeetingParticipantsParams meetingParticipantsDoctorInfo = meetingRecordMapper.getDoctorInfoByDoctorTel(phoneNumber);
                         if(null != meetingParticipantsDoctorInfo)
                         {
                             if(null != meetingParticipantsDoctorInfo.getDoctorId()){
@@ -434,12 +435,12 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
                                 meetingParticipantsExcel.setAttendSumTime(minutes+"");
                                 meetingParticipantsExcel.setType("1");
     //                            meetingParticipantsExcel.setItemId(meetingParticipants.getItemId().toString());
-                                meetingParticipantsExcel.setDoctorTel(h.getDoctorTel());
+                                meetingParticipantsExcel.setDoctorTel(phoneNumber);
                                 meetingParticipantsTemps.add(meetingParticipantsExcel);
                         }
                         else
                         {
-                            meetingParticipantsExcel.setDoctorName(h.getDoctorTel());
+                            meetingParticipantsExcel.setDoctorName(phoneNumber);
                             meetingParticipantsExcel.setMeetingId(meetingId);
                             meetingParticipantsExcel.setAttendStartTime(h.getAttendStartTime());
                             meetingParticipantsExcel.setAttendEndTime(h.getAttendEndTime());
@@ -453,7 +454,7 @@ public class MeetingRecordServiceImpl implements MeetingRecordService {
 
                             meetingParticipantsExcel.setAttendSumTime(minutes+"");
                             meetingParticipantsExcel.setType("1");
-                            meetingParticipantsExcel.setDoctorTel(h.getDoctorTel());
+                            meetingParticipantsExcel.setDoctorTel(phoneNumber);
                             meetingParticipantsTemps.add(meetingParticipantsExcel);
                         }
                     }
