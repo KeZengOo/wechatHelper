@@ -969,15 +969,20 @@
         FROM
         virtual_doctor_dynamic_field
         WHERE
-        classification IN (1,2,3,5) AND (
-        product_id IS NULL
-        OR product_id = 0
-        OR product_id IN
+        classification IN (1,5) OR (
+
+        classification IN (2, 3) AND
+
+        product_id IN
         <foreach collection="productIdList" item="productId" separator="," open="(" close=")">
             #{productId}
         </foreach>
         )
+
         ORDER BY classification
+
+
+
     </select>
 
     <!-- 得到医生填写的动态字段以及值 -->
@@ -995,8 +1000,20 @@
             <foreach collection="doctorIdList" item="doctorId" separator="," open="(" close=")">
                 #{doctorId}
             </foreach>
+
+            <!--
             AND v.classification IN ( 1, 2, 3, 5 )
             AND ( v.product_id = 0 OR v.product_id = #{productId} )
+            -->
+
+        AND (v.classification IN (1,5) OR (
+
+        v.classification IN (2, 3) AND
+
+        product_id = #{productId}
+        )
+        )
+
         GROUP BY
 	    v.id,
 	    v2.doctor_id
