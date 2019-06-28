@@ -963,8 +963,12 @@
             AND DATE_FORMAT( a.create_time, '%Y-%m' ) &lt;= #{endDate}
         </if>
         GROUP BY d.depart
-        ORDER BY d.depart
+        ORDER BY recruitDoctor
         DESC
+        <if test="limitFlag != null and limitFlag == 1">
+            LIMIT 10
+        </if>
+
     </select>
 
     <!-- 每个医生级别招募医生数据 -->

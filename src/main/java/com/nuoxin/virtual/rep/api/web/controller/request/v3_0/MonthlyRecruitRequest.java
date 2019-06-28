@@ -1,6 +1,7 @@
 package com.nuoxin.virtual.rep.api.web.controller.request.v3_0;
 
 import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
@@ -13,7 +14,8 @@ import lombok.Data;
 public class MonthlyRecruitRequest extends MonthlyCommonRequest{
     private static final long serialVersionUID = -4771140868736476024L;
 
-
+    @ApiModelProperty(value = "限制标识，1是有限制")
+    private Integer limitFlag;
 
 
 }
