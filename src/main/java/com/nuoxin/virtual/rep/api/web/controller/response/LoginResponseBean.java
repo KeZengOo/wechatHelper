@@ -1,6 +1,8 @@
 package com.nuoxin.virtual.rep.api.web.controller.response;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -19,10 +21,10 @@ public class LoginResponseBean implements Serializable {
     private String name;
     @ApiModelProperty(value = "邮箱")
     private String email;
-    @ApiModelProperty(value = "角色 101-普通虚拟代表，102-虚拟代表管理员, 103 项目管理员，104 招募，105 覆盖")
-    private Long roleId;
+    @ApiModelProperty(value = "角色 101-普通虚拟代表，102-虚拟代表管理员, 103 项目管理员，104 招募，105 电话覆盖, 106 微信覆盖")
+    private List<Long> roleIdList = new ArrayList<>();
 
-    @ApiModelProperty(value = "给前端前端展示用")
+    @ApiModelProperty(value = "角色名称给前端展示用")
     private String roleName;
 
     @ApiModelProperty(value = "虚拟代表ID")

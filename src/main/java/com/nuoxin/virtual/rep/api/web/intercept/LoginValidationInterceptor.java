@@ -79,7 +79,7 @@ public class LoginValidationInterceptor extends HandlerInterceptorAdapter {
                 DrugUser drugUser = drugUserRepository.findFirstByEmail(email);
                 if (drugUser != null){
 					drugUser.setLeaderPath(drugUser.getLeaderPath() + "%");
-					drugUser.setRoleId(roleUserService.checkVirtualRole(drugUser.getId()));
+					drugUser.setRoleIdList(roleUserService.checkVirtualRole(drugUser.getId()));
 					sercurityService.saveSession(request, response, drugUser);
                     request.setAttribute(SessionConfig.DEFAULT_REQUEST_DRUG_USER, drugUser);
                     return true;

@@ -396,12 +396,25 @@
             UNION
             SELECT doctor_id FROM doctor_telephone WHERE telephone = #{telephone} )
             AND dud.prod_id = #{productId}
-            AND ru.role_id =#{roleId}
+            AND ru.role_id IN
+            <foreach collection="roleIdList" item="roleId" open="(" close=")" separator=",">
+                #{roleId}
+            </foreach>
     </select>
 
 
     <select id="getRoleNameById" resultType="java.lang.String">
         SELECT role_name FROM role WHERE id=#{roleId}
+    </select>
+
+
+    <!-- 根据代表ID查询角色名称 -->
+    <select id="getRoleNameByUserId" resultType="java.lang.String">
+        SELECT GROUP_CONCAT(DISTINCT r.role_name) FROM role r
+        INNER JOIN role_user ru
+        ON r.id=ru.role_id
+        WHERE ru.user_id = #{drugUserId}
+        AND r.id > 100
     </select>
 
     

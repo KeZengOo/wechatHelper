@@ -237,7 +237,8 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 		// TODO @田存 角色修改
 		if (RoleTypeEnum.SALE.getType().equals(roleId)
 				|| RoleTypeEnum.RECRUIT_SALE.getType().equals(roleId)
-				|| RoleTypeEnum.COVER_SALE.getType().equals(roleId)){
+				|| RoleTypeEnum.MOBILE_COVER_SALE.getType().equals(roleId)
+				|| RoleTypeEnum.WECHAT_COVER_SALE.getType().equals(roleId)	){
 			List<Long> idList = new ArrayList<>(1);
 			idList.add(drugUserId);
 			List<ProductResponseBean> productList = productLineMapper.getListByDrugUserId(idList);

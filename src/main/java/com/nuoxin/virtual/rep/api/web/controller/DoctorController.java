@@ -314,7 +314,8 @@ public class DoctorController extends BaseController {
         Long roleId = user.getRoleId();
         if (RoleTypeEnum.SALE.getType().equals(roleId)
                 || RoleTypeEnum.RECRUIT_SALE.getType().equals(roleId)
-                || RoleTypeEnum.COVER_SALE.getType().equals(roleId)){
+                || RoleTypeEnum.MOBILE_COVER_SALE.getType().equals(roleId)
+                || RoleTypeEnum.WECHAT_COVER_SALE.getType().equals(roleId)     ){
             DrugUserResponseBean drugUserResponseBean = new DrugUserResponseBean();
             drugUserResponseBean.setId(user.getId());
             drugUserResponseBean.setName(user.getName());

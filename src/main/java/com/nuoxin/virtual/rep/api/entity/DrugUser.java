@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by fenggang on 9/11/17.
@@ -50,6 +51,9 @@ public class DrugUser extends IdEntity {
 
     @Transient
     private String roleName;
+
+    @Transient
+    private List<Long> roleIdList;
 
     public String getName() {
         return name;
@@ -170,5 +174,14 @@ public class DrugUser extends IdEntity {
 
     public void setRoleName(String roleName) {
         this.roleName = roleName;
+    }
+
+
+    public List<Long> getRoleIdList() {
+        return roleIdList;
+    }
+
+    public void setRoleIdList(List<Long> roleIdList) {
+        this.roleIdList = roleIdList;
     }
 }

@@ -122,7 +122,8 @@ public class VisitingDataController extends NewBaseController implements Seriali
     private Long fillDrugUserIdByRoleId(DrugUser drugUser){
         Long userId = 0L;
         Long roleId = drugUser.getRoleId();
-        if (RoleTypeEnum.SALE.getType().equals(roleId) || RoleTypeEnum.RECRUIT_SALE.getType().equals(roleId) || RoleTypeEnum.COVER_SALE.getType().equals(roleId)){
+        if (RoleTypeEnum.SALE.getType().equals(roleId) || RoleTypeEnum.RECRUIT_SALE.getType().equals(roleId)
+                || RoleTypeEnum.MOBILE_COVER_SALE.getType().equals(roleId) || RoleTypeEnum.WECHAT_COVER_SALE.getType().equals(roleId)){
             userId = drugUser.getId();
         }
         return userId;

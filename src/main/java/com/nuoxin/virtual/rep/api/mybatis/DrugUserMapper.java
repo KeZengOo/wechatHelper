@@ -171,11 +171,12 @@ public interface DrugUserMapper extends MyMapper<DrugUser> {
      * 得到代表角色种类，去重
      * @param telephone
      * @param productId
+     * @param roleIdList
      * @return
      */
     List<DrugUser> getDrugUserList(@Param(value = "telephone") String telephone,
                                                     @Param(value = "productId") Long productId,
-                                                    @Param(value = "roleId") Long roleId);
+                                                    @Param(value = "roleIdList") List<Long> roleIdList);
 
     /**
      * 根据角色ID查询名称
@@ -183,5 +184,12 @@ public interface DrugUserMapper extends MyMapper<DrugUser> {
      * @return
      */
     String getRoleNameById(@Param(value = "roleId") Long roleId);
+
+    /**
+     * 根据代表ID查询角色名称
+     * @param drugUserId
+     * @return
+     */
+    String getRoleNameByUserId(@Param(value = "drugUserId") Long drugUserId);
 
 }
