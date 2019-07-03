@@ -311,11 +311,11 @@ public class DoctorController extends BaseController {
             return responseBean;
         }
 
-        Long roleId = user.getRoleId();
-        if (RoleTypeEnum.SALE.getType().equals(roleId)
-                || RoleTypeEnum.RECRUIT_SALE.getType().equals(roleId)
-                || RoleTypeEnum.MOBILE_COVER_SALE.getType().equals(roleId)
-                || RoleTypeEnum.WECHAT_COVER_SALE.getType().equals(roleId)     ){
+        List<Long> roleIdList = user.getRoleIdList();
+        if (roleIdList.contains(RoleTypeEnum.SALE.getType())
+                || roleIdList.contains(RoleTypeEnum.RECRUIT_SALE.getType())
+                || roleIdList.contains(RoleTypeEnum.MOBILE_COVER_SALE.getType())
+                || roleIdList.contains(RoleTypeEnum.WECHAT_COVER_SALE.getType())){
             DrugUserResponseBean drugUserResponseBean = new DrugUserResponseBean();
             drugUserResponseBean.setId(user.getId());
             drugUserResponseBean.setName(user.getName());

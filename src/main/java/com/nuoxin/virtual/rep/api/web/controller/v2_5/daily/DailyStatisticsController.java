@@ -132,7 +132,8 @@ public class DailyStatisticsController  extends NewBaseController {
             return super.getLoginErrorResponse();
         }
 
-        if (!user.getRoleId().equals(RoleTypeEnum.MANAGER.getType())){
+        List<Long> roleIdList = user.getRoleIdList();
+        if (!roleIdList.contains(RoleTypeEnum.MANAGER.getType())){
             throw new BusinessException(ErrorEnum.ERROR, "只有管理员才能修改!");
         }
 
@@ -156,7 +157,8 @@ public class DailyStatisticsController  extends NewBaseController {
             return super.getLoginErrorResponse();
         }
 
-        if (!user.getRoleId().equals(RoleTypeEnum.MANAGER.getType())){
+        List<Long> roleIdList = user.getRoleIdList();
+        if (!roleIdList.contains(RoleTypeEnum.MANAGER.getType())){
             throw new BusinessException(ErrorEnum.ERROR, "只有管理员才能修改!");
         }
 

@@ -76,20 +76,20 @@ public abstract class BaseCallBackImpl implements CallBackService{
 		logger.info("unpressedOssCallUrlOut={}, 未压缩的 processCallBack方法中获取的地址："+ unpressedOssCallUrlOut);
 
 		//异步（分割录音文件并上传阿里云，返回左右声道的阿里云地址 并且 根据左右声道的阿里云地址进行语音识别，进行入库）
-		new Thread(new Runnable(){
-			@Override
-			public void run() {
-				logger.info("runCallOssUrl={}, processCallBack方法中获取的地址："+ callOssUrl);
-				//分割录音文件并上传阿里云，返回左右声道的阿里云地址
-				Map<String,String> pathMap = splitSpeechAliyunUrlUpdate(callOssUrl);
-				logger.info("pathMap={}, 分割录音文件并上传阿里云，返回左右声道的阿里云地址", pathMap);
-				if(pathMap.size() > 0){
-					//根据左右声道的阿里云地址进行语音识别，进行入库
-					boolean result_is_save = saveSpeechRecognitionResultCallInfo(pathMap, sinToken);
-					logger.info("result_is_save={}, 根据左右声道的阿里云地址进行语音识别，进行入库是否成功！", result_is_save);
-				}
-			}
-		}).start();
+//		new Thread(new Runnable(){
+//			@Override
+//			public void run() {
+//				logger.info("runCallOssUrl={}, processCallBack方法中获取的地址："+ callOssUrl);
+//				//分割录音文件并上传阿里云，返回左右声道的阿里云地址
+//				Map<String,String> pathMap = splitSpeechAliyunUrlUpdate(callOssUrl);
+//				logger.info("pathMap={}, 分割录音文件并上传阿里云，返回左右声道的阿里云地址", pathMap);
+//				if(pathMap.size() > 0){
+//					//根据左右声道的阿里云地址进行语音识别，进行入库
+//					boolean result_is_save = saveSpeechRecognitionResultCallInfo(pathMap, sinToken);
+//					logger.info("result_is_save={}, 根据左右声道的阿里云地址进行语音识别，进行入库是否成功！", result_is_save);
+//				}
+//			}
+//		}).start();
 
 //		//分割录音文件并上传阿里云，返回左右声道的阿里云地址
 //		Map<String,String> pathMap = splitSpeechAliyunUrlUpdate(callOssUrl);

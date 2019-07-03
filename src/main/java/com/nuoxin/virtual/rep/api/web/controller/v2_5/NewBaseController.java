@@ -106,9 +106,9 @@ public class NewBaseController {
 	 * @return
 	 */
 	protected void fillDrugUserIdListByRoleId(DrugUser drugUser, CommonRequest bean){
-		Long roleId = drugUser.getRoleId();
-		if (RoleTypeEnum.SALE.getType().equals(roleId) || RoleTypeEnum.RECRUIT_SALE.getType().equals(roleId)
-				|| RoleTypeEnum.MOBILE_COVER_SALE.getType().equals(roleId) || RoleTypeEnum.WECHAT_COVER_SALE.getType().equals(roleId)){
+		List<Long> roleIdList = drugUser.getRoleIdList();
+		if (roleIdList.contains(RoleTypeEnum.SALE.getType()) || roleIdList.contains(RoleTypeEnum.RECRUIT_SALE.getType())
+				|| roleIdList.contains(RoleTypeEnum.MOBILE_COVER_SALE.getType()) || roleIdList.contains(RoleTypeEnum.WECHAT_COVER_SALE.getType())){
 			List<Long> drugUserIdList = new ArrayList<>();
 			drugUserIdList.add(drugUser.getId());
 			bean.setDrugUserIdList(drugUserIdList);

@@ -79,9 +79,9 @@ public class StatisticalServiceImpl implements StatisticalService {
 
     private void fillDrugUserIdList(StatisticsParams statisticsParams) {
         Long drugUserId = statisticsParams.getDrugUserId();
-        String roleId = drugUserMapper.getRoleIdByDrugUserId(drugUserId);
-        if ((StringUtil.isNotEmpty(roleId) && roleId.contains(RoleTypeEnum.MANAGER.getType() + ""))
-                || (StringUtil.isNotEmpty(roleId) && roleId.contains(RoleTypeEnum.PROJECT_MANAGER.getType() + ""))){
+        List<Long> roleIdList = drugUserMapper.getRoleIdByDrugUserId(drugUserId);
+        if ((CollectionsUtil.isNotEmptyList(roleIdList) && roleIdList.contains(RoleTypeEnum.MANAGER.getType() + ""))
+                || (CollectionsUtil.isNotEmptyList(roleIdList) && roleIdList.contains(RoleTypeEnum.PROJECT_MANAGER.getType() + ""))){
             String leaderPath = drugUserMapper.getLeaderPathById(drugUserId);
             List<Long> drugUserIdList = drugUserMapper.getSubordinateIdsByLeaderPath(leaderPath);
             statisticsParams.setDrugUserIds(drugUserIdList);
@@ -239,9 +239,9 @@ public class StatisticalServiceImpl implements StatisticalService {
             // 判断用户是不是管理员，如果是管理员就查询包含全部下级的，如果不是管理员就查询自己的
             Long drugUserId = s.getDrugUserId();
             statisticsParams.setDrugUserId(drugUserId);
-            String roleId = drugUserMapper.getRoleIdByDrugUserId(drugUserId);
-            if ((StringUtil.isNotEmpty(roleId) && roleId.contains(RoleTypeEnum.MANAGER.getType()+""))
-                    || (StringUtil.isNotEmpty(roleId) && roleId.contains(RoleTypeEnum.PROJECT_MANAGER.getType()+""))){
+            List<Long> roleIdList = drugUserMapper.getRoleIdByDrugUserId(drugUserId);
+            if ((CollectionsUtil.isNotEmptyList(roleIdList) && roleIdList.contains(RoleTypeEnum.MANAGER.getType()+""))
+                    || (CollectionsUtil.isNotEmptyList(roleIdList) && roleIdList.contains(RoleTypeEnum.PROJECT_MANAGER.getType()+""))){
                 String leaderPath = drugUserMapper.getLeaderPathById(drugUserId);
                 List<Long> drugUserIdList = drugUserMapper.getSubordinateIdsByLeaderPath(leaderPath);
                 if (CollectionsUtil.isNotEmptyList(drugUserIdList)){

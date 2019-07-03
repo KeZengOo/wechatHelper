@@ -132,7 +132,7 @@ public interface DrugUserMapper extends MyMapper<DrugUser> {
      * @param drugUserId
      * @return
      */
-	String getRoleIdByDrugUserId(@Param(value = "drugUserId") Long drugUserId);
+	List<Long> getRoleIdByDrugUserId(@Param(value = "drugUserId") Long drugUserId);
 
     /**
      * 得到多个代表名字
