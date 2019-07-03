@@ -116,6 +116,8 @@ public class VisitingDataController extends NewBaseController implements Seriali
 
     /**
      * 根据角色补充代表查询条件
+     * TODO @军辉，代表可以有多个角色，
+     * 使用 List<Long> roleIdList = drugUser.getRoleIdList()
      * @param drugUser
      * @return
      */

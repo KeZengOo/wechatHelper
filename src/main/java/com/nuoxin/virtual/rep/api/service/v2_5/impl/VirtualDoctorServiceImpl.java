@@ -256,10 +256,10 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public void updateVirtualDoctor(UpdateVirtualDoctorRequest request, DrugUser user) {
-        Long roleId = user.getRoleId();
-        this.checkUpdateVirtualDoctorParam(request, roleId);
+        List<Long> roleIdList = user.getRoleIdList();
+        this.checkUpdateVirtualDoctorParam(request);
         // TODO @田存 修改角色
-        if (RoleTypeEnum.MANAGER.getType().equals(roleId) || RoleTypeEnum.PROJECT_MANAGER.getType().equals(roleId)) {
+        if (roleIdList.contains(RoleTypeEnum.MANAGER.getType()) || roleIdList.contains(RoleTypeEnum.PROJECT_MANAGER.getType())) {
             Integer isAddWechat = request.getIsAddWechat();
             if (isAddWechat != null) {
                 throw new BusinessException(ErrorEnum.ERROR, "管理员不能修改是否添加微信字段！");
@@ -496,7 +496,7 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
      *
      * @param request
      */
-    private void checkUpdateVirtualDoctorParam(UpdateVirtualDoctorRequest request, Long roleId) {
+    private void checkUpdateVirtualDoctorParam(UpdateVirtualDoctorRequest request) {
 
         Long id = request.getId();
         if (id == null && id <= 0) {

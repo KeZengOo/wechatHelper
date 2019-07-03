@@ -46,6 +46,10 @@ public class DrugUser extends IdEntity {
     @Column(name = "sale_type")
     private Integer saleType;
 
+    /**
+     * 废弃，使用 roleIdList
+     */
+    @Deprecated
     @Transient
     private Long roleId;
 
@@ -151,6 +155,7 @@ public class DrugUser extends IdEntity {
         this.userType = userType;
     }
 
+    @Deprecated
     public Long getRoleId() {
         return roleId;
     }

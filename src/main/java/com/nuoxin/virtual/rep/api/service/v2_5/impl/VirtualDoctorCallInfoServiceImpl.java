@@ -232,22 +232,8 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 	public List<ProductResponseBean> getProductList(DrugUser drugUser) {
 
 
-		Long roleId = drugUser.getRoleId();
-		Long drugUserId = drugUser.getId();
-		// TODO @田存 角色修改
-		if (RoleTypeEnum.SALE.getType().equals(roleId)
-				|| RoleTypeEnum.RECRUIT_SALE.getType().equals(roleId)
-				|| RoleTypeEnum.MOBILE_COVER_SALE.getType().equals(roleId)
-				|| RoleTypeEnum.WECHAT_COVER_SALE.getType().equals(roleId)	){
-			List<Long> idList = new ArrayList<>(1);
-			idList.add(drugUserId);
-			List<ProductResponseBean> productList = productLineMapper.getListByDrugUserId(idList);
-			if (CollectionsUtil.isNotEmptyList(productList)){
-				return productList;
-			}
-		}
-
-		if (RoleTypeEnum.MANAGER.getType().equals(roleId) || RoleTypeEnum.PROJECT_MANAGER.getType().equals(roleId)){
+		List<Long> roleIdList = drugUser.getRoleIdList();
+		if (roleIdList.contains(RoleTypeEnum.MANAGER.getType()) || roleIdList.contains(RoleTypeEnum.PROJECT_MANAGER.getType())){
 			List<Long> drugUserIdList = drugUserMapper.getSubordinateIdsByLeaderPath(drugUser.getLeaderPath());
 			if (CollectionsUtil.isNotEmptyList(drugUserIdList)){
 				List<ProductResponseBean> productList = productLineMapper.getListByDrugUserId(drugUserIdList);
@@ -256,6 +242,21 @@ public class VirtualDoctorCallInfoServiceImpl implements VirtualDoctorCallInfoSe
 				}
 			}
 		}
+
+
+		Long drugUserId = drugUser.getId();
+		// TODO @田存 角色修改
+		if(roleIdList.contains(RoleTypeEnum.SALE.getType()) || roleIdList.contains(RoleTypeEnum.RECRUIT_SALE.getType()) ||
+				roleIdList.contains(RoleTypeEnum.MOBILE_COVER_SALE.getType())
+				|| roleIdList.contains(RoleTypeEnum.WECHAT_COVER_SALE.getType())){
+			List<Long> idList = new ArrayList<>(1);
+			idList.add(drugUserId);
+			List<ProductResponseBean> productList = productLineMapper.getListByDrugUserId(idList);
+			if (CollectionsUtil.isNotEmptyList(productList)){
+				return productList;
+			}
+		}
+
 
 		List<ProductResponseBean> list = new ArrayList<>();
 		return list;
