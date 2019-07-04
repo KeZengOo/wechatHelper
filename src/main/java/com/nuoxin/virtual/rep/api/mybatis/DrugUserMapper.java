@@ -40,6 +40,14 @@ public interface DrugUserMapper extends MyMapper<DrugUser> {
      * @return
      */
     List<DrugUserResponseBean> relationDrugUser(@Param("leaderPath") String leaderPath,@Param("productId") Long productId);
+
+
+    /**
+     * virtual_doctor_call_info_mend 中代表ID已经和产品取消关联的代表ID
+     * @param productId
+     * @return
+     */
+    List<Long> mendOtherDrugUserId(@Param("productId") Long productId);
     
     ////////////////////////////////////////以下是V2.5用到的//////////////////////////////////////////////////////////////////////////////////////////////////
 

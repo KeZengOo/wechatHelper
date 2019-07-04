@@ -9,6 +9,7 @@ import com.nuoxin.virtual.rep.api.entity.v3_0.params.ContentSharingParams;
 import com.nuoxin.virtual.rep.api.entity.v3_0.params.FilePathParams;
 import com.nuoxin.virtual.rep.api.entity.v3_0.request.ContentReadLogsRequest;
 import com.nuoxin.virtual.rep.api.entity.v3_0.request.ContentSharingRequest;
+import com.nuoxin.virtual.rep.api.enums.RoleTypeEnum;
 import com.nuoxin.virtual.rep.api.service.v3_0.ContentSharingService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -41,8 +42,10 @@ public class ContentSharingController extends BaseController {
         if(user == null) {
             return super.getLoginErrorResponse();
         }
-        // 101 虚拟代表 104 招募 105 覆盖
-        if(user.getRoleId() == 101 || user.getRoleId() == 104 || user.getRoleId() == 105)
+        // 101 虚拟代表 104 招募 105 电话覆盖 106 微信覆盖
+        List<Long> roleIdList = user.getRoleIdList();
+        if (!(roleIdList.contains(RoleTypeEnum.MANAGER.getType()) || roleIdList.contains(RoleTypeEnum.PROJECT_MANAGER.getType())) )
+//        if(user.getRoleId() == 101 || user.getRoleId() == 104 || user.getRoleId() == 105)
         {
             drugUserIdArray[0] = user.getId();
             contentSharingRequest.setDrugUserId(drugUserIdArray);
