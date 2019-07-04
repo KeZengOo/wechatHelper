@@ -15,6 +15,18 @@
 	</insert>
 
 
+
+	<insert id="saveDrugUserDoctor" keyProperty="drugUserDoctorId" useGeneratedKeys="true" parameterType="com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorParams">
+		INSERT INTO drug_user_doctor
+		(doctor_id, doctor_name, doctor_email,
+		drug_user_id, drug_user_name, drug_user_email, prod_id, created_time)
+		VALUES
+		(#{doctorId}, #{doctorName}, #{doctorEmail},
+			#{drugUserId}, #{drugUserName}, #{drugUserEmail},
+			#{prodId}, NOW())
+	</insert>
+
+
 	<update id="updateDrugUserDoctorAvailable">
 		UPDATE drug_user_doctor SET is_available=0
 		WHERE drug_user_id=#{drugUserId}
@@ -153,5 +165,14 @@
 			#{id}
 		</foreach>
 	</delete>
+
+
+	<!-- 查询总数，判断记录是否存在 -->
+	<select id="getCountByDrugUserDoctorProduct" resultType="java.lang.Integer">
+	SELECT COUNT(*) FROM drug_user_doctor WHERE is_available=1
+	AND drug_user_id=#{drugUserId}
+	AND doctor_id=#{doctorId}
+	AND prod_id=#{productId}
+	</select>
 
 </mapper>

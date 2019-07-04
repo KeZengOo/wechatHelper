@@ -7,9 +7,12 @@ import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.service.v3_0.MyDoctorService;
 import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.share.ShareRequestBean;
+import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.DrugUserDoctorLogPageRequest;
+import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.DrugUserDoctorLogRequest;
 import com.nuoxin.virtual.rep.api.web.controller.request.v3_0.MyDoctorRequest;
 import com.nuoxin.virtual.rep.api.web.controller.response.v2_5.ContentShareResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DoctorImportErrorResponse;
+import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DrugUserDoctorLogResponse;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.MyDoctorResponse;
 import com.nuoxin.virtual.rep.api.web.controller.v2_5.NewBaseController;
 import io.swagger.annotations.Api;
@@ -51,6 +54,29 @@ public class MyDoctorController extends NewBaseController {
         PageResponseBean<MyDoctorResponse> doctorPage = myDoctorService.getDoctorPage(drugUser, bean);
         DefaultResponseBean<PageResponseBean<MyDoctorResponse>> responseBean = new DefaultResponseBean<>();
         responseBean.setData(doctorPage);
+        return responseBean;
+    }
+
+
+
+    @ApiOperation(value = "转移单个医生", notes = "转移单个医生")
+    @PostMapping(value = "/single/transfer")
+    public DefaultResponseBean<Boolean> getDoctorPage(HttpServletRequest request, @RequestBody DrugUserDoctorLogRequest bean) {
+        DrugUser drugUser = this.getDrugUser(request);
+        myDoctorService.insertDrugUserDoctorLog(drugUser, bean);
+        DefaultResponseBean<Boolean> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(true);
+        return responseBean;
+    }
+
+
+
+    @ApiOperation(value = "转移单个医生记录列表", notes = "转移单个医生记录列表")
+    @PostMapping(value = "/single/transfer/list")
+    public DefaultResponseBean<PageResponseBean<DrugUserDoctorLogResponse>> getDoctorPage(@RequestBody DrugUserDoctorLogPageRequest request) {
+        PageResponseBean<DrugUserDoctorLogResponse> singleDoctorTransferLogPage = myDoctorService.getSingleDoctorTransferLogPage(request);
+        DefaultResponseBean<PageResponseBean<DrugUserDoctorLogResponse>> responseBean = new DefaultResponseBean<>();
+        responseBean.setData(singleDoctorTransferLogPage);
         return responseBean;
     }
 

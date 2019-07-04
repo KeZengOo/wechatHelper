@@ -78,8 +78,9 @@ public class CommonPoolController extends NewBaseController {
 
     @ApiOperation(value = "导入医生转代表，不同的sheet错误一块展示", notes = "导入医生转代表，不同的sheet错误一块展示")
     @PostMapping(value = "/drug/user/doctor/transfer")
-    public DefaultResponseBean<DoctorImportErrorResponse> drugUserDoctorTransfer(MultipartFile file) {
-        DoctorImportErrorResponse error = commonService.drugUserDoctorTransfer(file);
+    public DefaultResponseBean<DoctorImportErrorResponse> drugUserDoctorTransfer(HttpServletRequest request,MultipartFile file) {
+        DrugUser drugUser = this.getDrugUser(request);
+        DoctorImportErrorResponse error = commonService.drugUserDoctorTransfer(drugUser, file);
         DefaultResponseBean<DoctorImportErrorResponse> responseBean = new DefaultResponseBean<>();
         responseBean.setData(error);
         return responseBean;

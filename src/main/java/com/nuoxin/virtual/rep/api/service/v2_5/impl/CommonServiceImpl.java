@@ -16,14 +16,13 @@ import com.nuoxin.virtual.rep.api.dao.DrugUserRepository;
 import com.nuoxin.virtual.rep.api.dao.ProductLineRepository;
 import com.nuoxin.virtual.rep.api.entity.Doctor;
 import com.nuoxin.virtual.rep.api.entity.DrugUser;
-import com.nuoxin.virtual.rep.api.entity.DrugUserDoctor;
 import com.nuoxin.virtual.rep.api.entity.ProductLine;
+import com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorLogParams;
 import com.nuoxin.virtual.rep.api.entity.v2_5.DrugUserDoctorParams;
 import com.nuoxin.virtual.rep.api.entity.v2_5.HospitalProvinceBean;
 import com.nuoxin.virtual.rep.api.mybatis.*;
 import com.nuoxin.virtual.rep.api.service.RoleUserService;
 import com.nuoxin.virtual.rep.api.utils.*;
-import com.nuoxin.virtual.rep.api.web.controller.request.v2_5.wechat.WechatMessageRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.vo.DoctorVo;
 import com.nuoxin.virtual.rep.api.web.controller.request.vo.DrugUserDoctorTransferVo;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DoctorImportErrorDetailResponse;
@@ -39,6 +38,10 @@ import org.springframework.stereotype.Service;
 import com.nuoxin.virtual.rep.api.service.v2_5.CommonService;
 import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean;
 import org.springframework.web.multipart.MultipartFile;
+
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toCollection;
 
 /**
  * 通用接口实现类
@@ -64,6 +67,10 @@ public class CommonServiceImpl implements CommonService {
 
 	@Resource
 	private DrugUserDoctorMapper drugUserDoctorMapper;
+
+	@Resource
+	private DrugUserDoctorLogMapper drugUserDoctorLogMapper;
+
 
 	@Resource
 	private DrugUserDoctorQuateMapper drugUserDoctorQuateMapper;
@@ -201,10 +208,10 @@ public class CommonServiceImpl implements CommonService {
 
 
 	@Override
-	public DoctorImportErrorResponse drugUserDoctorTransfer(MultipartFile file) {
+	public DoctorImportErrorResponse drugUserDoctorTransfer(DrugUser drugUser, MultipartFile file) {
 		Map<String, List<DrugUserDoctorTransferVo>> doctorListMap = this.getDrugUserDoctorTransferVoMap(file);
 		//新增或者更新，并且返回错误
-		DoctorImportErrorResponse error = this.saveOrUpdateDrugUserDoctorTransfer(doctorListMap);
+		DoctorImportErrorResponse error = this.saveOrUpdateDrugUserDoctorTransfer(drugUser, doctorListMap);
 
 
 		return error;
@@ -286,13 +293,14 @@ public class CommonServiceImpl implements CommonService {
 	 * @param doctorListMap
 	 * @return
 	 */
-	private DoctorImportErrorResponse saveOrUpdateDrugUserDoctorTransfer(Map<String, List<DrugUserDoctorTransferVo>> doctorListMap) {
+	private DoctorImportErrorResponse saveOrUpdateDrugUserDoctorTransfer(DrugUser operateDrugUser, Map<String, List<DrugUserDoctorTransferVo>> doctorListMap) {
 
 		Map<String, DoctorImportErrorResponse> errorMap = new HashMap<>();
 		Map<String, Long> productNameIdMap = this.getProductNameIdMap();
 		DoctorImportErrorResponse doctorImportError = new DoctorImportErrorResponse();
 		List<DoctorImportErrorDetailResponse> detailList = new ArrayList<>();
 
+		List<DrugUserDoctorLogParams> logList = new ArrayList<>();
 		List<DrugUserDoctorParams> addDrugUserDoctorParamsList = new ArrayList<>();
 		List<DrugUserDoctorParams> tempDrugUserDoctorParamsList = new ArrayList<>();
 		List<DrugUserDoctorParams> deleteDrugUserDoctorParamsList = new ArrayList<>();
@@ -418,6 +426,19 @@ public class CommonServiceImpl implements CommonService {
 					continue;
 				}
 
+
+				if (drugUser.getId().equals(toDrugUser.getId())){
+					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
+					doctorImportErrorDetail.setSheetName(sheetName);
+					doctorImportErrorDetail.setError("不能自己转到自己名下！" );
+					doctorImportErrorDetail.setRowNum(row);
+					detailList.add(doctorImportErrorDetail);
+					failNum ++;
+					continue;
+				}
+
+
+
 //				if (!RegularUtils.isMatcher(RegularUtils.MATCH_ELEVEN_NUM, telephone)) {
 //					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
 //					doctorImportErrorDetail.setSheetName(sheetName);
@@ -497,6 +518,20 @@ public class CommonServiceImpl implements CommonService {
 				tempDrugUserDoctorParams.setProdId(productId.intValue());
 				tempDrugUserDoctorParamsList.add(tempDrugUserDoctorParams);
 
+
+
+				DrugUserDoctorLogParams drugUserDoctorLogParams = new DrugUserDoctorLogParams();
+				drugUserDoctorLogParams.setOldDrugUserId(drugUser.getId());
+				drugUserDoctorLogParams.setOldDrugUserName(drugUser.getName());
+				drugUserDoctorLogParams.setNewDrugUserId(toDrugUser.getId());
+				drugUserDoctorLogParams.setNewDrugUserName(drugUser.getName());
+				drugUserDoctorLogParams.setOperateDrugUserId(operateDrugUser.getId());
+				drugUserDoctorLogParams.setOperateDrugUserName(operateDrugUser.getName());
+				drugUserDoctorLogParams.setDoctorId(doctor.getId());
+				drugUserDoctorLogParams.setProductId(productId);
+				// 2代表批量
+				drugUserDoctorLogParams.setOperateWay(2);
+				logList.add(drugUserDoctorLogParams);
 			}
 
 
@@ -521,6 +556,7 @@ public class CommonServiceImpl implements CommonService {
 		}
 
 		this.saveDrugUserDoctorTransferRecord(deleteDrugUserDoctorParamsList, addDrugUserDoctorParamsList);
+		this.batchInserDrugUserDoctorLog(logList);
 
 		doctorImportError.setDetailList(detailList);
 		doctorImportError.setRepeatNum(repeatNum);
@@ -536,6 +572,29 @@ public class CommonServiceImpl implements CommonService {
 
 	}
 
+	/**
+	 * 插入转移代表日志表
+	 * @param logList
+	 */
+	private void batchInserDrugUserDoctorLog(List<DrugUserDoctorLogParams> logList) {
+		if (CollectionsUtil.isEmptyList(logList)){
+			return;
+		}
+
+
+		// 去重
+		List<DrugUserDoctorLogParams> distinctLogList = logList.stream().collect(
+				collectingAndThen(
+						toCollection(() -> new TreeSet<>(comparing(d->d.getOldDrugUserId() + ";" + d.getNewDrugUserId() + ";" + d.getDoctorId() + ";" + d.getProductId()))),ArrayList::new)
+
+		);
+
+
+		if (CollectionsUtil.isNotEmptyList(distinctLogList)){
+			drugUserDoctorLogMapper.batchInsert(distinctLogList);
+		}
+
+	}
 
 
 	/**
@@ -543,6 +602,7 @@ public class CommonServiceImpl implements CommonService {
 	 * @param doctorListMap
 	 * @return
 	 */
+	@Deprecated
 	private Map<String, DoctorImportErrorResponse> saveOrUpdateDrugUserDoctorTransferMap(Map<String, List<DrugUserDoctorTransferVo>> doctorListMap) {
 		Map<String, DoctorImportErrorResponse> errorMap = new HashMap<>();
 		Map<String, Long> productNameIdMap = getProductNameIdMap();
@@ -728,6 +788,11 @@ public class CommonServiceImpl implements CommonService {
 					continue;
 				}
 
+
+
+
+
+
 				DrugUserDoctorParams addDrugUserDoctorParams = new DrugUserDoctorParams();
 				addDrugUserDoctorParams.setDoctorId(doctor.getId());
 				addDrugUserDoctorParams.setDoctorName(doctor.getName());
@@ -791,6 +856,7 @@ public class CommonServiceImpl implements CommonService {
 
 		if (CollectionsUtil.isNotEmptyList(addDrugUserDoctorParamsList)){
 			drugUserDoctorMapper.saveDrugUserDoctors(addDrugUserDoctorParamsList);
+
 		}
 
 		if (CollectionsUtil.isNotEmptyList(deleteDrugUserDoctorParamsList)){

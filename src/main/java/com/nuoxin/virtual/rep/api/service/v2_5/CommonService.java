@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.entity.v2_5.HospitalProvinceBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DoctorImportErrorResponse;
@@ -73,6 +74,7 @@ public interface CommonService {
 	 * @param file 导入的文件
 	 * @return 导出遇到的错误,不同的sheet错误分开展示
 	 */
+	@Deprecated
 	Map<String, DoctorImportErrorResponse> doctorImportMap(MultipartFile file);
 
 	/**
@@ -89,15 +91,17 @@ public interface CommonService {
 	 * @param file
 	 * @return 导出遇到的错误，不同的sheet错误分开展示
 	 */
+	@Deprecated
 	Map<String, DoctorImportErrorResponse> drugUserDoctorTransferMap(MultipartFile file);
 
 
 	/**
 	 * 根据现有的医生模板导入医生
+	 * @param drugUser 操作者
 	 * @param file
 	 * @return 导出遇到的错误，不同的sheet错误一块展示
 	 */
-	DoctorImportErrorResponse drugUserDoctorTransfer(MultipartFile file);
+	DoctorImportErrorResponse drugUserDoctorTransfer(DrugUser drugUser, MultipartFile file);
 
 
 

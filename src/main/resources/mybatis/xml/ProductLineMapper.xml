@@ -181,4 +181,16 @@
         SELECT prod_id id, prod_name name FROM product_line
     </select>
 
+    <!-- 查询总数，用来判断代表是否在某个产品名下 -->
+    <select id="getProductUserCountById" resultType="java.lang.Integer">
+        SELECT
+            COUNT(*)
+        FROM
+            product_user pu
+            INNER JOIN drug_user du ON pu.user_id = du.id
+            INNER JOIN product_line pl ON pu.prod_id = pl.prod_id
+        WHERE
+            pl.prod_id = #{productId}
+            AND du.id=#{drugUserId}
+    </select>
 </mapper>

@@ -135,6 +135,16 @@ public interface ProductLineMapper extends MyMapper<ProductLine> {
     Integer getProductUserCount(@Param(value = "email") String email,@Param(value = "productId") Long productId);
 
 
+    /**
+     * 查询总数，用来判断代表是否在某个产品名下
+     * @param drugUserId
+     * @param productId
+     * @return
+     */
+    Integer getProductUserCountById(@Param(value = "drugUserId") Long drugUserId,@Param(value = "productId") Long productId);
+
+
+
 
 
 }

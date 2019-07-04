@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nuoxin.virtual.rep.api.mybatis.DrugUserDoctorLogMapper">
+
+
+    <insert id="insert">
+        INSERT INTO drug_user_doctor_log
+        (old_drug_user_id, old_drug_user_name, new_drug_user_id, new_drug_user_name,
+        operate_drug_user_id, operate_drug_user_name, doctor_id, product_id, operate_way)
+        VALUES
+        (
+        #{oldDrugUserId},#{oldDrugUserName},#{newDrugUserId}, #{newDrugUserName},
+        #{operateDrugUserId}, #{operateDrugUserName}, #{doctorId}, #{productId},
+        #{operateWay}
+        )
+    </insert>
+
+
+    <insert id="batchInsert">
+        INSERT INTO drug_user_doctor_log
+        (old_drug_user_id, old_drug_user_name, new_drug_user_id, new_drug_user_name,
+        operate_drug_user_id, operate_drug_user_name, doctor_id, product_id, operate_way)
+        VALUES
+        <foreach collection ="list" item="d" separator =",">
+            (
+            #{d.oldDrugUserId},#{d.oldDrugUserName},#{d.newDrugUserId}, #{d.newDrugUserName},
+            #{d.operateDrugUserId}, #{d.operateDrugUserName}, #{d.doctorId}, #{d.productId},
+            #{d.operateWay}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 单个医生转移日志列表 -->
+    <select id="getSingleDoctorTransferLogList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.v3_0.DrugUserDoctorLogResponse">
+        SELECT
+            l.old_drug_user_id oldDrugUserId,
+            l.old_drug_user_name oldDrugUserName,
+            l.new_drug_user_id newDrugUserId,
+            l.new_drug_user_name newDrugUserName,
+            d.id doctorId,
+            d.NAME doctorName,
+            d.hospital_id hospitalId,
+            d.hospital_name hospitalName,
+            d.depart,
+            l.operate_drug_user_id operateDrugUserId,
+            l.operate_drug_user_name operateDrugUserName,
+            l.operate_way operateWay,
+            pl.prod_id productId,
+            pl.prod_name productName,
+            DATE_FORMAT( l.create_time, '%Y-%m-%d' ) operateTime
+        FROM
+            drug_user_doctor_log l
+            INNER JOIN doctor d ON l.doctor_id = d.id
+            INNER JOIN product_line pl ON l.product_id = pl.prod_id
+            WHERE d.id=#{doctorId}
+            GROUP BY l.id
+            LIMIT #{currentSize},#{pageSize}
+    </select>
+
+
+    <!-- 单个医生转移日志列表总数 -->
+    <select id="getSingleDoctorTransferLogListCount" resultType="java.lang.Integer">
+        SELECT
+            COUNT(DISTINCT l.id)
+        FROM
+            drug_user_doctor_log l
+            INNER JOIN doctor d ON l.doctor_id = d.id
+            INNER JOIN product_line pl ON l.product_id = pl.prod_id
+            WHERE d.id=#{doctorId}
+    </select>
+
+
+</mapper>

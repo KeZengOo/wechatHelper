@@ -24,6 +24,8 @@ public interface DrugUserDoctorMapper {
 	 */
 	int saveDrugUserDoctors(List<DrugUserDoctorParams> list);
 
+	int saveDrugUserDoctor(DrugUserDoctorParams params);
+
 	/**
 	 * 更新代表医生产品的关系可用状态
 	 * @param drugUserId
@@ -87,5 +89,15 @@ public interface DrugUserDoctorMapper {
 	 * @param list
 	 */
 	void deleteByIdList(List<Long> list);
+
+	/**
+	 * 查询总数，判断是否存在
+	 * @param drugUserId
+	 * @param doctorId
+	 * @param productId
+	 * @return
+	 */
+	Integer getCountByDrugUserDoctorProduct(@Param(value = "drugUserId") Long drugUserId,
+											@Param(value = "doctorId") Long doctorId,@Param(value = "productId") Long productId);
 }
 
