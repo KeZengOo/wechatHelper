@@ -38,9 +38,8 @@ public class VirtualRepApiApplication {
 	@Autowired
 	private TypeResolver typeResolver;
 	
-	@Bean
-	@LoadBalanced
-	public RestTemplate getRestTemplate(){
+	@Bean(name="remoteRestTemplate")
+	public RestTemplate restTemplate() {
 		return new RestTemplate();
 	}
 

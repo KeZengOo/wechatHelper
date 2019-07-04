@@ -17,6 +17,7 @@ import com.nuoxin.virtual.rep.api.utils.csv.PublicGlobalCSVExprot;
 import com.nuoxin.virtual.rep.api.web.controller.response.v3_0.questionnaire.QuestionnaireAnswerResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -43,6 +44,7 @@ public class WenJuanQuestionnaireServiceImpl implements WenJuanQuestionnaireServ
     private DoctorMapper doctorMapper;
 
     @Resource
+    @Qualifier(value = "remoteRestTemplate")
     private RestTemplate restTemplate;
 
     private static final Logger logger = LoggerFactory.getLogger(WenJuanQuestionnaireServiceImpl.class);
