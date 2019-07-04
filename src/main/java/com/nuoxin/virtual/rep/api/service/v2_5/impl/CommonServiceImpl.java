@@ -1066,7 +1066,7 @@ public class CommonServiceImpl implements CommonService {
 					failNum ++;
 					continue;
 				}
-				drugUser.setRoleId(roleUserService.checkVirtualRole(drugUser.getId()));
+				drugUser.setRoleIdList(roleUserService.checkVirtualRole(drugUser.getId()));
 
 				List<Long> productIdList = drugUserMapper.getProductIdListByEmail(drugUserEmail);
 				if (CollectionsUtil.isNotEmptyList(productIdList) && (!productIdList.contains(product.getId()))){
@@ -1089,14 +1089,19 @@ public class CommonServiceImpl implements CommonService {
 						// 查询角色数量
 						if (CollectionsUtil.isNotEmptyList(drugUserEmailList)){
 							List<Long> roleIdList = drugUserMapper.getRoleIdList(drugUserEmailList);
-							if (CollectionsUtil.isNotEmptyList(roleIdList) && roleIdList.contains(drugUser.getRoleId())){
-								DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
-								doctorImportErrorDetail.setSheetName(productName);
-								doctorImportErrorDetail.setError("和代表"+ drugUserEmailList.toString() +"关联的角色相同！");
-								doctorImportErrorDetail.setRowNum(row);
-								detailList.add(doctorImportErrorDetail);
-								roleFlag = true;
-								continue;
+							List<Long> roleIdList2 = drugUser.getRoleIdList();
+							if (CollectionsUtil.isNotEmptyList(roleIdList) && CollectionsUtil.isNotEmptyList(roleIdList2)){
+								roleIdList.retainAll(roleIdList2);
+								if (CollectionsUtil.isNotEmptyList(roleIdList)){
+									DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
+									doctorImportErrorDetail.setSheetName(productName);
+									doctorImportErrorDetail.setError("和代表"+ drugUserEmailList.toString() +"关联的角色相同！");
+									doctorImportErrorDetail.setRowNum(row);
+									detailList.add(doctorImportErrorDetail);
+									roleFlag = true;
+									continue;
+								}
+
 							}
 						}
 
@@ -1111,7 +1116,7 @@ public class CommonServiceImpl implements CommonService {
 
 
 
-				List<DrugUser> drugUserList = drugUserMapper.getDrugUserList(telephone, product.getId(), drugUser.getRoleId());
+				List<DrugUser> drugUserList = drugUserMapper.getDrugUserList(telephone, product.getId(), drugUser.getRoleIdList());
 				if (CollectionsUtil.isNotEmptyList(drugUserList)){
 					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
 					List<String> drugUserNameList = drugUserList.stream().map(DrugUser::getName).distinct().collect(Collectors.toList());
@@ -1130,7 +1135,8 @@ public class CommonServiceImpl implements CommonService {
 					// 判断库中同一个医生是否有不同的代表且同一个角色
 					List<DrugUser> roleDrugUserList = drugUserMapper.getRoleIdListByDoctor(drugUser.getId(), doctor.getId(), product.getId());
 					if (CollectionsUtil.isNotEmptyList(roleDrugUserList)) {
-						List<String> drugUserEmailList = roleDrugUserList.stream().filter(du -> (drugUser.getRoleId().equals(du.getRoleId()))).map(DrugUser::getEmail).distinct().collect(Collectors.toList());
+
+						List<String> drugUserEmailList = roleDrugUserList.stream().filter(du -> (du.getRoleIdList().retainAll(drugUser.getRoleIdList()))).map(DrugUser::getEmail).distinct().collect(Collectors.toList());
 						if (CollectionsUtil.isNotEmptyList(drugUserEmailList)){
 							DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
 							doctorImportErrorDetail.setSheetName(productName);
@@ -1465,7 +1471,7 @@ public class CommonServiceImpl implements CommonService {
 					failNum ++;
 					continue;
 				}
-				drugUser.setRoleId(roleUserService.checkVirtualRole(drugUser.getId()));
+				drugUser.setRoleIdList(roleUserService.checkVirtualRole(drugUser.getId()));
 
 				List<Long> productIdList = drugUserMapper.getProductIdListByEmail(drugUserEmail);
 				if (CollectionsUtil.isNotEmptyList(productIdList) && (!productIdList.contains(product.getId()))){
@@ -1487,13 +1493,19 @@ public class CommonServiceImpl implements CommonService {
 						// 查询角色数量
 						if (CollectionsUtil.isNotEmptyList(drugUserEmailList)){
 							List<Long> roleIdList = drugUserMapper.getRoleIdList(drugUserEmailList);
-							if (CollectionsUtil.isNotEmptyList(roleIdList) && roleIdList.contains(drugUser.getRoleId())){
-								DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
-								doctorImportErrorDetail.setError("和代表"+ drugUserEmailList.toString() +"关联的角色相同！");
-								doctorImportErrorDetail.setRowNum(row);
-								detailList.add(doctorImportErrorDetail);
-								roleFlag = true;
-								continue;
+							List<Long> roleIdList2 = drugUser.getRoleIdList();
+
+							if (CollectionsUtil.isNotEmptyList(roleIdList) && CollectionsUtil.isNotEmptyList(roleIdList2)){
+								roleIdList.retainAll(roleIdList2);
+								if (CollectionsUtil.isNotEmptyList(roleIdList)){
+									DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
+									doctorImportErrorDetail.setError("和代表"+ drugUserEmailList.toString() +"关联的角色相同！");
+									doctorImportErrorDetail.setRowNum(row);
+									detailList.add(doctorImportErrorDetail);
+									roleFlag = true;
+									continue;
+								}
+
 							}
 						}
 
@@ -1508,7 +1520,7 @@ public class CommonServiceImpl implements CommonService {
 
 
 
-				List<DrugUser> drugUserList = drugUserMapper.getDrugUserList(telephone, product.getId(), drugUser.getRoleId());
+				List<DrugUser> drugUserList = drugUserMapper.getDrugUserList(telephone, product.getId(), drugUser.getRoleIdList());
 				if (CollectionsUtil.isNotEmptyList(drugUserList)){
 					DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
 					List<String> drugUserNameList = drugUserList.stream().map(DrugUser::getName).distinct().collect(Collectors.toList());
@@ -1526,7 +1538,7 @@ public class CommonServiceImpl implements CommonService {
 					// 判断库中同一个医生是否有不同的代表且同一个角色
 					List<DrugUser> roleDrugUserList = drugUserMapper.getRoleIdListByDoctor(drugUser.getId(), doctor.getId(), product.getId());
 					if (CollectionsUtil.isNotEmptyList(roleDrugUserList)) {
-						List<String> drugUserEmailList = roleDrugUserList.stream().filter(du -> (drugUser.getRoleId().equals(du.getRoleId()))).map(DrugUser::getEmail).distinct().collect(Collectors.toList());
+						List<String> drugUserEmailList = roleDrugUserList.stream().filter(du -> (du.getRoleIdList().retainAll(drugUser.getRoleIdList()))).map(DrugUser::getEmail).distinct().collect(Collectors.toList());
 						if (CollectionsUtil.isNotEmptyList(drugUserEmailList)){
 							DoctorImportErrorDetailResponse doctorImportErrorDetail = new DoctorImportErrorDetailResponse();
 							doctorImportErrorDetail.setError("和代表"+ drugUserEmailList.toString() +"关联的角色相同！");

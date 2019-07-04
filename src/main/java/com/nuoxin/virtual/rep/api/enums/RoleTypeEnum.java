@@ -11,8 +11,8 @@ public enum RoleTypeEnum {
     SALE(101L,"普通销售"),
     PROJECT_MANAGER(103L, "项目管理员"),
     RECRUIT_SALE(104L, "招募代表"),
-    COVER_SALE(105L, "覆盖代表");
-
+    MOBILE_COVER_SALE(105L, "电话覆盖"),
+    WECHAT_COVER_SALE(106L, "微信覆盖");
 
 
     private Long type;

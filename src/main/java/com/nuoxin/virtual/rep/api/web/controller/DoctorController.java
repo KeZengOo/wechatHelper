@@ -311,10 +311,13 @@ public class DoctorController extends BaseController {
             return responseBean;
         }
 
-        Long roleId = user.getRoleId();
-        if (RoleTypeEnum.SALE.getType().equals(roleId)
-                || RoleTypeEnum.RECRUIT_SALE.getType().equals(roleId)
-                || RoleTypeEnum.COVER_SALE.getType().equals(roleId)){
+        List<Long> roleIdList = user.getRoleIdList();
+        if (roleIdList.contains(RoleTypeEnum.MANAGER.getType())
+                || roleIdList.contains(RoleTypeEnum.PROJECT_MANAGER.getType())){
+
+            responseBean.setData(drugUserService.relationDrugUser(user.getLeaderPath(),productId));
+            return responseBean;
+        }else {
             DrugUserResponseBean drugUserResponseBean = new DrugUserResponseBean();
             drugUserResponseBean.setId(user.getId());
             drugUserResponseBean.setName(user.getName());
@@ -325,8 +328,6 @@ public class DoctorController extends BaseController {
         }
 
 
-        responseBean.setData(drugUserService.relationDrugUser(user.getLeaderPath(),productId));
-        return responseBean;
     }
 
 

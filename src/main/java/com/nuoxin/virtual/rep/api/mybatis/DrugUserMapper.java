@@ -40,6 +40,14 @@ public interface DrugUserMapper extends MyMapper<DrugUser> {
      * @return
      */
     List<DrugUserResponseBean> relationDrugUser(@Param("leaderPath") String leaderPath,@Param("productId") Long productId);
+
+
+    /**
+     * virtual_doctor_call_info_mend 中代表ID已经和产品取消关联的代表ID
+     * @param productId
+     * @return
+     */
+    List<Long> mendOtherDrugUserId(@Param("productId") Long productId);
     
     ////////////////////////////////////////以下是V2.5用到的//////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -132,7 +140,7 @@ public interface DrugUserMapper extends MyMapper<DrugUser> {
      * @param drugUserId
      * @return
      */
-	String getRoleIdByDrugUserId(@Param(value = "drugUserId") Long drugUserId);
+	List<Long> getRoleIdByDrugUserId(@Param(value = "drugUserId") Long drugUserId);
 
     /**
      * 得到多个代表名字
@@ -171,11 +179,12 @@ public interface DrugUserMapper extends MyMapper<DrugUser> {
      * 得到代表角色种类，去重
      * @param telephone
      * @param productId
+     * @param roleIdList
      * @return
      */
     List<DrugUser> getDrugUserList(@Param(value = "telephone") String telephone,
                                                     @Param(value = "productId") Long productId,
-                                                    @Param(value = "roleId") Long roleId);
+                                                    @Param(value = "roleIdList") List<Long> roleIdList);
 
     /**
      * 根据角色ID查询名称
@@ -183,5 +192,12 @@ public interface DrugUserMapper extends MyMapper<DrugUser> {
      * @return
      */
     String getRoleNameById(@Param(value = "roleId") Long roleId);
+
+    /**
+     * 根据代表ID查询角色名称
+     * @param drugUserId
+     * @return
+     */
+    String getRoleNameByUserId(@Param(value = "drugUserId") Long drugUserId);
 
 }

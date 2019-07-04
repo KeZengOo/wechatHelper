@@ -928,7 +928,7 @@ public class CoverageReportServiceImpl implements CoverageReportService {
         }
         // 导出逻辑
         ExportExcelWrapper<CoverageMeetingResponse> exportExcelWrapper = new ExportExcelWrapper();
-        exportExcelWrapper.exportExcel("月报—不同患者量的医生覆盖分析覆盖分析—".concat(startTime).concat("-").concat(endTime), "不同患者量的医生覆盖分析覆盖分析表", PATIENT_VOLUME_DATA_TITLES,
+        exportExcelWrapper.exportExcel("月报—不同患者量的医生覆盖分析—".concat(startTime).concat("-").concat(endTime), "不同患者量的医生覆盖分析表", PATIENT_VOLUME_DATA_TITLES,
                 rlist, response, ExportExcelUtil.EXCEl_FILE_2007);
     }
 

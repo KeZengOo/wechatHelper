@@ -142,7 +142,7 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 			Date date=new Date();
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTime(date);
-			calendar.add(Calendar.DAY_OF_MONTH, -1);
+			calendar.add(Calendar.DAY_OF_MONTH, -2);
 			date = calendar.getTime();
 			bean.setBeginTime(DateUtil.getDateTimeString(date));
 		}
@@ -218,27 +218,27 @@ public class SevenMoorCallBackImpl extends BaseCallBackImpl implements CallBackS
 				super.updateCallUrlText(callInfo.getSinToken(), callInfo.getCallUrl(), callInfo.getUnpressedCallUrl(), callInfo.getUnpressedCallUrlIn(), callInfo.getUnpressedCallUrlOut());
 			}
 
-			//异步（分割录音文件并上传阿里云，返回左右声道的阿里云地址 并且 根据左右声道的阿里云地址进行语音识别，进行入库）
-			if(!callInfo.getCallUrl().isEmpty()){
-				new Thread(new Runnable(){
-					@Override
-					public void run() {
-						logger.info("callUrl={}, callInfo中获取的地址：", callInfo.getCallUrl());
-						//分割录音文件并上传阿里云，返回左右声道的阿里云地址
-						Map<String,String> pathMap = splitSpeechAliyunUrlUpdate(callInfo.getCallUrl());
-						logger.info("pathMap={}, 分割录音文件并上传阿里云，返回左右声道的阿里云地址", pathMap);
-						if(pathMap.size() > 0){
-							//根据左右声道的阿里云地址进行语音识别，进行入库
-							boolean result_is_save = saveSpeechRecognitionResultCallInfo(pathMap, callInfo.getSinToken());
-							logger.info("result_is_save={}, 根据左右声道的阿里云地址进行语音识别，进行入库是否成功！", result_is_save);
-						}
-					}
-				}).start();
-//			//分割录音文件并上传阿里云，返回左右声道的阿里云地址
-//			Map<String,String> pathMap = splitSpeechAliyunUrlUpdate(callInfo.getCallUrl());
-//			//根据左右声道的阿里云地址进行语音识别，进行入库
-//			boolean result_is_save = saveSpeechRecognitionResultCallInfo(pathMap, callInfo.getSinToken());
-			}
+//			//异步（分割录音文件并上传阿里云，返回左右声道的阿里云地址 并且 根据左右声道的阿里云地址进行语音识别，进行入库）
+//			if(!callInfo.getCallUrl().isEmpty()){
+//				new Thread(new Runnable(){
+//					@Override
+//					public void run() {
+//						logger.info("callUrl={}, callInfo中获取的地址：", callInfo.getCallUrl());
+//						//分割录音文件并上传阿里云，返回左右声道的阿里云地址
+//						Map<String,String> pathMap = splitSpeechAliyunUrlUpdate(callInfo.getCallUrl());
+//						logger.info("pathMap={}, 分割录音文件并上传阿里云，返回左右声道的阿里云地址", pathMap);
+//						if(pathMap.size() > 0){
+//							//根据左右声道的阿里云地址进行语音识别，进行入库
+//							boolean result_is_save = saveSpeechRecognitionResultCallInfo(pathMap, callInfo.getSinToken());
+//							logger.info("result_is_save={}, 根据左右声道的阿里云地址进行语音识别，进行入库是否成功！", result_is_save);
+//						}
+//					}
+//				}).start();
+////			//分割录音文件并上传阿里云，返回左右声道的阿里云地址
+////			Map<String,String> pathMap = splitSpeechAliyunUrlUpdate(callInfo.getCallUrl());
+////			//根据左右声道的阿里云地址进行语音识别，进行入库
+////			boolean result_is_save = saveSpeechRecognitionResultCallInfo(pathMap, callInfo.getSinToken());
+//			}
 		}
 	}
 

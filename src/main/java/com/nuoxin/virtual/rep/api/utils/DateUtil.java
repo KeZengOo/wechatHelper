@@ -269,10 +269,7 @@ public final class DateUtil {
         return result;
     }
 
-    public static void main(String[] args) throws ParseException {
-        List<String> monthBetween = DateUtil.getMonthBetween("2018-12-01", "2019-06-13");
-        System.out.println(monthBetween);
-    }
+
 
 
 
@@ -527,6 +524,16 @@ public final class DateUtil {
         }
 
     }
+
+    public static void main(String[] args) {
+        Date date = DateUtil.stringToDate("2019-06-26 19:53:54:000", DateUtil.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS__SSS);
+        String dateTimeString = DateUtil.getDateTimeString(date);
+        System.out.println(dateTimeString);
+    }
+
+
+
+
 
     /**
      * 根据时间获取当天23:59:59的时间

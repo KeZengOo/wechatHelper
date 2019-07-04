@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * Created by fenggang on 9/11/17.
@@ -40,9 +41,9 @@ public class LoginService {
 		}
 		
 		drugUser.setLeaderPath(drugUser.getLeaderPath() + "%");
-		Long roleId = roleUserService.checkVirtualRole(drugUser.getId());
-		drugUser.setRoleId(roleId);
-		String roleName = drugUserMapper.getRoleNameById(roleId);
+		List<Long> roleIdList = roleUserService.checkVirtualRole(drugUser.getId());
+		drugUser.setRoleIdList(roleIdList);
+		String roleName = drugUserMapper.getRoleNameByUserId(drugUser.getId());
 		drugUser.setRoleName(roleName);
 
 		return drugUser;

@@ -117,6 +117,8 @@
       select
        DISTINCT du.id,du.name
       from product_user pu
+      INNER JOIN product_line pl
+      ON pu.prod_id=pl.prod_id
       join drug_user du
       on pu.user_id=du.id
       INNER JOIN role_user ru
@@ -126,15 +128,54 @@
            AND pu.prod_id = #{productId}
        </if>
 
+      <!--
       <if test="leaderPath !=null and leaderPath!=''">
          AND du.leader_path like #{leaderPath,jdbcType=VARCHAR}
       </if>
+      -->
 
       AND du.status=1
-      AND ru.role_id IN (101, 104, 105)
+      AND pl.show_place=1
+      AND ru.role_id IN (101, 104, 105, 106)
 
 
       group by du.id
+
+    </select>
+
+
+    <!-- virtual_doctor_call_info_mend 表无法通过关系查询出来的代表ID -->
+    <select id="mendOtherDrugUserId" resultType="java.lang.Long">
+
+        SELECT DISTINCT du.id FROM virtual_doctor_call_info_mend m
+        INNER JOIN drug_user du
+        ON m.virtual_drug_user_id=du.id
+        WHERE 1=1
+        <if test="productId !=null and productId !=0">
+            AND m.product_id = #{productId}
+        </if>
+
+        AND m.virtual_drug_user_id NOT IN (
+
+            select
+            DISTINCT du.id
+            from product_user pu
+            INNER JOIN product_line pl
+            ON pu.prod_id=pl.prod_id
+            join drug_user du
+            on pu.user_id=du.id
+            INNER JOIN role_user ru
+            ON du.id=ru.user_id AND ru.role_id > 100
+            where 1=1
+            <if test="productId !=null and productId !=0">
+                AND pu.prod_id = #{productId}
+            </if>
+            AND du.status=1
+            AND pl.show_place=1
+            AND ru.role_id IN (101, 104, 105, 106)
+
+        )
+
 
     </select>
 
@@ -320,8 +361,8 @@
     </select>
 
 
-    <select id="getRoleIdByDrugUserId" resultType="java.lang.String">
-        SELECT GROUP_CONCAT(role_id) FROM role_user WHERE user_id=#{drugUserId}
+    <select id="getRoleIdByDrugUserId" resultType="java.lang.Long">
+        SELECT DISTINCT role_id FROM role_user WHERE user_id=#{drugUserId} AND role_id > 100
     </select>
 
     <!-- 得到多个代表名字 -->
@@ -396,12 +437,25 @@
             UNION
             SELECT doctor_id FROM doctor_telephone WHERE telephone = #{telephone} )
             AND dud.prod_id = #{productId}
-            AND ru.role_id =#{roleId}
+            AND ru.role_id IN
+            <foreach collection="roleIdList" item="roleId" open="(" close=")" separator=",">
+                #{roleId}
+            </foreach>
     </select>
 
 
     <select id="getRoleNameById" resultType="java.lang.String">
         SELECT role_name FROM role WHERE id=#{roleId}
+    </select>
+
+
+    <!-- 根据代表ID查询角色名称 -->
+    <select id="getRoleNameByUserId" resultType="java.lang.String">
+        SELECT GROUP_CONCAT(DISTINCT r.role_name) FROM role r
+        INNER JOIN role_user ru
+        ON r.id=ru.role_id
+        WHERE ru.user_id = #{drugUserId}
+        AND r.id > 100
     </select>
 
     

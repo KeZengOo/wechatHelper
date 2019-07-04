@@ -209,6 +209,7 @@ public class MonthlyRecruitServiceImpl implements MonthlyRecruitService {
     @Override
     public MonthlyHistogramResponse getMonthlyDepartRecruitList(MonthlyRecruitRequest request) {
         MonthlyHistogramResponse monthlyHistogramResponse = new MonthlyHistogramResponse();
+        request.setLimitFlag(1);
         List<MonthlyDepartRecruitResponse> monthlyDepartRecruitList = monthlyRecruitMapper.getMonthlyDepartRecruitList(request);
         if (CollectionsUtil.isNotEmptyList(monthlyDepartRecruitList)){
             List<String> departList = monthlyDepartRecruitList.stream().map(MonthlyDepartRecruitResponse::getDepart).collect(Collectors.toList());

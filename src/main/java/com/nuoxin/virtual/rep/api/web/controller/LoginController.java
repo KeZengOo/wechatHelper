@@ -8,6 +8,7 @@ import com.nuoxin.virtual.rep.api.entity.DrugUser;
 import com.nuoxin.virtual.rep.api.enums.OnOffLineEnum;
 import com.nuoxin.virtual.rep.api.enums.SaleUserTypeEnum;
 import com.nuoxin.virtual.rep.api.service.*;
+import com.nuoxin.virtual.rep.api.utils.CollectionsUtil;
 import com.nuoxin.virtual.rep.api.web.controller.request.LoginRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.request.UpdatePwdRequestBean;
 import com.nuoxin.virtual.rep.api.web.controller.response.DrugUserCallDetaiBean;
@@ -51,12 +52,7 @@ public class LoginController extends BaseController {
 	public DefaultResponseBean<LoginResponseBean> login(@RequestBody LoginRequestBean bean, 
 			                                                                              HttpServletRequest request, HttpServletResponse response) {
 		DrugUser drugUser = loginService.login(bean);
-		if (drugUser.getRoleId() == null) {
-			return super.getLoginErrorResponse();
-		}
-
 		sercurityService.saveSession(request, response, drugUser);
-
 		DefaultResponseBean<LoginResponseBean> responseBean = new DefaultResponseBean<>();
 		responseBean.setData(this.getLoginResponseBean(drugUser));
 		return responseBean;
@@ -168,7 +164,7 @@ public class LoginController extends BaseController {
 		LoginResponseBean loginBean = new LoginResponseBean();
 		loginBean.setName(drugUser.getName());
 		loginBean.setEmail(drugUser.getEmail());
-		loginBean.setRoleId(drugUser.getRoleId());
+		loginBean.setRoleIdList(drugUser.getRoleIdList());
 		loginBean.setRoleName(drugUser.getRoleName());
 		loginBean.setVirtualDrugUserId(drugUser.getId());
 		Integer saleType = drugUser.getSaleType();

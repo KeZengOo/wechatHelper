@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by fenggang on 9/11/17.
@@ -45,11 +46,18 @@ public class DrugUser extends IdEntity {
     @Column(name = "sale_type")
     private Integer saleType;
 
+    /**
+     * 废弃，使用 roleIdList
+     */
+    @Deprecated
     @Transient
     private Long roleId;
 
     @Transient
     private String roleName;
+
+    @Transient
+    private List<Long> roleIdList;
 
     public String getName() {
         return name;
@@ -147,6 +155,7 @@ public class DrugUser extends IdEntity {
         this.userType = userType;
     }
 
+    @Deprecated
     public Long getRoleId() {
         return roleId;
     }
@@ -170,5 +179,14 @@ public class DrugUser extends IdEntity {
 
     public void setRoleName(String roleName) {
         this.roleName = roleName;
+    }
+
+
+    public List<Long> getRoleIdList() {
+        return roleIdList;
+    }
+
+    public void setRoleIdList(List<Long> roleIdList) {
+        this.roleIdList = roleIdList;
     }
 }

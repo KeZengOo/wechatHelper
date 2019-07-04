@@ -116,14 +116,18 @@ public class VisitingDataController extends NewBaseController implements Seriali
 
     /**
      * 根据角色补充代表查询条件
+     * 使用 List<Long> roleIdList = drugUser.getRoleIdList()
      * @param drugUser
      * @return
      */
     private Long fillDrugUserIdByRoleId(DrugUser drugUser){
         Long userId = 0L;
-        Long roleId = drugUser.getRoleId();
-        if (RoleTypeEnum.SALE.getType().equals(roleId) || RoleTypeEnum.RECRUIT_SALE.getType().equals(roleId) || RoleTypeEnum.COVER_SALE.getType().equals(roleId)){
-            userId = drugUser.getId();
+        List<Long> roleIdList = drugUser.getRoleIdList();
+        if(!CollectionUtils.isEmpty(roleIdList)) {
+            if(roleIdList.contains(RoleTypeEnum.SALE.getType()) || roleIdList.contains(RoleTypeEnum.RECRUIT_SALE.getType())
+                    || roleIdList.contains(RoleTypeEnum.MOBILE_COVER_SALE.getType()) || roleIdList.contains(RoleTypeEnum.WECHAT_COVER_SALE.getType())) {
+                userId = drugUser.getId();
+            }
         }
         return userId;
     }
