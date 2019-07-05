@@ -80,7 +80,7 @@
 	<!-- 根据医生ID查询医生扩展信息 -->
 	<select id="getVirtualDoctorMendParams" resultType="com.nuoxin.virtual.rep.api.entity.v2_5.VirtualDoctorMendParams">
 
-		SELECT wechat, add_wechat_time addWechatTime, address
+		SELECT id, wechat, add_wechat_time addWechatTime, address
 		FROM doctor_mend WHERE virtual_doctor_id=#{doctorId}
 
 	</select>
