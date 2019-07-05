@@ -31,6 +31,14 @@ public interface DrugUserMapper extends MyMapper<DrugUser> {
      */
     List<DrugUserResponseBean> getOnlineDrugUserList(@Param(value = "productId") Long productId);
 
+    /**
+     * 得到产品下所有的代表，不包括经理,管理员
+     * @param productId
+     * @return
+     */
+    List<DrugUserResponseBean> getAllDrugUserList(@Param(value = "productId") Long productId);
+
+
     Integer doctorPageCount(QueryRequestBean bean);
 
     /**

@@ -73,6 +73,20 @@
         AND du.sale_type = 1
     </select>
 
+    <!-- 得到产品下所有的代表，不包括经理,管理员 -->
+    <select id="getAllDrugUserList" resultType="com.nuoxin.virtual.rep.api.web.controller.response.DrugUserResponseBean">
+        SELECT
+            DISTINCT du.id, du.name
+        FROM
+            product_user pu
+        INNER JOIN drug_user du ON pu.user_id = du.id
+        INNER JOIN role_user ru ON du.id=ru.user_id AND ru.role_id > 100
+        WHERE
+            pu.prod_id = #{productId}
+            AND ru.role_id NOT IN (102, 103)
+    </select>
+
+
     <select id="doctorPageCount" resultType="java.lang.Integer"
             parameterType="com.nuoxin.virtual.rep.api.web.controller.request.QueryRequestBean">
         select count(1) num from drug_user_doctor dud join doctor d on d.id=dud.doctor_id join
@@ -136,7 +150,7 @@
 
       AND du.status=1
       AND pl.show_place=1
-      AND ru.role_id IN (101, 104, 105, 106)
+      AND ru.role_id NOT IN (102, 103)
 
 
       group by du.id
@@ -172,7 +186,7 @@
             </if>
             AND du.status=1
             AND pl.show_place=1
-            AND ru.role_id IN (101, 104, 105, 106)
+            AND ru.role_id NOT IN (102, 103)
 
         )
 

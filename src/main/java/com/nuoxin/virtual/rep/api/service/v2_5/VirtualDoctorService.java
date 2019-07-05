@@ -42,6 +42,13 @@ public interface VirtualDoctorService {
 	 */
 	List<DrugUserResponseBean> getOnlineDrugUserList(Long productId);
 
+	/**
+	 * 得到指定产品下的所有代表，不包括经理、管理员
+	 * @param productId
+	 * @return
+	 */
+	List<DrugUserResponseBean> getAllDrugUserList(Long productId);
+
 
 	void updateVirtualDoctor(UpdateVirtualDoctorRequest request, DrugUser user);
 

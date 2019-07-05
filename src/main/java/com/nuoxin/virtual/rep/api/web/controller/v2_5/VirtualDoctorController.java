@@ -131,6 +131,19 @@ public class VirtualDoctorController extends NewBaseController {
 	}
 
 
+
+
+	@ApiOperation(value = "得到所有的代表，不包括经理、管理员")
+	@RequestMapping(value = "/all/user/list/{productId}", method = { RequestMethod.GET })
+	public DefaultResponseBean<List<DrugUserResponseBean>> getAllDrugUserList(HttpServletRequest request,@PathVariable(value = "productId") Long productId) {
+		List<DrugUserResponseBean> allDrugUserList = virtualDoctorService.getAllDrugUserList(productId);
+		DefaultResponseBean<List<DrugUserResponseBean>> responseBean = new DefaultResponseBean<>();
+		responseBean.setData(allDrugUserList);
+		return responseBean;
+	}
+
+
+
 	@ApiOperation(value = "修改单个医生基本信息固定字段")
 	@RequestMapping(value = "/basic/fix/field/update", method = { RequestMethod.POST })
 	public DefaultResponseBean<Boolean> singleUpdate(HttpServletRequest request,

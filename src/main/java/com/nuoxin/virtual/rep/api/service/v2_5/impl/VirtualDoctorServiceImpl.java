@@ -245,12 +245,20 @@ public class VirtualDoctorServiceImpl implements VirtualDoctorService {
 
     @Override
     public List<DrugUserResponseBean> getOnlineDrugUserList(Long productId) {
-        List<DrugUserResponseBean> list = new ArrayList<>();
         List<DrugUserResponseBean> onlineDrugUserList = drugUserMapper.getOnlineDrugUserList(productId);
         if (CollectionsUtil.isEmptyList(onlineDrugUserList)){
-            return list;
+            onlineDrugUserList = new ArrayList<>();
         }
         return onlineDrugUserList;
+    }
+
+    @Override
+    public List<DrugUserResponseBean> getAllDrugUserList(Long productId) {
+        List<DrugUserResponseBean> allDrugUserList = drugUserMapper.getAllDrugUserList(productId);
+        if (CollectionsUtil.isEmptyList(allDrugUserList)){
+            allDrugUserList = new ArrayList<>();
+        }
+        return allDrugUserList;
     }
 
     @Override
