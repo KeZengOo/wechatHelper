@@ -2587,6 +2587,7 @@
 		WHERE
 		1 = 1
 		<if test="drugUserIdList !=null and drugUserIdList.size > 0">
+			AND dud.is_available=1
 			AND dud.drug_user_id IN
 			<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
 				#{drugUserId}
@@ -2741,6 +2742,7 @@
 		WHERE
 		1 = 1
 		<if test="drugUserIdList !=null and drugUserIdList.size > 0">
+			AND dud.is_available=1
 			AND dud.drug_user_id IN
 			<foreach collection="drugUserIdList" item="drugUserId" open="(" close=")" separator=",">
 				#{drugUserId}
