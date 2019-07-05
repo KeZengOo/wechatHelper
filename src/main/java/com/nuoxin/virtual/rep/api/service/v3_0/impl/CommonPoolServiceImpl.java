@@ -171,11 +171,12 @@ public class CommonPoolServiceImpl implements CommonPoolService {
     @Override
     public void handleExportDoctorList(List<CommonPoolDoctorResponse> doctorList, List<Long> productIdList, HttpServletResponse response) {
 
-        List<LinkedHashMap<String, Object>> dataMap = this.exportData(productIdList, doctorList);
         /**
          * 得到导出的字段
          */
         Map<String, String> titleMap = this.getExportDoctorTitle(productIdList);
+
+        List<LinkedHashMap<String, Object>> dataMap = this.exportData(productIdList, doctorList);
         HSSFWorkbook workbook = ExportExcel.excelLinkedHashMapExport(dataMap, titleMap, "医生列表");
         OutputStream ouputStream = null;
         try {
@@ -309,7 +310,8 @@ public class CommonPoolServiceImpl implements CommonPoolService {
             String doctorName = m.getDoctorName();
             String sex = m.getSex();
             String depart = m.getDepart();
-            String positions = m.getPositions();
+            String doctorTitle = m.getDoctorTitle();
+            String doctorPosition = m.getDoctorPosition();
             Long hospitalId = m.getHospitalId();
             String hospitalName = m.getHospitalName();
             String province = m.getProvince();
@@ -331,7 +333,8 @@ public class CommonPoolServiceImpl implements CommonPoolService {
             doctorDetailMap.put("doctorName", doctorName);
             doctorDetailMap.put("sex", sex);
             doctorDetailMap.put("depart", depart);
-            doctorDetailMap.put("positions", positions);
+            doctorDetailMap.put("doctorTitle", doctorTitle);
+            doctorDetailMap.put("doctorPosition", doctorPosition);
             doctorDetailMap.put("hospitalId", hospitalId);
             doctorDetailMap.put("hospitalName", hospitalName);
             doctorDetailMap.put("province", province);
@@ -376,7 +379,8 @@ public class CommonPoolServiceImpl implements CommonPoolService {
         titleMap.put("doctorName", "医生姓名");
         titleMap.put("sex", "性别");
         titleMap.put("depart", "科室");
-        titleMap.put("positions", "职称");
+        titleMap.put("doctorTitle", "职称");
+        titleMap.put("doctorPosition", "职务");
         titleMap.put("hospitalId", "医院ID");
         titleMap.put("hospitalName", "医院名称");
         titleMap.put("province", "省份");
