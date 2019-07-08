@@ -47,7 +47,7 @@
             l.operate_way operateWay,
             pl.prod_id productId,
             pl.prod_name productName,
-            DATE_FORMAT( l.create_time, '%Y-%m-%d' ) operateTime
+            DATE_FORMAT( l.create_time, '%Y-%m-%d %H:%i:%s' ) operateTime
         FROM
             drug_user_doctor_log l
             INNER JOIN doctor d ON l.doctor_id = d.id

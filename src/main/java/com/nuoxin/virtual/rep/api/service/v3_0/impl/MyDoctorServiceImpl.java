@@ -202,6 +202,7 @@ public class MyDoctorServiceImpl implements MyDoctorService {
         drugUserDoctorParams.setDrugUserId(newDrugUserId);
         drugUserDoctorParams.setDrugUserName(newDrugUser.getName());
         drugUserDoctorParams.setDrugUserEmail(newDrugUser.getEmail());
+        drugUserDoctorParams.setProdId(productId.intValue());
         drugUserDoctorMapper.saveDrugUserDoctor(drugUserDoctorParams);
         drugUserDoctorMapper.updateDrugUserDoctorAvailable(oldDrugUserId, doctorId, productId);
 
