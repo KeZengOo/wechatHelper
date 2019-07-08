@@ -83,6 +83,7 @@
         INNER JOIN role_user ru ON du.id=ru.user_id AND ru.role_id > 100
         WHERE
             pu.prod_id = #{productId}
+            AND du.status=1
             AND ru.role_id NOT IN (102, 103)
     </select>
 
