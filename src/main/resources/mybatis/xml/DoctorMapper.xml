@@ -1896,6 +1896,11 @@
 		ON v.virtual_doctor_id=dud.doctor_id
 		AND v.product_id=dud.prod_id
 
+		<!-- 新转入医生 -->
+		<if test="tag !=null and tag==2">
+			AND v.virtual_drug_user_id=dud.drug_user_id
+		</if>
+
 		LEFT JOIN virtual_doctor_call_info_mend m
 		ON v.id=m.call_id
 
@@ -2186,6 +2191,12 @@
 		LEFT JOIN virtual_doctor_call_info v
 		ON v.virtual_doctor_id=dud.doctor_id
 		AND v.product_id=dud.prod_id
+
+		<!-- 新转入医生 -->
+		<if test="tag !=null and tag==2">
+			AND v.virtual_drug_user_id=dud.drug_user_id
+		</if>
+
 
 		LEFT JOIN virtual_doctor_call_info_mend m
 		ON v.id=m.call_id
