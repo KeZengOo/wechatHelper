@@ -12,11 +12,11 @@
 <RelativeLayout
     android:background="#2DA1F8"
     android:paddingBottom="125dp"
-    android:paddingTop="25dp"
+    android:paddingTop="20dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
     <TextView
-        android:id="@+id/tv_title"
+        android:id="@+id/tv_export_all_message"
         android:layout_centerHorizontal="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -27,7 +27,7 @@
 </RelativeLayout>
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="190dp"
         android:layout_centerHorizontal="true"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
@@ -40,7 +40,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="60dp"
+            android:layout_marginTop="50dp"
             android:gravity="center"
             android:hint="请输入您的微信号"
             android:maxLines="1"
@@ -52,7 +52,7 @@
             android:id="@+id/tv_updateTime"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="25dp"
+            android:layout_marginTop="15dp"
             android:gravity="center"
             android:text="2018-9-09"
             android:textColor="#b5b5b5"
@@ -80,7 +80,6 @@
         android:layout_width="match_parent"
         android:layout_height="340dp"
         android:layout_alignParentBottom="true"
-        android:background="#fff"
         android:orientation="vertical">
 
         <Button
@@ -89,7 +88,7 @@
             android:layout_height="50dp"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
             android:background="@drawable/bg_update"
             android:text="一键上传"
             android:textColor="#f4f6f8"
@@ -108,18 +107,29 @@
             android:textColor="#FFFFFF"
             android:textSize="18dp" />
         <Button
-            android:visibility="invisible"
-            android:id="@+id/btn_export_all_message"
+            android:id="@+id/btn_addbytime"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_alignParentRight="true"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
-            android:layout_marginTop="10dp"
             android:background="@drawable/bg_update"
-            android:text="导出所有聊天记录"
+            android:text="补充上传"
+            android:layout_marginTop="10dp"
             android:textColor="#FFFFFF"
             android:textSize="18dp" />
+        <EditText
+            android:id="@+id/et_addTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center"
+            android:hint="补充日期格式: 2019-01-01 12:15:00 "
+            android:maxLines="1"
+            android:singleLine="true"
+            android:textColor="#586066"
+            android:theme="@style/MyEditText"/>
+
 
         <ImageView
             android:layout_width="match_parent"
@@ -134,7 +144,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="10dp"
             android:text="您可以在工作台中查看和医生的聊天记录"
             android:textColor="#b5b5b5"
             android:textSize="14dp" />
@@ -147,7 +157,7 @@
             android:layout_marginBottom="20dp"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
-            android:layout_marginTop="9dp"
+            android:layout_marginTop="5dp"
             android:gravity="center"
             android:text="我们将会上传您和医生的聊天记录,保存到工作台中,不会采集您的个人隐私,请您放心使用此工具,谢谢!"
             android:textColor="#b5b5b5"

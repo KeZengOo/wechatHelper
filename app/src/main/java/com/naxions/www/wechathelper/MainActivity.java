@@ -7,13 +7,12 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -22,12 +21,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.azhon.appupdate.config.UpdateConfiguration;
 import com.azhon.appupdate.listener.OnButtonClickListener;
 import com.azhon.appupdate.listener.OnDownloadListener;
 import com.azhon.appupdate.manager.DownloadManager;
-import com.azhon.appupdate.config.UpdateConfiguration;
 import com.naxions.www.wechathelper.util.DateUtil;
-
 import com.naxions.www.wechathelper.util.FileUtil;
 import com.naxions.www.wechathelper.util.FilterUtil;
 import com.naxions.www.wechathelper.util.Md5Utils;
@@ -104,7 +102,8 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
      */
     private Button btn_updateData;
     private Button btn_export;
-    private Button btn_export_all_message;
+    private Button btn_addbytime;
+    private TextView tv_export_all_message;
     /**
      * 上次上传时间
      */
@@ -116,10 +115,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
      * 正在上传提示的 loadingView
      */
     private CustomDialog loadingDialog;
-    /**
-     * 提示关闭微信的loadingView
-     */
-    private CustomDialog closeWxDialog;
+
     /**
      * 转圈圈的图
      */
@@ -141,6 +137,10 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
      */
     private EditText et_name;
     /**
+     * 补充上传日期输入框
+     */
+    private EditText et_addTime;
+    /**
      * 用户姓名
      */
     private String userName;
@@ -153,9 +153,15 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
      */
     private String lastUpdateTime;
     /**
-     * 上次上传时间的时间戳
+     * 上次上传时间的时间
      */
-    private Long longLastUpdateTime;
+    private Long longLastUpdateTime; /**
+     * 补充上传的时间
+     */
+    private  String addTime ;
+    /** * 补充上传的时间戳
+     */
+    private  Long addTimestamp  ;
     /**
      * 文件上传
      */
@@ -165,10 +171,10 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
      * baseUrl
      */
     //测试
-     String baseUrl = "http://123.56.95.29:7083/android/wechat/";
+//     String baseUrl = "http://123.56.95.29:7083/android/wechat/";
     //正式
-//   String baseUrl = "http://47.93.121.23:10001/android/wechat/";
-    //sql 语句
+   String baseUrl = "http://47.93.121.23:10001/android/wechat/";
+     //sql 语句
      String contactSql = "select * from rcontact where verifyFlag = 0 and  type != 2 and type != 0 and type != 33 and nickname != ''and nickname != '文件传输助手'";
      String messageSql = "select * from message where  createTime >";
      String chatroomSql = "select * from chatroom";
@@ -180,11 +186,13 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
     /**
      * 是否选中全部的聊天记录
      */
-    public static boolean iselectAll = false;
+    public static boolean isSelectAll = false;
+
+    public static boolean isAddAll = false;
+
     /**
      * 是否仅导出不上传
      */
-    public static boolean isUpload = true;
     public static final String EMPTY = "";
     public static final String ZERO = "0";
     public static final String SUCCESS_CODE = "200";
@@ -219,13 +227,15 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
         btn_export = findViewById(R.id.btn_export);
         tv_updateTime = findViewById(R.id.tv_updateTime);
         tv_title = findViewById(R.id.tv_title);
-        btn_export_all_message = findViewById(R.id.btn_export_all_message);
+        tv_export_all_message = findViewById(R.id.tv_export_all_message);
+        btn_addbytime = findViewById(R.id.btn_addbytime);
         et_name = findViewById(R.id.et_name);
+        et_addTime = findViewById(R.id.et_addTime);
         des_text = findViewById(R.id.des_text);
         btn_updateData.setOnClickListener(this);
         btn_export.setOnClickListener(this);
-        tv_title.setOnClickListener(this);
-        btn_export_all_message.setOnClickListener(this);
+        tv_export_all_message.setOnClickListener(this);
+        btn_addbytime.setOnClickListener(this);
     }
 
     private void initData() {
@@ -262,26 +272,48 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
         switch (v.getId()) {
             //上传聊天记录按钮
             case (R.id.btn_updateData):
-                iselectAll = false;
-                isUpload = true;
+                isSelectAll = false;
+                isAddAll = false;
                 uploadData();
                 break;
             //导出联系人按钮
             case (R.id.btn_export):
                 startActivity(new Intent(mActivity, ExportActivity.class));
                 break;
-            //导出所有聊天记录到本地,不上传
-            case (R.id.btn_export_all_message):
-//                iselectAll = true;
-//                isUpload = false;
-//                uploadData();
-                  Toast.makeText(mActivity,"功能暂时下线",Toast.LENGTH_LONG).show() ;
-                  //startUpdate3();
-                break;
             //强制更新所有聊天记录
-            case (R.id.tv_title):
-                iselectAll = true;
-                isUpload = true;
+            case (R.id.tv_export_all_message):
+                isSelectAll = true;
+                isAddAll = true;
+                uploadData();
+                break;
+            //强制更新输入日期到下载的所有聊天记录
+            case (R.id.btn_addbytime):
+                addTime = et_addTime.getText().toString();
+                if(addTime.equals("")|| TextUtils.isEmpty(addTime)){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(),"请您输入补充的日期",Toast.LENGTH_LONG).show();
+                        }
+                    });
+                    return;
+                }
+
+                addTimestamp= DateUtil.date2Timestamp(addTime+":000");
+                //时间戳格式不对,直接提示
+                if(addTimestamp ==0 ){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(),"您输入的日期格式错误",Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+                    return;
+                }
+
+                isSelectAll = true;
+                isAddAll = false;
                 uploadData();
                 break;
             default:
@@ -324,46 +356,23 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
         edit.commit();
         //判断是否安装了微信
         if (isWeixinAvilible()) {
-            if (closeWxDialog == null) {
-                closeWxDialog = new CustomDialog(this, R.style.customDialog, R.layout.layout_closewx_dialog);
-            }
-            closeWxDialog.show();
-            TextView tv_updateData = closeWxDialog.findViewById(R.id.tv_update);
-            TextView tv_closeWX = closeWxDialog.findViewById(R.id.tv_closeWX);
-            tv_closeWX.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    //跳转到微信设置界面,关闭微信,避免操作同一数据库崩溃冲突
-                    Uri packageURI = Uri.parse("package:" + WXPACKAGENAME);
-                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, packageURI);
-                    startActivity(intent);
-                }
-            });
-            tv_updateData.setOnClickListener(new View.OnClickListener() {
+            //显示 loadingView
+            if (loadingDialog == null) {
+             loadingDialog = new CustomDialog(mActivity, R.style.customDialog, R.layout.layout_loading_dialog);
+             }
+             loadingDialog.setCancelable(false);
 
-                //点击上传文件
-                @Override
-                public void onClick(View view) {
-                    //显示 loadingView
-                    if (loadingDialog == null) {
-                        loadingDialog = new CustomDialog(mActivity, R.style.customDialog, R.layout.layout_loading_dialog);
-                    }
-                    loadingDialog.setCancelable(false);
-                    closeWxDialog.dismiss();
-                    loadingDialog.show();
-                    loadingView = loadingDialog.findViewById(R.id.loadingView);
-                    mRemindText = loadingDialog.findViewById(R.id.text);
-                    iv_success = loadingDialog.findViewById(R.id.iv_success);
-                    iv_fail = loadingDialog.findViewById(R.id.iv_fail);
-                    mRemindText.setText("正在从微信中导出聊天记录,请稍候");
-                    loadingView.setVisibility(View.VISIBLE);
-                    iv_success.setVisibility(View.INVISIBLE);
-                    iv_fail.setVisibility(View.INVISIBLE);
-                    //获取上次上传时间并赋值
-                    getLastUploadTime();
-
-                }
-            });
+             loadingDialog.show();
+             loadingView = loadingDialog.findViewById(R.id.loadingView);
+             mRemindText = loadingDialog.findViewById(R.id.text);
+             iv_success = loadingDialog.findViewById(R.id.iv_success);
+             iv_fail = loadingDialog.findViewById(R.id.iv_fail);
+             mRemindText.setText("正在从微信中导出聊天记录,请稍候");
+             loadingView.setVisibility(View.VISIBLE);
+             iv_success.setVisibility(View.INVISIBLE);
+             iv_fail.setVisibility(View.INVISIBLE);
+             //获取上次上传时间并赋值
+             getLastUploadTime();
         } else {
             runOnUiThread(new Runnable() {
                 @Override
@@ -423,7 +432,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
                         if (isDebug) {
                             Log.e("query 获取上次的上传时间==", messageUploadTime);
                         }
-                        //返回的时间不为空再复制,保存,不然就不处理,直接获取sp 的时间
+                        //返回的时间不为空再赋值,保存,不然就不处理,直接获取sp 的时间
                         if (!EMPTY.equals(messageUploadTime) && !ZERO.equals(messageUploadTime)) {
                             //赋值上次上传时间
                             runOnUiThread(new Runnable() {
@@ -541,7 +550,6 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
         SQLiteDatabaseHook hook = new SQLiteDatabaseHook() {
             @Override
             public void preKey(SQLiteDatabase database) {
-
             }
 
             @Override
@@ -560,7 +568,6 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
                 @Override
                 public void run() {
                     getUploadTimeError("读取数据库信息失败");
-
                 }
             });
         }
@@ -629,17 +636,11 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
             contactCsvPrinter.printRecord();
             contactCsvPrinter.flush();
 
-            //判断是否需要将聊天记录上传,若需要就上传,不然就导出到本地
-            if (isUpload) {
                 //上传联系人
                 upLoadFiles(baseUrl + "contact/import?uploadTime=" + currentTime, file1, 1);
                 //联系人上传后再获取并上传群聊记录
                 getChatRoomData(db);
 
-
-            } else {
-                exportMessageToSD(db);
-            }
 
         } catch (Exception e) {
             Log.e("openWxDb", "读取数据库信息失败" + e.toString());
@@ -662,7 +663,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
         Cursor cursor2 = null;
         try {
     //新建文件保存聊天记录
-            file2 = new File(Environment.getExternalStorageDirectory().getPath() + "/" + et_name.getText().toString().trim() + "ΞchatRoomΞfile" + ".csv");
+        file2 = new File(Environment.getExternalStorageDirectory().getPath() + "/" + et_name.getText().toString().trim() + "ΞchatRoomΞfile" + ".csv");
             // 防止出现乱码 utf-8
             BufferedWriter writer2 = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file2), "UTF-8"));
             messageCsvPrinter = new CSVPrinter(writer2, CSVFormat.DEFAULT.withHeader("chatroomname", "memberlist", "displayname", "roomowner","selfDisplayName"));
@@ -702,7 +703,6 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
         getReMessageData(db);
     }
 
-
     /**
      * 获取聊天记录并上传
      *
@@ -720,13 +720,22 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
             BufferedWriter writer2 = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file2), "UTF-8"));
             messageCsvPrinter = new CSVPrinter(writer2, CSVFormat.DEFAULT.withHeader("talker", "content", "createTime", "imgPath", "isSend", "type"));
 
-            //判断是否强制更新所有人
-            if (iselectAll) {
-                cursor3 = db.rawQuery(messageSql + "0", null);
-                Log.e("query", "更新全部记录" + messageSql + "0");
+            //判断是否强制更新所有的记录
+            if (isSelectAll) {
+                //如果是选择全部,则sql 为0
+                if(isAddAll){
+                    cursor3 = db.rawQuery(messageSql + 0, null);
+                    Log.e("query", "更新状态:更新全部记录" + messageSql + 0);
+                }else{
+                //不是选择全部,则sql 为yoghurt 输入值
+
+                cursor3 = db.rawQuery(messageSql + addTimestamp, null);
+                Log.e("query", "更新状态:更新选择的全部记录" + messageSql + addTimestamp);
+                }
+
             } else {
                 cursor3 = db.rawQuery(messageSql + longLastUpdateTime, null);
-                Log.e("query", "更新部分记录" + messageSql + longLastUpdateTime);
+                Log.e("query", "更新状态:增量更新部分记录" + messageSql + longLastUpdateTime);
             }
 
             while (cursor3.moveToNext()) {
@@ -792,7 +801,6 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
             if (cursor3 != null) {
                 cursor3.close();
             }
-
         }
 
         getMasSendInfo(db,file2,messageCsvPrinter);
@@ -904,20 +912,27 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
                 public void onFailure(Call call, final IOException e) {
                     Log.e("query上传文件失败的返回错误", e.toString());
                     //上传失败
-                    switch (type) {
-                        case 1:
-                            getUploadTimeError("联系人上传失败请联系开发人员");
-                            break;
-                        case 2:
-                            getUploadTimeError("群聊记录上传失败请联系开发人员");
-                            break;
-                        case 3:
-                            mRemindText.setText("聊天记录上传失败请联系开发人员");
-                            break;
-                        default:
-                            getUploadTimeError("上传失败请联系开发人员");
-                            break;
-                    }
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            switch (type) {
+                                case 1:
+                                    getUploadTimeError("联系人上传失败请联系开发人员");
+                                    break;
+                                case 2:
+                                    getUploadTimeError("群聊记录上传失败请联系开发人员");
+                                    break;
+                                case 3:
+                                    mRemindText.setText("聊天记录上传失败请联系开发人员");
+                                    break;
+                                default:
+                                    getUploadTimeError("上传失败请联系开发人员");
+                                    break;
+                            }
+                        }
+                    });
+
 
                     runOnUiThread(new Runnable() {
                         @Override
@@ -973,19 +988,22 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
                                     iv_fail.setVisibility(View.INVISIBLE);
                                     iv_success.setVisibility(View.VISIBLE);
                                     mRemindText.setText("聊天记录上传成功");
-                                    tv_updateTime.setText(currentTime);
-                                    if (preferences == null) {
-                                        preferences = getSharedPreferences(USERINFO, Context.MODE_PRIVATE);
+
+                                    //重新赋值本次上传时间,并保存在 sp 中
+                                        longLastUpdateTime = Long.valueOf(mTimeStamp);
+                                        tv_updateTime.setText(currentTime);
+                                        if (isDebug) {
+                                            Log.e("query聊天记录上传成功后更新的时间", DateUtil.timeStamp2Date(longLastUpdateTime + EMPTY));
+                                        }
+                                        if (preferences == null) {
+                                            preferences = getSharedPreferences(USERINFO, Context.MODE_PRIVATE);
+                                        }
+                                        SharedPreferences.Editor edit = preferences.edit();
+                                        edit.putString(LAST_UPDATE_TIME, currentTime);
+                                        edit.commit();
                                     }
-                                    SharedPreferences.Editor edit = preferences.edit();
-                                    edit.putString(LAST_UPDATE_TIME, currentTime);
-                                    edit.commit();
-                                    //重新赋值本次上传时间
-                                    longLastUpdateTime = Long.valueOf(mTimeStamp);
-                                    if (isDebug) {
-                                        Log.e("query聊天记录上传成功后更新的时间", DateUtil.timeStamp2Date(longLastUpdateTime + EMPTY));
-                                    }
-                                }
+
+
                             });
                         } else if(type==1){
                             if (isDebug) {
@@ -1027,8 +1045,50 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
         }
     }
 
+
+
     /**
-     * 获取聊天记录并保存在本地
+     * 请求失败的弹窗处理
+     *
+     * @param s
+     */
+    private void getUploadTimeError(final String s) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (loadingDialog == null) {
+                    loadingDialog = new CustomDialog(mActivity, R.style.customDialog, R.layout.layout_loading_dialog);
+                }
+                loadingDialog.setCancelable(true);
+                mRemindText.setText(s);
+                loadingView.setVisibility(View.INVISIBLE);
+                iv_success.setVisibility(View.INVISIBLE);
+                iv_fail.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    /**
+     * 判断是否安装了微信
+     *
+     * @return
+     */
+    public boolean isWeixinAvilible() {
+        final PackageManager packageManager = mActivity.getPackageManager();
+        List<PackageInfo> pinfo = packageManager.getInstalledPackages(0);
+        if (pinfo != null) {
+            for (int i = 0; i < pinfo.size(); i++) {
+                String pn = pinfo.get(i).packageName;
+                if (pn.equals(WXPACKAGENAME)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 获取聊天记录并保存在本地,权限问题暂时废用
      *
      * @param db
      */
@@ -1132,51 +1192,10 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
         }
     }
 
-    /**
-     * 请求失败的弹窗处理
-     *
-     * @param s
-     */
-    private void getUploadTimeError(final String s) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (loadingDialog == null) {
-                    loadingDialog = new CustomDialog(mActivity, R.style.customDialog, R.layout.layout_loading_dialog);
-                }
-                loadingDialog.setCancelable(true);
-                mRemindText.setText(s);
-                loadingView.setVisibility(View.INVISIBLE);
-                iv_success.setVisibility(View.INVISIBLE);
-                iv_fail.setVisibility(View.VISIBLE);
-            }
-        });
-    }
-
-    /**
-     * 判断是否安装了微信
-     *
-     * @return
-     */
-    public boolean isWeixinAvilible() {
-        final PackageManager packageManager = mActivity.getPackageManager();
-        List<PackageInfo> pinfo = packageManager.getInstalledPackages(0);
-        if (pinfo != null) {
-            for (int i = 0; i < pinfo.size(); i++) {
-                String pn = pinfo.get(i).packageName;
-                if (pn.equals(WXPACKAGENAME)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
     /*
      * 安装更新
      */
     private void startUpdate3() {
-
         UpdateConfiguration configuration = new UpdateConfiguration()
                 //输出错误日志
                 .setEnableLog(true)
@@ -1200,7 +1219,6 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
                 .setButtonClickListener(mActivity)
                 //设置下载过程的监听
                 .setOnDownloadListener(this);
-
         manager = DownloadManager.getInstance(this);
         manager.setApkName("wechatHelper.apk")
                 .setApkUrl("https://github.com/KeZengOo/wechatHelper/raw/master/app/%E8%81%8A%E5%A4%A9%E4%B8%8A%E4%BC%A0%E5%B7%A5%E5%85%B7.apk")
@@ -1213,7 +1231,6 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
                 .setAuthorities(getPackageName())
                 .setApkDescription("这都是啥")
                 .download();
-
     }
 
 
@@ -1253,9 +1270,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
         if (loadingDialog != null) {
             loadingDialog.dismiss();
         }
-        if (closeWxDialog != null) {
-            closeWxDialog.dismiss();
-        }
+
     }
 }
 

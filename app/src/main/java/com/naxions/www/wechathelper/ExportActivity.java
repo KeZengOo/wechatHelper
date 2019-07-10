@@ -162,7 +162,6 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
         protected void onPreExecute() {
             //拷贝前先提示正在处理
             super.onPreExecute();
-
         }
 
         @Override
@@ -416,7 +415,6 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
                 db.close();
             }
         }
-
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
