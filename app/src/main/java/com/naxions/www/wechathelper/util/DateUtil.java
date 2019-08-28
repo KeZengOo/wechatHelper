@@ -46,6 +46,12 @@ public class DateUtil {
         long time = System.currentTimeMillis();
         String t = String.valueOf(time);
         return t;  
-    }  
+    }
+
+    // formatType格式为yyyy-MM-dd HH:mm:ss//yyyy年MM月dd日 HH时mm分ss秒
+    // data Date类型的时间
+    public static String dateToString(Date data) {
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(data);
+    }
 
 }

@@ -2,6 +2,7 @@ package com.naxions.www.wechathelper.util;
 
 import android.app.Activity;
 import android.content.Context;
+import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -113,12 +114,16 @@ public class PasswordUtiles {
      */
     private static String initPhoneIMEI(Context mContext) {
 
-        TelephonyManager telephonyManager =
-                (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
-
-        String deviceId = telephonyManager.getDeviceId();
-
-        return deviceId;
+        String id;
+        //android.telephony.TelephonyManager
+        TelephonyManager mTelephony = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
+        if (mTelephony.getDeviceId() != null) {
+            id = mTelephony.getDeviceId();
+        } else {
+            //android.provider.Settings;
+            id = Settings.Secure.getString(mContext.getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+        }
+        return id;
 
     }
 

@@ -11,8 +11,8 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -25,6 +25,9 @@ import com.azhon.appupdate.config.UpdateConfiguration;
 import com.azhon.appupdate.listener.OnButtonClickListener;
 import com.azhon.appupdate.listener.OnDownloadListener;
 import com.azhon.appupdate.manager.DownloadManager;
+import com.codbking.widget.DatePickDialog;
+import com.codbking.widget.OnSureLisener;
+import com.codbking.widget.bean.DateType;
 import com.naxions.www.wechathelper.util.DateUtil;
 import com.naxions.www.wechathelper.util.FileUtil;
 import com.naxions.www.wechathelper.util.FilterUtil;
@@ -47,6 +50,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -92,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
     //根据输入的不同微信号切换到不同的key
     public String LAST_UPDATE_TIME = EMPTY;
 
-    /**
+    /**tv_addTime_start
      * apk下载
      */
     private DownloadManager manager;
@@ -139,7 +143,8 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
     /**
      * 补充上传日期输入框
      */
-    private EditText et_addTime;
+    private TextView tv_addTime_start;
+    private TextView tv_addTime_end;
     /**
      * 用户姓名
      */
@@ -159,9 +164,11 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
      * 补充上传的时间
      */
     private  String addTime ;
+    private  String endTime ;
     /** * 补充上传的时间戳
      */
     private  Long addTimestamp  ;
+    private  Long endTimestamp  ;
     /**
      * 文件上传
      */
@@ -173,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
     //测试
 //     String baseUrl = "http://123.56.95.29:7083/android/wechat/";
     //正式
-   String baseUrl = "http://47.93.121.23:10001/android/wechat/";
+     String baseUrl = "http://47.93.121.23:10001/android/wechat/";
      //sql 语句
      String contactSql = "select * from rcontact where verifyFlag = 0 and  type != 2 and type != 0 and type != 33 and nickname != ''and nickname != '文件传输助手'";
      String messageSql = "select * from message where  createTime >";
@@ -230,12 +237,15 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
         tv_export_all_message = findViewById(R.id.tv_export_all_message);
         btn_addbytime = findViewById(R.id.btn_addbytime);
         et_name = findViewById(R.id.et_name);
-        et_addTime = findViewById(R.id.et_addTime);
+        tv_addTime_start = findViewById(R.id.tv_addTime_start);
+        tv_addTime_end = findViewById(R.id.tv_addTime_end);
         des_text = findViewById(R.id.des_text);
         btn_updateData.setOnClickListener(this);
         btn_export.setOnClickListener(this);
         tv_export_all_message.setOnClickListener(this);
         btn_addbytime.setOnClickListener(this);
+        tv_addTime_start.setOnClickListener(this);
+        tv_addTime_end.setOnClickListener(this);
     }
 
     private void initData() {
@@ -288,33 +298,87 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
                 break;
             //强制更新输入日期到下载的所有聊天记录
             case (R.id.btn_addbytime):
-                addTime = et_addTime.getText().toString();
-                if(addTime.equals("")|| TextUtils.isEmpty(addTime)){
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(),"请您输入补充的日期",Toast.LENGTH_LONG).show();
-                        }
-                    });
-                    return;
-                }
-
+                addTime = tv_addTime_start.getText().toString();
                 addTimestamp= DateUtil.date2Timestamp(addTime+":000");
                 //时间戳格式不对,直接提示
                 if(addTimestamp ==0 ){
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(getApplicationContext(),"您输入的日期格式错误",Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(),"您输入的起始日期格式错误",Toast.LENGTH_LONG).show();
                         }
                     });
 
                     return;
                 }
 
+                endTime = tv_addTime_end.getText().toString();
+                endTimestamp= DateUtil.date2Timestamp(endTime+":000");
+                //时间戳格式不对,直接提示
+                if(endTimestamp == 0 ){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(),"您输入的截止日期格式错误",Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+                    return;
+                }
+
+                if(endTimestamp <= addTimestamp){
+                    Toast.makeText(getApplicationContext(),"输入的截止日期小于/等于起始日期",Toast.LENGTH_LONG).show();
+                    return;
+                }
+
                 isSelectAll = true;
                 isAddAll = false;
                 uploadData();
+                break;
+            case (R.id.tv_addTime_start):
+                //时间选择器
+
+                DatePickDialog dialog_start = new DatePickDialog(this);
+                //设置上下年分限制
+                dialog_start.setYearLimt(5);
+                //设置标题
+                dialog_start.setTitle("选择时间");
+                //设置类型
+                dialog_start.setType(DateType.TYPE_YMDHM);
+                //设置消息体的显示格式，日期格式
+                dialog_start.setMessageFormat("yyyy-MM-dd HH:mm");
+                //设置选择回调
+                dialog_start.setOnChangeLisener(null);
+                //设置点击确定按钮回调
+                dialog_start.setOnSureLisener(new OnSureLisener() {
+                    @Override
+                    public void onSure(Date date) {
+                        tv_addTime_start.setText(DateUtil.dateToString(date).substring(0,17)+"00");
+                    }
+                });
+                dialog_start.show();
+                break;
+
+            case (R.id.tv_addTime_end):
+                DatePickDialog dialog_end = new DatePickDialog(this);
+                //设置上下年分限制
+                dialog_end.setYearLimt(5);
+                //设置标题
+                dialog_end.setTitle("选择时间");
+                //设置类型
+                dialog_end.setType(DateType.TYPE_YMDHM);
+                //设置消息体的显示格式，日期格式
+                dialog_end.setMessageFormat("yyyy-MM-dd HH:mm");
+                //设置选择回调
+                dialog_end.setOnChangeLisener(null);
+                //设置点击确定按钮回调
+                dialog_end.setOnSureLisener(new OnSureLisener() {
+                    @Override
+                    public void onSure(Date date) {
+                        tv_addTime_end.setText(DateUtil.dateToString(date).substring(0,17)+"00");
+                    }
+                });
+                dialog_end.show();
                 break;
             default:
                 break;
@@ -727,10 +791,10 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
                     cursor3 = db.rawQuery(messageSql + 0, null);
                     Log.e("query", "更新状态:更新全部记录" + messageSql + 0);
                 }else{
-                //不是选择全部,则sql 为yoghurt 输入值
-
-                cursor3 = db.rawQuery(messageSql + addTimestamp, null);
-                Log.e("query", "更新状态:更新选择的全部记录" + messageSql + addTimestamp);
+                //不是选择全部,则sql 为用户输入值
+                    String searchMessageSql = messageSql + addTimestamp+ "  and createTime < "+endTimestamp;
+                cursor3 = db.rawQuery(searchMessageSql, null);
+                Log.e("query", "更新状态:更新选择的全部记录" + searchMessageSql);
                 }
 
             } else {
@@ -860,6 +924,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
      * @throws Exception isSave 用来表示只有消息表上传成功时,才保存上传时间到 sp
      * type  1 = 联系人    2 = 群聊  3 =  消息记录
      */
+    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
     private void upLoadFiles(String url, File file, final int type) {
         if (isDebug) {
             Log.e("query网址", url + file.getName());
@@ -1232,7 +1297,6 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
                 .setApkDescription("这都是啥")
                 .download();
     }
-
 
     @Override
     public void onButtonClick(int id) {
