@@ -42,6 +42,10 @@ public class PasswordUtiles {
      */
     public static String initDbPassword(final Activity mContext) {
         String imei = initPhoneIMEI(mContext);
+        //以为不同手机微信拿到的识别码不一样,所以需要做特别处理,可能是MEID,可能是 IMEI1,可能是IMEI2
+        if("868739046004754".equals(imei)){
+            imei = "99001184251238";
+        }
         String uin = initCurrWxUin(mContext);
         if(MainActivity.isDebug){
             Log.e("initDbPassword", "imei===" + imei);

@@ -30,6 +30,7 @@ public class FileUtil {
         try {
             int byteRead = 0;
             File oldFile = new File(oldPath);
+
             //文件存在时
             if (oldFile.exists()) {
                 //读入原文件

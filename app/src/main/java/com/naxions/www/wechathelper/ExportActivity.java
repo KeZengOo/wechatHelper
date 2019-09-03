@@ -22,10 +22,9 @@ import com.naxions.www.wechathelper.util.Md5Utils;
 import com.naxions.www.wechathelper.util.PasswordUtiles;
 import com.threekilogram.objectbus.bus.ObjectBus;
 import com.wang.avi.AVLoadingIndicatorView;
-
-import net.sqlcipher.Cursor;
-import net.sqlcipher.database.SQLiteDatabase;
-import net.sqlcipher.database.SQLiteDatabaseHook;
+import com.tencent.wcdb.Cursor;
+import com.tencent.wcdb.database.SQLiteCipherSpec;
+import com.tencent.wcdb.database.SQLiteDatabase;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -210,22 +209,24 @@ public class ExportActivity extends AppCompatActivity implements View.OnClickLis
      * 连接数据库
      */
     public void openWxDb(File dbFile, final Activity mContext, String mDbPassword, int type) {
-        SQLiteDatabase.loadLibs(mContext);
-        SQLiteDatabaseHook hook = new SQLiteDatabaseHook() {
-            @Override
-            public void preKey(SQLiteDatabase database) {
-            }
 
-            @Override
-            public void postKey(SQLiteDatabase database) {
-                database.rawExecSQL("PRAGMA cipher_migrate;");
-            }
-        };
-        //打开数据库连接
-        final SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(dbFile, mDbPassword, null, hook);
-        runRecontact(mContext, db, type);
+        SQLiteCipherSpec cipher = new SQLiteCipherSpec()  // 加密描述对象
+                .setPageSize(1024)        // SQLCipher 默认 Page size 为 1024
+                .setSQLCipherVersion(1);  // 1,2,3 分别对应 1.x, 2.x, 3.x 创建的 SQLCipher 数据库
+        // 如以前使用过其他PRAGMA，可添加其他选项
+
+            //打开数据库连接
+            SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(
+                    dbFile,     // DB 路径
+                    mDbPassword.getBytes(),  // WCDB 密码参数类型为 byte[]
+                    cipher,                 // 上面创建的加密描述对象
+                    null,                   // CursorFactory
+                    null                    // DatabaseErrorHandler
+                    // SQLiteDatabaseHook 参数去掉了，在cipher里指定参数可达到同样目的
+            );
+            runRecontact(mContext, db, type);
+
     }
-
     /**
      * 微信好友信息
      *

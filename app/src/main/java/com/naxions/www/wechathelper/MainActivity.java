@@ -33,12 +33,11 @@ import com.naxions.www.wechathelper.util.FileUtil;
 import com.naxions.www.wechathelper.util.FilterUtil;
 import com.naxions.www.wechathelper.util.Md5Utils;
 import com.naxions.www.wechathelper.util.PasswordUtiles;
+import com.tencent.wcdb.Cursor;
+import com.tencent.wcdb.database.SQLiteCipherSpec;
+import com.tencent.wcdb.database.SQLiteDatabase;
 import com.threekilogram.objectbus.bus.ObjectBus;
 import com.wang.avi.AVLoadingIndicatorView;
-
-import net.sqlcipher.Cursor;
-import net.sqlcipher.database.SQLiteDatabase;
-import net.sqlcipher.database.SQLiteDatabaseHook;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -62,6 +61,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+
+//import com.tencent.wcdb.database.SQLiteDatabaseHook;
 
 /**
  * @Author: zengke
@@ -587,8 +588,10 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
 
                 //将微信数据库拷贝出来，因为直接连接微信的db，会导致微信崩溃
                 FileUtil.copyFile(wxDataDir.getAbsolutePath(), copyFilePath);
+                File file = new File(copyFilePath);
                 //将微信数据库导出到sd卡操作sd卡上数据库
-                openWxDb(new File(copyFilePath), mActivity, password);
+                System.out.println(file.length()+"================================");
+                openWxDb(file, mActivity, password);
             } catch (Exception e) {
                 if (isDebug) {
                     Log.e("path", e.getMessage());
@@ -610,21 +613,37 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
      * 连接数据库
      */
     public void openWxDb(File dbFile, final Activity mContext, String mDbPassword) {
-        SQLiteDatabase.loadLibs(mContext);
-        SQLiteDatabaseHook hook = new SQLiteDatabaseHook() {
-            @Override
-            public void preKey(SQLiteDatabase database) {
-            }
+//        SQLiteDatabase.loadLibs(mContext);
+//        SQLiteDatabaseHook hook = new SQLiteDatabaseHook() {
+//            @Override
+//            public void preKey(SQLiteDatabase database) {
+//            }
+//
+//            @Override
+//            public void postKey(SQLiteDatabase database) {
+//                database.rawExecSQL("PRAGMA cipher_migrate;");
+//            }
+//        };
 
-            @Override
-            public void postKey(SQLiteDatabase database) {
-                database.rawExecSQL("PRAGMA cipher_migrate;");
-            }
-        };
+
+        SQLiteCipherSpec cipher = new SQLiteCipherSpec()  // 加密描述对象
+                .setPageSize(1024)        // SQLCipher 默认 Page size 为 1024
+                .setSQLCipherVersion(1);  // 1,2,3 分别对应 1.x, 2.x, 3.x 创建的 SQLCipher 数据库
+        // 如以前使用过其他PRAGMA，可添加其他选项
+
 
         try {
             //打开数据库连接
-            final SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(dbFile, mDbPassword, null, hook);
+//            final SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(dbFile.getPath(), mDbPassword, null, hook);
+            System.out.println(dbFile.length()+"================================");
+            SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(
+                    dbFile,     // DB 路径
+                    mDbPassword.getBytes(),  // WCDB 密码参数类型为 byte[]
+                    cipher,                 // 上面创建的加密描述对象
+                    null,                   // CursorFactory
+                    null                    // DatabaseErrorHandler
+                    // SQLiteDatabaseHook 参数去掉了，在cipher里指定参数可达到同样目的
+            );
             runRecontact(mContext, db);
         } catch (Exception e) {
             Log.e("openWxDb", "读取数据库信息失败" + e.toString());
