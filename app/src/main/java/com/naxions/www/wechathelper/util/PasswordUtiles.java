@@ -46,6 +46,9 @@ public class PasswordUtiles {
         if("868739046004754".equals(imei)){
             imei = "99001184251238";
         }
+        else if("99001184249875".equals(imei)){
+            imei = "868739045977497";
+        }
         String uin = initCurrWxUin(mContext);
         if(MainActivity.isDebug){
             Log.e("initDbPassword", "imei===" + imei);
