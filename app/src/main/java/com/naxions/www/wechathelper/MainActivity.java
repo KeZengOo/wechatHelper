@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -107,6 +108,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
      */
     private Button btn_updateData;
     private Button btn_export;
+    private Button btn_updelay;
     private Button btn_addbytime;
     private TextView tv_export_all_message;
     /**
@@ -179,9 +181,9 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
      * baseUrl
      */
     //测试
-//     String baseUrl = "http://123.56.95.29:7083/android/wechat/";
+     String baseUrl = "http://123.56.95.29:7083/android/wechat/";
     //正式
-     String baseUrl = "http://47.93.121.23:10001/android/wechat/";
+//     String baseUrl = "http://47.93.121.23:10001/android/wechat/";
      //sql 语句
      String contactSql = "select * from rcontact where verifyFlag = 0 and  type != 2 and type != 0 and type != 33 and nickname != ''and nickname != '文件传输助手'";
      String messageSql = "select * from message where  createTime >";
@@ -228,7 +230,9 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
         initView();
         initData();
 
+
     }
+
 
     private void initView() {
         btn_updateData = findViewById(R.id.btn_updateData);
@@ -237,6 +241,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
         tv_title = findViewById(R.id.tv_title);
         tv_export_all_message = findViewById(R.id.tv_export_all_message);
         btn_addbytime = findViewById(R.id.btn_addbytime);
+        btn_updelay = findViewById(R.id.btn_updelay);
         et_name = findViewById(R.id.et_name);
         tv_addTime_start = findViewById(R.id.tv_addTime_start);
         tv_addTime_end = findViewById(R.id.tv_addTime_end);
@@ -247,6 +252,7 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
         btn_addbytime.setOnClickListener(this);
         tv_addTime_start.setOnClickListener(this);
         tv_addTime_end.setOnClickListener(this);
+        btn_updelay.setOnClickListener(this);
     }
 
     private void initData() {
@@ -301,6 +307,8 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
             case (R.id.btn_addbytime):
                 addTime = tv_addTime_start.getText().toString();
                 addTimestamp= DateUtil.date2Timestamp(addTime+":000");
+                endTime = tv_addTime_end.getText().toString();
+                endTimestamp= DateUtil.date2Timestamp(endTime+":000");
                 //时间戳格式不对,直接提示
                 if(addTimestamp ==0 ){
                     runOnUiThread(new Runnable() {
@@ -313,8 +321,6 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
                     return;
                 }
 
-                endTime = tv_addTime_end.getText().toString();
-                endTimestamp= DateUtil.date2Timestamp(endTime+":000");
                 //时间戳格式不对,直接提示
                 if(endTimestamp == 0 ){
                     runOnUiThread(new Runnable() {
@@ -336,9 +342,44 @@ public class MainActivity extends AppCompatActivity implements OnDownloadListene
                 isAddAll = false;
                 uploadData();
                 break;
+
+            case (R.id.btn_updelay):
+                Intent intent2 = new Intent(mActivity,PlayerMusicService.class);
+                startService(intent2);
+                Intent intent = new Intent(mActivity,DaemonService.class);
+                startService(intent);
+                //延迟上传
+                addTime = tv_addTime_start.getText().toString();
+                addTimestamp= DateUtil.date2Timestamp(addTime+":000");
+                endTime = tv_addTime_end.getText().toString();
+                endTimestamp= DateUtil.date2Timestamp(endTime+":000");
+
+                //选择了起始和截止日期
+                if(endTimestamp != 0 && addTimestamp !=0  ){
+                    isSelectAll = true;
+                    isAddAll = false;
+                    //提示
+                   Toast.makeText(mActivity,"五个小时后将自动执行补充上传,请不要关闭本软件,并在本页面下锁屏",Toast.LENGTH_LONG).show();
+                }else{
+                    isSelectAll = false;
+                    isAddAll = false;
+                    //提示
+                    Toast.makeText(mActivity,"五个小时后将自动执行增量上传,请不要关闭本软件,并在本页面下锁屏",Toast.LENGTH_LONG).show();
+                }
+                System.out.println("等待执行");
+                new Handler().postDelayed(new Runnable() {
+                     @Override
+                        public void run() {
+                         System.out.println("执行了");
+                                uploadData();
+                        }
+//                    }, 300000); //五分钟
+                    }, 3600000); //一小时
+//                    }, 18000000); //五小时
+
+                break;
             case (R.id.tv_addTime_start):
                 //时间选择器
-
                 DatePickDialog dialog_start = new DatePickDialog(this);
                 //设置上下年分限制
                 dialog_start.setYearLimt(5);

@@ -113,21 +113,38 @@
 
         </LinearLayout>
 
-
+    <LinearLayout
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
         <Button
-            android:id="@+id/btn_export"
-            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:id="@+id/btn_updelay"
+            android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_alignParentRight="true"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
-            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_update"
+            android:text="延迟上传"
+            android:textColor="#FFFFFF"
+            android:textSize="18dp" />
+
+        <Button
+            android:layout_weight="1"
+            android:id="@+id/btn_export"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="20dp"
             android:background="@drawable/bg_update"
             android:text="按标签导出联系人"
             android:textColor="#FFFFFF"
             android:textSize="18dp" />
 
+    </LinearLayout>
         <TextView
             android:textSize="18dp"
             android:layout_marginTop="20dp"
@@ -136,7 +153,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:gravity="center"
-            android:text="补充起始日期: 2019-01-01 12:15:00 "
+            android:text="点击选择补充起始日期"
             android:maxLines="1"
             android:singleLine="true"
             android:textColor="#586066"
@@ -161,7 +178,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:gravity="center"
-            android:text="补充截止日期: 2019-01-01 12:15:00 "
+            android:text="点击选择补充截止日期"
             android:maxLines="1"
             android:singleLine="true"
             android:textColor="#586066"
